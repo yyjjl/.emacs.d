@@ -1,0 +1,15 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: inline-img
+# key: ilimg
+# binding: direct-keybinding
+# --
+  #+begin_html
+<div style="height:${1:300}px">
+  <div style="float:left;width:${2:50}%;word-wrap:break-word">
+    <p>
+      ${5:content here}
+    </p>
+  </div>
+  <div style="float:right;width:${3:50}%"><img src="${4:img-src}" ></div>
+</div> 
+  #+end_html
