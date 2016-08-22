@@ -576,6 +576,23 @@ Including indent-buffer, which should not be called automatically on save."
                            (face-attribute face :foreground)
                            30)))))
 
+;; {{ emacs2ram sync
+;; (global-set-key [f6] 'emacs2ram-sync)
+
+;; (defun emacs2ram-sync ()
+;;   "call emacs2ram sync"
+;;   (interactive)
+;;   (message (shell-command-to-string "emacs2ram sync")))
+
+;; (defun emacs2ram-restore ()
+;;   "call emacs2ram restore"
+;;   (interactive)
+;;   (let (ask)
+;;     (setq ask (read-string "Are you sure to restore? " "no"))
+;;     (if (or (string= ask "yes") (string= ask "y"))
+;;         (message (shell-command-to-string "emacs2ram restore")))))
+;; }}
+
 (provide 'init-misc-lazy)
 ;;; init-misc-lazy.el ends here
 

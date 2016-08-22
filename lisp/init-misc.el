@@ -125,4 +125,14 @@
 (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
 ;; }}
 
+;; make scratch buffer unkillable
+(defun unkillable-scratch-buffer ()
+  (if (equal (buffer-name (current-buffer)) "*scratch*")
+      (progn
+        (delete-region (point-min) (point-max))
+        nil)
+    t))
+
+(add-hook 'kill-buffer-query-functions 'unkillable-scratch-buffer)
+
 (provide 'init-misc)

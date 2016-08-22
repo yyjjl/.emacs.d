@@ -65,6 +65,6 @@
 
   (setq multi-term-dedicated-close-back-to-open-buffer-p t))
 
-
+(global-set-key [f8] 'get-term)
 
 (provide 'init-term-mode)

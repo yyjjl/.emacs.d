@@ -74,4 +74,6 @@
 (with-eval-after-load 'gud
   (gud-def gud-kill "kill" "\C-k" "Kill the debuger"))
 
+(global-set-key [f5] 'gdb)
+
 (provide 'init-gud)

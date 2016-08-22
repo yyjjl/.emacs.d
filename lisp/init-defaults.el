@@ -53,7 +53,11 @@
 (setq display-time-day-and-date t)
 (display-time)
 
+;; prolog system 
 (setq prolog-system 'swi)
+
+;; regex-tool setup
+(setq regex-tool-backend 'perl)
 
 (setq-default buffers-menu-max-size 30
               case-fold-search t

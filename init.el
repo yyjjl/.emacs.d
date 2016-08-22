@@ -97,6 +97,7 @@
 (require 'init-windows)
 (require 'init-misc)
 
+(require 'after-init)
 (require 'idle-require)
 (setq idle-require-idle-delay 1)
 (setq idle-require-symbols '(init-misc-lazy
@@ -115,8 +116,8 @@
 
 ;; my personal setup, other major-mode specific setup need it.
 ;; It's dependent on init-site-lisp.el
-(if (file-exists-p "~/.emacs.d/custom.el")
-    (load-file "~/.emacs.d/custom.el"))
+;; (if (file-exists-p "~/.emacs.d/custom.el")
+;;     (load-file "~/.emacs.d/custom.el"))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

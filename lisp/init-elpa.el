@@ -95,6 +95,7 @@ ARCHIVE is the string name of the package archive.")
 (require-package 'flyspell-correct-ivy)
 (require-package 'bind-key)
 (require-package 'hydra)
+(require-package 'fcitx)
 
 ;;------------------------------------------------------------------------------
 ;; theme packages

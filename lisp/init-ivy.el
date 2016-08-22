@@ -11,6 +11,8 @@
   (setq ivy-count-format "(%d/%d) ")
   (setq ivy-re-builders-alist
         '((swiper . ivy--regex-plus)
+          ;; fuzzy search doesn't perform well
+          (counsel-descbinds . ivy--regex-plus)
           (t . my-ivy--regex-fuzzy)))
   (setq ivy-initial-inputs-alist nil)
   (setq ivy-use-virtual-buffers t)

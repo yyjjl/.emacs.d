@@ -1,4 +1,7 @@
 #! /bin/bash
+# @see http://blog.binchen.org/posts/emacs-speed-up-1000.html
+# add below code to /etc/fstab
+# tmpfs /tmp/memory tmpfs nodev,nosuid,size=128M 0 0
 
 if [ "$1" == "sync" ];then
     backup=src/emacs.d-backup

@@ -26,4 +26,11 @@
            ("C-c m s" . mc/sort-regions)
            ("C-c m R" . mc/reverse-regions))
 
+(global-set-key (kbd "M--") 'er/expand-region)
+
+(with-eval-after-load 'fcitx
+  ;; init fcitx prefix keys
+  (setq fcitx-use-dbus t)
+  (fcitx-prefix-keys-add "C-h" "M-g"))
+
 (provide 'init-editing)
