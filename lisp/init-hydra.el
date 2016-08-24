@@ -1,49 +1,6 @@
 (require 'hydra)
 
-(with-eval-after-load 'ivy
-  (defun ivy--matcher-desc ()
-    (if (eq ivy--regex-function
-            'ivy--regex-fuzzy)
-        "fuzzy"
-      "ivy"))
-
-  (defhydra hydra-ivy (:hint nil
-                             :color pink)
-    "
-^ ^ ^ ^ ^ ^ | ^Call^      ^ ^  | ^Cancel^ | ^Options^ | Action _w_/_s_/_a_: %-14s(ivy-action-name)
-^-^-^-^-^-^-+-^-^---------^-^--+-^-^------+-^-^-------+-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^---------------------------
-^ ^ _p_ ^ ^ | _f_ollow occ_u_r | _i_nsert | _c_: calling %-5s(if ivy-calling \"on\" \"off\") _C_ase-fold: %-10`ivy-case-fold-search
-_r_ ^+^ _l_ | _d_one      ^ ^  | _o_ops   | _m_: matcher %-5s(ivy--matcher-desc)^^^^^^^^^^^^ _t_runcate: %-11`truncate-lines
-^ ^ _n_ ^ ^ | _g_o        ^ ^  | ^ ^      | _<_/_>_: shrink/grow^^^^^^^^^^^^^^^^^^^^^^^^^^^^ _D_efinition of this menu
-"
-    ;; arrows
-    ("r" ivy-beginning-of-buffer)
-    ("n" ivy-next-line)
-    ("p" ivy-previous-line)
-    ("l" ivy-end-of-buffer)
-    ;; actions
-    ("o" keyboard-escape-quit :exit t)
-    ("C-g" keyboard-escape-quit :exit t)
-    ("i" nil)
-    ("C-o" nil)
-    ("f" ivy-alt-done :exit nil)
-    ("C-j" ivy-alt-done :exit nil)
-    ("d" ivy-done :exit t)
-    ("g" ivy-call)
-    ("C-m" ivy-done :exit t)
-    ("c" ivy-toggle-calling)
-    ("m" ivy-toggle-fuzzy)
-    (">" ivy-minibuffer-grow)
-    ("<" ivy-minibuffer-shrink)
-    ("w" ivy-prev-action)
-    ("s" ivy-next-action)
-    ("a" ivy-read-action)
-    ("t" (setq truncate-lines (not truncate-lines)))
-    ("C" ivy-toggle-case-fold)
-    ("u" ivy-occur :exit t)
-    ("D" (ivy-exit-with-action
-          (lambda (_) (find-function 'hydra-ivy/body)))
-     :exit t)))
+(setq hydra-lv nil)
 
 (with-eval-after-load 'org
   (defhydra hydra-org-template (:color blue :hint nil)
@@ -85,5 +42,64 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
                       (hydra-org-template/body)
                     (self-insert-command 1))) org-mode-map))
 
+(defhydra hydra-move ()
+  "move"
+  ("n" next-line )
+  ("p" previous-line )
+  ("f" forward-char )
+  ("b" backward-char )
+  ("a" move-beginning-of-line )
+  ("e" move-end-of-line )
+  ("v" scroll-up-command )
+  ;; Converting M-v to V here by analogy .
+  ("V" scroll-down-command )
+  ("l" recenter-top-bottom)
+
+  ("SPC" set-mark-command)
+  ("x" exchange-point-and-mark)
+  ("RET" nil nil))
+
+(bind-keys ("C-n" . hydra-move/next-line)
+           ("C-p" . hydra-move/previous-line)
+           ("C-b" . hydra-move/backward-char)
+           ("C-f" . hydra-move/forward-char)
+           ("C-SPC" . hydra-move/set-mark-command))
+
+;; hydra move make mc too slow
+(with-eval-after-load 'multiple-cursors-core
+  (bind-keys :map mc/keymap
+             ("C-n" . next-line)
+             ("C-p" . previous-line)
+             ("C-f" . forward-char)
+             ("C-b" . backward-char)))
+
+(defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
+                           :color pink
+                           :post (deactivate-mark))
+  "
+  ^_p_^     [_d_]delete    [_s_]string
+_b_   _f_   [_o_]ok        [_y_]yank
+  ^_n_^     [_r_]reset     [_w_]cut
+^^^^        [_x_]exchange  [_/_]undo
+^^^^        [_a_]line beg  [_e_]line end
+"
+  ("b" backward-char nil)
+  ("f" forward-char nil)
+  ("p" previous-line nil)
+  ("n" next-line nil)
+  ("a" beginning-of-line)
+  ("e" end-of-line)
+  ("x" exchange-point-and-mark nil)
+  ("w" copy-rectangle-as-kill nil)
+  ("d" delete-rectangle nil)
+  ("r" (if (region-active-p)
+           (deactivate-mark)
+         (rectangle-mark-mode 1)) nil)
+  ("y" yank-rectangle nil)
+  ("/" undo nil)
+  ("s" string-rectangle nil)
+  ("k" kill-rectangle nil)
+  ("o" nil nil))
+(define-key global-map (kbd "C-x SPC") 'hydra-rectangle/body)
 
 (provide 'init-hydra)

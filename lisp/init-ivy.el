@@ -16,7 +16,14 @@
           (t . my-ivy--regex-fuzzy)))
   (setq ivy-initial-inputs-alist nil)
   (setq ivy-use-virtual-buffers t)
-  (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-immediate-done))
+
+  (bind-keys :map ivy-minibuffer-map
+             ("C-o" . ivy-immediate-done)
+             ("C-n" . ivy-next-line)
+             ("C-p" . ivy-previous-line)
+             ("C-b" . backward-char)
+             ("C-f" . forward-char)
+             ("C-SPC" . set-mark-command)))
 
 (ivy-mode 1)
 (with-eval-after-load 'counsel

@@ -15,19 +15,31 @@
     (backward-sexp (1+ arg))
     (forward-sexp 1))
 
+  (defhydra hydra-paredit ()
+    "move"
+    ("RET" nil nil)
+    ("p" paredit-backward "b")
+    ("n" paredit-forward "f")
+    ("[" paredit-backward-up "bu")
+    ("]" paredit-forward-down "fd")
+    ("," paredit-backward-down "bd")
+    ("." paredit-forward-up "fu")
+    (">" transpose-sexps "lTr")
+    ("<" reverse-transpose-sexps "rTl"))
+
   (bind-keys :map paredit-mode-map
              ("C-M-f" . nil) ("C-M-d" . nil) ("C-M-u" . nil)
              ("C-M-b" . nil) ("C-M-p" . nil) ("C-M-n" . nil)
-             ("C-." . paredit-forward)
-             ("C-," . paredit-backward)
-             ("M-p" . paredit-backward-down)
-             ("M-n" . paredit-forward-up)
-             ("M-]" . paredit-forward-down)
-             ("M-[" . paredit-backward-up)
+             ("M-n" . hydra-paredit/paredit-forward)
+             ("M-p" . hydra-paredit/paredit-backward)
+             ("C-," . hydra-paredit/paredit-backward-down)
+             ("C-." . hydra-paredit/paredit-forward-up)
+             ("M-]" . hydra-paredit/paredit-forward-down)
+             ("M-[" . hydra-paredit/paredit-backward-up)
              ("C-<backspace>" . paredit-backward-kill-word)
              ("M-<backspace>" . backward-kill-word)
-             ("C->" . transpose-sexps)
-             ("C-<" . reverse-transpose-sexps)))
+             ("C->" . hydra-paredit/transpose-sexps)
+             ("C-<" . hydra-paredit/reverse-transpose-sexps)))
 
 
 
