@@ -35,17 +35,15 @@
   "Face for the modeline in buffers with only Flycheck off"
   :group 'flycheck-faces)
 
-(spaceline-define-segment buffer-tmp
-  "Buffer is tmp"
-  (when (is-buffer-file-temp)
-    "tmp"))
-
-(spaceline-define-segment buffer-mod
+(spaceline-define-segment buffer-mod-or-tmp
   "Buffer is modified"
-  (when (buffer-modified-p)
-    (propertize "mod"
-                'face nil
-                'help-echo "Buffer has been modified")))
+  (if (is-buffer-file-temp)
+      "tmp"
+    (when (buffer-modified-p)
+      (propertize "mod"
+                  'face nil
+                  'help-echo "Buffer has been modified"))))
+
 (spaceline-define-segment buffer-ro
   "Buffer is read-only"
   (when buffer-read-only
@@ -136,9 +134,8 @@
 
 (spaceline-install '((buffer-id :face highlight-face)
                      (major-mode process)
-                     ((buffer-mod
+                     ((buffer-mod-or-tmp
                        buffer-ro
-                       buffer-tmp
                        buffer-encoding) :separator "|"))
                    '(version-control
                      (workgroup flycheck-info)

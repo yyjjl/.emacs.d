@@ -1,10 +1,12 @@
 ;; -*- coding: utf-8 -*-
 
-(defvar best-gc-cons-threshold (* 50 1024 1024) "Best default gc threshold value. Should't be too big.")
-;; don't GC during startup to save time
-(setq gc-cons-threshold most-positive-fixnum)
+ ;; don't GC during startup to save time
+(setq gc-cons-threshold (* 100 1024 1024))
 
-(setq emacs-load-start-time (current-time))
+(defvar file-name-handler-alist-tmp file-name-handler-alist
+  "Save file-name-handler-alist temporarily and set it to nil which means on every .el and .elc file loaded during start up, it hasn't to runs those regexps against the filename.")
+(setq file-name-handler-alist nil)
+
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 ;;----------------------------------------------------------------------------
 ;; Which functionality to enable (use t or nil for true and false)
@@ -105,10 +107,6 @@
                              init-hs-minor-mode))
 (idle-require-mode 1)
 
-(when (require 'time-date nil t)
-   (message "Emacs startup time: %d seconds."
-    (time-to-seconds (time-since emacs-load-start-time))))
-
 ;;----------------------------------------------------------------------------
 ;; Locales (setting them earlier in this file doesn't work in X)
 ;;----------------------------------------------------------------------------
@@ -152,7 +150,8 @@
  '(company-tooltip-common ((t (:inherit font-lock-constant-face))))
  '(company-tooltip-selection ((t (:inherit font-lock-keyword-face :background "#4b5053")))))
 
-(setq gc-cons-threshold best-gc-cons-threshold)
+(setq file-name-handler-alist file-name-handler-alist-tmp)
+
 ;;; Local Variables:
 ;;; no-byte-compile: t
 ;;; End:

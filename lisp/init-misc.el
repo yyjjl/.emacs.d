@@ -116,9 +116,8 @@
   (setq gc-cons-threshold most-positive-fixnum))
 
 (defun my-minibuffer-exit-hook ()
-  ;; evil-mode also use minibuf
   (conditionally-paredit-mode -1)
-  (setq gc-cons-threshold best-gc-cons-threshold))
+  (setq gc-cons-threshold (* 100 1024 1024)))
 
 ;; @see http://bling.github.io/blog/2016/01/18/why-are-you-changing-gc-cons-threshold/
 (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)

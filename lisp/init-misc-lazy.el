@@ -593,6 +593,9 @@ Including indent-buffer, which should not be called automatically on save."
         (message (shell-command-to-string "emacs2ram restore")))))
 ;; }}
 
+;; blew code will make initialization fail in daemon mode
+(custom-unicode-font-size 14)
+
 (provide 'init-misc-lazy)
 ;;; init-misc-lazy.el ends here
 

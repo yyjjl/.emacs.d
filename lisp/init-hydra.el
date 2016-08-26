@@ -55,7 +55,7 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
   ("V" scroll-down-command )
   ("l" recenter-top-bottom)
 
-  ("SPC" set-mark-command)
+  ("C-SPC" set-mark-command)
   ("x" exchange-point-and-mark)
   ("RET" nil nil))
 
