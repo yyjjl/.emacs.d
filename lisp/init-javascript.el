@@ -324,9 +324,9 @@ sudo pip install jsbeautifier"
                 "utag")))
 ;; }}
 
-(add-to-list 'auto-mode-alist '("\\.json$" . js-mode))
-(add-to-list 'auto-mode-alist '("\\.jason$" . js-mode))
-(add-to-list 'auto-mode-alist '("\\.jshintrc$" . js-mode))
+(add-to-list 'auto-mode-alist '("\\.json\\'" . js-mode))
+(add-to-list 'auto-mode-alist '("\\.jason\\'" . js-mode))
+(add-to-list 'auto-mode-alist '("\\.jshintrc\\'" . js-mode))
 
 (add-to-list 'auto-mode-alist '("\\.js\\(\\.erb\\)?\\'" . js2-mode))
 (add-to-list 'interpreter-mode-alist '("node" . js2-mode))

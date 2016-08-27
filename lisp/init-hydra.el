@@ -48,8 +48,6 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
   ("p" previous-line )
   ("f" forward-char )
   ("b" backward-char )
-  ("a" move-beginning-of-line )
-  ("e" move-end-of-line )
   ("v" scroll-up-command )
   ;; Converting M-v to V here by analogy .
   ("V" scroll-down-command )
