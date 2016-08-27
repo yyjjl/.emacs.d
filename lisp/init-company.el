@@ -86,6 +86,7 @@
 ;; message-mode use company-bbdb.
 ;; So we should NOT turn on company-ispell
 (add-hook 'org-mode-hook 'company-ispell-setup)
+(add-hook 'text-mode-hook 'company-ispell-setup)
 ;; }}
 
 (with-eval-after-load 'company-etags
