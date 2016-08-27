@@ -27,7 +27,6 @@
   (require 'cl)
   (require 'cl-lib))
 
-
 (if (fboundp 'normal-top-level-add-to-load-path)
     (let* ((my-lisp-dir "~/.emacs.d/site-lisp/")
            (default-directory my-lisp-dir))

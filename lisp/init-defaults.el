@@ -93,10 +93,6 @@
 ;;Don't echo passwords when communicating with interactive programs:
 (add-hook 'comint-output-filter-functions 'comint-watch-for-password-prompt)
 
-;; automatic save place of each buffer
-;; (require 'saveplace)
-(setq-default save-place t)
-
 ;; default prog-mode setup
 (defun generic-prog-mode-hook-setup ()
   (unless (is-buffer-file-temp)

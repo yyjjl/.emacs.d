@@ -141,7 +141,6 @@
                      (workgroup flycheck-info)
                      "%I(%l-%c)%p"))
 
-
 (window-numbering-mode 1)
 (setq-default mode-line-format '("%e" (:eval (spaceline-ml-main))))
 
