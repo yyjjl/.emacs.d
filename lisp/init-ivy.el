@@ -25,7 +25,6 @@
              ("C-f" . forward-char)
              ("C-SPC" . set-mark-command)))
 
-(ivy-mode 1)
 (with-eval-after-load 'counsel
   (defun counsel-sudo-edit (&optional arg)
     "Edit currently visited file as root.
@@ -61,43 +60,40 @@ buffer is not visiting a file."
    `(("x"
       (lambda (x) (delete-file (expand-file-name x ivy--directory)))
       ,(propertize "delete" 'face 'font-lock-warning-face))))
-  (define-key read-expression-map (kbd "C-r") 'counsel-expression-history))
+  (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+  (bind-keys ("C-s" . swiper)
+             ("C-M-s" .swiper-the-thing)
+             ("C-c i r" . ivy-resume)
+             ("C-x C-f" . counsel-find-file)
+             ("C-c i l l" . counsel-load-library)
+             ("C-c i l t" . counsel-load-theme)
+             ("C-c i u" . counsel-unicode-char)
+             ("C-c i i" . counsel-imenu)
+             ("C-c i l p" . counsel-list-processes)
+             ("C-c i R" . counsel-linux-app)
+             ("C-c i v" . counsel-set-variable)
 
-(counsel-mode 1)
+             ("C-c i g t" . counsel-git)
+             ("C-c i g g " . counsel-git-grep)
+             ("C-c i g r" . counsel-git-grep-recenter)
+             ("C-c i g q" . counsel-git-grep-query-replace)
+             ("C-c i g s" . counsel-git-stash)
 
-;; add default target
+             ("C-c i m" . counsel-tmm)
+             ("C-c i a" . counsel-ag)
+             ("C-c i s" . counsel-grep)
+             ("C-c i L" . counsel-locate)
+             ("C-c i d b" . counsel-descbinds)
+             ("C-c i d f" . counsel-describe-face)
+             ("C-c i b" . counsel-bookmark)
+             ("C-c i f s" . counsel-find-symbol)
+             ("C-c i e" . counsel-sudo-edit)))
+
 (defun swiper-the-thing ()
   (interactive)
   (swiper (if (region-active-p)
               (buffer-substring-no-properties (region-beginning) (region-end))
             (thing-at-point 'symbol))))
-
-(bind-keys ("C-s" . swiper-the-thing)
-           ("C-c i r" . ivy-resume)
-           ("C-x C-f" . counsel-find-file)
-           ("C-c i l l" . counsel-load-library)
-           ("C-c i l t" . counsel-load-theme)
-           ("C-c i u" . counsel-unicode-char)
-           ("C-c i i" . counsel-imenu)
-           ("C-c i l p" . counsel-list-processes)
-           ("C-c i R" . counsel-linux-app)
-           ("C-c i v" . counsel-set-variable)
-
-           ("C-c i g t" . counsel-git)
-           ("C-c i g g " . counsel-git-grep)
-           ("C-c i g r" . counsel-git-grep-recenter)
-           ("C-c i g q" . counsel-git-grep-query-replace)
-           ("C-c i g s" . counsel-git-stash)
-
-           ("C-c i m" . counsel-tmm)
-           ("C-c i a" . counsel-ag)
-           ("C-c i s" . counsel-grep)
-           ("C-c i L" . counsel-locate)
-           ("C-c i d b" . counsel-descbinds)
-           ("C-c i d f" . counsel-describe-face)
-           ("C-c i b" . counsel-bookmark)
-           ("C-c i f s" . counsel-find-symbol)
-           ("C-c i e" . counsel-sudo-edit))
 
 
 

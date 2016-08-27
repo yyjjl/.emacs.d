@@ -3,6 +3,14 @@
   (turnon-keyfreq-mode)
   (workgroups-mode 1)
   (wg-reload-session)
+
+  (ivy-mode 1)
+  (counsel-mode 1)
+
+  (guide-key-mode 1)  ;; Enable guide-key-mode
+
+  (popwin-mode 1)  ;; Enable popwin-mode
+
   ;; make zsh work correctly in emacs
   (setq system-uses-terminfo nil)
   (fcitx-aggressive-setup)

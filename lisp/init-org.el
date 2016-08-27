@@ -13,8 +13,6 @@
   "Face used for line delimiting the end of a src block "
   :group 'org-block)
 
-(autoload 'latex-unicode-simplified "latex-pretty-symbols" nil t)
-
 (with-eval-after-load 'org
   ;; {{ NO spell check for embedded snippets
   (defun org-mode-is-code-snippet ()
@@ -109,10 +107,8 @@
     (setq evil-auto-indent nil)
     ;; org-mode's own flycheck will be loaded
     (enable-flyspell-mode-conditionally)
-    
-    (flyspell-mode -1)
 
-    (latex-unicode-simplified)
+    (flyspell-mode -1)
 
     (org-bullets-mode 1)
 

@@ -34,7 +34,6 @@
 ;; Use regex to search by default
 ;;(global-set-key (kbd "C-s") 'isearch-forward-regexp)
 (global-set-key (kbd "C-r") 'isearch-backward-regexp)
-(global-set-key (kbd "C-M-s") 'isearch-forward)
 (global-set-key (kbd "C-M-r") 'isearch-backward)
 (define-key isearch-mode-map (kbd "C-o") 'isearch-occur)
 ;; }}
@@ -53,7 +52,7 @@
 (setq display-time-day-and-date t)
 (display-time)
 
-;; prolog system 
+;; prolog system
 (setq prolog-system 'swi)
 
 ;; regex-tool setup
@@ -95,7 +94,7 @@
 (add-hook 'comint-output-filter-functions 'comint-watch-for-password-prompt)
 
 ;; automatic save place of each buffer
-(require 'saveplace)
+;; (require 'saveplace)
 (setq-default save-place t)
 
 ;; default prog-mode setup

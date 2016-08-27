@@ -1,26 +1,25 @@
 ;; popwin setup
-(require 'popwin)
-(popwin-mode 1)
-(global-set-key (kbd "C-z") popwin:keymap)
-(push '(direx:direx-mode :position left :dedicated t)
-      popwin:special-display-config)
+(with-eval-after-load 'popwin
+  (global-set-key (kbd "C-z") popwin:keymap)
+  (push '(direx:direx-mode :position left :dedicated t)
+        popwin:special-display-config)
 
-(define-key popwin:keymap "d" 'direx:jump-to-directory-other-window)
-(define-key popwin:keymap "r"
-  'direx-project:jump-to-project-root-other-window)
+  (define-key popwin:keymap "d"
+    'direx:jump-to-directory-other-window)
+  (define-key popwin:keymap "r"
+    'direx-project:jump-to-project-root-other-window))
 
 ;; {{ guide-key-mode
-(require 'guide-key)
-(setq guide-key/guide-key-sequence
-      '("C-x v" ; VCS commands
-        "C-c" "C-z" "C-x r" 
-        "C-x g"
-        "C-x 4"
-        "C-x 5"
-        (dired-mode "]" "[" "%")))
-(guide-key-mode 1)  ; Enable guide-key-mode
-(setq guide-key/recursive-key-sequence-flag t)
-(setq guide-key/idle-delay 0.5)
+(with-eval-after-load 'guide-key
+  (setq guide-key/guide-key-sequence
+        '("C-x v" ; VCS commands
+          "C-c" "C-z" "C-x r"
+          "C-x g"
+          "C-x 4"
+          "C-x 5"
+          (dired-mode "]" "[" "%")))
+  (setq guide-key/recursive-key-sequence-flag t)
+  (setq guide-key/idle-delay 0.5))
 ;; }}
 
 ;; turns on auto-fill-mode, don't use text-mode-hook because for some
@@ -39,15 +38,6 @@
            ("C-c b k" . buf-move-down)
            ("C-c b j" . buf-move-left)
            ("C-c b l" . buf-move-right))
-;; }}
-
-
-;; {{ https://github.com/nschum/highlight-symbol.el
-(autoload 'highlight-symbol "highlight-symbol" "" t)
-(autoload 'highlight-symbol-next "highlight-symbol" "" t)
-(autoload 'highlight-symbol-prev "highlight-symbol" "" t)
-(autoload 'highlight-symbol-nav-mode "highlight-symbol" "" t)
-(autoload 'highlight-symbol-query-replace "highlight-symbol" "" t)
 ;; }}
 
 (defun add-pwd-into-load-path ()
@@ -85,7 +75,12 @@
 (global-set-key (kbd "M-g l") 'avy-goto-line)
 (global-set-key (kbd "M-g w") 'avy-goto-word-1)
 (global-set-key (kbd "C-\"") 'avy-goto-char-2)
-; }}
+;; }}
+
+;; automatic save place of each buffer
+(require 'saveplace)
+(setq-default save-place t)
+(setq save-place-file "~/.emacs.d/data/places")
 
 ;; ANSI-escape coloring in compilation-mode
 ;; {{ http://stackoverflow.com/questions/13397737/ansi-coloring-in-compilation-mode
