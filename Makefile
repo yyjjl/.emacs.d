@@ -1,7 +1,6 @@
 
-default: backup
+default: profile
 
-backup:
-	@echo Begin to backup
-	@tar -jcvf data/.emacs.tar.bz2 site-lisp/ snippets/ lisp/ init.el custom.el  README.org
-	@echo Finished
+profile:
+	emacs -Q -l ~/.emacs.d/profile.el -f profile-doemacs
+
