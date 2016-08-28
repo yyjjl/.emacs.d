@@ -11,6 +11,8 @@
 
   (popwin-mode 1)  ;; Enable popwin-mode
 
+  (global-git-gutter-mode 1)
+
   ;; make zsh work correctly in emacs
   (setq system-uses-terminfo nil)
   (fcitx-aggressive-setup)

@@ -88,8 +88,6 @@
                 (message "commit hash %s => clipboard & kill-ring" (match-string 2 msg))
                 ))) )
 
-(global-git-gutter-mode 1)
-
 
 (provide 'init-git)
 

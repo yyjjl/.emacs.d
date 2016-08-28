@@ -89,6 +89,7 @@
 (require 'init-glsl-mode)
 (require 'init-company)
 (require 'init-tide)
+(require 'init-latex)
 (require 'init-semantic)
 ;; need statistics of keyfreq asap
 (require 'init-keyfreq)
@@ -164,4 +165,3 @@
 ;; Ctrl-X, u/l  to upper/lowercase regions without confirm
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
-(put 'dired-find-alternate-file 'disabled nil)

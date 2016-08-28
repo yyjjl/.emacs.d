@@ -1,13 +1,18 @@
 ;; popwin setup
+(autoload 'popwin-mode "popwin" nil t)
 (with-eval-after-load 'popwin
   (global-set-key (kbd "C-z") popwin:keymap)
+
   (push '(direx:direx-mode :position left :dedicated t)
         popwin:special-display-config)
 
   (define-key popwin:keymap "d"
     'direx:jump-to-directory-other-window)
   (define-key popwin:keymap "r"
-    'direx-project:jump-to-project-root-other-window))
+    'direx-project:jump-to-project-root-other-window)
+  ;; add :default-config-keywords '(:noselect t) in
+  ;; popwin:display-buffer make it work corrrect
+  )
 
 ;; {{ guide-key-mode
 (with-eval-after-load 'guide-key
