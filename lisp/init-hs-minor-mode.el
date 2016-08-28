@@ -13,11 +13,11 @@
 
 (setq hs-minor-mode-map
       (let ((map (make-sparse-keymap)))
-        (define-key map (kbd "C-c b h") 'hs-hide-block)
-        (define-key map (kbd "C-c b s") 'hs-show-block)
-        (define-key map (kbd "C-c b H") 'hs-hide-all)
-        (define-key map (kbd "C-c b S") 'hs-show-all)
-        (define-key map (kbd "C-c b t") 'hs-toggle-hiding)
+        (define-key map (kbd "C-c w h") 'hs-hide-block)
+        (define-key map (kbd "C-c w s") 'hs-show-block)
+        (define-key map (kbd "C-c w H") 'hs-hide-all)
+        (define-key map (kbd "C-c w S") 'hs-show-all)
+        (define-key map (kbd "C-c w t") 'hs-toggle-hiding)
         (define-key map [(shift mouse-2)] 'hs-mouse-toggle-hiding)
         map))
 

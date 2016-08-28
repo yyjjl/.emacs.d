@@ -18,14 +18,14 @@
   (defhydra hydra-paredit ()
     "move"
     ("RET" nil nil)
-    ("p" paredit-backward "b")
-    ("n" paredit-forward "f")
-    ("[" paredit-backward-up "bu")
-    ("]" paredit-forward-down "fd")
-    ("," paredit-backward-down "bd")
-    ("." paredit-forward-up "fu")
-    (">" transpose-sexps "lTr")
-    ("<" reverse-transpose-sexps "rTl"))
+    ("p" paredit-backward "←")
+    ("n" paredit-forward "→")
+    ("[" paredit-backward-up "↖")
+    ("]" paredit-forward-down "↘")
+    ("," paredit-backward-down "↙")
+    ("." paredit-forward-up "↗")
+    (">" transpose-sexps "⇌")
+    ("<" reverse-transpose-sexps "⇋"))
 
   (bind-keys :map paredit-mode-map
              ("C-M-f" . nil) ("C-M-d" . nil) ("C-M-u" . nil)

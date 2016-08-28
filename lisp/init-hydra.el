@@ -1,6 +1,6 @@
 (require 'hydra)
 
-(setq hydra-lv nil)
+;; (setq hydra-lv nil)
 
 (with-eval-after-load 'org
   (defhydra hydra-org-template (:color blue :hint nil)
@@ -37,12 +37,30 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
     (org-try-structure-completion)
     (when mod (insert mod) (forward-line)))
 
-  (bind-key "<" (lambda () (interactive)
-                  (if (looking-back "^\\s-*")
-                      (hydra-org-template/body)
-                    (self-insert-command 1))) org-mode-map))
+  (defhydra hydra-org-move (:color pink :hint nil)
+    "org move"
+    ("u" outline-up-heading "up")                ; Up
+    ("n" outline-next-visible-heading "next")      ; Next
+    ("p" outline-previous-visible-heading "prev")  ; Previous
+    ("f" outline-forward-same-level "forward")        ; Forward - same level
+    ("b" outline-backward-same-level "back")       ; Backward - same level
+    ("q" nil "quit")
+    ("<tab>" yas-expand)
+    ("RET" nil))
 
-(defhydra hydra-move ()
+  (bind-keys :map org-mode-map
+             ("<" . (lambda () (interactive)
+                      (if (looking-back "^\\s-*")
+                          (hydra-org-template/body)
+                        (self-insert-command 1))))
+             ("C-c u" . hydra-org-move/outline-up-heading)
+             ("C-c n" . hydra-org-move/outline-next-visible-heading)
+             ("C-c p" . hydra-org-move/outline-previous-visible-heading)
+             ("C-c f" . hydra-org-move/outline-forward-same-level)
+             ("C-c b" . hydra-org-move/outline-backward-same-level)))
+
+(defhydra hydra-move (:pre (setq hydra-is-helpful nil) ;; do not show lv
+                      :post (setq hydra-is-helpful t))
   "move"
   ("n" next-line )
   ("p" previous-line )
@@ -85,8 +103,8 @@ _b_   _f_   [_o_]ok        [_y_]yank
   ("f" forward-char nil)
   ("p" previous-line nil)
   ("n" next-line nil)
-  ("a" beginning-of-line)
-  ("e" end-of-line)
+  ("a" beginning-of-line nil)
+  ("e" end-of-line nil)
   ("x" exchange-point-and-mark nil)
   ("w" copy-rectangle-as-kill nil)
   ("d" delete-rectangle nil)

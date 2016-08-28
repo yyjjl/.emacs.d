@@ -34,10 +34,10 @@
 (autoload 'legalese "legalese" "" t)
 
 ;; {{ buf-move
-(bind-keys ("C-c b i" . buf-move-up)
-           ("C-c b k" . buf-move-down)
-           ("C-c b j" . buf-move-left)
-           ("C-c b l" . buf-move-right))
+(bind-keys ("C-c w i" . buf-move-up)
+           ("C-c w k" . buf-move-down)
+           ("C-c w j" . buf-move-left)
+           ("C-c w l" . buf-move-right))
 ;; }}
 
 (defun add-pwd-into-load-path ()

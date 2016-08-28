@@ -11,6 +11,8 @@
   (setq ivy-count-format "(%d/%d) ")
   (setq ivy-re-builders-alist
         '((swiper . ivy--regex-plus)
+          ;; fuzzy make ivy so slow
+          (counsel-unicode-char . ivy--regex-plus)
           ;; fuzzy search doesn't perform well
           (counsel-descbinds . ivy--regex-plus)
           (t . my-ivy--regex-fuzzy)))
@@ -87,7 +89,8 @@ buffer is not visiting a file."
              ("C-c i d f" . counsel-describe-face)
              ("C-c i b" . counsel-bookmark)
              ("C-c i f s" . counsel-find-symbol)
-             ("C-c i e" . counsel-sudo-edit)))
+             ("C-c i e" . counsel-sudo-edit)
+             ("C-c i o" . counsel-outline)))
 
 (defun swiper-the-thing ()
   (interactive)

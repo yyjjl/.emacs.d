@@ -15,7 +15,7 @@
 
 (eval-after-load 'workgroups2
   '(progn
-     (setq wg-prefix-key (kbd "C-c w"))
+     (setq wg-prefix-key (kbd "C-c z"))
 
      (setq wg-session-file (expand-file-name
                             "~/.emacs.d/data/workgroups"))

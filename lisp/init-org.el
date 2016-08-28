@@ -123,14 +123,17 @@
   (add-hook 'org-mode-hook 'org-mode-hook-setup)
 
   (bind-keys :map org-mode-map
-   ("C-c c i" . org-clock-in)
-   ("C-c c o" . org-clock-out)
-   ("C-c c c" . org-clock-in-last)
-   ("C-c c e" . org-clock-modify-effort-estimate)
-   ("C-c c q" . org-clock-cancel)
-   ("C-c c g" . org-clock-goto)
-   ("C-c c d" . org-clock-display)
-   ("C-c c r" . org-clock-report)))
+             ("C-c c i" . org-clock-in)
+             ("C-c c o" . org-clock-out)
+             ("C-c c c" . org-clock-in-last)
+             ("C-c c e" . org-clock-modify-effort-estimate)
+             ("C-c c q" . org-clock-cancel)
+             ("C-c c g" . org-clock-goto)
+             ("C-c c d" . org-clock-display)
+             ("C-c c r" . org-clock-report)
+
+             ("C-c t" . org-todo)
+             ("C-c C-t" . nil)))
 
 
 (with-eval-after-load 'org-clock

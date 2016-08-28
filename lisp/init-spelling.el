@@ -130,7 +130,6 @@
 
 (bind-keys ("C-c s" . flyspell-correct-word-generic)
            ("C-c S" . flyspell-buffer)
-           ("C-c p" . flyspell-correct-previous-word-generic)
            ("C-c 4" . ispell-word))
 
 (provide 'init-spelling)
