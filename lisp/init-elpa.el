@@ -56,10 +56,8 @@ ARCHIVE is the string name of the package archive.")
 ;; Lock org-mode temporarily:
 ;; (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
 
-(setq package-archives '(
-                         ;; ("melpa" . "http://melpa.org/packages/")
+(setq package-archives '(("melpa" . "http://melpa.org/packages/")
                          ;; ("melpa-stable" . "http://stable.melpa.org/packages/")
-                         ("melpa-extra" . "http://melpa.milkbox.net/packages/")
                          ;; uncomment below line if you need use GNU ELPA
                          ("gnu" . "http://elpa.gnu.org/packages/")
                          ))
@@ -281,5 +279,6 @@ ARCHIVE is the string name of the package archive.")
 (require-package 'cmake-mode)
 (require-package 'cpputils-cmake)
 (require-package 'gnuplot)
+
 
 (provide 'init-elpa)

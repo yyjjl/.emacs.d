@@ -71,7 +71,9 @@
   "Buffer id include remote host"
   (let* ((host (and  default-directory
                     (file-remote-p default-directory 'host)))
-         (num (window-numbering-get-number-string))
+         (num (if (bound-and-true-p window-numbering-mode)
+                  (window-numbering-get-number-string)
+                ""))
          (real-id (if host
                       (concat "%b" "@" host)
                     "%b")))

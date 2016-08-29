@@ -1,5 +1,3 @@
-(add-hook 'after-init-hook 'global-company-mode)
-
 (with-eval-after-load 'company
   ;; @see https://github.com/company-mode/company-mode/issues/348
      (unless (featurep 'company-statistics)

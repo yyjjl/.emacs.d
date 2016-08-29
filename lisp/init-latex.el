@@ -2,7 +2,7 @@
 (defun LaTeX-mode-setup ()
   (add-to-list  'company-backends 'company-auctex-labels)
   (add-to-list  'company-backends 'company-auctex-bibs)
-  (add-to-list 'company-backends '(company-auctex-macros
+  (add-to-list  'company-backends '(company-auctex-macros
                                    company-auctex-symbols
                                    company-auctex-environments))
   (turn-on-reftex)

@@ -9,10 +9,7 @@
   (define-key popwin:keymap "d"
     'direx:jump-to-directory-other-window)
   (define-key popwin:keymap "r"
-    'direx-project:jump-to-project-root-other-window)
-  ;; add :default-config-keywords '(:noselect t) in
-  ;; popwin:display-buffer make it work corrrect
-  )
+    'direx-project:jump-to-project-root-other-window))
 
 ;; {{ guide-key-mode
 (with-eval-after-load 'guide-key
