@@ -1,4 +1,6 @@
 (defun after-init-function ()
+  (global-linum-mode 1)
+
   (session-initialize)
   (turnon-keyfreq-mode)
 

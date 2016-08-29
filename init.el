@@ -53,8 +53,8 @@
 
 ;; setup emacs outlooking
 (require 'init-color-theme)
-(require 'init-modeline)
 (require 'init-gui-frames)
+(require 'init-modeline)
 
 ;; Set up $PATH
 (require 'init-exec-path)
