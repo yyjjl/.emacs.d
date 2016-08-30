@@ -53,7 +53,7 @@
     (ivy-read "commits:"
               collection
               :action (lambda (rev)
-                        (git-timemachine-show-revision rev)))))
+                        (git-timemachine-show-revision (cdr rev))))))
 
 (defun my-git-timemachine ()
   "Open git snapshot with the selected version.  Based on ivy-mode."
