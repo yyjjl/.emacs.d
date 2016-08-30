@@ -17,7 +17,6 @@
 ;;------------------------------------------------------------------------------
 (defvar package-filter-function nil
   "Optional predicate function used to internally filter packages used by package.el.
-
 The function is called with the arguments PACKAGE VERSION ARCHIVE, where
 PACKAGE is a symbol, VERSION is a vector as produced by `version-to-list', and
 ARCHIVE is the string name of the package archive.")

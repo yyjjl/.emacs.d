@@ -18,8 +18,6 @@
   (set-scroll-bar-mode nil))
 (when (fboundp 'menu-bar-mode)
   (menu-bar-mode -1))
-;; no fringe
-(fringe-mode '(8 . 0))
 
 (defun default-console-setup-frame (frame)
   (xterm-mouse-mode 1)

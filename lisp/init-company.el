@@ -25,6 +25,7 @@
   (add-to-list 'company-backends 'company-tern)
   (add-to-list 'company-backends 'company-web-html)
   (add-to-list 'company-backends 'company-shell)
+  (add-to-list 'company-backends 'company-elisp)
   (add-to-list 'company-backends 'company-files)
   ;;     (add-to-list 'company-backends 'company-web-jade)
   ;;     (add-to-list 'company-backends 'company-web-slim)

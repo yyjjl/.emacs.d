@@ -1,13 +1,7 @@
 (autoload 'spaceline-install "spaceline" nil t)
 
 (setq-default mode-line-format nil)
-(set-face-attribute 'mode-line nil
-                    :box nil)
-(set-face-attribute 'mode-line-inactive nil
-                    :box nil)
-
-(with-eval-after-load 'spaceline
-  (defface  window-numbering-face
+ (defface  window-numbering-face
     '((t (:foreground "DeepPink" :weight bold)))
     "Window number face"
     :group 'mode-line)
@@ -42,6 +36,7 @@
     "Face for the modeline when the buffer has warnings or errors"
     :group 'flycheck-faces)
 
+(with-eval-after-load 'spaceline
   (spaceline-define-segment buffer-mod-or-tmp
     "Buffer is modified"
     (if (is-buffer-file-temp)
@@ -131,15 +126,7 @@
 
   (spaceline-define-segment version-control
     "vc info"
-    (powerline-vc 'font-lock-constant-face 'r))
-
-  (defun modeline-version-ctrl ()
-    (when (and (buffer-file-name (current-buffer)) vc-mode)
-      (if (and window-system (not powerline-gui-use-vcs-glyph))
-          (format-mode-line '(vc-mode vc-mode))
-        (format " %s%s"
-                (char-to-string #xe0a0)
-                (format-mode-line '(vc-mode vc-mode)))))))
+    (powerline-vc 'font-lock-constant-face 'r)))
 
 (add-hook 'after-init-hook
           '(lambda ()
@@ -157,7 +144,19 @@
 
              (window-numbering-mode 1)
              (setq-default mode-line-format
-                           '("%e" (:eval (spaceline-ml-main))))))
+                           '("%e" (:eval (spaceline-ml-main))))
+             ;; no fringe
+             (fringe-mode '(8 . 0))
+               (require 'color nil :noerror)
+               (let ((bg (face-attribute 'default :background)))
+                 (set-face-attribute 'mode-line nil
+                        :box nil
+                        :background (color-lighten-name bg 5))
+                 (set-face-attribute 'mode-line-inactive nil
+                        :box nil
+                        :background bg)
+                 (set-face-attribute 'fringe nil
+                                     :background bg))))
 
 (require 'uniquify)
 
