@@ -4,7 +4,6 @@
               (tide-setup)
               (flycheck-mode +1)
               (setq flycheck-check-syntax-automatically '(save idle-change mode-enabled))
-              (eldoc-mode +1)
               ;; company is an optional dependency. You have to
               ;; install it separately via package-install
               ;; since I use global company mode ,I don't need the exp blew
@@ -30,7 +29,6 @@
 (add-hook 'web-mode-hook
           (lambda ()
             (when (string-equal "tsx" (file-name-extension buffer-file-name))
-              (tide-setup)
-              (eldoc-mode +1))))
+              (tide-setup))))
 
 (provide 'init-tide)

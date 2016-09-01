@@ -27,6 +27,8 @@
   (require 'cl)
   (require 'cl-lib))
 
+(load-file "~/.emacs.d/packages.el")
+
 (if (fboundp 'normal-top-level-add-to-load-path)
     (let* ((my-lisp-dir "~/.emacs.d/site-lisp/")
            (default-directory my-lisp-dir))
@@ -98,14 +100,14 @@
 (require 'init-clipboard)
 (require 'init-workgroups2)
 (require 'init-windows)
+(require 'init-hs-minor-mode)
 (require 'init-misc)
 
 (require 'after-init)
 (require 'idle-require)
 (setq idle-require-idle-delay 1)
 (setq idle-require-symbols '(init-misc-lazy
-                             init-doxygen
-                             init-hs-minor-mode))
+                             init-doxygen))
 (idle-require-mode 1)
 
 ;;----------------------------------------------------------------------------

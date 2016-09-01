@@ -10,7 +10,6 @@
          (bf (gud-find-file true-file)))
     (with-current-buffer bf
       (move-overlay ov (line-beginning-position) (line-beginning-position 2)
-                    ;;(move-overlay ov (line-beginning-position) (line-end-position)
                     (current-buffer)))))
 
 (defun gud-kill-buffer ()
@@ -25,22 +24,19 @@
   (when (string= major-mode "gud-mode")
     (goto-char (point-max))))
 
-(defadvice switch-to-buffer
-    (after switch-to-buffer-after activate)
+(defadvice switch-to-buffer (after switch-to-buffer-after activate)
   (hack-gud-mode))
 
-(defadvice select-window-by-number
-    (after select-window-by-number-after activate)
+(defadvice select-window-by-number (after select-window-by-number-after activate)
   (hack-gud-mode))
 
 ;; windmove-do-window-select is from windmove.el
-(defadvice windmove-do-window-select
-    (after windmove-do-window-select-after activate)
+(defadvice windmove-do-window-select (after windmove-do-window-select-after activate)
   (hack-gud-mode))
 ;; }}
 
 (defun gud-cls (&optional num)
-  "Clear gud scree."
+  "clear gud screen"
   (interactive "p")
   (let ((old-window (selected-window)))
     (save-excursion
@@ -51,29 +47,8 @@
         (recenter-top-bottom)
         (if (> num 1) (recenter-top-bottom))
         (select-window old-window))
-       (t (error "GUD buffer doesn't exist!"))
-       ))
-    ))
+       (t (error "GUD buffer doesn't exist!"))))))
 
-(defun gud-kill-yes ()
-  "Gud-kill and confirm with y."
-  (interactive)
-  (let ((old-window (selected-window)))
-    (save-excursion
-      (cond
-       ((buffer-live-p (get-buffer "*gud-main*"))
-        (gud-kill nil)
-        (select-window (get-buffer-window "*gud-main*"))
-        (insert "y")
-        (comint-send-input)
-        (recenter-top-bottom)
-        (select-window old-window))
-       (t (error "GUD buffer doesn't exist!"))
-       ))))
-
-(with-eval-after-load 'gud
-  (gud-def gud-kill "kill" "\C-k" "Kill the debuger"))
-
-(global-set-key [f5] 'gdb)
+(global-set-key [f5] 'gud-gdb)
 
 (provide 'init-gud)

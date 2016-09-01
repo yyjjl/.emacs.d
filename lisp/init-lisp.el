@@ -95,8 +95,7 @@
 
     (when (require 'eldoc nil t)
       (setq eldoc-idle-delay 0.2)
-      (setq eldoc-echo-area-use-multiline-p t)
-      (eldoc-mode))
+      (setq eldoc-echo-area-use-multiline-p t))
     (auto-compile-on-save-mode)
     (set-up-hippie-expand-for-elisp)
 

@@ -26,6 +26,7 @@ cookies
 /ac-comphist.dat
 \#*
 /elpa
+/elpa-stable
 eshell/
 semanticdb/
 *.swp
