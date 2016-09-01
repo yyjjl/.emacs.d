@@ -3,20 +3,36 @@
   (define-key shm-map (kbd "C-c C-s") 'shm/case-split))
 
 (with-eval-after-load 'haskell-mode
-  (setq haskell-font-lock-symbols t)
+  (setq
+   ;; Use notify.el (if you have it installed) at the end of running
+   ;; Cabal commands or generally things worth notifying.
+   haskell-font-lock-symbols t
+   haskell-notify-p t
+   ;; To enable tags generation on save.
+   haskell-tags-on-save t
+   ;; Remove annoying error popups
+   haskell-interactive-popup-errors nil
+   ;; Better import handling
+   haskell-process-suggest-remove-import-lines t
+   haskell-process-auto-import-loaded-modules t
+   ;; Disable haskell-stylish-on-save, as it breaks flycheck highlighting.
+   ;; NOTE: May not be true anymore - taksuyu 2015-10-06
+   haskell-stylish-on-save nil)
   (add-hook 'haskell-mode-hook
             (lambda ()
               (ghc-init)
 
               (flycheck-mode 1)
               (haskell-doc-mode)
+              (hindent-mode)
               ;; haskell-indentation-mode is incompatible with shm
-              (haskell-indentation-mode -1)
+              ;; (haskell-indentation-mode -1)
               (turn-on-haskell-indent)
               (structured-haskell-mode 1)
               (define-key haskell-mode-map
                 (kbd "C-'") 'company-complete))))
 
-
+(with-eval-after-load 'hindent
+  (setq hindent-process-path "~/.cabal/bin/hindent"))
 
 (provide 'init-haskell)

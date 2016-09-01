@@ -155,7 +155,7 @@
     company-ghc
     ghc
     haskell-mode
-    shm
+    shm hindent
     company-cabal
     ;;---------------------------------------
     ;; ibuffer  packages
