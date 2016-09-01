@@ -36,7 +36,7 @@
     hideshowvis
     ;; highlight braces with their depth
     rainbow-delimiters
-    spaceline
+    ;; spaceline
     ;; give very variable a special color
     rainbow-mode ;;  required by css-mode
     ;; make buffer even line and odd line having different color
