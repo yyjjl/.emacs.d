@@ -20,6 +20,7 @@
   (fcitx-aggressive-setup)
 
   (workgroups-mode 1)
+  (winner-mode 1)
   (wg-reload-session)
   (message "Emacs setup time: %s" (emacs-init-time)))
 

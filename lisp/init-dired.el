@@ -60,6 +60,9 @@ if no files marked, always operate on current line in dired-mode
              ("C-M-n" . nil)
              ("C-M-p" . nil)))
 
+(with-eval-after-load 'dired+
+  (diredp-toggle-find-file-reuse-dir 1))
+
 
 (provide 'init-dired)
 

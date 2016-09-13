@@ -33,7 +33,6 @@
          charset (font-spec :family "Noto Sans S Chinese" :size size))))))
 
 (set-frame-font "Ubuntu Mono-12")
-
 ;; (custom-unicode-font-size 14)
 
 (provide 'init-color-theme)

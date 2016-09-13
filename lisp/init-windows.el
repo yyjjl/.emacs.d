@@ -1,10 +1,7 @@
-;;----------------------------------------------------------------------------
-;; Navigate window layouts with "C-c <left>" and "C-c <right>"
-;;----------------------------------------------------------------------------
-(winner-mode 1)
 ;; copied from http://puntoblogspot.blogspot.com/2011/05/undo-layouts-in-emacs.html
-(global-set-key (kbd "C-x 4 u") 'winner-undo)
-(global-set-key (kbd "C-x 4 r") 'winner-redo)
+(with-eval-after-load 'winner
+  (global-set-key (kbd "C-c w [") 'winner-undo)
+  (global-set-key (kbd "C-c w ]") 'winner-redo))
 
 
 ;;----------------------------------------------------------------------------
@@ -17,8 +14,10 @@
       (funcall s-f)
       (set-window-buffer (next-window) (other-buffer)))))
 
-(global-set-key "\C-x2" (split-window-func-with-other-buffer 'split-window-vertically))
-(global-set-key "\C-x3" (split-window-func-with-other-buffer 'split-window-horizontally))
+(global-set-key "\C-x2"
+                (split-window-func-with-other-buffer 'split-window-vertically))
+(global-set-key "\C-x3"
+                 (split-window-func-with-other-buffer 'split-window-horizontally))
 
 ;;----------------------------------------------------------------------------
 ;; Rearrange split windows

@@ -21,7 +21,7 @@
           "C-x 5"
           (dired-mode "]" "[" "%")))
   (setq guide-key/recursive-key-sequence-flag t)
-  (setq guide-key/idle-delay 0.5))
+  (setq guide-key/idle-delay 0.3))
 ;; }}
 
 ;; turns on auto-fill-mode, don't use text-mode-hook because for some
