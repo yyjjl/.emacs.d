@@ -7,6 +7,10 @@
 (add-to-list 'auto-mode-alist '("\\.mailcap\\'" . conf-mode))
 ;; }}
 
+;; {{ gnuplot-mode
+(add-to-list 'auto-mode-alist '("\\.gpl\\'" . gnuplot-mode))
+;; }}
+
 ;; {{ groovy-mode
 (add-to-list 'auto-mode-alist '("\\.groovy\\'" . groovy-mode))
 (add-to-list 'auto-mode-alist '("\\.gradle\\'" . groovy-mode))

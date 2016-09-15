@@ -9,7 +9,9 @@
   (LaTeX-math-mode 1)
   (TeX-source-correlate-mode 1)
   (TeX-PDF-mode 1)
-  (TeX-fold-mode 1))
+  (TeX-fold-mode 1)
+
+  (setq TeX-engine 'xetex))
 
 (add-hook 'LaTeX-mode-hook 'LaTeX-mode-setup)
 
@@ -21,9 +23,10 @@
         (TeX-save-document (TeX-master-file)))
       (TeX-command TeX-command-default  'TeX-master-file -1)))
 
+  (add-to-list 'TeX-command-list
+               '("XeLaTeX" "%`xelatex%(mode)%' %t" TeX-run-TeX nil t))
 
-  (setq TeX-command-default "xelatex"
-        TeX-auto-save t
+  (setq TeX-auto-save t
         TeX-parse-self t
         TeX-syntactic-comment t
         ;; Synctex support
@@ -57,7 +60,6 @@
              ("d" . TeX-fold-dwim) ("C-o")
              ("P" . TeX-fold-paragraph) ("C-p")
              ("R" . TeX-fold-region) ("C-r"))
-
   (bind-keys :map LaTeX-mode-map
              ("C-c b" . latex-build)
              ("C-c h" . TeX-doc)
@@ -74,6 +76,29 @@
              ("C-c x s e" . latex-font-serif)
              ("C-c x o" . latex-font-oblique)
              ("C-c x u" . latex-font-upright)))
+
+(with-eval-after-load 'preview
+  (setq preview-map
+        (let ((map (make-sparse-keymap)))
+          (bind-keys :map map
+                     ("p" . preview-at-point)
+                     ("r" . preview-region)
+                     ("b" . preview-buffer)
+                     ("d" . preview-document)
+                     ("f" . preview-cache-preamble)
+                     ("c f" . preview-cache-preamble-off)
+                     ("i" . preview-goto-info-page)
+                     ;; -q" #'preview-paragraph)
+                     ("e" . preview-environment)
+                     ("s" . preview-section)
+                     ("w" . preview-copy-region-as-mml)
+                     ("c p" . preview-clearout-at-point)
+                     ("c r" . preview-clearout)
+                     ("c s" . preview-clearout-section)
+                     ("c b" . preview-clearout-buffer)
+                     ("c d" . preview-clearout-document))
+          map))
+  (define-key LaTeX-mode-map "\C-cp" preview-map))
 
 (with-eval-after-load 'reftex
   (setq reftex-plug-into-AUCTeX '(nil nil t t t)

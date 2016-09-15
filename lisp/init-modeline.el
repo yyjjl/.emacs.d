@@ -4,12 +4,12 @@
 (let ((bg (face-attribute 'default :background)))
   (set-face-attribute 'mode-line-highlight nil
                       :box nil
-                      :background (color-darken-name bg 5))
+                      :background (color-darken-name bg 10))
   (set-face-attribute 'vertical-border nil
-                      :foreground bg)
+                      :foreground (color-darken-name bg 5))
   (set-face-attribute 'mode-line nil
                       :box nil
-                      :background bg)
+                      :background (color-darken-name bg 5))
   (set-face-attribute 'mode-line-inactive nil
                       :box nil
                       :background bg)
