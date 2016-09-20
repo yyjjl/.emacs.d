@@ -35,7 +35,7 @@ Will also prompt for a file to visit if current
 buffer is not visiting a file."
     (interactive "P")
     (if (or arg (not buffer-file-name))
-        (ivy-read "Find file(as root): :" 'read-file-name-internal
+        (ivy-read "Find file(as sudo): :" 'read-file-name-internal
                   :matcher #'counsel--find-file-matcher
                   :initial-input default-directory
                   :action

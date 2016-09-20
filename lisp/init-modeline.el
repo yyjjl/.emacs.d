@@ -1,21 +1,5 @@
 (setq-default mode-line-format nil)
 
-(require 'color nil :noerror)
-(let ((bg (face-attribute 'default :background)))
-  (set-face-attribute 'mode-line-highlight nil
-                      :box nil
-                      :background (color-darken-name bg 10))
-  (set-face-attribute 'vertical-border nil
-                      :foreground (color-darken-name bg 5))
-  (set-face-attribute 'mode-line nil
-                      :box nil
-                      :background (color-darken-name bg 5))
-  (set-face-attribute 'mode-line-inactive nil
-                      :box nil
-                      :background bg)
-  (set-face-attribute 'fringe nil
-                      :background bg))
-
 (defface  window-numbering-face
   '((t (:foreground "DeepPink" :weight bold)))
   "Window number face"
@@ -57,8 +41,9 @@
              (window-numbering-mode 1)
              (setq-default mode-line-format
                            '("%e" (:eval (generate-mode-line))))
+
              ;; no fringe
-             (fringe-mode '(8 . 0))))
+             (fringe-mode '(8 . 8))))
 
 (defun mode-line-buffer-id ()
     (let* ((host (and  default-directory

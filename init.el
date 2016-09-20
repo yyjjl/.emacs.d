@@ -167,3 +167,4 @@
 ;; Ctrl-X, u/l  to upper/lowercase regions without confirm
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
+(put 'erase-buffer 'disabled nil)

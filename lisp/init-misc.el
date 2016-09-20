@@ -97,7 +97,8 @@
 ;; {{ tramp setup
 ;; @see http://www.quora.com/Whats-the-best-way-to-edit-remote-files-from-Emacs
 (setq tramp-default-method "ssh")
-(setq tramp-auto-save-directory "~/.emacs.d/data/tramp/")
+(setq trampv-auto-save-directory "~/.emacs.d/data/tramp/")
+(setq tramp-backup-directory-alist '(("." . "~/.emacs.d/data/tramp/")))
 (setq tramp-chunksize 8192)
 ;; @see https://github.com/syl20bnr/spacemacs/issues/1921
 (setq tramp-ssh-controlmaster-options

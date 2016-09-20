@@ -1,0 +1,5 @@
+#+title: artist-mode
+
+artist-mode可以用ASCII字符画线,矩形,多边形,椭圆等图形
+
+* 

@@ -30,7 +30,7 @@
 
 ;; Write backup files to own directory
 (if (not (file-exists-p (expand-file-name "~/.emacs.d/data/backups")))
-  (make-directory (expand-file-name "~/.emacs.d/data/backups")))
+    (make-directory (expand-file-name "~/.emacs.d/data/backups")))
 (setq backup-by-coping t ; don't clobber symlinks
       backup-directory-alist '(("." . "~/.emacs.d/data/backups"))
       delete-old-versions t
@@ -44,16 +44,16 @@
 
 ;; I'm in Australia now, so I set the locale to "en_AU"
 (defun insert-date (prefix)
-    "Insert the current date.
+  "Insert the current date.
 With prefix-argument, use ISO format.  With
 two PREFIX arguments, write out the day and month name."
-    (interactive "P")
-    (let ((format (cond
-                   ((not prefix) "%d.%m.%Y")
-                   ((equal prefix '(4)) "%Y-%m-%d")
-                   ((equal prefix '(16)) "%d %B %Y")))
-          )
-      (insert (format-time-string format))))
+  (interactive "P")
+  (let ((format (cond
+                 ((not prefix) "%d.%m.%Y")
+                 ((equal prefix '(4)) "%Y-%m-%d")
+                 ((equal prefix '(16)) "%d %B %Y")))
+        )
+    (insert (format-time-string format))))
 
 ;;compute the length of the marked region
 (defun region-length ()
@@ -81,7 +81,7 @@ two PREFIX arguments, write out the day and month name."
       (if (< (abs (- (point) p1))
              (abs (- (point) p2)))
           (goto-char p2)
-          (goto-char p1))
+        (goto-char p1))
       )))
 ;; }}
 
@@ -94,8 +94,8 @@ two PREFIX arguments, write out the day and month name."
   (insert (format "ASCII characters up to number %d.\n" 254))
   (let ((i 0))
     (while (< i 254)
-           (setq i (+ i 1))
-           (insert (format "%4d %c\n" i i))))
+      (setq i (+ i 1))
+      (insert (format "%4d %c\n" i i))))
   (beginning-of-buffer))
 
 ;; {{ grep and kill-ring
@@ -211,8 +211,8 @@ The full path into relative path insert it as a local file link in `org-mode'"
 
     ;; convert to relative path (relative to current buffer) if possible
     (let ((m (string-match (file-name-directory (buffer-file-name)) str) ))
-        (if (and m (= 0 m ))
-            (setq str (substring str (length (file-name-directory (buffer-file-name))))))
+      (if (and m (= 0 m ))
+          (setq str (substring str (length (file-name-directory (buffer-file-name))))))
       (insert (format "[[file:%s]]" str))
       )))
 
@@ -252,11 +252,11 @@ The full path into relative path insert it as a local file link in `org-mode'"
         (shell-command (concat "cat " file "|base64") 1)
         (setq str (replace-regexp-in-string "\n" "" (buffer-string))))
       (setq rlt (concat "background:url(\"data:image/"
-                          file-ext
-                          ";base64,"
-                          str
-                          "\") no-repeat 0 0;"
-                          ))))
+                        file-ext
+                        ";base64,"
+                        str
+                        "\") no-repeat 0 0;"
+                        ))))
     (kill-new rlt)
     (copy-yank-str rlt)
     (message "css code => clipboard & yank ring")))
@@ -447,8 +447,8 @@ Including indent-buffer, which should not be called automatically on save."
       ;; the (line-beginning-position) of the line which is after the last selected
       ;; line is always (region-end)! Don't know why.
       (if (and (> e b)
-               (save-excursion (goto-char e) (= e (line-beginning-position)))
-               (boundp 'evil-state) (eq evil-state 'visual))
+              (save-excursion (goto-char e) (= e (line-beginning-position)))
+              (boundp 'evil-state) (eq evil-state 'visual))
           (setq e (1- e)))
       (goto-char b)
       (setq b (line-beginning-position))
@@ -527,8 +527,8 @@ Including indent-buffer, which should not be called automatically on save."
 (defun zeal-search (&optional arg)
   (interactive)
   (let* ((thing (if mark-active
-                   (buffer-substring (region-beginning) (region-end))
-                 (thing-at-point 'symbol)))
+                    (buffer-substring (region-beginning) (region-end))
+                  (thing-at-point 'symbol)))
          (search (concat (ivy-read (concat "Docset to search "
                                            (unless (null thing) (concat "(" thing ")"))
                                            ": ")
@@ -536,7 +536,7 @@ Including indent-buffer, which should not be called automatically on save."
                                    :history 'zeal-search-history
                                    :initial-input
                                    (car (split-string (symbol-name major-mode) "-")))
-                        ":")))
+                         ":")))
     (if (null thing)
         (setq search (read-string "Zeal search:" search))
       (setq search (concat search thing)))
@@ -564,6 +564,10 @@ Including indent-buffer, which should not be called automatically on save."
 (require 'midnight)
 (setq midnight-mode t)
 
+
+;; --------------------------------------------------------------------------------
+;; color-theme setting need lazy load
+;; --------------------------------------------------------------------------------
 ;; make rainbow-delimiters more saturate
 ;; I don't know why it make daemon mode crash
 (with-eval-after-load 'rainbow-delimiters
@@ -575,7 +579,22 @@ Including indent-buffer, which should not be called automatically on save."
                           (color-saturate-name
                            (face-attribute face :foreground)
                            30)))))
+(require 'color nil :noerror)
 
+(let ((bg (face-attribute 'default :background)))
+  (set-face-attribute 'mode-line-highlight nil
+                      :box nil
+                      :background (color-darken-name bg 10))
+  (set-face-attribute 'vertical-border nil
+                      :foreground (color-darken-name bg 3))
+  (set-face-attribute 'mode-line nil
+                      :box nil
+                      :background (color-darken-name bg 3))
+  (set-face-attribute 'mode-line-inactive nil
+                      :box nil
+                      :background bg)
+  (set-face-attribute 'fringe nil
+                      :background bg))
 ;; {{ emacs2ram sync
 (global-set-key [f6] 'emacs2ram-sync)
 
