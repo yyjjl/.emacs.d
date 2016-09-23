@@ -94,5 +94,4 @@
                           (derived-mode-p 'groovy-mode))
                 (my-c-mode-setup)))))
 
-
 (provide 'init-cc-mode)

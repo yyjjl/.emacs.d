@@ -54,22 +54,11 @@
              ("C-p" . hydra-picture-move/picture-move-up)))
 
 (with-eval-after-load 'artist
-  (defhydra hydra-artist-move (:pre (setq hydra-is-helpful nil) ;; do not show lv
-                             :post (setq hydra-is-helpful t))
-    "move"
-    ("n" artist-next-line)
-    ("p" artist-previous-line)
-    ("f" artist-forward-char)
-    ("b" artist-backward-char)
-
-    ("C-SPC" set-mark-command)
-    ("RET" nil nil))
-
   (bind-keys :map artist-mode-map
-             ("C-p" . hydra-artist-move/artist-previous-line)
-             ("C-n" . hydra-artist-move/artist-next-line)
-             ("C-b" . hydra-artist-move/artist-backward-char)
-             ("C-f" . hydra-artist-move/artist-forward-char)
+             ("p" . artist-previous-line)
+             ("n" . artist-next-line)
+             ("b" . artist-backward-char)
+             ("f" . artist-forward-char)
 
              ("C-c a e" . artist-select-erase-char)
              ("C-c a f" . artist-select-fill-char)

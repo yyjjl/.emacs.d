@@ -18,7 +18,7 @@
 ;; config cjk fonts
 (add-to-list 'default-frame-alist '(font . "Ubuntu Mono-12"))
 
-(defvar current-unicode-font-size 14
+(defvar current-unicode-font-size 18
   "default-unicode-font-size")
 (defun custom-unicode-font-size (&optional s)
   "set font height"

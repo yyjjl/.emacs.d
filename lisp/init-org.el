@@ -105,7 +105,7 @@
 
   (defun org-mode-hook-setup ()
     (setq evil-auto-indent nil)
-    ;; org-mode's own flycheck will be loaded
+    ;; org-mode's own flyspell will be loaded
     (enable-flyspell-mode-conditionally)
 
     (flyspell-mode -1)

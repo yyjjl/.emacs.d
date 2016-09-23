@@ -613,7 +613,7 @@ Including indent-buffer, which should not be called automatically on save."
 ;; }}
 
 ;; blew code will make initialization fail in daemon mode
-(custom-unicode-font-size 18)
+(custom-unicode-font-size current-unicode-font-size)
 
 (provide 'init-misc-lazy)
 ;;; init-misc-lazy.el ends here
