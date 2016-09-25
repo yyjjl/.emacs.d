@@ -11,7 +11,9 @@
   (TeX-PDF-mode 1)
   (TeX-fold-mode 1)
 
-  (setq TeX-engine 'xetex))
+  (setq TeX-engine 'xetex)
+
+  (outline-minor-mode 1))
 
 (add-hook 'LaTeX-mode-hook 'LaTeX-mode-setup)
 
@@ -35,7 +37,7 @@
         LaTeX-fill-break-at-separators nil))
 
 (with-eval-after-load 'latex
-  (setq TeX-fold-command-prefix (kbd "C-c o"))
+  (setq TeX-fold-command-prefix (kbd "C-c f"))
 
   (require 'tex-fold)
 
@@ -103,5 +105,29 @@
 (with-eval-after-load 'reftex
   (setq reftex-plug-into-AUCTeX '(nil nil t t t)
         reftex-use-fonts t))
+
+(setq outline-minor-mode-prefix "\C-co")
+(with-eval-after-load 'outline
+  (bind-keys :map outline-mode-prefix-map
+             ("C-a")   ("a" . show-all)
+             ("C-b")   ("b" . outline-backward-same-level)
+             ("C-f")   ("f" . outline-forward-same-level)
+             ("C-c")   ("h" . hide-entry)
+             ("C-d")   ("d" . hide-subtree)
+             ("C-e")   ("s" . show-entry)
+             ("C-n")   ("n" . outline-next-visible-heading)
+             ("C-p")   ("p" . outline-previous-visible-heading)
+             ("C-k")   ("k" . show-branches)
+             ("C-l")   ("l" . hide-leaves)
+             ("C-o")   ("o" . hide-other)
+             ("C-q")   ("q" . hide-sublevels)
+             ("C-x")   ("x" . show-subtree)
+             ("C-t")   ("t" . hide-body)
+             ("C-u")   ("u" . outline-up-heading)
+             ("C-v")   ("v" . outline-move-subtree-down)
+             ("C-^")   ("6" . outline-move-subtree-up)
+             ("C-<")   ("<" . outline-promote)
+             ("C->")   (">" . outline-demote)
+             ("@")  ("m" . outline-mark-subtree)))
 
 (provide 'init-latex)
