@@ -4,7 +4,6 @@
     ;; or just check https://github.com/jorgenschaefer/elpy
     (semantic-mode 1)
     (semantic-idle-summary-mode -1)
-    (elpy-enable)
     (flycheck-mode 1)
     (local-set-key (kbd "<backtab>") 'elpy-autopep8-fix-code)
     ;; http://emacs.stackexchange.com/questions/3322/python-auto-indent-problem/3338#3338
@@ -21,5 +20,7 @@
   (bind-keys :map elpy-mode-map
              ("C-c C-n" . nil)
              ("C-c C-p" . nil)))
+;; may take a long time 
+(elpy-enable)
 
 (provide 'init-python-mode)

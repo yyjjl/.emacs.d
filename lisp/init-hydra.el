@@ -59,6 +59,15 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
              ("C-c f" . hydra-org-move/outline-forward-same-level)
              ("C-c b" . hydra-org-move/outline-backward-same-level)))
 
+(defhydra hydra-resize-window (:pre (setq hydra-is-helpful nil)
+                                    :post (setq hydra-is-helpful t))
+  "shrink"
+  ("{" shrink-window-horizontally)
+  ("}" enlarge-window-horizontally)
+  ("^" enlarge-window)
+  ("_" shrink-window)
+  ("RET" nil nil))
+
 (defhydra hydra-move (:pre (setq hydra-is-helpful nil) ;; do not show lv
                       :post (setq hydra-is-helpful t))
   "move"
@@ -79,7 +88,11 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
            ("C-p" . hydra-move/previous-line)
            ("C-b" . hydra-move/backward-char)
            ("C-f" . hydra-move/forward-char)
-           ("C-SPC" . hydra-move/set-mark-command))
+           ("C-SPC" . hydra-move/set-mark-command)
+           ("C-x {" . hydra-resize-window/shrink-window-horizontally)
+           ("C-x }" . hydra-resize-window/enlarge-winodw-horizontally)
+           ("C-x ^" . hydra-resize-window/enlarge-window)
+           ("C-x _" . hydra-resize-window/shrink-window))
 
 ;; hydra move make mc too slow
 (with-eval-after-load 'multiple-cursors-core

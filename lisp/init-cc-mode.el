@@ -94,4 +94,7 @@
                           (derived-mode-p 'groovy-mode))
                 (my-c-mode-setup)))))
 
+(with-eval-after-load 'bison-mode
+  (setq bison-electric-open-brace-v nil))
+
 (provide 'init-cc-mode)

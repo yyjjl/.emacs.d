@@ -155,6 +155,34 @@
   (add-hook 'org-clock-out-hook 'sanityinc/hide-org-clock-from-header-line)
   (add-hook 'org-clock-cancel-hook 'sanityinc/hide-org-clock-from-header-line))
 
+
+(setq outline-minor-mode-prefix "\C-co")
+(with-eval-after-load 'outline
+  (let ((map (make-sparse-keymap)))
+    (bind-keys :map map
+               ("a" . show-all)
+               ("b" . outline-backward-same-level)
+               ("f" . outline-forward-same-level)
+               ("h" . hide-entry)
+               ("d" . hide-subtree)
+               ("s" . show-entry)
+               ("n" . outline-next-visible-heading)
+               ("p" . outline-previous-visible-heading)
+               ("k" . show-branches)
+               ("l" . hide-leaves)
+               ("o" . hide-other)
+               ("q" . hide-sublevels)
+               ("x" . show-subtree)
+               ("t" . hide-body)
+               ("u" . outline-up-heading)
+               ("v" . outline-move-subtree-down)
+               ("6" . outline-move-subtree-up)
+               ("<" . outline-promote)
+               (">" . outline-demote)
+               ("m" . outline-mark-subtree))
+    (define-key outline-minor-mode-map outline-minor-mode-prefix
+      map)))
+
 (with-eval-after-load 'ox-latex
 
   (setq org-latex-pdf-process '("xelatex -shell-escape -interaction nonstopmode %f"
