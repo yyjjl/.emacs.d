@@ -139,6 +139,7 @@
  '(recentf-save-file "~/.emacs.d/data/recentf")
  '(safe-local-variable-values (quote ((lentic-init . lentic-orgel-org-init))))
  '(savehist-file "~/.emacs.d/data/history")
+ '(send-mail-function (quote smtpmail-send-it))
  '(session-save-file "~/.emacs.d/data/session")
  '(session-use-package t nil (session))
  '(smex-save-file "~/.emacs.d/data/smex-items")

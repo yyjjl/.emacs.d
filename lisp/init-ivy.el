@@ -74,6 +74,7 @@ buffer is not visiting a file."
              ("C-c i l p" . counsel-list-processes)
              ("C-c i R" . counsel-linux-app)
              ("C-c i v" . counsel-set-variable)
+             ("C-c i j" . counsel-file-jump)
 
              ("C-c i g t" . counsel-git)
              ("C-c i g g " . counsel-git-grep)
@@ -83,7 +84,8 @@ buffer is not visiting a file."
 
              ("C-c i m" . counsel-tmm)
              ("C-c i a" . counsel-ag)
-             ("C-c i s" . counsel-grep)
+             ("C-c i /" . counsel-grep)
+             ("C-c i s" . counsel-semantic)
              ("C-c i L" . counsel-locate)
              ("C-c i d b" . counsel-descbinds)
              ("C-c i d f" . counsel-describe-face)
