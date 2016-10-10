@@ -193,33 +193,23 @@
   (setq org-latex-default-class "cn-article")
   (add-to-list 'org-latex-classes
                '("cn-article"
-                 "\\documentclass[11pt,a4paper]{article}
-\\usepackage{graphicx}
-\\usepackage{xcolor}
-\\usepackage{xeCJK}
-\\usepackage{lmodern}
-\\usepackage{verbatim}
-\\usepackage{longtable}
-\\usepackage{float}
-\\usepackage{tikz}
-\\usepackage{wrapfig}
-\\usepackage{soul}
-\\usepackage{textcomp}
+                 "\\documentclass[aps,pre,12pt,preprint,onecolumn,showpacs,showkeys]{revtex4-1}
+\\usepackage{ctex}
+\\usepackage{setspace,dcolumn}
+\\usepackage{subfig}
+\\usepackage{hyperref}
+\\usepackage{graphicx,psfrag,epsfig}
+\\usepackage[font=small,format=plain,labelfont=bf,textfont=it,justification=raggedright,singlelinecheck=false]{caption}
 \\usepackage{minted}
 \\usepackage{mdframed}
-\\usepackage{amsmath}
-\\usepackage[xetex,colorlinks=true,CJKbookmarks=true,
-linkcolor=green,
-urlcolor=blue,
-menucolor=blue]{hyperref}
-\\usepackage{fontspec,xunicode,xltxtra}
-\\setmainfont{Ubuntu Mono} %英文缺省
-\\setsansfont{Ubuntu Mono} %英文无衬线
-\\setmonofont{Ubuntu Mono}% 英文打字机
-\\setCJKmainfont{STKaiti} %中文缺省
-\\setCJKsansfont{Noto San S Chinese} %中文无衬线
-\\setCJKmonofont{STSong}% 中文打字机
-\\hypersetup{unicode=true}
+\\usepackage{amsmath,amsfonts,amssymb,amsthm,bm,upgreek}
+\\usepackage{geometry}
+\\usepackage[mathscr]{eucal}
+\\usepackage{background}
+\\SetBgContents{ } %Waterstamp to prevent copying
+\\SetBgScale{5}
+\\hypersetup{colorlinks=true}
+\\geometry{top=2.54cm,bottom=2.54cm,left=3cm,right=3cm}
 \\definecolor{bg}{rgb}{0.95,0.95,0.95}
 \\surroundwithmdframed{minted}
 \\mdfsetup{

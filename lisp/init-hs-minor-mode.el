@@ -9,7 +9,8 @@
                 ))
       (add-hook hook (lambda ()
                        (unless (is-buffer-file-temp)
-                         (hs-minor-mode)))))
+                         (hs-minor-mode)
+                         (hideshowvis-enable)))))
 
 (setq hs-minor-mode-map
       (let ((map (make-sparse-keymap)))
@@ -73,8 +74,6 @@
   (make-local-variable 'hs-hide-all)
   (make-variable-buffer-local 'fold-all-fun)
   (make-variable-buffer-local 'fold-fun)
-
-  (hideshowvis-enable)
 
   (defadvice goto-line (after expand-after-goto-line activate compile)
     (save-excursion (hs-show-block)))

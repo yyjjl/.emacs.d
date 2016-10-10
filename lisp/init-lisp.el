@@ -68,7 +68,8 @@
   (enable-paredit-mode)
 
   (rainbow-delimiters-mode t)
-  (semantic-mode 1)
+  (when (require 'semantic/bovine/el nil t)
+    (semantic-mode 1))
   (show-paren-mode 1)
   (hl-sexp-mode 1)
   (prettify-symbols-mode 1)
@@ -92,7 +93,6 @@
 (defun elisp-mode-hooks ()
   "lisp-mode-hooks"
   (unless (is-buffer-file-temp)
-
     (when (require 'eldoc nil t)
       (setq eldoc-idle-delay 0.2)
       (setq eldoc-echo-area-use-multiline-p t))

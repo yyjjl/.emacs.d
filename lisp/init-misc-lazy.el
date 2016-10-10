@@ -521,7 +521,7 @@ Including indent-buffer, which should not be called automatically on save."
 (defvar zeal-docsets '(angularjs
                        bash bootstrap c c++ css cmake
                        elisp express flask go haskell html jinja lisp "emacs lisp"
-                       latex less markdown nodejs opengl perl
+                       latex less markdown nodejs opengl perl vue
                        python sailsjs scipy typescript jquery))
 (defvar zeal-search-history nil)
 (defun zeal-search (&optional arg)

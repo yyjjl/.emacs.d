@@ -82,6 +82,7 @@ buffer is not visiting a file."
              ("C-c i g q" . counsel-git-grep-query-replace)
              ("C-c i g s" . counsel-git-stash)
 
+             ("C-c i h" . counsel-shell-command-history)
              ("C-c i m" . counsel-tmm)
              ("C-c i a" . counsel-ag)
              ("C-c i /" . counsel-grep)

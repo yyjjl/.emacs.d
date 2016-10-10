@@ -68,40 +68,6 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
   ("_" shrink-window)
   ("RET" nil nil))
 
-(defhydra hydra-move (:pre (setq hydra-is-helpful nil) ;; do not show lv
-                      :post (setq hydra-is-helpful t))
-  "move"
-  ("n" next-line )
-  ("p" previous-line )
-  ("f" forward-char )
-  ("b" backward-char )
-  ("v" scroll-up-command )
-  ;; Converting M-v to V here by analogy .
-  ("V" scroll-down-command )
-  ("l" recenter-top-bottom)
-
-  ("C-SPC" set-mark-command)
-  ("x" exchange-point-and-mark)
-  ("RET" nil nil))
-
-(bind-keys ("C-n" . hydra-move/next-line)
-           ("C-p" . hydra-move/previous-line)
-           ("C-b" . hydra-move/backward-char)
-           ("C-f" . hydra-move/forward-char)
-           ("C-SPC" . hydra-move/set-mark-command)
-           ("C-x {" . hydra-resize-window/shrink-window-horizontally)
-           ("C-x }" . hydra-resize-window/enlarge-winodw-horizontally)
-           ("C-x ^" . hydra-resize-window/enlarge-window)
-           ("C-x _" . hydra-resize-window/shrink-window))
-
-;; hydra move make mc too slow
-(with-eval-after-load 'multiple-cursors-core
-  (bind-keys :map mc/keymap
-             ("C-n" . next-line)
-             ("C-p" . previous-line)
-             ("C-f" . forward-char)
-             ("C-b" . backward-char)))
-
 (defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
                            :color pink
                            :post (deactivate-mark))

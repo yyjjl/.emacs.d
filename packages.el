@@ -89,7 +89,8 @@
     ;; provide tree style search jump
     avy
     ;; find files in project (in directory which has .git)
-    find-file-in-project ;;  lpy
+    find-file-in-project ;;
+    wgrep
     ;;---------------------------------------
     ;; c/c++  packages
     ;;---------------------------------------

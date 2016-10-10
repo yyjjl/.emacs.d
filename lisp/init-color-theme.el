@@ -16,9 +16,9 @@
       "^\\(w3-\\|dropdown-\\|info-\\|linum\\|yas-\\|font-lock-\\)")
 
 ;; config cjk fonts
-(add-to-list 'default-frame-alist '(font . "Ubuntu Mono-11"))
+(add-to-list 'default-frame-alist '(font . "Monaco-10"))
 
-(defvar current-unicode-font-size 18
+(defvar current-unicode-font-size 20
   "default-unicode-font-size")
 (defun custom-unicode-font-size (&optional s)
   "set font height"
@@ -32,7 +32,7 @@
          (frame-parameter nil 'font)
          charset (font-spec :family "Noto Sans S Chinese" :size size))))))
 
-(set-frame-font "Ubuntu Mono-11")
+(set-frame-font "Monaco-10")
 
 ;; (custom-unicode-font-size 14)
 
