@@ -16,11 +16,12 @@
 (add-hook 'python-mode-hook 'python-mode-hook-setup)
 
 (with-eval-after-load 'elpy
-  (setq elpy-modules (delete 'elpy-module-flymake elpy-modules))
+  (setq elpy-rpc-backend "jedi"
+        elpy-rpc-python-command "python3"
+        python-shell-interpreter "python3"
+        elpy-modules (delete 'elpy-module-flymake elpy-modules))
   (bind-keys :map elpy-mode-map
              ("C-c C-n" . nil)
              ("C-c C-p" . nil)))
-;; may take a long time 
-(elpy-enable)
 
 (provide 'init-python-mode)

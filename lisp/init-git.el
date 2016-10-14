@@ -75,8 +75,42 @@
            ("C-x g m" . git-messenger:popup-message))
 
 (with-eval-after-load 'git-gutter
-  (setq git-gutter:handled-backends '(svn hg git))
-  (git-gutter:linum-setup))
+  (require 'git-gutter-fringe)
+  (require 'fringe-helper)
+  (set-face-foreground 'git-gutter-fr:modified "yellow")
+  (set-face-foreground 'git-gutter-fr:added    "green")
+  (set-face-foreground 'git-gutter-fr:deleted  "red")
+  (fringe-helper-define 'git-gutter-fr:deleted nil
+    "........"
+    "........"
+    "........"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "........"
+    "........"
+    "........")
+
+  (fringe-helper-define 'git-gutter-fr:added nil
+    "...XX..."
+    "...XX..."
+    "...XX..."
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "...XX..."
+    "...XX..."
+    "...XX...")
+
+  (fringe-helper-define 'git-gutter-fr:modified nil
+    "........"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "........"
+    "........"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "........")
+  (setq git-gutter:handled-backends '(svn hg git)
+        git-gutter-fr:side 'right-fringe))
 
 (with-eval-after-load 'git-messenger
   (setq git-messenger:show-detail t)

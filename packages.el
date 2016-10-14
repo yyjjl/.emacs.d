@@ -17,7 +17,7 @@
     keyfreq
     session
     multi-term
-    flycheck
+    flycheck flycheck-pos-tip
     counsel hydra ivy swiper
     smex ;; counsel-M-x need smex to get history
     flyspell-correct-ivy flyspell-correct
@@ -106,7 +106,7 @@
     gitignore-mode
     gitconfig-mode
     git-messenger
-    git-gutter
+    git-gutter-fringe git-gutter
     git-link
     git-timemachine
     ;;---------------------------------------
@@ -178,5 +178,5 @@
     groovy-mode
     cmake-mode
     cpputils-cmake
-    gnuplot)
+    gnuplot graphviz-dot-mode)
   "packages required")

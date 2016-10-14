@@ -42,6 +42,7 @@
   (setq company-require-match nil)
   (setq company-etags-ignore-case t)
   (setq company-minimum-prefix-length 2)
+
   ;; @see https://github.com/redguardtoo/emacs.d/commit/2ff305c1ddd7faff6dc9fa0869e39f1e9ed1182d
   (defadvice company-in-string-or-comment (around company-in-string-or-comment-hack activate)
     ;; you can use (ad-get-arg 0) and (ad-set-arg 0) to tweak the arguments

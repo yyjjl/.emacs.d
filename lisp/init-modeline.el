@@ -40,10 +40,7 @@
           '(lambda ()
              (window-numbering-mode 1)
              (setq-default mode-line-format
-                           '("%e" (:eval (generate-mode-line))))
-
-             ;; no fringe
-             (fringe-mode '(8 . 8))))
+                           '("%e" (:eval (generate-mode-line))))))
 
 (defun mode-line-buffer-id ()
     (let* ((host (and  default-directory

@@ -1,6 +1,4 @@
 (defun after-init-function ()
-  (global-linum-mode 1)
-
   (session-initialize)
   (turnon-keyfreq-mode)
 
@@ -12,12 +10,18 @@
   (popwin-mode 1)  ;; Enable popwin-mode
 
   (global-git-gutter-mode 1)
+;;  (git-gutter:linum-setup)
+
+  (global-linum-mode 1)
 
   (global-company-mode 1)
 
   ;; make zsh work correctly in emacs
   (setq system-uses-terminfo nil)
   (fcitx-aggressive-setup)
+
+  ;; may take a long time
+  (elpy-enable)
 
   (workgroups-mode 1)
   (winner-mode 1)
