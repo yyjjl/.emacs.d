@@ -178,5 +178,5 @@
     groovy-mode
     cmake-mode
     cpputils-cmake
-    gnuplot graphviz-dot-mode)
+    graphviz-dot-mode)
   "packages required")

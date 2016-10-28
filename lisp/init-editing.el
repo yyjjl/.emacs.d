@@ -22,7 +22,7 @@
            ("C-c m r" . mc/mark-all-in-region-regexp)
 
            ("C-c m i" . mc/insert-numbers)
-           ("C-c m I" . mc/insert-letters)
+           ("C-c m L" . mc/insert-letters)
            ("C-c m s" . mc/sort-regions)
            ("C-c m R" . mc/reverse-regions))
 

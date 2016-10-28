@@ -39,6 +39,14 @@
     (message "NO git-gutters!")))
 ;; }}
 
+(defun my-git-log-graph ()
+  (interactive)
+  (multi-term)
+  (let ((buffer (last-term-buffer (buffer-list))))
+    (if buffer
+        (with-current-buffer buffer
+          (term-send-raw-string "git lg\n")))))
+
 ;; @see http://blog.binchen.org/posts/new-git-timemachine-ui-based-on-ivy-mode.html
 ;; {{ git-timemachine
 (defun my-git-timemachine-show-selected-revision ()
@@ -70,9 +78,10 @@
            ("C-x n" . git-gutter:next-hunk)
            ("C-x p" . git-gutter:previous-hunk)
            ("C-x g g" . my-goto-git-gutter)
-           ("C-x g l" . git-link)
+           ("C-x g L" . git-link)
            ("C-x g c" . git-link-commit)
-           ("C-x g m" . git-messenger:popup-message))
+           ("C-x g m" . git-messenger:popup-message)
+           ("C-x g l" . my-git-log-graph))
 
 (with-eval-after-load 'git-gutter
   (require 'git-gutter-fringe)

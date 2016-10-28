@@ -586,13 +586,13 @@ Including indent-buffer, which should not be called automatically on save."
                       :box nil
                       :background (color-darken-name bg 10))
   (set-face-attribute 'vertical-border nil
-                      :foreground (color-darken-name bg 3))
+                      :foreground (color-darken-name bg 4))
   (set-face-attribute 'mode-line nil
                       :box nil
-                      :background (color-darken-name bg 3))
+                      :background (color-darken-name bg 4))
   (set-face-attribute 'mode-line-inactive nil
                       :box nil
-                      :background bg)
+                      :background (color-darken-name bg 2))
   (set-face-attribute 'fringe nil
                       :background bg))
 ;; {{ emacs2ram sync

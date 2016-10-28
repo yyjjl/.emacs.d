@@ -1,6 +1,6 @@
 ;; I use ccl, `C-h v slime-read-interactive-args RET` for details
 ;; you need install the programy ccl, of cours
-(setq inferior-lisp-program "sbcl")
+(setq inferior-lisp-program "ccl")
 
 (with-eval-after-load 'slime
   (setq slime-protocol-version 'ignore)
