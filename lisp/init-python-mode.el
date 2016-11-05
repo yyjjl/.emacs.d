@@ -5,7 +5,7 @@
     (semantic-mode 1)
     (semantic-idle-summary-mode -1)
     (flycheck-mode 1)
-    (local-set-key (kbd "<backtab>") 'elpy-autopep8-fix-code)
+    (local-set-key (kbd "C-c b") 'elpy-autopep8-fix-code)
     ;; http://emacs.stackexchange.com/questions/3322/python-auto-indent-problem/3338#3338
     ;; emacs 24.4 only
     (setq electric-indent-chars (delq ?: electric-indent-chars))))

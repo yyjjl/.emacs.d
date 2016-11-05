@@ -183,52 +183,84 @@
     (define-key outline-minor-mode-map outline-minor-mode-prefix
       map)))
 
-(with-eval-after-load 'ox-latex
+(defvar org-cn-article-bg "yyj" "")
+(defvar org-cn-article-bgscale 5 "")
 
+(with-eval-after-load 'ox-latex
   (setq org-latex-pdf-process '("xelatex -shell-escape -interaction nonstopmode %f"
                                 "xelatex -shell-escape -interaction nonstopmode %f"))
 
   ;;使用minted
-  (setq org-latex-listings 'minted)
+  (when (executable-find "pygmentize")
+    (setq org-latex-listings 'minted))
   (setq org-latex-default-class "cn-article")
-  (add-to-list 'org-latex-classes
-               '("cn-article"
-                 "\\documentclass[aps,pre,12pt,preprint,onecolumn,showpacs,showkeys]{revtex4-1}
-\\usepackage{ctex}
-\\usepackage{setspace,dcolumn}
-\\usepackage{subfig}
-\\usepackage{hyperref}
-\\usepackage{graphicx,psfrag,epsfig}
-\\usepackage[font=small,format=plain,labelfont=bf,textfont=it,justification=raggedright,singlelinecheck=false]{caption}
-\\usepackage{minted}
-\\usepackage{mdframed}
-\\usepackage{amsmath,amsfonts,amssymb,amsthm,bm,upgreek}
-\\usepackage{geometry}
-\\usepackage[mathscr]{eucal}
-\\usepackage{background}
-\\SetBgContents{ } %Waterstamp to prevent copying
-\\SetBgScale{5}
-\\hypersetup{colorlinks=true}
-\\geometry{top=2.54cm,bottom=2.54cm,left=3cm,right=3cm}
-\\definecolor{bg}{rgb}{0.95,0.95,0.95}
-\\surroundwithmdframed{minted}
-\\mdfsetup{
-  backgroundcolor=bg
-}
-\\setminted{
-autogobble=true,
-breaklines=true,
-frame=none,
-linenos=true,
-tabsize=4
-}
-[NO-DEFAULT-PACKAGES]
-[NO-PACKAGES]"
-("\\section{%s}" . "\\section*{%s}")
-("\\subsection{%s}" . "\\subsection*{%s}")
-("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-("\\paragraph{%s}" . "\\paragraph*{%s}")
-("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+  (setq org-latex-packages-alist
+        '(("" "ctex" t)
+          ("" "setspace,dcolumn" t)
+          ("" "subfig" nil)
+          ("" "hyperref" t)
+          ("" "graphicx,psfrag,epsfig" t)
+          ("font=small,format=plain,labelfont=bf,textfont=it,justification=centering,singlelinecheck=false" "caption" t)
+          ("" "minted" t)
+          ("" "mdframed" t)
+          ("" "amsmath,amsfonts,amssymb,amsthm,bm,upgreek" t)
+          ("" "background" nil)
+          ("mathscr" "eucal" t)
+          ("" "geometry" t)
+          ("" "sectsty" t)))
+  (add-to-list
+   'org-latex-classes
+   `("cn-article"
+     ,(string-join
+       `("\\documentclass[11pt,a4paper]{article}"
+         "[NO-DEFAULT-PACKAGES]\n[PACKAGES]"
+         ,(format "\\SetBgContents{%s}" org-cn-article-bg)
+         ,(format "\\SetBgScale{%d}" org-cn-article-bgscale)
+         "\\setmonofont{Monaco}"
+         "\\setmainfont{Ubuntu}"
+         "%\\setCJKmainfont{KaiTi}"
+         "\\definecolor{codeblockbg}{rgb}{0.95,0.95,0.95}"
+         "\\definecolor{linkcolor}{rgb}{0.1,0.3,0.5}"
+          "\\hypersetup{colorlinks=true,linkcolor=linkcolor}"
+          "\\geometry{top=2.54cm,bottom=2.54cm,left=3cm,right=3cm}"
+          "\\renewcommand{\\theFancyVerbLine}{"
+          "  \\sffamily \\textcolor[rgb]{1.0,0.2,1.0}{"
+          "   \\scriptsize \\oldstylenums{\\arabic{FancyVerbLine}}}}"
+          "\\renewcommand\\listoflistingscaption{Program Code List}"
+          "\\renewcommand\\listingscaption{Program Code}"
+          "\\surroundwithmdframed{minted}"
+          "\\surroundwithmdframed{quote}"
+          "\\mdfsetup{"
+          "topline=false,bottomline=false,rightline=false,"
+          "linewidth=1pt,linecolor=black!40,"
+          "backgroundcolor=codeblockbg"
+          "}"
+          "\\setminted{"
+          "fontsize=\\scriptsize,"
+          "autogobble=true,breaklines=true,frame=none,linenos=true,tabsize=4,"
+          "breakautoindent=false,"
+          "breaksymbolleft=\\raisebox{0.8ex}{"
+          "\\rotatebox{90}{\\small\\ensuremath{\\curvearrowleft}}},"
+          "breaksymbolindentleft=0pt,"
+          "breaksymbolsepleft=0pt,"
+          "breaksymbolright=\\rotatebox{270}{\\small\\ensuremath{\\curvearrowright}},"
+          "breaksymbolindentright=0pt,"
+          "breaksymbolsepright=0pt"
+          "}"
+          "\\definecolor{codeblockbg}{rgb}{0.95,0.95,0.95}"
+          "\\definecolor{linkcolor}{rgb}{0.1,0.3,0.5}"
+          "\\definecolor{sectioncolor}{rgb}{0.5,0.5,0.25}"
+          "\\definecolor{subsubsectioncolor}{rgb}{0.7,0.3,0.2}"
+          "\\sectionfont{\\color{sectioncolor}}"
+          "\\subsectionfont{\\color{cyan}}"
+          "\\subsubsectionfont{\\color{subsubsectioncolor}}")
+        "\n")
+       ("\\section{%s}" . "\\section*{%s}")
+       ("\\subsection{%s}" . "\\subsection*{%s}")
+       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+       ("\\paragraph{%s}" . "\\paragraph*{%s}")
+       ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+
 
 
 (provide 'init-org)

@@ -115,10 +115,9 @@
 ;;----------------------------------------------------------------------------
 (require 'init-locales)
 
-;; my personal setup, other major-mode specific setup need it.
-;; It's dependent on init-site-lisp.el
-;; (if (file-exists-p "~/.emacs.d/custom.el")
-;;     (load-file "~/.emacs.d/custom.el"))
+;; load org project file
+(if (file-exists-p "~/.emacs.d/org-project.el")
+    (load-file "~/.emacs.d/org-project.el"))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

@@ -48,8 +48,7 @@
   ;; @see http://stackoverflow.com/questions/3509919/ \
   ;; emacs-c-opening-corresponding-header-file
   (local-set-key (kbd "C-x C-o") 'ff-find-other-file)
-  (local-set-key (kbd "C-c C-f") 'clang-format-buffer)
-  (local-set-key (kbd "C-c C-r") 'clang-format-region)
+  (local-set-key (kbd "C-c b") 'clang-format-buffer)
   (local-set-key (kbd "C-c C-j") 'semantic-ia-fast-jump)
   (local-set-key (kbd "C-c C-v") 'semantic-decoration-include-visit)
   (local-set-key (kbd "M-RET") 'srefactor-refactor-at-point)

@@ -23,10 +23,16 @@
     (progn
       (let ((TeX-save-query nil))
         (TeX-save-document (TeX-master-file)))
-      (TeX-command TeX-command-default  'TeX-master-file -1)))
+      (let ((command (if (save-excursion
+                           (goto-char 1)
+                           (search-forward-regexp "\\\\usepackage\\s-*{\\s-*minted"
+                                                  nil t))
+                         "XeLaTeX"
+                       TeX-command-default)))
+        (TeX-command command  'TeX-master-file -1))))
 
   (add-to-list 'TeX-command-list
-               '("XeLaTeX" "%`xelatex%(mode)%' %t" TeX-run-TeX nil t))
+               '("XeLaTeX" "%`xelatex -shell-escape%(mode)%' %t" TeX-run-TeX nil t))
 
   (setq TeX-auto-save t
         TeX-parse-self t

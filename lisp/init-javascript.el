@@ -244,7 +244,7 @@ sudo pip install jsbeautifier"
               '(".eslintrc"  ".eslintrc.js"
                 ".eslintrc.json" ".eslintrc.yml" ".eslintrc.yaml"))
         (setq end-p t)
-      (if (string= "/" pwd)
+        (if (string= pwd (file-name-directory (directory-file-name pwd)))
           (progn
             (setq end-p t)
             (setq pwd ""))))))

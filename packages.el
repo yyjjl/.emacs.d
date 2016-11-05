@@ -178,5 +178,6 @@
     groovy-mode
     cmake-mode
     cpputils-cmake
+    php-mode
     graphviz-dot-mode)
   "packages required")

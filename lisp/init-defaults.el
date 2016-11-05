@@ -33,6 +33,7 @@
 
 ;; M-x without meta
 (global-set-key (kbd "C-x C-m") 'execute-extended-command)
+(global-set-key (kbd "<backtab>") 'company-complete)
 
 ;; {{ isearch
 ;; Use regex to search by default
