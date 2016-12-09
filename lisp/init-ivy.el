@@ -92,6 +92,9 @@ buffer is not visiting a file."
              ("C-c i d f" . counsel-describe-face)
              ("C-c i b" . counsel-bookmark)
              ("C-c i f s" . counsel-find-symbol)
+             ("C-c i f f" . counsel-faces)
+             ("C-c i c w" . counsel-colors-web)
+             ("C-c i c e" . counsel-colors-emacs)
              ("C-c i e" . counsel-sudo-edit)
              ("C-c i o" . counsel-outline)))
 

@@ -124,7 +124,7 @@
     ;; js company backend
     company-tern
     js-doc
-    web-mode
+    web-mode vue-mode
     company-web
     ;; optional package add support for angluar 1.x
     ac-html-angular

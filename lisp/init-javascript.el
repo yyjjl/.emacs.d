@@ -240,7 +240,7 @@ sudo pip install jsbeautifier"
           (end-p nil))
       (end-p  pwd)
     (if (some (lambda (file)
-                (file-exists-p (message  (concat pwd file))))
+                (file-exists-p (concat pwd file)))
               '(".eslintrc"  ".eslintrc.js"
                 ".eslintrc.json" ".eslintrc.yml" ".eslintrc.yaml"))
         (setq end-p t)

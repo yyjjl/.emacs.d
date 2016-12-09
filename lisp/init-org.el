@@ -1,18 +1,3 @@
-(defface org-block-begin-line
-  '((t (:underline "#A7A6AA" :foreground "#484848" :background "#020202")))
-  "Face used for line delimiting the begin of a src block"
-    :group 'org-block)
-
-(defface org-block-background
-  '((t (:background "#080808")))
-  "Face for the background of a src block"
-    :group 'org-block)
-
-(defface org-block-end-line
-  '((t (:overline "#A7A6AA" :foreground "#484848" :background "#020202")))
-  "Face used for line delimiting the end of a src block "
-  :group 'org-block)
-
 (with-eval-after-load 'org
   ;; {{ NO spell check for embedded snippets
   (defun org-mode-is-code-snippet ()

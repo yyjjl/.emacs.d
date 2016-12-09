@@ -7,7 +7,8 @@
 ;; Hazenberg and a darker variant by Hamish Stuart Macpherson.
 
 (eval-when-compile
-  (require 'color-theme))
+  (require 'color-theme)
+  (require 'color))
 
 (defun color-theme-molokai ()
   "Color theme based on the Molokai color scheme for vim."
@@ -38,13 +39,14 @@
      (diff-removed ((t (:foreground "#F92672" :weight bold))))
      (escape-glyph ((t (:foreground "#E6DB74"))))
      (minibuffer-prompt ((t (:foreground "#66D9EF"))))
-     (mode-line ((t (:foreground "#F8F8F2" :background "#000000"
-                                 :box (:line-width 1 :color "#000000" :style released-button)))))
+
+     (mode-line ((t (:foreground "#F8F8F2" :background "#111213"))))
      (mode-line-buffer-id ((t (:foreground nil :background "#000000" :weight semi-bold))))
-     (mode-line-inactive ((t (:foreground "#BCBCBC" :background "#000000"
-                                          :box (:line-width 1 :color "#232526")))))
+     (mode-line-inactive ((t (:foreground "#BCBCBC" :background "#161718"))))
+     (mode-line-highlight ((t (:background "#020303"))))
      (mode-line-mousable ((t (:foreground "#BCBCBC" :background "#000000"))))
      (mode-line-mousable-minor-mode ((t (:foreground "#BCBCBC" :background "#000000"))))
+
      (font-lock-builtin-face ((t (:foreground "#A6E22E"))))
      (font-lock-comment-face ((t (:foreground "#465457" :slant italic))))
      (font-lock-comment-delimiter-face ((t (:foreground "#465457" :slant italic))))
@@ -61,7 +63,8 @@
      (font-lock-variable-name-face ((t (:foreground "#F92672"))))
      (font-lock-warning-face ((t (:foreground "#FFFFFF"
                                               :background "#333333"))))
-     (fringe ((t (:background "#232526"))))
+     (fringe ((t (:background "#1B1D1E"))))
+     (vertical-border ((t (:foreground "#111213"))))
      (highlight ((t (:foreground "#000000" :background "#C4BE89"))))
      (hl-line ((t (:background "#293739"))))
      (icompletep-choices ((t (:foreground "#F92672"))))
@@ -108,6 +111,76 @@
      (woman-bold ((t (:foreground "#F92672"))))
      (woman-italic ((t (:foreground "#A6E22E"))))
      (woman-unknown ((t (:foreground "#66D9EF"))))
+
+     ;; Rainbow-delimiters
+     (rainbow-delimiters-depth-1-face ((t (:foreground "#e91e63"))))
+     (rainbow-delimiters-depth-2-face ((t (:foreground "#2196F3"))))
+     (rainbow-delimiters-depth-3-face ((t (:foreground "#EF6C00"))))
+     (rainbow-delimiters-depth-4-face ((t (:foreground "#B388FF"))))
+     (ainbow-delimiters-depth-5-face ((t (:foreground "#76ff03"))))
+     (rainbow-delimiters-depth-6-face ((t (:foreground "#26A69A"))))
+     (rainbow-delimiters-depth-7-face ((t (:foreground "#FFCDD2"))))
+     (rainbow-delimiters-depth-8-face ((t (:foreground "#795548"))))
+     (rainbow-delimiters-depth-9-face ((t (:foreground "#DCE775"))))
+     (rainbow-delimiters-unmatched-face ((t (:foreground "#F8F8F2"
+                                                         :background "#EF6C00"))))
+     ;; Company autocomplete
+
+     (company-scrollbar-bg ((t (:background "#3f4346"))))
+     (company-scrollbar-fg ((t (:background "#333638"))))
+     (company-tooltip ((t (:inherit default :weight bold  :background "#1c1f26"))))
+     (company-tooltip-annotation ((t (:weight normal :foreground "orange"))))
+     (company-tooltip-annotation-selection
+      ((t (:weight normal :foreground "red"))))
+     (company-tooltip-common ((t (:inherit font-lock-constant-face))))
+     (company-tooltip-selection ((t (:inherit font-lock-keyword-face
+                                              :weight bold  :background "#4b5053"))))
+     
+     (regex-tool-matched-face ((t (:foreground nil :background nil :inherit match))))
+
+     (org-block ((t (:foreground "#8bc34a" :background "#1c1f26"))))
+     (org-block-background ((t (:background "#1c1f26"))))
+     (org-code ((t (:foreground "#8bc34a" :background "#1c1f26"))))
+     (org-column ((t (:background "37474f"))))
+     (org-column-title ((t (:inherit org-column :weight bold :underline t))))
+     (org-date ((t (:foreground "#80cbc4" :underline t))))
+     (org-document-info ((t (:foreground "#81d4fa" :height 1.35))))
+     (org-document-info-keyword ((t (:foreground "8bc34a" :height 1.35))))
+     (org-document-title ((t (:weight bold :height 1.35))))
+     (org-done ((t (:foreground "8bc34a" :bold t :background "#1b5e20"))))
+     (org-ellipsis ((t (:foreground "#81d4df"))))
+     (org-footnote ((t (:foreground "#4dd0e1"))))
+     (org-formula ((t (:foreground "#f36c60"))))
+     (org-link ((t (:foreground "#b39ddb" :underline t))))
+     (org-scheduled ((t (:foreground "8bc34a"))))
+     (org-scheduled-previously ((t (:foreground "#ff9800"))))
+     (org-scheduled-today ((t (:foreground "#8bc34a"))))
+     (org-special-keyword ((t (:foreground "#b0bec5"))))
+     (org-table ((t (:foreground "#e3f2fd" :background "#1c1f26"))))
+     (org-todo ((t (:foreground "#ffab91" :bold t :background "#dd2c00"))))
+     (org-upcoming-deadline ((t (:foreground "ff9800"))))
+     (org-warning ((t (:weight bold :foreground "#f36c60"))))
+     (org-block-begin-line ((t (:foreground "#b3e5fc" :background "#1e2930"))))
+     (org-block-end-line ((t (:foreground "#b3e5fc" :background "#1e2930"))))
+
+     (org-level-1 ((class (:inherit outline-1
+                                     :background "#455A64"
+                                     :weight bold
+                                     :height 1.3))))
+     (org-level-2 ((class (:inherit outline-2
+                                     :background "#35575b"
+                                     :height 1.2))))
+     (org-level-3 ((class (:inherit outline-3 :height 1.1))))
+     (org-level-4 ((class (:inherit outline-4 :height 1.0))))
+     (org-level-5 ((class (:inherit outline-5 ))))
+     (org-level-6 ((class (:inherit outline-6 ))))
+     (org-level-7 ((class (:inherit outline-7 ))))
+     (org-level-8 ((class (:inherit outline-8 ))))
+     (org-level-9 ((class (:inherit outline-9 ))))
      )))
 
 (provide 'color-theme-molokai)
+
+
+
+

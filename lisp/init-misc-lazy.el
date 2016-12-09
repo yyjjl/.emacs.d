@@ -564,38 +564,6 @@ Including indent-buffer, which should not be called automatically on save."
 (require 'midnight)
 (setq midnight-mode t)
 
-
-;; --------------------------------------------------------------------------------
-;; color-theme setting need lazy load
-;; --------------------------------------------------------------------------------
-;; make rainbow-delimiters more saturate
-;; I don't know why it make daemon mode crash
-(with-eval-after-load 'rainbow-delimiters
-  (dotimes (index rainbow-delimiters-max-face-count)
-    (let ((face
-           (intern (format "rainbow-delimiters-depth-%d-face" (+ 1 index)))))
-      (set-face-attribute face nil
-                          :foreground
-                          (color-saturate-name
-                           (face-attribute face :foreground)
-                           30)))))
-(require 'color nil :noerror)
-
-(let ((bg (face-attribute 'default :background)))
-  (set-face-attribute 'mode-line-highlight nil
-                      :box nil
-                      :background (color-darken-name bg 10))
-  (set-face-attribute 'vertical-border nil
-                      :foreground (color-darken-name bg 4))
-  (set-face-attribute 'mode-line nil
-                      :box nil
-                      :background (color-darken-name bg 4))
-  (set-face-attribute 'mode-line-inactive nil
-                      :box nil
-                      :background (color-darken-name bg 2))
-  (set-face-attribute 'fringe nil
-                      :background bg))
-;; {{ emacs2ram sync
 (global-set-key [f6] 'emacs2ram-sync)
 
 (defun emacs2ram-sync ()

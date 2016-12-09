@@ -1,18 +1,6 @@
 (with-eval-after-load 'company
   (company-statistics-mode 1)
 
-  (require 'color nil :noerror)
-  (let ((bg (face-attribute 'default :background)))
-    (custom-set-faces
-     `(company-tooltip
-       ((t (:inherit default :background ,(color-lighten-name bg 5)))))
-     `(company-scrollbar-bg ((t (:background ,(color-lighten-name bg 15)))))
-     `(company-scrollbar-fg ((t (:background ,(color-lighten-name bg 10)))))
-     `(company-tooltip-selection
-       ((t (:inherit font-lock-keyword-face
-                     :background ,(color-lighten-name bg 20)))))
-     `(company-tooltip-common ((t (:inherit font-lock-constant-face))))))
-
   ;; can't work with TRAMP
   (setq company-backends (delete 'company-ropemacs company-backends))
   (setq company-backends (delete 'company-semantic company-backends))
