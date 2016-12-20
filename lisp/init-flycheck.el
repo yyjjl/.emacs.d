@@ -6,7 +6,6 @@
   (setq flycheck-html-tidy-executable
         (expand-file-name "~/.emacs.d/bin/tidy"))
   (setq flycheck-mode-line-prefix "")
-
   (flycheck-pos-tip-mode 1))
 
 

@@ -66,8 +66,8 @@
   (setq c-electric-pound-behavior (quote (alignleft)))
 
   (when buffer-file-name
-    ;; c-eldoc (https://github.com/mooz/c-eldoc)
-    (c-turn-on-eldoc-mode)
+    (irony-eldoc)
+    (irony-mode 1)
 
     ;; @see https://github.com/redguardtoo/cpputils-cmake
     ;; Make sure your project use cmake!
@@ -79,8 +79,7 @@
     ;;                  (string-match "^/usr/src/linux/include/.*" buffer-file-name)))
     ;;         (cppcm-reload-all)))
     ;; }}
-    )
-  )
+    ))
 ;; donot use c-mode-common-hook or cc-mode-hook because many major-modes use this hook
 (add-hook 'c-mode-common-hook
           (lambda ()
@@ -93,7 +92,16 @@
                           (derived-mode-p 'groovy-mode))
                 (my-c-mode-setup)))))
 
-(with-eval-after-load 'bison-mode
-  (setq bison-electric-open-brace-v nil))
+(add-hook 'flycheck-mode-hook 'flycheck-irony-setup)
+
+(with-eval-after-load 'irony
+  (setq irony-additional-clang-options '("-std=c++14"))
+  (defun my-irony-mode-hook ()
+    (define-key irony-mode-map [remap completion-at-point]
+      'irony-completion-at-point-async)
+    (define-key irony-mode-map [remap complete-symbol]
+      'irony-completion-at-point-async))
+  (add-hook 'irony-mode-hook 'my-irony-mode-hook)
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
 
 (provide 'init-cc-mode)

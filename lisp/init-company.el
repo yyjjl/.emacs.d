@@ -4,11 +4,11 @@
   ;; can't work with TRAMP
   (setq company-backends (delete 'company-ropemacs company-backends))
   (setq company-backends (delete 'company-semantic company-backends))
+  (setq company-backends (delete 'company-clang company-backends))
   ;; make company-files a work before capf
   (setq company-backends (delete 'company-files  company-backends))
   ;; (setq company-backends (delete 'company-capf company-backends))
   (add-to-list 'company-backends 'company-cmake)
-  (add-to-list 'company-backends 'company-c-headers)
   (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code))
   (add-to-list 'company-backends 'company-tern)
   (add-to-list 'company-backends 'company-web-html)
@@ -18,6 +18,8 @@
   ;;     (add-to-list 'company-backends 'company-web-jade)
   ;;     (add-to-list 'company-backends 'company-web-slim)
   (add-to-list 'company-backends 'company-cabal)
+  (add-to-list 'company-backends 'company-irony)
+  (add-to-list 'company-backends 'company-irony-c-headers)
   ;; I don't like the downcase word in company-dabbrev
   ;; for languages use camel case naming convention
   ;; company should be case sensitive
@@ -29,7 +31,7 @@
   (setq company-clang-insert-arguments nil)
   (setq company-require-match nil)
   (setq company-etags-ignore-case t)
-  (setq company-minimum-prefix-length 3)
+  (setq company-minimum-prefix-length 2)
 
   (bind-keys :map company-active-map
             ("C-n" . company-select-next)

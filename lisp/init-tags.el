@@ -4,9 +4,7 @@
   (setq ggtags-navigation-mode-lighter nil)
   (setq ggtags-oversize-limit (* 30 1024 1024))
   (bind-keys :map ggtags-mode-map
-             ( "C-c g t" . ggtags-find-tag-dwim)
              ( "C-c g d" . ggtags-find-definition)
-             ( "C-c g r" . ggtags-find-reference)
              ( "C-c g o" . ggtags-find-other-symbol)
              ( "C-c g R" . ggtags-find-tag-regexp)
              ( "C-c g f" . ggtags-find-file)

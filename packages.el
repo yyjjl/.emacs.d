@@ -95,11 +95,12 @@
     ;; c/c++  packages
     ;;---------------------------------------
     clang-format
-    company-c-headers
     srefactor
-    c-eldoc
+    irony-eldoc
+    irony
+    company-irony
+    flycheck-irony
     ggtags
-    bison-mode
     ;;---------------------------------------
     ;; git packages
     ;;---------------------------------------
