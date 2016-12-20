@@ -127,7 +127,6 @@
  '(abbrev-file-name "~/.emacs.d/data/abbrev_defs")
  '(bmkp-bmenu-state-file "~/.emacs.d/data/bmk-bmenu-state.el")
  '(bmkp-last-as-first-bookmark-file "/home/yyj/.emacs.d/data/bookmarks")
- '(clang-format-executable "clang-format-3.7")
  '(clang-format-style "{BasedOnStyle: Google,IndentWidth: 4}")
  '(company-statistics-file "~/.emacs.d/data/company-statistics-cache.el")
  '(git-gutter:handled-backends (quote (svn hg git)))
