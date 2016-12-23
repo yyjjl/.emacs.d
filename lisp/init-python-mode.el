@@ -4,7 +4,6 @@
     ;; or just check https://github.com/jorgenschaefer/elpy
     (semantic-mode 1)
     (semantic-idle-summary-mode -1)
-    (flycheck-mode 1)
     (local-set-key (kbd "C-c b") 'elpy-autopep8-fix-code)
     (local-set-key (kbd "<backtab>") 'company-complete)
     ;; http://emacs.stackexchange.com/questions/3322/python-auto-indent-problem/3338#3338

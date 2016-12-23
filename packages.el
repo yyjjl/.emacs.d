@@ -27,6 +27,7 @@
     workgroups2
     benchmark-init
     idle-require
+    realgud
     ;;---------------------------------------
     ;; theme packages
     ;;---------------------------------------

@@ -16,6 +16,8 @@
 
   (global-company-mode 1)
 
+  (global-flycheck-mode 1)
+
   ;; make zsh work correctly in emacs
   (setq system-uses-terminfo nil)
   (fcitx-aggressive-setup)

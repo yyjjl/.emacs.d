@@ -55,8 +55,6 @@
 
   (semantic-mode 1)
 
-  (flycheck-mode 1)
-
   (setq cc-search-directories '("."
                                 "/usr/include"
                                 "/usr/local/include/*"

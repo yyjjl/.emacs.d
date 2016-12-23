@@ -2,7 +2,6 @@
           (lambda ()
             (unless (is-buffer-file-temp)
               (tide-setup)
-              (flycheck-mode +1)
               (setq flycheck-check-syntax-automatically '(save idle-change mode-enabled))
               ;; company is an optional dependency. You have to
               ;; install it separately via package-install

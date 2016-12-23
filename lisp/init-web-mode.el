@@ -23,7 +23,6 @@
 
 ;; don't use (unlesss (is-buffer-file-temp)) ,there is a bug
 (defun web-mode-hook-setup ()
-  (flycheck-mode +1)
   (enable-flyspell-mode-conditionally)
   (setq flyspell-check-doublon nil)
   (remove-hook 'yas-after-exit-snippet-hook

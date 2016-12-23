@@ -232,22 +232,7 @@ sudo pip install jsbeautifier"
                              nil t)
     (goto-char orig-point)))
 ;; }}
-
-;; if return a nonempty string, eslint will find config file automately
-(defun try-get-eslint-config-file ()
-  (cl-do ((pwd (expand-file-name default-directory)
-               (file-name-directory (directory-file-name pwd)))
-          (end-p nil))
-      (end-p  pwd)
-    (if (some (lambda (file)
-                (file-exists-p (concat pwd file)))
-              '(".eslintrc"  ".eslintrc.js"
-                ".eslintrc.json" ".eslintrc.yml" ".eslintrc.yaml"))
-        (setq end-p t)
-        (if (string= pwd (file-name-directory (directory-file-name pwd)))
-          (progn
-            (setq end-p t)
-            (setq pwd ""))))))
+1
 
 (defun my-js2-mode-setup()
   (unless (is-buffer-file-temp)
@@ -256,16 +241,11 @@ sudo pip install jsbeautifier"
 
     (js2-refactor-mode 1)
 
-    (unless (try-get-eslint-config-file)
-      (message "Can't find custom config file,use default file instead")
-      (setq flycheck-eslintrc
-                  (expand-file-name "~/.emacs.d/data/.eslintrc")))
-    (flycheck-mode 1)
     (tern-mode 1)
 
     (define-key js2-mode-map "\C-cd" 'js-doc-insert-function-doc)
     (define-key js2-mode-map "\C-cf" 'js-doc-insert-file-doc)
-    (define-key js2-mode-map "\C-c\C-b" 'js-beautify)))
+    (define-key js2-mode-map "\C-cb" 'js-beautify)))
 
 
 

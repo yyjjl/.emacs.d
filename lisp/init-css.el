@@ -11,7 +11,6 @@
   (add-hook hook
             '(lambda ()
                (rainbow-mode 1)
-               (flycheck-mode 1)
                (unless (is-buffer-file-temp)
                  (setq imenu-create-index-function 'my-css-imenu-make-index)))))
 

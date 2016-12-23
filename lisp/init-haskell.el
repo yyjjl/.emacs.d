@@ -22,15 +22,17 @@
             (lambda ()
               (ghc-init)
 
-              (flycheck-mode 1)
               (haskell-doc-mode)
               (hindent-mode)
               ;; haskell-indentation-mode is incompatible with shm
               ;; (haskell-indentation-mode -1)
               (turn-on-haskell-indent)
               (structured-haskell-mode 1)
+              (define-key shm-map (kbd "C-c C-s") 'shm/case-split)
               (define-key haskell-mode-map
-                (kbd "C-'") 'company-complete))))
+                (kbd "M-S") 'ghc-sort-lines)
+              (define-key haskell-mode-map
+                (kbd "C-'") 'ghc-complete))))
 
 (with-eval-after-load 'hindent
   (setq hindent-process-path "~/.cabal/bin/hindent"))

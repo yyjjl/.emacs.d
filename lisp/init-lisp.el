@@ -73,6 +73,7 @@
   (show-paren-mode 1)
   (hl-sexp-mode 1)
   (prettify-symbols-mode 1)
+  (flycheck-mode -1)
 
   (local-set-key (kbd "C-c e") 'eval-and-replace)
   (local-set-key (kbd "C-c c") 'comment-region)
