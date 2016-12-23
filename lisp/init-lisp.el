@@ -75,10 +75,7 @@
   (prettify-symbols-mode 1)
   (flycheck-mode -1)
 
-  (local-set-key (kbd "C-c e") 'eval-and-replace)
-  (local-set-key (kbd "C-c c") 'comment-region)
-  (local-set-key (kbd "C-c u") 'uncomment-region)
-  (local-set-key (kbd "C-c l") 'comment-line))
+  (local-set-key (kbd "C-c e") 'eval-and-replace))
 
 
 ;; ----------------------------------------------------------------------------
