@@ -69,12 +69,12 @@
 
   (rainbow-delimiters-mode t)
   (when (require 'semantic/bovine/el nil t)
-    (semantic-mode 1))
+    (try-turn-on-semantic-mode))
   (show-paren-mode 1)
   (hl-sexp-mode 1)
   (prettify-symbols-mode 1)
   (flycheck-mode -1)
-
+  (local-set-key (kbd "M-<RET>") 'srefactor-refactor-at-point)
   (local-set-key (kbd "C-c e") 'eval-and-replace))
 
 

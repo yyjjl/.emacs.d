@@ -55,18 +55,22 @@
       (concat num " %[" real-id "%]")))
 
 (defun mode-line-buffer-major-mode ()
-  (propertize " %m " 'face 'font-lock-builtin-face
-              'mouse-face 'mode-line-highlight
-              'local-map (let ((map (make-sparse-keymap)))
-                           (define-key map [mode-line mouse-2]
-                             'describe-mode)
-                           (define-key map [mode-line down-mouse-1]
-                             `(menu-item
-                               ,(purecopy "Menu Bar")
-                               ignore
-                               :filter (lambda (_)
-                                         (mouse-menu-major-mode-map))))
-                           map)))
+  (concat  (propertize " %m" 'face 'font-lock-builtin-face
+                       'mouse-face 'mode-line-highlight
+                       'local-map (let ((map (make-sparse-keymap)))
+                                    (define-key map [mode-line mouse-2]
+                                      'describe-mode)
+                                    (define-key map [mode-line down-mouse-1]
+                                      `(menu-item
+                                        ,(purecopy "Menu Bar")
+                                        ignore
+                                        :filter (lambda (_)
+                                                  (mouse-menu-major-mode-map))))
+                                    map))
+           " {"
+           (when mode-line-process
+                (format-mode-line   mode-line-process))
+           "} "))
 
 (defun mode-line-buffer-status ()
   (concat "("
@@ -85,6 +89,7 @@
                 (match-string 1 buf-coding)
               buf-coding))
           ")"))
+
 (defun mode-line-workgroup2 ()
   (when (and (boundp 'workgroups-mode)
             (symbol-value 'workgroups-mode))

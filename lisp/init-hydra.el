@@ -59,18 +59,25 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
              ("C-c f" . hydra-org-move/outline-forward-same-level)
              ("C-c b" . hydra-org-move/outline-backward-same-level)))
 
-(defhydra hydra-resize-window (:pre (setq hydra-is-helpful nil)
-                                    :post (setq hydra-is-helpful t))
+(defhydra hydra-resize-window (:color pink)
   "shrink"
-  ("{" shrink-window-horizontally)
-  ("}" enlarge-window-horizontally)
-  ("^" enlarge-window)
-  ("_" shrink-window)
-  ("RET" nil nil))
+  ("{" shrink-window-horizontally "-><-")
+  ("}" enlarge-window-horizontally "<-->")
+  ("^" enlarge-window "enlarge")
+  ("-" shrink-window  "shrink")
+  ("RET" nil "quit"))
+
+(bind-keys ("C-x {" . hydra-resize-window/shrink-window-horizontally)
+           ("C-x }" . hydra-resize-window/enlarge-window-horizontally)
+           ("C-x ^" . hydra-resize-window/enlarge-window)
+           ("C-x _" . hydra-resize-window/shrink-window))
+
+
+(define-key global-map (kbd "C-x SPC") 'hydra-rectangle/body)
 
 (defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
-                           :color pink
-                           :post (deactivate-mark))
+                                     :color pink
+                                     :post (deactivate-mark))
   "
   ^_p_^     [_d_]delete    [_s_]string
 _b_   _f_   [_o_]ok        [_y_]yank

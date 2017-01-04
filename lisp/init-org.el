@@ -59,12 +59,14 @@
         ;; org v8
         org-odt-preferred-output-format "doc"
         org-tags-column 80
+        org-latex-preview-ltxpng-directory "/tmp/ltxpng/"
         ;; org-startup-indented t
         ;; {{ org 8.2.6 has some performance issue. Here is the workaround.
         ;; @see http://punchagan.muse-amuse.in/posts/how-i-learnt-to-use-emacs-profiler.html
         org-agenda-inhibit-startup t ;; ~50x speedup
         org-agenda-use-tag-inheritance nil ;; 3-4x speedup
         ;; }}
+        ;; org-pretty-entities t
         )
 
   ;; Refile targets include this file and any file contributing to the agenda - up to 5 levels deep
@@ -89,17 +91,12 @@
       (setq load-user-customized-major-mode-hook old)))
 
   (defun org-mode-hook-setup ()
-    (setq evil-auto-indent nil)
     ;; org-mode's own flyspell will be loaded
-    (enable-flyspell-mode-conditionally)
-
+    (add-to-list 'completion-at-point-functions
+                 'pcomplete-completions-at-point)
     (flyspell-mode -1)
 
     (org-bullets-mode 1)
-
-    ;; don't spell check double words
-    (setq flyspell-check-doublon nil)
-
     ;; display wrapped lines instead of truncated lines
     (setq truncate-lines nil)
     (setq word-wrap t)
@@ -179,15 +176,17 @@
   (when (executable-find "pygmentize")
     (setq org-latex-listings 'minted))
   (setq org-latex-default-class "cn-article")
+  (setq org-format-latex-options
+        (plist-put org-format-latex-options :scale 1.8))
   (setq org-latex-packages-alist
-        '(("" "ctex" t)
+        '(("" "ctex" nil)
           ("" "setspace,dcolumn" t)
           ("" "subfig" nil)
           ("" "hyperref" t)
           ("" "graphicx,psfrag,epsfig" t)
           ("font=small,format=plain,labelfont=bf,textfont=it,justification=centering,singlelinecheck=false" "caption" t)
-          ("" "minted" t)
-          ("" "mdframed" t)
+          ("" "minted" nil)
+          ("" "mdframed" nil)
           ("" "amsmath,amsfonts,amssymb,amsthm,bm,upgreek" t)
           ("" "background" nil)
           ("mathscr" "eucal" t)
@@ -206,45 +205,91 @@
          "%\\setCJKmainfont{KaiTi}"
          "\\definecolor{codeblockbg}{rgb}{0.95,0.95,0.95}"
          "\\definecolor{linkcolor}{rgb}{0.1,0.3,0.5}"
-          "\\hypersetup{colorlinks=true,linkcolor=linkcolor}"
-          "\\geometry{top=2.54cm,bottom=2.54cm,left=3cm,right=3cm}"
-          "\\renewcommand{\\theFancyVerbLine}{"
-          "  \\sffamily \\textcolor[rgb]{1.0,0.2,1.0}{"
-          "   \\scriptsize \\oldstylenums{\\arabic{FancyVerbLine}}}}"
-          "\\renewcommand\\listoflistingscaption{Program Code List}"
-          "\\renewcommand\\listingscaption{Program Code}"
-          "\\surroundwithmdframed{minted}"
-          "\\surroundwithmdframed{quote}"
-          "\\mdfsetup{"
-          "topline=false,bottomline=false,rightline=false,"
-          "linewidth=1pt,linecolor=black!40,"
-          "backgroundcolor=codeblockbg"
-          "}"
-          "\\setminted{"
-          "fontsize=\\scriptsize,"
-          "autogobble=true,breaklines=true,frame=none,linenos=true,tabsize=4,"
-          "breakautoindent=false,"
-          "breaksymbolleft=\\raisebox{0.8ex}{"
-          "\\rotatebox{90}{\\small\\ensuremath{\\curvearrowleft}}},"
-          "breaksymbolindentleft=0pt,"
-          "breaksymbolsepleft=0pt,"
-          "breaksymbolright=\\rotatebox{270}{\\small\\ensuremath{\\curvearrowright}},"
-          "breaksymbolindentright=0pt,"
-          "breaksymbolsepright=0pt"
-          "}"
-          "\\definecolor{codeblockbg}{rgb}{0.95,0.95,0.95}"
-          "\\definecolor{linkcolor}{rgb}{0.1,0.3,0.5}"
-          "\\definecolor{sectioncolor}{rgb}{0.5,0.5,0.25}"
-          "\\definecolor{subsubsectioncolor}{rgb}{0.7,0.3,0.2}"
-          "\\sectionfont{\\color{sectioncolor}}"
-          "\\subsectionfont{\\color{cyan}}"
-          "\\subsubsectionfont{\\color{subsubsectioncolor}}")
-        "\n")
-       ("\\section{%s}" . "\\section*{%s}")
-       ("\\subsection{%s}" . "\\subsection*{%s}")
-       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-       ("\\paragraph{%s}" . "\\paragraph*{%s}")
-       ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+         "\\hypersetup{colorlinks=true,linkcolor=linkcolor}"
+         "\\geometry{top=2.54cm,bottom=2.54cm,left=3cm,right=3cm}"
+         "\\renewcommand{\\theFancyVerbLine}{"
+         "  \\sffamily \\textcolor[rgb]{1.0,0.2,1.0}{"
+         "   \\scriptsize \\oldstylenums{\\arabic{FancyVerbLine}}}}"
+         "\\renewcommand\\listoflistingscaption{Program Code List}"
+         "\\renewcommand\\listingscaption{Program Code}"
+         "\\surroundwithmdframed{minted}"
+         "\\surroundwithmdframed{quote}"
+         "\\mdfsetup{"
+         "topline=false,bottomline=false,rightline=false,"
+         "linewidth=1pt,linecolor=black!40,"
+         "backgroundcolor=codeblockbg"
+         "}"
+         "\\setminted{"
+         "fontsize=\\scriptsize,"
+         "autogobble=true,breaklines=true,frame=none,linenos=true,tabsize=4,"
+         "breakautoindent=false,"
+         "breaksymbolleft=\\raisebox{0.8ex}{"
+         "\\rotatebox{90}{\\small\\ensuremath{\\curvearrowleft}}},"
+         "breaksymbolindentleft=0pt,"
+         "breaksymbolsepleft=0pt,"
+         "breaksymbolright=\\rotatebox{270}{\\small\\ensuremath{\\curvearrowright}},"
+         "breaksymbolindentright=0pt,"
+         "breaksymbolsepright=0pt"
+         "}"
+         "\\definecolor{codeblockbg}{rgb}{0.95,0.95,0.95}"
+         "\\definecolor{linkcolor}{rgb}{0.1,0.3,0.5}"
+         "\\definecolor{sectioncolor}{rgb}{0.5,0.5,0.25}"
+         "\\definecolor{subsubsectioncolor}{rgb}{0.7,0.3,0.2}"
+         "\\sectionfont{\\color{sectioncolor}}"
+         "\\subsectionfont{\\color{cyan}}"
+         "\\subsubsectionfont{\\color{subsubsectioncolor}}")
+       "\n")
+     ("\\section{%s}" . "\\section*{%s}")
+     ("\\subsection{%s}" . "\\subsection*{%s}")
+     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+     ("\\paragraph{%s}" . "\\paragraph*{%s}")
+     ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+
+
+(with-eval-after-load 'ox-html
+  (setq org-html-mathjax-template
+        "<script type=\"text/javascript\" src=\"%PATH\"></script>
+<script type=\"text/javascript\">
+<!--/*--><![CDATA[/*><!--*/
+    MathJax.Hub.Config({
+        // Only one of the two following lines, depending on user settings
+        // First allows browser-native MathML display, second forces HTML/CSS
+        :MMLYES: config: [\"MMLorHTML.js\"], jax: [\"input/TeX\"],
+        :MMLNO: jax: [\"input/TeX\", \"output/HTML-CSS\"],
+        extensions: [\"tex2jax.js\",\"TeX/AMSmath.js\",\"TeX/AMSsymbols.js\",
+                     \"TeX/noUndefined.js\"],
+        tex2jax: {
+            inlineMath: [ [\"\\\\(\",\"\\\\)\"] ],
+            displayMath: [ ['$$','$$'], [\"\\\\[\",\"\\\\]\"], [\"\\\\begin{displaymath}\",\"\\\\end{displaymath}\"] ],
+            skipTags: [\"script\",\"noscript\",\"style\",\"textarea\"],
+            ignoreClass: \"tex2jax_ignore\",
+            processEscapes: false,
+            processEnvironments: true,
+            preview: \"TeX\"
+        },
+        showProcessingMessages: true,
+        displayAlign: \"%ALIGN\",
+        displayIndent: \"%INDENT\",
+
+        \"HTML-CSS\": {
+             scale: %SCALE,
+             availableFonts: [\"STIX\",\"TeX\"],
+             preferredFont: \"TeX\",
+             webFont: \"TeX\",
+             imageFont: \"TeX\",
+             showMathMenu: true,
+        },
+        MMLorHTML: {
+             prefer: {
+                 MSIE:    \"MML\",
+                 Firefox: \"MML\",
+                 Opera:   \"HTML\",
+                 other:   \"HTML\"
+             }
+        }
+    });
+/*]]>*///-->
+</script>"))
 
 
 

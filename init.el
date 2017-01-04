@@ -132,8 +132,6 @@
  '(git-gutter:handled-backends (quote (svn hg git)))
  '(ispell-personal-dictionary "~/.emacs.d/data/aspell.pws")
  '(keyfreq-file "~/.emacs.d/data/keyfreq")
- '(realgud:ipdb-command-name "ipdb3")
- '(realgud:pdb-command-name "pdb3")
  '(recentf-save-file "~/.emacs.d/data/recentf")
  '(safe-local-variable-values (quote ((lentic-init . lentic-orgel-org-init))))
  '(savehist-file "~/.emacs.d/data/history")

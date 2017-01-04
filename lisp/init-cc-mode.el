@@ -53,8 +53,7 @@
   (local-set-key (kbd "C-c C-v") 'semantic-decoration-include-visit)
   (local-set-key (kbd "M-RET") 'srefactor-refactor-at-point)
 
-  (semantic-mode 1)
-
+  (try-turn-on-semantic-mode)
   (setq cc-search-directories '("."
                                 "/usr/include"
                                 "/usr/local/include/*"

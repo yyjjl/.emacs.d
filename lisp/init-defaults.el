@@ -35,13 +35,14 @@
 (global-set-key (kbd "C-x C-m") 'execute-extended-command)
 (global-set-key (kbd "<backtab>") 'company-complete)
 
-;; {{ isearch
+;; {{ global-keys
 ;; Use regex to search by default
 ;;(global-set-key (kbd "C-s") 'isearch-forward-regexp)
 (global-set-key (kbd "C-r") 'isearch-backward-regexp)
 (global-set-key (kbd "C-M-r") 'isearch-backward)
 (global-set-key (kbd "C-c c") 'comment-region)
 (global-set-key (kbd "C-c u") 'uncomment-region)
+(global-set-key [f6] 'toggle-company-ispell)
 (define-key isearch-mode-map (kbd "C-o") 'isearch-occur)
 ;; }}
 

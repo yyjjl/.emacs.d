@@ -4,7 +4,7 @@
     (yas-compile-directory (file-truename "~/.emacs.d/snippets"))
     (yas-reload-all))
 
-  (yas-reload-all)
+  (my-yas-reload-all)
 
   (add-to-list 'auto-mode-alist '("\\.yasnippet\\'" . snippet-mode))
 

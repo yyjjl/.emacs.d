@@ -23,11 +23,8 @@
     flyspell-correct-ivy flyspell-correct
     bind-key
     fcitx
-    ;; define working groups
-    workgroups2
     benchmark-init
     idle-require
-    realgud
     ;;---------------------------------------
     ;; theme packages
     ;;---------------------------------------
@@ -168,6 +165,7 @@
     ;; other mode  packages
     ;;---------------------------------------
     company-shell
+    sql-indent
     ;; yaml format
     yaml-mode
     ;; haml format

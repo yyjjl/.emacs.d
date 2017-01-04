@@ -40,7 +40,8 @@
             ("M-p" . company-previous-page))
 
   ;; @see https://github.com/redguardtoo/emacs.d/commit/2ff305c1ddd7faff6dc9fa0869e39f1e9ed1182d
-  (defadvice company-in-string-or-comment (around company-in-string-or-comment-hack activate)
+  (defadvice company-in-string-or-comment
+      (around company-in-string-or-comment-hack activate)
     ;; you can use (ad-get-arg 0) and (ad-set-arg 0) to tweak the arguments
     (if (memq major-mode '(php-mode html-mode web-mode nxml-mode))
         (setq ad-return-value nil)
@@ -62,26 +63,19 @@
 ;; {{ setup company-ispell
 (defun toggle-company-ispell ()
   (interactive)
+  (make-local-variable 'company-backends)
   (cond
    ((memq 'company-ispell company-backends)
     (setq company-backends (delete 'company-ispell company-backends))
     (message "company-ispell disabled"))
    (t
-    (add-to-list 'company-backends 'company-ispell)
+    ;; company-ispell need to be after company-capf
+    ;; or it will stop use completions
+    (let ((index (cl-position 'company-capf company-backends)))
+      (if index
+          (add-to-list-after index 'company-ispell company-backends)
+        (add-to-list 'company-backends 'company-ispell)))
     (message "company-ispell enabled!"))))
-
-(defun company-ispell-setup ()
-  ;; @see https://github.com/company-mode/company-mode/issues/50
-  (when (boundp 'company-backends)
-    (make-local-variable 'company-backends)
-    (add-to-list 'company-backends 'company-ispell)
-    (setq company-ispell-dictionary ispell-alternate-dictionary)))
-
-;; message-mode use company-bbdb.
-;; So we should NOT turn on company-ispell
-(add-hook 'org-mode-hook 'company-ispell-setup)
-(add-hook 'text-mode-hook 'company-ispell-setup)
-;; }}
 
 (with-eval-after-load 'company-etags
   (add-to-list 'company-etags-modes 'web-mode))

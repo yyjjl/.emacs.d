@@ -139,4 +139,10 @@
       (setq rlt nil)))
     rlt))
 
+(defun add-to-list-after (n ele lst)
+  "add a element after position"
+  (when (>= n 0)
+    (let ((ncdr (nthcdr n lst)))
+      (setcdr ncdr (cons ele (cdr ncdr)))))) 
+
 (provide 'init-utils)

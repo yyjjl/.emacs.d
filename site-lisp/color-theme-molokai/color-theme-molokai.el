@@ -135,7 +135,7 @@
      (company-tooltip-common ((t (:inherit font-lock-constant-face))))
      (company-tooltip-selection ((t (:inherit font-lock-keyword-face
                                               :weight bold  :background "#4b5053"))))
-     
+
      (regex-tool-matched-face ((t (:foreground nil :background nil :inherit match))))
 
      (org-block ((t (:foreground "#8bc34a" :background "#1c1f26"))))
