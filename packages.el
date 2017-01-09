@@ -99,6 +99,7 @@
     company-irony
     flycheck-irony
     ggtags
+    disaster
     ;;---------------------------------------
     ;; git packages
     ;;---------------------------------------

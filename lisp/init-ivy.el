@@ -63,7 +63,7 @@ buffer is not visiting a file."
       (lambda (x) (delete-file (expand-file-name x ivy--directory)))
       ,(propertize "delete" 'face 'font-lock-warning-face))))
   (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
-  (bind-keys ("C-s" . swiper)
+  (bind-keys ("C-s" . counsel-grep-or-swiper)
              ("C-M-s" .swiper-the-thing)
              ("C-c i r" . ivy-resume)
              ("C-x C-f" . counsel-find-file)

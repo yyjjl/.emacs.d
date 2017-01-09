@@ -101,4 +101,7 @@
   (add-hook 'irony-mode-hook 'my-irony-mode-hook)
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
 
+(with-eval-after-load 'disaster
+  (setq disaster-cxxflags "--std=c++14"))
+
 (provide 'init-cc-mode)
