@@ -1,8 +1,3 @@
-(defvar flyspell-check-doublon t
-  "Check doublon (double word) when calling `flyspell-highlight-incorrect-region'.")
-
-(make-variable-buffer-local 'flyspell-check-doublon)
-
 (with-eval-after-load 'ispell
   (cond
    ((executable-find "aspell")
@@ -18,27 +13,27 @@
       (message "You need install either aspell or hunspell for ispell"))))
 
 (with-eval-after-load 'flyspell
-  ;; flyspell set up for web-mode
+  ;; {{ flyspell set up for web-mode
   (defun web-mode-flyspell-verify ()
     (let ((f (get-text-property (- (point) 1) 'face))
           thing
           rlt)
       (cond
        ((not (memq f '(web-mode-html-attr-value-face
-                       web-mode-html-tag-face
-                       web-mode-html-attr-name-face
-                       web-mode-constant-face
-                       web-mode-doctype-face
-                       web-mode-keyword-face
-                       web-mode-comment-face ;; focus on get html label right
-                       web-mode-function-name-face
-                       web-mode-variable-name-face
-                       web-mode-css-property-name-face
-                       web-mode-css-selector-face
-                       web-mode-css-color-face
-                       web-mode-type-face
-                       web-mode-block-control-face)
-                   ))
+                     web-mode-html-tag-face
+                     web-mode-html-attr-name-face
+                     web-mode-constant-face
+                     web-mode-doctype-face
+                     web-mode-keyword-face
+                     web-mode-comment-face ;; focus on get html label right
+                     web-mode-function-name-face
+                     web-mode-variable-name-face
+                     web-mode-css-property-name-face
+                     web-mode-css-selector-face
+                     web-mode-css-color-face
+                     web-mode-type-face
+                     web-mode-block-control-face)
+                 ))
         (setq rlt t))
        ((memq f '(web-mode-html-attr-value-face))
         (save-excursion
@@ -51,6 +46,24 @@
       rlt))
 
   (put 'web-mode 'flyspell-mode-predicate 'web-mode-flyspell-verify)
+  ;; }}
+
+  ;; {{ flyspell setup for js2-mode
+  (defun js-flyspell-verify ()
+    (let* ((f (get-text-property (- (point) 1) 'face)))
+      ;; *whitelist*
+      ;; only words with following font face will be checked
+      (memq f '(js2-function-call
+                js2-function-param
+                js2-object-property
+                font-lock-variable-name-face
+                font-lock-string-face
+                font-lock-function-name-face
+                font-lock-builtin-face
+                rjsx-tag
+                rjsx-attr))))
+  (put 'js2-mode 'flyspell-mode-predicate 'js-flyspell-verify)
+  ;; }}
 
   ;; better performance
   (setq flyspell-issue-message-flag nil)
@@ -81,55 +94,33 @@
   ;; process when ispell-send-string()
   ;; ispell-extra-args is the command arguments which will
   ;; *always* be used when start ispell process
-  (setq ispell-extra-args (flyspell-detect-ispell-args t))
-  ;; (setq ispell-cmd-args (flyspell-detect-ispell-args))
+  (setq-default ispell-extra-args (flyspell-detect-ispell-args t))
 
-
-  (defadvice ispell-word (around my-ispell-word activate)
+  (defun ispell-extra-args-around (orig-fun &rest args)
     (let ((old-ispell-extra-args ispell-extra-args))
       (ispell-kill-ispell t)
       ;; use emacs original arguments
+      ;; donot use together
       (setq ispell-extra-args (flyspell-detect-ispell-args))
-      ad-do-it
+      (apply orig-fun args)
       ;; restore our own ispell arguments
       (setq ispell-extra-args old-ispell-extra-args)
       (ispell-kill-ispell t)))
-
-  (defadvice flyspell-auto-correct-word (around my-flyspell-auto-correct-word activate)
-    (let ((old-ispell-extra-args ispell-extra-args))
-      (ispell-kill-ispell t)
-      ;; use emacs original arguments
-      (setq ispell-extra-args (flyspell-detect-ispell-args))
-      ad-do-it
-      ;; restore our own ispell arguments
-      (setq ispell-extra-args old-ispell-extra-args)
-      (ispell-kill-ispell t)))
-  (defadvice flyspell-highlight-incorrect-region (around flyspell-highlight-incorrect-region-hack activate)
-  (if (or flyspell-check-doublon (not (eq 'doublon (ad-get-arg 2))))
-      ad-do-it)))
+  (advice-add 'ispell-word :around #'ispell-extra-args-around)
+  (advice-add 'flyspell-auto-correct-word :around #'ispell-extra-args-around))
 
 ;; Add auto spell-checking in comments for all programming language modes
 ;; if and only if there is enough memory
 ;; You can use prog-mode-hook instead.
 (defun can-enable-flyspell-mode ()
-  (and (not *no-memory*)
-       ispell-program-name
-       (executable-find ispell-program-name)))
+  (and ispell-program-name
+      (executable-find ispell-program-name)))
 
 (defun enable-flyspell-mode-conditionally ()
-  (if (and (not *no-memory*)
-           ispell-program-name
+  (if (and  ispell-program-name
            (executable-find ispell-program-name))
       (flyspell-mode 1)))
-
-(if (can-enable-flyspell-mode)
-    (add-hook 'prog-mode-hook 'flyspell-prog-mode))
-
-(autoload 'flyspell-correct-ivy "flyspell-correct-ivy" nil t)
-(setq flyspell-correct-interface 'flyspell-correct-ivy)
-
-(bind-keys ("C-c s" . flyspell-correct-word-generic)
-           ("C-c S" . flyspell-buffer)
-           ("C-c 4" . ispell-word))
-
+(when (can-enable-flyspell-mode)
+    (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+    (add-hook 'text-mode-hook 'flyspell-mode))
 (provide 'init-spelling)

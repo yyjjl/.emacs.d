@@ -8,7 +8,7 @@
           (setq str (s-replace " " "" str))))
     (ivy--regex-fuzzy str))
 
-  (setq ivy-count-format "(%d/%d) ")
+  (setq ivy-count-format "[%d/%d] ")
   (setq ivy-re-builders-alist
         '((swiper . ivy--regex-plus)
           ;; fuzzy make ivy so slow
@@ -27,25 +27,26 @@
              ("C-f" . forward-char)
              ("C-SPC" . set-mark-command)))
 
-(with-eval-after-load 'counsel
-  (defun counsel-sudo-edit (&optional arg)
-    "Edit currently visited file as root.
+(defun counsel-sudo-edit (&optional arg)
+  "Edit currently visited file as root.
 With a prefix ARG prompt for a file to visit.
 Will also prompt for a file to visit if current
 buffer is not visiting a file."
-    (interactive "P")
-    (if (or arg (not buffer-file-name))
-        (ivy-read "Find file(as sudo): :" 'read-file-name-internal
-                  :matcher #'counsel--find-file-matcher
-                  :initial-input default-directory
-                  :action
-                  (lambda (x)
-                    (with-ivy-window
-                      (find-file (concat "/sudo:root@localhost:"
-                                         (expand-file-name x ivy--directory)))))
-                  :keymap counsel-find-file-map
-                  :caller 'counsel-sudo-edit)
-      (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
+  (interactive "P")
+  (if (or arg (not buffer-file-name))
+      (ivy-read "Find file(as sudo): :" 'read-file-name-internal
+                :matcher #'counsel--find-file-matcher
+                :initial-input default-directory
+                :action
+                (lambda (x)
+                  (with-ivy-window
+                    (find-file (concat "/sudo:root@localhost:"
+                                       (expand-file-name x ivy--directory)))))
+                :keymap counsel-find-file-map
+                :caller 'counsel-sudo-edit)
+    (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
+
+(with-eval-after-load 'counsel
   (setq counsel-find-file-at-point t)
   (setq counsel-find-file-ignore-regexp
         (concat
@@ -57,6 +58,7 @@ buffer is not visiting a file."
     (unless (boundp 'bookmark-maybe-load-default-file)
       (require 'bookmark+))
     (bookmark-maybe-load-default-file))
+
   (ivy-set-actions
    'counsel-find-file
    `(("x"

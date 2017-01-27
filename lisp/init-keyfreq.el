@@ -29,60 +29,6 @@
         describe-variable
         erase-message-buffer
         eval-buffer
-        evil-a-WORD
-        evil-append
-        evil-backward-char
-        evil-backward-word-begin
-        evil-change
-        evil-change-line
-        evil-delete
-        evil-delete-backward-char-and-join
-        evil-delete-char
-        evil-delete-line
-        evil-emacs-state
-        evil-end-of-line
-        evil-escape-emacs-state
-        evil-escape-insert-state
-        evil-escape-isearch
-        evil-escape-minibuffer
-        evil-escape-motion-state
-        evil-escape-visual-state
-        evil-ex
-        evil-ex-command
-        evil-ex-delete-backward-char
-        evil-exit-visual-state
-        evil-find-char
-        evil-first-non-blank
-        evil-force-normal-state
-        evil-forward-char
-        evil-forward-word-begin
-        evil-forward-word-end
-        evil-goto-first-line
-        evil-goto-line
-        evil-indent
-        evil-insert
-        evil-join
-        evil-jump-forward
-        evil-mc-make-and-goto-next-match
-        evil-next-line
-        evil-next-visual-line
-        evil-normal-state
-        evil-open-below
-        evil-paste-after
-        evil-previous-line
-        evil-previous-visual-line
-        evil-record-macro
-        evil-replace
-        evil-ret
-        evil-scroll-page-down
-        evil-scroll-page-up
-        evil-search-forward
-        evil-search-next
-        evil-search-word-forward
-        evil-substitute
-        evil-visual-char
-        evil-visual-line
-        evil-yank
         exit-minibuffer
         ffip
         forward-char

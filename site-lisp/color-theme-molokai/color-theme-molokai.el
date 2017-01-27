@@ -137,7 +137,7 @@
                                               :weight bold  :background "#4b5053"))))
 
      (regex-tool-matched-face ((t (:foreground nil :background nil :inherit match))))
-
+     (hl-sexp-face ((t (:background "gray5"))))
      (org-block ((t (:foreground "#8bc34a" :background "#1c1f26"))))
      (org-block-background ((t (:background "#1c1f26"))))
      (org-code ((t (:foreground "#8bc34a" :background "#1c1f26"))))

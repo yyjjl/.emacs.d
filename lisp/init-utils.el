@@ -10,9 +10,6 @@
          retval)
      ,@clean-up))
 
-;;a no-op function to bind to if you want to set a keystroke to null
-(defun void () "this is a no-op" (interactive))
-
 ;;----------------------------------------------------------------------------
 ;; Handier way to add modes to auto-mode-alist
 ;;----------------------------------------------------------------------------
@@ -20,24 +17,6 @@
   "Add entries to `auto-mode-alist' to use `MODE' for all given file `PATTERNS'."
   (dolist (pattern patterns)
     (add-to-list 'auto-mode-alist (cons pattern mode))))
-
-
-;;----------------------------------------------------------------------------
-;; String utilities missing from core emacs
-;;----------------------------------------------------------------------------
-(defun string-all-matches (regex str &optional group)
-  "Find all matches for `REGEX' within `STR', returning the full match string or group `GROUP'."
-  (let ((result nil)
-        (pos 0)
-        (group (or group 0)))
-    (while (string-match regex str pos)
-      (push (match-string group str) result)
-      (setq pos (match-end group)))
-    result))
-
-(defun string-rtrim (str)
-  "Remove trailing whitespace from `STR'."
-  (replace-regexp-in-string "[ \t\n]*$" "" str))
 
 
 ;;----------------------------------------------------------------------------
@@ -80,31 +59,6 @@
         (set-visited-file-name new-name)
         (set-buffer-modified-p nil)))))
 
-;; @see http://emacs.stackexchange.com/questions/14129/which-keyboard-shortcut-to-use-for-navigating-out-of-a-string
-(defun font-face-is-similar (f1 f2)
-  (let (rlt)
-    ;; (message "f1=%s f2=%s" f1 f2)
-    ;; in emacs-lisp-mode, the '^' from "^abde" has list of faces:
-    ;;   (font-lock-negation-char-face font-lock-string-face)
-    (if (listp f1) (setq f1 (nth 1 f1)))
-    (if (listp f2) (setq f2 (nth 1 f2)))
-
-    (if (eq f1 f2) (setq rlt t)
-      ;; C++ comment has different font face for limit and content
-      ;; f1 or f2 could be a function object because of rainbow mode
-      (if (and (string-match "-comment-" (format "%s" f1)) (string-match "-comment-" (format "%s" f2)))
-          (setq rlt t)))
-    rlt))
-
-;;----------------------------------------------------------------------------
-;; Browse current HTML file
-;;----------------------------------------------------------------------------
-(defun browse-current-file ()
-  "Open the current file as a URL using `browse-url'."
-  (interactive)
-  (browse-url-generic (concat "file://" (buffer-file-name))))
-
-
 (defmacro with-selected-frame (frame &rest forms)
   (let ((prev-frame (gensym))
         (new-frame (gensym)))
@@ -139,10 +93,48 @@
       (setq rlt nil)))
     rlt))
 
+(defun create-scratch-buffer nil
+  "Create a new scratch buffer to work in.  (could be *scratch* - *scratchX*)."
+  (interactive)
+  (let ((n 0)
+        bufname)
+    (while (progn
+             (setq bufname (concat "*scratch"
+                                   (if (= n 0) "" (int-to-string n))
+                                   "*"))
+             (setq n (1+ n))
+             (get-buffer bufname)))
+    (switch-to-buffer (get-buffer-create bufname))
+    (lisp-interaction-mode)))
+
+(defun cleanup-buffer-safe ()
+  "Perform a bunch of safe operations on the whitespace content of a buffer.
+Does not indent buffer, because it is used for a `before-save-hook', and that
+might be bad."
+  (interactive)
+  (untabify (point-min) (point-max))
+  (delete-trailing-whitespace)
+  (set-buffer-file-coding-system 'utf-8))
+
+(defun show-messages-buffer ()
+  " show message buffer"
+  (interactive)
+  (popwin:popup-buffer (get-buffer "*Messages*")))
+
+(defun remap-kbd (old-key new-key &optional map)
+  (let ((m (or map global-map))
+        (key-seq (string-to-list (kbd old-key))))
+    (while (and m key-seq)
+      (setq m (assoc (car key-seq) m))
+      (setq key-seq (cdr key-seq)))
+    (when m
+      (define-key map (kbd new-key) (cdr m))
+      (define-key map (kbd old-key) nil))))
+
 (defun add-to-list-after (n ele lst)
   "add a element after position"
   (when (>= n 0)
     (let ((ncdr (nthcdr n lst)))
-      (setcdr ncdr (cons ele (cdr ncdr)))))) 
+      (setcdr ncdr (cons ele (cdr ncdr))))))
 
 (provide 'init-utils)

@@ -10,7 +10,6 @@
 ;; Show a marker in the left fringe for lines not in the buffer
 ;;----------------------------------------------------------------------------
 (setq indicate-empty-lines t)
-
 ;; NO tool bar or scroll bar
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
@@ -18,16 +17,13 @@
   (set-scroll-bar-mode nil))
 (when (fboundp 'menu-bar-mode)
   (menu-bar-mode -1))
+(setq-default mode-line-format nil)
+(setq-default frame-title-format nil)
 
 (defun default-console-setup-frame (frame)
   (xterm-mouse-mode 1)
   (if window-system
       (mwheel-install)))
-
-(when (or (display-graphic-p)
-          (daemonp))
-    (global-set-key (kbd "C-=") 'text-scale-increase)
-    (global-set-key (kbd "C--") 'text-scale-decrease))
 
 (defun default-setup-frame (frame)
   (with-selected-frame frame

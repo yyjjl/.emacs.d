@@ -14,11 +14,11 @@
 
 (setq hs-minor-mode-map
       (let ((map (make-sparse-keymap)))
-        (define-key map (kbd "C-c w h") 'hs-hide-block)
-        (define-key map (kbd "C-c w s") 'hs-show-block)
-        (define-key map (kbd "C-c w H") 'hs-hide-all)
-        (define-key map (kbd "C-c w S") 'hs-show-all)
-        (define-key map (kbd "C-c w t") 'hs-toggle-hiding)
+        (define-key map (kbd "C-x t h") 'hs-hide-block)
+        (define-key map (kbd "C-x t s") 'hs-show-block)
+        (define-key map (kbd "C-x t H") 'hs-hide-all)
+        (define-key map (kbd "C-x t S") 'hs-show-all)
+        (define-key map (kbd "C-x t t") 'hs-toggle-hiding)
         (define-key map [(shift mouse-2)] 'hs-mouse-toggle-hiding)
         map))
 
@@ -27,6 +27,8 @@
 (defvar hs-hide-all nil "Current state of hideshow for toggling all.")
 (defvar fold-all-fun nil "Function to fold all.")
 (defvar fold-fun nil "Function to fold.")
+(make-variable-buffer-local 'fold-all-fun)
+(make-variable-buffer-local 'fold-fun)
 
 (defun hs-display-headline ()
   (let* ((len (length hs-headline))
@@ -40,8 +42,9 @@
 (defun hs-abstract-overlay (ov)
   (let* ((start (overlay-start ov))
          (end (overlay-end ov))
-         (str (format "<%d lines>" (count-lines start end))) text)
-    (setq text (propertize str 'face 'hs-block-flag-face 'help-echo (buffer-substring (1+ start) end)))
+         (str (format " ...%d... " (count-lines start end))) text)
+    (setq text (propertize str 'face 'whitespace-space
+                           'help-echo (buffer-substring (1+ start) end)))
     (overlay-put ov 'display text)
     (overlay-put ov 'pointer 'hand)
     (overlay-put ov 'keymap hs-overlay-map)))
@@ -72,8 +75,6 @@
   (setq hs-isearch-open t)
   (setq hs-set-up-overlay 'hs-abstract-overlay)
   (make-local-variable 'hs-hide-all)
-  (make-variable-buffer-local 'fold-all-fun)
-  (make-variable-buffer-local 'fold-fun)
 
   (defadvice goto-line (after expand-after-goto-line activate compile)
     (save-excursion (hs-show-block)))

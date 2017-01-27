@@ -1,0 +1,12 @@
+
+* editing
+  | M-m | back-to-indentation     |
+  | M-/ | delete-horizontal-space |
+
+** sexp
+    prefix C-M
+    | a   | begin-of-defun |
+    | e   | end-of-defun   |
+    | SPC | mark-sexp      |
+    | h   | mark-defun     |
+    | k   | kill-sexp      |

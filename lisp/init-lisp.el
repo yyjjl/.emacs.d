@@ -1,11 +1,12 @@
 ;; ----------------------------------------------------------------------------
 ;; Paredit
 ;; ----------------------------------------------------------------------------
-(defvar paredit-minibuffer-commands '(eval-expression
-                                      pp-eval-expression
-                                      eval-expression-with-eldoc
-                                      ibuffer-do-eval
-                                      ibuffer-do-view-and-eval)
+(defvar paredit-minibuffer-commands
+  '(eval-expression
+    pp-eval-expression
+    eval-expression-with-eldoc
+    ibuffer-do-eval
+    ibuffer-do-view-and-eval)
   "Interactive commands for which paredit should be enabled in the minibuffer.")
 
 (with-eval-after-load 'paredit
@@ -66,7 +67,6 @@
 (defun my-lisp-setup ()
   "Enable features useful in any Lisp mode."
   (enable-paredit-mode)
-
   (rainbow-delimiters-mode t)
   (when (require 'semantic/bovine/el nil t)
     (try-turn-on-semantic-mode))
@@ -75,7 +75,9 @@
   (prettify-symbols-mode 1)
   (flycheck-mode -1)
   (local-set-key (kbd "M-<RET>") 'srefactor-refactor-at-point)
-  (local-set-key (kbd "C-c e") 'eval-and-replace))
+  (local-set-key (kbd "C-c e") 'eval-and-replace)
+
+  (add-to-list 'company-backends 'company-elisp))
 
 
 ;; ----------------------------------------------------------------------------
@@ -85,8 +87,10 @@
 (defun set-up-hippie-expand-for-elisp ()
   "Locally set `hippie-expand' completion functions for use with Emacs Lisp."
   (make-local-variable 'hippie-expand-try-functions-list)
-  (add-to-list 'hippie-expand-try-functions-list 'try-complete-lisp-symbol t)
-  (add-to-list 'hippie-expand-try-functions-list 'try-complete-lisp-symbol-partially t))
+  (add-to-list 'hippie-expand-try-functions-list
+               'try-complete-lisp-symbol t)
+  (add-to-list 'hippie-expand-try-functions-list
+               'try-complete-lisp-symbol-partially t))
 
 (defun elisp-mode-hooks ()
   "lisp-mode-hooks"
@@ -143,8 +147,7 @@
 ;; A quick way to jump to the definition of a function given its key binding
 (global-set-key (kbd "C-h K") 'find-function-on-key)
 
-(add-to-list 'auto-mode-alist '("\\.emacs-project\\'" . emacs-lisp-mode))
-(add-to-list 'auto-mode-alist '("archive-contents\\'" . emacs-lisp-mode))
+
 
 
 (provide 'init-lisp)

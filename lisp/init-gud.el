@@ -24,14 +24,17 @@
   (when (string= major-mode "gud-mode")
     (goto-char (point-max))))
 
-(defadvice switch-to-buffer (after switch-to-buffer-after activate)
+(defadvice switch-to-buffer
+    (after switch-to-buffer-after activate)
   (hack-gud-mode))
 
-(defadvice select-window-by-number (after select-window-by-number-after activate)
+(defadvice select-window-by-number
+    (after select-window-by-number-after activate)
   (hack-gud-mode))
 
 ;; windmove-do-window-select is from windmove.el
-(defadvice windmove-do-window-select (after windmove-do-window-select-after activate)
+(defadvice windmove-do-window-select
+    (after windmove-do-window-select-after activate)
   (hack-gud-mode))
 ;; }}
 
@@ -53,13 +56,29 @@
 (with-eval-after-load 'gud
   (add-hook 'gud-mode-hook
             '(lambda ()
+               (bind-keys ("C-x C-a C-b") ("C-x a b" . gud-break)
+                          ("C-x C-a C-t") ("C-x a t" . gud-tbreak)
+                          ("C-x C-a C-d") ("C-x a d" . gud-remove)
+                          ("C-x C-a C-s") ("C-x a s" . gud-step)
+                          ("C-x C-a C-i") ("C-x a i" . gud-stepi)
+                          ("C-x C-a C-n") ("C-x a n" . gud-next)
+                          ("C-x C-a C-r") ("C-x a c" . gud-cont)
+                          ("C-x C-a C-f") ("C-x a f" . gud-finish)
+                          ("C-x C-a C-j") ("C-x a j" . gud-jump)
+                          ("C-x C-a <") ("C-x a ," . gud-up)
+                          ("C-x C-a >") ("C-x a ." . gud-down)
+                          ("C-x C-a p") ("C-x a p" . gud-print)
+                          ("C-x C-a C-u") ("C-x a u" . gud-until)
+                          ("C-x C-a C-v") ("C-x a v" . gud-pv))
                (company-mode 1)
                (local-set-key (kbd "<tab>") 'indent-for-tab-command)
                (setq comint-prompt-read-only t)
-               (setq gdb-many-windows t)))
+               (setq gdb-many-windows nil)))
 
   (defun gud-gdb-completions (context command)
-    (when (string-match "\\(::\\|->\\|[*.a-zA-Z]\\)$" command)
+    (when (and  (string-match "\\(::\\|->\\|[*.a-zA-Z]\\)$" command)
+               (save-excursion (forward-line 0)
+                               (looking-at comint-prompt-regexp)))
       (let* ((start (- (point) (field-beginning)))
              (complete-list
               (gud-gdb-run-command-fetch-lines (concat "complete " context command)
@@ -96,7 +115,9 @@
   (setq gud-pdb-command-name "pdb-setup")
 
   (defun gud-pdb-completions (context command)
-    (when (string-match "\\([*.a-zA-Z0-9_]\\)$" command)
+    (when (and  (string-match "\\([*.a-zA-Z0-9_]\\)$" command)
+               (save-excursion (forward-line 0)
+                               (looking-at comint-prompt-regexp)))
       (let ((gud-pdb-fetch-lines-in-progress t)
             (gud-pdb-fetch-lines-string nil)
             (gud-pdb-fetched-lines nil)
@@ -117,7 +138,9 @@
 
 (with-eval-after-load 'gdb-mi
   (defun gud-gdbmi-completions (context command)
-    (when (string-match "\\(::\\|->\\|[*.a-zA-Z0-9_]\\)$" command)
+    (when (and  (string-match "\\(::\\|->\\|[*.a-zA-Z0-9_]\\)$" command)
+               (save-excursion (forward-line 0)
+                               (looking-at gdb-prompt-name)))
       (let ((gud-gdb-fetch-lines-in-progress t)
             (gud-gdb-fetch-lines-string nil)
             (gud-gdb-fetch-lines-break (length context))

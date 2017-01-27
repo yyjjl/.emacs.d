@@ -23,7 +23,7 @@
       (string-match "^[ \t]+:[A-Z]+:[ \t]+" cur-line)))
 
   ;; Please note flyspell only use ispell-word
-  (defadvice org-mode-flyspell-verify (after org-mode-flyspell-verify-hack activate)
+  (defun org-mode-flyspell-verify-hack ()
     (let ((run-spellcheck ad-return-value))
       (if ad-return-value
           (cond
@@ -32,6 +32,8 @@
            ((org-mode-current-line-is-property)
             (setq run-spellcheck nil))))
       (setq ad-return-value run-spellcheck)))
+  (advice-add 'org-mode-flyspell-verify :after
+              #'org-mode-flyspell-verify-hack)
   ;; }}
 
   ;; @see https://gist.github.com/mwfogleman/95cc60c87a9323876c6c
@@ -70,7 +72,8 @@
         )
 
   ;; Refile targets include this file and any file contributing to the agenda - up to 5 levels deep
-  (setq org-refile-targets (quote ((nil :maxlevel . 5) (org-agenda-files :maxlevel . 5))))
+  (setq org-refile-targets (quote ((nil :maxlevel . 5)
+                                   (org-agenda-files :maxlevel . 5))))
   ;; Targets start with the file name - allows creating level 1 tasks
   (setq org-refile-use-outline-path (quote file))
   ;; Targets complete in steps so we start with filename, TAB shows the next level of targets etc
@@ -78,7 +81,8 @@
 
   (setq org-todo-keywords
         (quote ((sequence "TODO(t)" "STARTED(s)" "|" "DONE(d!/!)")
-                (sequence "WAITING(w@/!)" "SOMEDAY(S)" "PROJECT(P@)" "|" "CANCELLED(c@/!)"))))
+                (sequence "WAITING(w@/!)" "SOMEDAY(S)"
+                          "PROJECT(P@)" "|" "CANCELLED(c@/!)"))))
   (setq org-imenu-depth 9)
 
   (setq org-src-fontify-natively t)
@@ -170,8 +174,9 @@
 (defvar org-cn-article-bgscale 5 "")
 
 (with-eval-after-load 'ox-latex
-  (setq org-latex-pdf-process '("xelatex -shell-escape -interaction nonstopmode %f"
-                                "xelatex -shell-escape -interaction nonstopmode %f"))
+  (setq org-latex-pdf-process
+        '("xelatex -shell-escape -interaction nonstopmode %f"
+          "xelatex -shell-escape -interaction nonstopmode %f"))
 
   ;;使用minted
   (when (executable-find "pygmentize")

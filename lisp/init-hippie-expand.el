@@ -30,6 +30,4 @@
           try-expand-dabbrev-from-kill
           try-expand-by-dict)))
 
-(global-set-key (kbd "M-/") 'hippie-expand)
-
 (provide 'init-hippie-expand)

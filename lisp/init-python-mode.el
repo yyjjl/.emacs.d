@@ -10,9 +10,6 @@
     ;; emacs 24.4 only
     (setq electric-indent-chars (delq ?: electric-indent-chars))))
 
-(setq interpreter-mode-alist
-      (cons '("python" .   python-mode) interpreter-mode-alist))
-
 (add-hook 'python-mode-hook 'python-mode-hook-setup)
 
 (with-eval-after-load 'elpy

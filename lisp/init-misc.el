@@ -1,39 +1,25 @@
+(autoload 'glsl-mode "glsl-mode" "Major mode for OpenGL Shader langugae" t)
 ;; popwin setup
 (autoload 'popwin-mode "popwin" nil t)
+
+;; input open source license
+(autoload 'legalese "legalese" "" t)
+
 (with-eval-after-load 'popwin
   (global-set-key (kbd "C-z") popwin:keymap)
 
-  (push '(direx:direx-mode :position left :dedicated t)
-        popwin:special-display-config)
+  (push '(direx:direx-mode :position left :width 30 :dedicated t)
+      popwin:special-display-config)
 
   (define-key popwin:keymap "d"
     'direx:jump-to-directory-other-window)
   (define-key popwin:keymap "r"
     'direx-project:jump-to-project-root-other-window))
 
-;; {{ guide-key-mode
-(with-eval-after-load 'guide-key
-  (setq guide-key/guide-key-sequence
-        '("C-x v" ; VCS commands
-          "C-c" "C-z" "C-x r"
-          "C-x g"
-          "C-x 4"
-          "C-x 5"
-          (dired-mode "]" "[" "%")))
-  (setq guide-key/recursive-key-sequence-flag t)
-  (setq guide-key/idle-delay 0.3))
-;; }}
-
-;; turns on auto-fill-mode, don't use text-mode-hook because for some
-;; mode (org-mode for example), this will make the exported document
-;; ugly!
+;; turns on auto-fill-mode, don't use text-mode-hook
 (add-hook 'change-log-mode-hook 'turn-on-auto-fill)
-(global-set-key (kbd "C-c q") 'auto-fill-mode)
 
 ;;----------------------------------------------------------------------------
-
-;; input open source license
-(autoload 'legalese "legalese" "" t)
 
 ;; {{ buf-move
 (bind-keys ("C-c w i" . buf-move-up)
@@ -51,21 +37,15 @@
     (message "Directory added into load-path:%s" dir)))
 
 ;; {{ recentf-mode
+(transient-mark-mode t)
+(recentf-mode 1)
+
 (setq recentf-keep '(file-remote-p file-readable-p))
 (setq recentf-max-saved-items 2048
       recentf-exclude '("/tmp/"
                         "/ssh:"
                         "/sudo:"))
 ;; }}
-
-;; @see http://www.emacswiki.org/emacs/EasyPG#toc4
-;; besides, use gnupg 1.4.9 instead of 2.0
-(defadvice epg--start (around advice-epg-disable-agent disable)
-  "Make epg--start not able to find a gpg-agent"
-  (let ((agent (getenv "GPG_AGENT_INFO")))
-    (setenv "GPG_AGENT_INFO" nil)
-    ad-do-it
-    (setenv "GPG_AGENT_INFO" agent)))
 
 ;; https://github.com/abo-abo/ace-window
 ;; `M-x ace-window ENTER m` to swap window
@@ -131,5 +111,246 @@
     t))
 
 (add-hook 'kill-buffer-query-functions 'unkillable-scratch-buffer)
+
+
+
+;; I'm in Australia now, so I set the locale to "en_AU"
+(defun insert-date (prefix)
+  "Insert the current date.
+With prefix-argument, use ISO format.  With
+two PREFIX arguments, write out the day and month name."
+  (interactive "P")
+  (let ((format (cond
+                 ((not prefix) "%d.%m.%Y")
+                 ((equal prefix '(4)) "%Y-%m-%d")
+                 ((equal prefix '(16)) "%d %B %Y"))))
+    (insert (format-time-string format))))
+
+;;compute the length of the marked region
+(defun region-length ()
+  "Length of a region."
+  (interactive)
+  (message (format "%d" (- (region-end) (region-beginning)))))
+
+
+;; {{ imenu tweak
+(defvar rimenu-position-pair nil "Positions before and after imenu jump.")
+(add-hook 'imenu-after-jump-hook
+          (lambda ()
+            (let ((start-point (marker-position (car mark-ring)))
+                  (end-point (point)))
+              (setq rimenu-position-pair (list start-point end-point)))))
+
+(defun rimenu-jump ()
+  "Jump to the closest before/after position of latest imenu jump."
+  (interactive)
+  (when rimenu-position-pair
+    (let ((p1 (car rimenu-position-pair))
+          (p2 (cadr rimenu-position-pair)))
+
+      ;; jump to the far way point of the rimenu-position-pair
+      (if (< (abs (- (point) p1))
+             (abs (- (point) p2)))
+          (goto-char p2)
+        (goto-char p1))
+      )))
+;; }}
+
+;; show ascii table
+(defun ascii-table ()
+  "Print the ascii table.  Based on a defun by Alex Schroeder <asc@bsiag.com>."
+  (interactive)
+  (switch-to-buffer "*ASCII*")
+  (erase-buffer)
+  (insert (format "ASCII characters up to number %d.\n" 254))
+  (let ((i 0))
+    (while (< i 254)
+      (setq i (+ i 1))
+      (insert (format "%4d %c\n" i i))))
+  (goto-char (point-min)))
+
+;; {{ grep and kill-ring
+(defun grep-pattern-into-list (regexp)
+  (let ((s (buffer-string))
+        (pos 0)
+        item
+        items)
+    (while (setq pos (string-match regexp s pos))
+      (setq item (match-string-no-properties 0 s))
+      (setq pos (+ pos (length item)))
+      (if (not (member item items))
+          (add-to-list 'items item)
+        ))
+    items))
+
+(defun grep-pattern-into-kill-ring (regexp)
+  "Find all strings matching REGEXP in current buffer.
+grab matched string and insert them into `kill-ring'"
+  (interactive
+   (let* ((regexp (read-regexp "grep regex:")))
+     (list regexp)))
+  (let (items rlt)
+    (setq items (grep-pattern-into-list regexp))
+    (dolist (i items)
+      (setq rlt (concat rlt (format "%s\n" i)))
+      )
+    (kill-new rlt)
+    (message "matched strings => kill-ring")
+    rlt))
+
+(defun grep-pattern-jsonize-into-kill-ring (regexp)
+  "Find all strings matching REGEXP in current buffer.
+grab matched string, jsonize them, and insert into kill ring"
+  (interactive
+   (let* ((regexp (read-regexp "grep regex:")))
+     (list regexp)))
+  (let (items rlt)
+    (setq items (grep-pattern-into-list regexp))
+    (dolist (i items)
+      (setq rlt (concat rlt (format "%s : %s ,\n" i i)))
+      )
+    (kill-new rlt)
+    (message "matched strings => json => kill-ring")
+    rlt))
+
+(defun grep-pattern-cssize-into-kill-ring (regexp)
+  "Find all strings matching REGEXP in current buffer.
+grab matched string, cssize them, and insert into kill ring"
+  (interactive
+   (let* ((regexp (read-regexp "grep regex:")))
+     (list regexp)))
+  (let (items rlt)
+    (setq items (grep-pattern-into-list regexp))
+    (dolist (i items)
+      (setq i (replace-regexp-in-string "\\(class=\\|\"\\)" "" i))
+      (setq rlt (concat rlt (format ".%s {\n}\n\n" i))))
+    (kill-new rlt)
+    (message "matched strings => json => kill-ring")
+    rlt))
+;; }}
+
+
+(with-eval-after-load 'grep
+  (dolist (v '("auto"
+               "target"
+               "node_modules"
+               "bower_components"
+               ".sass_cache"
+               ".cache"
+               ".git"
+               ".cvs"
+               ".svn"
+               ".hg"
+               "elpa"))
+    (add-to-list 'grep-find-ignored-directories v)))
+
+;; {{ unique lines
+(defun uniquify-all-lines-region (start end)
+  "Find duplicate lines in region START to END keeping first occurrence."
+  (interactive "*r")
+  (save-excursion
+    (let ((end (copy-marker end)))
+      (while
+          (progn
+            (goto-char start)
+            (re-search-forward "^\\(.*\\)\n\\(\\(.*\n\\)*\\)\\1\n" end t))
+        (replace-match "\\1\n\\2")))))
+
+(defun uniquify-all-lines-buffer ()
+  "Delete duplicate lines in buffer and keep first occurrence."
+  (interactive "*")
+  (uniquify-all-lines-region (point-min) (point-max)))
+;; }}
+
+
+(defun current-font-face ()
+  "Get the font face under cursor."
+  (interactive)
+  (let ((rlt (format "%S" (get-text-property (point) 'face))))
+    (kill-new rlt)
+    (copy-yank-str rlt)
+    (message "%s => clipboard & yank ring" rlt)))
+
+(defun toggle-env-http-proxy ()
+  "Set/unset the environment variable http_proxy which w3m uses."
+  (interactive)
+  (let ((proxy "http://127.0.0.1:1080"))
+    (if (string= (getenv "http_proxy") proxy)
+        ;; clear the the proxy
+        (progn
+          (setenv "http_proxy" "")
+          (message "env http_proxy is empty now")
+          )
+      ;; set the proxy
+      (setenv "http_proxy" proxy)
+      (message "env http_proxy is %s now" proxy))))
+
+;; {{ save history
+;; On Corp machines, I don't have permission to access history,
+;; so safe-wrap is used
+(safe-wrap
+ (if (file-writable-p (file-truename "~/.emacs.d/data/history"))
+     (progn
+       (setq history-length 8000)
+       (setq savehist-additional-variables
+             '(search-ring regexp-search-ring kill-ring))
+       (savehist-mode 1))
+   (message "Failed to access ~/.emacs.d/data/history")))
+;; }}
+
+;; ------------------------------------------------------------
+
+;; zeal-at-point {{
+(defvar zeal-docsets '(angularjs
+                       bash bootstrap c c++ css cmake
+                       elisp express flask go haskell html jinja lisp "emacs lisp"
+                       latex less markdown nodejs opengl perl vue
+                       python sailsjs scipy typescript jquery))
+(defvar zeal-search-history nil)
+(defun zeal-search (&optional arg)
+  (interactive)
+  (let* ((thing (if mark-active
+                    (buffer-substring (region-beginning) (region-end))
+                  (thing-at-point 'symbol)))
+         (search (concat (ivy-read (concat "Docset to search "
+                                           (unless (null thing) (concat "(" thing ")"))
+                                           ": ")
+                                   zeal-docsets
+                                   :history 'zeal-search-history
+                                   :initial-input
+                                   (car (split-string (symbol-name major-mode) "-")))
+                         ":")))
+    (if (null thing)
+        (setq search (read-string "Zeal search:" search))
+      (setq search (concat search thing)))
+    (if (executable-find "zeal")
+        (start-process "Zeal" nil "zeal" "-q" search)
+      (message "Zeal wasn't found"))))
+
+(global-set-key (kbd "C-h z") 'zeal-search)
+;; }}
+
+
+;; {{start dictionary lookup
+;; use below commands to create dicitonary
+;; mkdir -p ~/.stardict/dic
+;; # wordnet English => English
+;; curl http://abloz.com/huzheng/stardict-dic/dict.org/stardict-dictd_www.dict.org_wn-2.4.2.tar.bz2 | tar jx -C ~/.stardict/dic
+;; # Langdao Chinese => English
+;; curl http://abloz.com/huzheng/stardict-dic/zh_CN/stardict-langdao-ec-gb-2.4.2.tar.bz2 | tar jx -C ~/.stardict/dic
+;;
+(autoload 'sdcv-search "sdcv" nil t)
+(global-set-key (kbd "C-c D") 'sdcv-search)
+;; }}
+
+(global-set-key (kbd "C-x j j") 'bookmark-jump)
+(setq bmkp-bookmark-map-prefix-keys nil)
+
+;; midnight mode purges buffers which haven't been displayed in 3 days
+(require 'midnight)
+(setq midnight-mode t)
+
+;; blew code will make initialization fail in daemon mode
+(custom-unicode-font-size current-unicode-font-size)
 
 (provide 'init-misc)

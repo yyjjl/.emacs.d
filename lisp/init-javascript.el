@@ -1,16 +1,3 @@
-;; {{ js2-mode or javascript-mode
-(setq-default js2-use-font-lock-faces t
-              js2-mode-must-byte-compile nil
-              js2-idle-timer-delay 0.5 ; NOT too big for real time syntax check
-              js2-auto-indent-p nil
-              js2-indent-on-enter-key nil ; annoying instead useful
-              js2-skip-preprocessor-directives t
-              js2-strict-inconsistent-return-warning nil ; return <=> return null
-              js2-enter-indents-newline nil
-              js2-bounce-indent-p t)
-;; }}
-
-
 (defun js2-print-json-path (&optional hardcoded-array-index)
   "Print the path to the JSON value under point, and save it in the kill ring.
 If HARDCODED-ARRAY-INDEX provided, array index in JSON path is replaced with it."
@@ -27,16 +14,19 @@ If HARDCODED-ARRAY-INDEX provided, array index in JSON path is replaced with it.
       (cond
        ;; JSON property node
        ((js2-object-prop-node-p current-node)
-        (setq key-name (js2-prop-node-name (js2-object-prop-node-left current-node)))
+        (setq key-name (js2-prop-node-name
+                        (js2-object-prop-node-left current-node)))
         (if rlt (setq rlt (concat "." key-name rlt))
           (setq rlt (concat "." key-name))))
 
        ;; Array node
        ((or (js2-array-node-p current-node))
-        (setq rlt (concat (js2-get-element-index-from-array-node previous-node
-                                                                 current-node
-                                                                 hardcoded-array-index)
-                          rlt)))
+        (setq rlt (concat
+                   (js2-get-element-index-from-array-node
+                    previous-node
+                    current-node
+                    hardcoded-array-index)
+                   rlt)))
        ;; Other nodes are ignored
        (t))
       ;; current node is archived
@@ -53,90 +43,56 @@ If HARDCODED-ARRAY-INDEX provided, array index in JSON path is replaced with it.
       (message "No JSON path found!")))
     rlt))
 
-;; {{ js-beautify
-(defun js-beautify ()
-  "Beautify a region of javascript using the code from jsbeautify.org.
-sudo pip install jsbeautifier"
-  (interactive)
-  (let ((orig-point (point)))
-    (unless (mark)
-      (mark-defun))
-    (shell-command-on-region (point)
-                             (mark)
-                             (concat "js-beautify"
-                                     " --stdin "
-                                     " --jslint-happy --brace-style=end-expand --keep-array-indentation "
-                                     (format " --indent-size=%d " js2-basic-offset))
-                             nil t)
-    (goto-char orig-point)))
-;; }}
+(with-eval-after-load 'js2-mode
+  (defun my-js2-mode-setup()
+    (unless (is-buffer-file-temp)
+      (js2-imenu-extras-mode)
+      (setq mode-name "JS2")
 
-
+      (js2-refactor-mode 1)
 
-(defun my-js2-mode-setup()
-  (unless (is-buffer-file-temp)
-    (js2-imenu-extras-mode)
-    (setq mode-name "JS2")
+      (tern-mode 1)
 
-    (js2-refactor-mode 1)
+      (add-to-list 'company-backends 'company-tern)
 
-    (tern-mode 1)
-    (js2r-add-keybindings-with-prefix "C-c j")
-    (define-key js2-mode-map "\C-cb" 'js-beautify)))
+      (js2r-add-keybindings-with-prefix "C-c j")
+      (define-key js2-mode-map (kbd "C-c b") 'web-beautify-js)))
 
-
-(add-hook 'js2-mode-hook 'my-js2-mode-setup)
+  (setq-default js2-use-font-lock-faces t
+                js2-mode-must-byte-compile nil
+                js2-idle-timer-delay 0.5 ; NOT too big for real time syntax check
+                js2-auto-indent-p nil
+                js2-indent-on-enter-key nil ; annoying instead useful
+                js2-skip-preprocessor-directives t
+                js2-strict-inconsistent-return-warning nil ; return <=> return null
+                js2-enter-indents-newline nil
+                js2-bounce-indent-p t)
 
+  (add-hook 'js2-mode-hook 'my-js2-mode-setup)
+  (setq-default js2-additional-externs
+                '("$"
+                  "$A" ; salesforce lightning component
+                  "AccessifyHTML5" "KeyEvent"
+                  "Raphael" "React" "_content" ; Keysnail
+                  "angular" "app" "beforeEach" "browser"
+                  "by" "clearInterval" "clearTimeout"
+                  "command" ; Keysnail
+                  "content" ; Keysnail
+                  "define" "describe"
+                  "display" ; Keysnail
+                  "element" "expect"
+                  "ext" ; Keysnail
+                  "gBrowser" ; Keysnail
+                  "goDoCommand" ; Keysnail
+                  "hook" ; Keysnail
+                  "inject" "it" "jQuery" "jasmine"
+                  "key" ; Keysnail
+                  "ko" "log" "module"
+                  "plugins" ; Keysnail
+                  "process" "require" "setInterval" "setTimeout"
+                  "shell" ; Keysnail
+                  "tileTabs" ; Firefox addon
+                  "util" ; Keysnail
+                  "utag")))
 
-(add-to-list 'auto-mode-alist '("\\.json\\'" . js-mode))
-(add-to-list 'auto-mode-alist '("\\.jason\\'" . js-mode))
-(add-to-list 'auto-mode-alist '("\\.jshintrc\\'" . js-mode))
-
-(add-to-list 'auto-mode-alist '("\\.js\\(\\.erb\\)?\\'" . js2-mode))
-(add-to-list 'interpreter-mode-alist '("node" . js2-mode))
-(add-to-list 'auto-mode-alist '("\\.jsx?\\'" . js2-jsx-mode))
-
-(setq-default js2-additional-externs
-              '("$"
-                "$A" ; salesforce lightning component
-                "AccessifyHTML5"
-                "KeyEvent"
-                "Raphael"
-                "React"
-                "_content" ; Keysnail
-                "angular"
-                "app"
-                "beforeEach"
-                "browser"
-                "by"
-                "clearInterval"
-                "clearTimeout"
-                "command" ; Keysnail
-                "content" ; Keysnail
-                "define"
-                "describe"
-                "display" ; Keysnail
-                "element"
-                "expect"
-                "ext" ; Keysnail
-                "gBrowser" ; Keysnail
-                "goDoCommand" ; Keysnail
-                "hook" ; Keysnail
-                "inject"
-                "it"
-                "jQuery"
-                "jasmine"
-                "key" ; Keysnail
-                "ko"
-                "log"
-                "module"
-                "plugins" ; Keysnail
-                "process"
-                "require"
-                "setInterval"
-                "setTimeout"
-                "shell" ; Keysnail
-                "tileTabs" ; Firefox addon
-                "util" ; Keysnail
-                "utag"))
 (provide 'init-javascript)

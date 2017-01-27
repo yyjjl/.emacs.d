@@ -21,8 +21,10 @@
   (add-hook 'haskell-mode-hook
             (lambda ()
               (ghc-init)
-
-              (haskell-doc-mode)
+              (add-to-list 'company-backends '(company-ghc
+                                               :with company-dabbrev-code))
+              (add-to-list 'company-backends 'company-cabal)
+              (haskell-doc-mode 1)
               (hindent-mode)
               ;; haskell-indentation-mode is incompatible with shm
               ;; (haskell-indentation-mode -1)

@@ -1,5 +1,3 @@
-(setq-default mode-line-format nil)
-
 (defface  window-numbering-face
   '((t (:foreground "DeepPink" :weight bold)))
   "Window number face"
@@ -55,7 +53,7 @@
       (concat num " %[" real-id "%]")))
 
 (defun mode-line-buffer-major-mode ()
-  (concat  (propertize " %m" 'face 'font-lock-builtin-face
+  (concat  (propertize " %m " 'face 'font-lock-builtin-face
                        'mouse-face 'mode-line-highlight
                        'local-map (let ((map (make-sparse-keymap)))
                                     (define-key map [mode-line mouse-2]
@@ -66,11 +64,7 @@
                                         ignore
                                         :filter (lambda (_)
                                                   (mouse-menu-major-mode-map))))
-                                    map))
-           " {"
-           (when mode-line-process
-                (format-mode-line   mode-line-process))
-           "} "))
+                                    map))))
 
 (defun mode-line-buffer-status ()
   (concat "("
@@ -134,6 +128,12 @@
     (propertize (format-mode-line '(vc-mode vc-mode))
                 'face 'font-lock-constant-face)))
 
+(defun mode-line-process ()
+  (when mode-line-process
+    (concat " {"
+            (format-mode-line   mode-line-process)
+            "} ")))
+
 (defun generate-mode-line ()
   (let ((lhs (format-mode-line
               (concat (mode-line-buffer-id)
@@ -141,7 +141,8 @@
                       (mode-line-buffer-status))))
         (rhs (format-mode-line
               (concat (mode-line-vc)
-                      (mode-line-workgroup2)
+                      ;; (mode-line-workgroup2)
+                      (mode-line-process)
                       (mode-line-flycheck)
                       " %I(%l-%c)%p%%"))))
     (format (format " %%s%%%ds" (or (- (window-total-width)

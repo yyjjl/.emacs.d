@@ -3,7 +3,6 @@
   (setq wg-mode-line-display-on nil)
   (setq wg-session-file (expand-file-name
                          "~/.emacs.d/data/workgroups"))
-  (setq wg-session-load-on-start nil)
-  (setq wg-open-this-wg "none"))
+  (setq wg-load-last-workgroup nil))
 
 (provide 'init-workgroups2)

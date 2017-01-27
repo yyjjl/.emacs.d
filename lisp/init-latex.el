@@ -86,6 +86,12 @@
              ("C-c x u" . latex-font-upright)))
 
 (with-eval-after-load 'preview
+  (setq preview-auto-cache-preamble t
+        preview-transparent-color "white"
+        preview-transparent-border 0
+        preview-scale-function 1.2)
+  (set-face-background 'preview-face "#1b1d1e")
+  (set-face-background 'preview-reference-face "#1b1d1e")
   (setq preview-map
         (let ((map (make-sparse-keymap)))
           (bind-keys :map map

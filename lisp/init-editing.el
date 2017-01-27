@@ -26,7 +26,8 @@
            ("C-c m s" . mc/sort-regions)
            ("C-c m R" . mc/reverse-regions))
 
-(global-set-key (kbd "M--") 'er/expand-region)
+(with-eval-after-load 'indent-guide
+  (setq indent-guide-recursive t))
 
 (with-eval-after-load 'fcitx
   ;; init fcitx prefix keys

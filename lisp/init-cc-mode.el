@@ -9,9 +9,12 @@
   ;; remove the old element
   (setq c-offsets-alist (delq (assoc key c-offsets-alist) c-offsets-alist))
   ;; new value
-  (add-to-list 'c-offsets-alist '(key . val)))
+  (add-to-list 'c-offsets-alist (cons key  val)))
 
 
+
+(with-eval-after-load 'cc-mode
+  (add-to-list 'c++-font-lock-extra-types "auto"))
 
 (defun my-common-cc-mode-setup ()
   "setup shared by all languages (java/groovy/c++ ...)"
@@ -19,28 +22,18 @@
   (setq c-basic-offset 4)
   ;; give me NO newline automatically after electric expressions are entered
   (setq c-auto-newline nil)
-  ;; @see http://xugx2007.blogspot.com.au/2007/06/benjamin-rutts-emacs-c-development-tips.html
-  (setq compilation-window-height 8)
-  (add-to-list 'compilation-finish-functions
-               '(lambda (buf str)
-                  (if (string-match "exited abnormally" str)
-                      ;;there were errors
-                      (message "compilation errors, press C-x ` to visit")
-                    ;;no errors, make the compilation window go away in 0.5 seconds
-                    (when (string-match "*compilation*" (buffer-name buf))
-                      ;; @see http://emacswiki.org/emacs/ModeCompile#toc2
-                      (bury-buffer "*compilation*")
-                      (winner-undo)
-                      (message "NO COMPILATION ERRORS!")
-                      ))))
 
   ;;make DEL take all previous whitespace with it
   (c-toggle-hungry-state 1)
   (ggtags-mode 1)
   (ggtags-auto-update-mode 1)
   ;; indent
-  (fix-c-indent-offset-according-to-syntax-context 'substatement 0)
-  (fix-c-indent-offset-according-to-syntax-context 'func-decl-cont 0))
+  (fix-c-indent-offset-according-to-syntax-context 'innamespace [0])
+  (fix-c-indent-offset-according-to-syntax-context 'substatement-open 0)
+  (fix-c-indent-offset-according-to-syntax-context 'func-decl-cont 0)
+  (fix-c-indent-offset-according-to-syntax-context 'case-label 4)
+  (local-set-key (kbd "M-n") 'forward-sexp)
+  (local-set-key (kbd "M-p") 'backward-sexp))
 
 (defun my-c-mode-setup ()
   "C/C++ only setup"
@@ -62,21 +55,12 @@
   ;; make a #define be left-aligned
   (setq c-electric-pound-behavior (quote (alignleft)))
 
+  (add-to-list 'company-backends 'company-irony)
+  (add-to-list 'company-backends 'company-irony-c-headers)
+
   (when buffer-file-name
     (irony-eldoc)
-    (irony-mode 1)
-
-    ;; @see https://github.com/redguardtoo/cpputils-cmake
-    ;; Make sure your project use cmake!
-    ;; Or else, you need comment out below code:
-    ;; {{
-
-    ;; (if (executable-find "cmake")
-    ;;     (if (not (or (string-match "^/usr/local/include/.*" buffer-file-name)
-    ;;                  (string-match "^/usr/src/linux/include/.*" buffer-file-name)))
-    ;;         (cppcm-reload-all)))
-    ;; }}
-    ))
+    (irony-mode 1)))
 ;; donot use c-mode-common-hook or cc-mode-hook because many major-modes use this hook
 (add-hook 'c-mode-common-hook
           (lambda ()
@@ -93,6 +77,8 @@
 
 (with-eval-after-load 'irony
   (setq irony-additional-clang-options '("-std=c++14"))
+  (setq irony--server-executable (expand-file-name
+                                  "~/.emacs.d/bin/irony-server"))
   (defun my-irony-mode-hook ()
     (define-key irony-mode-map [remap completion-at-point]
       'irony-completion-at-point-async)
@@ -103,5 +89,8 @@
 
 (with-eval-after-load 'disaster
   (setq disaster-cxxflags "--std=c++14"))
+
+(autoload 'cmake-font-lock-activate "cmake-font-lock" nil t)
+(add-hook 'cmake-mode-hook 'cmake-font-lock-activate)
 
 (provide 'init-cc-mode)

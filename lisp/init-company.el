@@ -1,25 +1,16 @@
 (with-eval-after-load 'company
   (company-statistics-mode 1)
-
   ;; can't work with TRAMP
-  (setq company-backends (delete 'company-ropemacs company-backends))
-  (setq company-backends (delete 'company-semantic company-backends))
-  (setq company-backends (delete 'company-clang company-backends))
+  (make-variable-buffer-local 'company-backends)
+  (setq-default company-backends (delete 'company-ropemacs company-backends))
+  (setq-default company-backends (delete 'company-semantic company-backends))
+  (setq-default company-backends (delete 'company-clang company-backends))
   ;; make company-files a work before capf
-  (setq company-backends (delete 'company-files  company-backends))
   ;; (setq company-backends (delete 'company-capf company-backends))
-  (add-to-list 'company-backends 'company-cmake)
-  (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code))
-  (add-to-list 'company-backends 'company-tern)
-  (add-to-list 'company-backends 'company-web-html)
-  (add-to-list 'company-backends 'company-shell)
-  (add-to-list 'company-backends 'company-elisp)
-  (add-to-list 'company-backends 'company-files)
-  ;;     (add-to-list 'company-backends 'company-web-jade)
-  ;;     (add-to-list 'company-backends 'company-web-slim)
-  (add-to-list 'company-backends 'company-cabal)
-  (add-to-list 'company-backends 'company-irony)
-  (add-to-list 'company-backends 'company-irony-c-headers)
+  (setq-default company-backends (delete 'company-files  company-backends))
+  ;; company-files before company-capf
+  (setq-default company-backends (cons 'company-files company-backends))
+
   ;; I don't like the downcase word in company-dabbrev
   ;; for languages use camel case naming convention
   ;; company should be case sensitive
@@ -32,6 +23,7 @@
   (setq company-require-match nil)
   (setq company-etags-ignore-case t)
   (setq company-minimum-prefix-length 2)
+  (setq company-tooltip-align-annotations t)
 
   (bind-keys :map company-active-map
             ("C-n" . company-select-next)
@@ -63,7 +55,6 @@
 ;; {{ setup company-ispell
 (defun toggle-company-ispell ()
   (interactive)
-  (make-local-variable 'company-backends)
   (cond
    ((memq 'company-ispell company-backends)
     (setq company-backends (delete 'company-ispell company-backends))
@@ -82,5 +73,8 @@
 
 (with-eval-after-load 'company-shell
   (setq company-shell-modes '(sh-mode)))
+
+(add-hook 'cmake-mode-hook '(lambda ()
+                              (add-to-list 'company-backends 'company-cmake)))
 
 (provide 'init-company)

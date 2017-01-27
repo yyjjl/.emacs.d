@@ -39,11 +39,11 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
 
   (defhydra hydra-org-move (:color pink :hint nil)
     "org move"
-    ("u" outline-up-heading "up")                ; Up
-    ("n" outline-next-visible-heading "next")      ; Next
-    ("p" outline-previous-visible-heading "prev")  ; Previous
-    ("f" outline-forward-same-level "forward")        ; Forward - same level
-    ("b" outline-backward-same-level "back")       ; Backward - same level
+    ("u" outline-up-heading "up")                 ; Up
+    ("n" outline-next-visible-heading "next")     ; Next
+    ("p" outline-previous-visible-heading "prev") ; Previous
+    ("f" outline-forward-same-level "forward") ; Forward - same level
+    ("b" outline-backward-same-level "back")   ; Backward - same level
     ("q" nil "quit")
     ("<tab>" yas-expand)
     ("RET" nil))
@@ -75,9 +75,7 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
 
 (define-key global-map (kbd "C-x SPC") 'hydra-rectangle/body)
 
-(defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
-                                     :color pink
-                                     :post (deactivate-mark))
+(defhydra hydra-rectangle (:color pink)
   "
   ^_p_^     [_d_]delete    [_s_]string
 _b_   _f_   [_o_]ok        [_y_]yank

@@ -25,7 +25,10 @@ if no files marked, always operate on current line in dired-mode
   ;; search file name only when focus is over file
   (setq dired-isearch-filenames 'dwim)
   (setq dired-recursive-copies 'always)
-  (setq dired-recursive-deletes 'always))
+  (setq dired-recursive-deletes 'always)
+
+  (add-hook 'dired-initial-position-hook 'dired-k)
+  (add-hook 'dired-after-readin-hook #'dired-k-no-revert))
 
 
 

@@ -1,4 +1,3 @@
-
 (defun markdown-imenu-create-index ()
   (let* ((root '(nil . nil))
          cur-alist
@@ -47,7 +46,8 @@
 
   (add-hook 'markdown-mode-hook
           '(lambda ()
-             (setq imenu-create-index-function 'markdown-imenu-create-index)))
+             (setq imenu-create-index-function
+                   'markdown-imenu-create-index)))
 
 
 (provide 'init-markdown)

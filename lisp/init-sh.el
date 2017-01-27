@@ -1,11 +1,18 @@
-(add-to-list 'auto-mode-alist '("\\.bash_profile\\'" . sh-mode))
-(add-to-list 'auto-mode-alist '("\\.bash_history\\'" . sh-mode))
-(add-to-list 'auto-mode-alist '("\\.sh\\'" . sh-mode))
-(add-to-list 'auto-mode-alist '("\\.bash\\'" . sh-mode))
-(add-to-list 'auto-mode-alist '("\\.bashrc.local\\'" . sh-mode))
-(add-to-list 'auto-mode-alist '("\\.zsh\\'" . sh-mode))
-(add-to-list 'auto-mode-alist '("\\.bashrc\\'" . sh-mode))
+(add-hook 'sh-mode-hook
+          '(lambda ()
+             (add-to-list 'company-backends 'company-shell)
+             (flycheck-mode 1)))
 
-(add-hook 'sh-mode-hook 'flycheck-mode)
+
+;; But don't show trailing whitespace in SQLi, inf-ruby etc.
+(add-hook 'comint-mode-hook
+          (lambda () (setq show-trailing-whitespace nil)))
+
+(with-eval-after-load 'eshell
+  (setq eshell-prompt-function
+        (lambda()
+          (concat (getenv "USER") "@" (getenv "HOST") ":"
+                  (eshell/pwdx)
+                  (if (= (user-uid) 0) " # " " $ ")))))
 
 (provide 'init-sh)

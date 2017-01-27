@@ -12,9 +12,10 @@
       ;; find out the longest stripped line in the gutter
       (while (<= linenum-start linenum-end)
         (goto-line linenum-start)
-        (setq tmp-line (replace-regexp-in-string "^[ \t]*" ""
-                                                 (buffer-substring (line-beginning-position)
-                                                                   (line-end-position))))
+        (setq tmp-line (replace-regexp-in-string
+                        "^[ \t]*" ""
+                        (buffer-substring (line-beginning-position)
+                                          (line-end-position))))
         (when (> (length tmp-line) max-line-length)
           (setq target-linenum linenum-start)
           (setq target-line tmp-line)
