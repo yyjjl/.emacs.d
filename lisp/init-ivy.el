@@ -8,7 +8,7 @@
           (setq str (s-replace " " "" str))))
     (ivy--regex-fuzzy str))
 
-  (setq ivy-count-format "[%d/%d] ")
+  (setq ivy-count-format "(%d/%d) ")
   (setq ivy-re-builders-alist
         '((swiper . ivy--regex-plus)
           ;; fuzzy make ivy so slow

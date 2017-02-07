@@ -40,6 +40,7 @@
                              (mode . scala-mode)
                              (mode . go-mode)
                              (mode . erlang-mode)
+                             (mode . haskell-mode)
                              ))
                  ("dired" (or (mode . dired-mode)
                               (mode . sr-mode)

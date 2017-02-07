@@ -91,6 +91,7 @@
     multi-term
     flycheck flycheck-pos-tip
     counsel hydra ivy swiper tiny
+    counsel-projectile
     smex ;; counsel-M-x need smex to get history
     bind-key
     fcitx
@@ -122,7 +123,6 @@
     ;; provide functions to build jump action
     jump ;;
     dired+ dired-filter dired-k
-    direx
     bookmark+
     ;; select bigger region contain current region or point
     expand-region
@@ -152,13 +152,12 @@
     find-by-pinyin-dired
     zzz-to-char
     stickyfunc-enhance
+    zeal-at-point
     ;;---------------------------------------
     ;; search  packages
     ;;---------------------------------------
     ;; provide tree style search jump
     avy
-    ;; find files in project (in directory which has .git)
-    find-file-in-project ;;
     wgrep
     ;;---------------------------------------
     ;; c/c++  packages
@@ -224,7 +223,7 @@
     ;;---------------------------------------
     ;; haskell  packages
     ;;---------------------------------------
-    company-ghc
+    company-ghc company-ghci
     ghc
     haskell-mode
     shm hindent

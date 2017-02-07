@@ -6,16 +6,7 @@
 (autoload 'legalese "legalese" "" t)
 
 (with-eval-after-load 'popwin
-  (global-set-key (kbd "C-z") popwin:keymap)
-
-  (push '(direx:direx-mode :position left :width 30 :dedicated t)
-      popwin:special-display-config)
-
-  (define-key popwin:keymap "d"
-    'direx:jump-to-directory-other-window)
-  (define-key popwin:keymap "r"
-    'direx-project:jump-to-project-root-other-window))
-
+  (global-set-key (kbd "C-z") popwin:keymap))
 ;; turns on auto-fill-mode, don't use text-mode-hook
 (add-hook 'change-log-mode-hook 'turn-on-auto-fill)
 
@@ -300,35 +291,8 @@ grab matched string, cssize them, and insert into kill ring"
 
 ;; ------------------------------------------------------------
 
-;; zeal-at-point {{
-(defvar zeal-docsets '(angularjs
-                       bash bootstrap c c++ css cmake
-                       elisp express flask go haskell html jinja lisp "emacs lisp"
-                       latex less markdown nodejs opengl perl vue
-                       python sailsjs scipy typescript jquery))
-(defvar zeal-search-history nil)
-(defun zeal-search (&optional arg)
-  (interactive)
-  (let* ((thing (if mark-active
-                    (buffer-substring (region-beginning) (region-end))
-                  (thing-at-point 'symbol)))
-         (search (concat (ivy-read (concat "Docset to search "
-                                           (unless (null thing) (concat "(" thing ")"))
-                                           ": ")
-                                   zeal-docsets
-                                   :history 'zeal-search-history
-                                   :initial-input
-                                   (car (split-string (symbol-name major-mode) "-")))
-                         ":")))
-    (if (null thing)
-        (setq search (read-string "Zeal search:" search))
-      (setq search (concat search thing)))
-    (if (executable-find "zeal")
-        (start-process "Zeal" nil "zeal" "-q" search)
-      (message "Zeal wasn't found"))))
 
-(global-set-key (kbd "C-h z") 'zeal-search)
-;; }}
+(global-set-key (kbd "C-h z") 'zeal-at-point)
 
 
 ;; {{start dictionary lookup
@@ -349,8 +313,5 @@ grab matched string, cssize them, and insert into kill ring"
 ;; midnight mode purges buffers which haven't been displayed in 3 days
 (require 'midnight)
 (setq midnight-mode t)
-
-;; blew code will make initialization fail in daemon mode
-(custom-unicode-font-size current-unicode-font-size)
 
 (provide 'init-misc)

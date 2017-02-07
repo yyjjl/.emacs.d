@@ -1,7 +1,7 @@
 #+title: paredit-mode
 
 编辑lisp语言(及其类似语言)的很好用的工具
-* Opening(键入一队新的"括号")
+* Opening(键入一对新的"括号")
    + =(= -> =paradit-open-round=
    + =[= -> =paredit-open-square=
    + ={= -> =paredit-open-curly=

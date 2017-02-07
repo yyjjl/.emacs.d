@@ -18,20 +18,10 @@
 ;; config cjk fonts
 (add-to-list 'default-frame-alist '(font . "Ubuntu Mono-13"))
 
-(defvar current-unicode-font-size 22
-  "default-unicode-font-size")
-(defun custom-unicode-font-size (&optional s)
-  "set font height"
-  (interactive)
-  ;; run below code in console mode cause error
-  (when (display-graphic-p)
-    (let ((size (or s (read-number "size: "))))
-      (setq current-unicode-font-size size)
-      (dolist (charset '(kana han symbol cjk-misc bopomofo))
-        (set-fontset-font
-         (frame-parameter nil 'font)
-         charset (font-spec :family "Noto Sans S Chinese" :size size))))))
-
-;; (custom-unicode-font-size 14)
+;; (when (display-graphic-p)
+;;            (dolist (charset '(kana han cjk-misc bopomofo))
+;;              (set-fontset-font
+;;               (frame-parameter nil 'font)
+;;               charset (font-spec :family "Noto Sans S Chinese" :size 22))))
 
 (provide 'init-color-theme)

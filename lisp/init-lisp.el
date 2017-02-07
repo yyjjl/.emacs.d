@@ -19,30 +19,26 @@
   (defhydra hydra-paredit ()
     "move"
     ("RET" nil nil)
-    ("p" paredit-backward "←")
-    ("n" paredit-forward "→")
-    ("[" paredit-backward-up "↖")
-    ("]" paredit-forward-down "↘")
-    ("," paredit-backward-down "↙")
-    ("." paredit-forward-up "↗")
-    (">" transpose-sexps "⇌")
-    ("<" reverse-transpose-sexps "⇋"))
+    ("b" paredit-backward "←")
+    ("f" paredit-forward "→")
+    ("p" paredit-backward-up "↖")
+    ("n" paredit-forward-down "↘")
+    ("d" paredit-backward-down "↙")
+    ("u" paredit-forward-up "↗")
+    ("." transpose-sexps "⇌")
+    ("," reverse-transpose-sexps "⇋"))
 
   (bind-keys :map paredit-mode-map
-             ("C-M-f" . nil) ("C-M-d" . nil) ("C-M-u" . nil)
-             ("C-M-b" . nil) ("C-M-p" . nil) ("C-M-n" . nil)
-             ("M-n" . hydra-paredit/paredit-forward)
-             ("M-p" . hydra-paredit/paredit-backward)
-             ("C-," . hydra-paredit/paredit-backward-down)
-             ("C-." . hydra-paredit/paredit-forward-up)
-             ("M-]" . hydra-paredit/paredit-forward-down)
-             ("M-[" . hydra-paredit/paredit-backward-up)
+             ("C-M-f" . hydra-paredit/paredit-forward)
+             ("C-M-b" . hydra-paredit/paredit-backward)
+             ("C-M-d" . hydra-paredit/paredit-backward-down)
+             ("C-M-u" . hydra-paredit/paredit-forward-up)
+             ("C-M-n" . hydra-paredit/paredit-forward-down)
+             ("C-M-p" . hydra-paredit/paredit-backward-up)
              ("C-<backspace>" . paredit-backward-kill-word)
              ("M-<backspace>" . backward-kill-word)
-             ("C->" . hydra-paredit/transpose-sexps)
-             ("C-<" . hydra-paredit/reverse-transpose-sexps)))
-
-
+             ("C-." . hydra-paredit/transpose-sexps)
+             ("C-," . hydra-paredit/reverse-transpose-sexps)))
 
 (defun conditionally-paredit-mode (flag)
   "Enable paredit during lisp-related minibuffer commands."
@@ -59,7 +55,7 @@
   (interactive)
   (backward-kill-sexp)
   (condition-case nil
-      (prin1 (eval (read (current-kill 0)))
+      (print (eval (read (current-kill 0)))
              (current-buffer))
     (error (message "Invalid expression")
            (insert (current-kill 0)))))
@@ -67,7 +63,7 @@
 (defun my-lisp-setup ()
   "Enable features useful in any Lisp mode."
   (enable-paredit-mode)
-  (rainbow-delimiters-mode t)
+  (rainbow-delimiters-mode 1)
   (when (require 'semantic/bovine/el nil t)
     (try-turn-on-semantic-mode))
   (show-paren-mode 1)
@@ -75,9 +71,7 @@
   (prettify-symbols-mode 1)
   (flycheck-mode -1)
   (local-set-key (kbd "M-<RET>") 'srefactor-refactor-at-point)
-  (local-set-key (kbd "C-c e") 'eval-and-replace)
-
-  (add-to-list 'company-backends 'company-elisp))
+  (local-set-key (kbd "C-c e") 'eval-and-replace))
 
 
 ;; ----------------------------------------------------------------------------
@@ -146,8 +140,5 @@
 
 ;; A quick way to jump to the definition of a function given its key binding
 (global-set-key (kbd "C-h K") 'find-function-on-key)
-
-
-
 
 (provide 'init-lisp)

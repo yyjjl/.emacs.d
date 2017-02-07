@@ -4,6 +4,8 @@
 
   (ivy-mode 1)
   (counsel-mode 1)
+  (projectile-mode 1)
+  (counsel-projectile-on)
 
   (which-key-mode)
 
@@ -41,10 +43,9 @@
              ("C-=" . text-scale-increase)
              ("C--" . text-scale-decrease)
              ;; flyspell
-             ("C-c s" . flyspell-auto-correct-word)
+             ("C-c S" . flyspell-auto-correct-word)
              ("C-c 4" . ispell-word)
              ("C-c q" . auto-fill-mode)
-             ("C-x F" . ffip)
              ("C-x C-b" . ibuffer)
 
              ;; narrow

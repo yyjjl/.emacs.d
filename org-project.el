@@ -20,7 +20,7 @@
 <script src='../../../script/main.js'></script>
 "
     :preparation-function my-generate-note-sitemap
-
+    :complete-function my-pretty-symbol
     :with-sub-superscript nil
     )
 
@@ -47,6 +47,11 @@
   (save-excursion
     (cd "~/project/org")
     (shell-command "make clean")))
+
+(defun my-pretty-symbol ()
+    (save-excursion
+      (cd "~/project/org")
+      (shell-command "make pretty")))
 
 (defun my-generate-note-sitemap ()
   (save-excursion

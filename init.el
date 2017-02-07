@@ -103,6 +103,8 @@
  '(company-statistics-file "~/.emacs.d/data/company-statistics-cache.el")
  '(ispell-personal-dictionary "~/.emacs.d/data/aspell.pws")
  '(keyfreq-file "~/.emacs.d/data/keyfreq")
+ '(projectile-known-projects-file
+   "/home/yyj/.emacs.d/data/projectile-bookmarks.eld")
  '(recentf-save-file "~/.emacs.d/data/recentf")
  '(savehist-file "~/.emacs.d/data/history")
  '(semanticdb-default-save-directory "~/.emacs.d/data/semanticdb/")
@@ -113,6 +115,12 @@
  '(tramp-persistentcy-file-name "~/.emacs.d/data/tramp"))
 
 (setq file-name-handler-alist file-name-handler-alist-tmp)
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
 ;;; Local Variables:
 ;;; no-byte-compile: t
 ;;; End:

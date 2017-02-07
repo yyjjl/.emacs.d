@@ -90,8 +90,7 @@
               ;; @see https://github.com/redguardtoo/mastering-emacs-in-one-year-guide/issues/9#issuecomment-97848938
               visible-bell nil)
 
-;; find-file-in-project (ffip)
-(setq ffip-match-path-instead-of-filename t)
+(setq projectile-completion-system 'ivy)
 (setq system-time-locale "C")
 (setq imenu-max-item-length 1024)
 (setq minibuffer-prompt-properties

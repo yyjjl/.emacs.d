@@ -1,8 +1,26 @@
 (with-eval-after-load 'shm
   (setq shm-program-name "~/.cabal/bin/structured-haskell-mode")
-  (define-key shm-map (kbd "C-c C-s") 'shm/case-split))
+  (defun shm/tab-or-close ()
+    (interactive)
+    (if (looking-at ")\\|]\\|}\\|`")
+        (forward-char 1)
+      (shm/tab)))
+  (bind-keys :map shm-map
+             ("C-c C-^") ("C-c 6" . shm/swing-up)
+             ("C-c C-_") ("C-c -" . shm/insert-underscore)
+             ("C-c C-e") ("C-c C-j")
+             ("C-c e" . shm/export)
+             ("C-c j" . shm/swing-down)
+             ("<tab>" . shm/tab-or-close)))
+
+(with-eval-after-load 'hindent
+  (defun force-hindent-indent-size (org-fn)
+    (list* "--tab-size" "4" (apply org-fn '())))
+  (advice-add 'hindent-extra-arguments :around  #'force-hindent-indent-size))
 
 (with-eval-after-load 'haskell-mode
+  (set-fontset-font (frame-parameter nil 'font)
+                    'symbol (font-spec :size 18 :family "Noto Sans S Chinese"))
   (setq
    ;; Use notify.el (if you have it installed) at the end of running
    ;; Cabal commands or generally things worth notifying.
@@ -17,26 +35,65 @@
    haskell-process-auto-import-loaded-modules t
    ;; Disable haskell-stylish-on-save, as it breaks flycheck highlighting.
    ;; NOTE: May not be true anymore - taksuyu 2015-10-06
-   haskell-stylish-on-save nil)
+   haskell-stylish-on-save t)
+  (setq haskell-font-lock-symbols-alist
+        (append haskell-font-lock-symbols-alist
+                '(("*" . "×")
+                  ("/" . "÷"))))
+
+  (bind-keys :map haskell-mode-map
+             ("C-c s" . ghc-sort-lines)
+             ("C-'" . ghc-complete)
+             ("C-c C-s" . ghc-case-split)
+             ("M-." . haskell-mode-tag-find)
+             ("C-c C-=") ("C-c =" . haskell-indent-insert-equal)
+             ("C-c C-o") ("C-c o" . haskell-indent-insert-otherwise)
+             ("C-c C-." . haskell-indent-put-region-in-literate)
+             ("C-c ." . haskell-indent-align-guards-and-rhs)
+             ("C-c C-|") ("C-c \\" . haskell-indent-insert-guard)
+             ("C-c a c" . haskell-compile)
+             ("C-c C-l" . haskell-process-load-file)
+             ("C-c C-z" . haskell-interactive-switch)
+             ("C-c k" . haskell-interactive-mode-clear)
+             ("C-c a b" . haskell-process-cabal-build)
+             ("C-c a a" . haskell-process-cabal)
+             ("C-c M-n") ("C-c C-n" . ghc-goto-next-hole)
+             ("C-c M-p") ("C-c C-p" . ghc-goto-prev-hole))
   (add-hook 'haskell-mode-hook
             (lambda ()
-              (ghc-init)
-              (add-to-list 'company-backends '(company-ghc
-                                               :with company-dabbrev-code))
-              (add-to-list 'company-backends 'company-cabal)
-              (haskell-doc-mode 1)
-              (hindent-mode)
+              (unless (is-buffer-file-temp)
+                (ghc-init)
+                (hare-init)
+                (remap-kbd "C-c C-r" "C-c r" haskell-mode-map)
+                (define-key haskell-mode-map
+                  (kbd "C-c <tab>") 'haskell-process-do-info)
+                (define-key haskell-mode-map
+                  (kbd "C-c C-t") 'haskell-process-do-type)
+                (add-to-list 'company-backends 'company-ghc)
+                (add-to-list 'company-backends 'company-cabal)
+                (add-to-list 'company-backends 'company-ghci)
+                (haskell-doc-mode 1))
+              (rainbow-delimiters-mode 1)
+              (hindent-mode 1)
               ;; haskell-indentation-mode is incompatible with shm
               ;; (haskell-indentation-mode -1)
               (turn-on-haskell-indent)
-              (structured-haskell-mode 1)
-              (define-key shm-map (kbd "C-c C-s") 'shm/case-split)
-              (define-key haskell-mode-map
-                (kbd "M-S") 'ghc-sort-lines)
-              (define-key haskell-mode-map
-                (kbd "C-'") 'ghc-complete))))
+              (structured-haskell-mode 1))))
+
+(with-eval-after-load 'haskell-cabal
+  (bind-keys :map haskell-cabal-mode-map
+             ("C-c a c" . haskell-compile)
+             ("C-c a a" . haskell-process-cabal )
+             ("C-c C-c" . haskell-process-cabal-build)
+             ("C-c C-z" . haskell-interactive-switch)
+             ("C-c k" . haskell-interactive-mode-clear)))
 
 (with-eval-after-load 'hindent
   (setq hindent-process-path "~/.cabal/bin/hindent"))
+
+(add-to-list 'load-path
+             (expand-file-name
+              "~/.cabal/share/x86_64-linux-ghc-7.10.3/HaRe-0.8.3.0/elisp"))
+(autoload 'hare-init "hare" nil t)
 
 (provide 'init-haskell)
