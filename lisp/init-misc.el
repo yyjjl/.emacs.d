@@ -78,14 +78,13 @@
 
 ;; {{ minibuffer-hook
 (defun my-minibuffer-setup-hook ()
-  ;; Use paredit in the minibuffer
-  (conditionally-paredit-mode 1)
-  (local-set-key (kbd "M-y") 'paste-from-x-clipboard)
+  ;; Use lispy in the minibuffer
+  (conditionally-enable-lispy 1)
   (local-set-key (kbd "C-k") 'kill-line)
   (setq gc-cons-threshold most-positive-fixnum))
 
 (defun my-minibuffer-exit-hook ()
-  (conditionally-paredit-mode -1)
+  (conditionally-enable-lispy -1)
   (setq gc-cons-threshold (* 100 1024 1024)))
 
 ;; @see http://bling.github.io/blog/2016/01/18/why-are-you-changing-gc-cons-threshold/
@@ -293,8 +292,9 @@ grab matched string, cssize them, and insert into kill ring"
 
 
 (global-set-key (kbd "C-h z") 'zeal-at-point)
-
-
+(global-set-key (kbd "C-h Z") 'zeal-at-point-search)
+(with-eval-after-load 'zeal-at-point
+  (setf (cdr (assoc 'c++-mode zeal-at-point-mode-alist)) "cpp"))
 ;; {{start dictionary lookup
 ;; use below commands to create dicitonary
 ;; mkdir -p ~/.stardict/dic
@@ -313,5 +313,15 @@ grab matched string, cssize them, and insert into kill ring"
 ;; midnight mode purges buffers which haven't been displayed in 3 days
 (require 'midnight)
 (setq midnight-mode t)
+
+(with-eval-after-load 'vlf
+  (require 'vlf-setup)
+  (define-key vlf-prefix-map (kbd "C-c v") vlf-mode-map))
+
+(dolist (hook '(text-mode-hook org-mode-hook))
+  (add-hook hook 'emojify-mode))
+(with-eval-after-load 'emojify-mode
+  (setq emojify-emojis-dir "~/.emacs.d/data/emojis")
+  (global-set-key (kbd "C-?") 'emojify-insert-emoji))
 
 (provide 'init-misc)

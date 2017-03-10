@@ -1,78 +1,38 @@
-;; ----------------------------------------------------------------------------
-;; Paredit
-;; ----------------------------------------------------------------------------
-(defvar paredit-minibuffer-commands
-  '(eval-expression
-    pp-eval-expression
-    eval-expression-with-eldoc
-    ibuffer-do-eval
-    ibuffer-do-view-and-eval)
-  "Interactive commands for which paredit should be enabled in the minibuffer.")
+(defun conditionally-enable-lispy (&optional arg)
+  (if (and (memq this-command
+              '(eval-expression
+                pp-eval-expression
+                eval-expression-with-eldoc
+                ibuffer-do-eval
+                ibuffer-do-view-and-eval))
+	   arg)
+      (lispy-mode 1)
+    (lispy-mode -1)))
 
-(with-eval-after-load 'paredit
-  (defun reverse-transpose-sexps (arg)
-    (interactive "*p")
-    (transpose-sexps (- arg))
-    (backward-sexp (1+ arg))
-    (forward-sexp 1))
-
-  (defhydra hydra-paredit ()
-    "move"
-    ("RET" nil nil)
-    ("b" paredit-backward "←")
-    ("f" paredit-forward "→")
-    ("p" paredit-backward-up "↖")
-    ("n" paredit-forward-down "↘")
-    ("d" paredit-backward-down "↙")
-    ("u" paredit-forward-up "↗")
-    ("." transpose-sexps "⇌")
-    ("," reverse-transpose-sexps "⇋"))
-
-  (bind-keys :map paredit-mode-map
-             ("C-M-f" . hydra-paredit/paredit-forward)
-             ("C-M-b" . hydra-paredit/paredit-backward)
-             ("C-M-d" . hydra-paredit/paredit-backward-down)
-             ("C-M-u" . hydra-paredit/paredit-forward-up)
-             ("C-M-n" . hydra-paredit/paredit-forward-down)
-             ("C-M-p" . hydra-paredit/paredit-backward-up)
-             ("C-<backspace>" . paredit-backward-kill-word)
-             ("M-<backspace>" . backward-kill-word)
-             ("C-." . hydra-paredit/transpose-sexps)
-             ("C-," . hydra-paredit/reverse-transpose-sexps)))
-
-(defun conditionally-paredit-mode (flag)
-  "Enable paredit during lisp-related minibuffer commands."
-  (if (memq this-command paredit-minibuffer-commands)
-      (paredit-mode flag)))
-
-
-;; ----------------------------------------------------------------------------
-;; ENABLE desired features for all lisp modes
-;; ----------------------------------------------------------------------------
-;; this function is a part of preclude emacs
-(defun eval-and-replace ()
-  "Replace the preceding sexp with its value."
+(defun indent-for-tab-or-close ()
   (interactive)
-  (backward-kill-sexp)
-  (condition-case nil
-      (print (eval (read (current-kill 0)))
-             (current-buffer))
-    (error (message "Invalid expression")
-           (insert (current-kill 0)))))
+  (if (looking-at "`\\|\"")
+      (forward-char 1)
+    (indent-for-tab-command)))
 
 (defun my-lisp-setup ()
   "Enable features useful in any Lisp mode."
-  (enable-paredit-mode)
   (rainbow-delimiters-mode 1)
+  (hl-sexp-mode 1)
+  (when (> (buffer-size) 51200)
+    (prettify-symbols-mode 1))
+  (lispy-mode 1)
+  (if (eq major-mode 'scheme-mode)
+      (progn
+        (setq flycheck-check-syntax-automatically
+              '(idle-change save mode-enabled))
+        (geiser-mode 1))
+    (flycheck-mode -1))
   (when (require 'semantic/bovine/el nil t)
     (try-turn-on-semantic-mode))
-  (show-paren-mode 1)
-  (hl-sexp-mode 1)
-  (prettify-symbols-mode 1)
-  (flycheck-mode -1)
   (local-set-key (kbd "M-<RET>") 'srefactor-refactor-at-point)
-  (local-set-key (kbd "C-c e") 'eval-and-replace))
-
+  (local-set-key (kbd "M-,") 'pop-tag-mark)
+  (local-set-key (kbd "<tab>") 'indent-for-tab-or-close))
 
 ;; ----------------------------------------------------------------------------
 ;; Hippie-expand
@@ -104,8 +64,9 @@
 (add-hook 'emacs-lisp-mode-hook 'elisp-mode-hooks)
 
 (let ((lispy-hooks '(lisp-mode-hook
-                      inferior-lisp-mode-hook
-                      lisp-interaction-mode-hook)))
+                     scheme-mode-hook
+                     inferior-lisp-mode-hook
+                     lisp-interaction-mode-hook)))
   (dolist (hook lispy-hooks)
     (add-hook hook 'my-lisp-setup)))
 
@@ -131,12 +92,12 @@
 (setq-default initial-scratch-message
               (concat ";; Welcome to Emacs " (or user-login-name "")))
 
-;; {{ scheme setup
-;; (setq scheme-program-name "guile")
-;; (eval-after-load 'scheme-mode
-;;   '(progn
-;;      (require 'quack)))
-;; }}
+(with-eval-after-load 'geiser-mode
+  (remap-kbd "C-c C-d" "C-c d" geiser-mode-map)
+  (remap-kbd "C-c C-e" "C-c e" geiser-mode-map))
+
+(with-eval-after-load 'geiser
+  (setq geiser-active-implementations '(racket)))
 
 ;; A quick way to jump to the definition of a function given its key binding
 (global-set-key (kbd "C-h K") 'find-function-on-key)

@@ -22,14 +22,14 @@
   (setq company-clang-insert-arguments nil)
   (setq company-require-match nil)
   (setq company-etags-ignore-case t)
-  (setq company-minimum-prefix-length 2)
+  (setq company-minimum-prefix-length 3)
   (setq company-tooltip-align-annotations t)
 
   (bind-keys :map company-active-map
-            ("C-n" . company-select-next)
-            ("C-p" . company-select-previous)
-            ("M-n" . company-next-page)
-            ("M-p" . company-previous-page))
+             ("C-n" . company-select-next)
+             ("C-p" . company-select-previous)
+             ("M-n" . company-next-page)
+             ("M-p" . company-previous-page))
 
   ;; @see https://github.com/redguardtoo/emacs.d/commit/2ff305c1ddd7faff6dc9fa0869e39f1e9ed1182d
   (defadvice company-in-string-or-comment

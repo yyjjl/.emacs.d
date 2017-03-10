@@ -101,7 +101,6 @@
     color-theme
     ;; helper control fringe(edge of a window) style
     fringe-helper
-    hideshowvis
     ;; highlight braces with their depth
     rainbow-delimiters
     ;; spaceline
@@ -111,7 +110,7 @@
     stripe-buffer
     ;; ^L beautifier
     page-break-lines
-    goto-last-change
+    emojify
     ;;---------------------------------------
     ;; latex packages
     ;;---------------------------------------
@@ -185,8 +184,8 @@
     ;; auto compile after .el file load or save
     auto-compile
     ;; pair edit
-    paredit
-    ;; ( quack) ;; for scheme
+    lispy
+    geiser
     hl-sexp
     ;;---------------------------------------
     ;; web  packages

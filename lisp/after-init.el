@@ -20,7 +20,6 @@
   (global-auto-revert-mode)
   (column-number-mode 1)
   (global-page-break-lines-mode)
-
   ;; make zsh work correctly in emacs
   (setq system-uses-terminfo nil)
   (fcitx-aggressive-setup)
@@ -58,7 +57,6 @@
              ("RET" . newline-and-indent)
              ("M-'" . tiny-expand)
              ("M--" . er/expand-region)
-             ("C-?" . goto-last-change)
              ([f6] . toggle-company-ispell)
              ([f7] . create-scratch-buffer)))
 

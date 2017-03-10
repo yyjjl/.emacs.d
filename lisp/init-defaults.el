@@ -131,6 +131,7 @@
     (electric-pair-mode 1)
     ;; eldoc, show API doc in minibuffer echo area
     (eldoc-mode 1)
+    (show-paren-mode 1)
     ;; show trailing spaces in a programming mode
     (setq show-trailing-whitespace t)))
 (add-hook 'prog-mode-hook 'generic-prog-mode-hook-setup)
@@ -142,5 +143,7 @@
 ;; }}
 
 (defalias 'perl-mode 'cperl-mode)
+
+(global-set-key [escape] 'keyboard-escape-quit)
 
 (provide 'init-defaults)

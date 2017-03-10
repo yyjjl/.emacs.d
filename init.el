@@ -18,7 +18,7 @@
   (require 'cl-lib))
 
 ;; all packages
-(load-file "~/.emacs.d/packages.el")
+(load-file "~/.emacs.d/lisp/packages.el")
 (if (fboundp 'normal-top-level-add-to-load-path)
     (let ((default-directory site-packages-directory))
       (setq load-path
@@ -101,10 +101,11 @@
  '(bmkp-bmenu-state-file "~/.emacs.d/data/bmk-bmenu-state.el")
  '(bmkp-last-as-first-bookmark-file "/home/yyj/.emacs.d/data/bookmarks")
  '(company-statistics-file "~/.emacs.d/data/company-statistics-cache.el")
+ '(emojify-emojis-dir "~/.emacs.d/data/emojis")
+ '(geiser-repl-history-filename "/home/yyj/.emacs.d/data/.geiser_history")
  '(ispell-personal-dictionary "~/.emacs.d/data/aspell.pws")
  '(keyfreq-file "~/.emacs.d/data/keyfreq")
- '(projectile-known-projects-file
-   "/home/yyj/.emacs.d/data/projectile-bookmarks.eld")
+ '(projectile-known-projects-file "/home/yyj/.emacs.d/data/projectile-bookmarks.eld")
  '(recentf-save-file "~/.emacs.d/data/recentf")
  '(savehist-file "~/.emacs.d/data/history")
  '(semanticdb-default-save-directory "~/.emacs.d/data/semanticdb/")
@@ -115,6 +116,7 @@
  '(tramp-persistentcy-file-name "~/.emacs.d/data/tramp"))
 
 (setq file-name-handler-alist file-name-handler-alist-tmp)
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -130,3 +132,4 @@
 (put 'narrow-to-page 'disabled nil)
 (put 'narrow-to-defun 'disabled nil)
 (put 'erase-buffer 'disabled nil)
+(setq enable-local-variables :all)

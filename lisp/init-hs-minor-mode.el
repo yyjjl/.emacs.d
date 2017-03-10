@@ -9,8 +9,7 @@
                 ))
       (add-hook hook (lambda ()
                        (unless (is-buffer-file-temp)
-                         (hs-minor-mode)
-                         (hideshowvis-enable)))))
+                         (hs-minor-mode)))))
 
 (setq hs-minor-mode-map
       (let ((map (make-sparse-keymap)))

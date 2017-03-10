@@ -170,7 +170,7 @@
     (define-key outline-minor-mode-map outline-minor-mode-prefix
       map)))
 
-(defvar org-cn-article-bg "yyj" "")
+(defvar org-cn-article-bg "" "")
 (defvar org-cn-article-bgscale 5 "")
 
 (with-eval-after-load 'ox-latex

@@ -18,7 +18,6 @@
 (when (fboundp 'menu-bar-mode)
   (menu-bar-mode -1))
 (setq-default mode-line-format nil)
-(setq-default frame-title-format nil)
 
 (defun default-console-setup-frame (frame)
   (xterm-mouse-mode 1)

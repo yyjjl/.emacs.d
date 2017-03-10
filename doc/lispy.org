@@ -1,0 +1,176 @@
+#+title: lispy
+
+* 注意
+  - 大部分快捷键之在成对字符左右时有效
+  - *不要使用C-q (插入单个的括号*
+
+* 括号的输入
+  | (   | lispy-parens         | 插入()                          |
+  | )   | lispy-right-nostring | 上层列表的),在字符串中简单插入) |
+  | {   | lispy-braces         | 插入{}                          |
+  | }   | lispy-brackets       | 插入[]                          |
+  | C-8 | lispy-parens-down    | 跳出当前一层(),换行,插入()      |
+
+** Wrap括号
+    lispy-pair ---  '(','}','{'
+    - 在选中区域使用,添加left,right
+    - 在字符串中,在注释里,字符?\转义,和普通一样,但是[]都用}输入
+    - 没有arg传入,直接插入left和right和一个空格
+    - arg>0,将arg个sexp包装起来
+    - arg=0,将尽可能多的sexp包装
+    - arg=-1,(~C-u - (~)将当前行的所有sexp包装
+
+* 删除和复制
+   | n   | lispy-new-copy | 复制当前sexp       |
+   | C-y | lispy-yank     | 考虑引号转义的粘贴 |
+   | c   | lispy-clone    | 复制当前sexp       |
+   删除的相关指令
+   - C-k :: 
+     + 在注释,多行字符串,在当前行内括号平衡 --- kill-line
+     + 在单行字符串,删除剩余部分
+     + 在空列表,删除列表
+     + 删除当前的sexp
+   - C-d :: 
+     + 删除区域
+     + 删除成对的\\(和\\),都是在第一个/处
+     + 在注释,字符串 --- delete-char
+     + 在left _处_,删除arg个sexp
+     + 在right _处_,跳到left
+     + 在字符串末尾跳到开头,在开头删除字符串
+   - DEL :: 
+     + 删除区域
+     + 删除成对的\\(和\\),都是在(和)的后面
+     + 在注释,字符串 --- backward-delete-char
+     + 在left _后_,删除当前sexp
+     + 在right _后_,删除arg个sexp
+     + 在字符串开头跳到末尾,在末尾删除字符串
+   - C-, :: 删除当前的最小的注释,string或列表
+   - M-k :: 删除string或列表光标右边所有
+   - M-DEL/d :: 删除words,保持括号平衡
+
+* 字符串
+  lisp-quotes
+  - 在字符串内,选中区域使用 => quote
+  - 选中区域或在括号左右 => quote
+  - 在 _字符串内_,选中或处于括号边, 传入non nil参数 => unquote
+  - 在字符串中直接使用 => 插入quote的引号
+  - 插入""
+
+* 移动
+  |       | <10>       |                                                   |
+  | [     | lispy-backward | 同级别的上一个(,没有则是上一级的(                 |
+  | ]     | lispy-forward | 同级别的下一个),没有则是上一级的)                 |
+  |-------+------------+---------------------------------------------------|
+  | h     | lispy-left | 上层列表的(                                       |
+  | l     | lispy-right | 上层列表的)                                       |
+  | k     | lispy-up   | 同级别的上一个(或)                                |
+  | j     | lispy-down | 同级别的下一个(或),根据原始位置确定               |
+  |-------+------------+---------------------------------------------------|
+  | d     | lisp-difference | 在()之间跳动                                      |
+  | f     | lisp-flow  | 在左边括号时,跳到下一个(,在右边括号时,调到上一个) |
+  | zj/zk | lisp-knight | 最左最右                                          |
+  | b     | lispy-back | 在历史位置跳                                      |
+  | A     | lispy-beginning-of-defun | 在调用行和defun之间跳动                           |
+  | Q     | lispy-ace-char | 在当前列表ace-cha                                 |
+  - h,l在区域模式启动时可用,上层区域也会选中
+  - j,k在区域模式会同时移动,区域两个端点.
+    (_a b c_ d e f) 按下j后可得 (a _b c d_ e f)
+    
+* 选择区域
+  |       | <10>       |                                                      |
+  | m     | lisp-mark-list | 选中当前列表,或第arg个子sexp                         |
+  | i     | lisp-mark-car | 选中当前选中的car,或者去掉quote,只在区域有效         |
+  | C-M-, | lispy-mark | 选中最小的string,注释或sexp                          |
+  | M-m   | lispy-mark-symbol | 根据情况选中string,注释和sexp,和er/expand-region类似 |
+  |-------+------------+------------------------------------------------------|
+  | -     | lisp-ace-subword | ace跳转到当前sexp的subword                           |
+  | a     | lisp-ace-symbol | ace跳转到当前sexp的symbol                            |
+  | q     | lisp-ace-paren | ace跳转到当前sexp的所有parens                        |
+  - <,>在区域模式启动时,向前后扩展选中区域
+    
+* 大纲模式
+  在注释中可以包含org-mode类似的大纲,
+  | i | lispy-tab          | 折叠,在outline行首 |
+  | J | lispy-outline-next | 下一个             |
+  | K | lispy-outline-prev | 上一个             |
+  - i,format当前sexp
+
+* 操作list
+  | "/" | lispy-splice             | 去掉该层括号                           |
+  | r   | lispy-raise              | sexp代替父sexp                         |
+  | s   | lispy-move-down          | sexp下移                               |
+  | w   | lispy-move-up            | sexp上移                               |
+  | t   | lispy-teleport           | 使用ace选中转移位置                    |
+  | u   | lispy-undo               | 一些操作只能undo来撤回                 |
+  | H   | lispy-ace-symbol-replace | 删除ace选中symbol                      |
+  | C   | lispy-convolute          | 交换两个上层最近表达式                 |
+  | R   | lispy-raise-some         | 在左边调用,保留右边全部,反之一样       |
+  | S   | lispy-stringify          | 将当前sexp加引号,arg不为1时换行也quote |
+  #+BEGIN_EXAMPLE
+  ;; 一个convolute例子
+  (fooA a1 a2                  (fooB b1 b2 
+       (fooB b1 b2         =>      (fooA a1 a2
+            |(fooC c1)))                |(fooC c1)))
+
+  ;; 一个raise-some例子
+  (progn
+      (fooA a1)                (fooB b1)
+      |(fooB b1)           =>  (fooC c1)  
+      (fooC c1))
+
+  (progn                       progn
+      (fooA a1)            =>  (fooA a1)    
+      (fooB b1)                (fooB b1)
+      (fooC c1))
+  #+END_EXAMPLE
+
+* 搜索
+  | y     | lispy-occur | swiper当前顶层的sexp |
+  | F/M-. | -----       | 跳到(选中的)当前符号 |
+  | D/M-, | -----       | 跳回来               |
+
+* 文档
+  | C-1 | lispy-describe-inline | 显示符号文档   |
+  | C-2 | lispy-arglist-inline  | 显示函数的参数 |
+
+* 求值
+  | e | lispy-eval           | 求值当前的sexp       |
+  | E | lisp-eval-and-insert | 求值当前的sexp并插入 |
+  | p | -----                | 其他窗口                 |
+
+* 类似反射的操作
+  |    | <10>       |                                                         |
+  | xb | lispy-bind-variable | 将当前sexp包装进一个let中                               |
+  | xu | lispy-unbind-variable | 将当前let的绑定symbol替换为sexp                         |
+  |----+------------+---------------------------------------------------------|
+  | xr | lispy-eval-and-replace | 求值并替换                                              |
+  |----+------------+---------------------------------------------------------|
+  | xB | lispy-store-region-and-buffer | 选中当前的区域或当前表达式                              |
+  | B  | lispy-ediff-regions | 将xB选中的区域和当前ediff                               |
+  |----+------------+---------------------------------------------------------|
+  | xl | lispy-to-lambda | 将defun转为lambda                                       |
+  | xd | lispy-to-defun | 将lambda或顶层表达式转为输入的函数名,函数体复制到剪贴板 |
+  |----+------------+---------------------------------------------------------|
+  | xf | lispy-flatten | 将macro或函数内联                                       |
+  |----+------------+---------------------------------------------------------|
+  | xi | lispy-to-ifs | 将cond变为if                                            |
+  | xc | lispy-to-cond | 将if变为cond                                            |
+  |----+------------+---------------------------------------------------------|
+  | xh | lispy-describe | C-h v和C-h f的快捷方式                                  |
+  |----+------------+---------------------------------------------------------|
+  | xe | lispy-edebug | 进入edebug模式                                          |
+  | xj | lispy-debug-step-in | 进入单步调试!!! (配合xh查看值)                          |
+
+* 其他
+  | M   | lispy-multiline       | 将当前表达式变为多行                  |
+  | O   | lispy-oneline         | 变为一行                              |
+  | N   | lispy-narrow          | narrow                                |
+  | W   | lispy-widen           | widen                                 |
+  | V   | lispy-visit           | 打开项目文件                          |
+  |-----+-----------------------+---------------------------------------|
+  | </> | -----                 | 括号朝箭头方向移动,都是对外层括号而言 |
+  |-----+-----------------------+---------------------------------------|
+  | g   | lispy-goto            | 跳到tag当前direcotry                  |
+  | G   | lispy-goto-local      | 当前文件tag                           |
+  | ogr | lispy-goto-recursive  | 整个目录和子目录                      |
+  | ogp | lispy-goto-projectile | -----                                 |
