@@ -22,15 +22,13 @@
   (when (> (buffer-size) 51200)
     (prettify-symbols-mode 1))
   (lispy-mode 1)
-  (if (eq major-mode 'scheme-mode)
-      (progn
-        (setq flycheck-check-syntax-automatically
-              '(idle-change save mode-enabled))
-        (geiser-mode 1))
+  (if (eq major-mode 'racket-mode)
+      (progn (setq flycheck-check-syntax-automatically
+                   '(save mode-enabled)
+                   eldoc-documentation-function 'racket-eldoc-function)
+             (unless (buffer-file-name)
+               (setq completion-at-point-functions nil)))
     (flycheck-mode -1))
-  (when (require 'semantic/bovine/el nil t)
-    (try-turn-on-semantic-mode))
-  (local-set-key (kbd "M-<RET>") 'srefactor-refactor-at-point)
   (local-set-key (kbd "M-,") 'pop-tag-mark)
   (local-set-key (kbd "<tab>") 'indent-for-tab-or-close))
 
@@ -62,9 +60,9 @@
 
 
 (add-hook 'emacs-lisp-mode-hook 'elisp-mode-hooks)
-
 (let ((lispy-hooks '(lisp-mode-hook
-                     scheme-mode-hook
+                     ;; scheme-mode-hook
+                     racket-mode-hook
                      inferior-lisp-mode-hook
                      lisp-interaction-mode-hook)))
   (dolist (hook lispy-hooks)
@@ -89,15 +87,19 @@
                   (">=" . ?≥)
                   ("<=" . ?≤)))))
 
+(with-eval-after-load 'lispy
+  (add-to-list 'lispy-goto-symbol-alist
+               '(racket-mode racket-visit-definition racket-mode)))
+
+(with-eval-after-load 'racket-mode
+  (defun racket--read-identifier (prompt default)
+    (ivy-read prompt
+              (racket--get-namespace-symbols)
+              :initial-input default                   ;initial
+              :preselect default)))
+
 (setq-default initial-scratch-message
               (concat ";; Welcome to Emacs " (or user-login-name "")))
-
-(with-eval-after-load 'geiser-mode
-  (remap-kbd "C-c C-d" "C-c d" geiser-mode-map)
-  (remap-kbd "C-c C-e" "C-c e" geiser-mode-map))
-
-(with-eval-after-load 'geiser
-  (setq geiser-active-implementations '(racket)))
 
 ;; A quick way to jump to the definition of a function given its key binding
 (global-set-key (kbd "C-h K") 'find-function-on-key)

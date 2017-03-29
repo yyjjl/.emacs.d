@@ -1,7 +1,7 @@
 (with-eval-after-load 'yasnippet
   (defun my-yas-reload-all ()
     (interactive)
-    (yas-compile-directory (file-truename "~/.emacs.d/snippets"))
+    (yas-compile-directory (file-truename yasnippet-extra-dir))
     (yas-reload-all))
 
   (my-yas-reload-all)

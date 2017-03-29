@@ -38,11 +38,11 @@
              ("C-c u" . uncomment-region)
              ("C-x R" . rename-this-file-and-buffer)
              ("C-x D" . delete-this-file)
+             ("C-x C" . copy-this-file-path)
              ("C-x c" . cleanup-buffer-safe)
              ("C-=" . text-scale-increase)
              ("C--" . text-scale-decrease)
              ;; flyspell
-             ("C-c S" . flyspell-auto-correct-word)
              ("C-c 4" . ispell-word)
              ("C-c q" . auto-fill-mode)
              ("C-x C-b" . ibuffer)

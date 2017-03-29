@@ -20,20 +20,20 @@
           rlt)
       (cond
        ((not (memq f '(web-mode-html-attr-value-face
-                     web-mode-html-tag-face
-                     web-mode-html-attr-name-face
-                     web-mode-constant-face
-                     web-mode-doctype-face
-                     web-mode-keyword-face
-                     web-mode-comment-face ;; focus on get html label right
-                     web-mode-function-name-face
-                     web-mode-variable-name-face
-                     web-mode-css-property-name-face
-                     web-mode-css-selector-face
-                     web-mode-css-color-face
-                     web-mode-type-face
-                     web-mode-block-control-face)
-                 ))
+                       web-mode-html-tag-face
+                       web-mode-html-attr-name-face
+                       web-mode-constant-face
+                       web-mode-doctype-face
+                       web-mode-keyword-face
+                       web-mode-comment-face ;; focus on get html label right
+                       web-mode-function-name-face
+                       web-mode-variable-name-face
+                       web-mode-css-property-name-face
+                       web-mode-css-selector-face
+                       web-mode-css-color-face
+                       web-mode-type-face
+                       web-mode-block-control-face)
+                   ))
         (setq rlt t))
        ((memq f '(web-mode-html-attr-value-face))
         (save-excursion

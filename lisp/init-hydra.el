@@ -45,7 +45,7 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
     ("f" outline-forward-same-level "forward") ; Forward - same level
     ("b" outline-backward-same-level "back")   ; Backward - same level
     ("q" nil "quit")
-    ("<tab>" yas-expand)
+    ("<tab>" org-cycle "tab")
     ("RET" nil))
 
   (bind-keys :map org-mode-map
@@ -75,7 +75,9 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
 
 (define-key global-map (kbd "C-x SPC") 'hydra-rectangle/body)
 
-(defhydra hydra-rectangle (:color pink)
+(defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
+                           :color pink
+                           :post (deactivate-mark))
   "
   ^_p_^     [_d_]delete    [_s_]string
 _b_   _f_   [_o_]ok        [_y_]yank

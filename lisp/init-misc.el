@@ -318,10 +318,13 @@ grab matched string, cssize them, and insert into kill ring"
   (require 'vlf-setup)
   (define-key vlf-prefix-map (kbd "C-c v") vlf-mode-map))
 
-(dolist (hook '(text-mode-hook org-mode-hook))
-  (add-hook hook 'emojify-mode))
-(with-eval-after-load 'emojify-mode
-  (setq emojify-emojis-dir "~/.emacs.d/data/emojis")
-  (global-set-key (kbd "C-?") 'emojify-insert-emoji))
+(with-eval-after-load 'restclient
+  (bind-keys :map restclient-mode-map
+             ("C-c C-p") ("M-p" . restclient-jump-prev)
+             ("C-c C-n") ("M-n" . restclient-jump-next)))
+
+(add-hook 'restclient-mode-hook
+          (lambda ()
+            (add-to-list 'company-backends 'company-restclient)))
 
 (provide 'init-misc)

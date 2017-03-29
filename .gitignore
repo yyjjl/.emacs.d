@@ -54,3 +54,5 @@ projectile.cache
 .orig
 .unpacked
 /irony
+private.el
+/lisp.old

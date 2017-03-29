@@ -141,24 +141,24 @@
      (org-block ((t (:foreground "#8bc34a" :background "#1c1f26"))))
      (org-block-background ((t (:background "#1c1f26"))))
      (org-code ((t (:foreground "#8bc34a" :background "#1c1f26"))))
-     (org-column ((t (:background "37474f"))))
+     (org-column ((t (:background "#37474f"))))
      (org-column-title ((t (:inherit org-column :weight bold :underline t))))
      (org-date ((t (:foreground "#80cbc4" :underline t))))
      (org-document-info ((t (:foreground "#81d4fa" :height 1.35))))
-     (org-document-info-keyword ((t (:foreground "8bc34a" :height 1.35))))
+     (org-document-info-keyword ((t (:foreground "#8bc34a" :height 1.35))))
      (org-document-title ((t (:weight bold :height 1.35))))
-     (org-done ((t (:foreground "8bc34a" :bold t :background "#1b5e20"))))
+     (org-done ((t (:foreground "#8bc34a" :bold t :background "#1b5e20"))))
      (org-ellipsis ((t (:foreground "#81d4df"))))
      (org-footnote ((t (:foreground "#4dd0e1"))))
      (org-formula ((t (:foreground "#f36c60"))))
      (org-link ((t (:foreground "#b39ddb" :underline t))))
-     (org-scheduled ((t (:foreground "8bc34a"))))
+     (org-scheduled ((t (:foreground "#8bc34a"))))
      (org-scheduled-previously ((t (:foreground "#ff9800"))))
      (org-scheduled-today ((t (:foreground "#8bc34a"))))
      (org-special-keyword ((t (:foreground "#b0bec5"))))
      (org-table ((t (:foreground "#e3f2fd" :background "#1c1f26"))))
      (org-todo ((t (:foreground "#ffab91" :bold t :background "#dd2c00"))))
-     (org-upcoming-deadline ((t (:foreground "ff9800"))))
+     (org-upcoming-deadline ((t (:foreground "#ff9800"))))
      (org-warning ((t (:weight bold :foreground "#f36c60"))))
      (org-block-begin-line ((t (:foreground "#b3e5fc" :background "#1e2930"))))
      (org-block-end-line ((t (:foreground "#b3e5fc" :background "#1e2930"))))
@@ -166,12 +166,18 @@
      (org-level-1 ((class (:inherit outline-1
                                      :background "#455A64"
                                      :weight bold
-                                     :height 1.3))))
+                                     ;; :height 1.3
+                                     ))))
      (org-level-2 ((class (:inherit outline-2
                                      :background "#35575b"
-                                     :height 1.2))))
-     (org-level-3 ((class (:inherit outline-3 :height 1.1))))
-     (org-level-4 ((class (:inherit outline-4 :height 1.0))))
+                                     ;; :height 1.2
+                                     ))))
+     (org-level-3 ((class (:inherit outline-3
+                                    ;; :height 1.1
+                                    ))))
+     (org-level-4 ((class (:inherit outline-4
+                                    ;; :height 1.0
+                                    ))))
      (org-level-5 ((class (:inherit outline-5 ))))
      (org-level-6 ((class (:inherit outline-6 ))))
      (org-level-7 ((class (:inherit outline-7 ))))

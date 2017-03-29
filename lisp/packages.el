@@ -76,11 +76,6 @@
 (defvar required-packages
   '(
     ;;---------------------------------------
-    ;; basic packages
-    ;;---------------------------------------
-    dash dash-functional
-    s
-    ;;---------------------------------------
     ;; core packages
     ;;---------------------------------------
     yasnippet
@@ -110,7 +105,6 @@
     stripe-buffer
     ;; ^L beautifier
     page-break-lines
-    emojify
     ;;---------------------------------------
     ;; latex packages
     ;;---------------------------------------
@@ -120,6 +114,8 @@
     ;; tool packages
     ;;---------------------------------------
     ;; provide functions to build jump action
+    restclient company-restclient
+    package-safe-delete
     jump ;;
     dired+ dired-filter dired-k
     bookmark+
@@ -131,10 +127,6 @@
     exec-path-from-shell
     ;; inverse of fill region and paragraph
     unfill
-    ;; regex expression evaluation tool
-    regex-tool
-    ;; edit string as origin format in a new buffer
-    string-edit
     ;; move whole buffer
     buffer-move
     ;; clipbord tools
@@ -142,13 +134,11 @@
     ;; quick switch window
     ace-window
     dropdown-list
-    ;; auto add license
-    legalese
     ;; show key bindings while pressing
     which-key
     visual-regexp
     window-numbering
-    find-by-pinyin-dired
+    ;; find-by-pinyin-dired
     zzz-to-char
     stickyfunc-enhance
     zeal-at-point
@@ -162,13 +152,11 @@
     ;; c/c++  packages
     ;;---------------------------------------
     clang-format
-    srefactor
     irony-eldoc
     irony
     company-irony
     flycheck-irony
-    ggtags
-    disaster
+    rtags
     ;;---------------------------------------
     ;; git packages
     ;;---------------------------------------
@@ -185,7 +173,7 @@
     auto-compile
     ;; pair edit
     lispy
-    geiser
+    racket-mode
     hl-sexp
     ;;---------------------------------------
     ;; web  packages
@@ -206,14 +194,13 @@
     ;; typescript
     typescript-mode
     tide
-    sass-mode
-    scss-mode
+    css-eldoc
     emmet-mode
-    less-css-mode
     ;;---------------------------------------
     ;; python packages
     ;;---------------------------------------
     elpy
+    py-isort
     ;;---------------------------------------
     ;; org  mode  packages
     ;;---------------------------------------
@@ -243,10 +230,14 @@
     markdown-mode
     crontab-mode
     csv-mode
+    sass-mode
+    less-css-mode
+    scss-mode
     glsl-mode lua-mode
-    go-mode    groovy-mode
-    cmake-mode cmake-font-lock
-    cpputils-cmake php-mode
+    go-mode
+    groovy-mode
+    cmake-mode cmake-font-lock cmake-ide
+    php-mode
     graphviz-dot-mode)
   "packages required")
 

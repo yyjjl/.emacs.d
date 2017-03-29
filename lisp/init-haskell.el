@@ -1,5 +1,4 @@
 (with-eval-after-load 'shm
-  (setq shm-program-name "~/.cabal/bin/structured-haskell-mode")
   (defun shm/tab-or-close ()
     (interactive)
     (if (looking-at ")\\|]\\|}\\|`")
@@ -20,7 +19,7 @@
 
 (with-eval-after-load 'haskell-mode
   (set-fontset-font (frame-parameter nil 'font)
-                    'symbol (font-spec :size 18 :family "Noto Sans S Chinese"))
+                    'symbol (font-spec :size 18 :family symbol-font-name))
   (setq
    ;; Use notify.el (if you have it installed) at the end of running
    ;; Cabal commands or generally things worth notifying.
@@ -33,8 +32,6 @@
    ;; Better import handling
    haskell-process-suggest-remove-import-lines t
    haskell-process-auto-import-loaded-modules t
-   ;; Disable haskell-stylish-on-save, as it breaks flycheck highlighting.
-   ;; NOTE: May not be true anymore - taksuyu 2015-10-06
    haskell-stylish-on-save t)
   (setq haskell-font-lock-symbols-alist
         (append haskell-font-lock-symbols-alist
@@ -64,7 +61,6 @@
               (unless (is-buffer-file-temp)
                 (ghc-init)
                 (hare-init)
-                (remap-kbd "C-c C-r" "C-c r" haskell-mode-map)
                 (define-key haskell-mode-map
                   (kbd "C-c <tab>") 'haskell-process-do-info)
                 (define-key haskell-mode-map
@@ -87,13 +83,5 @@
              ("C-c C-c" . haskell-process-cabal-build)
              ("C-c C-z" . haskell-interactive-switch)
              ("C-c k" . haskell-interactive-mode-clear)))
-
-(with-eval-after-load 'hindent
-  (setq hindent-process-path "~/.cabal/bin/hindent"))
-
-(add-to-list 'load-path
-             (expand-file-name
-              "~/.cabal/share/x86_64-linux-ghc-7.10.3/HaRe-0.8.3.0/elisp"))
-(autoload 'hare-init "hare" nil t)
 
 (provide 'init-haskell)

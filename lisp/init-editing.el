@@ -1,5 +1,3 @@
-(setq mc/list-file "~/.emacs.d/data/mc-lists.el")
-
 (bind-keys ("M-z" . zzz-to-char)
            ("M-Z" . zzz-up-to-char))
 
@@ -7,8 +5,8 @@
            ("C-c v r" . vr/replace)
            ("C-c v m" . vr/mc-mark)
 
-           ("C-c m ," . mc/mark-next-like-this)
-           ("C-c m ." . mc/mark-previous-like-this)
+           ("C-c m ." . mc/mark-next-like-this)
+           ("C-c m ," . mc/mark-previous-like-this)
            ("C-c m m" . mc/mark-all-like-this)
            ("C-c m p" . mc/mark-pop)
            ("C-c m d" . mc/mark-all-like-this-dwim)

@@ -40,6 +40,13 @@
     (delete-file (buffer-file-name))
     (kill-this-buffer)))
 
+(defun copy-this-file-path ()
+  (interactive)
+  (let ((name (buffer-file-name)))
+    (if (not name)
+        (error "No file is currently being edited")
+      (message "copy => %s" name)
+      (kill-new name))))
 
 ;;----------------------------------------------------------------------------
 ;; Rename the current file

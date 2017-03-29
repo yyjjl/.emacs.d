@@ -2,9 +2,12 @@
 (setq flycheck-keymap-prefix (kbd "C-c f"))
 
 (with-eval-after-load 'flycheck
+  (setq-default flycheck-check-syntax-automatically
+                '(idle-change save mode-enabled))
   (flycheck-add-mode 'html-tidy 'web-mode)
-  (setq flycheck-html-tidy-executable
-        (expand-file-name "~/.emacs.d/bin/tidy"))
+
+  (add-hook 'flycheck-mode-hook 'flycheck-irony-setup)
+
   (setq flycheck-eslintrc "~/.emacs.d/data/.eslintrc")
   (setq flycheck-mode-line-prefix "")
   (flycheck-pos-tip-mode 1))

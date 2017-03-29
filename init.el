@@ -8,6 +8,10 @@
 (defvar file-name-handler-alist-tmp file-name-handler-alist)
 (defvar package-use-priority nil  "whether to use priority")
 (defvar site-packages-directory "~/.emacs.d/site-lisp/")
+(defvar symbol-font-name "Noto Sans S Chinese")
+(defvar yasnippet-extra-dir "~/.emacs.d/snippets")
+
+(add-to-list 'default-frame-alist '(font . "Ubuntu Mono-13"))
 
 (setq file-name-handler-alist nil)
 
@@ -63,7 +67,7 @@
 (require 'init-javascript)
 (require 'init-linum-mode)
 (require 'init-sh)
-(require 'init-tags)
+;; (require 'init-tags)
 (require 'init-term-mode)
 (require 'init-web-mode)
 (require 'init-slime)
@@ -88,8 +92,8 @@
 (require 'init-locales)
 
 ;; load org project file
-(if (file-exists-p "~/.emacs.d/org-project.el")
-    (load-file "~/.emacs.d/org-project.el"))
+(if (file-exists-p "~/.emacs.d/private.el")
+    (load-file "~/.emacs.d/private.el"))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -99,18 +103,23 @@
  '(abbrev-file-name "~/.emacs.d/data/abbrev_defs")
  '(auto-save-list-file-prefix "~/.emacs.d/data/auto-save-list/.saves-")
  '(bmkp-bmenu-state-file "~/.emacs.d/data/bmk-bmenu-state.el")
- '(bmkp-last-as-first-bookmark-file "/home/yyj/.emacs.d/data/bookmarks")
+ '(bmkp-last-as-first-bookmark-file "~/.emacs.d/data/bookmarks")
+ '(cmake-ide-rdm-executable "~/.emacs.d/bin/rtags-build/bin/rdm")
  '(company-statistics-file "~/.emacs.d/data/company-statistics-cache.el")
- '(emojify-emojis-dir "~/.emacs.d/data/emojis")
- '(geiser-repl-history-filename "/home/yyj/.emacs.d/data/.geiser_history")
+ '(flycheck-html-tidy-executable "~/.emacs.d/bin/tidy")
+ '(geiser-repl-history-filename "~/.emacs.d/data/.geiser_history")
+ '(hindent-process-path "~/.cabal/bin/hindent")
  '(ispell-personal-dictionary "~/.emacs.d/data/aspell.pws")
  '(keyfreq-file "~/.emacs.d/data/keyfreq")
- '(projectile-known-projects-file "/home/yyj/.emacs.d/data/projectile-bookmarks.eld")
+ '(mc/list-file "~/.emacs.d/data/mc-lists.el")
+ '(projectile-known-projects-file "~/.emacs.d/data/projectile-bookmarks.eld")
  '(recentf-save-file "~/.emacs.d/data/recentf")
+ '(rtags-path "~/.emacs.d/bin/rtags-build/bin")
  '(savehist-file "~/.emacs.d/data/history")
  '(semanticdb-default-save-directory "~/.emacs.d/data/semanticdb/")
  '(session-save-file "~/.emacs.d/data/session")
  '(session-use-package t nil (session))
+ '(shm-program-name "~/.cabal/bin/structured-haskell-mode")
  '(smex-save-file "~/.emacs.d/data/smex-items")
  '(srecode-map-save-file "~/.emacs.d/data/srecode-map.el")
  '(tramp-persistentcy-file-name "~/.emacs.d/data/tramp"))

@@ -50,6 +50,8 @@
   (add-hook hook
             '(lambda ()
                (rainbow-mode 1)
+               (when (require 'css-eldoc nil t)
+                 (turn-on-css-eldoc))
                (unless (is-buffer-file-temp)
                  (setq imenu-create-index-function 'my-css-imenu-make-index)))))
 
