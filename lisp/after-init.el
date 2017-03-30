@@ -24,9 +24,6 @@
   (setq system-uses-terminfo nil)
   (fcitx-aggressive-setup)
 
-  ;; may take a long time
-  (elpy-enable)
-
   (winner-mode 1)
   (message "Emacs setup time: %s" (emacs-init-time))
   (define-key isearch-mode-map (kbd "C-o") 'isearch-occur)

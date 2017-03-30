@@ -22,7 +22,7 @@
   (setq company-clang-insert-arguments nil)
   (setq company-require-match nil)
   (setq company-etags-ignore-case t)
-  (setq company-minimum-prefix-length 3)
+  (setq company-minimum-prefix-length 2)
   (setq company-tooltip-align-annotations t)
 
   (bind-keys :map company-active-map

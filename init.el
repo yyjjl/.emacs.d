@@ -101,6 +101,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(abbrev-file-name "~/.emacs.d/data/abbrev_defs")
+ '(anaconda-mode-installation-directory "~/.emacs.d/bin/anaconda-mode")
  '(auto-save-list-file-prefix "~/.emacs.d/data/auto-save-list/.saves-")
  '(bmkp-bmenu-state-file "~/.emacs.d/data/bmk-bmenu-state.el")
  '(bmkp-last-as-first-bookmark-file "~/.emacs.d/data/bookmarks")
@@ -109,6 +110,7 @@
  '(flycheck-html-tidy-executable "~/.emacs.d/bin/tidy")
  '(geiser-repl-history-filename "~/.emacs.d/data/.geiser_history")
  '(hindent-process-path "~/.cabal/bin/hindent")
+ '(irony-server-install-prefix "~/.emacs.d/bin/irony/")
  '(ispell-personal-dictionary "~/.emacs.d/data/aspell.pws")
  '(keyfreq-file "~/.emacs.d/data/keyfreq")
  '(mc/list-file "~/.emacs.d/data/mc-lists.el")

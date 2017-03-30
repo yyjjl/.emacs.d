@@ -199,7 +199,9 @@
     ;;---------------------------------------
     ;; python packages
     ;;---------------------------------------
-    elpy
+    anaconda-mode
+    company-anaconda
+    yapfify
     py-isort
     ;;---------------------------------------
     ;; org  mode  packages
