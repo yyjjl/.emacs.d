@@ -80,7 +80,6 @@
     ;;---------------------------------------
     yasnippet
     company company-statistics
-    slime slime-company
     ;; keyfreq
     session
     multi-term
@@ -175,6 +174,8 @@
     lispy
     racket-mode
     hl-sexp
+    slime
+    slime-company
     ;;---------------------------------------
     ;; web  packages
     ;;---------------------------------------
