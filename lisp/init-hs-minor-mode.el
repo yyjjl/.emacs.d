@@ -1,16 +1,3 @@
-(dolist (hook '(emacs-lisp-mode-hook
-                java-mode-hook
-                lisp-mode-hook
-                perl-mode-hook
-                sh-mode-hook
-                js-mode-hook
-                c++-mode-hook
-                c-mode-hook
-                ))
-      (add-hook hook (lambda ()
-                       (unless (is-buffer-file-temp)
-                         (hs-minor-mode)))))
-
 (setq hs-minor-mode-map
       (let ((map (make-sparse-keymap)))
         (define-key map (kbd "C-x t h") 'hs-hide-block)
@@ -42,7 +29,7 @@
   (let* ((start (overlay-start ov))
          (end (overlay-end ov))
          (str (format " ...%d... " (count-lines start end))) text)
-    (setq text (propertize str 'face 'whitespace-space
+    (setq text (propertize str 'face 'font-lock-builtin-face
                            'help-echo (buffer-substring (1+ start) end)))
     (overlay-put ov 'display text)
     (overlay-put ov 'pointer 'hand)
@@ -70,7 +57,7 @@
       (call-interactively fold-fun)
     (hs-toggle-hiding)))
 
-(with-eval-after-load "hideshow"
+(with-eval-after-load 'hideshow
   (setq hs-isearch-open t)
   (setq hs-set-up-overlay 'hs-abstract-overlay)
   (make-local-variable 'hs-hide-all)

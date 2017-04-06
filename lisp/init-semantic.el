@@ -12,7 +12,7 @@
   (require 'stickyfunc-enhance))
 
 (defun try-turn-on-semantic-mode ()
-  (if (> (buffer-size) 1048576)
+  (if (> (buffer-size) large-buffer-size)
       (semantic-mode -1)
     (semantic-mode 1)))
 

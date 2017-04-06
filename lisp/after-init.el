@@ -9,7 +9,7 @@
 
   (which-key-mode)
 
-  (popwin-mode 1)  ;; enable popwin-mode
+  (popwin-mode 1) ;; enable popwin-mode
 
   (global-git-gutter-mode 1)
   (global-linum-mode 1)
@@ -23,6 +23,8 @@
   ;; make zsh work correctly in emacs
   (setq system-uses-terminfo nil)
   (fcitx-aggressive-setup)
+
+  (elpy-enable)
 
   (winner-mode 1)
   (message "Emacs setup time: %s" (emacs-init-time))

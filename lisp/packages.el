@@ -200,9 +200,7 @@
     ;;---------------------------------------
     ;; python packages
     ;;---------------------------------------
-    anaconda-mode
-    company-anaconda
-    yapfify
+    elpy
     py-isort
     ;;---------------------------------------
     ;; org  mode  packages
@@ -241,6 +239,7 @@
     groovy-mode
     cmake-mode cmake-font-lock cmake-ide
     php-mode
+    gnuplot-mode
     graphviz-dot-mode)
   "packages required")
 

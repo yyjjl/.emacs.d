@@ -10,7 +10,8 @@
 
   (setq flycheck-eslintrc "~/.emacs.d/data/.eslintrc")
   (setq flycheck-mode-line-prefix "")
-  (flycheck-pos-tip-mode 1))
+  (when (display-graphic-p)
+    (flycheck-pos-tip-mode 1)))
 
 
 (provide 'init-flycheck)

@@ -64,7 +64,8 @@
      (font-lock-warning-face ((t (:foreground "#FFFFFF"
                                               :background "#333333"))))
      (fringe ((t (:background "#1B1D1E"))))
-     (vertical-border ((t (:foreground "#111213"))))
+     ;; (vertical-border ((t (:foreground "#111213"))))
+     (vertical-border ((t (:foreground "#1B1D1E"))))
      (highlight ((t (:foreground "#000000" :background "#C4BE89"))))
      (hl-line ((t (:background "#293739"))))
      (icompletep-choices ((t (:foreground "#F92672"))))

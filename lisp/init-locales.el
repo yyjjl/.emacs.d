@@ -4,7 +4,8 @@
 
 (defun locale-is-utf8-p ()
   "Return t if the \"locale\" command or environment variables prefer utf-8."
-  (or (sanityinc/utf8-locale-p (and (executable-find "locale") (shell-command-to-string "locale")))
+  (or (sanityinc/utf8-locale-p (and (executable-find "locale")
+                                   (shell-command-to-string "locale")))
       (sanityinc/utf8-locale-p (getenv "LC_ALL"))
       (sanityinc/utf8-locale-p (getenv "LC_CTYPE"))
       (sanityinc/utf8-locale-p (getenv "LANG"))))

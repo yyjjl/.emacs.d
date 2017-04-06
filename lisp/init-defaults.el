@@ -123,6 +123,8 @@
 ;;Don't echo passwords when communicating with interactive programs:
 (add-hook 'comint-output-filter-functions
           'comint-watch-for-password-prompt)
+
+(defvar large-buffer-size 1048576)
 ;; default prog-mode setup
 (defun generic-prog-mode-hook-setup ()
   (unless (is-buffer-file-temp)
@@ -132,6 +134,9 @@
     ;; eldoc, show API doc in minibuffer echo area
     (eldoc-mode 1)
     (show-paren-mode 1)
+    (hs-minor-mode 1)
+    (when (< (buffer-size) large-buffer-size)
+      (hs-hide-all))
     ;; show trailing spaces in a programming mode
     (setq show-trailing-whitespace t)))
 (add-hook 'prog-mode-hook 'generic-prog-mode-hook-setup)

@@ -19,7 +19,7 @@
   "Enable features useful in any Lisp mode."
   (rainbow-delimiters-mode 1)
   (hl-sexp-mode 1)
-  (when (> (buffer-size) 51200)
+  (unless (> (buffer-size) 51200)
     (prettify-symbols-mode 1))
   (lispy-mode 1)
   (if (eq major-mode 'racket-mode)
@@ -92,10 +92,15 @@
                '(racket-mode racket-visit-definition racket-mode)))
 
 (with-eval-after-load 'racket-mode
+  (defun racket-complete-at-point-hack (fn &rest args)
+    (when (and (buffer-file-name) (racket--in-repl-or-its-file-p))
+      (apply fn args)))
+  (advice-add 'racket-complete-at-point
+              :around #'racket-complete-at-point-hack)
   (defun racket--read-identifier (prompt default)
     (ivy-read prompt
               (racket--get-namespace-symbols)
-              :initial-input default                   ;initial
+              :initial-input default    ;initial
               :preselect default)))
 
 (setq-default initial-scratch-message

@@ -4,15 +4,11 @@
     ;; or just check https://github.com/jorgenschaefer/elpy
     (try-turn-on-semantic-mode)
     (semantic-idle-summary-mode -1)
-    ;; (local-set-key (kbd "C-c b") 'elpy-autopep8-fix-code)
-    (local-set-key (kbd "C-c b") 'yapfify-buffer)
-    (local-set-key (kbd "C-c B") 'py-isort-buffer)
+    (local-set-key (kbd "C-c b") 'elpy-autopep8-fix-code)
     (local-set-key (kbd "<backtab>") 'company-complete)
     (local-set-key (kbd "C-c t t") 'pytest-one)
     (local-set-key (kbd "C-c t d") 'pytest-directory)
-    (anaconda-mode 1)
-    (anaconda-eldoc-mode 1)
-    (push 'company-anaconda company-backends)
+    (local-set-key (kbd "C-c B") 'py-isort-buffer)
     ;; emacs 24.4 only
     (setq electric-indent-chars (delq ?: electric-indent-chars))))
 
@@ -21,10 +17,16 @@
 (with-eval-after-load 'py-isort
   (setq py-isort-options '("--lines=100")))
 
-(with-eval-after-load 'anaconda-mode
-  (setq python-shell-interpreter "python3"))
-
-
+(with-eval-after-load 'elpy
+  (setcar elpy-test-discover-runner-command "python3")
+  (setq elpy-rpc-backend "jedi"
+        python-shell-interpreter "ipython"
+        python-shell-interpreter-args "--simple-prompt -i"
+        elpy-rpc-python-command "python3"
+        elpy-modules (delete 'elpy-module-flymake elpy-modules))
+  (bind-keys :map elpy-mode-map
+             ("C-c C-n" . nil)
+             ("C-c C-p" . nil)))
 (defvar pytest-executable "pytest")
 (defvar pytest-cmd-flags "")
 (defconst pytest-cmd-fmt "%s %s %s\n")

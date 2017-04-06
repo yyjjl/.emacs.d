@@ -43,21 +43,18 @@
   (fix-c-indent-offset-according-to-syntax-context 'innamespace [0])
   (fix-c-indent-offset-according-to-syntax-context 'substatement-open 0)
   (fix-c-indent-offset-according-to-syntax-context 'func-decl-cont 0)
-  (fix-c-indent-offset-according-to-syntax-context 'case-label 4)
-  (local-set-key (kbd "M-n") 'forward-sexp)
-  (local-set-key (kbd "M-p") 'backward-sexp))
+  (fix-c-indent-offset-according-to-syntax-context 'case-label 4))
 
 (defun my-c-mode-setup ()
   "C/C++ only setup"
-  ;; (message "my-c-mode-setup called (buffer-file-name)=%s" (buffer-file-name))
-  ;; @see http://stackoverflow.com/questions/3509919/ \
-  ;; emacs-c-opening-corresponding-header-file
   (local-set-key (kbd "C-x C-o") 'ff-find-other-file)
   (local-set-key (kbd "C-c b") 'clang-format-buffer)
   (local-set-key (kbd "C-c C-j") 'semantic-ia-fast-jump)
   (local-set-key (kbd "C-c C-v") 'semantic-decoration-include-visit)
   (local-set-key (kbd "M-.") 'rtags-find-symbol-at-point)
   (local-set-key (kbd "M-,") 'rtags-location-stack-back)
+  (local-set-key (kbd "M-n") 'rtags-next-match)
+  (local-set-key (kbd "M-p") 'rtags-previous-match)
   (local-set-key [f9] 'cmake-ide-run-cmake)
   (local-set-key [f10] 'cmake-ide-compile)
 

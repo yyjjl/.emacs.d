@@ -146,7 +146,7 @@
                       (mode-line-flycheck)
                       " %I(%l-%c)%p%%"))))
     (format (format " %%s%%%ds" (or (- (window-total-width)
-                                       (length (format-mode-line lhs))
+                                       (string-width (format-mode-line lhs))
                                        1)
                                      0))
             lhs rhs)))

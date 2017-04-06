@@ -18,11 +18,11 @@
   (setq company-dabbrev-ignore-case nil)
   (setq company-dabbrev-code-ignore-case t)
   (setq company-show-numbers t)
-  (setq company-idle-delay 0.2)
+  (setq company-idle-delay 0.3)
   (setq company-clang-insert-arguments nil)
   (setq company-require-match nil)
   (setq company-etags-ignore-case t)
-  (setq company-minimum-prefix-length 2)
+  (setq company-minimum-prefix-length 3)
   (setq company-tooltip-align-annotations t)
 
   (bind-keys :map company-active-map

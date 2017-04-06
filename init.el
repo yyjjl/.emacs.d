@@ -2,9 +2,9 @@
 
  ;; don't GC during startup to save time
 (setq gc-cons-threshold (* 100 1024 1024))
-;;Save file-name-handler-alist temporarily and set it to nil which means on every
-;; .el and .elc file loaded during start up, it hasn't to runs those regexps
-;; against the filename.
+;; save file-name-handler-alist temporarily and set it to nil
+;; which means on every .el and .elc file loaded during start up,
+;; it hasn't to runs those regexps against the filename.
 (defvar file-name-handler-alist-tmp file-name-handler-alist)
 (defvar package-use-priority nil  "whether to use priority")
 (defvar site-packages-directory "~/.emacs.d/site-lisp/")
@@ -34,7 +34,6 @@
 
 ;; need bind-key immediately
 (require 'bind-key)
-
 ;; some important tool function
 (require 'init-utils)
 (require 'init-defaults)
@@ -110,7 +109,6 @@
  '(flycheck-html-tidy-executable "~/.emacs.d/bin/tidy")
  '(geiser-repl-history-filename "~/.emacs.d/data/.geiser_history")
  '(hindent-process-path "~/.cabal/bin/hindent")
- '(irony-server-install-prefix "~/.emacs.d/bin/irony/")
  '(ispell-personal-dictionary "~/.emacs.d/data/aspell.pws")
  '(keyfreq-file "~/.emacs.d/data/keyfreq")
  '(mc/list-file "~/.emacs.d/data/mc-lists.el")
@@ -126,14 +124,14 @@
  '(srecode-map-save-file "~/.emacs.d/data/srecode-map.el")
  '(tramp-persistentcy-file-name "~/.emacs.d/data/tramp"))
 
-(setq file-name-handler-alist file-name-handler-alist-tmp)
-
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+(setq file-name-handler-alist file-name-handler-alist-tmp)
 ;;; Local Variables:
 ;;; no-byte-compile: t
 ;;; End:
