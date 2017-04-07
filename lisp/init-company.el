@@ -3,7 +3,7 @@
   ;; make company-files a work before capf
   (setq-default company-backends
                 '(company-bbdb company-nxml company-css company-cmake
-                               company-files
+                               company-files company-clang company-semantic
                                (company-capf :with company-yasnippet)
                                (company-dabbrev-code
                                 company-gtags
