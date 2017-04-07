@@ -33,7 +33,12 @@
   "Face for the modeline when the buffer has warnings or errors"
   :group 'flycheck-faces)
 
-;; ------------------------------------------------------------
+
+(add-hook 'after-init-hook
+          '(lambda ()
+             (window-numbering-mode 1)
+             (setq-default mode-line-format
+                           '("%e" (:eval (generate-mode-line))))))
 
 (defun mode-line-buffer-id ()
     (let* ((host (and  default-directory
@@ -79,17 +84,43 @@
               buf-coding))
           ")"))
 
+(defun mode-line-workgroup2 ()
+  (when (and (boundp 'workgroups-mode)
+            (symbol-value 'workgroups-mode))
+    (let ((name (condition-case nil
+                    (wg-workgroup-name (wg-current-workgroup))
+                  (error ""))))
+      (if (string= name "")
+          (setq name "none"))
+      (concat " <"
+              (propertize name
+                          'face 'font-lock-function-name-face
+                          'help-echo (format "Current workgroup is %s" name))
+              ">"))))
+
 (defun mode-line-flycheck ()
-  (if (bound-and-true-p flycheck-mode)
-      (let* ((str (s-trim (flycheck-mode-line-status-text)))
-             (infos '(("" "ok" flycheck-mode-line-ok-face)
-                      ("*" "run" flycheck-mode-line-run-face)
-                      ("-" "no" flycheck-mode-line-off-face)
-                      ("!" "fail" flycheck-mode-line-failed-face)
-                      ("?" "err" flycheck-mode-line-error-face)))
-             (info (assoc-string str infos))
-             (msg (if info (cadr info) str))
-             (face (if info (caddr info) 'flycheck-mode-line-result-face)))
+  (if (and (boundp 'flycheck-mode)
+          (symbol-value 'flycheck-mode))
+      (let ((str (s-trim (flycheck-mode-line-status-text)))
+            (msg "")
+            (face nil))
+        (cond ((string= str "")
+               (setq msg "ok")
+               (setq face 'flycheck-mode-line-ok-face))
+              ((string= str "*")
+               (setq msg "run")
+               (setq face 'flycheck-mode-line-run-face))
+              ((string= str "-")
+               (setq msg "no")
+               (setq face 'flycheck-mode-line-off-face))
+              ((string= str "!")
+               (setq msg "fail")
+               (setq face 'flycheck-mode-line-failed-face))
+              ((string= str "?")
+               (setq msg "err")
+               (setq face 'flycheck-mode-line-error-face))
+              (t (setq face 'flycheck-mode-line-result-face)
+                 (setq msg (s-replace ":" "" str))))
         (concat " " (propertize msg 'face face)))))
 
 (defun mode-line-vc ()
@@ -110,6 +141,7 @@
                       (mode-line-buffer-status))))
         (rhs (format-mode-line
               (concat (mode-line-vc)
+                      ;; (mode-line-workgroup2)
                       (mode-line-process)
                       (mode-line-flycheck)
                       " %I(%l-%c)%p%%"))))

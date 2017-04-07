@@ -1,4 +1,62 @@
+(add-auto-mode 'conf-mode
+               "\\.[^b][^a][a-zA-Z]*rc$"
+               "\\.aspell\\.en\\.pws\\'"
+               "\\.meta\\'"
+               "\\.?muttrc\\'"
+               "\\.ctags\\'"
+               "\\.mailcap\\'")
 
+(add-auto-mode 'groovy-mode
+               "\\.groovy\\'"
+               "\\.gradle\\'")
+
+(add-auto-mode 'crontab-mode
+               "crontab.*\\'"
+               "\\.?cron\\(tab\\)?\\'")
+
+;; cmake
+(add-auto-mode 'cmake-mode
+               "CMakeLists\\.txt\\'"
+               "\\.cmake\\'")
+;; markdown
+(add-auto-mode 'markdown-mode
+               "\\.\\(md\\|markdown\\)\\'")
+
+(add-auto-mode 'emacs-lisp-mode
+               "\\.emacs-project\\'"
+               "archive-contents\\'")
+
+(add-auto-mode 'js-mode "\\.json\\'" "\\.jason\\'" "\\.jshintrc\\'")
+(add-auto-mode 'js2-mode "\\.js\\(\\.erb\\)?\\'")
+(add-auto-mode 'js2-jsx-mode "\\.jsx?\\'")
+
+(add-auto-mode 'sh-mode
+               "\\.basj_profile\\'" "\\.bash_history\\'"
+               "\\.sh\\'" "\\.bash\\'" "\\.bashrc.local\\'"
+               "\\.zsh\\'" "\\.bashrc\\'")
+
+(add-auto-mode 'web-mode
+               "\\.phtml\\'" "\\.cmp\\'" "\\.app\\'"
+               "\\.page\\'" "\\.component\\'"
+               "\\.wp\\'" "\\.tmpl\\'" "\\.php\\'"
+               "\\.module\\'" "\\.inc\\'" "\\.hbs\\'"
+               "\\.tpl\\'" "\\.[gj]sp\\'" "\\.as[cp]x\\'"
+               "\\.erb\\'" "\\.mustache\\'"
+               "\\.djhtml\\'" "\\.ftl\\'"
+               "\\.html?\\'" "\\.xul?\\'" "\\.eex?\\'"
+               "\\.xml?\\'")
+
+(add-auto-mode 'glsl-mode
+               "\\.glsl\\'" "\\.vert\\'"
+               "\\.frag\\'" "\\.geom\\'")
+
+
+(add-to-list 'interpreter-mode-alist '("node" . js2-mode))
+(add-to-list 'interpreter-mode-alist '("python" .   python-mode))
+
+
+
+(setq-default tab-width 4)
 (setq history-delete-duplicates t)
 (fset 'yes-or-no-p 'y-or-n-p)
 ;; no automatic new line when scrolling down at buffer bottom
@@ -49,12 +107,8 @@
 (setq csv-separators '("," ";" "|" " "))
 
 ;; Write backup files to own directory
-(let ((dir (expand-file-name "~/.emacs.d/data")))
-  (unless (file-exists-p dir)
-    (make-directory dir)
-    (if (not (file-exists-p (expand-file-name "backups" dir)))
-        (make-directory (expand-file-name "backups" dir)))))
-
+(if (not (file-exists-p (expand-file-name "~/.emacs.d/data/backups")))
+    (make-directory (expand-file-name "~/.emacs.d/data/backups")))
 
 (setq backup-by-coping t ; don't clobber symlinks
       backup-directory-alist '(("." . "~/.emacs.d/data/backups"))
@@ -74,6 +128,7 @@
 ;; default prog-mode setup
 (defun generic-prog-mode-hook-setup ()
   (unless (is-buffer-file-temp)
+    ;; (subword-mode 1)
     ;; auto insert closing pair
     (electric-pair-mode 1)
     ;; eldoc, show API doc in minibuffer echo area
@@ -81,7 +136,7 @@
     (show-paren-mode 1)
     (hs-minor-mode 1)
     (when (< (buffer-size) large-buffer-size)
-      (highlight-indentation-mode))
+      (hs-hide-all))
     ;; show trailing spaces in a programming mode
     (setq show-trailing-whitespace t)))
 (add-hook 'prog-mode-hook 'generic-prog-mode-hook-setup)
@@ -95,7 +150,5 @@
 (defalias 'perl-mode 'cperl-mode)
 
 (global-set-key [escape] 'keyboard-escape-quit)
-;; A quick way to jump to the definition of a function given its key binding
-(global-set-key (kbd "C-h K") 'find-function-on-key)
 
 (provide 'init-defaults)

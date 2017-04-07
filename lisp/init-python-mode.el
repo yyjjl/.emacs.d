@@ -5,6 +5,7 @@
     (try-turn-on-semantic-mode)
     (semantic-idle-summary-mode -1)
     (local-set-key (kbd "C-c b") 'elpy-autopep8-fix-code)
+    (local-set-key (kbd "<backtab>") 'company-complete)
     (local-set-key (kbd "C-c t t") 'pytest-one)
     (local-set-key (kbd "C-c t d") 'pytest-directory)
     (local-set-key (kbd "C-c B") 'py-isort-buffer)

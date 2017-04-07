@@ -18,6 +18,8 @@
   (advice-add 'hindent-extra-arguments :around  #'force-hindent-indent-size))
 
 (with-eval-after-load 'haskell-mode
+  (set-fontset-font (frame-parameter nil 'font)
+                    'symbol (font-spec :size 18 :family symbol-font-name))
   (setq
    ;; Use notify.el (if you have it installed) at the end of running
    ;; Cabal commands or generally things worth notifying.
