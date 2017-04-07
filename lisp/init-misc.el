@@ -1,16 +1,12 @@
-(autoload 'glsl-mode "glsl-mode" "Major mode for OpenGL Shader langugae" t)
 ;; popwin setup
 (autoload 'popwin-mode "popwin" nil t)
-
-;; input open source license
-(autoload 'legalese "legalese" "" t)
 
 (with-eval-after-load 'popwin
   (global-set-key (kbd "C-z") popwin:keymap))
 ;; turns on auto-fill-mode, don't use text-mode-hook
 (add-hook 'change-log-mode-hook 'turn-on-auto-fill)
 
-;;----------------------------------------------------------------------------
+;; ----------------------------------------
 
 ;; {{ buf-move
 (bind-keys ("C-c w i" . buf-move-up)
@@ -182,8 +178,7 @@ grab matched string and insert them into `kill-ring'"
   (let (items rlt)
     (setq items (grep-pattern-into-list regexp))
     (dolist (i items)
-      (setq rlt (concat rlt (format "%s\n" i)))
-      )
+      (setq rlt (concat rlt (format "%s\n" i))))
     (kill-new rlt)
     (message "matched strings => kill-ring")
     rlt))

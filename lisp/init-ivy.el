@@ -31,9 +31,8 @@
 (defun counsel-kill-buffer (&optional arg)
   (interactive "P")
   (ivy-read (format  "Kill buffer (default %s) :" (buffer-name))
-            (loop for buffer in  (mapcar #'buffer-name (buffer-list))
-                  if (not (string= (substring buffer 0 1) " "))
-                  collect buffer)
+            'internal-complete-buffer
+            :preselect (buffer-name (current-buffer))
             :action #'kill-buffer
             :keymap counsel-find-file-map
             :caller 'counsel-kill-buffer))

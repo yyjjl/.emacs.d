@@ -1,9 +1,6 @@
 (add-hook 'sh-mode-hook
           '(lambda ()
-             (let ((index (cl-position 'company-files company-backends)))
-               (if index
-                   (add-to-list-after index 'company-shell company-backends)
-                 (add-to-list 'company-backends 'company-shell)))
+             (add-to-list-after 'company-files 'company-shell company-backends)
              (flycheck-mode 1)))
 
 

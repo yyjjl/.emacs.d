@@ -50,6 +50,8 @@
     (when (require 'eldoc nil t)
       (setq eldoc-idle-delay 0.2)
       (setq eldoc-echo-area-use-multiline-p t))
+    (when (require 'semantic/bovine/el nil t)
+      (semantic-mode 1))
     (auto-compile-on-save-mode)
     (set-up-hippie-expand-for-elisp)
 
@@ -72,7 +74,8 @@
 ;; ----------------------------------------------------------------------------
 ;; Highlight current sexp
 ;;----------------------------------------------------------------------------
-;;Prevent flickery behaviour due to hl-sexp-mode unhighlighting before each command
+;;Prevent flickery behaviour due to hl-sexp-mode unhighlighting
+;; before each command
 (with-eval-after-load 'hl-sexp
   (defadvice hl-sexp-mode (after unflicker (turn-on) activate)
      (when turn-on
@@ -105,8 +108,5 @@
 
 (setq-default initial-scratch-message
               (concat ";; Welcome to Emacs " (or user-login-name "")))
-
-;; A quick way to jump to the definition of a function given its key binding
-(global-set-key (kbd "C-h K") 'find-function-on-key)
 
 (provide 'init-lisp)

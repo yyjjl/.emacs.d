@@ -32,7 +32,7 @@
                         (setf (car x) (- k 32))))))
               (cddr m)))))
 
-(defun my-common-cc-mode-setup ()
+(defun common-cc-mode-setup ()
   "setup shared by all languages (java/groovy/c++ ...)"
   (turn-on-auto-fill)
   (setq c-basic-offset 4)
@@ -45,7 +45,7 @@
   (fix-c-indent-offset-according-to-syntax-context 'func-decl-cont 0)
   (fix-c-indent-offset-according-to-syntax-context 'case-label 4))
 
-(defun my-c-mode-setup ()
+(defun c-mode-setup ()
   "C/C++ only setup"
   (local-set-key (kbd "C-x C-o") 'ff-find-other-file)
   (local-set-key (kbd "C-c b") 'clang-format-buffer)
@@ -62,11 +62,12 @@
   (setq cc-search-directories '("."
                                 "/usr/include"
                                 "/usr/local/include/*"
-                                "../*/include"))
+                                "../*/include")
+        highlight-indentation-offset 4)
   ;; make a #define be left-aligned
-  (setq c-electric-pound-behavior (quote (alignleft)))
+  (setq c-electric-pound-behavior '(alignleft))
 
-  (add-to-list 'company-backends 'company-irony)
+  (add-to-list 'company-backends '(company-irony :with company-files))
   (add-to-list 'company-backends 'company-irony-c-headers)
   (when buffer-file-name
     (irony-eldoc)
@@ -75,13 +76,13 @@
 (add-hook 'c-mode-common-hook
           (lambda ()
             (unless (is-buffer-file-temp)
-              (my-common-cc-mode-setup)
+              (common-cc-mode-setup)
               (if (derived-mode-p 'c++-mode)
                   (setq-local flycheck-clang-language-standard "c++14")
                 (setq flycheck-clang-language-standard nil))
               (unless (or (derived-mode-p 'java-mode)
                           (derived-mode-p 'groovy-mode))
-                (my-c-mode-setup)))))
+                (c-mode-setup)))))
 
 
 (with-eval-after-load 'irony
@@ -100,7 +101,9 @@
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
 
 (autoload 'cmake-font-lock-activate "cmake-font-lock" nil t)
-(add-hook 'cmake-mode-hook 'cmake-font-lock-activate)
+(add-hook 'cmake-mode-hook '(lambda ()
+                              (cmake-font-lock-activate)
+                              (add-to-list 'company-backends 'company-cmake)))
 
 (cmake-ide-setup)
 (provide 'init-cc-mode)

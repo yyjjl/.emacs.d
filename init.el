@@ -1,6 +1,6 @@
 ;; -*- coding: utf-8 -*-
 
- ;; don't GC during startup to save time
+;; don't GC during startup to save time
 (setq gc-cons-threshold (* 100 1024 1024))
 ;; save file-name-handler-alist temporarily and set it to nil
 ;; which means on every .el and .elc file loaded during start up,
@@ -10,6 +10,7 @@
 (defvar site-packages-directory "~/.emacs.d/site-lisp/")
 (defvar symbol-font-name "Noto Sans S Chinese")
 (defvar yasnippet-extra-dir "~/.emacs.d/snippets")
+(defvar large-buffer-size (* 1024 1024))
 
 (add-to-list 'default-frame-alist '(font . "Ubuntu Mono-13"))
 
@@ -37,9 +38,9 @@
 ;; some important tool function
 (require 'init-utils)
 (require 'init-defaults)
+(require 'init-auto-mode)
 ;; setup emacs outlooking
 (require 'init-color-theme)
-(require 'init-gui-frames)
 (require 'init-modeline)
 ;; Set up $PATH
 (require 'init-exec-path)
@@ -76,7 +77,6 @@
 (require 'init-semantic)
 ;; need statistics of keyfreq
 ;; (require 'init-keyfreq)
-
 ;; misc has some crucial tools I need immediately
 (require 'init-clipboard)
 (require 'init-windows)
@@ -85,9 +85,9 @@
 (require 'init-doxygen)
 (require 'after-init)
 
-;;----------------------------------------------------------------------------
+;;--------------------------------------------------------
 ;; Locales (setting them earlier in this file doesn't work in X)
-;;----------------------------------------------------------------------------
+;;--------------------------------------------------------
 (require 'init-locales)
 
 ;; load org project file
@@ -132,9 +132,6 @@
  )
 
 (setq file-name-handler-alist file-name-handler-alist-tmp)
-;;; Local Variables:
-;;; no-byte-compile: t
-;;; End:
 (put 'scroll-left 'disabled nil)
 ;; Don't disable narrowing commands
 (put 'narrow-to-region 'disabled nil)
