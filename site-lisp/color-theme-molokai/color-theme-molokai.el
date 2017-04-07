@@ -64,6 +64,7 @@
      (font-lock-warning-face ((t (:foreground "#FFFFFF"
                                               :background "#333333"))))
      (fringe ((t (:background "#1B1D1E"))))
+     (highlight-indentation-face ((t (:background "#111213"))))
      ;; (vertical-border ((t (:foreground "#111213"))))
      (vertical-border ((t (:foreground "#1B1D1E"))))
      (highlight ((t (:foreground "#000000" :background "#C4BE89"))))
@@ -165,14 +166,14 @@
      (org-block-end-line ((t (:foreground "#b3e5fc" :background "#1e2930"))))
 
      (org-level-1 ((class (:inherit outline-1
-                                     :background "#455A64"
-                                     :weight bold
-                                     ;; :height 1.3
-                                     ))))
+                                    :background "#455A64"
+                                    :weight bold
+                                    ;; :height 1.3
+                                    ))))
      (org-level-2 ((class (:inherit outline-2
-                                     :background "#35575b"
-                                     ;; :height 1.2
-                                     ))))
+                                    :background "#35575b"
+                                    ;; :height 1.2
+                                    ))))
      (org-level-3 ((class (:inherit outline-3
                                     ;; :height 1.1
                                     ))))

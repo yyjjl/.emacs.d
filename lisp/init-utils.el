@@ -10,27 +10,27 @@
          retval)
      ,@clean-up))
 
-;;----------------------------------------------------------------------------
+;;--------------------------------------------------------
 ;; Handier way to add modes to auto-mode-alist
-;;----------------------------------------------------------------------------
+;;--------------------------------------------------------
 (defun add-auto-mode (mode &rest patterns)
   "Add entries to `auto-mode-alist' to use `MODE' for all given file `PATTERNS'."
   (dolist (pattern patterns)
     (add-to-list 'auto-mode-alist (cons pattern mode))))
 
 
-;;----------------------------------------------------------------------------
+;;--------------------------------------------------------
 ;; Find the directory containing a given library
-;;----------------------------------------------------------------------------
+;;--------------------------------------------------------
 (autoload 'find-library-name "find-func")
 (defun directory-of-library (library-name)
   "Return the directory in which the `LIBRARY-NAME' load file is found."
   (file-name-as-directory (file-name-directory (find-library-name library-name))))
 
 
-;;----------------------------------------------------------------------------
+;;--------------------------------------------------------
 ;; Delete the current file
-;;----------------------------------------------------------------------------
+;;--------------------------------------------------------
 (defun delete-this-file ()
   "Delete the current file, and kill the buffer."
   (interactive)
@@ -138,10 +138,9 @@ might be bad."
       (define-key map (kbd new-key) (cdr m))
       (define-key map (kbd old-key) nil))))
 
-(defun add-to-list-after (n ele lst)
-  "add a element after position"
-  (when (>= n 0)
-    (let ((ncdr (nthcdr n lst)))
-      (setcdr ncdr (cons ele (cdr ncdr))))))
+(defun add-to-list-after (val ele lst)
+  (let ((pair (memq val lst)))
+    (when pair
+      (setcdr pair (cons ele (cdr pair))))))
 
 (provide 'init-utils)
