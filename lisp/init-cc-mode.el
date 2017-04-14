@@ -59,6 +59,11 @@
   (local-set-key [f10] 'cmake-ide-compile)
 
   (try-turn-on-semantic-mode)
+
+  (unless (cmake-ide--locate-cmakelists)
+    (ggtags-mode 1)
+    (ggtags-auto-update-mode 1))
+
   (setq cc-search-directories '("."
                                 "/usr/include"
                                 "/usr/local/include/*"
@@ -72,7 +77,8 @@
   (when buffer-file-name
     (irony-eldoc)
     (irony-mode 1)))
-;; donot use c-mode-common-hook or cc-mode-hook because many major-modes use this hook
+;; donot use c-mode-common-hook or cc-mode-hook
+;; because many major-modes use this hook
 (add-hook 'c-mode-common-hook
           (lambda ()
             (unless (is-buffer-file-temp)

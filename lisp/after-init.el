@@ -28,6 +28,7 @@
     (fcitx-aggressive-setup))
 
   (elpy-enable)
+  (remove-hook  'python-mode-hook 'elpy-mode)
 
   (winner-mode 1)
   ;; modeline

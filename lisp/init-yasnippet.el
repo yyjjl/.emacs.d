@@ -24,8 +24,7 @@
     ;; highlight FIXME/BUG/TODO in comment
     (yas-minor-mode 1)))
 
-(add-hook 'prog-mode-hook
-          'yasnippet-generic-setup-for-mode-hook)
+(add-hook 'prog-mode-hook 'yasnippet-generic-setup-for-mode-hook)
 (add-hook 'text-mode-hook 'yasnippet-generic-setup-for-mode-hook)
 (add-hook 'cmake-mode-hook 'yasnippet-generic-setup-for-mode-hook)
 

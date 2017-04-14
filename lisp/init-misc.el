@@ -322,4 +322,32 @@ grab matched string, cssize them, and insert into kill ring"
           (lambda ()
             (add-to-list 'company-backends 'company-restclient)))
 
+(with-eval-after-load 'octave
+  (defun inferior-octave-return-to-buffer ()
+    (interactive)
+    (let ((bufs (loop for buf in (buffer-list)
+                      if (with-current-buffer buf (eq major-mode 'octave-mode))
+                      collect (buffer-name buf))))
+      (if (= 1 (length bufs))
+          (pop-to-buffer (car bufs))
+        (ivy-read "Select buffer: " bufs
+                  :action #'pop-to-buffer))))
+  (defun octave-mode-return-to-inferior ()
+    (interactive)
+    (let ((inferior (and (inferior-octave-process-live-p)
+                        (process-buffer inferior-octave-process))))
+      (if inferior
+          (pop-to-buffer inferior)
+        (message "No inferior-octave buffer is alive !"))))
+  (setq inferior-octave-prompt-read-only t)
+  (bind-key "C-c C-c"
+            'run-octave
+            octave-mode-map)
+  (bind-key "C-c C-z"
+            'octave-mode-return-to-inferior
+            octave-mode-map)
+  (bind-key "C-c C-z"
+            'inferior-octave-return-to-buffer
+            inferior-octave-mode-map))
+
 (provide 'init-misc)

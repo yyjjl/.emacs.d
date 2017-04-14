@@ -56,6 +56,7 @@
              ("C-c M-p") ("C-c C-p" . ghc-goto-prev-hole))
   (add-hook 'haskell-mode-hook
             (lambda ()
+              (rainbow-delimiters-mode 1)
               (unless (is-buffer-file-temp)
                 (ghc-init)
                 (hare-init)
@@ -67,7 +68,6 @@
                 (add-to-list 'company-backends 'company-cabal)
                 (add-to-list 'company-backends 'company-ghci)
                 (haskell-doc-mode 1))
-              (rainbow-delimiters-mode 1)
               (hindent-mode 1)
               ;; haskell-indentation-mode is incompatible with shm
               ;; (haskell-indentation-mode -1)

@@ -1,15 +1,16 @@
 ;; don't use (unlesss (is-buffer-file-temp)) ,there is a bug
 (defun web-mode-hook-setup ()
-  (enable-flyspell-mode-conditionally)
+  (unless (is-buffer-file-temp)
+    (enable-flyspell-mode-conditionally)
 
-  (add-to-list 'company-backends 'company-web-html)
-  ;;     (add-to-list 'company-backends 'company-web-jade)
-  ;;     (add-to-list 'company-backends 'company-web-slim)
+    (add-to-list 'company-backends 'company-web-html)
+    ;;     (add-to-list 'company-backends 'company-web-jade)
+    ;;     (add-to-list 'company-backends 'company-web-slim)
 
-  (remove-hook 'yas-after-exit-snippet-hook
-               'web-mode-yasnippet-exit-hook t)
-  (remove-hook 'yas/after-exit-snippet-hook
-               'web-mode-yasnippet-exit-hook t))
+    (remove-hook 'yas-after-exit-snippet-hook
+                 'web-mode-yasnippet-exit-hook t)
+    (remove-hook 'yas/after-exit-snippet-hook
+                 'web-mode-yasnippet-exit-hook t)))
 
 (add-hook 'web-mode-hook 'web-mode-hook-setup)
 

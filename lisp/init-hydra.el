@@ -74,14 +74,17 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
 
 
 (define-key global-map (kbd "C-x SPC") 'hydra-rectangle/body)
-
+(defun cut-rectangle (start end &optional fill)
+  (interactive "r")
+  (copy-rectangle-as-kill start end)
+  (delete-rectangle start end fill))
 (defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
                            :color pink
                            :post (deactivate-mark))
   "
-  ^_p_^     [_d_]delete    [_s_]string
+  ^_p_^     [_c_]cut       [_s_]string
 _b_   _f_   [_o_]ok        [_y_]yank
-  ^_n_^     [_r_]reset     [_w_]cut
+  ^_n_^     [_r_]reset     [_w_]copy
 ^^^^        [_x_]exchange  [_/_]undo
 ^^^^        [_a_]line beg  [_e_]line end
 "
@@ -93,7 +96,7 @@ _b_   _f_   [_o_]ok        [_y_]yank
   ("e" end-of-line nil)
   ("x" exchange-point-and-mark nil)
   ("w" copy-rectangle-as-kill nil)
-  ("d" delete-rectangle nil)
+  ("c" cut-rectangle nil)
   ("r" (if (region-active-p)
            (deactivate-mark)
          (rectangle-mark-mode 1)) nil)

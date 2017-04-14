@@ -46,6 +46,7 @@
 
 (defun elisp-mode-hooks ()
   "lisp-mode-hooks"
+  (my-lisp-setup)
   (unless (is-buffer-file-temp)
     (when (require 'eldoc nil t)
       (setq eldoc-idle-delay 0.2)
@@ -54,8 +55,6 @@
       (semantic-mode 1))
     (auto-compile-on-save-mode)
     (set-up-hippie-expand-for-elisp)
-
-    (my-lisp-setup)
 
     (checkdoc-minor-mode)))
 

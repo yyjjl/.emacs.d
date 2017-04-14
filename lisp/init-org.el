@@ -61,15 +61,15 @@
         ;; org v8
         org-odt-preferred-output-format "doc"
         org-tags-column 80
-        org-latex-preview-ltxpng-directory "/tmp/ltxpng/"
+        org-latex-preview-ltxpng-directory "~/.emacs.d/data/ltxpng/"
         ;; org-startup-indented t
         ;; {{ org 8.2.6 has some performance issue. Here is the workaround.
         ;; @see http://punchagan.muse-amuse.in/posts/how-i-learnt-to-use-emacs-profiler.html
-        org-agenda-inhibit-startup t ;; ~50x speedup
+        org-agenda-inhibit-startup t       ;; ~50x speedup
         org-agenda-use-tag-inheritance nil ;; 3-4x speedup
         ;; }}
         ;; org-pretty-entities t
-        )
+        org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
 
   ;; Refile targets include this file and any file contributing to the agenda - up to 5 levels deep
   (setq org-refile-targets (quote ((nil :maxlevel . 5)
@@ -182,8 +182,6 @@
   (when (executable-find "pygmentize")
     (setq org-latex-listings 'minted))
   (setq org-latex-default-class "cn-article")
-  (setq org-format-latex-options
-        (plist-put org-format-latex-options :scale 1.5))
   (setq org-latex-packages-alist
         '(("" "ctex" nil)
           ("" "setspace,dcolumn" t)
@@ -209,7 +207,7 @@
                 "\\definecolor{codeblockbg}{rgb}{0.95,0.95,0.95}"
                 "\\definecolor{linkcolor}{rgb}{0.1,0.3,0.5}"
                 "\\hypersetup{colorlinks=true,linkcolor=linkcolor}"
-                "\\geometry{top=2.54cm,bottom=2.54cm,left=3cm,right=3cm}"
+                "\\geometry{top=2.54cm,bottom=2.54cm,left=2.54cm,right=2.54cm}"
                 "\\renewcommand{\\theFancyVerbLine}{"
                 "  \\sffamily \\textcolor[rgb]{1.0,0.2,1.0}{"
                 "   \\scriptsize \\oldstylenums{\\arabic{FancyVerbLine}}}}"

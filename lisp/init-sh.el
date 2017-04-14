@@ -1,7 +1,8 @@
 (add-hook 'sh-mode-hook
           '(lambda ()
-             (add-to-list-after 'company-files 'company-shell company-backends)
-             (flycheck-mode 1)))
+             (unless (is-buffer-file-temp)
+               (add-to-list-after 'company-files 'company-shell company-backends)
+               (flycheck-mode 1))))
 
 
 ;; But don't show trailing whitespace in SQLi, inf-ruby etc.

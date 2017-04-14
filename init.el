@@ -67,7 +67,7 @@
 (require 'init-javascript)
 (require 'init-linum-mode)
 (require 'init-sh)
-;; (require 'init-tags)
+(require 'init-tags)
 (require 'init-term-mode)
 (require 'init-web-mode)
 (require 'init-slime)

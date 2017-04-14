@@ -1,5 +1,6 @@
 (defun python-mode-hook-setup ()
   (unless (is-buffer-file-temp)
+    (elpy-mode 1)
     ;; run command `pip install jedi flake8 importmagic` in shell,
     ;; or just check https://github.com/jorgenschaefer/elpy
     (try-turn-on-semantic-mode)

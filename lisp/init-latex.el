@@ -1,19 +1,20 @@
 (autoload 'LaTeX-math-mode "latex" nil t)
 (defun LaTeX-mode-setup ()
-  (add-to-list  'company-backends 'company-auctex-labels)
-  (add-to-list  'company-backends 'company-auctex-bibs)
-  (add-to-list  'company-backends '(company-auctex-macros
-                                   company-auctex-symbols
-                                   company-auctex-environments))
-  (turn-on-reftex)
-  (LaTeX-math-mode 1)
-  (TeX-source-correlate-mode 1)
-  (TeX-PDF-mode 1)
-  (TeX-fold-mode 1)
+  (unless (is-buffer-file-temp)
+    (add-to-list  'company-backends 'company-auctex-labels)
+    (add-to-list  'company-backends 'company-auctex-bibs)
+    (add-to-list  'company-backends '(company-auctex-macros
+                                      company-auctex-symbols
+                                      company-auctex-environments))
+    (turn-on-reftex)
+    (LaTeX-math-mode 1)
+    (TeX-source-correlate-mode 1)
+    (TeX-PDF-mode 1)
+    (TeX-fold-mode 1)
 
-  (setq TeX-engine 'xetex)
+    (setq TeX-engine 'xetex)
 
-  (outline-minor-mode 1))
+    (outline-minor-mode 1)))
 
 (add-hook 'LaTeX-mode-hook 'LaTeX-mode-setup)
 

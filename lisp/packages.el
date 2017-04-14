@@ -89,6 +89,7 @@
     smex ;; counsel-M-x need smex to get history
     bind-key
     fcitx
+    ggtags
     ;;---------------------------------------
     ;; theme packages
     ;;---------------------------------------

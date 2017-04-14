@@ -50,6 +50,7 @@
                "\\.glsl\\'" "\\.vert\\'"
                "\\.frag\\'" "\\.geom\\'")
 
+(setcdr (assoc-string "\\.m\\'" auto-mode-alist) 'octave-mode)
 
 (add-to-list 'interpreter-mode-alist '("node" . js2-mode))
 (add-to-list 'interpreter-mode-alist '("python" .   python-mode))
