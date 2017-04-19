@@ -290,7 +290,7 @@ grab matched string, cssize them, and insert into kill ring"
 (global-set-key (kbd "C-h Z") 'zeal-at-point-search)
 (with-eval-after-load 'zeal-at-point
   (setf (cdr (assoc 'c++-mode zeal-at-point-mode-alist)) "cpp"))
-;; {{start dictionary lookup
+;; {{ start dictionary lookup
 ;; use below commands to create dicitonary
 ;; mkdir -p ~/.stardict/dic
 ;; # wordnet English => English

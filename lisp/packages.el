@@ -41,10 +41,11 @@
           (setq cur-priority (if pri (cdr pri) 0)))))
     (setf (cdr pkg) (list cur-archive))))
 
-(when package-use-priority
-  (defun manager-packages-with-priority ()
+(defun manager-packages-with-priority ()
     (dolist (pkg package-archive-contents)
       (package-set-right-archive pkg)))
+
+(when package-use-priority
   (advice-add 'package-read-all-archive-contents :after
               #'manager-packages-with-priority))
 
@@ -74,13 +75,11 @@
 (package-initialize)
 
 (defvar required-packages
-  '(
-    ;;---------------------------------------
+  '( ;;---------------------------------------
     ;; core packages
     ;;---------------------------------------
     yasnippet
     company company-statistics
-    ;; keyfreq
     session
     multi-term
     flycheck flycheck-pos-tip
@@ -89,7 +88,6 @@
     smex ;; counsel-M-x need smex to get history
     bind-key
     fcitx
-    ggtags
     ;;---------------------------------------
     ;; theme packages
     ;;---------------------------------------
@@ -99,7 +97,6 @@
     ;; highlight braces with their depth
     rainbow-delimiters
     ;; spaceline
-    ;; give very variable a special color
     rainbow-mode ;;  required by css-mode
     ;; make buffer even line and odd line having different color
     stripe-buffer
@@ -114,9 +111,9 @@
     ;; tool packages
     ;;---------------------------------------
     ;; provide functions to build jump action
+    popwin
     restclient company-restclient
     package-safe-delete
-    jump ;;
     dired+ dired-filter dired-k
     bookmark+
     ;; select bigger region contain current region or point
@@ -124,9 +121,9 @@
     ;; make a scratch buffer
     scratch
     ;; get system environment
-    exec-path-from-shell
+    ;; exec-path-from-shell
     ;; inverse of fill region and paragraph
-    unfill
+    ;; unfill
     ;; move whole buffer
     buffer-move
     ;; clipbord tools
@@ -157,6 +154,7 @@
     company-irony
     flycheck-irony
     rtags
+    ggtags
     ;;---------------------------------------
     ;; git packages
     ;;---------------------------------------
@@ -175,8 +173,8 @@
     lispy
     racket-mode
     hl-sexp
-    slime
-    slime-company
+    ;; slime
+    ;; slime-company
     ;;---------------------------------------
     ;; web  packages
     ;;---------------------------------------
@@ -193,9 +191,6 @@
     js2-refactor
     multiple-cursors ;; js2-refactor
     tern
-    ;; typescript
-    typescript-mode
-    tide
     css-eldoc
     emmet-mode
     ;;---------------------------------------
@@ -228,14 +223,15 @@
     ;; yaml format
     yaml-mode
     ;; haml format
-    haml-mode ;;  ass-mode
+    haml-mode
     markdown-mode
     crontab-mode
     csv-mode
     sass-mode
     less-css-mode
     scss-mode
-    glsl-mode lua-mode
+    glsl-mode
+    lua-mode
     go-mode
     groovy-mode
     cmake-mode cmake-font-lock cmake-ide

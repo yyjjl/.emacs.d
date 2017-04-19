@@ -43,7 +43,7 @@
 (require 'init-color-theme)
 (require 'init-modeline)
 ;; Set up $PATH
-(require 'init-exec-path)
+;; (require 'init-exec-path)
 ;; any file use flyspell should be initialized after init-spelling.el
 (require 'init-spelling)
 (require 'init-company)
@@ -70,19 +70,15 @@
 (require 'init-tags)
 (require 'init-term-mode)
 (require 'init-web-mode)
-(require 'init-slime)
+;; (require 'init-slime)
 (require 'init-gud)
-(require 'init-tide)
 (require 'init-latex)
 (require 'init-semantic)
-;; need statistics of keyfreq
-;; (require 'init-keyfreq)
-;; misc has some crucial tools I need immediately
 (require 'init-clipboard)
 (require 'init-windows)
 (require 'init-hs-minor-mode)
-(require 'init-misc)
 (require 'init-doxygen)
+(require 'init-misc)
 (require 'after-init)
 
 ;;--------------------------------------------------------
