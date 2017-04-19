@@ -78,27 +78,14 @@
            (select-frame ,prev-frame))))))
 
 (defvar load-user-customized-major-mode-hook t)
-(defvar cached-normal-file-full-path nil)
 (defun is-buffer-file-temp ()
   (interactive)
-  "If (buffer-file-name) is nil or a temp file or HTML file converted from org file"
-  (let ((f (buffer-file-name))
-        org
-        (rlt t))
-    (cond
-     ((not load-user-customized-major-mode-hook) t)
-     ((not f)
-      ;; file does not exist at all
-      (setq rlt t))
-     ((string= f cached-normal-file-full-path)
-      (setq rlt nil))
-     ((string-match (concat "^" temporary-file-directory) f)
-      ;; file is create from temp directory
-      (setq rlt t))
-     (t
-      (setq cached-normal-file-full-path f)
-      (setq rlt nil)))
-    rlt))
+  "If (buffer-file-name) is nil or a temp file or
+HTML file converted from org file"
+  (let ((filename (buffer-file-name)))
+    (or (not load-user-customized-major-mode-hook)
+        (not filename)
+        (string-match (concat "^" temporary-file-directory) filename))))
 
 (defun create-scratch-buffer nil
   "Create a new scratch buffer to work in.  (could be *scratch* - *scratchX*)."

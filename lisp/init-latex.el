@@ -1,16 +1,18 @@
 (autoload 'LaTeX-math-mode "latex" nil t)
 (defun LaTeX-mode-setup ()
   (unless (is-buffer-file-temp)
-    (add-to-list  'company-backends 'company-auctex-labels)
-    (add-to-list  'company-backends 'company-auctex-bibs)
     (add-to-list  'company-backends '(company-auctex-macros
                                       company-auctex-symbols
-                                      company-auctex-environments))
+                                      company-auctex-environments
+                                      company-auctex-bibs
+                                      company-auctex-labels))
     (turn-on-reftex)
     (LaTeX-math-mode 1)
     (TeX-source-correlate-mode 1)
     (TeX-PDF-mode 1)
     (TeX-fold-mode 1)
+    ;; will conflict with latex-mode
+    (electric-pair-mode -1)
 
     (setq TeX-engine 'xetex)
 
@@ -26,25 +28,31 @@
         (TeX-save-document (TeX-master-file)))
       (let ((command (if (save-excursion
                            (goto-char 1)
-                           (search-forward-regexp "\\\\usepackage\\s-*{\\s-*minted"
-                                                  nil t))
+                           (search-forward-regexp
+                            "\\\\usepackage\\s-*{\\s-*minted"
+                            nil t))
                          "XeLaTeX"
                        TeX-command-default)))
         (TeX-command command  'TeX-master-file -1))))
 
   (add-to-list 'TeX-command-list
-               '("XeLaTeX" "%`xelatex -shell-escape%(mode)%' %t" TeX-run-TeX nil t))
+               '("XeLaTeX" "%`xelatex -shell-escape%(mode)%' %t"
+                 TeX-run-TeX nil t))
 
   (setq TeX-auto-save t
         TeX-parse-self t
         TeX-syntactic-comment t
+        TeX-electric-math '("$" . "$")
+        LaTeX-electric-left-right-brace t
+        TeX-complete-expert-commands t
+        TeX-electric-sub-and-superscript t
         ;; Synctex support
         TeX-source-correlate-start-server nil
         ;; Don't insert line-break at inline math
         LaTeX-fill-break-at-separators nil))
 
 (with-eval-after-load 'latex
-  (setq TeX-fold-command-prefix (kbd "C-c f"))
+  (setq TeX-fold-command-prefix (kbd "C-c C-o"))
 
   (require 'tex-fold)
 
@@ -72,6 +80,8 @@
   (bind-keys :map LaTeX-mode-map
              ("C-c b" . latex-build)
              ("C-c h" . TeX-doc)
+             ("C-c C-s") ("C-c s" . LaTeX-section)
+             ("C-c C-e") ("C-c e" . LaTeX-environment)
              ("C-c x b" . latex-font-bold)
              ("C-c x m" . latex-font-medium)
              ("C-c x c" . latex-font-code)
@@ -113,7 +123,7 @@
                      ("c b" . preview-clearout-buffer)
                      ("c d" . preview-clearout-document))
           map))
-  (define-key LaTeX-mode-map "\C-cp" preview-map))
+  (define-key LaTeX-mode-map "\C-cl" preview-map))
 
 (with-eval-after-load 'reftex
   (setq reftex-plug-into-AUCTeX '(nil nil t t t)

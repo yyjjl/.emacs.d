@@ -87,13 +87,6 @@
 
   (setq org-src-fontify-natively t)
 
-  (defadvice org-publish (around org-publish-advice activate)
-    "Stop running major-mode hook when org-publish"
-    (let ((old load-user-customized-major-mode-hook))
-      (setq load-user-customized-major-mode-hook nil)
-      ad-do-it
-      (setq load-user-customized-major-mode-hook old)))
-
   (defun org-mode-hook-setup ()
     ;; org-mode's own flyspell will be loaded
     (make-local-variable 'completion-at-point-functions)

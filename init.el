@@ -112,6 +112,7 @@
  '(ispell-personal-dictionary "~/.emacs.d/data/aspell.pws")
  '(keyfreq-file "~/.emacs.d/data/keyfreq")
  '(mc/list-file "~/.emacs.d/data/mc-lists.el")
+ '(org-publish-timestamp-directory "~/.emacs.d/data/.org-timestamps/")
  '(projectile-known-projects-file "~/.emacs.d/data/projectile-bookmarks.eld")
  '(recentf-save-file "~/.emacs.d/data/recentf")
  '(rtags-path "~/.emacs.d/bin/rtags-build/bin")
@@ -139,3 +140,4 @@
 (put 'narrow-to-defun 'disabled nil)
 (put 'erase-buffer 'disabled nil)
 (setq enable-local-variables :all)
+(put 'LaTeX-narrow-to-environment 'disabled nil)

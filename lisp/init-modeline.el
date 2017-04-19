@@ -88,7 +88,7 @@
                       ("!" "fail" flycheck-mode-line-failed-face)
                       ("?" "err" flycheck-mode-line-error-face)))
              (info (assoc-string str infos))
-             (msg (if info (cadr info) str))
+             (msg (if info (cadr info) (substring str 1)))
              (face (if info (caddr info) 'flycheck-mode-line-result-face)))
         (concat " " (propertize msg 'face face)))))
 

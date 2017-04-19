@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: table
+# key: table
+# --
+\begin{table}[ht]
+  \caption{\label{tab:$1}$2}
+  \begin{ruledtabular}
+  \begin{tabular}{$3}
+  $4
+  \end{tabular}
+  \end{ruledtabular}
+\end{table}

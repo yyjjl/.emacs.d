@@ -41,13 +41,34 @@
 
 (add-hook 'after-init-hook 'after-init-function)
 
+(defun comment-currnet-line (&optional arg)
+  (save-excursion
+    (beginning-of-line)
+    (set-mark-command nil)
+    (end-of-line)
+    (if arg
+        (call-interactively #'uncomment-region)
+      (call-interactively #'comment-region))))
+
+(defun comment-region-or-line ()
+  (interactive "*")
+  (if mark-active
+      (call-interactively 'comment-region)
+    (comment-currnet-line)))
+
+(defun uncomment-region-or-line ()
+  (interactive "*")
+  (if mark-active
+      (call-interactively 'uncomment-region)
+    (comment-currnet-line t)))
+
 (bind-keys ("C-x C-m" . execute-extended-command)
            ("C-}" . force-company-yasnippet)
            ("<backtab>" . company-complete)
            ("C-r" . isearch-backward-regexp)
            ("C-M-r" . isearch-backeard)
-           ("C-c c" . comment-region)
-           ("C-c u" . uncomment-region)
+           ("C-c c" . comment-region-or-line)
+           ("C-c u" . uncomment-region-or-line)
            ("C-x R" . rename-this-file-and-buffer)
            ("C-x D" . delete-this-file)
            ("C-x C" . copy-this-file-path)
@@ -70,6 +91,7 @@
            ("M-'" . tiny-expand)
            ("M--" . er/expand-region)
            ([f6] . toggle-company-ispell)
-           ([f7] . create-scratch-buffer))
+           ([f7] . create-scratch-buffer)
+           ([f12] . fcitx-aggressive-setup))
 
 (provide 'after-init)

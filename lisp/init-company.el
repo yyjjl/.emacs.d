@@ -8,8 +8,8 @@
                                (company-dabbrev-code
                                 company-gtags
                                 company-etags
-                                company-keywords)
-                               company-oddmuse company-dabbrev))
+                                company-keywords
+                                company-oddmuse company-dabbrev)))
   (make-variable-buffer-local 'company-backends)
   ;; company should be case sensitive
   (setq company-dabbrev-downcase nil)
