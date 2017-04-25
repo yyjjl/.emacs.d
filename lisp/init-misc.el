@@ -27,7 +27,11 @@
 (transient-mark-mode t)
 (recentf-mode 1)
 
-(setq recentf-keep '(file-remote-p file-readable-p))
+(defvar recentf-can-track t)
+(setq recentf-keep '((lambda (fn)
+                       (and recentf-can-track
+                           (or (file-remote-p fn)
+                               (file-readable-p fn))))))
 (setq recentf-max-saved-items 2048
       recentf-exclude '("/tmp/"
                         "/ssh:"
@@ -43,6 +47,7 @@
 (global-set-key (kbd "C-:") 'avy-goto-char)
 (global-set-key (kbd "M-g l") 'avy-goto-line)
 (global-set-key (kbd "M-g w") 'avy-goto-word-1)
+(global-set-key (kbd "M-g y") 'avy-copy-line)
 (global-set-key (kbd "C-\"") 'avy-goto-char-2)
 ;; }}
 
@@ -349,5 +354,29 @@ grab matched string, cssize them, and insert into kill ring"
   (bind-key "C-c C-z"
             'inferior-octave-return-to-buffer
             inferior-octave-mode-map))
+
+(defconst ascii-before-chinese
+  (rx (group-n 1 (in "a-zA-Z0-9!@#$%^&*\\-+|)\\]}\\:;?><.,"))
+      (group-n 2 (category chinese-two-byte))))
+(defconst ascii-after-chinese
+  (rx (group-n 1 (category chinese-two-byte))
+      (group-n 2 (in "a-zA-Z0-9@#$%^&*\\-+|(\\[{\\></"))))
+
+(defun insert-space-around-chinese (&optional start end)
+  (interactive)
+  (if (region-active-p)
+      (setq start (region-beginning)
+            end (region-end))
+    (setq start (point-min)
+          end (point-max)))
+  (save-excursion
+    (goto-char start)
+    (while (re-search-forward ascii-before-chinese end t)
+      (replace-match "\\1 \\2" nil nil))
+    (goto-char start)
+    (while (re-search-forward ascii-after-chinese end t)
+      (replace-match "\\1 \\2" nil nil))))
+
+(global-set-key (kbd "M-Q") 'insert-space-around-chinese)
 
 (provide 'init-misc)

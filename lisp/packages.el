@@ -55,12 +55,15 @@
 
 ;; We include the org repository for completeness, but don't use it.
 ;; Lock org-mode temporarily:
-;; (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
 
-(setq package-archives '(("melpa" . "http://melpa.org/packages/")
-                         ("melpa-stable" . "http://stable.melpa.org/packages/")
-                         ;; uncomment below line if you need use GNU ELPA
-                         ("gnu" . "http://elpa.gnu.org/packages/")))
+;; (setq package-archives '(("melpa" . "http://melpa.org/packages/")
+;;                          ("melpa-stable" . "http://stable.melpa.org/packages/")
+;;                          ;; uncomment below line if you need use GNU ELPA
+;;                          ("gnu" . "http://elpa.gnu.org/packages/")))
+;; use mirror in china
+(setq package-archives '(("gnu"   . "https://elpa.emacs-china.org/gnu/")
+                         ("melpa" . "https://elpa.emacs-china.org/melpa/")
+                         ("melpa-stable" . "https://elpa.emacs-china.org/melpa-stable/")))
 
 (defvar package-archive-priority
   '(("melpa" . 1)
@@ -118,8 +121,6 @@
     bookmark+
     ;; select bigger region contain current region or point
     expand-region
-    ;; make a scratch buffer
-    scratch
     ;; get system environment
     ;; exec-path-from-shell
     ;; inverse of fill region and paragraph
@@ -202,7 +203,6 @@
     ;; org  mode  packages
     ;;---------------------------------------
     htmlize
-    org-bullets
     ;;---------------------------------------
     ;; haskell  packages
     ;;---------------------------------------

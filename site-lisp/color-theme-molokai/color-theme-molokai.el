@@ -40,8 +40,9 @@
      (escape-glyph ((t (:foreground "#E6DB74"))))
      (minibuffer-prompt ((t (:foreground "#66D9EF"))))
 
-     (mode-line ((t (:foreground "#F8F8F2" :background "#111213"))))
-     (mode-line-buffer-id ((t (:foreground nil :background "#000000" :weight semi-bold))))
+     (mode-line ((t (:foreground "#F8F8F2" :background "#1b1d1e"))))
+     (mode-line-buffer-id ((t (:foreground nil :background "#000000"
+                                           :weight semi-bold))))
      (mode-line-inactive ((t (:foreground "#BCBCBC" :background "#161718"))))
      (mode-line-highlight ((t (:background "#020303"))))
      (mode-line-mousable ((t (:foreground "#BCBCBC" :background "#000000"))))
@@ -49,7 +50,8 @@
 
      (font-lock-builtin-face ((t (:foreground "#A6E22E"))))
      (font-lock-comment-face ((t (:foreground "#465457" :slant italic))))
-     (font-lock-comment-delimiter-face ((t (:foreground "#465457" :slant italic))))
+     (font-lock-comment-delimiter-face ((t (:foreground "#465457"
+                                                        :slant italic))))
      (font-lock-constant-face ((t (:foreground "#AE81FF"))))
      (font-lock-doc-face ((t (:foreground "#E6DB74" :slant italic))))
      (font-lock-function-name-face ((t (:foreground "#F92672" :slant italic))))
@@ -136,9 +138,13 @@
       ((t (:weight normal :foreground "red"))))
      (company-tooltip-common ((t (:inherit font-lock-constant-face))))
      (company-tooltip-selection ((t (:inherit font-lock-keyword-face
-                                              :weight bold  :background "#4b5053"))))
+                                              :weight bold
+                                              :background "#4b5053"))))
 
-     (regex-tool-matched-face ((t (:foreground nil :background nil :inherit match))))
+     (regex-tool-matched-face ((t (:foreground nil :background nil
+                                               :inherit match))))
+     (eldoc-highlight-function-argument ((t (:foreground "#86dc2f"
+                                                         :inherit bold))))
      (hl-sexp-face ((t (:background "gray5"))))
      (org-block ((t (:foreground "#8bc34a" :background "#1c1f26"))))
      (org-block-background ((t (:background "#1c1f26"))))
@@ -168,24 +174,33 @@
      (org-level-1 ((class (:inherit outline-1
                                     :background "#455A64"
                                     :weight bold
-                                    ;; :height 1.3
-                                    ))))
-     (org-level-2 ((class (:inherit outline-2
-                                    :background "#35575b"
-                                    ;; :height 1.2
-                                    ))))
-     (org-level-3 ((class (:inherit outline-3
-                                    ;; :height 1.1
-                                    ))))
-     (org-level-4 ((class (:inherit outline-4
-                                    ;; :height 1.0
-                                    ))))
+                                    :height 1.3))))
+     (org-level-2 ((class (:inherit outline-2 :background "#35575b"
+                                    :height 1.2))))
+     (org-level-3 ((class (:inherit outline-3 :height 1.1))))
+     (org-level-4 ((class (:inherit outline-4 :height 1.0))))
      (org-level-5 ((class (:inherit outline-5 ))))
      (org-level-6 ((class (:inherit outline-6 ))))
      (org-level-7 ((class (:inherit outline-7 ))))
      (org-level-8 ((class (:inherit outline-8 ))))
      (org-level-9 ((class (:inherit outline-9 ))))
-     )))
+     ;;;;; flycheck
+     (flycheck-error
+      ((((supports :underline (:style line)))
+        (:underline (:style line :color "#e0211d")))
+       (t (:background "#e0211d" :inherit bold :underline t))))
+     (flycheck-error-list-checker-name ((t (:foreground "#4f97d7"))))
+     (flycheck-fringe-error ((t (:foreground "#e0211d" :inherit bold))))
+     (flycheck-fringe-info ((t (:foreground "#4f97d7" :inherit bold))))
+     (flycheck-fringe-warning ((t (:foreground "#dc752f" :inherit bold))))
+     (flycheck-info
+      ((((supports :underline (:style line)))
+        (:underline (:style line :color "#4f97d7")))
+       (t (:background "#4f97d7" :inherit bold :underline t))))
+     (flycheck-warning
+      ((((supports :underline (:style line)))
+        (:underline (:style line :color "#dc752f")))
+       (t (:background "#dc752f" :inherit bold :underline t)))))))
 
 (provide 'color-theme-molokai)
 

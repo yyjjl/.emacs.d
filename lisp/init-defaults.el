@@ -98,4 +98,11 @@
 ;; A quick way to jump to the definition of a function given its key binding
 (global-set-key (kbd "C-h K") 'find-function-on-key)
 
+(defun indent-for-tab-or-close (fn &optional arg)
+  (if (looking-at "`\\|\"\\|}\\|\\$")
+      (forward-char 1)
+    (funcall fn arg)))
+
+(advice-add 'indent-for-tab-command :around #'indent-for-tab-or-close)
+
 (provide 'init-defaults)

@@ -94,7 +94,6 @@
                  'pcomplete-completions-at-point)
     (flyspell-mode -1)
 
-    (org-bullets-mode 1)
     ;; display wrapped lines instead of truncated lines
     (setq truncate-lines nil)
     (setq word-wrap t)
@@ -111,7 +110,8 @@
              ("C-c c g" . org-clock-goto)
              ("C-c c d" . org-clock-display)
              ("C-c c r" . org-clock-report)
-
+             ([f9] . org-project-publish-this-file-to-html)
+             ([f10] . org-publish)
              ("C-c t" . org-todo)
              ("C-c C-t" . nil)))
 
@@ -163,9 +163,6 @@
     (define-key outline-minor-mode-map outline-minor-mode-prefix
       map)))
 
-(defvar org-cn-article-bg "" "")
-(defvar org-cn-article-bgscale 5 "")
-
 (with-eval-after-load 'ox-latex
   (setq org-latex-pdf-process
         '("xelatex -shell-escape -interaction nonstopmode %f"
@@ -181,19 +178,15 @@
           ("" "subfig" nil)
           ("" "hyperref" t)
           ("" "graphicx,psfrag,epsfig" t)
-          ("font=small,format=plain,labelfont=bf,textfont=it,justification=centering,singlelinecheck=false" "caption" t)
           ("" "minted" nil)
           ("" "mdframed" nil)
           ("" "amsmath,amsfonts,amssymb,amsthm,bm,upgreek" t)
-          ("" "background" nil)
           ("mathscr" "eucal" t)
           ("" "geometry" t)
           ("" "sectsty" t)))
   (let ((headers
          (string-join
           (list "[NO-DEFAULT-PACKAGES]\n[PACKAGES]"
-                (format "\\SetBgContents{%s}" org-cn-article-bg)
-                (format "\\SetBgScale{%d}" org-cn-article-bgscale)
                 ;;         "\\setmonofont{Monaco}"
                 ;;         "\\setmainfont{Ubuntu}"
                 "%\\setCJKmainfont{KaiTi}"

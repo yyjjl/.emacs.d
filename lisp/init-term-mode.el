@@ -24,10 +24,17 @@
   "Switch to the term buffer last used, or create a new one if
     none exists, or if the current buffer is already a term."
   (interactive)
-  (let ((b (last-term-buffer (buffer-list))))
-    (if (or (not b) (eq 'term-mode major-mode))
-        (multi-term)
-      (switch-to-buffer b))))
+  (unless (featurep 'multi-term)
+    (require 'multi-term nil t))
+  (let ((buf (last-term-buffer (buffer-list))))
+    (when (or (not buf) (eq 'term-mode major-mode))
+      (setq buf (multi-term-get-buffer current-prefix-arg))
+      (setq multi-term-buffer-list
+            (nconc multi-term-buffer-list (list buf)))
+      (set-buffer buf)
+      ;; Internal handle for `multi-term' buffer.
+      (multi-term-internal))
+    (pop-to-buffer buf)))
 
 (defun term-send-kill-whole-line ()
   "Kill whole line in term mode."

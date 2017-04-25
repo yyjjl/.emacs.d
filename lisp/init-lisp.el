@@ -9,11 +9,6 @@
       (lispy-mode 1)
     (lispy-mode -1)))
 
-(defun indent-for-tab-or-close ()
-  (interactive)
-  (if (looking-at "`\\|\"")
-      (forward-char 1)
-    (indent-for-tab-command)))
 
 (defun my-lisp-setup ()
   "Enable features useful in any Lisp mode."
@@ -29,8 +24,7 @@
              (unless (buffer-file-name)
                (setq completion-at-point-functions nil)))
     (flycheck-mode -1))
-  (local-set-key (kbd "M-,") 'pop-tag-mark)
-  (local-set-key (kbd "<tab>") 'indent-for-tab-or-close))
+  (local-set-key (kbd "M-,") 'pop-tag-mark))
 
 ;; ----------------------------------------------------------------------------
 ;; Hippie-expand
@@ -106,6 +100,6 @@
               :preselect default)))
 
 (setq-default initial-scratch-message
-              (concat ";; Welcome to Emacs " (or user-login-name "")))
+              (concat ";; Welcome Emacs " (or user-login-name "")))
 
 (provide 'init-lisp)

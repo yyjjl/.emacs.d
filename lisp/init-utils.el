@@ -45,8 +45,23 @@
   (let ((name (buffer-file-name)))
     (if (not name)
         (error "No file is currently being edited")
-      (message "copy => %s" name)
+      (message "Copy => %s" name)
       (kill-new name))))
+
+(defun copy-this-file-to-new-file ()
+  (interactive)
+  (let* ((this (current-buffer))
+         (this-name (buffer-file-name))
+         (name (read-string "New name: " (file-name-base this-name))))
+    (if (and name this-name
+            (string= name this-name)
+            (not (get-buffer name)))
+        (message "Copy failed !!")
+      (let ((buf (get-buffer-create name)))
+        (with-current-buffer buf
+          (insert-buffer-substring this)
+          (write-file (expand-file-name name (file-name-directory this-name))))
+        (switch-to-buffer buf)))))
 
 ;;----------------------------------------------------------------------------
 ;; Rename the current file

@@ -9,13 +9,6 @@
 (add-hook 'comint-mode-hook
           (lambda () (setq show-trailing-whitespace nil)))
 
-(with-eval-after-load 'eshell
-  (setq eshell-prompt-function
-        (lambda()
-          (concat (getenv "USER") "@" (getenv "HOST") ":"
-                  (eshell/pwdx)
-                  (if (= (user-uid) 0) " # " " $ ")))))
-
 (with-eval-after-load 'sh-script
   ;; fix freeze problem
   (defun sh-smie-sh-forward-token ()

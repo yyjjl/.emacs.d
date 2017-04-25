@@ -16,7 +16,8 @@
 
     (setq TeX-engine 'xetex)
 
-    (outline-minor-mode 1)))
+    (outline-minor-mode 1)
+    (hide-body)))
 
 (add-hook 'LaTeX-mode-hook 'LaTeX-mode-setup)
 
@@ -45,7 +46,7 @@
         TeX-electric-math '("$" . "$")
         LaTeX-electric-left-right-brace t
         TeX-complete-expert-commands t
-        TeX-electric-sub-and-superscript t
+        TeX-electric-sub-and-superscript nil
         ;; Synctex support
         TeX-source-correlate-start-server nil
         ;; Don't insert line-break at inline math
@@ -55,6 +56,14 @@
   (setq TeX-fold-command-prefix (kbd "C-c C-o"))
 
   (require 'tex-fold)
+
+  (defun latex-skip-close-pair ()
+    (interactive)
+    (let ((char (char-after)))
+      (if (and (equal char (string-to-char (this-command-keys)))
+              (member char '(?\) ?\} ?\])))
+          (forward-char)
+        (self-insert-command 1))))
 
   (defun latex-font-bold () (interactive) (TeX-font nil ?\C-b))
   (defun latex-font-medium () (interactive) (TeX-font nil ?\C-m))
@@ -78,6 +87,9 @@
              ("P" . TeX-fold-paragraph) ("C-p")
              ("R" . TeX-fold-region) ("C-r"))
   (bind-keys :map LaTeX-mode-map
+             ("}" . latex-skip-close-pair)
+             (")" . latex-skip-close-pair)
+             ("]" . latex-skip-close-pair)
              ("C-c b" . latex-build)
              ("C-c h" . TeX-doc)
              ("C-c C-s") ("C-c s" . LaTeX-section)
@@ -100,7 +112,8 @@
   (setq preview-auto-cache-preamble t
         preview-transparent-color "white"
         preview-transparent-border 0
-        preview-scale-function 1.2)
+        preview-scale-function 1.4
+        preview-default-document-pt 12)
   (set-face-background 'preview-face "#1b1d1e")
   (set-face-background 'preview-reference-face "#1b1d1e")
   (setq preview-map

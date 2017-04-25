@@ -10,8 +10,7 @@
          (max-line-length 0))
     (save-excursion
       ;; find out the longest stripped line in the gutter
-      (while (<= linenum-start linenum-end)
-        (goto-line linenum-start)
+      (while (<= linenum-start linenum-end) (goto-line linenum-start)
         (setq tmp-line (replace-regexp-in-string
                         "^[ \t]*" ""
                         (buffer-substring (line-beginning-position)
@@ -40,14 +39,6 @@
     (message "NO git-gutters!")))
 ;; }}
 
-(defun my-git-log-graph ()
-  (interactive)
-  (multi-term)
-  (let ((buffer (last-term-buffer (buffer-list))))
-    (if buffer
-        (with-current-buffer buffer
-          (term-send-raw-string "git lg\n")))))
-
 ;; @see http://blog.binchen.org/posts/new-git-timemachine-ui-based-on-ivy-mode.html
 ;; {{ git-timemachine
 (defun my-git-timemachine-show-selected-revision ()
@@ -57,7 +48,8 @@
     (setq collection
           (mapcar (lambda (rev)
                     ;; re-shape list for the ivy-read
-                    (cons (concat (substring (nth 0 rev) 0 7) "|" (nth 5 rev) "|" (nth 6 rev)) rev))
+                    (cons (concat (substring (nth 0 rev) 0 7) "|"
+                                  (nth 5 rev) "|" (nth 6 rev)) rev))
                   (git-timemachine--revisions)))
     (ivy-read "commits:"
               collection
@@ -79,10 +71,9 @@
            ("C-x n" . git-gutter:next-hunk)
            ("C-x p" . git-gutter:previous-hunk)
            ("C-x g g" . my-goto-git-gutter)
-           ("C-x g L" . git-link)
+           ("C-x g l" . git-link)
            ("C-x g c" . git-link-commit)
-           ("C-x g m" . git-messenger:popup-message)
-           ("C-x g l" . my-git-log-graph))
+           ("C-x g m" . git-messenger:popup-message))
 
 (with-eval-after-load 'git-gutter
   (require 'git-gutter-fringe)
