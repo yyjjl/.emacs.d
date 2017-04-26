@@ -61,8 +61,7 @@
   (try-turn-on-semantic-mode)
 
   (unless (cmake-ide--locate-cmakelists)
-    (ggtags-mode 1)
-    (ggtags-auto-update-mode 1))
+    (rtags-start-process-unless-running))
 
   (setq cc-search-directories '("."
                                 "/usr/include"
@@ -74,9 +73,9 @@
 
   (add-to-list 'company-backends '(company-irony :with company-files))
   (add-to-list 'company-backends 'company-irony-c-headers)
-  (when buffer-file-name
-    (irony-eldoc)
-    (irony-mode 1)))
+
+  (irony-eldoc)
+  (irony-mode 1))
 ;; donot use c-mode-common-hook or cc-mode-hook
 ;; because many major-modes use this hook
 (add-hook 'c-mode-common-hook
@@ -92,11 +91,7 @@
 
 
 (with-eval-after-load 'irony
-  (setq irony-additional-clang-options '("-std=c++14"
-                                         "-Wall"))
-
-  (setq irony--server-executable (expand-file-name
-                                  "~/.emacs.d/irony/bin/irony-server"))
+  (setq irony-additional-clang-options '("-std=c++14" "-Wall"))
 
   (defun my-irony-mode-hook ()
     (define-key irony-mode-map [remap completion-at-point]

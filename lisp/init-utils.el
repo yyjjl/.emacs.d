@@ -145,4 +145,97 @@ might be bad."
     (when pair
       (setcdr pair (cons ele (cdr pair))))))
 
+(defun add-pwd-into-load-path ()
+  "add current directory into load-path, useful for elisp developers"
+  (interactive)
+  (let ((dir (expand-file-name default-directory)))
+    (if (not (memq dir load-path))
+        (add-to-list 'load-path dir))
+    (message "Directory added into load-path:%s" dir)))
+
+;;compute the length of the marked region
+(defun region-length ()
+  "Length of a region."
+  (interactive)
+  (message (format "%d" (- (region-end) (region-beginning)))))
+
+;; show ascii table
+(defun ascii-table ()
+  "Print the ascii table.  Based on a defun by Alex Schroeder <asc@bsiag.com>."
+  (interactive)
+  (switch-to-buffer "*ASCII*")
+  (erase-buffer)
+  (insert (format "ASCII characters up to number %d.\n" 254))
+  (let ((i 0))
+    (while (< i 254)
+      (setq i (+ i 1))
+      (insert (format "%4d %c\n" i i))))
+  (goto-char (point-min)))
+
+;; grep and kill-ring
+(defun grep-pattern-into-list (regexp)
+  (let ((s (buffer-string))
+        (pos 0)
+        item
+        items)
+    (while (setq pos (string-match regexp s pos))
+      (setq item (match-string-no-properties 0 s))
+      (setq pos (+ pos (length item)))
+      (if (not (member item items))
+          (add-to-list 'items item)))
+    items))
+
+(defun grep-pattern-into-kill-ring (regexp)
+  "Find all strings matching REGEXP in current buffer.
+grab matched string and insert them into `kill-ring'"
+  (interactive
+   (let* ((regexp (read-regexp "grep regex:")))
+     (list regexp)))
+  (let (items rlt)
+    (setq items (grep-pattern-into-list regexp))
+    (dolist (i items)
+      (setq rlt (concat rlt (format "%s\n" i))))
+    (kill-new rlt)
+    (message "matched strings => kill-ring")
+    rlt))
+
+(defun grep-pattern-jsonize-into-kill-ring (regexp)
+  "Find all strings matching REGEXP in current buffer.
+grab matched string, jsonize them, and insert into kill ring"
+  (interactive
+   (let* ((regexp (read-regexp "grep regex:")))
+     (list regexp)))
+  (let (items rlt)
+    (setq items (grep-pattern-into-list regexp))
+    (dolist (i items)
+      (setq rlt (concat rlt (format "\"%s\" : %s ,\n" i i))))
+    (kill-new rlt)
+    (message "matched strings => json => kill-ring")
+    rlt))
+
+;; unique lines
+(defun uniquify-all-lines-region (start end)
+  "Find duplicate lines in region START to END keeping first occurrence."
+  (interactive "*r")
+  (save-excursion
+    (let ((end (copy-marker end)))
+      (while
+          (progn
+            (goto-char start)
+            (re-search-forward "^\\(.*\\)\n\\(\\(.*\n\\)*\\)\\1\n" end t))
+        (replace-match "\\1\n\\2")))))
+
+(defun uniquify-all-lines-buffer ()
+  "Delete duplicate lines in buffer and keep first occurrence."
+  (interactive "*")
+  (uniquify-all-lines-region (point-min) (point-max)))
+
+(defun current-font-face ()
+  "Get the font face under cursor."
+  (interactive)
+  (let ((rlt (format "%S" (get-text-property (point) 'face))))
+    (kill-new rlt)
+    (copy-yank-str rlt)
+    (message "%s => clipboard & yank ring" rlt)))
+
 (provide 'init-utils)

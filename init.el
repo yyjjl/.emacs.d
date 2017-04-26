@@ -67,7 +67,7 @@
 (require 'init-javascript)
 (require 'init-linum-mode)
 (require 'init-sh)
-(require 'init-tags)
+;; (require 'init-tags)
 ;; (require 'init-eshell)
 (require 'init-term-mode)
 (require 'init-web-mode)
@@ -79,7 +79,8 @@
 (require 'init-windows)
 (require 'init-hs-minor-mode)
 (require 'init-doxygen)
-(require 'init-misc)
+;; (require 'init-misc)
+(require 'init-extra)
 (require 'after-init)
 
 ;;--------------------------------------------------------
@@ -107,6 +108,8 @@
  '(flycheck-html-tidy-executable "~/.emacs.d/bin/tidy")
  '(geiser-repl-history-filename "~/.emacs.d/data/.geiser_history")
  '(hindent-process-path "~/.cabal/bin/hindent")
+ '(irony-server-install-prefix "~/.emacs.d/bin/irony")
+ '(irony-user-dir "~/.emacs.d/bin/irony/")
  '(ispell-personal-dictionary "~/.emacs.d/data/aspell.pws")
  '(keyfreq-file "~/.emacs.d/data/keyfreq")
  '(mc/list-file "~/.emacs.d/data/mc-lists.el")
@@ -137,5 +140,6 @@
 (put 'narrow-to-page 'disabled nil)
 (put 'narrow-to-defun 'disabled nil)
 (put 'erase-buffer 'disabled nil)
-(setq enable-local-variables :all)
 (put 'LaTeX-narrow-to-environment 'disabled nil)
+
+(setq enable-local-variables :all)

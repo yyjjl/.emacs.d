@@ -174,17 +174,22 @@
      (org-level-1 ((class (:inherit outline-1
                                     :background "#455A64"
                                     :weight bold
-                                    :height 1.3))))
+                                    ;; :height 1.3
+                                    ))))
      (org-level-2 ((class (:inherit outline-2 :background "#35575b"
-                                    :height 1.2))))
-     (org-level-3 ((class (:inherit outline-3 :height 1.1))))
-     (org-level-4 ((class (:inherit outline-4 :height 1.0))))
-     (org-level-5 ((class (:inherit outline-5 ))))
-     (org-level-6 ((class (:inherit outline-6 ))))
-     (org-level-7 ((class (:inherit outline-7 ))))
-     (org-level-8 ((class (:inherit outline-8 ))))
-     (org-level-9 ((class (:inherit outline-9 ))))
-     ;;;;; flycheck
+                                    ;; :height 1.2
+                                    ))))
+     (org-level-3 ((class (:inherit outline-3 ;; :height 1.1
+                                    ))))
+     (org-level-4 ((class (:inherit outline-4))))
+     (org-level-5 ((class (:inherit outline-5))))
+     (org-level-6 ((class (:inherit outline-6))))
+     (org-level-7 ((class (:inherit outline-7))))
+     (org-level-8 ((class (:inherit outline-8))))
+     (org-level-9 ((class (:inherit outline-9))))
+
+     (window-numbering-face ((t (:foreground "DeepPink" :weight bold))))
+;;;;; flycheck
      (flycheck-error
       ((((supports :underline (:style line)))
         (:underline (:style line :color "#e0211d")))
@@ -193,6 +198,7 @@
      (flycheck-fringe-error ((t (:foreground "#e0211d" :inherit bold))))
      (flycheck-fringe-info ((t (:foreground "#4f97d7" :inherit bold))))
      (flycheck-fringe-warning ((t (:foreground "#dc752f" :inherit bold))))
+     (flycheck-running ((t (:weight normal :foreground "Green"))))
      (flycheck-info
       ((((supports :underline (:style line)))
         (:underline (:style line :color "#4f97d7")))

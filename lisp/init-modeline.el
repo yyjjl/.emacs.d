@@ -1,40 +1,3 @@
-(defface  window-numbering-face
-  '((t (:foreground "DeepPink" :weight bold)))
-  "Window number face"
-  :group 'mode-line)
-
-(defface flycheck-mode-line-off-face
-  '((t :weight normal :foreground "tan"))
-  "Face for the modeline when flycheck mode is not activate"
-  :group 'flycheck-faces)
-
-(defface flycheck-mode-line-run-face
-  '((t :weight normal :foreground "DeepSkyBlue"))
-  "Face for the modeline in buffers with Flycheck running."
-  :group 'flycheck-faces)
-
-(defface flycheck-mode-line-error-face
-  '((t :weight normal :foreground "DarkRed"))
-  "Face for the modeline when flycheck exited with an error"
-  :group 'flycheck-faces)
-
-(defface flycheck-mode-line-ok-face
-  '((t  :weight normal :foreground "DarkOliveGreen"))
-  "Face for the modeline when buffer is ok"
-  :group 'flycheck-faces)
-
-(defface flycheck-mode-line-failed-face
-  '((t :weight normal :foreground "OrangeRed"))
-  "Face for the modeline when flycheck failed to parse buffer"
-  :group 'flycheck-faces)
-
-(defface flycheck-mode-line-result-face
-  '((t :weight normal :foreground "Orange"))
-  "Face for the modeline when the buffer has warnings or errors"
-  :group 'flycheck-faces)
-
-;; ------------------------------------------------------------
-
 (defun mode-line-buffer-id ()
     (let* ((host (and  default-directory
                       (file-remote-p default-directory 'host)))
@@ -82,14 +45,14 @@
 (defun mode-line-flycheck ()
   (if (bound-and-true-p flycheck-mode)
       (let* ((str (s-trim (flycheck-mode-line-status-text)))
-             (infos '(("" "ok" flycheck-mode-line-ok-face)
-                      ("*" "run" flycheck-mode-line-run-face)
-                      ("-" "no" flycheck-mode-line-off-face)
-                      ("!" "fail" flycheck-mode-line-failed-face)
-                      ("?" "err" flycheck-mode-line-error-face)))
+             (infos '(("" "ok" flycheck-fringe-info)
+                      ("*" "run" flycheck-running)
+                      ("-" "no" flycheck-fringe-error)
+                      ("!" "fail" flycheck-fringe-error)
+                      ("?" "err" flycheck-fringe-error)))
              (info (assoc-string str infos))
              (msg (if info (cadr info) (substring str 1)))
-             (face (if info (caddr info) 'flycheck-mode-line-result-face)))
+             (face (if info (caddr info) 'flycheck-fringe-error)))
         (concat " " (propertize msg 'face face)))))
 
 (defun mode-line-vc ()

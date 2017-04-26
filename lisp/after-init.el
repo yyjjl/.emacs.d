@@ -80,7 +80,6 @@
            ("C-c 4" . ispell-word)
            ("C-c q" . auto-fill-mode)
            ("C-x C-b" . ibuffer)
-
            ;; narrow
            ("C-x , ," . narrow-to-defun)
            ("C-x , SPC" . widen)
@@ -93,6 +92,18 @@
            ("M--" . er/expand-region)
            ([f6] . toggle-company-ispell)
            ([f7] . create-scratch-buffer)
-           ([f12] . fcitx-aggressive-setup))
-
+           ([f12] . fcitx-aggressive-setup)
+           ;; buffer-mode
+           ("C-c w i" . buf-move-up)
+           ("C-c w k" . buf-move-down)
+           ("C-c w j" . buf-move-left)
+           ("C-c w l" . buf-move-right)
+           ;; ace and avy
+           ("C-x o" . ace-window)
+           ("C-:" . avy-goto-char)
+           ("C-\"" . avy-goto-char-2)
+           ("M-g l" . avy-goto-line)
+           ("M-g w" . avy-goto-word-1)
+           ("M-g y" . avy-copy-line))
+;; }}
 (provide 'after-init)
