@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: array-spacing
+# key: acs
+# --
+\arraycolsep=1.0pt\def\arraystretch{${1:1.5}}  

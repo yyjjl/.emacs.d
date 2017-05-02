@@ -2,13 +2,16 @@
   (semantic-add-system-include "/usr/include/c++/5/" 'c++-mode)
   (semantic-add-system-include "/usr/include/" 'c++-mode)
   (semantic-add-system-include "/usr/include/" 'c-mode)
-  (setq semantic-default-submodes '(global-semantic-idle-scheduler-mode
-                                    global-semanticdb-minor-mode
-                                    ;; global-semantic-idle-summary-mode
-                                    global-semantic-stickyfunc-mode
-                                    global-semantic-decoration-mode
-                                    global-semantic-highlight-func-mode
-                                    global-semantic-mru-bookmark-mode))
+  (setq semantic-default-submodes
+        '(global-semantic-idle-scheduler-mode
+          global-semanticdb-minor-mode
+          ;; global-semantic-idle-summary-mode
+          global-semantic-idle-local-symbol-highlight-mode
+          global-semantic-stickyfunc-mode
+          ;; error occurs a lot
+          ;; global-semantic-decoration-mode
+          global-semantic-highlight-func-mode
+          global-semantic-mru-bookmark-mode))
   (require 'stickyfunc-enhance))
 
 (defun try-turn-on-semantic-mode ()

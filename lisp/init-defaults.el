@@ -85,7 +85,7 @@
 
 ;; tab to skip close pair
 (defun indent-for-tab-or-close (fn &optional arg)
-  (if (looking-at "`\\|\"\\|}\\|\\]\\|\\$")
+  (if (looking-at "`\\|\"\\|}\\|\\$")
       (forward-char 1)
     (funcall fn arg)))
 (advice-add 'indent-for-tab-command :around #'indent-for-tab-or-close)

@@ -2,9 +2,9 @@
   (company-statistics-mode 1)
   ;; make company-files a work before capf
   (setq-default company-backends
-                '(company-bbdb company-nxml company-css company-cmake
-                               company-files
-                               (company-capf :with company-yasnippet)
+                '(company-bbdb company-nxml company-css
+                               (company-files company-cmake company-semantic)
+                               company-capf
                                (company-dabbrev-code
                                 company-gtags
                                 company-etags

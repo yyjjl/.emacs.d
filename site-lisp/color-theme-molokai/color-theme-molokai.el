@@ -40,10 +40,10 @@
      (escape-glyph ((t (:foreground "#E6DB74"))))
      (minibuffer-prompt ((t (:foreground "#66D9EF"))))
 
-     (mode-line ((t (:foreground "#F8F8F2" :background "#1b1d1e"))))
+     (mode-line-inactive ((t (:foreground "#F8F8F2" :background "#1b1d1e"))))
      (mode-line-buffer-id ((t (:foreground nil :background "#000000"
                                            :weight semi-bold))))
-     (mode-line-inactive ((t (:foreground "#BCBCBC" :background "#161718"))))
+     (mode-line ((t (:foreground "#BCBCBC" :background "#161718"))))
      (mode-line-highlight ((t (:background "#020303"))))
      (mode-line-mousable ((t (:foreground "#BCBCBC" :background "#000000"))))
      (mode-line-mousable-minor-mode ((t (:foreground "#BCBCBC" :background "#000000"))))

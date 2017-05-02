@@ -20,7 +20,8 @@
   (if (eq major-mode 'racket-mode)
       (progn (setq flycheck-check-syntax-automatically
                    '(save mode-enabled)
-                   eldoc-documentation-function 'racket-eldoc-function)
+                   ;; eldoc-documentation-function 'racket-eldoc-function
+                   )
              (unless (buffer-file-name)
                (setq completion-at-point-functions nil)))
     (flycheck-mode -1))
@@ -90,7 +91,9 @@
 (with-eval-after-load 'racket-mode
   (defun racket-complete-at-point-hack (fn &rest args)
     (when (and (buffer-file-name) (racket--in-repl-or-its-file-p))
-      (apply fn args)))
+      (let ((result (apply fn args)))
+        (when result
+          (delete 'racket--get-type (delete :company-docsig result))))))
   (advice-add 'racket-complete-at-point
               :around #'racket-complete-at-point-hack)
   (defun racket--read-identifier (prompt default)

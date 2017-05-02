@@ -17,8 +17,24 @@
   (add-to-list 'c++-font-lock-extra-types "auto"))
 
 (with-eval-after-load 'rtags
+  (defun rtags-eldoc-mine ()
+    (when (and (not (nth 4 (syntax-ppss)))
+              (let ((text (thing-at-point 'symbol)))
+                (when (and text (sequencep text))
+                  (set-text-properties 0 (length text) nil text))
+                text))
+      (let* ((info (rtags-symbol-info-internal))
+             (sym-name (cdr (assoc 'symbolName info)))
+             (type (cdr (assoc 'type info))))
+        (and sym-name type
+            (format "%s ⇒ %s"
+                    (propertize sym-name 'face
+                                'eldoc-highlight-function-argument)
+                    (propertize (substring type 0 (string-match "=>" type))
+                                'face
+                                'font-lock-keyword-face))))))
   (setq rtags-completions-enabled nil
-        rtags-autostart-diagnostics t))
+        rtags-autostart-diagnostics nil))
 
 (with-eval-after-load 'cc-mode
   (rtags-enable-standard-keybindings)
@@ -51,17 +67,8 @@
   (local-set-key (kbd "C-c b") 'clang-format-buffer)
   (local-set-key (kbd "C-c C-j") 'semantic-ia-fast-jump)
   (local-set-key (kbd "C-c C-v") 'semantic-decoration-include-visit)
-  (local-set-key (kbd "M-.") 'rtags-find-symbol-at-point)
-  (local-set-key (kbd "M-,") 'rtags-location-stack-back)
-  (local-set-key (kbd "M-n") 'rtags-next-match)
-  (local-set-key (kbd "M-p") 'rtags-previous-match)
-  (local-set-key [f9] 'cmake-ide-run-cmake)
-  (local-set-key [f10] 'cmake-ide-compile)
 
   (try-turn-on-semantic-mode)
-
-  (unless (cmake-ide--locate-cmakelists)
-    (rtags-start-process-unless-running))
 
   (setq cc-search-directories '("."
                                 "/usr/include"
@@ -74,7 +81,18 @@
   (add-to-list 'company-backends '(company-irony :with company-files))
   (add-to-list 'company-backends 'company-irony-c-headers)
 
-  (irony-eldoc)
+  (if (cmake-ide--locate-cmakelists)
+      (progn
+        (local-set-key [f10] 'cmake-ide-compile)
+        (setq-local eldoc-documentation-function 'rtags-eldoc-mine)
+        (local-set-key (kbd "M-.") 'rtags-find-symbol-at-point)
+        (local-set-key (kbd "M-,") 'rtags-location-stack-back)
+        (local-set-key (kbd "M-n") 'rtags-next-match)
+        (local-set-key (kbd "M-p") 'rtags-previous-match)
+        (local-set-key (kbd "C-c .") 'rtags-symbol-type))
+    (local-set-key [f10] 'compile)
+    (irony-eldoc))
+
   (irony-mode 1))
 ;; donot use c-mode-common-hook or cc-mode-hook
 ;; because many major-modes use this hook
@@ -102,9 +120,9 @@
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
 
 (autoload 'cmake-font-lock-activate "cmake-font-lock" nil t)
-(add-hook 'cmake-mode-hook '(lambda ()
-                              (cmake-font-lock-activate)
-                              (add-to-list 'company-backends 'company-cmake)))
+(add-hook 'cmake-mode-hook
+          '(lambda ()
+             (cmake-font-lock-activate)))
 
 (cmake-ide-setup)
 (provide 'init-cc-mode)

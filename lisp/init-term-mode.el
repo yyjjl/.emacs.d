@@ -1,12 +1,11 @@
-;; {{ @see http://emacs-journey.blogspot.com.au/2012/06/improving-ansi-term.html
 ;; kill the buffer when terminal is exited
-(defadvice term-sentinel (around my-advice-term-sentinel (proc msg))
+(defun autoclose-term-buffer (fn proc msg)
   (if (memq (process-status proc) '(signal exit))
       (let ((buffer (process-buffer proc)))
-        ad-do-it
+        (funcall fn proc msg)
         (kill-buffer buffer))
-    ad-do-it))
-(ad-activate 'term-sentinel)
+    (funcall fn proc msg)))
+(advice-add 'term-sentinel :around #'autoclose-term-buffer)
 
 ;; utf8
 (defun my-term-use-utf8 ()

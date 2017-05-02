@@ -163,6 +163,54 @@
     (define-key outline-minor-mode-map outline-minor-mode-prefix
       map)))
 
+(defvar org-latex-extra-options
+  (string-join
+   '("[NO-DEFAULT-PACKAGES]\n[PACKAGES]"
+     ;;         "\\setmonofont{Monaco}"
+     ;;         "\\setmainfont{Ubuntu}"
+     "%\\setCJKmainfont{KaiTi}"
+     "\\definecolor{codeblockbg}{rgb}{0.95,0.95,0.95}"
+     "\\definecolor{linkcolor}{rgb}{0.1,0.3,0.5}"
+     "\\hypersetup{colorlinks=true,linkcolor=linkcolor}"
+     "\\geometry{top=2.54cm,bottom=2.54cm,left=2.54cm,right=2.54cm}"
+     "\\renewcommand{\\theFancyVerbLine}{"
+     "  \\sffamily \\textcolor[rgb]{1.0,0.2,1.0}{"
+     "   \\scriptsize \\oldstylenums{\\arabic{FancyVerbLine}}}}"
+     "\\renewcommand\\listoflistingscaption{Program Code List}"
+     "\\renewcommand\\listingscaption{Program Code}"
+     "\\surroundwithmdframed{minted}"
+     "\\surroundwithmdframed{quote}"
+     "\\mdfsetup{"
+     "topline=false,bottomline=false,rightline=false,"
+     "linewidth=1pt,linecolor=black,"
+     "backgroundcolor=codeblockbg"
+     "}"
+     "\\setminted{"
+     ;;         "fontsize=\\scriptsize,"
+     "fontsize=\\small,"
+     "autogobble=true,breaklines=true,frame=none,linenos=true,tabsize=4,"
+     "breakautoindent=false,mathescape=true,escapeinside=\\#\\%,"
+     "breaksymbolleft=\\raisebox{0.8ex}{"
+     "\\rotatebox{90}{\\small\\ensuremath{\\curvearrowleft}}},"
+     "breaksymbolindentleft=0pt,"
+     "breaksymbolsepleft=0pt,"
+     "breaksymbolright=\\rotatebox{270}{\\small\\ensuremath{\\curvearrowright}},"
+     "breaksymbolindentright=0pt,"
+     "breaksymbolsepright=0pt"
+     "}"
+     "\\definecolor{codeblockbg}{rgb}{0.95,0.95,0.95}"
+     "\\definecolor{linkcolor}{rgb}{0.1,0.3,0.5}")
+   "\n"))
+
+(defvar org-latex-section-options
+  (string-join '("\\definecolor{sectioncolor}{rgb}{0.5,0.5,0.25}"
+                 "\\definecolor{subsubsectioncolor}{rgb}{0.7,0.3,0.2}"
+                 "\\sectionfont{\\LARGE\\color{sectioncolor}}"
+                 "\\subsectionfont{\\Large\\color{cyan}}"
+                 "\\subsubsectionfont{\\large\\color{subsubsectioncolor}}"
+                 "\\paragraphfont{\\large}")
+               "\n"))
+
 (with-eval-after-load 'ox-latex
   (setq org-latex-pdf-process
         '("xelatex -shell-escape -interaction nonstopmode %f"
@@ -182,69 +230,39 @@
           ("" "mdframed" nil)
           ("" "amsmath,amsfonts,amssymb,amsthm,bm,upgreek" t)
           ("mathscr" "eucal" t)
-          ("" "geometry" t)
-          ("" "sectsty" t)))
-  (let ((headers
-         (string-join
-          (list "[NO-DEFAULT-PACKAGES]\n[PACKAGES]"
-                ;;         "\\setmonofont{Monaco}"
-                ;;         "\\setmainfont{Ubuntu}"
-                "%\\setCJKmainfont{KaiTi}"
-                "\\definecolor{codeblockbg}{rgb}{0.95,0.95,0.95}"
-                "\\definecolor{linkcolor}{rgb}{0.1,0.3,0.5}"
-                "\\hypersetup{colorlinks=true,linkcolor=linkcolor}"
-                "\\geometry{top=2.54cm,bottom=2.54cm,left=2.54cm,right=2.54cm}"
-                "\\renewcommand{\\theFancyVerbLine}{"
-                "  \\sffamily \\textcolor[rgb]{1.0,0.2,1.0}{"
-                "   \\scriptsize \\oldstylenums{\\arabic{FancyVerbLine}}}}"
-                "\\renewcommand\\listoflistingscaption{Program Code List}"
-                "\\renewcommand\\listingscaption{Program Code}"
-                "\\surroundwithmdframed{minted}"
-                "\\surroundwithmdframed{quote}"
-                "\\mdfsetup{"
-                "topline=false,bottomline=false,rightline=false,"
-                "linewidth=1pt,linecolor=black!40,"
-                "backgroundcolor=codeblockbg"
-                "}"
-                "\\setminted{"
-                ;;         "fontsize=\\scriptsize,"
-                "fontsize=\\small,"
-                "autogobble=true,breaklines=true,frame=none,linenos=true,tabsize=4,"
-                "breakautoindent=false,mathescape=true,escapeinside=\\#\\%,"
-                "breaksymbolleft=\\raisebox{0.8ex}{"
-                "\\rotatebox{90}{\\small\\ensuremath{\\curvearrowleft}}},"
-                "breaksymbolindentleft=0pt,"
-                "breaksymbolsepleft=0pt,"
-                "breaksymbolright=\\rotatebox{270}{\\small\\ensuremath{\\curvearrowright}},"
-                "breaksymbolindentright=0pt,"
-                "breaksymbolsepright=0pt"
-                "}"
-                "\\definecolor{codeblockbg}{rgb}{0.95,0.95,0.95}"
-                "\\definecolor{linkcolor}{rgb}{0.1,0.3,0.5}"
-                "\\definecolor{sectioncolor}{rgb}{0.5,0.5,0.25}"
-                "\\definecolor{subsubsectioncolor}{rgb}{0.7,0.3,0.2}"
-                "\\sectionfont{\\LARGE\\color{sectioncolor}}"
-                "\\subsectionfont{\\Large\\color{cyan}}"
-                "\\subsubsectionfont{\\large\\color{subsubsectioncolor}}"
-                "\\paragraphfont{\\large}")
-          "\n")))
-    (add-to-list  'org-latex-classes
-                  (list "cn-article"
-                        (concat "\\documentclass[11pt,a4paper]{article}\n"
-                                headers)
-                        '("\\section{%s}" . "\\section*{%s}")
-                        '("\\subsection{%s}" . "\\subsection*{%s}")
-                        '("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                        '("\\paragraph{%s}" . "\\paragraph*{%s}")
-                        '("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-    (add-to-list  'org-latex-classes
-                  (list "cn-book"
-                        (concat "\\documentclass[11pt,openany]{book}\n"
-                                headers)
-                        '("\\chapter{%s}" . "\\chapter*{%s}")
-                        '("\\section{%s}" . "\\section*{%s}")
-                        '("\\subsection{%s}" . "\\subsection*{%s}")
-                        '("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                        '("\\paragraph{%s}" . "\\paragraph*{%s}")))))
+          ("" "geometry" t)))
+  (add-to-list  'org-latex-classes
+                (list "cn-article"
+                      (concat "\\documentclass[11pt,a4paper]{article}\n"
+                              "\\usepackage{sectsty}\n"
+                              org-latex-extra-options "\n"
+                              org-latex-section-options)
+                      '("\\section{%s}" . "\\section*{%s}")
+                      '("\\subsection{%s}" . "\\subsection*{%s}")
+                      '("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                      '("\\paragraph{%s}" . "\\paragraph*{%s}")
+                      '("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+  (add-to-list  'org-latex-classes
+                (list "cn-book"
+                      (concat "\\documentclass[11pt,openany]{book}\n"
+                              "\\usepackage{sectsty}\n"
+                              org-latex-extra-options "\n"
+                              org-latex-section-options)
+                      '("\\chapter{%s}" . "\\chapter*{%s}")
+                      '("\\section{%s}" . "\\section*{%s}")
+                      '("\\subsection{%s}" . "\\subsection*{%s}")
+                      '("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                      '("\\paragraph{%s}" . "\\paragraph*{%s}"))))
+
+(with-eval-after-load 'ox-beamer
+  (add-to-list  'org-latex-classes
+                (list "cn-beamer"
+                      (concat "\\documentclass[bigger]{beamer}\n"
+                              org-latex-extra-options)
+                      '("\\section{%s}" . "\\section*{%s}")
+                      '("\\subsection{%s}" . "\\subsection*{%s}")
+                      '("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                      '("\\paragraph{%s}" . "\\paragraph*{%s}")
+                      '("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
 
 (provide 'init-org)

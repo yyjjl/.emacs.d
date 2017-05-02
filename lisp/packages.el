@@ -155,7 +155,6 @@
     company-irony
     flycheck-irony
     rtags
-    ggtags
     ;;---------------------------------------
     ;; git packages
     ;;---------------------------------------
