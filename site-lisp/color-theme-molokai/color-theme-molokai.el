@@ -46,22 +46,25 @@
      (mode-line ((t (:foreground "#BCBCBC" :background "#161718"))))
      (mode-line-highlight ((t (:background "#020303"))))
      (mode-line-mousable ((t (:foreground "#BCBCBC" :background "#000000"))))
-     (mode-line-mousable-minor-mode ((t (:foreground "#BCBCBC" :background "#000000"))))
+     (mode-line-mousable-minor-mode
+      ((t (:foreground "#BCBCBC" :background "#000000"))))
 
      (font-lock-builtin-face ((t (:foreground "#A6E22E"))))
      (font-lock-comment-face ((t (:foreground "#465457" :slant italic))))
      (font-lock-comment-delimiter-face ((t (:foreground "#465457"
                                                         :slant italic))))
      (font-lock-constant-face ((t (:foreground "#AE81FF"))))
-     (font-lock-doc-face ((t (:foreground "#E6DB74" :slant italic))))
-     (font-lock-function-name-face ((t (:foreground "#F92672" :slant italic))))
-     (font-lock-keyword-face ((t (:foreground "#66D9EF"))))
+     (font-lock-doc-face ((t (:foreground "#06DB74" :slant italic))))
+     (font-lock-function-name-face ((t (:foreground "#F92672"
+                                                    :inherit bold-italic))))
+     (font-lock-keyword-face ((t (:foreground "#66D9EF" :inherit bold))))
      (font-lock-negation-char-face ((t (:weight bold))))
-     (font-lock-preprocessor-face ((t (:foreground "#A6E22E"))))
+     (font-lock-preprocessor-face ((t (:foreground "#A6E22E" :inherit bold))))
+     (font-lock-reference-face ((t (:foreground "#AE81FF"))))
      (font-lock-regexp-grouping-backslash ((t (:weight bold))))
      (font-lock-regexp-grouping-construct ((t (:weight bold))))
      (font-lock-string-face ((t (:foreground "#E6DB74"))))
-     (font-lock-type-face ((t (:foreground "#66D9EF"))))
+     (font-lock-type-face ((t (:foreground "#66D9EF" :inherit bold))))
      (font-lock-variable-name-face ((t (:foreground "#F92672"))))
      (font-lock-warning-face ((t (:foreground "#FFFFFF"
                                               :background "#333333"))))
@@ -154,9 +157,10 @@
      (org-date ((t (:foreground "#80cbc4" :underline t))))
      (org-document-info ((t (:foreground "#81d4fa" :height 1.35))))
      (org-document-info-keyword ((t (:foreground "#8bc34a" :height 1.35))))
-     (org-document-title ((t (:weight bold :height 1.35))))
+     (org-document-title ((t (:weight bold :height 1.35 :foreground "purple4"))))
      (org-done ((t (:foreground "#8bc34a" :bold t :background "#1b5e20"))))
      (org-ellipsis ((t (:foreground "#81d4df"))))
+     (org-meta-line ((t (:foreground "#9f8766"))))
      (org-footnote ((t (:foreground "#4dd0e1"))))
      (org-formula ((t (:foreground "#f36c60"))))
      (org-link ((t (:foreground "#b39ddb" :underline t))))
@@ -172,15 +176,13 @@
      (org-block-end-line ((t (:foreground "#b3e5fc" :background "#1e2930"))))
 
      (org-level-1 ((class (:inherit outline-1
-                                    :background "#455A64"
+                                    ;; :background "#455A64"
                                     :weight bold
-                                    ;; :height 1.3
-                                    ))))
-     (org-level-2 ((class (:inherit outline-2 :background "#35575b"
-                                    ;; :height 1.2
-                                    ))))
-     (org-level-3 ((class (:inherit outline-3 ;; :height 1.1
-                                    ))))
+                                    :overline t
+                                    :height 1.3))))
+     (org-level-2 ((class (:inherit outline-2 ;; :background "#35575b"
+                                    :height 1.2))))
+     (org-level-3 ((class (:inherit outline-3 :height 1.1))))
      (org-level-4 ((class (:inherit outline-4))))
      (org-level-5 ((class (:inherit outline-5))))
      (org-level-6 ((class (:inherit outline-6))))
@@ -189,6 +191,33 @@
      (org-level-9 ((class (:inherit outline-9))))
 
      (window-numbering-face ((t (:foreground "DeepPink" :weight bold))))
+
+     (popup-enu-selection-face ((t (:background "#5e5079"
+                                                :foreground "#b2b2b2"))))
+     (popup-face ((t (:background "#34323e" :foreground "#9a9aba"))))
+     (popup-isearch-match ((t (:inherit match))))
+     (popup-menu-face ((t (:background "#34323e" :foreground "#9a9aba"))))
+     (popup-menu-mouse-face ((t (:inherit highlight))))
+     (popup-scroll-bar-background-face ((t (:background "#212026"))))
+     (popup-scroll-bar-foreground-face ((t (:background "#5d4d7a"))))
+     (popup-tip-face
+      ((t (:background "#5e5079" :foreground "#b2b2b2"
+                       :bold nil :italic nil :underline nil))))
+
+     (web-mode-builtin-face ((t (:inherit font-lock-builtin-face))))
+     (web-mode-comment-face ((t (:inherit font-lock-comment-face))))
+     (web-mode-constant-face ((t (:inherit font-lock-constant-face))))
+     (web-mode-doctype-face ((t (:inherit font-lock-comment-face))))
+     (web-mode-function-name-face ((t (:inherit font-lock-function-name-face))))
+     (web-mode-html-attr-name-face ((t (:inherit font-lock-function-name-face
+                                                 :bold nil))))
+     (web-mode-html-attr-value-face ((t (:inherit font-lock-doc-face))))
+     (web-mode-html-tag-face ((t (:inherit font-lock-keyword-face :bold nil))))
+     (web-mode-keyword-face ((t (:inherit font-lock-keyword-face ))))
+     (web-mode-string-face ((t (:inherit font-lock-string-face))))
+     (web-mode-symbol-face ((t (:inherit font-lock-type-face :bold nil))))
+     (web-mode-type-face ((t (:inherit font-lock-type-face))))
+     (web-mode-warning-face ((t (:inherit font-lock-warning-face))))
 ;;;;; flycheck
      (flycheck-error
       ((((supports :underline (:style line)))

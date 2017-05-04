@@ -11,6 +11,7 @@
 
 (setq-default buffers-menu-max-size 30
               case-fold-search t
+              indicate-empty-lines nil
               compilation-scroll-output t
               ediff-split-window-function 'split-window-horizontally
               ediff-window-setup-function 'ediff-setup-windows-plain
