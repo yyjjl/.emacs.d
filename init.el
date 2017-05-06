@@ -6,7 +6,6 @@
 ;; which means on every .el and .elc file loaded during start up,
 ;; it hasn't to runs those regexps against the filename.
 (defvar file-name-handler-alist-tmp file-name-handler-alist)
-(defvar package-use-priority nil  "whether to use priority")
 (defvar site-packages-directory "~/.emacs.d/site-lisp/")
 (defvar symbol-font-name "Noto Sans S Chinese")
 (defvar yasnippet-extra-dir "~/.emacs.d/snippets")
