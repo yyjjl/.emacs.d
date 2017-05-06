@@ -75,10 +75,10 @@
               (concat (mode-line-vc)
                       (mode-line-process)
                       (mode-line-flycheck)
-                      " %I(%l-%c)%p%%"))))
+                      (propertize " %I (L%l-C%c) %p%%"
+                                  'face 'font-lock-string-face)))))
     (format (format " %%s%%%ds" (or (- (window-total-width)
-                                       (string-width (format-mode-line lhs))
-                                       1)
+                                       (string-width (format-mode-line lhs)))
                                      0))
             lhs rhs)))
 

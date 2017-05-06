@@ -28,7 +28,8 @@
               truncate-lines nil
               truncate-partial-width-windows nil
               ;; visible-bell has some issue
-              visible-bell nil)
+              visible-bell nil
+              speedbar-use-images nil)
 
 (setq projectile-completion-system 'ivy)
 (setq system-time-locale "C")
@@ -157,5 +158,9 @@
              '(search-ring regexp-search-ring kill-ring))
        (savehist-mode 1))
    (message "Failed to access ~/.emacs.d/data/history")))
+
+(setq-default initial-scratch-message
+              (concat ";; Welcome Emacs " (or user-login-name "") " !!!")
+              initial-major-mode 'org-mode)
 
 (provide 'init-defaults)

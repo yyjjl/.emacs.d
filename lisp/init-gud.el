@@ -166,6 +166,4 @@
       (after undedicate-gdb-set-window-buffer activate)
     (set-window-dedicated-p window nil)))
 
-(global-set-key [f5] 'gdb)
-
 (provide 'init-gud)

@@ -35,9 +35,6 @@
 (autoload 'sdcv-search "sdcv" nil t)
 (global-set-key (kbd "C-c D") 'sdcv-search)
 
-(global-set-key (kbd "C-x j j") 'bookmark-jump)
-(setq bmkp-bookmark-map-prefix-keys nil)
-
 ;; midnight mode purges buffers which haven't been displayed in 3 days
 (require 'midnight)
 (setq midnight-mode t)

@@ -102,7 +102,4 @@
               :initial-input default    ;initial
               :preselect default)))
 
-(setq-default initial-scratch-message
-              (concat ";; Welcome Emacs " (or user-login-name "")))
-
 (provide 'init-lisp)

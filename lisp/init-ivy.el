@@ -33,7 +33,10 @@
   (ivy-read (format  "Kill buffer (default %s) :" (buffer-name))
             'internal-complete-buffer
             :preselect (buffer-name (current-buffer))
-            :action #'kill-buffer
+            :action (if arg
+                        (lambda () (let ((kill-buffer-hook nil))
+                                 (kill-buffer)))
+                        #'kill-buffer)
             :keymap counsel-find-file-map
             :caller 'counsel-kill-buffer))
 
