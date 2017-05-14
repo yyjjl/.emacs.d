@@ -218,6 +218,16 @@
      (web-mode-symbol-face ((t (:inherit font-lock-type-face :bold nil))))
      (web-mode-type-face ((t (:inherit font-lock-type-face))))
      (web-mode-warning-face ((t (:inherit font-lock-warning-face))))
+
+     (whitespace-empty ((t (:background nil :foreground "#9f8766"))))
+     (whitespace-indentation ((t (:background nil :foreground "#dc752f"))))
+     (whitespace-line ((t (:background nil :foreground "#c56ec3"))))
+     (whitespace-newline ((t (:background nil :foreground "#c56ec3"))))
+     (whitespace-space ((t (:background nil :foreground "#5d4d7a"))))
+     (whitespace-space-after-tab ((t (:background nil :foreground "#9f8766"))))
+     (whitespace-space-before-tab ((t (:background nil :foreground "#9f8766"))))
+     (whitespace-tab ((t (:background nil))))
+     (whitespace-trailing ((t (:background "#dc752f"))))
 ;;;;; flycheck
      (flycheck-error
       ((((supports :underline (:style line)))

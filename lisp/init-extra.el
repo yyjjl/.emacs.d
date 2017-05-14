@@ -77,11 +77,11 @@
             inferior-octave-mode-map))
 
 (defconst ascii-before-chinese
-  (rx (group-n 1 (in "a-zA-Z0-9!@#$%^&*\\-+|)\\]}\\:;?><.,"))
+  (rx (group-n 1 (in "a-zA-Z0-9!@#$%^&\\-+|)\\]}\\:;?><.,"))
       (group-n 2 (category chinese-two-byte))))
 (defconst ascii-after-chinese
   (rx (group-n 1 (category chinese-two-byte))
-      (group-n 2 (in "a-zA-Z0-9@#$%^&*\\-+|(\\[{\\></"))))
+      (group-n 2 (in "a-zA-Z0-9@#$%^&\\-+|(\\[{\\></"))))
 
 (defun insert-space-around-chinese (&optional start end)
   (interactive)

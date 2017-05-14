@@ -12,14 +12,15 @@
 ;; make emacs transparent
 ;; (add-to-list 'default-frame-alist '(alpha 100 70))
 (defvar fix-symbol-font-timer nil)
-(setq fix-symbol-font-timer
-      (run-with-idle-timer
-       2 1
-       (lambda ()
-         (set-fontset-font (frame-parameter nil 'font)
-                           'symbol (font-spec :size 18 :family
-                                              symbol-font-name))
-         (cancel-timer fix-symbol-font-timer))))
+(when window-system
+  (setq fix-symbol-font-timer
+        (run-with-idle-timer
+         2 1
+         (lambda ()
+           (set-fontset-font (frame-parameter nil 'font)
+                             'symbol (font-spec :size 18 :family
+                                                symbol-font-name))
+           (cancel-timer fix-symbol-font-timer)))))
 
 ;; This line must be after color-theme-molokai! Don't know why.
 (setq color-theme-illegal-faces

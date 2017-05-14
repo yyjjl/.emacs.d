@@ -12,6 +12,7 @@
 (setq-default buffers-menu-max-size 30
               case-fold-search t
               indicate-empty-lines nil
+              indicate-buffer-boundaries '((t . right))
               compilation-scroll-output t
               ediff-split-window-function 'split-window-horizontally
               ediff-window-setup-function 'ediff-setup-windows-plain
@@ -160,7 +161,14 @@
    (message "Failed to access ~/.emacs.d/data/history")))
 
 (setq-default initial-scratch-message
-              (concat ";; Welcome Emacs " (or user-login-name "") " !!!")
-              initial-major-mode 'org-mode)
+              (concat ";; Welcome to Emacs " (or user-login-name "") " !!!"))
+
+(with-eval-after-load 'whitespace
+  (setq whitespace-style '(face spaces tabs newline
+                                space-mark tab-mark newline-mark))
+  (setcdr (assoc 'newline-mark whitespace-display-mappings)
+          '(10 [182 10]))
+  (setcdr (assoc 'tab-mark whitespace-display-mappings)
+          '(9 [8594] [92 9])))
 
 (provide 'init-defaults)

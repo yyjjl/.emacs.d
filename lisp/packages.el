@@ -32,6 +32,7 @@
                 fcitx))
 ;; theme
 (add-packages '(color-theme
+                all-the-icons all-the-icons-ivy all-the-icons-dired
                 ;; helper control fringe(edge of a window) style
                 fringe-helper
                 ;; highlight braces with their depth
@@ -51,7 +52,7 @@
 (add-packages '(popwin
                 expand-region
                 restclient company-restclient
-                dired+ dired-filter dired-k
+                dired+ dired-k
                 buffer-move
                 ;; clipbord tools
                 simpleclip
@@ -112,8 +113,7 @@
 (add-packages '(irony-eldoc irony
                company-irony company-irony-c-headers
                flycheck-irony
-               rtags)
-              "melpa-stable")
+               rtags))
 
 (add-packages '(
                 company-shell

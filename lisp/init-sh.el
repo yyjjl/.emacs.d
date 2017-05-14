@@ -3,9 +3,8 @@
              (unless (is-buffer-file-temp)
                (setq-local company-backends
                            (delete 'company-capf company-backends))
-               (add-to-list-after 'company-files
-                                  '(company-shell :with company-yasnippet)
-                                  company-backends)
+               (add-to-list 'company-backends
+                            '(company-shell :with company-yasnippet))
                (flycheck-mode 1))))
 
 

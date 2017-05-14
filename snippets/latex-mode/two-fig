@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: two-fig
+# key: tfig
+# --
+\begin{figure}[ht]
+  \centering
+  \begin{minipage}[t]{${1:0.49}\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{$2}
+    \caption{\label{fig:$3}$4}
+  \end{minipage}
+  \begin{minipage}[t]{${5:0.49}\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{$6}
+    \caption{\label{fig:$7}$8} 
+  \end{minipage}
+\end{figure}  

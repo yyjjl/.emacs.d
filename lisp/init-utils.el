@@ -238,4 +238,10 @@ grab matched string, jsonize them, and insert into kill ring"
     (copy-yank-str rlt)
     (message "%s => clipboard & yank ring" rlt)))
 
+(defun read-file-as-string (filename)
+  (let ((recentf-can-track nil))
+    (with-temp-buffer
+      (insert-file-contents filename)
+      (buffer-string))))
+
 (provide 'init-utils)

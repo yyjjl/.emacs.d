@@ -38,7 +38,7 @@ Archive with high priority will be used when install a package."
                   value elt)))))
     value))
 
-(defsubst package-archive-priority (archive)
+(defsubst package--archive-priority (archive)
   (length (member (package-desc-archive archive)
                   package-archive-priority-alist)))
 
@@ -50,7 +50,7 @@ Archive with high priority will be used when install a package."
                           :test (lambda (name info)
                                   (string= name (package-desc-archive info))))))
     (when (and (not archive) package-use-priority)
-      (setq archive (max-of pkg-archives #'package-archive-priority)))
+      (setq archive (max-of pkg-archives #'package--archive-priority)))
     (when archive
       (setf (cdr pkg) (list archive)))))
 

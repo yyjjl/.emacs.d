@@ -109,7 +109,7 @@
 
 
 (with-eval-after-load 'irony
-  (setq irony-additional-clang-options '("-std=c++14" "-Wall"))
+  (setq irony-additional-clang-options '("-Wall" "-std=c++14"))
 
   (defun my-irony-mode-hook ()
     (define-key irony-mode-map [remap completion-at-point]

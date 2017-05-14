@@ -9,6 +9,8 @@
 
   (which-key-mode)
 
+  (yas-global-mode 1)
+
   ;; enable popwin-mode
   (popwin-mode 1)
 
@@ -22,6 +24,7 @@
   (global-auto-revert-mode 1)
   (column-number-mode 1)
   (global-page-break-lines-mode 1)
+  ;; (global-whitespace-newline-mode 1)
   ;; make zsh work correctly in emacs
   (setq system-uses-terminfo nil)
   (when window-system

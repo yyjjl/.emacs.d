@@ -16,11 +16,7 @@ if no files marked, always operate on current line in dired-mode
   (message command))
 
 (with-eval-after-load 'dired
-  (add-hook 'dired-mode-hook '(lambda ()
-                                (dired-filter-mode 1)
-                                (dired-filter-group-mode 1)
-                                (turn-on-stripe-buffer-mode)
-                                (stripe-listify-buffer)))
+  (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
   (setq dired-dwim-target t)
   ;; search file name only when focus is over file
   (setq dired-isearch-filenames 'dwim)
@@ -28,40 +24,8 @@ if no files marked, always operate on current line in dired-mode
   (setq dired-recursive-deletes 'always)
 
   (add-hook 'dired-initial-position-hook 'dired-k)
-  (add-hook 'dired-after-readin-hook #'dired-k-no-revert))
-
-
-
-(with-eval-after-load 'dired-filter
-  (set-face-attribute 'dired-filter-group-header nil
-                      :foreground "Orange")
-  (setq dired-filter-group-saved-groups
-        '(("default"
-           ("Document"
-            (extension  "pdf" "txt" "doc" "xls" "ppt" "pptx" "ps" "djvu"
-                        "docx" "xlsx"))
-           ("Org"
-            (extension . "org"))
-           ("Configuration"
-            (regexp . "\\.[a-zA-Z\\-]*\\(rc\\|config\\)\\'"))
-           ("Image"
-            (extension "svg" "svgz" "jpg" "jpeg" "gif" "tiff" "png" "ico"
-                       "bmp"))
-           ("Archives"
-            (extension "zip" "rar" "gz" "bz2" "tar" "jar" "7z"))
-           ("Directory"
-            (directory)))))
-
-  (define-key dired-mode-map "[" dired-filter-map)
-  (define-key dired-mode-map "]" dired-filter-mark-map)
-  (bind-keys :map dired-mode-map
-             (";" . avy-goto-subword-1)
-             ("\\" . diredext-exec-git-command-in-shell)
-             ("/" . swiper)
-             ("M-n" . dired-next-subdir)
-             ("M-p" . dired-prev-subdir)
-             ("C-M-n" . nil)
-             ("C-M-p" . nil)))
+  (add-hook 'dired-after-readin-hook #'dired-k-no-revert)
+  (require 'dired+))
 
 (with-eval-after-load 'dired+
   (diredp-toggle-find-file-reuse-dir 1))

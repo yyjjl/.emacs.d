@@ -1,28 +1,38 @@
+(require 'all-the-icons)
 (defun mode-line-buffer-id ()
-    (let* ((host (and  default-directory
-                      (file-remote-p default-directory 'host)))
-           (num (if (bound-and-true-p window-numbering-mode)
-                    (window-numbering-get-number-string)
-                  ""))
-           (real-id (propertize (if host
-                                    (concat "%b" "@" host)
-                                  "%b")
-                                'face font-lock-keyword-face)))
-      (concat num " %[" real-id "%]")))
+  (let* ((host (and  default-directory
+                    (file-remote-p default-directory 'host)))
+         (num (if (bound-and-true-p window-numbering-mode)
+                  (window-numbering-get-number-string)
+                ""))
+         (real-id (propertize (if host
+                                  (concat "%b" "@" host)
+                                "%b")
+                              'face font-lock-keyword-face)))
+    (concat num " %[" real-id "%]")))
 
 (defun mode-line-buffer-major-mode ()
-  (concat  (propertize " %m " 'face 'font-lock-builtin-face
-                       'mouse-face 'mode-line-highlight
-                       'local-map (let ((map (make-sparse-keymap)))
-                                    (define-key map [mode-line mouse-2]
-                                      'describe-mode)
-                                    (define-key map [mode-line down-mouse-1]
-                                      `(menu-item
-                                        ,(purecopy "Menu Bar")
-                                        ignore
-                                        :filter (lambda (_)
-                                                  (mouse-menu-major-mode-map))))
-                                    map))))
+  (propertize (concat " "
+                      (if window-system
+                          (let ((mode
+                                 (all-the-icons-icon-for-mode major-mode
+                                                              :v-adjust 0.02)))
+                            (if (symbolp mode) (symbol-name mode) mode))
+                        "%m")
+                      " ")
+              'face 'font-lock-builtin-face
+              'help-echo (symbol-name major-mode)
+              'mouse-face 'mode-line-highlight
+              'local-map
+              (let ((map (make-sparse-keymap)))
+                (define-key map [mode-line mouse-2]
+                  'describe-mode)
+                (define-key map [mode-line down-mouse-1]
+                  `(menu-item
+                    ,(purecopy "Menu Bar")
+                    ignore
+                    :filter (lambda (_) (mouse-menu-major-mode-map))))
+                map)))
 
 (defun mode-line-buffer-status ()
   (concat "("
@@ -49,34 +59,31 @@
                       ("*" "run" flycheck-running)
                       ("-" "no" flycheck-fringe-error)
                       ("!" "fail" flycheck-fringe-error)
-                      ("?" "err" flycheck-fringe-error)))
+                      ("?" "error" flycheck-fringe-error)))
              (info (assoc-string str infos))
              (msg (if info (cadr info) (substring str 1)))
-             (face (if info (caddr info) 'flycheck-fringe-error)))
-        (concat " " (propertize msg 'face face)))))
+             (face (if info (caddr info) 'flycheck-fringe-warning)))
+        (propertize msg 'face face))))
 
 (defun mode-line-vc ()
-  (when (and (buffer-file-name (current-buffer)) vc-mode)
-    (propertize (format-mode-line '(vc-mode vc-mode))
-                'face 'font-lock-constant-face)))
+  (and (buffer-file-name (current-buffer)) vc-mode))
 
 (defun mode-line-process ()
-  (when mode-line-process
-    (concat " {"
-            (format-mode-line   mode-line-process)
-            "} ")))
+  (concat "{"
+          (if mode-line-process (format-mode-line   mode-line-process) "")
+          "}"))
 
 (defun generate-mode-line ()
   (let ((lhs (format-mode-line
-              (concat (mode-line-buffer-id)
+              (concat (mode-line-buffer-id) " "
+                      (mode-line-process)
                       (mode-line-buffer-major-mode)
                       (mode-line-buffer-status))))
         (rhs (format-mode-line
-              (concat (mode-line-vc)
-                      (mode-line-process)
-                      (mode-line-flycheck)
-                      (propertize " %I (L%l-C%c) %p%%"
-                                  'face 'font-lock-string-face)))))
+              (concat (mode-line-vc) " "
+                      (mode-line-flycheck) " "
+                      (propertize "%I [%l:%c] %p%% "
+                                  'face 'font-lock-constant-face)))))
     (format (format " %%s%%%ds" (or (- (window-total-width)
                                        (string-width (format-mode-line lhs)))
                                      0))

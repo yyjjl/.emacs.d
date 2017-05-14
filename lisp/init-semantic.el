@@ -6,7 +6,7 @@
         '(global-semantic-idle-scheduler-mode
           global-semanticdb-minor-mode
           ;; global-semantic-idle-summary-mode
-          global-semantic-idle-local-symbol-highlight-mode
+          ;; global-semantic-idle-local-symbol-highlight-mode
           global-semantic-stickyfunc-mode
           ;; error occurs a lot
           ;; global-semantic-decoration-mode
