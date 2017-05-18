@@ -8,9 +8,9 @@
 (advice-add 'term-sentinel :around #'autoclose-term-buffer)
 
 ;; utf8
-(defun my-term-use-utf8 ()
+(defun term-mode-utf8-setup ()
   (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
-(add-hook 'term-exec-hook 'my-term-use-utf8)
+(add-hook 'term-exec-hook 'term-mode-utf8-setup)
 
 
 (defun last-term-buffer (l)

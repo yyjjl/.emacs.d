@@ -1,4 +1,3 @@
-(require 'all-the-icons)
 (defun mode-line-buffer-id ()
   (let* ((host (and  default-directory
                     (file-remote-p default-directory 'host)))
@@ -12,14 +11,7 @@
     (concat num " %[" real-id "%]")))
 
 (defun mode-line-buffer-major-mode ()
-  (propertize (concat " "
-                      (if window-system
-                          (let ((mode
-                                 (all-the-icons-icon-for-mode major-mode
-                                                              :v-adjust 0.02)))
-                            (if (symbolp mode) (symbol-name mode) mode))
-                        "%m")
-                      " ")
+  (propertize " %m "
               'face 'font-lock-builtin-face
               'help-echo (symbol-name major-mode)
               'mouse-face 'mode-line-highlight
@@ -43,7 +35,7 @@
                           'face nil
                           'help-echo "Buffer has been modified")))
           (when buffer-read-only
-            (propertize "ro|"
+            (propertize "read-only|"
                         'face nil
                         'help-echo "Buffer is read-only"))
           (let ((buf-coding (format "%s" buffer-file-coding-system)))

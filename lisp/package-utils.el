@@ -1,5 +1,6 @@
 (require 'package)
-(require 'cl)
+(eval-when-compile
+  (require 'cl))
 
 (defcustom package-use-priority nil
   "Non-nil means to use priority defined in variable `package-archive-priority'.

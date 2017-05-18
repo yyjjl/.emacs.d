@@ -81,6 +81,8 @@
   (add-to-list 'company-backends '(company-irony :with company-files))
   (add-to-list 'company-backends 'company-irony-c-headers)
 
+  (irony-mode 1)
+
   (if (cmake-ide--locate-cmakelists)
       (progn
         (local-set-key [f10] 'cmake-ide-compile)
@@ -91,9 +93,13 @@
         (local-set-key (kbd "M-p") 'rtags-previous-match)
         (local-set-key (kbd "C-c .") 'rtags-symbol-type))
     (local-set-key [f10] 'compile)
-    (irony-eldoc))
-
-  (irony-mode 1))
+    (setq-local compile-command
+                '(let ((filename (buffer-file-name)))
+                   (concat "g++ "
+                           (string-join irony--compile-options " ") " "
+                           (file-name-nondirectory filename) " -o "
+                           (file-name-base filename))))
+    (irony-eldoc)))
 ;; donot use c-mode-common-hook or cc-mode-hook
 ;; because many major-modes use this hook
 (add-hook 'c-mode-common-hook

@@ -18,7 +18,7 @@
                 company company-statistics
                 session
                 multi-term
-                flycheck flycheck-pos-tip
+                flycheck
                 counsel hydra ivy swiper tiny
                 counsel-projectile
                 smex ;; counsel-M-x need smex to get history
@@ -32,7 +32,7 @@
                 fcitx))
 ;; theme
 (add-packages '(color-theme
-                all-the-icons all-the-icons-ivy all-the-icons-dired
+                all-the-icons all-the-icons-dired
                 ;; helper control fringe(edge of a window) style
                 fringe-helper
                 ;; highlight braces with their depth
@@ -115,8 +115,7 @@
                flycheck-irony
                rtags))
 
-(add-packages '(
-                company-shell
+(add-packages '(company-shell
                 sql-indent
                 ;; yaml format
                 yaml-mode

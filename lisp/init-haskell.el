@@ -36,6 +36,9 @@
                 '(("*" . "×")
                   ("/" . "÷"))))
 
+  (hare-init)
+  (remap-kbd "C-c C-r" "C-c r" haskell-mode-map)
+
   (bind-keys :map haskell-mode-map
              ("C-c s" . ghc-sort-lines)
              ("C-'" . ghc-complete)
@@ -59,7 +62,6 @@
               (rainbow-delimiters-mode 1)
               (unless (is-buffer-file-temp)
                 (ghc-init)
-                (hare-init)
                 (define-key haskell-mode-map
                   (kbd "C-c <tab>") 'haskell-process-do-info)
                 (define-key haskell-mode-map

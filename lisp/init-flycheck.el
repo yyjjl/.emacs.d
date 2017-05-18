@@ -9,9 +9,7 @@
   (add-hook 'flycheck-mode-hook 'flycheck-irony-setup)
 
   (setq flycheck-eslintrc "~/.emacs.d/data/.eslintrc")
-  (setq flycheck-mode-line-prefix "")
-  (when (display-graphic-p)
-    (flycheck-pos-tip-mode 1)))
+  (setq flycheck-mode-line-prefix ""))
 
 
 (provide 'init-flycheck)

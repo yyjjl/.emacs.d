@@ -10,7 +10,6 @@
 (color-theme-molokai)
 
 ;; make emacs transparent
-;; (add-to-list 'default-frame-alist '(alpha 100 70))
 (defvar fix-symbol-font-timer nil)
 (when window-system
   (setq fix-symbol-font-timer

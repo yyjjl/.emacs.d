@@ -1,8 +1,6 @@
 (with-eval-after-load 'ivy
   (require 's)
 
-  (all-the-icons-ivy-setup)
-
   (defun my-ivy--regex-fuzzy (str)
     "remove space from str"
     (if (stringp str)
