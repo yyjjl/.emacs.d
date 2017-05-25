@@ -1,11 +1,13 @@
 (autoload 'LaTeX-math-mode "latex" nil t)
 (defun LaTeX-mode-setup ()
   (unless (is-buffer-file-temp)
-    (add-to-list  'company-backends '(company-auctex-macros
-                                      company-auctex-symbols
-                                      company-auctex-environments
-                                      company-auctex-bibs
-                                      company-auctex-labels))
+    (setq company-backends
+          (cons '(company-auctex-macros
+                  company-auctex-symbols
+                  company-auctex-environments
+                  company-auctex-bibs
+                  company-auctex-labels)
+                (delete 'company-dabbrev company-backends)))
     (turn-on-reftex)
     (LaTeX-math-mode 1)
     (TeX-source-correlate-mode 1)

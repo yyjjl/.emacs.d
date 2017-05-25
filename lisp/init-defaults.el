@@ -129,13 +129,17 @@
 (setq save-place-file "~/.emacs.d/data/places")
 
 ;; tramp setup
-(setq tramp-default-method "ssh")
-(setq trampv-auto-save-directory "~/.emacs.d/data/tramp/")
-(setq tramp-backup-directory-alist '(("." . "~/.emacs.d/data/tramp/")))
-(setq tramp-chunksize 8192)
-;; @see https://github.com/syl20bnr/spacemacs/issues/1921
-(setq tramp-ssh-controlmaster-options
-      "-o ControlMaster=auto -o ControlPath='tramp.%%C' -o ControlPersist=no")
+(with-eval-after-load 'tramp
+  (setq tramp-default-method "ssh")
+  (setq trampv-auto-save-directory "~/.emacs.d/data/tramp/")
+  (setq tramp-backup-directory-alist '(("." . "~/.emacs.d/data/tramp/")))
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+  (setq tramp-chunksize 8192)
+  (setq tramp-verbose 1)
+  ;; @see https://github.com/syl20bnr/spacemacs/issues/1921
+  (setq tramp-persistency-file-name "~/.emacs.d/data/tramp")
+  (setq tramp-ssh-controlmaster-options
+        "-o ControlMaster=auto -o ControlPath='tramp.%%C' -o ControlPersist=no"))
 
 ;; minibuffer-hook
 (defun my-minibuffer-setup-hook ()

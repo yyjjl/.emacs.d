@@ -1,10 +1,8 @@
 (add-hook 'sh-mode-hook
           '(lambda ()
              (unless (is-buffer-file-temp)
-               (setq-local company-backends
-                           (delete 'company-capf company-backends))
-               (add-to-list 'company-backends
-                            '(company-shell :with company-yasnippet))
+               (add-to-list 'company-backends 'company-shell)
+               (add-to-list 'company-backends 'company-files)
                (flycheck-mode 1))))
 
 

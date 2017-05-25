@@ -65,8 +65,7 @@
       (call-interactively 'uncomment-region)
     (comment-currnet-line t)))
 
-(bind-keys ("C-x C-m" . execute-extended-command)
-           ("C-}" . force-company-yasnippet)
+(bind-keys ("C-}" . force-company-yasnippet)
            ("<backtab>" . company-complete)
            ("C-r" . isearch-backward-regexp)
            ("C-M-r" . isearch-backeard)

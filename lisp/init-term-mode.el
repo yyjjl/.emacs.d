@@ -13,64 +13,76 @@
 (add-hook 'term-exec-hook 'term-mode-utf8-setup)
 
 
-(defun last-term-buffer (l)
+(defun last-term-buffer (buffers mode)
   "Return most recently used term buffer."
-  (when l
-    (if (eq 'term-mode (with-current-buffer (car l) major-mode))
-        (car l) (last-term-buffer (cdr l)))))
+  (when buffers
+    (let* ((buf (car buffers))
+           (info (with-current-buffer buf
+                   (cons major-mode default-directory))))
+      (if (and (eq mode (car info)) (equal default-directory
+                                           (cdr info)))
+          buf
+        (last-term-buffer (cdr buffers) mode)))))
+
+(defun get-first-buffer-name (fmt)
+  (let ((index 1) name)
+    (setq name (format fmt index))
+    (while (buffer-live-p (get-buffer name))
+      (setq index (1+ index)))
+    name))
+
+(defun get-eshell (name)
+  "Switch to eshell"
+  (let ((path  (s-join ":" (tramp-get-remote-path
+                                 (tramp-dissect-file-name name))))
+        (buf (last-term-buffer (buffer-list) 'eshell-mode)))
+    (unless buf
+      (setq buf (get-buffer-create (get-first-buffer-name "*eshell*<%d>*")))
+      (set-buffer buf)
+      (unless (derived-mode-p 'eshell-mode)
+        (eshell-mode)
+        (setq eshell-path-env path)))
+    buf))
 
 (defun get-term ()
-  "Switch to the term buffer last used, or create a new one if
-    none exists, or if the current buffer is already a term."
-  (interactive)
   (unless (featurep 'multi-term)
     (require 'multi-term nil t))
-  (let ((buf (last-term-buffer (buffer-list))))
-    (when (or (not buf) (eq 'term-mode major-mode))
+  (let ((buf (last-term-buffer (buffer-list) 'term-mode)))
+    (unless buf
       (setq buf (multi-term-get-buffer current-prefix-arg))
       (setq multi-term-buffer-list
             (nconc multi-term-buffer-list (list buf)))
       (set-buffer buf)
       ;; Internal handle for `multi-term' buffer.
       (multi-term-internal))
-    (pop-to-buffer buf)))
+    buf))
 
-(defun term-send-kill-whole-line ()
-  "Kill whole line in term mode."
+(defun get-term-or-eshell ()
+  "Switch to the term buffer last used, or create a new one if
+    none exists, or if the current buffer is already a term."
   (interactive)
-  (term-send-raw-string "\C-a")
-  (term-send-raw-string "\C-k"))
-
-(defun term-send-kill-line ()
-  "Kill line in term mode."
-  (interactive)
-  (term-send-raw-string "\C-k"))
+  (if (and default-directory (file-remote-p default-directory))
+      (pop-to-buffer (get-eshell (buffer-file-name)))
+    (pop-to-buffer (get-term))))
 
 (with-eval-after-load 'multi-term
   (setq multi-term-program "/bin/zsh")
   (setq term-unbind-key-list '("C-x" "<ESC>" "C-y" "C-h" "C-c"))
   (setq term-bind-key-alist
-        '(("C-c C-c" . term-interrupt-subjob)
-          ("C-c C-n" . multi-term)
-          ("M-p" . term-send-up)
-          ("M-n" . term-send-down)
-          ("C-s" . swiper)
-          ("C-r" . term-send-reverse-search-history)
-          ("C-m" . term-send-raw)
-          ("M-k" . term-send-kill-whole-line)
-          ("C-_" . term-send-raw)
-          ("M-f" . term-send-forward-word)
-          ("M-b" . term-send-backward-word)
-          ("C-k" . term-send-kill-line)
-          ("C-p" . previous-line)
-          ("C-n" . next-line)
-          ("M-y" . yank-pop)
-          ("M-." . term-send-raw-meta)
-          ("M-]" . multi-term-next)
-          ("M-[" . multi-term-prev)))
-
+        (append term-bind-key-alist
+                '(("C-c C-n" . multi-term)
+                  ("C-s" . swiper)
+                  ("M-]" . multi-term-next)
+                  ("M-[" . multi-term-prev))))
   (setq multi-term-dedicated-close-back-to-open-buffer-p t))
 
-(global-set-key [f8] 'get-term)
+(with-eval-after-load 'esh-opt
+  (autoload 'epe-theme-lambda "eshell-prompt-extras")
+  (setq eshell-highlight-prompt nil
+        eshell-prompt-function 'epe-theme-lambda))
+(with-eval-after-load 'esh-module
+  (add-to-list 'eshell-modules-list 'eshell-tramp))
+
+(global-set-key [f8] 'get-term-or-eshell)
 
 (provide 'init-term-mode)

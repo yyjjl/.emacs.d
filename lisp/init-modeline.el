@@ -1,13 +1,15 @@
 (defun mode-line-buffer-id ()
-  (let* ((host (and  default-directory
-                    (file-remote-p default-directory 'host)))
+  (let* ((host (and default-directory
+                   (let ((tmp (file-remote-p default-directory)))
+                     (and tmp (split-string tmp ":")))))
          (num (if (bound-and-true-p window-numbering-mode)
                   (window-numbering-get-number-string)
                 ""))
-         (real-id (propertize (if host
-                                  (concat "%b" "@" host)
-                                "%b")
-                              'face font-lock-keyword-face)))
+         (real-id (concat (propertize "%b" 'face font-lock-keyword-face)
+                          (if (and host (cdr host))
+                              (propertize (concat "(" (cadr host) ")")
+                                          'face font-lock-string-face)
+                            ""))))
     (concat num " %[" real-id "%]")))
 
 (defun mode-line-buffer-major-mode ()

@@ -122,8 +122,7 @@
  '(session-use-package t nil (session))
  '(shm-program-name "~/.cabal/bin/structured-haskell-mode")
  '(smex-save-file "~/.emacs.d/data/smex-items")
- '(srecode-map-save-file "~/.emacs.d/data/srecode-map.el")
- '(tramp-persistentcy-file-name "~/.emacs.d/data/tramp"))
+ '(srecode-map-save-file "~/.emacs.d/data/srecode-map.el"))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
