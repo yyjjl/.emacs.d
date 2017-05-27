@@ -32,7 +32,6 @@
                 fcitx))
 ;; theme
 (add-packages '(color-theme
-                all-the-icons all-the-icons-dired
                 ;; helper control fringe(edge of a window) style
                 fringe-helper
                 ;; highlight braces with their depth

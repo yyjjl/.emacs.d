@@ -16,16 +16,23 @@ if no files marked, always operate on current line in dired-mode
   (message command))
 
 (with-eval-after-load 'dired
-  (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+  (add-hook 'dired-mode-hook (lambda ()
+                               (turn-on-stripe-buffer-mode)
+                               (dired-omit-mode 1)))
   (setq dired-dwim-target t)
   ;; search file name only when focus is over file
   (setq dired-isearch-filenames 'dwim)
   (setq dired-recursive-copies 'always)
   (setq dired-recursive-deletes 'always)
 
+  (define-key dired-mode-map ")" 'dired-omit-mode)
+
   (add-hook 'dired-initial-position-hook 'dired-k)
   (add-hook 'dired-after-readin-hook #'dired-k-no-revert)
-  (require 'dired+))
+  (require 'dired-x)
+  (require 'dired+)
+  (setq-default dired-omit-files-p t)
+  (setq dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$\\|^\\..*$"))
 
 (with-eval-after-load 'dired+
   (diredp-toggle-find-file-reuse-dir 1))
