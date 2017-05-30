@@ -88,7 +88,7 @@ it narrows to region, or Org subtree."
     (add-to-list 'completion-at-point-functions
                  'pcomplete-completions-at-point)
     (flyspell-mode -1)
-
+    (show-paren-mode 1)
     ;; display wrapped lines instead of truncated lines
     (setq truncate-lines nil)
     (setq word-wrap t)
@@ -204,6 +204,11 @@ it narrows to region, or Org subtree."
                  ,(s-replace "[ORG-TEMPLATE-DIR]"
                              (expand-file-name "~/.emacs.d/org-template")
                              (read-file-as-string
-                              "~/.emacs.d/org-template/beamer")))))
+                              "~/.emacs.d/org-template/beamer"))
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
 
 (provide 'init-org)

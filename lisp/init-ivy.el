@@ -58,7 +58,7 @@ buffer is not visiting a file."
                                          (expand-file-name x ivy--directory)))))
                   :keymap counsel-find-file-map
                   :caller 'counsel-sudo-edit)
-      (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
+      (find-file (concat "/sudo:root@localhost:" buffer-file-name))))
 
   (with-eval-after-load 'counsel
     (setq counsel-find-file-at-point t)
