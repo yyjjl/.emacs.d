@@ -1,6 +1,5 @@
 (defun after-init-function ()
   (session-initialize)
-  ;; (turnon-keyfreq-mode)
 
   (ivy-mode 1)
   (counsel-mode 1)
@@ -27,7 +26,8 @@
   ;; (global-whitespace-newline-mode 1)
   ;; make zsh work correctly in emacs
   (setq system-uses-terminfo nil)
-  (when window-system
+
+  (when use-fcitx-setup-p
     (fcitx-aggressive-setup))
 
   (elpy-enable)
@@ -108,5 +108,5 @@
            ("M-g l" . avy-goto-line)
            ("M-g w" . avy-goto-word-1)
            ("M-g y" . avy-copy-line))
-;; }}
+
 (provide 'after-init)

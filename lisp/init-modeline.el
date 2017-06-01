@@ -63,8 +63,11 @@
   (and (buffer-file-name (current-buffer)) vc-mode))
 
 (defun mode-line-process ()
-  (concat "{"
-          (if mode-line-process (format-mode-line   mode-line-process) "")
+  (concat "{" (let ((proc (get-buffer-process (current-buffer))))
+                (if (not proc) ""
+                  (if (process-live-p proc)
+                      (format ":run %s" (process-id proc))
+                    (format ":exit %s" (process-exit-status proc)))))
           "}"))
 
 (defun generate-mode-line ()

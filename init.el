@@ -10,6 +10,7 @@
 (defvar symbol-font-name "Noto Sans S Chinese")
 (defvar yasnippet-extra-dir "~/.emacs.d/snippets")
 (defvar large-buffer-size (* 1024 1024))
+(defvar use-fcitx-setup-p t)
 
 (add-to-list 'default-frame-alist '(font . "Ubuntu Mono-13"))
 
@@ -78,7 +79,6 @@
 (require 'init-windows)
 (require 'init-hs-minor-mode)
 (require 'init-doxygen)
-;; (require 'init-misc)
 (require 'init-extra)
 (require 'after-init)
 
