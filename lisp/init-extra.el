@@ -5,6 +5,11 @@
 
 (defalias 'perl-mode 'cperl-mode)
 
+(with-eval-after-load 'fcitx
+  ;; init fcitx prefix keys
+  (setq fcitx-use-dbus t)
+  (fcitx-prefix-keys-add "C-h" "M-g"))
+
 ;; popwin setup
 (autoload 'popwin-mode "popwin" nil t)
 

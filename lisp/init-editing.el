@@ -27,11 +27,6 @@
 (with-eval-after-load 'indent-guide
   (setq indent-guide-recursive t))
 
-(with-eval-after-load 'fcitx
-  ;; init fcitx prefix keys
-  (setq fcitx-use-dbus t)
-  (fcitx-prefix-keys-add "C-h" "M-g"))
-
 (with-eval-after-load 'picture
   (defhydra hydra-picture-move (:pre (setq hydra-is-helpful nil) ;; do not show lv
                              :post (setq hydra-is-helpful t))

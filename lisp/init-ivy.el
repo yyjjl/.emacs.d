@@ -68,10 +68,6 @@ buffer is not visiting a file."
            "\\(?:\\`[#.]\\)"
            ;; file names ending with # or ~
            "\\|\\(?:[#~]\\'\\)"))
-    (defadvice counsel-bookmark (before make-sure-bookmark-loaded activate)
-      (unless (boundp 'bookmark-maybe-load-default-file)
-        (require 'bookmark+))
-      (bookmark-maybe-load-default-file))
 
     (ivy-set-actions
      'counsel-find-file

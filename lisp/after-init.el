@@ -95,7 +95,6 @@
            ([f6] . toggle-company-ispell)
            ([f7] . create-scratch-buffer)
            ([f5] . gdb)
-           ([f12] . fcitx-aggressive-setup)
            ;; buffer-mode
            ("C-c w i" . buf-move-up)
            ("C-c w k" . buf-move-down)
