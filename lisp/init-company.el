@@ -7,7 +7,7 @@
                                company-capf
                                (company-dabbrev-code
                                 company-gtags
-                                company-etags
+                                ;; company-etags
                                 company-keywords)
                                company-oddmuse company-dabbrev))
   (make-variable-buffer-local 'company-backends)

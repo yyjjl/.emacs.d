@@ -43,11 +43,12 @@
      (mode-line-inactive ((t (:foreground "#F8F8F2" :background "#1b1d1e"))))
      (mode-line-buffer-id ((t (:foreground nil :background "#000000"
                                            :weight semi-bold))))
-     (mode-line ((t (:foreground "#BCBCBC" :background "#161718"))))
+     (mode-line ((t (:foreground "#BCBCBC" :background "#1b1d1e"))))
      (mode-line-highlight ((t (:background "#020303"))))
      (mode-line-mousable ((t (:foreground "#BCBCBC" :background "#000000"))))
      (mode-line-mousable-minor-mode
       ((t (:foreground "#BCBCBC" :background "#000000"))))
+     (header-line ((t (:forground "grey90" :background "#1b1d1e"))))
 
      (font-lock-builtin-face ((t (:foreground "#A6E22E"))))
      (font-lock-comment-face ((t (:foreground "#465457" :slant italic))))

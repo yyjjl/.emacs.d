@@ -89,7 +89,10 @@
 (defun indent-for-tab-or-close (fn &optional arg)
   (if (looking-at "`\\|\"\\|}\\|\\$")
       (forward-char 1)
-    (funcall fn arg)))
+    (if (save-excursion (forward-line 0)
+                        (and outline-minor-mode (looking-at-p outline-regexp)))
+        (outline-toggle-children)
+      (funcall fn arg))))
 (advice-add 'indent-for-tab-command :around #'indent-for-tab-or-close)
 
 ;; make scratch buffer unkillable

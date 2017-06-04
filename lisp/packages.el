@@ -109,10 +109,12 @@
                 shm hindent
                 company-cabal))
 
-(add-packages '(irony-eldoc irony
-               company-irony company-irony-c-headers
-               flycheck-irony
-               rtags))
+(add-packages '(irony-eldoc
+                irony
+                company-irony company-irony-c-headers
+                flycheck-irony
+                ggtags
+                rtags))
 
 (add-packages '(company-shell
                 sql-indent

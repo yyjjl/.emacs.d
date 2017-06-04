@@ -93,12 +93,14 @@
         (local-set-key (kbd "M-p") 'rtags-previous-match)
         (local-set-key (kbd "C-c .") 'rtags-symbol-type))
     (local-set-key [f10] 'compile)
+    (ggtags-mode 1)
     (setq-local compile-command
-                '(let ((filename (buffer-file-name)))
-                   (concat "g++ "
-                           (string-join irony--compile-options " ") " "
-                           (file-name-nondirectory filename) " -o "
-                           (file-name-base filename))))
+                '(ignore-errors
+                   (let ((filename (buffer-file-name)))
+                     (concat "g++ "
+                             (string-join irony--compile-options " ") " "
+                             (file-name-nondirectory filename) " -o "
+                             (file-name-base filename)))))
     (irony-eldoc)))
 ;; donot use c-mode-common-hook or cc-mode-hook
 ;; because many major-modes use this hook

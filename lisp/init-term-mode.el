@@ -13,14 +13,14 @@
 (add-hook 'term-exec-hook 'term-mode-utf8-setup)
 
 
-(defun last-term-buffer (buffers mode)
+(defun last-term-buffer (buffers mode &optional dir)
   "Return most recently used term buffer."
   (when buffers
     (let* ((buf (car buffers))
            (info (with-current-buffer buf
                    (cons major-mode default-directory))))
-      (if (and (eq mode (car info)) (equal default-directory
-                                           (cdr info)))
+      (if (and (eq mode (car info))
+              (equal (or dir default-directory) (cdr info)))
           buf
         (last-term-buffer (cdr buffers) mode)))))
 
@@ -44,12 +44,15 @@
         (setq eshell-path-env path)))
     buf))
 
-(defun get-term ()
+(defun get-term (&optional dir)
   (unless (featurep 'multi-term)
     (require 'multi-term nil t))
-  (let ((buf (last-term-buffer (buffer-list) 'term-mode)))
+  (let ((buf (last-term-buffer (buffer-list) 'term-mode dir)))
     (unless buf
-      (setq buf (multi-term-get-buffer current-prefix-arg))
+      (if dir
+          (let ((default-directory dir))
+            (setq buf (multi-term-get-buffer current-prefix-arg)))
+        (setq buf (multi-term-get-buffer current-prefix-arg)))
       (setq multi-term-buffer-list
             (nconc multi-term-buffer-list (list buf)))
       (set-buffer buf)
@@ -63,7 +66,7 @@
   (interactive)
   (if (and default-directory (file-remote-p default-directory))
       (pop-to-buffer (get-eshell (buffer-file-name)))
-    (pop-to-buffer (get-term))))
+    (pop-to-buffer (get-term (ignore-errors (projectile-project-root))))))
 
 (with-eval-after-load 'multi-term
   (setq multi-term-program "/bin/zsh")
