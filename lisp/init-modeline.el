@@ -13,20 +13,23 @@
     (concat num " %[" real-id "%]")))
 
 (defun mode-line-buffer-major-mode ()
-  (propertize " %m "
-              'face 'font-lock-builtin-face
-              'help-echo (symbol-name major-mode)
-              'mouse-face 'mode-line-highlight
-              'local-map
-              (let ((map (make-sparse-keymap)))
-                (define-key map [mode-line mouse-2]
-                  'describe-mode)
-                (define-key map [mode-line down-mouse-1]
-                  `(menu-item
-                    ,(purecopy "Menu Bar")
-                    ignore
-                    :filter (lambda (_) (mouse-menu-major-mode-map))))
-                map)))
+  (let ((mm (format-mode-line "%m")))
+    (propertize (concat " "
+                         (if (string= mm "") (symbol-name major-mode) mm)
+                         " ")
+                'face 'font-lock-builtin-face
+                'help-echo (symbol-name major-mode)
+                'mouse-face 'mode-line-highlight
+                'local-map
+                (let ((map (make-sparse-keymap)))
+                  (define-key map [mode-line mouse-2]
+                    'describe-mode)
+                  (define-key map [mode-line down-mouse-1]
+                    `(menu-item
+                      ,(purecopy "Menu Bar")
+                      ignore
+                      :filter (lambda (_) (mouse-menu-major-mode-map))))
+                  map))))
 
 (defun mode-line-buffer-status ()
   (concat "("

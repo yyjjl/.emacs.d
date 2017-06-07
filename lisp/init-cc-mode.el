@@ -106,7 +106,7 @@
 ;; because many major-modes use this hook
 (add-hook 'c-mode-common-hook
           (lambda ()
-            (unless (is-buffer-file-temp)
+            (unless (or (is-buffer-file-temp) (file-remote-p (buffer-file-name)))
               (common-cc-mode-setup)
               (if (derived-mode-p 'c++-mode)
                   (setq-local flycheck-clang-language-standard "c++14")

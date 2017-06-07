@@ -16,9 +16,7 @@ if no files marked, always operate on current line in dired-mode
   (message command))
 
 (with-eval-after-load 'dired
-  (add-hook 'dired-mode-hook (lambda ()
-                               (turn-on-stripe-buffer-mode)
-                               (dired-omit-mode 1)))
+  (add-hook 'dired-mode-hook (lambda () (turn-on-stripe-buffer-mode)))
   (setq dired-dwim-target t)
   ;; search file name only when focus is over file
   (setq dired-isearch-filenames 'dwim)
@@ -29,7 +27,10 @@ if no files marked, always operate on current line in dired-mode
   (define-key dired-mode-map "E" 'open-externally)
 
   (add-hook 'dired-initial-position-hook 'dired-k)
-  (add-hook 'dired-after-readin-hook #'dired-k-no-revert)
+  (add-hook 'dired-after-readin-hook
+            (lambda ()
+              (unless (file-remote-p default-directory)
+                (dired-k-no-revert))))
   (require 'dired-x)
   (require 'dired+)
   (setq-default dired-omit-files-p t)

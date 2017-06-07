@@ -5,7 +5,15 @@
         (funcall fn proc msg)
         (kill-buffer buffer))
     (funcall fn proc msg)))
+
+(defun autoclose-shell-buffer (fn proc msg)
+  (if (and (eq major-mode 'shell-mode) (memq (process-status proc) '(signal exit)))
+      (let ((buffer (process-buffer proc)))
+        (funcall fn proc msg)
+        (kill-buffer buffer))
+    (funcall fn proc msg)))
 (advice-add 'term-sentinel :around #'autoclose-term-buffer)
+(advice-add 'tramp-process-sentinel :around #'autoclose-term-buffer)
 
 ;; utf8
 (defun term-mode-utf8-setup ()
@@ -31,18 +39,16 @@
       (setq index (1+ index)))
     name))
 
-(defun get-eshell (name)
-  "Switch to eshell"
-  (let ((path  (s-join ":" (tramp-get-remote-path
-                                 (tramp-dissect-file-name name))))
-        (buf (last-term-buffer (buffer-list) 'eshell-mode)))
-    (unless buf
-      (setq buf (get-buffer-create (get-first-buffer-name "*eshell*<%d>*")))
-      (set-buffer buf)
-      (unless (derived-mode-p 'eshell-mode)
-        (eshell-mode)
-        (setq eshell-path-env path)))
-    buf))
+(defun get-remote-shell ()
+  "Switch to remote shell"
+  (interactive)
+  (let ((new-buffer-name (get-first-buffer-name "*ssh%d*")))
+    (if (file-remote-p default-directory)
+        (let ((explicit-shell-file-name "/bin/bash")
+              (buf (get-buffer-create new-buffer-name)))
+          (pop-to-buffer buf)
+          (shell buf))
+      (message "Host is can not be determined"))))
 
 (defun get-term (&optional dir)
   (unless (featurep 'multi-term)
@@ -60,13 +66,13 @@
       (multi-term-internal))
     buf))
 
-(defun get-term-or-eshell ()
+(defun get-term-or-shell ()
   "Switch to the term buffer last used, or create a new one if
     none exists, or if the current buffer is already a term."
   (interactive)
-  (if (and default-directory (file-remote-p default-directory))
-      (pop-to-buffer (get-eshell (buffer-file-name)))
-    (pop-to-buffer (get-term (ignore-errors (projectile-project-root))))))
+  (if (not (file-remote-p default-directory))
+      (pop-to-buffer (get-term (ignore-errors (projectile-project-root))))
+    (get-remote-shell)))
 
 (with-eval-after-load 'multi-term
   (setq multi-term-program "/bin/zsh")
@@ -79,13 +85,6 @@
                   ("M-[" . multi-term-prev))))
   (setq multi-term-dedicated-close-back-to-open-buffer-p t))
 
-(with-eval-after-load 'esh-opt
-  (autoload 'epe-theme-lambda "eshell-prompt-extras")
-  (setq eshell-highlight-prompt nil
-        eshell-prompt-function 'epe-theme-lambda))
-(with-eval-after-load 'esh-module
-  (add-to-list 'eshell-modules-list 'eshell-tramp))
-
-(global-set-key [f8] 'get-term-or-eshell)
+(global-set-key [f8] 'get-term-or-shell)
 
 (provide 'init-term-mode)

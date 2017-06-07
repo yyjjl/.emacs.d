@@ -135,7 +135,6 @@
                 cmake-mode cmake-font-lock cmake-ide
                 php-mode
                 gnuplot-mode
-                eshell-prompt-extras
                 graphviz-dot-mode))
 
 (package-utils-initialize)
