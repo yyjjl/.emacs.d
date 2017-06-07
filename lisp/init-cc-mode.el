@@ -133,4 +133,13 @@
              (cmake-font-lock-activate)))
 
 (cmake-ide-setup)
+
+(with-eval-after-load 'cmake-ide
+  (defun do-unless-buffer-is-temp (fn &rest args)
+    "Do function unless buffer is temporary"
+    (unless (is-buffer-file-temp)
+      (apply fn args)))
+  (advice-add 'cmake-ide--mode-hook :around #'do-unless-buffer-is-temp)
+  (advice-add 'cmake-ide--before-save :around #'do-unless-buffer-is-temp))
+
 (provide 'init-cc-mode)

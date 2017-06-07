@@ -26,6 +26,7 @@ if no files marked, always operate on current line in dired-mode
   (setq dired-recursive-deletes 'always)
 
   (define-key dired-mode-map ")" 'dired-omit-mode)
+  (define-key dired-mode-map "E" 'open-externally)
 
   (add-hook 'dired-initial-position-hook 'dired-k)
   (add-hook 'dired-after-readin-hook #'dired-k-no-revert)

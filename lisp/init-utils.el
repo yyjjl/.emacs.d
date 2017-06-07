@@ -244,4 +244,24 @@ grab matched string, jsonize them, and insert into kill ring"
       (insert-file-contents filename)
       (buffer-string))))
 
+(defun open-externally ()
+  "Open the current file or dired marked files in external app.
+The app is chosen from your OS's preference."
+  (interactive)
+  (let* ((file-list (if (eq major-mode 'dired-mode)
+                         (dired-get-marked-files)
+                       (list (buffer-file-name))))
+         (do-it-p (or (<= (length file-list) 5)
+                       (y-or-n-p "Open more than 5 files? "))))
+    (when do-it-p
+      (cond
+       ((eq system-type 'darwin)
+        (mapc (lambda (path)
+                (shell-command (concat "open " (shell-quote-argument path))))
+              file-list))
+       ((eq system-type 'gnu/linux)
+        (mapc (lambda (path) (let ((process-connection-type nil))
+                           (start-process "" nil "xdg-open" path)))
+              file-list))))))
+
 (provide 'init-utils)

@@ -45,7 +45,7 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
     ("f" outline-forward-same-level "forward") ; Forward - same level
     ("b" outline-backward-same-level "back")   ; Backward - same level
     ("q" nil "quit")
-    ("<tab>" org-cycle "tab")
+    ("<tab>" org-cycle "cycle")
     ("RET" nil))
 
   (bind-keys :map org-mode-map

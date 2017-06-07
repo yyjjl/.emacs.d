@@ -105,5 +105,4 @@
 
 (global-set-key (kbd "M-Q") 'insert-space-around-chinese)
 
-
 (provide 'init-extra)

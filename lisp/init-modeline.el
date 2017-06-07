@@ -63,16 +63,15 @@
   (and (buffer-file-name (current-buffer)) vc-mode))
 
 (defun mode-line-process ()
-  (concat "{" (let ((proc (get-buffer-process (current-buffer))))
-                (if (not proc) ""
-                  (if (process-live-p proc)
-                      (format ":run %s" (process-id proc))
-                    (format ":exit %s" (process-exit-status proc)))))
-          "}"))
+  (let ((proc (get-buffer-process (current-buffer))))
+    (if (not proc) ""
+      (if (process-live-p proc)
+          (format " {:run %s} " (process-id proc))
+        (format " {:exit %s} " (process-exit-status proc))))))
 
 (defun generate-mode-line ()
   (let ((lhs (format-mode-line
-              (concat (mode-line-buffer-id) " "
+              (concat (mode-line-buffer-id)
                       (mode-line-process)
                       (mode-line-buffer-major-mode)
                       (mode-line-buffer-status))))
