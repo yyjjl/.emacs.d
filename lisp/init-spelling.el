@@ -91,7 +91,7 @@
            (executable-find ispell-program-name))
       (flyspell-mode 1)))
 (when (can-enable-flyspell-mode)
-    (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-    (add-hook 'text-mode-hook 'flyspell-mode))
+  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+  (add-hook 'text-mode-hook 'flyspell-mode))
 
 (provide 'init-spelling)

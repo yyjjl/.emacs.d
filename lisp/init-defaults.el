@@ -44,7 +44,6 @@
       auto-revert-verbose nil)
 
 (setq backup-by-coping t ; don't clobber symlinks
-      backup-directory-alist '(("." . "~/.emacs.d/data/backups"))
       delete-old-versions t
       version-control t  ;use versioned backups
       kept-new-versions 6
@@ -129,18 +128,18 @@
 ;; automatic save place of each buffer
 (require 'saveplace)
 (setq-default save-place t)
-(setq save-place-file "~/.emacs.d/data/places")
 
 ;; tramp setup
 (with-eval-after-load 'tramp
   (setq tramp-default-method "ssh")
-  (setq trampv-auto-save-directory "~/.emacs.d/data/tramp/")
-  (setq tramp-backup-directory-alist '(("." . "~/.emacs.d/data/tramp/")))
+  (setq backup-enable-predicate
+        (lambda (name)
+          (and (normal-backup-enable-predicate name)
+              (not (file-remote-p name 'method)))))
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
   (setq tramp-chunksize 8192)
   (setq tramp-verbose 1)
   ;; @see https://github.com/syl20bnr/spacemacs/issues/1921
-  (setq tramp-persistency-file-name "~/.emacs.d/data/tramp")
   (setq tramp-ssh-controlmaster-options
         "-o ControlMaster=auto -o ControlPath='tramp.%%C' -o ControlPersist=no"))
 
@@ -158,13 +157,11 @@
 
 ;; history
 (safe-wrap
- (if (file-writable-p (file-truename "~/.emacs.d/data/history"))
-     (progn
-       (setq history-length 8000)
-       (setq savehist-additional-variables
-             '(search-ring regexp-search-ring kill-ring))
-       (savehist-mode 1))
-   (message "Failed to access ~/.emacs.d/data/history")))
+ (progn
+   (setq history-length 8000)
+   (setq savehist-additional-variables
+         '(search-ring regexp-search-ring kill-ring))
+   (savehist-mode 1)))
 
 (setq-default initial-scratch-message
               (concat ";; Welcome to Emacs " (or user-login-name "") " !!!"))

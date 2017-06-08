@@ -78,35 +78,37 @@
   ;; make a #define be left-aligned
   (setq c-electric-pound-behavior '(alignleft))
 
-  (add-to-list 'company-backends '(company-irony :with company-files))
-  (add-to-list 'company-backends 'company-irony-c-headers)
+  (unless (file-remote-p default-directory)
 
-  (irony-mode 1)
+    (add-to-list 'company-backends '(company-irony :with company-files))
+    (add-to-list 'company-backends 'company-irony-c-headers)
 
-  (if (cmake-ide--locate-cmakelists)
-      (progn
-        (local-set-key [f10] 'cmake-ide-compile)
-        (setq-local eldoc-documentation-function 'rtags-eldoc-mine)
-        (local-set-key (kbd "M-.") 'rtags-find-symbol-at-point)
-        (local-set-key (kbd "M-,") 'rtags-location-stack-back)
-        (local-set-key (kbd "M-n") 'rtags-next-match)
-        (local-set-key (kbd "M-p") 'rtags-previous-match)
-        (local-set-key (kbd "C-c .") 'rtags-symbol-type))
-    (local-set-key [f10] 'compile)
-    (ggtags-mode 1)
-    (setq-local compile-command
-                '(ignore-errors
-                   (let ((filename (buffer-file-name)))
-                     (concat "g++ "
-                             (string-join irony--compile-options " ") " "
-                             (file-name-nondirectory filename) " -o "
-                             (file-name-base filename)))))
-    (irony-eldoc)))
+    (irony-mode 1)
+
+    (if (cmake-ide--locate-cmakelists)
+        (progn
+          (local-set-key [f10] 'cmake-ide-compile)
+          (setq-local eldoc-documentation-function 'rtags-eldoc-mine)
+          (local-set-key (kbd "M-.") 'rtags-find-symbol-at-point)
+          (local-set-key (kbd "M-,") 'rtags-location-stack-back)
+          (local-set-key (kbd "M-n") 'rtags-next-match)
+          (local-set-key (kbd "M-p") 'rtags-previous-match)
+          (local-set-key (kbd "C-c .") 'rtags-symbol-type))
+      (local-set-key [f10] 'compile)
+      (ggtags-mode 1)
+      (setq-local compile-command
+                  '(ignore-errors
+                     (let ((filename (buffer-file-name)))
+                       (concat "g++ "
+                               (string-join irony--compile-options " ") " "
+                               (file-name-nondirectory filename) " -o "
+                               (file-name-base filename)))))
+      (irony-eldoc))))
 ;; donot use c-mode-common-hook or cc-mode-hook
 ;; because many major-modes use this hook
 (add-hook 'c-mode-common-hook
           (lambda ()
-            (unless (or (is-buffer-file-temp) (file-remote-p (buffer-file-name)))
+            (unless (is-buffer-file-temp)
               (common-cc-mode-setup)
               (if (derived-mode-p 'c++-mode)
                   (setq-local flycheck-clang-language-standard "c++14")
@@ -137,7 +139,7 @@
 (with-eval-after-load 'cmake-ide
   (defun do-unless-buffer-is-temp (fn &rest args)
     "Do function unless buffer is temporary"
-    (unless (is-buffer-file-temp)
+    (unless (or (is-buffer-file-temp) (file-remote-p default-directory))
       (apply fn args)))
   (advice-add 'cmake-ide--mode-hook :around #'do-unless-buffer-is-temp)
   (advice-add 'cmake-ide--before-save :around #'do-unless-buffer-is-temp))
