@@ -15,7 +15,8 @@
   (require 'stickyfunc-enhance))
 
 (defun try-turn-on-semantic-mode ()
-  (if (> (buffer-size) large-buffer-size)
+  (if (or (file-remote-p default-directory)
+          (> (buffer-size) large-buffer-size))
       (semantic-mode -1)
     (semantic-mode 1)))
 

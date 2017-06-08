@@ -29,6 +29,7 @@
                 window-numbering
                 htmlize
                 ibuffer-vc
+                easy-kill
                 fcitx))
 ;; theme
 (add-packages '(color-theme

@@ -95,6 +95,26 @@
 (setq uniquify-after-kill-buffer-p t)
 (setq uniquify-ignore-buffers-re "^\\*")
 
+(when (fboundp 'define-fringe-bitmap)
+  (define-fringe-bitmap 'right-curly-arrow
+    [#b11111111
+     #b11111111
+     #b00000011
+     #b00000011
+     #b00000011
+     #b00000011
+     #b00000011
+     #b00000011])
+  (define-fringe-bitmap 'left-curly-arrow
+    [#b11000000
+     #b11000000
+     #b11000000
+     #b11000000
+     #b11000000
+     #b11000000
+     #b11111111
+     #b11111111]))
+
 (provide 'init-modeline)
 
 ;;; init-modeline ends here

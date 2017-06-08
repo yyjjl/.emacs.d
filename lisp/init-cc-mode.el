@@ -68,8 +68,6 @@
   (local-set-key (kbd "C-c C-j") 'semantic-ia-fast-jump)
   (local-set-key (kbd "C-c C-v") 'semantic-decoration-include-visit)
 
-  (try-turn-on-semantic-mode)
-
   (setq cc-search-directories '("."
                                 "/usr/include"
                                 "/usr/local/include/*"
@@ -79,7 +77,6 @@
   (setq c-electric-pound-behavior '(alignleft))
 
   (unless (file-remote-p default-directory)
-
     (add-to-list 'company-backends '(company-irony :with company-files))
     (add-to-list 'company-backends 'company-irony-c-headers)
 

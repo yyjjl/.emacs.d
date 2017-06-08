@@ -66,9 +66,11 @@
 (defvar large-buffer-size 1048576)
 ;; default prog-mode setup
 (defun generic-prog-mode-hook-setup ()
+  (try-turn-on-semantic-mode)
   (unless (is-buffer-file-temp)
     ;; auto insert closing pair
     (electric-pair-mode 1)
+    (electric-layout-mode 1)
     ;; eldoc, show API doc in minibuffer echo area
     (eldoc-mode 1)
     (show-paren-mode 1)

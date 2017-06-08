@@ -16,10 +16,10 @@
   (color-theme-install
    '(color-theme-molokai
      ((foreground-color . "#F8F8F2")
-      (background-color . "#2D2D2D")
+      (background-color . "#1B1D1E")
       (cursor-color . "#F8F8F0")
       (background-mode . dark))
-     (default ((t (:foreground "#F8F8F2" :background "#2D2D2D"))))
+     (default ((t (:foreground "#F8F8F2" :background "#1B1D1E"))))
      (bold ((t (:weight bold))))
      (bold-italic ((t (:weight bold :slant italic))))
      (custom-face-tag ((t (:foreground "#66D9EF" :weight bold))))
@@ -40,10 +40,10 @@
      (escape-glyph ((t (:foreground "#E6DB74"))))
      (minibuffer-prompt ((t (:foreground "#66D9EF"))))
 
-     (mode-line-inactive ((t (:foreground "#F8F8F2" :background "#242424"))))
+     (mode-line-inactive ((t (:foreground "#F8F8F2" :background "#2d2d2d"))))
      (mode-line-buffer-id ((t (:foreground nil :background "#000000"
                                            :weight semi-bold))))
-     (mode-line ((t (:foreground "#BCBCBC" :background "#1b1d1e"))))
+     (mode-line ((t (:foreground "#BCBCBC" :background "#181818"))))
      (mode-line-highlight ((t (:background "#020303"))))
      (mode-line-mousable ((t (:foreground "#BCBCBC" :background "#000000"))))
      (mode-line-mousable-minor-mode
@@ -69,10 +69,10 @@
      (font-lock-variable-name-face ((t (:foreground "#F92672"))))
      (font-lock-warning-face ((t (:foreground "#FFFFFF"
                                               :background "#333333"))))
-     (fringe ((t (:background "#2D2D2D"))))
+     (fringe ((t (:background "#1B1D1E"))))
      (highlight-indentation-face ((t (:background "#111213"))))
      ;; (vertical-border ((t (:foreground "#111213"))))
-     (vertical-border ((t (:foreground "#2D2D2D"))))
+     (vertical-border ((t (:foreground "#1B1D1E"))))
      (highlight ((t (:foreground "#000000" :background "#C4BE89"))))
      (hl-line ((t (:background "#293739"))))
      (icompletep-choices ((t (:foreground "#F92672"))))
@@ -102,7 +102,7 @@
      (markdown-comment-face ((t (:foreground "#465457"))))
      (markdown-math-face ((t (:foreground "#AE81FF" :slant italic))))
      (mumamo-background-chunk-major ((t (:background "#272822"))))
-     (mumamo-background-chunk-submode ((t (:background "#2D2D2D"))))
+     (mumamo-background-chunk-submode ((t (:background "#1B1D1E"))))
      (outline-1 ((t (:foreground "#66D9EF"))))
      (outline-2 ((t (:foreground "#F92672"))))
      (outline-3 ((t (:foreground "#A6E22E"))))
@@ -229,6 +229,7 @@
      (whitespace-space-before-tab ((t (:background nil :foreground "#9f8766"))))
      (whitespace-tab ((t (:background nil))))
      (whitespace-trailing ((t (:background "#dc752f"))))
+     
 ;;;;; flycheck
      (flycheck-error
       ((((supports :underline (:style line)))
@@ -246,7 +247,9 @@
      (flycheck-warning
       ((((supports :underline (:style line)))
         (:underline (:style line :color "#dc752f")))
-       (t (:background "#dc752f" :inherit bold :underline t)))))))
+       (t (:background "#dc752f" :inherit bold :underline t))))
+
+     (ivy-highlight-face ((t (:background "#444155")))))))
 
 (provide 'color-theme-molokai)
 

@@ -43,14 +43,6 @@
     (delete-file (buffer-file-name))
     (kill-this-buffer)))
 
-(defun copy-this-file-path ()
-  (interactive)
-  (let ((name (buffer-file-name)))
-    (if (not name)
-        (error "No file is currently being edited")
-      (message "Copy => %s" name)
-      (kill-new name))))
-
 (defun copy-this-file-to-new-file ()
   (interactive)
   (let* ((this (current-buffer))

@@ -3,7 +3,6 @@
     (elpy-mode 1)
     ;; run command `pip install jedi flake8 importmagic` in shell,
     ;; or just check https://github.com/jorgenschaefer/elpy
-    (try-turn-on-semantic-mode)
     (semantic-idle-summary-mode -1)
     (local-set-key (kbd "C-c b") 'elpy-autopep8-fix-code)
     (local-set-key (kbd "C-c t t") 'pytest-one)
