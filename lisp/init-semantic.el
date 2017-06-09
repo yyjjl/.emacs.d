@@ -14,9 +14,17 @@
           global-semantic-mru-bookmark-mode))
   (require 'stickyfunc-enhance))
 
+(with-eval-after-load "db-file"
+  ;; Fix remote file problem
+  (defmethod semanticdb-live-p ((obj semanticdb-project-database))
+    "Return non-nil if the file associated with OBJ is live.
+  Live databases are objects associated with existing directories."
+    (and (slot-boundp obj 'reference-directory)
+         (let ((dir (oref obj reference-directory)))
+           (and (not (file-remote-p dir)) (file-exists-p dir))))))
+
 (defun try-turn-on-semantic-mode ()
-  (if (or (file-remote-p default-directory)
-          (> (buffer-size) large-buffer-size))
+  (if (> (buffer-size) large-buffer-size)
       (semantic-mode -1)
     (semantic-mode 1)))
 

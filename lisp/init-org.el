@@ -56,6 +56,8 @@ it narrows to region, or Org subtree."
         ;; org v8
         org-odt-preferred-output-format "doc"
         org-tags-column 80
+        org-hide-emphasis-markers t
+        org-hide-leading-stars t
         org-latex-preview-ltxpng-directory "~/.emacs.d/data/ltxpng/"
         ;; org-startup-indented t
         ;; {{ org 8.2.6 has some performance issue. Here is the workaround.
@@ -89,10 +91,15 @@ it narrows to region, or Org subtree."
                  'pcomplete-completions-at-point)
     (flyspell-mode -1)
     (show-paren-mode 1)
+    (setq-local company-backends (remove 'company-dabbrev company-backends))
     ;; display wrapped lines instead of truncated lines
     (setq truncate-lines nil)
     (setq word-wrap t)
-    (turn-on-stripe-table-mode))
+    (turn-on-stripe-table-mode)
+    (font-lock-add-keywords
+     nil
+     '(("\\\\(\\([^^@]*?\\)\\\\)" 1 font-lock-constant-face)
+       ("\\\\\\[\\([^^@]*?\\)\\\\\\]" 1 font-lock-constant-face))))
 
   (add-hook 'org-mode-hook 'org-mode-hook-setup)
 

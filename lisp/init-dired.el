@@ -33,7 +33,6 @@ if no files marked, always operate on current line in dired-mode
                 (dired-k-no-revert))))
   (require 'dired-x)
   (require 'dired+)
-  (setq-default dired-omit-files-p t)
   (setq dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$\\|^\\..*$"))
 
 (with-eval-after-load 'dired+
