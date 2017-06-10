@@ -259,4 +259,13 @@ The app is chosen from your OS's preference."
                            (start-process "" nil "xdg-open" path)))
               file-list))))))
 
+(defun narrow-or-widen-dwim (&optional arg)
+    "If the buffer is narrowed, it widens. Otherwise,it narrows
+to region, or Org subtree."
+    (interactive "P")
+    (cond ((buffer-narrowed-p) (widen))
+          ((region-active-p) (narrow-to-region (region-beginning) (region-end)))
+          ((eq major-mode 'org-mode) (org-narrow-to-subtree))
+          (t (if arg (narrow-to-page) (narrow-to-defun)))))
+
 (provide 'init-utils)

@@ -51,7 +51,8 @@
 (defun common-cc-mode-setup ()
   "setup shared by all languages (java/groovy/c++ ...)"
   (turn-on-auto-fill)
-  (setq c-basic-offset 4)
+  (setq c-basic-offset 4
+        highlight-indentation-offset 4)
   ;; make DEL take all previous whitespace with it
   (c-toggle-hungry-state 1)
   (c-toggle-auto-newline -1)
@@ -61,18 +62,78 @@
   (fix-c-indent-offset-according-to-syntax-context 'func-decl-cont 0)
   (fix-c-indent-offset-according-to-syntax-context 'case-label 4))
 
+;; makefile support for rtags
+(defsubst rtags-locate-makefile (&optional makefile-name)
+  (locate-dominating-file default-directory (or makefile-name "Makefile")))
+
+(defun rtags-indexing-use-makefile (&optional name)
+  (interactive)
+  (if (rtags-is-indexed)
+      (message "Project indexed already !!")
+    (let ((root (rtags-locate-makefile name)))
+      (if root
+          (let ((default-directory root) ret)
+            (equal (shell-command (format "make -nk|%s -c -"
+                                          (expand-file-name "rc" rtags-path)))
+                   0))
+        (message "Makefile not found !!!")
+        nil))))
+
+(defun rtags-remove-current-project-cache (&optional force)
+  (interactive "P")
+  (let ((root (ignore-errors (projectile-project-root))))
+    (when (and root (or force (y-or-n-p (format "Delete %s"
+                                               (abbreviate-file-name root)))))
+      (let ((default-directory root))
+        (shell-command (format "%s -W %s"
+                               (expand-file-name "rc" rtags-path)
+                               default-directory))
+        (c-mode-normal-setup)))))
+
+(defun c-mode-rtags-setup ()
+  (setq-local eldoc-documentation-function 'rtags-eldoc-mine)
+  (local-set-key (kbd "M-.") 'rtags-find-symbol-at-point)
+  (local-set-key (kbd "M-,") 'rtags-location-stack-back)
+  (local-set-key (kbd "M-n") 'rtags-next-match)
+  (local-set-key (kbd "M-p") 'rtags-previous-match)
+  (local-set-key (kbd "C-c .") 'rtags-symbol-type)
+  (local-set-key (kbd "C-c C-k") 'rtags-remove-current-project-cache)
+  (irony-eldoc -1)
+  (ggtags-mode -1))
+
+(defun c-mode-try-use-rtags ()
+  (interactive)
+  (when (rtags-indexing-use-makefile)
+    (message "Rtags is ready !!")
+    (c-mode-rtags-setup)))
+
+(defun c-mode-normal-setup ()
+  (local-set-key [f10] 'compile)
+  (ggtags-mode 1)
+  (setq-local compile-command
+              '(ignore-errors
+                 (let ((root (rtags-locate-makefile)))
+                   (if root (concat "make -C " root)
+                     (let ((filename (buffer-file-name)))
+                       (concat "g++ "
+                               (string-join irony--compile-options " ") " "
+                               (file-name-nondirectory filename) " -o "
+                               (file-name-base filename)))))))
+  (irony-eldoc))
+
 (defun c-mode-setup ()
   "C/C++ only setup"
-  (local-set-key (kbd "C-x C-o") 'ff-find-other-file)
+  (bind-keys)
+  (local-set-key (kbd "C-c o") 'ff-find-other-file)
   (local-set-key (kbd "C-c b") 'clang-format-buffer)
   (local-set-key (kbd "C-c C-j") 'semantic-ia-fast-jump)
   (local-set-key (kbd "C-c C-v") 'semantic-decoration-include-visit)
+  (local-set-key [f9] 'c-mode-try-use-rtags)
 
   (setq cc-search-directories '("."
                                 "/usr/include"
                                 "/usr/local/include/*"
-                                "../*/include")
-        highlight-indentation-offset 4)
+                                "../*/include"))
   ;; make a #define be left-aligned
   (setq c-electric-pound-behavior '(alignleft))
 
@@ -81,26 +142,13 @@
     (add-to-list 'company-backends 'company-irony-c-headers)
 
     (irony-mode 1)
+    (rtags-start-process-unless-running)
 
     (if (cmake-ide--locate-cmakelists)
         (progn
           (local-set-key [f10] 'cmake-ide-compile)
-          (setq-local eldoc-documentation-function 'rtags-eldoc-mine)
-          (local-set-key (kbd "M-.") 'rtags-find-symbol-at-point)
-          (local-set-key (kbd "M-,") 'rtags-location-stack-back)
-          (local-set-key (kbd "M-n") 'rtags-next-match)
-          (local-set-key (kbd "M-p") 'rtags-previous-match)
-          (local-set-key (kbd "C-c .") 'rtags-symbol-type))
-      (local-set-key [f10] 'compile)
-      (ggtags-mode 1)
-      (setq-local compile-command
-                  '(ignore-errors
-                     (let ((filename (buffer-file-name)))
-                       (concat "g++ "
-                               (string-join irony--compile-options " ") " "
-                               (file-name-nondirectory filename) " -o "
-                               (file-name-base filename)))))
-      (irony-eldoc))))
+          (c-mode-rtags-setup))
+      (c-mode-normal-setup))))
 ;; donot use c-mode-common-hook or cc-mode-hook
 ;; because many major-modes use this hook
 (add-hook 'c-mode-common-hook

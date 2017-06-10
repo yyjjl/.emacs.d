@@ -1,5 +1,5 @@
 (with-eval-after-load 'org
-  ;; {{ NO spell check for embedded snippets
+  ;; NO spell check for embedded snippets
   (defun org-mode-is-code-snippet ()
     (let (rlt
           (begin-regexp "^[ \t]*#\\+begin_\\(src\\|html\\|latex\\)")
@@ -30,16 +30,6 @@
   (advice-add 'org-mode-flyspell-verify :around
               #'org-mode-flyspell-verify-hack)
 
-  ;; @see https://gist.github.com/mwfogleman/95cc60c87a9323876c6c
-  (defun narrow-or-widen-dwim ()
-    "If the buffer is narrowed, it widens. Otherwise,
-it narrows to region, or Org subtree."
-    (interactive)
-    (cond ((buffer-narrowed-p) (widen))
-          ((region-active-p) (narrow-to-region (region-beginning) (region-end)))
-          ((equal major-mode 'org-mode) (org-narrow-to-subtree))
-          (t (error "Please select a region to narrow to"))))
-
   ;; Various preferences
   (setq org-log-done t
         org-completion-use-ido t
@@ -53,6 +43,7 @@ it narrows to region, or Org subtree."
         org-export-kill-product-buffer-when-displayed t
         ;; org v7
         org-export-odt-preferred-output-format "doc"
+        org-export-with-sub-superscripts t
         ;; org v8
         org-odt-preferred-output-format "doc"
         org-tags-column 80
@@ -60,20 +51,20 @@ it narrows to region, or Org subtree."
         org-hide-leading-stars t
         org-latex-preview-ltxpng-directory "~/.emacs.d/data/ltxpng/"
         ;; org-startup-indented t
-        ;; {{ org 8.2.6 has some performance issue. Here is the workaround.
-        ;; @see http://punchagan.muse-amuse.in/posts/how-i-learnt-to-use-emacs-profiler.html
         org-agenda-inhibit-startup t       ;; ~50x speedup
         org-agenda-use-tag-inheritance nil ;; 3-4x speedup
-        ;; }}
         ;; org-pretty-entities t
-        org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
+        org-format-latex-options (plist-put org-format-latex-options :scale 1.5)
+        org-highlight-latex-and-related '(latex))
 
-  ;; Refile targets include this file and any file contributing to the agenda - up to 5 levels deep
+  ;; Refile targets include this file and any file contributing to the
+  ;; agenda - up to 5 levels deep
   (setq org-refile-targets (quote ((nil :maxlevel . 5)
                                    (org-agenda-files :maxlevel . 5))))
   ;; Targets start with the file name - allows creating level 1 tasks
   (setq org-refile-use-outline-path (quote file))
-  ;; Targets complete in steps so we start with filename, TAB shows the next level of targets etc
+  ;; Targets complete in steps so we start with filename, TAB shows
+  ;; the next level of targets etc
   (setq org-outline-path-complete-in-steps t)
 
   (setq org-todo-keywords
@@ -89,17 +80,11 @@ it narrows to region, or Org subtree."
     (make-local-variable 'completion-at-point-functions)
     (add-to-list 'completion-at-point-functions
                  'pcomplete-completions-at-point)
-    (flyspell-mode -1)
-    (show-paren-mode 1)
     (setq-local company-backends (remove 'company-dabbrev company-backends))
     ;; display wrapped lines instead of truncated lines
     (setq truncate-lines nil)
     (setq word-wrap t)
-    (turn-on-stripe-table-mode)
-    (font-lock-add-keywords
-     nil
-     '(("\\\\(\\([^^@]*?\\)\\\\)" 1 font-lock-constant-face)
-       ("\\\\\\[\\([^^@]*?\\)\\\\\\]" 1 font-lock-constant-face))))
+    (turn-on-stripe-table-mode))
 
   (add-hook 'org-mode-hook 'org-mode-hook-setup)
 

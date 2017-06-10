@@ -81,11 +81,6 @@
            ("C-c 4" . ispell-word)
            ("C-c q" . auto-fill-mode)
            ("C-x C-b" . ibuffer)
-           ;; narrow
-           ("C-x , ," . narrow-to-defun)
-           ("C-x , SPC" . widen)
-           ("C-x , p" . narrow-to-page)
-           ("C-x , r" . narrow-to-region)
            ("C-x m" . show-messages-buffer)
            ("M-/" . hippie-expand)
            ("RET" . newline-and-indent)
@@ -102,6 +97,7 @@
            ("C-c w l" . buf-move-right)
            ;; ace and avy
            ("C-x o" . ace-window)
+           ("C-x n n" . narrow-or-widen-dwim)
            ("C-:" . avy-goto-char)
            ("C-\"" . avy-goto-char-2)
            ("M-g l" . avy-goto-line)
