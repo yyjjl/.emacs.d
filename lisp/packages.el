@@ -29,7 +29,7 @@
                 window-numbering
                 htmlize
                 ibuffer-vc
-                easy-kill
+                easy-kill  f
                 fcitx))
 ;; theme
 (add-packages '(color-theme
@@ -39,8 +39,6 @@
                 rainbow-delimiters
                 ;; spaceline
                 rainbow-mode ;;  required by css-mode
-                ;; make buffer even line and odd line having different color
-                stripe-buffer
                 ;; ^L beautifier
                 page-break-lines
                 ;; header-line
@@ -52,7 +50,7 @@
 (add-packages '(popwin
                 expand-region
                 restclient company-restclient
-                dired+ dired-k
+                dired+
                 buffer-move
                 ;; clipbord tools
                 simpleclip
@@ -108,12 +106,13 @@
                 ghc
                 haskell-mode
                 shm hindent
-                company-cabal))
+                company-cabal
+                idris-mode))
 
 (add-packages '(irony-eldoc
                 irony
                 company-irony company-irony-c-headers
-                flycheck-irony
+                flycheck-irony clang-format
                 ggtags
                 rtags))
 
@@ -137,5 +136,9 @@
                 php-mode
                 gnuplot-mode
                 graphviz-dot-mode))
+
+(with-eval-after-load 'package-safe-delete
+  (setq package-safe-delete-required-packages
+        (hash-table-keys required-packages)))
 
 (package-utils-initialize)

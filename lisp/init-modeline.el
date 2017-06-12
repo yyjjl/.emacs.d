@@ -60,10 +60,10 @@
         (`interrupted (propertize "interrupted" 'face  'flycheck-fringe-warning))
         (`suspicious (propertize "???" 'face 'flycheck-fringe-error))
         (`finished (let-alist (flycheck-count-errors flycheck-current-errors)
-                      (concat (propertize (format "e%s" (or .error 0))
+                      (concat (propertize (format "E%s" (or .error 0))
                                           'face 'flycheck-fringe-error)
-                              "-"
-                              (propertize (format "w%s" (or .warning 0))
+                              "|"
+                              (propertize (format "W%s" (or .warning 0))
                                           'face 'flycheck-fringe-warning)))))))
 
 (defun mode-line-vc ()

@@ -42,13 +42,14 @@
 (defun get-remote-shell ()
   "Switch to remote shell"
   (interactive)
-  (let ((new-buffer-name (get-first-buffer-name "*ssh%d*")))
-    (if (file-remote-p default-directory)
-        (let ((explicit-shell-file-name "/bin/bash")
-              (buf (get-buffer-create new-buffer-name)))
-          (pop-to-buffer buf)
-          (shell buf))
-      (message "Host is can not be determined"))))
+  (let ((buf   (or (last-term-buffer (buffer-list) 'shell-mode)
+                   (get-buffer-create (get-first-buffer-name "*shell%d*")))))
+    (when buf
+      (pop-to-buffer buf)
+      (set-buffer buf)
+      (unless (eq major-mode 'shell-mode)
+        (let ((explicit-shell-file-name "/bin/bash"))
+          (shell buf))))))
 
 (defun get-term (&optional dir)
   (unless (featurep 'multi-term)

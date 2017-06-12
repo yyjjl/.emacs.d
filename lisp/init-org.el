@@ -83,8 +83,7 @@
     (setq-local company-backends (remove 'company-dabbrev company-backends))
     ;; display wrapped lines instead of truncated lines
     (setq truncate-lines nil)
-    (setq word-wrap t)
-    (turn-on-stripe-table-mode))
+    (setq word-wrap t))
 
   (add-hook 'org-mode-hook 'org-mode-hook-setup)
 

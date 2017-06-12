@@ -31,10 +31,6 @@
    haskell-process-suggest-remove-import-lines t
    haskell-process-auto-import-loaded-modules t
    haskell-stylish-on-save t)
-  (setq haskell-font-lock-symbols-alist
-        (append haskell-font-lock-symbols-alist
-                '(("*" . "×")
-                  ("/" . "÷"))))
 
   (hare-init)
   (remap-kbd "C-c C-r" "C-c r" haskell-mode-map)
@@ -83,5 +79,24 @@
              ("C-c C-c" . haskell-process-cabal-build)
              ("C-c C-z" . haskell-interactive-switch)
              ("C-c k" . haskell-interactive-mode-clear)))
+
+(with-eval-after-load 'haskell-font-lock
+  (setq haskell-font-lock-symbols-alist
+        (append haskell-font-lock-symbols-alist
+                '(("*" . "×")
+                  ("/" . "÷")))))
+
+(with-eval-after-load 'idris-mode
+  (require 'haskell-font-lock)
+  (font-lock-add-keywords 'idris-mode
+                          (haskell-font-lock-symbols-keywords))
+  (push 'idris-compiler-notes-mode
+        popwin:special-display-config)
+  (push '(idris-repl-mode
+          :height 0.4
+          :noselect nil
+          :position bottom)
+        popwin:special-display-config))
+
 
 (provide 'init-haskell)

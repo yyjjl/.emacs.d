@@ -14,7 +14,8 @@
 
 
 (with-eval-after-load 'cc-mode
-  (add-to-list 'c++-font-lock-extra-types "auto"))
+  (add-to-list 'c++-font-lock-extra-types "auto")
+  (add-to-list 'c++-font-lock-extra-types "nullptr"))
 
 (with-eval-after-load 'rtags
   (defun rtags-eldoc-mine ()
@@ -51,8 +52,7 @@
 (defun common-cc-mode-setup ()
   "setup shared by all languages (java/groovy/c++ ...)"
   (turn-on-auto-fill)
-  (setq c-basic-offset 4
-        highlight-indentation-offset 4)
+  (setq c-basic-offset 4)
   ;; make DEL take all previous whitespace with it
   (c-toggle-hungry-state 1)
   (c-toggle-auto-newline -1)
@@ -133,7 +133,8 @@
   (setq cc-search-directories '("."
                                 "/usr/include"
                                 "/usr/local/include/*"
-                                "../*/include"))
+                                "../*/include")
+        highlight-indentation-offset 4)
   ;; make a #define be left-aligned
   (setq c-electric-pound-behavior '(alignleft))
 
