@@ -74,7 +74,7 @@
            ("C-x R" . rename-this-file-and-buffer)
            ("C-x D" . delete-this-file)
            ("C-x W" . copy-this-file-to-new-file)
-           ("C-x c" . cleanup-buffer-safe)
+           ("C-x C" . cleanup-buffer-safe)
            ("C-=" . text-scale-increase)
            ("C--" . text-scale-decrease)
            ;; flyspell

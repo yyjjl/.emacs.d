@@ -42,6 +42,7 @@
 (defun elisp-mode-hooks ()
   "lisp-mode-hooks"
   (my-lisp-setup)
+  (define-key emacs-lisp-mode-map (kbd "C-c e") 'macrostep-expand)
   (unless (is-buffer-file-temp)
     (when (require 'eldoc nil t)
       (setq eldoc-idle-delay 0.2)

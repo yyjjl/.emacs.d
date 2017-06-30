@@ -20,6 +20,10 @@
   (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
 (add-hook 'term-exec-hook 'term-mode-utf8-setup)
 
+(defun directory-equal-p (d1 d2)
+  (equal (expand-file-name (concat d1 "/"))
+         (expand-file-name (concat d2 "/"))))
+
 
 (defun last-term-buffer (buffers mode &optional dir)
   "Return most recently used term buffer."
@@ -28,9 +32,9 @@
            (info (with-current-buffer buf
                    (cons major-mode default-directory))))
       (if (and (eq mode (car info))
-              (equal (or dir default-directory) (cdr info)))
+              (directory-equal-p (or dir default-directory) (cdr info)))
           buf
-        (last-term-buffer (cdr buffers) mode)))))
+        (last-term-buffer (cdr buffers) mode dir)))))
 
 (defun get-first-buffer-name (fmt)
   (let ((index 1) name)
@@ -72,7 +76,10 @@
     none exists, or if the current buffer is already a term."
   (interactive)
   (if (not (file-remote-p default-directory))
-      (pop-to-buffer (get-term (ignore-errors (projectile-project-root))))
+      (unless (eq major-mode 'term-mode)
+        (pop-to-buffer (get-term (or (and (bound-and-true-p cmake-ide-enabled)
+                                         cmake-ide-build-dir)
+                                     (ignore-errors (projectile-project-root))))))
     (get-remote-shell)))
 
 (with-eval-after-load 'multi-term
@@ -85,6 +92,12 @@
                   ("M-]" . multi-term-next)
                   ("M-[" . multi-term-prev))))
   (setq multi-term-dedicated-close-back-to-open-buffer-p t))
+
+(defun term-mode-setup ()
+  (dirtrack-mode 1)
+  (setq dirtrack-list '("^#.*?in \\(.*?\\) \\[[:0-9]*\\]" 1 nil)))
+
+(add-hook 'term-mode-hook 'term-mode-setup)
 
 (global-set-key [f8] 'get-term-or-shell)
 

@@ -108,7 +108,6 @@
     (c-mode-rtags-setup)))
 
 (defun c-mode-normal-setup ()
-  (local-set-key [f10] 'compile)
   (ggtags-mode 1)
   (setq-local compile-command
               '(ignore-errors
@@ -121,6 +120,14 @@
                                (file-name-base filename)))))))
   (irony-eldoc))
 
+(defvar-local cmake-ide-enabled nil)
+
+(defun cc-mode-compile ()
+  (interactive)
+  (call-interactively
+   (if cmake-ide-enabled 'cmake-ide-compile
+     'compile)))
+
 (defun c-mode-setup ()
   "C/C++ only setup"
   (bind-keys)
@@ -129,6 +136,7 @@
   (local-set-key (kbd "C-c C-j") 'semantic-ia-fast-jump)
   (local-set-key (kbd "C-c C-v") 'semantic-decoration-include-visit)
   (local-set-key [f9] 'c-mode-try-use-rtags)
+  (local-set-key [f10] 'cc-mode-compile)
 
   (setq cc-search-directories '("."
                                 "/usr/include"
@@ -147,7 +155,7 @@
 
     (if (cmake-ide--locate-cmakelists)
         (progn
-          (local-set-key [f10] 'cmake-ide-compile)
+          (setq-local cmake-ide-enabled t)
           (c-mode-rtags-setup))
       (c-mode-normal-setup))))
 ;; donot use c-mode-common-hook or cc-mode-hook
@@ -165,7 +173,10 @@
 
 
 (with-eval-after-load 'irony
-  (setq irony-additional-clang-options '("-Wall" "-std=c++14"))
+  (setq irony-additional-clang-options
+        '("-Wall"
+          "-I/usr/lib/gcc/x86_64-linux-gnu/5/include/"
+          "-std=c++14"))
 
   (defun my-irony-mode-hook ()
     (define-key irony-mode-map [remap completion-at-point]

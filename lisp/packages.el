@@ -15,6 +15,7 @@
 
 ;; core packages
 (add-packages '(yasnippet
+                auto-yasnippet
                 company company-statistics
                 session
                 multi-term
@@ -52,6 +53,7 @@
                 restclient company-restclient
                 dired+
                 buffer-move
+                macrostep
                 ;; clipbord tools
                 simpleclip
                 ;; quick switch window
@@ -65,8 +67,7 @@
                 avy
                 wgrep))
 
-(add-packages '(magit
-                gitignore-mode
+(add-packages '(gitignore-mode
                 gitconfig-mode
                 git-messenger
                 git-gutter-fringe git-gutter
@@ -116,8 +117,7 @@
                 ggtags
                 rtags))
 
-(add-packages '(company-shell
-                sql-indent
+(add-packages '(sql-indent
                 ;; yaml format
                 yaml-mode
                 ;; haml format
@@ -135,6 +135,8 @@
                 cmake-mode cmake-font-lock cmake-ide
                 php-mode
                 gnuplot-mode
+                orgtbl-aggregate
+                csharp-mode
                 graphviz-dot-mode))
 
 (with-eval-after-load 'package-safe-delete

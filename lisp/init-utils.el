@@ -58,6 +58,18 @@
           (write-file (expand-file-name name (file-name-directory this-name))))
         (switch-to-buffer buf)))))
 
+(defun copy-file-name (&optional args)
+  (interactive "P")
+  (let ((path (buffer-file-name)))
+    (cond ((and path args) (setq path (file-name-directory path)))
+          ((not path) (setq path default-directory)))
+    (setq path (if (and path args) (file-name-directory path)
+                 (or path default-directory)))
+    (if path
+        (progn (message "Copy => %s" path)
+               (kill-new path))
+      (message "Nothing to do"))))
+
 ;;----------------------------------------------------------------------------
 ;; Rename the current file
 ;;----------------------------------------------------------------------------

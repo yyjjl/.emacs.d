@@ -84,7 +84,7 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
   "
   ^_p_^     [_c_]cut       [_s_]string
 _b_   _f_   [_o_]ok        [_y_]yank
-  ^_n_^     [_r_]reset     [_w_]copy
+  ^_n_^     [_m_]mark     [_w_]copy
 ^^^^        [_x_]exchange  [_/_]undo
 ^^^^        [_a_]line beg  [_e_]line end
 "
@@ -97,7 +97,7 @@ _b_   _f_   [_o_]ok        [_y_]yank
   ("x" exchange-point-and-mark nil)
   ("w" copy-rectangle-as-kill nil)
   ("c" cut-rectangle nil)
-  ("r" (if (region-active-p)
+  ("m" (if (region-active-p)
            (deactivate-mark)
          (rectangle-mark-mode 1)) nil)
   ("y" yank-rectangle nil)
