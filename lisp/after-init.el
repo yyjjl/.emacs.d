@@ -16,6 +16,7 @@
   ;; global-modes
   (global-git-gutter-mode 1)
   (global-linum-mode 1)
+  (hlinum-activate)
   (global-company-mode 1)
   (global-flycheck-mode 1)
   (global-subword-mode 1)
@@ -75,8 +76,8 @@
            ("C-x D" . delete-this-file)
            ("C-x W" . copy-this-file-to-new-file)
            ("C-x C" . cleanup-buffer-safe)
-           ("C-=" . text-scale-increase)
-           ("C--" . text-scale-decrease)
+           ;; ("C-=" . text-scale-increase)
+           ;; ("C--" . text-scale-decrease)
            ;; flyspell
            ("C-c 4" . ispell-word)
            ("C-c q" . auto-fill-mode)

@@ -11,6 +11,33 @@
   ;; new value
   (add-to-list 'c-offsets-alist (cons key  val)))
 
+;; @see
+;; https://emacs.stackexchange.com/questions/14563/how-to-automatically-create-neat-c-comment-blocks-while-typing
+(defun cc-prettify-c-block-comment (orig-fun &rest args)
+  (let* ((first-comment-line (looking-back "/\\*\\s-*.*"))
+         (star-col-num (when first-comment-line
+                         (save-excursion
+                           (re-search-backward "/\\*")
+                           (1+ (current-column))))))
+    (print first-comment-line)
+    (apply orig-fun args)
+    (when first-comment-line
+      (save-excursion
+        (newline)
+        (dotimes (cnt star-col-num)
+          (insert " "))
+        (move-to-column star-col-num)
+        (insert "*/"))
+      (move-to-column star-col-num)
+      ;; comment this line if using bsd style
+      (insert "*")))
+  ;; Ensure one space between the asterisk and the comment
+  (when (not (looking-back " "))
+    (insert " ")))
+(advice-add 'c-indent-new-comment-line :around #'cc-prettify-c-block-comment)
+;; (advice-remove 'c-indent-new-comment-line #'cc-prettify-c-block-comment)
+
+
 
 
 (with-eval-after-load 'cc-mode
@@ -34,6 +61,7 @@
                     (propertize (substring type 0 (string-match "=>" type))
                                 'face
                                 'font-lock-keyword-face))))))
+  (setq rtags-display-result-backend 'ivy)
   (setq rtags-completions-enabled nil
         rtags-autostart-diagnostics nil))
 
@@ -112,10 +140,13 @@
   (setq-local compile-command
               '(ignore-errors
                  (let ((root (rtags-locate-makefile)))
-                   (if root (concat "make -C " root)
+                   (if (and cmake-ide-enabled  root) (concat "make -C " root)
                      (let ((filename (buffer-file-name)))
                        (concat "g++ "
-                               (string-join irony--compile-options " ") " "
+                               (when (bound-and-true-p irony-mode)
+                                 (string-join
+                                  (irony--adjust-compile-options) " "))
+                               " "
                                (file-name-nondirectory filename) " -o "
                                (file-name-base filename)))))))
   (irony-eldoc))

@@ -1,7 +1,6 @@
 (add-hook 'sh-mode-hook
           '(lambda ()
              (unless (is-buffer-file-temp)
-               (add-to-list 'company-backends 'company-shell)
                (add-to-list 'company-backends 'company-files)
                (flycheck-mode 1))))
 

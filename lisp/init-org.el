@@ -1,4 +1,21 @@
 (with-eval-after-load 'org
+  (defun kill-hidden-http-buffer ()
+    (dolist (buf (buffer-list))
+      (when (and (string-prefix-p " *http " (buffer-name buf))
+                (let ((proc (get-buffer-process buf)))
+                  (not (and proc (process-live-p proc)))))
+        (kill-buffer buf))))
+  ;; don't prompt me to confirm everytime I want to evaluate a block
+  (setq org-confirm-babel-evaluate nil)
+
+  ;; display/update images in the buffer after I evaluate
+  (add-hook 'org-babel-after-execute-hook
+            #'(lambda ()
+                (kill-hidden-http-buffer)
+                (org-display-inline-images t))
+            'append)
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               '((ipython . t)))
   ;; NO spell check for embedded snippets
   (defun org-mode-is-code-snippet ()
     (let (rlt
@@ -85,9 +102,12 @@
     (setq truncate-lines nil)
     (setq word-wrap t))
 
+  (add-hook 'org-src-mode-hook #'(lambda () (flycheck-mode -1)))
+
   (add-hook 'org-mode-hook 'org-mode-hook-setup)
 
   (bind-keys :map org-mode-map
+             ("C-c o" . ob-ipython-inspect)
              ("C-c c i" . org-clock-in)
              ("C-c c o" . org-clock-out)
              ("C-c c c" . org-clock-in-last)
@@ -150,6 +170,7 @@
       map)))
 
 (with-eval-after-load 'ox-latex
+  (add-to-list 'org-latex-minted-langs '(ipython "python"))
   (setq org-latex-pdf-process
         '("xelatex -shell-escape -interaction nonstopmode %f"
           "xelatex -shell-escape -interaction nonstopmode %f"))
@@ -181,13 +202,13 @@
                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
     (add-to-list  'org-latex-classes
                   `("cn-book"
-                        ,(concat "\\documentclass[11pt,openany]{book}\n"
-                                 common)
-                        ("\\chapter{%s}" . "\\chapter*{%s}")
-                        ("\\section{%s}" . "\\section*{%s}")
-                        ("\\subsection{%s}" . "\\subsection*{%s}")
-                        ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                        ("\\paragraph{%s}" . "\\paragraph*{%s}")))))
+                    ,(concat "\\documentclass[11pt,openany]{book}\n"
+                             common)
+                    ("\\chapter{%s}" . "\\chapter*{%s}")
+                    ("\\section{%s}" . "\\section*{%s}")
+                    ("\\subsection{%s}" . "\\subsection*{%s}")
+                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                    ("\\paragraph{%s}" . "\\paragraph*{%s}")))))
 
 (with-eval-after-load 'ox-beamer
   (add-to-list 'org-latex-classes

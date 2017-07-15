@@ -62,8 +62,8 @@
     (unless buf
       (if dir
           (let ((default-directory dir))
-            (setq buf (multi-term-get-buffer current-prefix-arg)))
-        (setq buf (multi-term-get-buffer current-prefix-arg)))
+            (setq buf (multi-term-get-buffer)))
+        (setq buf (multi-term-get-buffer)))
       (setq multi-term-buffer-list
             (nconc multi-term-buffer-list (list buf)))
       (set-buffer buf)
@@ -71,15 +71,17 @@
       (multi-term-internal))
     buf))
 
-(defun get-term-or-shell ()
+(defun get-term-or-shell (&optional arg)
   "Switch to the term buffer last used, or create a new one if
     none exists, or if the current buffer is already a term."
-  (interactive)
+  (interactive "P")
   (if (not (file-remote-p default-directory))
       (unless (eq major-mode 'term-mode)
-        (pop-to-buffer (get-term (or (and (bound-and-true-p cmake-ide-enabled)
-                                         cmake-ide-build-dir)
-                                     (ignore-errors (projectile-project-root))))))
+        (pop-to-buffer
+         (get-term (or (and arg default-directory)
+                       (and (bound-and-true-p cmake-ide-enabled)
+                            cmake-ide-build-dir)
+                       (ignore-errors (projectile-project-root))))))
     (get-remote-shell)))
 
 (with-eval-after-load 'multi-term

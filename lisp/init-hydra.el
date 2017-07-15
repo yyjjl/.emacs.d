@@ -73,7 +73,6 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
            ("C-x _" . hydra-resize-window/shrink-window))
 
 
-(define-key global-map (kbd "C-x SPC") 'hydra-rectangle/body)
 (defun cut-rectangle (start end &optional fill)
   (interactive "r")
   (copy-rectangle-as-kill start end)
@@ -114,7 +113,7 @@ _b_   _f_   [_o_]ok        [_y_]yank
 ^^^^^^          ^Actions^       ^Quit^
 ^^^^^^--------------------------------------------
 ^ ^ _p_ ^ ^     _SPC_ repeat     _c_ancel
-_<_ ^✜^ _>_     _/_ undo         _q_uit
+_<_ ^✜^ _>_     _q_uit
 ^ ^ _n_ ^ ^
 "
     ;; arrows
@@ -124,11 +123,12 @@ _<_ ^✜^ _>_     _/_ undo         _q_uit
     (">" ivy-end-of-buffer)
     ;; actions
     ("SPC" hydra-repeat)
-    ("/" ivy-undo)
     ;; exit
     ("q" keyboard-escape-quit :exit t)
     ("c" nil))
 
   (define-key ivy-minibuffer-map (kbd "C-j") 'hydra-ivy/body))
+
+
 
 (provide 'init-hydra)

@@ -43,13 +43,17 @@ Archive with high priority will be used when install a package."
   (length (member (package-desc-archive archive)
                   package-archive-priority-alist)))
 
+(defun package-get-archive-by-name (name archives)
+  (unless (null archives)
+    (if (string= name (package-desc-archive (car archives)))
+        (car archives)
+      (package-get-archive-by-name name (cdr archives)))))
+
 (defun package-set-right-archive (pkg &optional archive-name)
   "Set right archive content by priority."
   (let* ((pkg-archives (cdr pkg)) archive)
     (when archive-name
-      (setq archive (find archive-name pkg-archives
-                          :test (lambda (name info)
-                                  (string= name (package-desc-archive info))))))
+      (setq archive (package-get-archive-by-name archive-name pkg-archives)))
     (when (and (not archive) package-use-priority)
       (setq archive (max-of pkg-archives #'package--archive-priority)))
     (when archive

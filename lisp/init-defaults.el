@@ -67,18 +67,17 @@
 ;; default prog-mode setup
 (defun generic-prog-mode-hook-setup ()
   (try-turn-on-semantic-mode)
-  (unless (is-buffer-file-temp)
-    ;; auto insert closing pair
-    (electric-pair-mode 1)
-    (electric-layout-mode 1)
-    ;; eldoc, show API doc in minibuffer echo area
-    (eldoc-mode 1)
-    (show-paren-mode 1)
-    (hs-minor-mode 1)
-    (when (< (buffer-size) large-buffer-size)
-      (highlight-indentation-mode))
-    ;; show trailing spaces in a programming mode
-    (setq show-trailing-whitespace t)))
+  ;; auto insert closing pair
+  (electric-pair-mode 1)
+  (electric-layout-mode 1)
+  ;; eldoc, show API doc in minibuffer echo area
+  (eldoc-mode 1)
+  (show-paren-mode 1)
+  (hs-minor-mode 1)
+  (when (< (buffer-size) large-buffer-size)
+    (highlight-indent-guides-mode))
+  ;; show trailing spaces in a programming mode
+  (setq show-trailing-whitespace t))
 (add-hook 'prog-mode-hook 'generic-prog-mode-hook-setup)
 
 ;; display long lines in truncated style (end line with $)

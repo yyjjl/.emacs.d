@@ -36,6 +36,7 @@
 (add-packages '(color-theme
                 ;; helper control fringe(edge of a window) style
                 fringe-helper
+                hlinum
                 ;; highlight braces with their depth
                 rainbow-delimiters
                 ;; spaceline
@@ -100,6 +101,7 @@
                 emmet-mode))
 
 (add-packages '(elpy
+                ob-ipython
                 py-isort))
 
 (add-packages '(company-ghc
@@ -115,7 +117,8 @@
                 company-irony company-irony-c-headers
                 flycheck-irony clang-format
                 ggtags
-                rtags))
+                rtags
+                ivy-rtags))
 
 (add-packages '(sql-indent
                 ;; yaml format
@@ -135,7 +138,6 @@
                 cmake-mode cmake-font-lock cmake-ide
                 php-mode
                 gnuplot-mode
-                orgtbl-aggregate
                 csharp-mode
                 graphviz-dot-mode))
 

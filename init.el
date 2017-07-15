@@ -82,6 +82,7 @@
 (require 'init-windows)
 (require 'init-hs-minor-mode)
 (require 'init-doxygen)
+;; (require 'init-ein)
 (require 'init-extra)
 (require 'after-init)
 
@@ -103,7 +104,7 @@
  '(auto-save-list-file-prefix (in-data-directory "auto-save-list/.saves-"))
  '(backup-directory-alist (list (cons "." (in-data-directory "backups"))))
  '(bookmark-default-file (in-data-directory "bookmarks"))
- '(cmake-ide-rdm-executable (in-data-directory "rtags-build/bin/rdm"))
+ '(cmake-ide-rdm-executable (in-data-directory "rtags/bin/rdm"))
  '(company-statistics-file (in-data-directory "company-statistics-cache.el"))
  '(eshell-directory-name (in-data-directory "eshell/"))
  '(flycheck-html-tidy-executable (in-data-directory "tidy"))
@@ -116,7 +117,7 @@
  '(org-publish-timestamp-directory (in-data-directory ".org-timestamps/"))
  '(projectile-known-projects-file (in-data-directory "projectile-bookmarks.eld"))
  '(recentf-save-file (in-data-directory "recentf"))
- '(rtags-path (in-data-directory "rtags-build/bin"))
+ '(rtags-path (in-data-directory "rtags/bin"))
  '(save-place-file (in-data-directory "places"))
  '(savehist-file (in-data-directory "history"))
  '(semanticdb-default-save-directory (in-data-directory "semanticdb/"))
@@ -131,7 +132,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+)
 
 (setq file-name-handler-alist file-name-handler-alist-tmp)
 (put 'scroll-left 'disabled nil)

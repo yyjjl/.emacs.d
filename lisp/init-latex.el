@@ -38,9 +38,10 @@
                        TeX-command-default)))
         (TeX-command command  'TeX-master-file -1))))
 
-  (add-to-list 'TeX-command-list
-               '("XeLaTeX" "%`xelatex -shell-escape%(mode)%' %t"
-                 TeX-run-TeX nil t))
+  (add-to-list
+   'TeX-command-list
+   '("XeLaTeX" "%`xelatex -interaction nonstopmode -shell-escape%(mode)%' %t"
+     TeX-run-TeX nil t))
 
   (setq TeX-auto-save t
         TeX-parse-self t

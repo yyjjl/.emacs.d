@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: ipython block
+# key: ipyb
+# --
+#+BEGIN_SRC ipython :session ${1::file ${2:figure.svg} }:exports ${3:both} ${4::async t}
+$0
+#+END_SRC
+    

@@ -4,12 +4,12 @@
           shell-mode
           dictionary-mode
           erc-mode
+          org-mode
           browse-kill-ring-mode
           etags-select-mode
           dired-mode
           help-mode
           text-mode
-          org-mode
           fundamental-mode
           jabber-roster-mode
           jabber-chat-mode

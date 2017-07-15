@@ -5,15 +5,14 @@
            ("C-c v r" . vr/replace)
            ("C-c v m" . vr/mc-mark)
 
-           ("C-c m ." . mc/mark-next-like-this)
-           ("C-c m ," . mc/mark-previous-like-this)
-           ("C-c m m" . mc/mark-all-like-this)
-           ("C-c m p" . mc/mark-pop)
-           ("C-c m d" . mc/mark-all-like-this-dwim)
+           ("C-c m ." . mc-hydra/mc/mark-next-like-this)
+           ("C-c m ," . mc-hydra/mc/mark-previous-like-this)
+           ("C-c m P" . mc/mark-pop)
+           ("C-c m m" . mc/mark-all-like-this-dwim)
 
            ("C-c m l" . mc/edit-lines)
            ("C-c m e" . mc/edit-ends-of-lines)
-           ("C-c m b" . mc/edit-beginnings-of-lines)
+           ("C-c m a" . mc/edit-beginnings-of-lines)
 
            ("C-c m n" . mc/skip-to-next-like-this)
            ("C-c m p" . mc/skip-to-previous-like-this)
@@ -23,9 +22,6 @@
            ("C-c m L" . mc/insert-letters)
            ("C-c m s" . mc/sort-regions)
            ("C-c m R" . mc/reverse-regions))
-
-(with-eval-after-load 'indent-guide
-  (setq indent-guide-recursive t))
 
 (with-eval-after-load 'picture
   (defhydra hydra-picture-move (:pre (setq hydra-is-helpful nil) ;; do not show lv

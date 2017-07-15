@@ -34,7 +34,8 @@
 (global-set-key (kbd "C-h z") 'zeal-at-point)
 (global-set-key (kbd "C-h Z") 'zeal-at-point-search)
 (with-eval-after-load 'zeal-at-point
-  (setf (cdr (assoc 'c++-mode zeal-at-point-mode-alist)) "cpp"))
+  (setf (cdr (assoc 'c++-mode zeal-at-point-mode-alist)) "cpp"
+        (cdr (assoc 'python-mode zeal-at-point-mode-alist)) "python"))
 
 ;;  start dictionary lookup
 (autoload 'sdcv-search "sdcv" nil t)
@@ -104,5 +105,10 @@
       (replace-match "\\1 \\2" nil nil))))
 
 (global-set-key (kbd "M-Q") 'insert-space-around-chinese)
+
+
+(with-eval-after-load 'highlight-indent-guides
+  (setq highlight-indent-guides-method 'character
+        highlight-indent-guides-character ?\|))
 
 (provide 'init-extra)

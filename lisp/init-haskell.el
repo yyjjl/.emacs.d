@@ -1,21 +1,31 @@
 (with-eval-after-load 'shm
-  (defun shm/tab-or-close ()
-    (interactive)
+  (defun shm/tab-or-close (fn &rest args)
     (if (looking-at ")\\|]\\|}\\|`")
         (forward-char 1)
-      (shm/tab)))
+      (apply fn args)))
+  (advice-add 'shm/tab :around #'shm/tab-or-close)
+
   (bind-keys :map shm-map
              ("C-c C-^") ("C-c 6" . shm/swing-up)
              ("C-c C-_") ("C-c -" . shm/insert-underscore)
              ("C-c C-e") ("C-c C-j")
              ("C-c e" . shm/export)
-             ("C-c j" . shm/swing-down)
-             ("<tab>" . shm/tab-or-close)))
+             ("C-c j" . shm/swing-down)))
 
 (with-eval-after-load 'hindent
+  (defun hindent-reformat-decl ()
+    "Work with `align'"
+    (interactive)
+    (let ((start-end (hindent-decl-points)))
+      (when start-end
+        (let ((beg (car start-end))
+              (end (cdr start-end)))
+          (hindent-reformat-region beg end t)
+          (align beg end)))))
+
   (defun force-hindent-indent-size (org-fn)
     (list* "--tab-size" "4" (apply org-fn '())))
-  (advice-add 'hindent-extra-arguments :around  #'force-hindent-indent-size))
+  (advice-add 'hindent-extra-arguments :around #'force-hindent-indent-size))
 
 (with-eval-after-load 'haskell-mode
   (setq
@@ -24,21 +34,20 @@
    haskell-font-lock-symbols t
    haskell-notify-p t
    ;; To enable tags generation on save.
-   haskell-tags-on-save t
+   haskell-tags-on-save nil
    ;; Remove annoying error popups
    haskell-interactive-popup-errors nil
    ;; Better import handling
    haskell-process-suggest-remove-import-lines t
    haskell-process-auto-import-loaded-modules t
-   haskell-stylish-on-save t)
+   haskell-stylish-on-save nil)
 
   (hare-init)
   (remap-kbd "C-c C-r" "C-c r" haskell-mode-map)
 
   (bind-keys :map haskell-mode-map
-             ("C-c s" . ghc-sort-lines)
-             ("C-'" . ghc-complete)
-             ("C-c C-s" . ghc-case-split)
+             ("C-c b" . haskell-mode-stylish-buffer)
+             ("C-c s" . haskell-sort-imports)
              ("M-." . haskell-mode-tag-find)
              ("C-c C-=") ("C-c =" . haskell-indent-insert-equal)
              ("C-c C-o") ("C-c o" . haskell-indent-insert-otherwise)
@@ -50,27 +59,29 @@
              ("C-c C-z" . haskell-interactive-switch)
              ("C-c k" . haskell-interactive-mode-clear)
              ("C-c a b" . haskell-process-cabal-build)
-             ("C-c a a" . haskell-process-cabal)
-             ("C-c M-n") ("C-c C-n" . ghc-goto-next-hole)
-             ("C-c M-p") ("C-c C-p" . ghc-goto-prev-hole))
-  (add-hook 'haskell-mode-hook
-            (lambda ()
-              (rainbow-delimiters-mode 1)
-              (unless (is-buffer-file-temp)
-                (ghc-init)
-                (define-key haskell-mode-map
-                  (kbd "C-c <tab>") 'haskell-process-do-info)
-                (define-key haskell-mode-map
-                  (kbd "C-c C-t") 'haskell-process-do-type)
-                (add-to-list 'company-backends 'company-ghc)
-                (add-to-list 'company-backends 'company-cabal)
-                (add-to-list 'company-backends 'company-ghci)
-                (haskell-doc-mode 1))
-              (hindent-mode 1)
-              ;; haskell-indentation-mode is incompatible with shm
-              ;; (haskell-indentation-mode -1)
-              (turn-on-haskell-indent)
-              (structured-haskell-mode 1))))
+             ("C-c a a" . haskell-process-cabal))
+
+  (defun haskell-mode-setup ()
+    (rainbow-delimiters-mode 1)
+    (haskell-decl-scan-mode 1)
+    (unless (is-buffer-file-temp)
+      (ghc-init)
+
+      (define-key haskell-mode-map
+        (kbd "C-c <tab>") 'haskell-process-do-info)
+      (define-key haskell-mode-map
+        (kbd "C-c C-t") 'haskell-process-do-type)
+      (add-to-list 'company-backends 'company-ghc)
+      (add-to-list 'company-backends 'company-cabal)
+      (add-to-list 'company-backends 'company-ghci)
+      (haskell-doc-mode 1))
+    (hindent-mode 1)
+    ;; haskell-indentation-mode is incompatible with shm
+    ;; (haskell-indentation-mode -1)
+    (turn-on-haskell-indent)
+    (structured-haskell-mode 1))
+
+  (add-hook 'haskell-mode-hook #'haskell-mode-setup))
 
 (with-eval-after-load 'haskell-cabal
   (bind-keys :map haskell-cabal-mode-map
@@ -97,6 +108,24 @@
           :noselect nil
           :position bottom)
         popwin:special-display-config))
+
+(with-eval-after-load 'align
+  (add-to-list 'align-rules-list
+               '(haskell-types
+                 (regexp . "\\(\\s-+\\)\\(::\\|∷\\)\\s-+")
+                 (modes quote (haskell-mode literate-haskell-mode))))
+  (add-to-list 'align-rules-list
+               '(haskell-assignment
+                 (regexp . "\\(\\s-+\\)=\\s-+")
+                 (modes quote (haskell-mode literate-haskell-mode))))
+  (add-to-list 'align-rules-list
+               '(haskell-arrows
+                 (regexp . "\\(\\s-+\\)\\(->\\|→\\)\\s-+")
+                 (modes quote (haskell-mode literate-haskell-mode))))
+  (add-to-list 'align-rules-list
+               '(haskell-left-arrows
+                 (regexp . "\\(\\s-+\\)\\(<-\\|←\\)\\s-+")
+                 (modes quote (haskell-mode literate-haskell-mode)))))
 
 
 (provide 'init-haskell)

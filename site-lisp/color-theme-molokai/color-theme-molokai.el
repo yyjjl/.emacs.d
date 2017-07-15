@@ -249,6 +249,8 @@
         (:underline (:style line :color "#dc752f")))
        (t (:background "#dc752f" :inherit bold :underline t))))
 
+     (linum-highlight-face ((t (:inherit default :foreground "orange red"))))
+     (shm-current-face ((t (:inherit hl-sexp-face))))
      (ivy-highlight-face ((t (:background "#444155")))))))
 
 (provide 'color-theme-molokai)
