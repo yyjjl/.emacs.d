@@ -48,7 +48,7 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
     ("<tab>" org-cycle "cycle")
     ("RET" nil))
 
-  (bind-keys :map org-mode-map
+  (define-keys :map org-mode-map
              ("<" . (lambda () (interactive)
                       (if (looking-back "^\\s-*")
                           (hydra-org-template/body)
@@ -67,7 +67,7 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
   ("-" shrink-window  "shrink")
   ("RET" nil "quit"))
 
-(bind-keys ("C-x {" . hydra-resize-window/shrink-window-horizontally)
+(define-keys ("C-x {" . hydra-resize-window/shrink-window-horizontally)
            ("C-x }" . hydra-resize-window/enlarge-window-horizontally)
            ("C-x ^" . hydra-resize-window/enlarge-window)
            ("C-x _" . hydra-resize-window/shrink-window))

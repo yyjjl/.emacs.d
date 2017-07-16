@@ -26,9 +26,9 @@
         python-shell-interpreter-args "--simple-prompt -i"
         elpy-rpc-python-command "python3"
         elpy-modules (delete 'elpy-module-flymake elpy-modules))
-  (bind-keys :map elpy-mode-map
-             ("C-c C-n" . nil)
-             ("C-c C-p" . nil)))
+  (define-keys :map elpy-mode-map
+    ("C-c C-n" . nil)
+    ("C-c C-p" . nil)))
 (defvar pytest-executable "pytest")
 (defvar pytest-cmd-flags "")
 (defconst pytest-cmd-fmt "%s %s %s\n")

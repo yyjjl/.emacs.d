@@ -37,8 +37,6 @@
                           collecting (expand-file-name dir))))))
 
 (require 'init-packages)
-;; need bind-key immediately
-(require 'bind-key)
 ;; some important tool function
 (require 'init-vars)
 (require 'init-utils)

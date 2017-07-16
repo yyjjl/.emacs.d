@@ -10,6 +10,23 @@
          retval)
      ,@clean-up))
 
+(cl-defun remove-keywords (rest)
+  (unless (null rest)
+    (if (keywordp (car rest))
+        (remove-keywords (cddr rest))
+      (cons (car rest) (remove-keywords (cdr rest))))))
+
+(cl-defmacro define-keys
+    (&rest keys &key (prefix "") (map 'global-map) &allow-other-keys)
+  "Define multiple keys in one expression"
+  `(progn
+     ,@(mapcar (lambda (key)
+                 (let ((k (car key))
+                       (f (cdr key)))
+                   `(define-key ,map
+                      ,(if (vectorp k) k `(kbd ,(concat prefix " " k))) ',f)))
+               (remove-keywords keys))))
+
 ;;--------------------------------------------------------
 ;; Handier way to add modes to auto-mode-alist
 ;;--------------------------------------------------------

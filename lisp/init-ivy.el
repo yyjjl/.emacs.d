@@ -21,7 +21,7 @@
   (setq ivy-initial-inputs-alist nil)
   (setq ivy-use-virtual-buffers t)
 
-  (bind-keys :map ivy-minibuffer-map
+  (define-keys :map ivy-minibuffer-map
              ("C-o" . ivy-immediate-done)
              ("C-n" . ivy-next-line)
              ("C-p" . ivy-previous-line)
@@ -75,7 +75,7 @@ buffer is not visiting a file."
         (lambda (x) (delete-file (expand-file-name x ivy--directory)))
         ,(propertize "delete" 'face 'font-lock-warning-face))))
     (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
-    (bind-keys ("C-s" . counsel-grep-or-swiper)
+    (define-keys ("C-s" . counsel-grep-or-swiper)
                ("C-M-s" .swiper-the-thing)
                ("C-c i r" . ivy-resume)
                ("C-x C-f" . counsel-find-file)

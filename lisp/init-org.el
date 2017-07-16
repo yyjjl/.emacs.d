@@ -105,7 +105,7 @@
 
   (add-hook 'org-mode-hook 'org-mode-hook-setup)
 
-  (bind-keys :map org-mode-map
+  (define-keys :map org-mode-map
              ("C-c o" . ob-ipython-inspect)
              ("C-c c i" . org-clock-in)
              ("C-c c o" . org-clock-out)
@@ -144,7 +144,7 @@
 (setq outline-minor-mode-prefix "\C-co")
 (with-eval-after-load 'outline
   (let ((map (make-sparse-keymap)))
-    (bind-keys :map map
+    (define-keys :map map
                ("a" . show-all)
                ("b" . outline-backward-same-level)
                ("f" . outline-forward-same-level)

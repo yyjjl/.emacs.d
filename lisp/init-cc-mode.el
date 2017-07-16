@@ -161,13 +161,13 @@
 
 (defun c-mode-setup ()
   "C/C++ only setup"
-  (bind-keys)
   (local-set-key (kbd "C-c o") 'ff-find-other-file)
   (local-set-key (kbd "C-c b") 'clang-format-buffer)
   (local-set-key (kbd "C-c C-j") 'semantic-ia-fast-jump)
   (local-set-key (kbd "C-c C-v") 'semantic-decoration-include-visit)
   (local-set-key [f9] 'c-mode-try-use-rtags)
   (local-set-key [f10] 'cc-mode-compile)
+  (local-set-key [f5] 'gdb)
 
   (setq cc-search-directories '("."
                                 "/usr/include"

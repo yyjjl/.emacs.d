@@ -82,14 +82,14 @@
   (defun latex-font-oblique () (interactive) (TeX-font nil ?\C-s))
   (defun latex-font-upright () (interactive) (TeX-font nil ?\C-u))
 
-  (bind-keys :map TeX-fold-keymap
+  (define-keys :map TeX-fold-keymap
              ("B" . TeX-fold-buffer) ("C-b")
              ("c" . TeX-fold-comment) ("C-c")
              ("e" . TeX-fold-env) ("C-e")
              ("d" . TeX-fold-dwim) ("C-o")
              ("P" . TeX-fold-paragraph) ("C-p")
              ("R" . TeX-fold-region) ("C-r"))
-  (bind-keys :map LaTeX-mode-map
+  (define-keys :map LaTeX-mode-map
              ("}" . latex-skip-close-pair)
              (")" . latex-skip-close-pair)
              ("]" . latex-skip-close-pair)
@@ -121,7 +121,7 @@
   (set-face-background 'preview-reference-face "#1b1d1e")
   (setq preview-map
         (let ((map (make-sparse-keymap)))
-          (bind-keys :map map
+          (define-keys :map map
                      ("p" . preview-at-point)
                      ("r" . preview-region)
                      ("b" . preview-buffer)

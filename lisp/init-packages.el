@@ -24,7 +24,6 @@
                 counsel-projectile
                 smex ;; counsel-M-x need smex to get history
                 package-safe-delete
-                bind-key
                 ;; show key bindings while pressing
                 which-key
                 window-numbering
@@ -39,6 +38,7 @@
                 hlinum
                 ;; highlight braces with their depth
                 rainbow-delimiters
+                highlight-indent-guides
                 ;; spaceline
                 rainbow-mode ;;  required by css-mode
                 ;; ^L beautifier

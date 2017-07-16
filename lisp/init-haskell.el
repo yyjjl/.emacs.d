@@ -5,7 +5,7 @@
       (apply fn args)))
   (advice-add 'shm/tab :around #'shm/tab-or-close)
 
-  (bind-keys :map shm-map
+  (define-keys :map shm-map
              ("C-c C-^") ("C-c 6" . shm/swing-up)
              ("C-c C-_") ("C-c -" . shm/insert-underscore)
              ("C-c C-e") ("C-c C-j")
@@ -45,7 +45,7 @@
   (hare-init)
   (remap-kbd "C-c C-r" "C-c r" haskell-mode-map)
 
-  (bind-keys :map haskell-mode-map
+  (define-keys :map haskell-mode-map
              ("C-c b" . haskell-mode-stylish-buffer)
              ("C-c s" . haskell-sort-imports)
              ("M-." . haskell-mode-tag-find)
@@ -84,7 +84,7 @@
   (add-hook 'haskell-mode-hook #'haskell-mode-setup))
 
 (with-eval-after-load 'haskell-cabal
-  (bind-keys :map haskell-cabal-mode-map
+  (define-keys :map haskell-cabal-mode-map
              ("C-c a c" . haskell-compile)
              ("C-c a a" . haskell-process-cabal )
              ("C-c C-c" . haskell-process-cabal-build)

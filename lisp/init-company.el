@@ -23,11 +23,11 @@
   (setq company-minimum-prefix-length 2)
   (setq company-tooltip-align-annotations t)
 
-  (bind-keys :map company-active-map
-             ("C-n" . company-select-next)
-             ("C-p" . company-select-previous)
-             ("M-n" . company-next-page)
-             ("M-p" . company-previous-page))
+  (define-keys :map company-active-map
+    ("C-n" . company-select-next)
+    ("C-p" . company-select-previous)
+    ("M-n" . company-next-page)
+    ("M-p" . company-previous-page))
 
   ;; press SPACE will accept the highlighted candidate and insert a space
   ;; `M-x describe-variable company-auto-complete-chars` for details

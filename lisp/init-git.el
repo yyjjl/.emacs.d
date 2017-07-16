@@ -1,7 +1,7 @@
 ;; @see http://blog.binchen.org/posts/enhance-emacs-git-gutter-with-ivy-mode.html
 ;; {{ git gutter with ivy
-(defun my-reshape-git-gutter (gutter)
-  "Re-shape gutter for `ivy-read'."
+(defun reshape-git-gutter (gutter)
+  "Re-shape GUTTER for `ivy-read'."
   (let* ((linenum-start (aref gutter 3))
          (linenum-end (aref gutter 4))
          (target-line "")
@@ -27,10 +27,10 @@
                   target-linenum target-line)
           target-linenum)))
 
-(defun my-goto-git-gutter ()
+(defun ivy-goto-git-gutter ()
   (interactive)
   (if git-gutter:diffinfos
-      (let* ((collection (mapcar 'my-reshape-git-gutter
+      (let* ((collection (mapcar 'reshape-git-gutter
                                  git-gutter:diffinfos)))
         (ivy-read "git-gutters:"
                   collection
@@ -41,7 +41,7 @@
 
 ;; @see http://blog.binchen.org/posts/new-git-timemachine-ui-based-on-ivy-mode.html
 ;; {{ git-timemachine
-(defun my-git-timemachine-show-selected-revision ()
+(defun ivy-git-timemachine-show-selected-revision ()
   "Show last (current) revision of file."
   (interactive)
   (let (collection)
@@ -56,25 +56,26 @@
               :action (lambda (rev)
                         (git-timemachine-show-revision (cdr rev))))))
 
-(defun my-git-timemachine ()
-  "Open git snapshot with the selected version.  Based on ivy-mode."
+(defun ivy-git-timemachine ()
+  "Open git snapshot with the selected version.  Based on `ivy-mode'."
   (interactive)
   (unless (featurep 'git-timemachine)
     (require 'git-timemachine))
-  (git-timemachine--start #'my-git-timemachine-show-selected-revision))
+  (git-timemachine--start #'ivy-git-timemachine-show-selected-revision))
 ;; }}
 
-(bind-keys ("C-x g h" . git-gutter:popup-hunk)
-           ("C-x g s" . git-gutter:stage-hunk)
-           ("C-x g r" . git-gutter:revert-hunk)
-           ("C-x g t" . my-git-timemachine)
-           ("C-x g n" . git-gutter:next-hunk)
-           ("C-x g p" . git-gutter:previous-hunk)
-           ("C-x g j" . my-goto-git-gutter)
-           ("C-x g g" . magit-status)
-           ("C-x g l" . git-link)
-           ("C-x g c" . git-link-commit)
-           ("C-x g m" . git-messenger:popup-message))
+(define-keys
+  ("C-x g h" . git-gutter:popup-hunk)
+  ("C-x g s" . git-gutter:stage-hunk)
+  ("C-x g r" . git-gutter:revert-hunk)
+  ("C-x g t" . ivy-git-timemachine)
+  ("C-x g n" . git-gutter:next-hunk)
+  ("C-x g p" . git-gutter:previous-hunk)
+  ("C-x g j" . ivy-goto-git-gutter)
+  ("C-x g g" . magit-status)
+  ("C-x g l" . git-link)
+  ("C-x g c" . git-link-commit)
+  ("C-x g m" . git-messenger:popup-message))
 
 (with-eval-after-load 'git-gutter
   (require 'git-gutter-fringe)

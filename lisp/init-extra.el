@@ -46,9 +46,9 @@
 (setq midnight-mode t)
 
 (with-eval-after-load 'restclient
-  (bind-keys :map restclient-mode-map
-             ("C-c C-p") ("M-p" . restclient-jump-prev)
-             ("C-c C-n") ("M-n" . restclient-jump-next)))
+  (define-keys :map restclient-mode-map
+    ("C-c C-p") ("M-p" . restclient-jump-prev)
+    ("C-c C-n") ("M-n" . restclient-jump-next)))
 
 (add-hook 'restclient-mode-hook
           (lambda ()
