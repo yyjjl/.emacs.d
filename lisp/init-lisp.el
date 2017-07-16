@@ -10,10 +10,9 @@
     (lispy-mode -1)))
 
 
-(defun my-lisp-setup ()
+(defun lisp-setup ()
   "Enable features useful in any Lisp mode."
   (rainbow-delimiters-mode 1)
-  (hl-sexp-mode 1)
   (unless (> (buffer-size) 51200)
     (prettify-symbols-mode 1))
   (lispy-mode 1)
@@ -41,7 +40,7 @@
 
 (defun elisp-mode-hooks ()
   "lisp-mode-hooks"
-  (my-lisp-setup)
+  (lisp-setup)
   (define-key emacs-lisp-mode-map (kbd "C-c e") 'macrostep-expand)
   (unless (is-buffer-file-temp)
     (when (require 'eldoc nil t)
@@ -62,7 +61,7 @@
                      inferior-lisp-mode-hook
                      lisp-interaction-mode-hook)))
   (dolist (hook lispy-hooks)
-    (add-hook hook 'my-lisp-setup)))
+    (add-hook hook 'lisp-setup)))
 
 
 ;; ----------------------------------------------------------------------------

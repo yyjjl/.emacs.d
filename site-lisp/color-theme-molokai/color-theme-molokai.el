@@ -20,29 +20,28 @@
       (cursor-color . "#F8F8F0")
       (background-mode . dark))
      (default ((t (:foreground "#F8F8F2" :background "#1B1D1E"))))
-     (bold ((t (:weight bold))))
-     (bold-italic ((t (:weight bold :slant italic))))
+     (button ((t (:underline t))))
+     (link ((t (:underline t :weight bold :foreground "#66D9EF"))))
+     (link-visited ((t (:underline t :weight bold :foreground "#AE81EF"))))
+
      (custom-face-tag ((t (:foreground "#66D9EF" :weight bold))))
      (custom-state ((t (:foreground "#A6E22E"))))
-     (italic ((t (:slant italic))))
      (region ((t (:background "#403D3D"))))
-     (underline ((t (:underline t))))
      (css-selector ((t (:foreground "#F92672"))))
      (css-property ((t (:foreground "#66D9EF"))))
      (diff-added ((t (:foreground "#A6E22E" :weight bold))))
      (diff-context ((t (:foreground "#F8F8F2"))))
-     (diff-file-header ((t (:foreground "#66D9EF" :background nil))))
+     (diff-file-header ((t (:foreground "#66D9EF"))))
      (diff-indicator-added ((t (:foreground "#A6E22E"))))
      (diff-indicator-removed ((t (:foreground "#F92672"))))
      (diff-header ((t (:foreground "#F8F8F2" :background "#232526"))))
      (diff-hunk-header ((t (:foreground "#AE81FF" :background "#232526"))))
      (diff-removed ((t (:foreground "#F92672" :weight bold))))
      (escape-glyph ((t (:foreground "#E6DB74"))))
-     (minibuffer-prompt ((t (:foreground "#66D9EF"))))
+     (minibuffer-prompt ((t (:foreground "#AE81EF"))))
 
      (mode-line-inactive ((t (:foreground "#F8F8F2" :background "#2d2d2d"))))
-     (mode-line-buffer-id ((t (:foreground nil :background "#000000"
-                                           :weight semi-bold))))
+     (mode-line-buffer-id ((t (:background "#000000" :weight semi-bold))))
      (mode-line ((t (:foreground "#BCBCBC" :background "#181818"))))
      (mode-line-highlight ((t (:background "#020303"))))
      (mode-line-mousable ((t (:foreground "#BCBCBC" :background "#000000"))))
@@ -52,20 +51,20 @@
 
      (font-lock-builtin-face ((t (:foreground "#A6E22E"))))
      (font-lock-comment-face ((t (:foreground "#465457" :slant italic))))
-     (font-lock-comment-delimiter-face ((t (:foreground "#465457"
-                                                        :slant italic))))
+     (font-lock-comment-delimiter-face ((t (:foreground "#345678" :slant italic))))
      (font-lock-constant-face ((t (:foreground "#AE81FF"))))
      (font-lock-doc-face ((t (:foreground "#06DB74" :slant italic))))
-     (font-lock-function-name-face ((t (:foreground "#F92672"
-                                                    :inherit bold-italic))))
-     (font-lock-keyword-face ((t (:foreground "#66D9EF" :inherit bold))))
-     (font-lock-negation-char-face ((t (:weight bold))))
-     (font-lock-preprocessor-face ((t (:foreground "#A6E22E" :inherit bold))))
+     (font-lock-function-name-face
+      ((t (:foreground "#F92672" :slant italic :weight bold))))
+     (font-lock-keyword-face ((t (:foreground "#66D9EF" :weight bold))))
+     (font-lock-negation-char-face ((t (:foreground "#CD7673" :weight bold))))
+     (font-lock-preprocessor-face ((t (:foreground "#A6E22E" :weight bold))))
      (font-lock-reference-face ((t (:foreground "#AE81FF"))))
-     (font-lock-regexp-grouping-backslash ((t (:weight bold))))
-     (font-lock-regexp-grouping-construct ((t (:weight bold))))
+     (font-lock-regexp-grouping-backslash
+      ((t (:foreground "#AE81FF" :weight bold))))
+     (font-lock-regexp-grouping-construct ((t ( :weight bold))))
      (font-lock-string-face ((t (:foreground "#E6DB74"))))
-     (font-lock-type-face ((t (:foreground "#66D9EF" :inherit bold))))
+     (font-lock-type-face ((t (:foreground "#66D9EF" :weight bold))))
      (font-lock-variable-name-face ((t (:foreground "#F92672"))))
      (font-lock-warning-face ((t (:foreground "#FFFFFF"
                                               :background "#333333"))))
@@ -74,7 +73,6 @@
      ;; (vertical-border ((t (:foreground "#111213"))))
      (vertical-border ((t (:foreground "#1B1D1E"))))
      (highlight ((t (:foreground "#000000" :background "#C4BE89"))))
-     (hl-line ((t (:background "#293739"))))
      (icompletep-choices ((t (:foreground "#F92672"))))
      (icompletep-determined ((t (:foreground "#A6E22E"))))
      (icompletep-keys ((t (:foreground "#F92672"))))
@@ -112,8 +110,10 @@
      (outline-7 ((t (:foreground "#F92672"))))
      (outline-8 ((t (:foreground "#A6E22E"))))
      (secondary-selection ((t (:background "#272822"))))
-     (show-paren-match-face ((t (:foreground "#000000" :background "#FD971F"))))
-     (show-paren-mismatch-face ((t (:foreground "#960050" :background "#1E0010"))))
+     (show-paren-match
+      ((t (:foreground "#000000" :background "#FD971F"))))
+     (show-paren-mismatch
+      ((t (:foreground "#960050" :background "#1E0010"))))
      (widget-inactive-face ((t (:background "#ff0000"))))
      (woman-addition ((t (:foreground "#AE81FF"))))
      (woman-bold ((t (:foreground "#F92672"))))
@@ -125,13 +125,13 @@
      (rainbow-delimiters-depth-2-face ((t (:foreground "#2196F3"))))
      (rainbow-delimiters-depth-3-face ((t (:foreground "#EF6C00"))))
      (rainbow-delimiters-depth-4-face ((t (:foreground "#B388FF"))))
-     (ainbow-delimiters-depth-5-face ((t (:foreground "#76ff03"))))
+     (rainbow-delimiters-depth-5-face ((t (:foreground "#006600"))))
      (rainbow-delimiters-depth-6-face ((t (:foreground "#26A69A"))))
      (rainbow-delimiters-depth-7-face ((t (:foreground "#FFCDD2"))))
      (rainbow-delimiters-depth-8-face ((t (:foreground "#795548"))))
      (rainbow-delimiters-depth-9-face ((t (:foreground "#DCE775"))))
-     (rainbow-delimiters-unmatched-face ((t (:foreground "#F8F8F2"
-                                                         :background "#EF6C00"))))
+     (rainbow-delimiters-unmatched-face
+      ((t (:foreground "#F8F8F2" :background "#EF6C00"))))
      ;; Company autocomplete
 
      (company-scrollbar-bg ((t (:background "#3f4346"))))
@@ -140,7 +140,8 @@
      (company-tooltip-annotation ((t (:weight normal :foreground "orange"))))
      (company-tooltip-annotation-selection
       ((t (:weight normal :foreground "red"))))
-     (company-tooltip-common ((t (:inherit font-lock-constant-face))))
+     (company-tooltip-common
+      ((t (:inherit font-lock-constant-face :underline t))))
      (company-tooltip-selection ((t (:inherit font-lock-keyword-face
                                               :weight bold
                                               :background "#4b5053"))))
@@ -148,8 +149,9 @@
      (regex-tool-matched-face ((t (:foreground nil :background nil
                                                :inherit match))))
      (eldoc-highlight-function-argument ((t (:foreground "#86dc2f"
-                                                         :inherit bold))))
+                                                         :weight bold))))
      (hl-sexp-face ((t (:background "gray5"))))
+     (hl-line ((t (:background "gray5"))))
      (org-block ((t (:foreground "#8bc34a" :background "#1c1f26"))))
      (org-block-background ((t (:background "#1c1f26"))))
      (org-code ((t (:foreground "#8bc34a" :background "#1c1f26"))))
@@ -177,11 +179,12 @@
      (org-block-end-line ((t (:foreground "#b3e5fc" :background "#1e2930"))))
 
      (org-level-1 ((class (:inherit outline-1
-                                    ;; :background "#455A64"
+                                    :background "#455A64"
                                     :weight bold
                                     :overline t
                                     :height 1.3))))
-     (org-level-2 ((class (:inherit outline-2 ;; :background "#35575b"
+     (org-level-2 ((class (:inherit outline-2
+                                    :background "#35575b"
                                     :height 1.2))))
      (org-level-3 ((class (:inherit outline-3 :height 1.1))))
      (org-level-4 ((class (:inherit outline-4))))
@@ -229,32 +232,28 @@
      (whitespace-space-before-tab ((t (:background nil :foreground "#9f8766"))))
      (whitespace-tab ((t (:background nil))))
      (whitespace-trailing ((t (:background "#dc752f"))))
-     
+
 ;;;;; flycheck
      (flycheck-error
       ((((supports :underline (:style line)))
         (:underline (:style line :color "#e0211d")))
-       (t (:background "#e0211d" :inherit bold :underline t))))
+       (t (:background "#e0211d" :weight bold :underline t))))
      (flycheck-error-list-checker-name ((t (:foreground "#4f97d7"))))
-     (flycheck-fringe-error ((t (:foreground "#e0211d" :inherit bold))))
-     (flycheck-fringe-info ((t (:foreground "#4f97d7" :inherit bold))))
-     (flycheck-fringe-warning ((t (:foreground "#dc752f" :inherit bold))))
+     (flycheck-fringe-error ((t (:foreground "#e0211d" :weight bold))))
+     (flycheck-fringe-info ((t (:foreground "#4f97d7" :weight bold))))
+     (flycheck-fringe-warning ((t (:foreground "#dc752f" :weight bold))))
      (flycheck-running ((t (:weight normal :foreground "Green"))))
      (flycheck-info
       ((((supports :underline (:style line)))
         (:underline (:style line :color "#4f97d7")))
-       (t (:background "#4f97d7" :inherit bold :underline t))))
+       (t (:background "#4f97d7" :weight bold :underline t))))
      (flycheck-warning
       ((((supports :underline (:style line)))
         (:underline (:style line :color "#dc752f")))
-       (t (:background "#dc752f" :inherit bold :underline t))))
+       (t (:background "#dc752f" :weight bold :underline t))))
 
      (linum-highlight-face ((t (:inherit default :foreground "orange red"))))
      (shm-current-face ((t (:inherit hl-sexp-face))))
      (ivy-highlight-face ((t (:background "#444155")))))))
 
 (provide 'color-theme-molokai)
-
-
-
-

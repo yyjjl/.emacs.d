@@ -55,7 +55,7 @@
              (sym-name (cdr (assoc 'symbolName info)))
              (type (cdr (assoc 'type info))))
         (and sym-name type
-            (format "%s ⇒ %s"
+            (format "%s => %s"
                     (propertize sym-name 'face
                                 'eldoc-highlight-function-argument)
                     (propertize (substring type 0 (string-match "=>" type))

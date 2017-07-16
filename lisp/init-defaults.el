@@ -152,9 +152,9 @@
 ;; history
 (safe-wrap
  (progn
-   (setq history-length 8000)
-   (setq savehist-additional-variables
-         '(search-ring regexp-search-ring kill-ring))
+   (setq history-length 100)
+   ;; kill-ring is too big
+   (setq savehist-additional-variables '(search-ring regexp-search-ring))
    (savehist-mode 1)))
 
 (setq-default initial-scratch-message

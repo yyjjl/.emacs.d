@@ -35,7 +35,6 @@
 (add-packages '(color-theme
                 ;; helper control fringe(edge of a window) style
                 fringe-helper
-                hlinum
                 ;; highlight braces with their depth
                 rainbow-delimiters
                 highlight-indent-guides

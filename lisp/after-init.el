@@ -16,7 +16,7 @@
   ;; global-modes
   (global-git-gutter-mode 1)
   (global-linum-mode 1)
-  (hlinum-activate)
+  (global-hl-line-mode 1)
   (global-company-mode 1)
   (global-flycheck-mode 1)
   (global-subword-mode 1)

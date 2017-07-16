@@ -1,5 +1,4 @@
 (with-eval-after-load 'hippie-exp
-
   ;; @ see http://blog.binchen.org/posts/autocomplete-with-a-dictionary-with-hippie-expand.html
   (defun try-expand-by-dict (old)
     ;; old is true if we have already attempted an expansion
