@@ -56,13 +56,6 @@
 (add-hook 'comint-output-filter-functions
           'comint-watch-for-password-prompt)
 
-;; Write backup files to data directory
-(let ((dir (expand-file-name "~/.emacs.d/data")))
-  (unless (file-exists-p dir)
-    (make-directory dir)
-    (if (not (file-exists-p (expand-file-name "backups" dir)))
-        (make-directory (expand-file-name "backups" dir)))))
-
 (defvar large-buffer-size 1048576)
 ;; default prog-mode setup
 (defun generic-prog-mode-hook-setup ()
@@ -116,7 +109,7 @@
                            (or (file-remote-p fn)
                                (file-readable-p fn))))))
 (setq recentf-max-saved-items 2048
-      recentf-exclude '("/tmp/" "/ssh:" "/sudo:"))
+      recentf-exclude (list "/tmp/" "/ssh:" "/sudo:" emacs-var-direcotry))
 
 ;; ANSI-escape coloring in compilation-mode
 (ignore-errors

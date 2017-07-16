@@ -6,26 +6,26 @@
 ;; which means on every .el and .elc file loaded during start up,
 ;; it hasn't to runs those regexps against the filename.
 (defvar file-name-handler-alist-tmp file-name-handler-alist)
-(defvar emacs-site-packages-directory (expand-file-name "~/.emacs.d/site-lisp/"))
-(defvar emacs-yasnippet-extra-dir (expand-file-name "~/.emacs.d/snippets"))
-(defvar emacs-data-directory (expand-file-name "~/.emacs.d/data"))
+(defvar emacs-site-packages-directory
+  (expand-file-name "site-lisp" user-emacs-directory))
+(defvar emacs-etc-direcotry (expand-file-name "etc" user-emacs-directory))
+(defvar emacs-var-direcotry (expand-file-name "var" user-emacs-directory))
+(defvar emacs-config-directory (expand-file-name "lisp" user-emacs-directory))
 
 (defvar symbol-font-name "Noto Sans S Chinese")
+(defvar symbol-font-size 18)
+(defvar default-font-name "Ubuntu Mono-13")
 (defvar large-buffer-size (* 1024 1024))
 (defvar use-fcitx-setup-p t)
 
-(add-to-list 'default-frame-alist '(font . "Ubuntu Mono-13"))
-
 (setq file-name-handler-alist nil)
-
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 
 (eval-when-compile
   (require 'cl)
   (require 'cl-lib))
 
+(add-to-list 'load-path emacs-config-directory)
 ;; all packages
-(load-file "~/.emacs.d/lisp/packages.el")
 (if (fboundp 'normal-top-level-add-to-load-path)
     (let ((default-directory emacs-site-packages-directory))
       (setq load-path
@@ -36,9 +36,11 @@
                           unless (string-match "^\\." dir)
                           collecting (expand-file-name dir))))))
 
+(require 'init-packages)
 ;; need bind-key immediately
 (require 'bind-key)
 ;; some important tool function
+(require 'init-vars)
 (require 'init-utils)
 (require 'init-defaults)
 (require 'init-auto-mode)
@@ -95,44 +97,6 @@
 (if (file-exists-p "~/.emacs.d/private.el")
     (load-file "~/.emacs.d/private.el"))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(abbrev-file-name (in-data-directory "abbrev_defs"))
- '(auto-save-list-file-prefix (in-data-directory "auto-save-list/.saves-"))
- '(backup-directory-alist (list (cons "." (in-data-directory "backups"))))
- '(bookmark-default-file (in-data-directory "bookmarks"))
- '(cmake-ide-rdm-executable (in-data-directory "rtags/bin/rdm"))
- '(company-statistics-file (in-data-directory "company-statistics-cache.el"))
- '(eshell-directory-name (in-data-directory "eshell/"))
- '(flycheck-html-tidy-executable (in-data-directory "tidy"))
- '(geiser-repl-history-filename (in-data-directory ".geiser_history"))
- '(irony-server-install-prefix (in-data-directory "irony"))
- '(irony-user-dir (in-data-directory "irony/"))
- '(ispell-personal-dictionary (in-data-directory "aspell.pws"))
- '(keyfreq-file (in-data-directory "keyfreq"))
- '(mc/list-file (in-data-directory "mc-lists.el"))
- '(org-publish-timestamp-directory (in-data-directory ".org-timestamps/"))
- '(projectile-known-projects-file (in-data-directory "projectile-bookmarks.eld"))
- '(recentf-save-file (in-data-directory "recentf"))
- '(rtags-path (in-data-directory "rtags/bin"))
- '(save-place-file (in-data-directory "places"))
- '(savehist-file (in-data-directory "history"))
- '(semanticdb-default-save-directory (in-data-directory "semanticdb/"))
- '(session-save-file (in-data-directory "session"))
- '(session-use-package t nil (session))
- '(smex-save-file (in-data-directory "smex-items"))
- '(srecode-map-save-file (in-data-directory "srecode-map.el"))
- '(tramp-persistency-file-name (in-data-directory "tramp")))
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
-)
 
 (setq file-name-handler-alist file-name-handler-alist-tmp)
 (put 'scroll-left 'disabled nil)

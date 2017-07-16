@@ -66,7 +66,6 @@
         org-tags-column 80
         org-hide-emphasis-markers t
         org-hide-leading-stars t
-        org-latex-preview-ltxpng-directory "~/.emacs.d/data/ltxpng/"
         ;; org-startup-indented t
         org-agenda-inhibit-startup t       ;; ~50x speedup
         org-agenda-use-tag-inheritance nil ;; 3-4x speedup
@@ -190,7 +189,8 @@
           ("" "amsmath,amsfonts,amssymb,amsthm,bm,upgreek" t)
           ("mathscr" "eucal" t)
           ("" "geometry" t)))
-  (let ((common (read-file-as-string "~/.emacs.d/org-template/common")))
+  (let ((common (read-file-as-string
+                 (expand-file-name "common" org-template-direcotry))))
     (add-to-list 'org-latex-classes
                  `("cn-article"
                    ,(concat "\\documentclass[11pt,a4paper]{article}\n"
@@ -214,9 +214,9 @@
   (add-to-list 'org-latex-classes
                `("cn-beamer"
                  ,(s-replace "[ORG-TEMPLATE-DIR]"
-                             (expand-file-name "~/.emacs.d/org-template")
+                             org-template-directory
                              (read-file-as-string
-                              "~/.emacs.d/org-template/beamer"))
+                              (expand-file-name "beamer" org-template-direcotry)))
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")

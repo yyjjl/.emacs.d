@@ -9,13 +9,14 @@
 
 (color-theme-molokai)
 
+(add-to-list 'default-frame-alist `(font . ,default-font-name))
 ;; make emacs transparent
 (defun fix-symbol-font-size ()
   (ignore-errors
     (when window-system
       (set-fontset-font (frame-parameter nil 'font)
-                        'symbol (font-spec :size 18 :family
-                                           symbol-font-name)))))
+                        'symbol (font-spec :size symbol-font-size
+                                           :family symbol-font-name)))))
 (if (daemonp)
     (run-with-idle-timer 1 nil #'fix-symbol-font-size)
   (fix-symbol-font-size))

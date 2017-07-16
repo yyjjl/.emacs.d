@@ -146,3 +146,5 @@
         (hash-table-keys required-packages)))
 
 (package-utils-initialize)
+
+(provide 'init-packages)

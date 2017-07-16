@@ -5,6 +5,7 @@ anaconda-mode/
 /url/cache
 /auto-save-list
 /data
+/var
 /session.*
 /custom.el
 *.elc

@@ -5,8 +5,8 @@
            ("C-c v r" . vr/replace)
            ("C-c v m" . vr/mc-mark)
 
-           ("C-c m ." . mc-hydra/mc/mark-next-like-this)
-           ("C-c m ," . mc-hydra/mc/mark-previous-like-this)
+           ("C-c m ." . mc/mark-next-like-this)
+           ("C-c m ," . mc/mark-previous-like-this)
            ("C-c m P" . mc/mark-pop)
            ("C-c m m" . mc/mark-all-like-this-dwim)
 

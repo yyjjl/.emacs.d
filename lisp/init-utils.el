@@ -10,9 +10,6 @@
          retval)
      ,@clean-up))
 
-(defun in-data-directory (name)
-  (expand-file-name name emacs-data-directory))
-
 ;;--------------------------------------------------------
 ;; Handier way to add modes to auto-mode-alist
 ;;--------------------------------------------------------
