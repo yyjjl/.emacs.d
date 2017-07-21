@@ -1,6 +1,6 @@
 ;; @see http://blog.binchen.org/posts/enhance-emacs-git-gutter-with-ivy-mode.html
 ;; {{ git gutter with ivy
-(defun reshape-git-gutter (gutter)
+(defun git|reshape-gutter (gutter)
   "Re-shape GUTTER for `ivy-read'."
   (let* ((linenum-start (aref gutter 3))
          (linenum-end (aref gutter 4))
@@ -10,7 +10,8 @@
          (max-line-length 0))
     (save-excursion
       ;; find out the longest stripped line in the gutter
-      (while (<= linenum-start linenum-end) (goto-line linenum-start)
+      (while (<= linenum-start linenum-end)
+        (forward-line 1)
         (setq tmp-line (replace-regexp-in-string
                         "^[ \t]*" ""
                         (buffer-substring (line-beginning-position)
@@ -27,21 +28,23 @@
                   target-linenum target-line)
           target-linenum)))
 
-(defun ivy-goto-git-gutter ()
+(defun git|ivy-goto-gutter ()
   (interactive)
   (if git-gutter:diffinfos
-      (let* ((collection (mapcar 'reshape-git-gutter
+      (let* ((collection (mapcar 'git|reshape-gutter
                                  git-gutter:diffinfos)))
         (ivy-read "git-gutters:"
                   collection
                   :action (lambda (linenum)
-                            (goto-line linenum))))
+                            (forward-line (- (cdr linenum)
+                                             (line-number-at-pos))))))
     (message "NO git-gutters!")))
 ;; }}
 
-;; @see http://blog.binchen.org/posts/new-git-timemachine-ui-based-on-ivy-mode.html
+;; @see
+;; http://blog.binchen.org/posts/new-git-timemachine-ui-based-on-ivy-mode.html
 ;; {{ git-timemachine
-(defun ivy-git-timemachine-show-selected-revision ()
+(defun git|ivy-timemachine-show-selected-revision ()
   "Show last (current) revision of file."
   (interactive)
   (let (collection)
@@ -56,75 +59,80 @@
               :action (lambda (rev)
                         (git-timemachine-show-revision (cdr rev))))))
 
-(defun ivy-git-timemachine ()
+(defun git|ivy-timemachine ()
   "Open git snapshot with the selected version.  Based on `ivy-mode'."
   (interactive)
   (unless (featurep 'git-timemachine)
     (require 'git-timemachine))
-  (git-timemachine--start #'ivy-git-timemachine-show-selected-revision))
+  (git-timemachine--start #'git|ivy-timemachine-show-selected-revision))
 ;; }}
 
-(define-keys
-  ("C-x g h" . git-gutter:popup-hunk)
-  ("C-x g s" . git-gutter:stage-hunk)
-  ("C-x g r" . git-gutter:revert-hunk)
-  ("C-x g t" . ivy-git-timemachine)
-  ("C-x g n" . git-gutter:next-hunk)
-  ("C-x g p" . git-gutter:previous-hunk)
-  ("C-x g j" . ivy-goto-git-gutter)
-  ("C-x g g" . magit-status)
-  ("C-x g l" . git-link)
-  ("C-x g c" . git-link-commit)
-  ("C-x g m" . git-messenger:popup-message))
-
+(require 'git-gutter-fringe)
 (with-eval-after-load 'git-gutter
-  (require 'git-gutter-fringe)
-  (require 'fringe-helper)
-  (set-face-foreground 'git-gutter-fr:modified "yellow")
-  (set-face-foreground 'git-gutter-fr:added    "green")
-  (set-face-foreground 'git-gutter-fr:deleted  "red")
-  (fringe-helper-define 'git-gutter-fr:deleted nil
-    "........"
-    "........"
-    "........"
-    "XXXXXXXX"
-    "XXXXXXXX"
-    "........"
-    "........"
-    "........")
+  (when (fboundp 'define-fringe-bitmap)
+    (set-face-foreground 'git-gutter-fr:modified "yellow")
+    (set-face-foreground 'git-gutter-fr:added    "green")
+    (set-face-foreground 'git-gutter-fr:deleted  "red")
+    (setq git-gutter-fr:side 'right-fringe)
+    (define-fringe-bitmap 'git-gutter-fr:modified
+      [#b00000000
+       #b11111111
+       #b11111111
+       #b00000000
+       #b00000000
+       #b11111111
+       #b11111111
+       #b00000000])
+    (define-fringe-bitmap 'git-gutter-fr:deleted
+      [#b00000000
+       #b00000000
+       #b00000000
+       #b11111111
+       #b11111111
+       #b00000000
+       #b00000000
+       #b00000000])
+    (define-fringe-bitmap 'git-gutter-fr:added
+      [#b00011000
+       #b00011000
+       #b00011000
+       #b11111111
+       #b11111111
+       #b00011000
+       #b00011000
+       #b00011000]))
+  (setq git-gutter:update-hooks '(after-save-hook))
+  (setq git-gutter:handled-backends '(svn hg git)))
 
-  (fringe-helper-define 'git-gutter-fr:added nil
-    "...XX..."
-    "...XX..."
-    "...XX..."
-    "XXXXXXXX"
-    "XXXXXXXX"
-    "...XX..."
-    "...XX..."
-    "...XX...")
-
-  (fringe-helper-define 'git-gutter-fr:modified nil
-    "........"
-    "XXXXXXXX"
-    "XXXXXXXX"
-    "........"
-    "........"
-    "XXXXXXXX"
-    "XXXXXXXX"
-    "........")
-  (setq git-gutter:handled-backends '(svn hg git)
-        git-gutter-fr:side 'right-fringe))
+;; This setup function must run before `semantic-mode' invoke to avoid
+;; a error
+(defhook git|generic-prog-mode-setup ((prog-mode-hook :append))
+  (unless (or (file-remote-p default-directory)
+              (buffer-temporary-p)
+              (> (buffer-size) emacs|large-buffer-size))
+    (git-gutter-mode 1)))
 
 (with-eval-after-load 'git-messenger
-  (setq git-messenger:show-detail t)
-  (add-hook 'git-messenger:after-popup-hook
-            (lambda (msg)
-              ;; extract commit id and put into the kill ring
-              (when (string-match "\\(commit *: *\\)\\([0-9a-z]+\\)" msg)
-                (copy-yank-str (match-string 2 msg))
-                (message "commit hash %s => clipboard & kill-ring" (match-string 2 msg))
-                ))) )
+  (setq git-messenger:show-detail t))
+
+
+(defhook (git|message-kill-commit-id msg) (git-messenger:after-popup-hook)
+  ;; extract commit id and put into the kill ring
+  (when (string-match "\\(commit *: *\\)\\([0-9a-z]+\\)" msg)
+    (kill-new (match-string 2 msg))
+    (message "commit hash %s => kill-ring" (match-string 2 msg))))
+
+(define-keys :prefix "C-x g"
+  ("h" . git-gutter:popup-hunk)
+  ("s" . git-gutter:stage-hunk)
+  ("r" . git-gutter:revert-hunk)
+  ("t" . git|ivy-timemachine)
+  ("n" . git-gutter:next-hunk)
+  ("p" . git-gutter:previous-hunk)
+  ("j" . git|ivy-goto-gutter)
+  ("l" . git-link)
+  ("c" . git-link-commit)
+  ("m" . git-messenger:popup-message))
 
 
 (provide 'init-git)
-

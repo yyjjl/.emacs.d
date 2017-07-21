@@ -1,149 +1,193 @@
 (require 'package-utils)
 
-;; We include the org repository for completeness, but don't use it.
-;; Lock org-mode temporarily:
+;; add site-package's path to `load-path'
+(if (fboundp 'normal-top-level-add-to-load-path)
+    (let ((default-directory emacs|site-packages-directory))
+      (setq load-path
+            (append load-path
+                    (loop for dir in
+                          (directory-files
+                           (expand-file-name emacs|site-packages-directory))
+                          unless (string-match "^\\." dir)
+                          collecting (expand-file-name dir))))))
 
 ;; (setq package-archives '(("melpa" . "http://melpa.org/packages/")
 ;;                          ("melpa-stable" . "http://stable.melpa.org/packages/")
 ;;                          ;; uncomment below line if you need use GNU ELPA
 ;;                          ("gnu" . "http://elpa.gnu.org/packages/")))
-;; use mirror in china
+;; use mirror in China
 (setq package-archives
       '(("melpa-stable" . "https://elpa.emacs-china.org/melpa-stable/")
         ("melpa" . "https://elpa.emacs-china.org/melpa/")
         ("gnu"   . "https://elpa.emacs-china.org/gnu/")))
 
 ;; core packages
-(add-packages '(yasnippet
-                auto-yasnippet
-                company company-statistics
-                session
-                multi-term
-                flycheck
-                counsel hydra ivy swiper tiny
-                counsel-projectile
-                smex ;; counsel-M-x need smex to get history
-                package-safe-delete
-                ;; show key bindings while pressing
-                which-key
-                window-numbering
-                htmlize
-                ibuffer-vc
-                easy-kill  f
-                fcitx))
-;; theme
-(add-packages '(color-theme
-                ;; helper control fringe(edge of a window) style
-                fringe-helper
-                ;; highlight braces with their depth
-                rainbow-delimiters
-                highlight-indent-guides
-                ;; spaceline
-                rainbow-mode ;;  required by css-mode
-                ;; ^L beautifier
-                page-break-lines
-                ;; header-line
-                stickyfunc-enhance))
+(package|add
+ '(yasnippet
+   auto-yasnippet
+   ;; code completion framework
+   company
+   company-statistics
+   ;; save session to disk
+   session
+
+   multi-term
+
+   flycheck
+
+   hydra
+   ivy
+   swiper
+   counsel
+   counsel-projectile
+   ;; counsel-M-x need smex to get history
+   smex
+
+   ;; delete packages safely
+   package-safe-delete
+   ;; show key bindings while pressing
+   which-key
+   dired+
+   info+
+   ibuffer-vc))
+
+;; edit, mark and jump
+(package|add
+ '(;; mark tools
+   visual-regexp
+   multiple-cursors
+   fcitx
+   expand-region
+   ;; wgrep allows you to edit a grep buffer and apply those changes
+   ;; to the file buffer.
+   wgrep
+   ;; provide tree style search jump
+   avy
+   tiny
+   zzz-to-char))
+
+;; note
+(package|add
+ '( ;; ipython notebook feature in `org-mode'
+   ob-ipython
+   org-present
+   ;; export colorful src block in `org-mode'
+   htmlize
+   zeal-at-point))
+
+;; outlooking
+(package|add
+ '(color-theme
+   ;; Highlight braces with their depth
+   rainbow-delimiters
+   ;; Numbering windows
+   window-numbering
+   ;; Highlight indentation
+   highlight-indentation
+   ;; Colorize strings that represent colors
+   rainbow-mode
+   ;; ^L beautifier
+   page-break-lines
+   ;; Show information in header-line for `semantic-mode'
+   stickyfunc-enhance
+   unicode-fonts))
+
 ;; latex
-(add-packages '(auctex
-                company-auctex))
+(package|add
+ '(auctex
+   company-auctex))
 
-(add-packages '(popwin
-                expand-region
-                restclient company-restclient
-                dired+
-                buffer-move
-                macrostep
-                ;; clipbord tools
-                simpleclip
-                ;; quick switch window
-                ace-window
-                dropdown-list
-                visual-regexp
-                ;; find-by-pinyin-dired
-                zzz-to-char
-                zeal-at-point
-                ;; provide tree style search jump
-                avy
-                wgrep))
+;; buffer and window
+(package|add
+ '(;; Manage popup windows
+   popwin
+   ;; Move buffers between windows
+   buffer-move
+   ;; Quick switch window
+   ace-window))
 
-(add-packages '(gitignore-mode
-                gitconfig-mode
-                git-messenger
-                git-gutter-fringe git-gutter
-                git-link
-                git-timemachine))
+(package|add
+ '(gitignore-mode
+   gitconfig-mode
+   git-messenger
+   git-gutter git-gutter-fringe
+   git-link
+   git-timemachine))
 
-(add-packages '( ;; auto compile after .el file load or save
-                auto-compile
-                ;; pair edit
-                lispy
-                racket-mode
-                ;; slime
-                ;; slime-company
-                hl-sexp))
+(package|add
+ '( ;; auto compile after .el file load or save
+   auto-compile
+   ;; pair edit
+   lispy
+   racket-mode
+   macrostep
+   ;; slime
+   ;; slime-company
+   hl-sexp))
 
-(add-packages '( ;; js company backend
-                company-tern
-                js-doc
-                web-mode web-beautify
-                company-web
-                ;; optional package add support for angluar 1.x
-                ac-html-angular
-                ac-html-bootstrap
-                js2-mode
-                js-comint
-                js2-refactor
-                multiple-cursors ;; js2-refactor
-                tern
-                css-eldoc
-                emmet-mode))
+(package|add
+ '( ;; js company backend
+   company-tern
+   js-doc
+   web-mode web-beautify
+   company-web
+   ;; optional package add support for angluar 1.x
+   ac-html-angular
+   ac-html-bootstrap
+   js2-mode
+   js-comint
+   js2-refactor
+   tern
+   css-eldoc
+   emmet-mode
 
-(add-packages '(elpy
-                ob-ipython
-                py-isort))
+   restclient
+   company-restclient))
 
-(add-packages '(company-ghc
-                company-ghci
-                ghc
-                haskell-mode
-                shm hindent
-                company-cabal
-                idris-mode))
+(package|add
+ '(elpy
+   ob-ipython
+   py-isort))
 
-(add-packages '(irony-eldoc
-                irony
-                company-irony company-irony-c-headers
-                flycheck-irony clang-format
-                ggtags
-                rtags
-                ivy-rtags))
+(package|add
+ '(company-ghc
+   ghc
+   haskell-mode
+   shm hindent
+   company-cabal
+   idris-mode))
 
-(add-packages '(sql-indent
-                ;; yaml format
-                yaml-mode
-                ;; haml format
-                haml-mode
-                markdown-mode
-                crontab-mode
-                csv-mode
-                sass-mode
-                less-css-mode
-                scss-mode
-                glsl-mode
-                lua-mode
-                go-mode
-                groovy-mode
-                cmake-mode cmake-font-lock cmake-ide
-                php-mode
-                gnuplot-mode
-                csharp-mode
-                graphviz-dot-mode))
+(package|add
+ '(irony-eldoc
+   irony
+   company-irony company-irony-c-headers
+   flycheck-irony clang-format
+   ggtags
+   rtags
+   ivy-rtags))
 
-(with-eval-after-load 'package-safe-delete
-  (setq package-safe-delete-required-packages
-        (hash-table-keys required-packages)))
+(package|add
+ '(sql-indent
+   ;; yaml format
+   yaml-mode
+   ;; haml format
+   haml-mode
+   markdown-mode
+   crontab-mode
+   csv-mode
+   sass-mode
+   less-css-mode
+   scss-mode
+   glsl-mode
+   lua-mode
+   go-mode
+   groovy-mode
+   cmake-mode cmake-font-lock cmake-ide
+   php-mode
+   gnuplot-mode
+   csharp-mode
+   graphviz-dot-mode))
 
-(package-utils-initialize)
+(package|initialize)
 
 (provide 'init-packages)

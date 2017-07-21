@@ -40,31 +40,37 @@
    ;; Better import handling
    haskell-process-suggest-remove-import-lines t
    haskell-process-auto-import-loaded-modules t
-   haskell-stylish-on-save nil)
+   haskell-stylish-on-save nil
+   company-ghc-show-info t)
 
   (hare-init)
-  (remap-kbd "C-c C-r" "C-c r" haskell-mode-map)
+  (remap-keybindings "C-c C-r" "C-c r" haskell-mode-map)
 
   (define-keys :map haskell-mode-map
-             ("C-c b" . haskell-mode-stylish-buffer)
-             ("C-c s" . haskell-sort-imports)
-             ("M-." . haskell-mode-tag-find)
-             ("C-c C-=") ("C-c =" . haskell-indent-insert-equal)
-             ("C-c C-o") ("C-c o" . haskell-indent-insert-otherwise)
-             ("C-c C-." . haskell-indent-put-region-in-literate)
-             ("C-c ." . haskell-indent-align-guards-and-rhs)
-             ("C-c C-|") ("C-c \\" . haskell-indent-insert-guard)
-             ("C-c a c" . haskell-compile)
-             ("C-c C-l" . haskell-process-load-file)
-             ("C-c C-z" . haskell-interactive-switch)
-             ("C-c k" . haskell-interactive-mode-clear)
-             ("C-c a b" . haskell-process-cabal-build)
-             ("C-c a a" . haskell-process-cabal))
+    ("C-c b" . haskell-mode-stylish-buffer)
+    ("C-c s" . haskell-sort-imports)
+    ("M-." . haskell-mode-tag-find)
+    ("C-c C-." . haskell-indent-put-region-in-literate)
+    ("C-c ." . haskell-indent-align-guards-and-rhs)
+    ("C-c C-|") ("C-c \\" . haskell-indent-insert-guard)
+    ("C-c a c" . haskell-compile)
+    ("C-c C-l" . haskell-process-load-file)
+    ("C-c C-z" . haskell-interactive-switch)
+    ("C-c k" . haskell-interactive-mode-clear)
+    ("C-c a b" . haskell-process-cabal-build)
+    ("C-c a a" . haskell-process-cabal)
+    ("C-c '" . company-ghc-complete-by-hoogle)
+    ("C-c ;" . company-ghc-complete-in-module))
+
+  (defun haskell-cabal-mode-setup ()
+    (rainbow-delimiters-mode 1)
+    (add-to-list 'company-backends 'company-cabal))
+  (add-hook 'haskell-cabal-mode-hook #'haskell-cabal-mode-setup)
 
   (defun haskell-mode-setup ()
     (rainbow-delimiters-mode 1)
     (haskell-decl-scan-mode 1)
-    (unless (is-buffer-file-temp)
+    (unless (buffer-temporary-p)
       (ghc-init)
 
       (define-key haskell-mode-map
@@ -72,13 +78,12 @@
       (define-key haskell-mode-map
         (kbd "C-c C-t") 'haskell-process-do-type)
       (add-to-list 'company-backends 'company-ghc)
-      (add-to-list 'company-backends 'company-cabal)
-      (add-to-list 'company-backends 'company-ghci)
       (haskell-doc-mode 1))
     (hindent-mode 1)
     ;; haskell-indentation-mode is incompatible with shm
     ;; (haskell-indentation-mode -1)
     (turn-on-haskell-indent)
+    (hl-line-mode -1)
     (structured-haskell-mode 1))
 
   (add-hook 'haskell-mode-hook #'haskell-mode-setup))
@@ -89,7 +94,7 @@
              ("C-c a a" . haskell-process-cabal )
              ("C-c C-c" . haskell-process-cabal-build)
              ("C-c C-z" . haskell-interactive-switch)
-             ("C-c k" . haskell-interactive-mode-clear)))
+             ("C-c C-k" . haskell-interactive-mode-clear)))
 
 (with-eval-after-load 'haskell-font-lock
   (setq haskell-font-lock-symbols-alist

@@ -145,7 +145,10 @@
                        (concat "g++ "
                                (when (bound-and-true-p irony-mode)
                                  (string-join
-                                  (irony--adjust-compile-options) " "))
+                                  (append (irony--lang-compile-option)
+                                          irony-additional-clang-options
+                                          irony--compile-options)
+                                  " "))
                                " "
                                (file-name-nondirectory filename) " -o "
                                (file-name-base filename)))))))
@@ -172,8 +175,8 @@
   (setq cc-search-directories '("."
                                 "/usr/include"
                                 "/usr/local/include/*"
-                                "../*/include")
-        highlight-indentation-offset 4)
+                                "../*/include"))
+  (highlight-indentation-set-offset 4)
   ;; make a #define be left-aligned
   (setq c-electric-pound-behavior '(alignleft))
 
@@ -193,17 +196,18 @@
 ;; because many major-modes use this hook
 (add-hook 'c-mode-common-hook
           (lambda ()
-            (unless (is-buffer-file-temp)
+            (unless (buffer-temporary-p)
               (common-cc-mode-setup)
               (if (derived-mode-p 'c++-mode)
                   (setq-local flycheck-clang-language-standard "c++14")
-                (setq flycheck-clang-language-standard nil))
-              (unless (or (derived-mode-p 'java-mode)
-                          (derived-mode-p 'groovy-mode))
-                (c-mode-setup)))))
+                (setq flycheck-clang-language-standard nil)))
+             (unless (or (derived-mode-p 'java-mode)
+                         (derived-mode-p 'groovy-mode))
+               (c-mode-setup))))
 
 
 (with-eval-after-load 'irony
+  (add-hook 'flycheck-mode-hook 'flycheck-irony-setup)
   (setq irony-additional-clang-options
         '("-Wall"
           "-I/usr/lib/gcc/x86_64-linux-gnu/5/include/"
@@ -227,7 +231,7 @@
 (with-eval-after-load 'cmake-ide
   (defun do-unless-buffer-is-temp (fn &rest args)
     "Do function unless buffer is temporary"
-    (unless (or (is-buffer-file-temp) (file-remote-p default-directory))
+    (unless (or (buffer-temporary-p) (file-remote-p default-directory))
       (apply fn args)))
   (advice-add 'cmake-ide--mode-hook :around #'do-unless-buffer-is-temp)
   (advice-add 'cmake-ide--before-save :around #'do-unless-buffer-is-temp))

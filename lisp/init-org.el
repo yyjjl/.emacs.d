@@ -2,8 +2,8 @@
   (defun kill-hidden-http-buffer ()
     (dolist (buf (buffer-list))
       (when (and (string-prefix-p " *http " (buffer-name buf))
-                (let ((proc (get-buffer-process buf)))
-                  (not (and proc (process-live-p proc)))))
+                 (let ((proc (get-buffer-process buf)))
+                   (not (and proc (process-live-p proc)))))
         (kill-buffer buf))))
   ;; don't prompt me to confirm everytime I want to evaluate a block
   (setq org-confirm-babel-evaluate nil)
@@ -42,8 +42,8 @@
   ;; Please note flyspell only use ispell-word
   (defun org-mode-flyspell-verify-hack (fn &rest args)
     (and (apply fn args)
-        (not (org-mode-is-code-snippet))
-        (not (org-mode-current-line-is-property))))
+         (not (org-mode-is-code-snippet))
+         (not (org-mode-current-line-is-property))))
   (advice-add 'org-mode-flyspell-verify :around
               #'org-mode-flyspell-verify-hack)
 
@@ -91,11 +91,22 @@
 
   (setq org-src-fontify-natively t)
 
+  (unless (featurep 'company-auctex)
+    (require 'company-auctex))
+  (defun company-org-symbols (command &optional arg &rest ignored)
+    (interactive (list 'interactive))
+    (cl-case command
+      (interactive (company-begin-backend 'company-org-symbols))
+      (prefix  (and (org-inside-LaTeX-fragment-p)
+                    (company-grab-word)))
+      (candidates (company-auctex-symbol-candidates arg))
+      (annotation (company-auctex-symbol-annotation arg))))
+
   (defun org-mode-hook-setup ()
-    ;; org-mode's own flyspell will be loaded
     (make-local-variable 'completion-at-point-functions)
     (add-to-list 'completion-at-point-functions
                  'pcomplete-completions-at-point)
+    (add-to-list 'company-backends 'company-org-symbols)
     (setq-local company-backends (remove 'company-dabbrev company-backends))
     ;; display wrapped lines instead of truncated lines
     (setq truncate-lines nil)
@@ -106,19 +117,23 @@
   (add-hook 'org-mode-hook 'org-mode-hook-setup)
 
   (define-keys :map org-mode-map
-             ("C-c o" . ob-ipython-inspect)
-             ("C-c c i" . org-clock-in)
-             ("C-c c o" . org-clock-out)
-             ("C-c c c" . org-clock-in-last)
-             ("C-c c e" . org-clock-modify-effort-estimate)
-             ("C-c c q" . org-clock-cancel)
-             ("C-c c g" . org-clock-goto)
-             ("C-c c d" . org-clock-display)
-             ("C-c c r" . org-clock-report)
-             ([f9] . org-project-publish-this-file-to-html)
-             ([f10] . org-publish)
-             ("C-c t" . org-todo)
-             ("C-c C-t" . nil)))
+    ("C-c o" . ob-ipython-inspect)
+    ("C-c c i" . org-clock-in)
+    ("C-c c o" . org-clock-out)
+    ("C-c c c" . org-clock-in-last)
+    ("C-c c e" . org-clock-modify-effort-estimate)
+    ("C-c c q" . org-clock-cancel)
+    ("C-c c g" . org-clock-goto)
+    ("C-c c d" . org-clock-display)
+    ("C-c c r" . org-clock-report)
+    ("M-," . org-mark-ring-goto)
+    ("M-." . org-mark-ring-push)
+    ("C-c l" . org-store-link)
+    ([f9] . org-project-publish-this-file-to-html)
+    ([f10] . org-publish)
+    ([f5] . org-present)
+    ("C-c t" . org-todo)
+    ("C-c C-t" . nil)))
 
 
 (with-eval-after-load 'org-clock
@@ -222,5 +237,28 @@
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                  ("\\paragraph{%s}" . "\\paragraph*{%s}")
                  ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+
+(with-eval-after-load 'org-present
+  (define-keys :map org-present-mode-keymap
+    ("<down>" . scroll-down-line)
+    ("<up>" . scroll-up-line)
+    ("q" . org-present-quit))
+  (setq org-present-text-scale 2)
+
+  (defhook org|present-setup (org-present-mode-hook)
+    (setq org-format-latex-options (plist-put org-format-latex-options :scale 2))
+    (setq mode-line-format nil)
+    (org-present-big)
+    (org-display-inline-images)
+    (org-present-hide-cursor)
+    (org-present-read-only))
+  (defhook org|present-exit (org-present-mode-quit-hook)
+    (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
+    (setq mode-line-format
+                '("%e" (:eval (generate-mode-line))))
+    (org-present-small)
+    (org-remove-inline-images)
+    (org-present-show-cursor)
+    (org-present-read-write)))
 
 (provide 'init-org)

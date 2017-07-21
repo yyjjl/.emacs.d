@@ -37,7 +37,6 @@
                         "\") no-repeat 0 0;"
                         ))))
     (kill-new rlt)
-    (copy-yank-str rlt)
     (message "css code => clipboard & yank ring")))
 
 (defun my-css-imenu-make-index ()
@@ -52,7 +51,7 @@
                (rainbow-mode 1)
                (when (require 'css-eldoc nil t)
                  (turn-on-css-eldoc))
-               (unless (is-buffer-file-temp)
+               (unless (buffer-temporary-p)
                  (setq imenu-create-index-function 'my-css-imenu-make-index)))))
 
 (with-eval-after-load 'css-mode

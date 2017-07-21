@@ -1,31 +1,33 @@
 ;; kill the buffer when terminal is exited
-(defun autoclose-term-buffer (fn proc msg)
-  (if (memq (process-status proc) '(signal exit))
-      (let ((buffer (process-buffer proc)))
-        (funcall fn proc msg)
-        (kill-buffer buffer))
-    (funcall fn proc msg)))
+(defun term|wrap-sentinel (&optional _fn)
+  (lexical-let ((fn _fn)
+                (kill-window-p (= 1 (length (window-list)))))
+    (lambda (proc msg)
+      (if (memq (process-status proc) '(signal exit))
+          (let* ((buffer (process-buffer proc))
+                 (window (get-buffer-window buffer)))
+            (and fn (funcall fn proc msg))
+            (when (and (window-live-p window)
+                       (> (length (window-list)) 1)
+                       kill-window-p)
+              (delete-window window))
+            (kill-buffer buffer))
+        (and fn (funcall fn proc msg))))))
 
-(defun autoclose-shell-buffer (fn proc msg)
-  (if (and (eq major-mode 'shell-mode) (memq (process-status proc) '(signal exit)))
-      (let ((buffer (process-buffer proc)))
-        (funcall fn proc msg)
-        (kill-buffer buffer))
-    (funcall fn proc msg)))
-(advice-add 'term-sentinel :around #'autoclose-term-buffer)
-(advice-add 'tramp-process-sentinel :around #'autoclose-term-buffer)
+(defhook term|shell-setup (shell-mode-hook)
+  (let ((proc (ignore-errors (get-buffer-process (current-buffer)))))
+    (when proc
+      (set-process-sentinel proc
+                            (term|wrap-sentinel (process-sentinel proc))))))
 
-;; utf8
-(defun term-mode-utf8-setup ()
+(defhook term|term-setup (term-mode-hook)
+  (dirtrack-mode 1)
+  (setq dirtrack-list '("^#.*?in \\(.*?\\) \\[[:0-9]*\\]" 1 nil)))
+
+(defhook term|utf8-setup (term-exec-hook)
   (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
-(add-hook 'term-exec-hook 'term-mode-utf8-setup)
 
-(defun directory-equal-p (d1 d2)
-  (equal (expand-file-name (concat d1 "/"))
-         (expand-file-name (concat d2 "/"))))
-
-
-(defun last-term-buffer (buffers mode &optional dir)
+(defun term|last-buffer (buffers mode &optional dir)
   "Return most recently used term buffer."
   (when buffers
     (let* ((buf (car buffers))
@@ -34,20 +36,20 @@
       (if (and (eq mode (car info))
               (directory-equal-p (or dir default-directory) (cdr info)))
           buf
-        (last-term-buffer (cdr buffers) mode dir)))))
+        (term|last-buffer (cdr buffers) mode dir)))))
 
-(defun get-first-buffer-name (fmt)
+(defun term|get-buffer-name (fmt)
   (let ((index 1) name)
     (setq name (format fmt index))
     (while (buffer-live-p (get-buffer name))
       (setq index (1+ index)))
     name))
 
-(defun get-remote-shell ()
+(defun term|remote-shell ()
   "Switch to remote shell"
   (interactive)
-  (let ((buf   (or (last-term-buffer (buffer-list) 'shell-mode)
-                   (get-buffer-create (get-first-buffer-name "*shell%d*")))))
+  (let ((buf (or (term|last-buffer (buffer-list) 'shell-mode)
+                 (get-buffer-create (term|get-buffer-name "*shell%d*")))))
     (when buf
       (pop-to-buffer buf)
       (set-buffer buf)
@@ -55,10 +57,10 @@
         (let ((explicit-shell-file-name "/bin/bash"))
           (shell buf))))))
 
-(defun get-term (&optional dir)
+(defun term|local-shell (&optional dir)
   (unless (featurep 'multi-term)
     (require 'multi-term nil t))
-  (let ((buf (last-term-buffer (buffer-list) 'term-mode dir)))
+  (let ((buf (term|last-buffer (buffer-list) 'term-mode dir)))
     (unless buf
       (if dir
           (let ((default-directory dir))
@@ -68,21 +70,23 @@
             (nconc multi-term-buffer-list (list buf)))
       (set-buffer buf)
       ;; Internal handle for `multi-term' buffer.
-      (multi-term-internal))
+      (multi-term-internal)
+      (let ((proc (ignore-errors (get-buffer-process (current-buffer)))))
+        (when proc (set-process-sentinel proc (term|wrap-sentinel)))))
     buf))
 
-(defun get-term-or-shell (&optional arg)
+(defun term|pop-shell (&optional arg)
   "Switch to the term buffer last used, or create a new one if
-    none exists, or if the current buffer is already a term."
+none exists, or if the current buffer is already a term."
   (interactive "P")
   (if (not (file-remote-p default-directory))
       (unless (eq major-mode 'term-mode)
         (pop-to-buffer
-         (get-term (or (and arg default-directory)
-                       (and (bound-and-true-p cmake-ide-enabled)
-                            cmake-ide-build-dir)
-                       (ignore-errors (projectile-project-root))))))
-    (get-remote-shell)))
+         (term|local-shell (or (and arg default-directory)
+                               (and (bound-and-true-p cmake-ide-enabled)
+                                    cmake-ide-build-dir)
+                               (ignore-errors (projectile-project-root))))))
+    (term|remote-shell)))
 
 (with-eval-after-load 'multi-term
   (setq multi-term-program "/bin/zsh")
@@ -95,12 +99,6 @@
                   ("M-[" . multi-term-prev))))
   (setq multi-term-dedicated-close-back-to-open-buffer-p t))
 
-(defun term-mode-setup ()
-  (dirtrack-mode 1)
-  (setq dirtrack-list '("^#.*?in \\(.*?\\) \\[[:0-9]*\\]" 1 nil)))
-
-(add-hook 'term-mode-hook 'term-mode-setup)
-
-(global-set-key [f8] 'get-term-or-shell)
+(global-set-key [f8] 'term|pop-shell)
 
 (provide 'init-term-mode)

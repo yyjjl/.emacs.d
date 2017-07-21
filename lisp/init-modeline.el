@@ -1,7 +1,12 @@
-(defun mode-line-buffer-id ()
+(defun mode-line|buffer-id ()
+  "Display buffer id in mode-line.
+Default format 'window-number %[%b (host-address) %]'
+If function `window-numbering-mode' enabled window-number will be showed.
+If buffer is narrowed, there will be a '><' around window-number.
+If buffer file is a remote file, host-address will be showed"
   (let* ((host (and default-directory
-                   (let ((tmp (file-remote-p default-directory)))
-                     (and tmp (split-string tmp ":")))))
+                    (let ((tmp (file-remote-p default-directory)))
+                      (and tmp (split-string tmp ":")))))
          (num (if (bound-and-true-p window-numbering-mode)
                   (let ((num-str (window-numbering-get-number-string)))
                     (if (buffer-narrowed-p) (concat ">" num-str "<") num-str))
@@ -13,7 +18,8 @@
                             ""))))
     (concat num " %[" real-id "%]")))
 
-(defun mode-line-buffer-major-mode ()
+(defun mode-line|buffer-major-mode ()
+  "Display buffer major mode in mode-line."
   (propertize " %m "
               'face 'font-lock-builtin-face
               'help-echo (symbol-name major-mode)
@@ -29,9 +35,12 @@
                     :filter (lambda (_) (mouse-menu-major-mode-map))))
                 map)))
 
-(defun mode-line-buffer-status ()
+(defun mode-line|buffer-status ()
+  "Display buffer status.
+Whether it is temporary file, whether it is modified, whether is read-only,
+and `buffer-file-coding-system'"
   (concat "("
-          (if (is-buffer-file-temp)
+          (if (buffer-temporary-p)
               "tmp|"
             (when (buffer-modified-p)
               (propertize "mod|"
@@ -47,7 +56,8 @@
               buf-coding))
           ")"))
 
-(defun mode-line-flycheck ()
+(defun mode-line|flycheck ()
+  "Display flycheck status in mode-line."
   (if (bound-and-true-p flycheck-mode)
       (pcase flycheck-last-status-change
         (`not-checked (propertize "waiting" 'face 'font-lock-comment-face))
@@ -57,37 +67,54 @@
         (`interrupted (propertize "interrupted" 'face  'flycheck-fringe-warning))
         (`suspicious (propertize "???" 'face 'flycheck-fringe-error))
         (`finished (let-alist (flycheck-count-errors flycheck-current-errors)
-                      (concat (propertize (format "E%s" (or .error 0))
-                                          'face 'flycheck-fringe-error)
-                              "|"
-                              (propertize (format "W%s" (or .warning 0))
-                                          'face 'flycheck-fringe-warning)))))))
+                     (concat (propertize (format "E%s" (or .error 0))
+                                         'face 'flycheck-fringe-error)
+                             "|"
+                             (propertize (format "W%s" (or .warning 0))
+                                         'face 'flycheck-fringe-warning)))))))
 
-(defun mode-line-vc ()
+(defun mode-line|vc ()
+  "Display `version-control' status."
   (and (buffer-file-name (current-buffer)) vc-mode))
 
-(defun mode-line-process ()
+(defun mode-line|process ()
+  "Display buffer process status."
   (let ((proc (get-buffer-process (current-buffer))))
     (if (not proc) ""
       (if (process-live-p proc)
           (format " {:run %s} " (process-id proc))
         (format " {:exit %s} " (process-exit-status proc))))))
 
-(defun generate-mode-line ()
-  (let ((lhs (format-mode-line
-              (concat (mode-line-buffer-id)
-                      (mode-line-process)
-                      (mode-line-buffer-major-mode)
-                      (mode-line-buffer-status))))
-        (rhs (format-mode-line
-              (concat (mode-line-vc) " "
-                      (mode-line-flycheck) " "
-                      (propertize "%I [%l:%c] %p%% "
-                                  'face 'font-lock-constant-face)))))
-    (format (format " %%s%%%ds" (or (- (window-total-width)
-                                       (string-width (format-mode-line lhs)))
-                                     0))
-            lhs rhs)))
+(defvar mode-line|center-margin 3)
+(defun mode-line|generate ()
+  "Generate mode-line."
+  (let* ((lhs (format-mode-line
+               (concat (mode-line|buffer-id)
+                       (mode-line|process)
+                       (mode-line|buffer-major-mode)
+                       (mode-line|buffer-status))))
+         (chs (propertize (or display-time-string "")
+                          'face 'font-lock-negation-char-face))
+         (rhs (format-mode-line
+               (concat (mode-line|vc) " "
+                       (mode-line|flycheck) " "
+                       (propertize "%I [%l:%c] %p%% "
+                                   'face 'font-lock-constant-face))))
+         (lw (string-width lhs))
+         (cw (string-width chs))
+         (rw (string-width rhs))
+         (tw (window-total-width))
+         (margin (/ (- tw (+ lw rw cw)) 2)))
+    (if (>= margin mode-line|center-margin)
+        (format (format " %%s%%%ds%%%ds" (+ cw margin) (+ rw  margin 1))
+                lhs chs rhs)
+      (format (format " %%s%%%ds" (+ 1 (- tw lw)))
+              lhs rhs))))
+
+;; Setup `mode-line-format'
+(window-numbering-mode 1)
+(setq-default mode-line-format
+              '("%e" (:eval (mode-line|generate))))
 
 (require 'uniquify)
 
@@ -117,5 +144,3 @@
      #b11111111]))
 
 (provide 'init-modeline)
-
-;;; init-modeline ends here

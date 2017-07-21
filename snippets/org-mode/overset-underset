@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: overset-underset
+# key: ou
+# --
+\overset{$1}{\underset{$2}{$0}}

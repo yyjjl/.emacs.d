@@ -23,8 +23,9 @@
          (let ((dir (oref obj reference-directory)))
            (and (not (file-remote-p dir)) (file-exists-p dir))))))
 
-(defun try-turn-on-semantic-mode ()
-  (if (> (buffer-size) large-buffer-size)
+(defun main|semantic-mode ()
+  (if (or (> (buffer-size) emacs|large-buffer-size)
+          (file-remote-p default-directory))
       (semantic-mode -1)
     (semantic-mode 1)))
 

@@ -1,6 +1,6 @@
 (add-hook 'sh-mode-hook
           '(lambda ()
-             (unless (is-buffer-file-temp)
+             (unless (buffer-temporary-p)
                (add-to-list 'company-backends 'company-files)
                (flycheck-mode 1))))
 
@@ -10,7 +10,7 @@
           (lambda () (setq show-trailing-whitespace nil)))
 
 (with-eval-after-load 'sh-script
-  ;; fix freeze problem
+  ;; Fix freeze problem
   (defun sh-smie-sh-forward-token ()
     (if (and (looking-at "[ \t]*\\(?:#\\|\\(\\s|\\)\\|$\\)")
             (save-excursion

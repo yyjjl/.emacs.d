@@ -20,7 +20,6 @@
       (cursor-color . "#F8F8F0")
       (background-mode . dark))
      (default ((t (:foreground "#F8F8F2" :background "#1B1D1E"))))
-     (button ((t (:underline t))))
      (link ((t (:underline t :weight bold :foreground "#66D9EF"))))
      (link-visited ((t (:underline t :weight bold :foreground "#AE81EF"))))
 
@@ -71,7 +70,7 @@
      (fringe ((t (:background "#1B1D1E"))))
      (highlight-indentation-face ((t (:background "#111213"))))
      ;; (vertical-border ((t (:foreground "#111213"))))
-     (vertical-border ((t (:foreground "#1B1D1E"))))
+     (vertical-border ((t (:foreground "black"))))
      (highlight ((t (:foreground "#000000" :background "#C4BE89"))))
      (icompletep-choices ((t (:foreground "#F92672"))))
      (icompletep-determined ((t (:foreground "#A6E22E"))))
@@ -179,12 +178,12 @@
      (org-block-end-line ((t (:foreground "#b3e5fc" :background "#1e2930"))))
 
      (org-level-1 ((class (:inherit outline-1
-                                    :background "#455A64"
+                                    ;; :background "#455A64"
                                     :weight bold
                                     :overline t
                                     :height 1.3))))
      (org-level-2 ((class (:inherit outline-2
-                                    :background "#35575b"
+                                    ;; :background "#35575b"
                                     :height 1.2))))
      (org-level-3 ((class (:inherit outline-3 :height 1.1))))
      (org-level-4 ((class (:inherit outline-4))))
@@ -252,8 +251,13 @@
         (:underline (:style line :color "#dc752f")))
        (t (:background "#dc752f" :weight bold :underline t))))
 
+     (diredp-dir-heading ((((background dark))
+                           (:inherit font-lock-keyword-face))))
+
+     (semantic-highlight-func-current-tag-face ((t (:background "gray5"))))
      (linum-highlight-face ((t (:inherit default :foreground "orange red"))))
      (shm-current-face ((t (:inherit hl-sexp-face))))
      (ivy-highlight-face ((t (:background "#444155")))))))
 
 (provide 'color-theme-molokai)
+

@@ -1,3 +1,23 @@
+(defun main|toggle-company-ispell ()
+  "Toggle `company-ispell'"
+  (interactive)
+  (cond
+   ((memq 'company-ispell company-backends)
+    (setq company-backends (delete 'company-ispell company-backends))
+    (message "company-ispell disabled"))
+   (t
+    ;; Company-ispell it will stop other completions
+    (add-to-list 'company-backends 'company-ispell)
+    (message "company-ispell enabled!"))))
+
+(defun main|company-yasnippet ()
+  "Call `company-yasnippet'"
+  (interactive)
+  (company-abort)
+  (call-interactively 'company-yasnippet))
+
+(make-variable-buffer-local 'company-backends)
+
 (with-eval-after-load 'company
   (company-statistics-mode 1)
   ;; make company-files a work before capf
@@ -7,10 +27,10 @@
                                company-capf
                                (company-dabbrev-code
                                 company-gtags
-                                ;; company-etags
+                                company-etags
                                 company-keywords)
-                               company-oddmuse company-dabbrev))
-  (make-variable-buffer-local 'company-backends)
+                               company-oddmuse
+                               company-dabbrev))
   ;; company should be case sensitive
   (setq company-dabbrev-downcase nil)
   (setq company-dabbrev-ignore-case nil)
@@ -41,25 +61,5 @@
 
 (with-eval-after-load 'company-etags
   (add-to-list 'company-etags-modes 'web-mode))
-
-(with-eval-after-load 'company-shell
-  (setq company-shell-modes '(sh-mode)))
-
-
-(defun toggle-company-ispell ()
-  (interactive)
-  (cond
-   ((memq 'company-ispell company-backends)
-    (setq company-backends (delete 'company-ispell company-backends))
-    (message "company-ispell disabled"))
-   (t
-    ;; company-ispell it will stop other completions
-    (add-to-list 'company-backends 'company-ispell)
-    (message "company-ispell enabled!"))))
-
-(defun force-company-yasnippet ()
-  (interactive)
-  (company-abort)
-  (call-interactively 'company-yasnippet))
 
 (provide 'init-company)

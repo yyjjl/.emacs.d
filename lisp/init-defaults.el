@@ -7,7 +7,7 @@
 ;; time management
 (setq display-time-24hr-format t)
 (setq display-time-day-and-date t)
-;; (display-time)
+(display-time-mode)
 
 (setq-default buffers-menu-max-size 30
               case-fold-search t
@@ -31,35 +31,100 @@
               visible-bell nil
               speedbar-use-images nil)
 
-(setq projectile-completion-system 'ivy)
 (setq system-time-locale "C")
 (setq imenu-max-item-length 1024)
+;; key value
 (setq minibuffer-prompt-properties
-      '(;; key value
-        read-only t
+      '(read-only t
         point-entered minibuffer-avoid-prompt
         face minibuffer-prompt))
 
 (setq global-auto-revert-non-file-buffers t
       auto-revert-verbose nil)
 
-(setq backup-by-coping t ; don't clobber symlinks
+;; don't clobber symbol links
+(setq backup-by-coping t
       delete-old-versions t
-      version-control t  ;use versioned backups
+      ;; use versioned backups
+      version-control t
       kept-new-versions 6
       kept-old-versions 2)
 
+;; Use the system clipboard
+(setq x-select-enable-clipboard t
+      x-select-enable-primary t)
+
 ;; Donot make backups of files, not safe
 (setq vc-make-backup-files nil)
+
+;; automatic save place of each buffer
+(setq-default save-place t)
+(require 'saveplace)
+
+;; history
+(setq history-length 100)
+;; kill-ring is too big
+(setq savehist-additional-variables '(search-ring regexp-search-ring))
+(savehist-mode 1)
+
+(setq-default initial-scratch-message
+              (concat ";; Welcome to Emacs " (or user-login-name "") " !!!"))
+
+;; recentf-mode
+(transient-mark-mode t)
+(recentf-mode 1)
+(defvar core|recentf-enabled-p t)
+(setq recentf-keep '((lambda (fn)
+                       (and core|recentf-enabled-p
+                           (or (file-remote-p fn)
+                               (file-readable-p fn))))))
+(setq recentf-max-saved-items 2048
+      recentf-exclude (list "/tmp/" "/ssh:" "/sudo:" emacs|var-direcotry))
+
+;; `midnight-mode' purges buffers which haven't been displayed in 3 days
+(require 'midnight)
+(setq midnight-mode t)
 
 ;; Don't echo passwords when communicating with interactive programs:
 (add-hook 'comint-output-filter-functions
           'comint-watch-for-password-prompt)
 
-(defvar large-buffer-size 1048576)
+;; display long lines in truncated style (end line with $)
+(defhook core|truncate-lines-setup (grep-mode-hook)
+  (toggle-truncate-lines 1))
+
+;; tab to skip close pair
+(defun core|indent-for-tab (fn &optional arg)
+  (if (looking-at "`\\|\"\\|}\\|\\$")
+      (forward-char 1)
+    (if (save-excursion (forward-line 0)
+                        (and outline-minor-mode (looking-at-p outline-regexp)))
+        (outline-toggle-children)
+      (funcall fn arg))))
+(advice-add 'indent-for-tab-command :around #'core|indent-for-tab)
+
+;; make scratch buffer un-killable
+(defhook core|unkillable-scratch-buffer (kill-buffer-query-functions)
+  (if (equal (buffer-name (current-buffer)) "*scratch*")
+      (progn
+        (delete-region (point-min) (point-max))
+        nil)
+    t))
+
+;; turns on auto-fill-mode, don't use text-mode-hook
+(add-hook 'change-log-mode-hook 'turn-on-auto-fill)
+
+;; ANSI-escape coloring in compilation-mode
+(ignore-errors
+  (require 'ansi-color)
+  (defhook core|colorize-compilation-buffer (compilation-filter-hook)
+    (when (eq major-mode 'compilation-mode)
+      (ansi-color-apply-on-region compilation-filter-start (point-max)))))
+
+
 ;; default prog-mode setup
-(defun generic-prog-mode-hook-setup ()
-  (try-turn-on-semantic-mode)
+(defhook core|generic-prog-mode-setup (prog-mode-hook)
+  (main|semantic-mode)
   ;; auto insert closing pair
   (electric-pair-mode 1)
   (electric-layout-mode 1)
@@ -67,61 +132,18 @@
   (eldoc-mode 1)
   (show-paren-mode 1)
   (hs-minor-mode 1)
-  (when (< (buffer-size) large-buffer-size)
-    (highlight-indent-guides-mode))
+  (hl-line-mode 1)
+  (when (< (buffer-size) emacs|large-buffer-size)
+    (highlight-indentation-mode 1))
   ;; show trailing spaces in a programming mode
   (setq show-trailing-whitespace t))
-(add-hook 'prog-mode-hook 'generic-prog-mode-hook-setup)
 
-;; display long lines in truncated style (end line with $)
-(defun truncate-lines-setup ()
-  (toggle-truncate-lines 1))
-(add-hook 'grep-mode-hook 'truncate-lines-setup)
+(defhook core|minibuffer-setup (minibuffer-setup-hook)
+  (local-set-key (kbd "C-k") 'kill-line)
+  (setq gc-cons-threshold most-positive-fixnum))
 
-;; tab to skip close pair
-(defun indent-for-tab-or-close (fn &optional arg)
-  (if (looking-at "`\\|\"\\|}\\|\\$")
-      (forward-char 1)
-    (if (save-excursion (forward-line 0)
-                        (and outline-minor-mode (looking-at-p outline-regexp)))
-        (outline-toggle-children)
-      (funcall fn arg))))
-(advice-add 'indent-for-tab-command :around #'indent-for-tab-or-close)
-
-;; make scratch buffer unkillable
-(defun unkillable-scratch-buffer ()
-  (if (equal (buffer-name (current-buffer)) "*scratch*")
-      (progn
-        (delete-region (point-min) (point-max))
-        nil)
-    t))
-(add-hook 'kill-buffer-query-functions 'unkillable-scratch-buffer)
-
-;; turns on auto-fill-mode, don't use text-mode-hook
-(add-hook 'change-log-mode-hook 'turn-on-auto-fill)
-
-;; recentf-mode
-(transient-mark-mode t)
-(recentf-mode 1)
-(defvar recentf-can-track t)
-(setq recentf-keep '((lambda (fn)
-                       (and recentf-can-track
-                           (or (file-remote-p fn)
-                               (file-readable-p fn))))))
-(setq recentf-max-saved-items 2048
-      recentf-exclude (list "/tmp/" "/ssh:" "/sudo:" emacs-var-direcotry))
-
-;; ANSI-escape coloring in compilation-mode
-(ignore-errors
-  (require 'ansi-color)
-  (defun my-colorize-compilation-buffer ()
-    (when (eq major-mode 'compilation-mode)
-      (ansi-color-apply-on-region compilation-filter-start (point-max))))
-  (add-hook 'compilation-filter-hook 'my-colorize-compilation-buffer))
-
-;; automatic save place of each buffer
-(require 'saveplace)
-(setq-default save-place t)
+(defhook core|minibuffer-exit (minibuffer-exit-hook)
+  (setq gc-cons-threshold emacs|gc-cons-threshold))
 
 ;; tramp setup
 (with-eval-after-load 'tramp
@@ -136,36 +158,5 @@
   ;; @see https://github.com/syl20bnr/spacemacs/issues/1921
   (setq tramp-ssh-controlmaster-options
         "-o ControlMaster=auto -o ControlPath='tramp.%%C' -o ControlPersist=no"))
-
-;; minibuffer-hook
-(defun my-minibuffer-setup-hook ()
-  ;; Use lispy in the minibuffer
-  (conditionally-enable-lispy 1)
-  (local-set-key (kbd "C-k") 'kill-line)
-  (setq gc-cons-threshold most-positive-fixnum))
-(defun my-minibuffer-exit-hook ()
-  (conditionally-enable-lispy -1)
-  (setq gc-cons-threshold (* 100 1024 1024)))
-(add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
-(add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
-
-;; history
-(safe-wrap
- (progn
-   (setq history-length 100)
-   ;; kill-ring is too big
-   (setq savehist-additional-variables '(search-ring regexp-search-ring))
-   (savehist-mode 1)))
-
-(setq-default initial-scratch-message
-              (concat ";; Welcome to Emacs " (or user-login-name "") " !!!"))
-
-(with-eval-after-load 'whitespace
-  (setq whitespace-style '(face spaces tabs newline
-                                space-mark tab-mark newline-mark))
-  (setcdr (assoc 'newline-mark whitespace-display-mappings)
-          '(10 [182 10]))
-  (setcdr (assoc 'tab-mark whitespace-display-mappings)
-          '(9 [8594] [92 9])))
 
 (provide 'init-defaults)

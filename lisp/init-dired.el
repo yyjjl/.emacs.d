@@ -1,4 +1,4 @@
-(defun diredext-exec-git-command-in-shell (command &optional arg file-list)
+(defun dired|git-command-in-shell (command &optional arg file-list)
   "Run a shell command `git COMMAND`' on the marked files.
 if no files marked, always operate on current line in dired-mode
 "
@@ -15,6 +15,26 @@ if no files marked, always operate on current line in dired-mode
   (dired-do-shell-command command arg file-list)
   (message command))
 
+(defun dired|open-externally ()
+  "Open the current file or dired marked files in external app.
+The app is chosen from your OS's preference."
+  (interactive)
+  (let* ((file-list (if (eq major-mode 'dired-mode)
+                        (dired-get-marked-files)
+                      (list (buffer-file-name))))
+         (do-it-p (or (<= (length file-list) 5)
+                      (y-or-n-p "Open more than 5 files? "))))
+    (when do-it-p
+      (cond
+       ((eq system-type 'darwin)
+        (mapc (lambda (path)
+                (shell-command (concat "open " (shell-quote-argument path))))
+              file-list))
+       ((eq system-type 'gnu/linux)
+        (mapc (lambda (path) (let ((process-connection-type nil))
+                               (start-process "" nil "xdg-open" path)))
+              file-list))))))
+
 (with-eval-after-load 'dired
   (setq dired-dwim-target t)
   ;; search file name only when focus is over file
@@ -23,8 +43,8 @@ if no files marked, always operate on current line in dired-mode
   (setq dired-recursive-deletes 'always)
 
   (define-key dired-mode-map ")" 'dired-omit-mode)
-  (define-key dired-mode-map "E" 'open-externally)
-  
+  (define-key dired-mode-map "E" 'dired|open-externally)
+
   (require 'dired-x)
   (require 'dired+)
   (setq dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$\\|^\\..*$"))
@@ -34,4 +54,3 @@ if no files marked, always operate on current line in dired-mode
 
 
 (provide 'init-dired)
-

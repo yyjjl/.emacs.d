@@ -1,4 +1,77 @@
+(defvar core|narrow-dwim-alist
+  '((org-mode org-narrow-to-subtree org-narrow-to-element)
+    (latex-mode LaTeX-narrow-to-environment TeX-narrow-to-group)))
+(defun core|narrow-or-widen-dwim (&optional arg)
+  "If the buffer is narrowed, it widens.
+Otherwise,it narrows to region, or Org subtree.
+Optional argument ARG is used to toggle narrow functions."
+  (interactive "P")
+  (cond ((buffer-narrowed-p) (widen))
+        ((region-active-p) (narrow-to-region (region-beginning) (region-end)))
+        (t (let ((cmd (cdr (assoc major-mode core|narrow-dwim-alist))))
+             (if cmd
+                 (setq cmd (if arg (cadr cmd) (car cmd)))
+               (setq cmd (if arg #'narrow-to-page #'narrow-to-defun)))
+             (when cmd
+               (message "Use command `%s'" cmd)
+               (funcall cmd))))))
+
+(defun comment-current-line (&optional arg)
+  "Comment current line."
+  (save-excursion
+    (beginning-of-line)
+    (set-mark-command nil)
+    (end-of-line)
+    (if arg
+        (call-interactively #'uncomment-region)
+      (call-interactively #'comment-region))))
+
+(defun comment-region-or-line ()
+  "If `mark-active' is non-nil, call `comment-region'. Otherwise
+call `comment-current-line'."
+  (interactive "*")
+  (if mark-active
+      (call-interactively 'comment-region)
+    (comment-current-line)))
+
+(defun uncomment-region-or-line ()
+    "If `mark-active' is non-nil, call
+`uncomment-region'. Otherwise call `comment-current-line' with argument t."
+  (interactive "*")
+  (if mark-active
+      (call-interactively 'uncomment-region)
+    (comment-current-line t)))
+
+(defun core|grab-regexp (regexp)
+  "Grab strings matching REGEXP to list."
+  (let ((s (buffer-string))
+        (pos 0)
+        item
+        items)
+    (while (setq pos (string-match regexp s pos))
+      (setq item (match-string-no-properties 0 s))
+      (setq pos (+ pos (length item)))
+      (add-to-list 'items item))
+    items))
+
+(autoload 'string-join "subr-x")
+(defun core|kill-regexp (regexp)
+  "Find all strings matching REGEXP in current buffer.
+grab matched string and insert them into `kill-ring'"
+  (interactive
+   (let ((regexp (read-regexp "grep regex: ")))
+     (list regexp)))
+  (let ((items (core|grab-regexp regexp)))
+    (kill-new (string-join items "\n"))
+    (message "matched strings => kill-ring")
+    items))
+
 (define-keys
+  ("C-c c" . comment-region-or-line)
+  ("C-c u" . uncomment-region-or-line)
+  ("C-x n n" . core|narrow-or-widen-dwim)
+  ("C-x K" . core|kill-regexp)
+
   ("M-z" . zzz-to-char)
   ("M-Z" . zzz-up-to-char)
   ("C-=" . mc/mark-next-like-this)
@@ -24,24 +97,22 @@
   ("R" . mc/reverse-regions))
 
 (with-eval-after-load 'picture
-  (defhydra hydra-picture-move (:pre (setq hydra-is-helpful nil) ;; do not show lv
-                             :post (setq hydra-is-helpful t))
+  (defhydra hydra|picture-move ()
     "move"
-    ("n" picture-move-down)
-    ("p" picture-move-up)
-    ("f" picture-motion)
-    ("b" picture-motion-reverse)
-
-    ("C-SPC" set-mark-command)
+    ("n" picture-move-down "down")
+    ("p" picture-move-up "up")
+    ("f" picture-motion "forward")
+    ("b" picture-motion-reverse "backward")
+    ("C-SPC" set-mark-command "mark")
     ("RET" nil nil))
   (define-keys :map picture-mode-map
     ("C-d" . picture-delete-char)
     ("C-c C-f") ("C-c C-b")
     ("C-c a" . artist-mode)
-    ("C-f" . hydra-picture-move/picture-motion)
-    ("C-b" . hydra-picture-move/picture-motion-reverse)
-    ("C-n" . hydra-picture-move/picture-move-down)
-    ("C-p" . hydra-picture-move/picture-move-up)))
+    ("C-f" . hydra|picture-move/picture-motion)
+    ("C-b" . hydra|picture-move/picture-motion-reverse)
+    ("C-n" . hydra|picture-move/picture-move-down)
+    ("C-p" . hydra|picture-move/picture-move-up)))
 
 (with-eval-after-load 'artist
   (define-keys :map artist-mode-map

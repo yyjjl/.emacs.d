@@ -2,19 +2,14 @@
 (eval-when-compile
   (require 'cl))
 
-(defcustom package-use-priority nil
-  "Non-nil means to use priority defined in variable `package-archive-priority'.
-Archive with high priority will be used when install a package."
-  :group 'package-utils)
+(defvar package|use-priority-p nil
+  "Non-nil means to use priority defined in variable `package|priority-alist'.
+Archive with high priority will be used when install a package.")
 
-(defcustom package-autoclose-autoloads t
-  "Auto close *-autoloads.el after a package installed."
-  :group 'package-utils)
+(defvar package|priority-alist nil "Package archive priority.")
+(defvar package|required-packages (make-hash-table) "All packages required.")
 
-(defvar package-archive-priority-alist nil "Package archive priority.")
-(defvar required-packages (make-hash-table) "All packages required.")
-
-(defun autoclose-autoloads (name pkg-dir)
+(defun package|autoclose-autoloads (name pkg-dir)
   "Auto close *-autoloads.el after a package installed."
   (let ((buf (find-file-existing
               (expand-file-name (concat (if (symbolp name)
@@ -23,43 +18,44 @@ Archive with high priority will be used when install a package."
                                         "-autoloads.el") pkg-dir))))
     (when buf (kill-buffer buf))))
 
-(defun add-packages (pkgs &optional archive)
-  (dolist (pkg pkgs)
-    (puthash pkg archive required-packages)))
-
-(defsubst max-of (seq &optional key)
-  (let* ((func (or key #'identity))
-         (value (car seq))
-         (maximum (funcall func value)))
+(defun package|max-of (seq &optional key)
+  "Get max element of SEQ.
+KEY is a function to compute value of element."
+  (unless key (setq key #'identity))
+  (let* ((value (car seq))
+         (maximum (funcall key value)))
     (when value
-      (dolist (elt (cdr seq))
-        (let ((m (funcall func elt)))
+      (dolist (e (cdr seq))
+        (let ((m (funcall key e)))
           (when (< maximum m)
             (setq maximum m
-                  value elt)))))
+                  value e)))))
     value))
 
-(defsubst package--archive-priority (archive)
-  (length (member (package-desc-archive archive)
-                  package-archive-priority-alist)))
+(defun package|add (pkgs &optional archive)
+  (dolist (pkg pkgs)
+    (puthash pkg archive package|required-packages)))
 
-(defun package-get-archive-by-name (name archives)
+(defsubst package|archive-priority (archive)
+  (length (member (package-desc-archive archive) package|priority-alist)))
+
+(defun package|get-archive (name archives)
   (unless (null archives)
     (if (string= name (package-desc-archive (car archives)))
         (car archives)
-      (package-get-archive-by-name name (cdr archives)))))
+      (package|get-archive name (cdr archives)))))
 
-(defun package-set-right-archive (pkg &optional archive-name)
-  "Set right archive content by priority."
-  (let* ((pkg-archives (cdr pkg)) archive)
+(defun package|set-archive (pkg &optional archive-name)
+  "Set right archive content for PKG."
+  (let ((pkg-archives (cdr pkg)) archive)
     (when archive-name
-      (setq archive (package-get-archive-by-name archive-name pkg-archives)))
-    (when (and (not archive) package-use-priority)
-      (setq archive (max-of pkg-archives #'package--archive-priority)))
+      (setq archive (package|get-archive archive-name pkg-archives)))
+    (when (and (not archive) package|use-priority-p)
+      (setq archive (package|max-of pkg-archives #'package|archive-priority)))
     (when archive
       (setf (cdr pkg) (list archive)))))
 
-(defun require-packages ()
+(defun package|load-all ()
   (let (freshed-p)
     (maphash (lambda (pkg _)
                (unless (package-installed-p pkg)
@@ -67,27 +63,27 @@ Archive with high priority will be used when install a package."
                    (setq freshed-p t)
                    (package-refresh-contents))
                  (package-install pkg)))
-             required-packages)))
+             package|required-packages)))
 
 
-(defun manager-packages-with-priority ()
+(defun package|after-read-contents ()
   (dolist (pkg package-archive-contents)
-    (package-set-right-archive pkg (gethash (car pkg) required-packages))))
+    (package|set-archive pkg (gethash (car pkg) package|required-packages))))
 
-(defun package-utils-initialize (&optional no-activate)
+(defun package|initialize (&optional no-activate)
   "Load Emacs Lisp packages."
-  (when package-use-priority
-    (setq package-archive-priority-alist (mapcar #'car package-archives)))
-  (when package-autoclose-autoloads
-    (advice-add 'package-generate-autoloads :after #'autoclose-autoloads))
-  (advice-add 'package-read-all-archive-contents :after
-              #'manager-packages-with-priority)
+  (when package|use-priority-p
+    (setq package|priority-alist (mapcar #'car package-archives)))
+  (advice-add 'package-generate-autoloads
+              :after #'package|autoclose-autoloads)
+  (advice-add 'package-read-all-archive-contents
+              :after #'package|after-read-contents)
 
   (package-initialize 'no-activate)
 
-  (require-packages)
+  (package|load-all)
 
-  (dolist (elt package-alist)
-    (package-activate (car elt))))
+  (dolist (e package-alist)
+    (package-activate (car e))))
 
 (provide 'package-utils)

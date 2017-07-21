@@ -1,5 +1,5 @@
 (with-eval-after-load 'linum
-  (setq linum-mode-inhibit-modes-list
+  (setq main|linum-disabled-modes
         '(eshell-mode
           shell-mode
           dictionary-mode
@@ -35,9 +35,8 @@
           gnus-summary-mode
           gnus-article-mode
           calendar-mode))
-  (defadvice linum-on (around linum-on-inhibit-for-modes)
-    "Stop the load of linum-mode for some major modes."
-    (unless (member major-mode linum-mode-inhibit-modes-list)
-      ad-do-it))
-  (ad-activate 'linum-on))
+  (defun main|disable-linum-mode (fn &rest args)
+    (unless (memq major-mode main|linum-disabled-modes)
+      (apply fn args)))
+  (advice-add 'linum-mode :around #'main|disable-linum-mode))
 (provide 'init-linum-mode)
