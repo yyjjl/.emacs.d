@@ -2,7 +2,7 @@
 (eval-when-compile
   (require 'cl))
 
-(defvar package|use-priority-p t
+(defvar package|use-priority-p nil
   "Non-nil means to use priority defined in variable `package|priority-alist'.
 Archive with high priority will be used when install a package.")
 

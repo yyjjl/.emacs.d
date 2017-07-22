@@ -1,16 +1,23 @@
-* 关于这个配置
-  这个配置的大部分代码和基本构架来自于[[https://github.com/redguardtoo/emacs.d/][Chen Bin]].
-  增加了很多其他的插件,删去我不使用的配置和插件.
+#+title: My emacs configuration files
 
-* 一些问题的解决
-** Fcitx中文的输入
-    可以尝试以下方法解决:(参见[[https://wiki.archlinux.org/index.php/Fcitx_(%25E7%25AE%2580%25E4%25BD%2593%25E4%25B8%25AD%25E6%2596%2587)#Emacs_.E6.97.A0.E6.B3.95.E4.BD.BF.E7.94.A8.E8.BE.93.E5.85.A5.E6.B3.95][Archwiki]])
-    1) 当 =LC_CTYPE= 为英文时,可能无法使用,在emacs启动之前启动
-       : export LC_CTYPE=zh_CN.UTF-8
-    2) Emacs默认使用的fontset是 =-*-*-*-r-normal--14-*-*-*-*-*-*-*=,
-       (terminus等字体),安装相应的字体
-    3) 如果上面的方法无法解决,尝试:
-       : export XMODIFIERS='@im=fcitx'
-       : export XIM=fcitx
-       : export XIM_PROGRAM=fcitx
-       可能会解决问题
+* About
+  This configuration originally comes from [[https://github.com/redguardtoo/emacs.d/][Chen Bin]]. I remove a lot
+  functions and packages which I don't need. 
+  
+* How to use
+  #+BEGIN_SRC sh
+  # copy this configuration to ~/.emacs.d
+  cd ~/.emacs.d/ || exit 1
+  make && emacs
+  #+END_SRC
+  Packages will be download automatically.
+
+* Some tips
+** Fcitx input method
+   Take a look at [[https://wiki.archlinux.org/index.php/Fcitx_(%25E7%25AE%2580%25E4%25BD%2593%25E4%25B8%25AD%25E6%2596%2587)#Emacs_.E6.97.A0.E6.B3.95.E4.BD.BF.E7.94.A8.E8.BE.93.E5.85.A5.E6.B3.95][Archwiki]].
+   #+BEGIN_SRC sh
+   export LC_CTYPE=zh_CN.UTF-8
+   export XMODIFIERS='@im=fcitx'
+   export XIM=fcitx
+   export XIM_PROGRAM=fcitx
+   #+END_SRC

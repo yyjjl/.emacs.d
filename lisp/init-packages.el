@@ -161,8 +161,9 @@
    flycheck-irony clang-format
    ggtags
    rtags
-   ivy-rtags
-   cmake-ide))
+   ivy-rtags))
+
+(package|add '(cmake-ide) "melpa-stable")
 
 (package|add
  '(sql-indent
