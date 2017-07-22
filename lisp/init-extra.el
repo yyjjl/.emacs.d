@@ -6,9 +6,7 @@
 (defalias 'perl-mode 'cperl-mode)
 
 (with-eval-after-load 'grep
-  (dolist (v '("auto" "target" "node_modules"
-               "bower_components" ".sass_cache" ".cache"
-               ".git" ".cvs" ".svn" ".hg" "elpa"))
+  (dolist (v core|ignored-directories)
     (add-to-list 'grep-find-ignored-directories v)))
 
 ;; Zeal at point

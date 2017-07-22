@@ -60,6 +60,8 @@
   (global-auto-revert-mode 1)
   (column-number-mode 1)
   (global-page-break-lines-mode 1)
+  ;; eldoc, show API doc in minibuffer echo area
+  (global-eldoc-mode 1)
   ;; (global-whitespace-newline-mode 1)
   ;; make zsh work correctly in emacs
   (setq system-uses-terminfo nil)

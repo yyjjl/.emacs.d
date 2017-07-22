@@ -1,68 +1,58 @@
 (defun js2-print-json-path (&optional hardcoded-array-index)
   "Print the path to the JSON value under point, and save it in the kill ring.
-If HARDCODED-ARRAY-INDEX provided, array index in JSON path is replaced with it."
+If HARDCODED-ARRAY-INDEX provided, array index in JSON path is
+replaced with it."
   (interactive "P")
-  (let (previous-node current-node
-                      key-name
-                      rlt)
-
+  (let (previous-node
+        (current-node (js2-node-at-point))
+        result)
     ;; The `js2-node-at-point' starts scanning from AST root node.
     ;; So there is no way to optimize it.
-    (setq current-node (js2-node-at-point))
-
     (while (not (js2-ast-root-p current-node))
       (cond
        ;; JSON property node
        ((js2-object-prop-node-p current-node)
-        (setq key-name (js2-prop-node-name
-                        (js2-object-prop-node-left current-node)))
-        (if rlt (setq rlt (concat "." key-name rlt))
-          (setq rlt (concat "." key-name))))
-
+        (push (concat "." (js2-prop-node-name
+                           (js2-object-prop-node-left current-node)))
+              result))
        ;; Array node
        ((or (js2-array-node-p current-node))
-        (setq rlt (concat
-                   (js2-get-element-index-from-array-node
-                    previous-node
-                    current-node
-                    hardcoded-array-index)
-                   rlt)))
+        (push (js2-get-element-index-from-array-node
+               previous-node
+               current-node
+               hardcoded-array-index)
+              result))
        ;; Other nodes are ignored
        (t))
-      ;; current node is archived
+      ;; Current node is archived
       (setq previous-node current-node)
       ;; Get parent node and continue the loop
       (setq current-node (js2-node-parent current-node)))
-    (cond
-     (rlt
-      ;; Clean the final result
-      (setq rlt (replace-regexp-in-string "^\\." "" rlt))
-      (kill-new rlt)
-      (message "%s => kill-ring" rlt))
-     (t
-      (message "No JSON path found!")))
-    rlt))
+    (if (equal (car result) ".")
+        (setq result (cdr result)))
+    (setq result (string-join result))
+    (if result
+        (progn
+          (kill-new result)
+          (message "%s => kill-ring" result))
+      (message "No JSON path found!"))
+    result))
 
-(defun my-js2-mode-setup()
-    (unless (buffer-temporary-p)
-      (js2-imenu-extras-mode)
-      (setq mode-name "JS2")
+(defhook js2|setup (js2-mode-hook)
+  (js2-imenu-extras-mode)
+  (setq mode-name "JavaScript2")
+  (js2r-add-keybindings-with-prefix "C-c j")
+  (define-key js2-mode-map (kbd "C-c b") 'web-beautify-js)
+  (js2-refactor-mode 1)
+  (unless (buffer-temporary-p)
 
-      (js2-refactor-mode 1)
+    (tern-mode 1)
+    (add-to-list 'company-backends 'company-tern)))
 
-      (tern-mode 1)
-
-      (add-to-list 'company-backends 'company-tern)
-
-      (js2r-add-keybindings-with-prefix "C-c j")
-      (define-key js2-mode-map (kbd "C-c b") 'web-beautify-js)))
-
-(add-hook 'js2-mode-hook 'my-js2-mode-setup)
-
-;;  flyspell setup for js2-mode
-(defun js-flyspell-verify ()
+;;  `flyspell' setup for js2-mode
+(defun js2|flyspell-verify ()
   (let* ((f (get-text-property (- (point) 1) 'face)))
-    ;; only words with following font face will be checked
+    ;; Only words with following font face will be checked
     (memq f '(js2-function-call
               js2-function-param
               js2-object-property
@@ -72,7 +62,7 @@ If HARDCODED-ARRAY-INDEX provided, array index in JSON path is replaced with it.
               font-lock-builtin-face
               rjsx-tag
               rjsx-attr))))
-(put 'js2-mode 'flyspell-mode-predicate 'js-flyspell-verify)
+(put 'js2-mode 'flyspell-mode-predicate 'js2|flyspell-verify)
 
 (setq-default js2-use-font-lock-faces t
               js2-mode-must-byte-compile nil

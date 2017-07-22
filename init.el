@@ -16,13 +16,8 @@
 (defvar emacs|var-direcotry (expand-file-name "var" user-emacs-directory))
 ;; All configuration in this directory
 (defvar emacs|config-directory (expand-file-name "lisp" user-emacs-directory))
-
 ;; Font size and family seeting
 (defvar emacs|default-font-name "Ubuntu Mono-13")
-
-;; When buffer's size bigger than `emacs|large-buffer-size', it will
-;; close some features to speed up emacs performance
-(defvar emacs|large-buffer-size (* 1024 1024))
 
 (setq file-name-handler-alist nil)
 ;; Don't GC during startup to save time
@@ -31,11 +26,15 @@
 (add-to-list 'load-path emacs|config-directory)
 
 ;;* Core features {{
-;; Some important tool (function)
+(require 'init-outlooking)
+;; Some important tool functions
 (require 'init-utils)
+
 ;; Set some important variables
 ;; Load all packages
+;; (package-initialize 'no-activate)
 (require 'init-packages)
+
 (ignore-errors (load-file (core|expand-var "init-env-vars.el")))
 (require 'init-vars)
 (require 'init-auto-mode)
@@ -55,6 +54,8 @@
 (require 'init-semantic)
 (require 'init-linum-mode)
 (require 'init-hs-minor-mode)
+(require 'init-org)
+(require 'init-latex)
 ;; }}
 
 (if git|has-git-p
@@ -62,25 +63,25 @@
 (if (or spelling|has-aspell-p
         spelling|has-hunspell-p)
     (require 'init-spelling))
+(if tags|has-ggtags-p
+    (require 'init-tags))
+
+(require 'init-cc-mode)
 (require 'init-python-mode)
 (require 'init-lisp)
 (require 'init-web-mode)
 (require 'init-sh)
+(require 'init-javascript)
+(require 'init-css)
 
 ;; Some keybindings using when editing
 (require 'init-editing)
 (require 'init-dired)
 (require 'init-ibuffer)
 (require 'init-windows)
-
-(require 'init-org)
-(require 'init-css)
-(require 'init-haskell)
-(require 'init-cc-mode)
-(require 'init-javascript)
-(require 'init-tags)
 (require 'init-gud)
-(require 'init-latex)
+
+(require 'init-haskell)
 
 ;; Other small tools
 (require 'init-extra)

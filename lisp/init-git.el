@@ -109,7 +109,7 @@
 (defhook git|generic-prog-mode-setup ((prog-mode-hook :append))
   (unless (or (file-remote-p default-directory)
               (buffer-temporary-p)
-              (> (buffer-size) emacs|large-buffer-size))
+              (> (buffer-size) core|large-buffer-size))
     (git-gutter-mode 1)))
 
 (with-eval-after-load 'git-messenger

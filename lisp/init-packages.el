@@ -2,20 +2,16 @@
 
 ;; add site-package's path to `load-path'
 (if (fboundp 'normal-top-level-add-to-load-path)
-    (let ((default-directory emacs|site-packages-directory))
-      (setq load-path
-            (append load-path
-                    (loop for dir in
-                          (directory-files
-                           (expand-file-name emacs|site-packages-directory))
-                          unless (string-match "^\\." dir)
-                          collecting (expand-file-name dir))))))
+    (dolist (dir (directory-files emacs|site-packages-directory))
+      (unless (string-match "^\\." dir)
+        (push (expand-file-name dir emacs|site-packages-directory) load-path))))
 
 ;; (setq package-archives '(("melpa" . "http://melpa.org/packages/")
 ;;                          ("melpa-stable" . "http://stable.melpa.org/packages/")
 ;;                          ;; uncomment below line if you need use GNU ELPA
 ;;                          ("gnu" . "http://elpa.gnu.org/packages/")))
-;; use mirror in China
+;; Use mirror in China
+;; The index of archive represent its priority
 (setq package-archives
       '(("melpa-stable" . "https://elpa.emacs-china.org/melpa-stable/")
         ("melpa" . "https://elpa.emacs-china.org/melpa/")
@@ -44,7 +40,8 @@
    smex
 
    ;; delete packages safely
-   package-safe-delete
+   ;; emacs 25 has builtin support
+   ;; package-safe-delete
    ;; show key bindings while pressing
    which-key
    dired+
@@ -164,7 +161,8 @@
    flycheck-irony clang-format
    ggtags
    rtags
-   ivy-rtags))
+   ivy-rtags
+   cmake-ide))
 
 (package|add
  '(sql-indent
@@ -182,12 +180,12 @@
    lua-mode
    go-mode
    groovy-mode
-   cmake-mode cmake-font-lock cmake-ide
+   cmake-mode cmake-font-lock
    php-mode
    gnuplot-mode
    csharp-mode
    graphviz-dot-mode))
 
-(package|initialize)
+(package|load-all)
 
 (provide 'init-packages)

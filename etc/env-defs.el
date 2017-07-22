@@ -3,12 +3,10 @@
   (require 'cl-lib)
   (require 'subr-x))
 
-(defvar env|data-directory
-  (expand-file-name "var" user-emacs-directory)
-  "Almost all emacs data store in this directory.")
-
-(defsubst env|expand (name)
-  (expand-file-name name env|data-directory))
+(defsubst env|expand-var (name)
+  (expand-file-name name (expand-file-name "var" user-emacs-directory)))
+(defsubst env|expand-etc (name)
+  (expand-file-name name (expand-file-name "etc" user-emacs-directory)))
 
 (defvar env|all-docs (make-hash-table))
 (defvar env|all-variables (make-hash-table))
@@ -54,7 +52,7 @@
                          (string-trim-right msg)))
     ""))
 
-(defmacro ref (name &optional (layer env|current-layer))
+(cl-defmacro ref (name &optional (layer env|current-layer))
   (env|wrap-name name "" "" layer))
 
 (cl-defmacro var (name form &optional doc)

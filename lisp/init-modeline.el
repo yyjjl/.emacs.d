@@ -8,8 +8,11 @@ If buffer file is a remote file, host-address will be showed"
                     (let ((tmp (file-remote-p default-directory)))
                       (and tmp (split-string tmp ":")))))
          (num (if (bound-and-true-p window-numbering-mode)
-                  (let ((num-str (window-numbering-get-number-string)))
-                    (if (buffer-narrowed-p) (concat ">" num-str "<") num-str))
+                  (let ((num-str (condition-case nil
+                                     (window-numbering-get-number-string)
+                                   (error " "))))
+                    (if (buffer-narrowed-p)
+                        (concat ">" num-str "<") num-str))
                 ""))
          (real-id (concat (propertize "%b" 'face font-lock-keyword-face)
                           (if (and host (cdr host))
@@ -86,35 +89,47 @@ and `buffer-file-coding-system'"
         (format " {:exit %s} " (process-exit-status proc))))))
 
 (defvar mode-line|center-margin 3)
+(defvar mode-line|special-string-function nil)
+(defvar mode-line|default-format '("%e" (:eval (mode-line|generate))))
+(defun mode-line|special-string ()
+  (propertize (cond ((stringp mode-line|special-string-function)
+                     mode-line|special-string-function)
+                    ((or (functionp mode-line|special-string-function)
+                         (fboundp mode-line|special-string-function))
+                     (funcall mode-line|special-string-function))
+                    (t ""))
+              'face 'font-lock-doc-face))
+(make-variable-buffer-local 'mode-line|special-string-function)
 (defun mode-line|generate ()
   "Generate mode-line."
-  (let* ((lhs (format-mode-line
-               (concat (mode-line|buffer-id)
-                       (mode-line|process)
-                       (mode-line|buffer-major-mode)
-                       (mode-line|buffer-status))))
-         (chs (propertize (or display-time-string "")
-                          'face 'font-lock-negation-char-face))
-         (rhs (format-mode-line
-               (concat (mode-line|vc) " "
-                       (mode-line|flycheck) " "
-                       (propertize "%I [%l:%c] %p%% "
-                                   'face 'font-lock-constant-face))))
-         (lw (string-width lhs))
-         (cw (string-width chs))
-         (rw (string-width rhs))
-         (tw (window-total-width))
-         (margin (/ (- tw (+ lw rw cw)) 2)))
-    (if (>= margin mode-line|center-margin)
-        (format (format " %%s%%%ds%%%ds" (+ cw margin) (+ rw  margin 1))
-                lhs chs rhs)
-      (format (format " %%s%%%ds" (+ 1 (- tw lw)))
-              lhs rhs))))
+  (unless (bound-and-true-p eldoc-mode-line-string)
+    (let* ((lhs (format-mode-line
+                 (concat (mode-line|buffer-id)
+                         (mode-line|process)
+                         (mode-line|buffer-major-mode)
+                         (mode-line|buffer-status))))
+           (chs (concat (propertize (or display-time-string "")
+                                    'face 'font-lock-negation-char-face)
+                        (mode-line|special-string)))
+           (rhs (format-mode-line
+                 (concat (mode-line|vc) " "
+                         (mode-line|flycheck) " "
+                         (propertize "%I [%l:%c] %p%% "
+                                     'face 'font-lock-constant-face))))
+           (lw (string-width lhs))
+           (cw (string-width chs))
+           (rw (string-width rhs))
+           (tw (window-total-width))
+           (margin (/ (- tw (+ lw rw cw)) 2)))
+      (if (>= margin mode-line|center-margin)
+          (format (format " %%s%%%ds%%%ds" (+ cw margin) (+ rw  margin 1))
+                  lhs chs rhs)
+        (format (format " %%s%%%ds" (+ 1 (- tw lw)))
+                lhs rhs)))))
 
 ;; Setup `mode-line-format'
 (window-numbering-mode 1)
-(setq-default mode-line-format
-              '("%e" (:eval (mode-line|generate))))
+(setq-default mode-line-format mode-line|default-format)
 
 (require 'uniquify)
 

@@ -13,7 +13,7 @@
 (defun lisp|common-setup ()
   "Enable features useful in any Lisp mode."
   (rainbow-delimiters-mode 1)
-  (unless (> (buffer-size) emacs|large-buffer-size)
+  (unless (> (buffer-size) core|large-buffer-size)
     (prettify-symbols-mode 1))
   (lispy-mode 1)
   (local-set-key (kbd "M-,") 'pop-tag-mark))
@@ -41,6 +41,10 @@ Emacs Lisp."
   (lisp|common-setup)
   (flycheck-mode -1)
   (define-key emacs-lisp-mode-map (kbd "C-c e") 'macrostep-expand)
+
+  (setq company-backends (remove 'company-capf company-backends))
+  (add-to-list 'company-backends 'company-elisp)
+
   (unless (buffer-temporary-p)
     (when (require 'eldoc nil t)
       (setq eldoc-idle-delay 0.2)
@@ -85,10 +89,6 @@ Emacs Lisp."
                 font-lock-type-face)
                (t font-lock-function-name-face)))
        nil t)))))
-
-(with-eval-after-load 'lispy
-  (add-to-list 'lispy-goto-symbol-alist
-               '(racket-mode racket-visit-definition racket-mode)))
 
 (with-eval-after-load 'racket-mode
   ;; Hide error message when racket script is not loaded

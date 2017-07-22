@@ -1,17 +1,16 @@
-(with-eval-after-load 'ispell
-  (cond
-   (spelling|has-aspell-p
-    (setq ispell-program-name "aspell"))
-   (spelling|has-hunspell-p
-    (setq ispell-program-name "hunspell")
-    ;; just reset dictionary to the safe one "en_US" for hunspell.  if
-    ;; we need use different dictionary, we specify it in command line
-    ;; arguments
-    (setq ispell-local-dictionary "en_US")
-    (setq ispell-local-dictionary-alist
-          '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil nil nil utf-8))))
-   (t (setq ispell-program-name nil)
-      (message "You need install either aspell or hunspell for ispell"))))
+(cond
+ (spelling|has-aspell-p
+  (setq ispell-program-name "aspell"))
+ (spelling|has-hunspell-p
+  (setq ispell-program-name "hunspell")
+  ;; just reset dictionary to the safe one "en_US" for hunspell.  if
+  ;; we need use different dictionary, we specify it in command line
+  ;; arguments
+  (setq ispell-local-dictionary "en_US")
+  (setq ispell-local-dictionary-alist
+        '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil nil nil utf-8))))
+ (t (setq ispell-program-name nil)
+    (message "You need install either aspell or hunspell for ispell")))
 
 (with-eval-after-load 'flyspell
   ;; Better performance

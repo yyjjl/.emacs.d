@@ -1,9 +1,9 @@
 (with-eval-after-load 'shm
-  (defun shm/tab-or-close (fn &rest args)
+  (defun haskell|shm-tab-or-close (fn &rest args)
     (if (looking-at ")\\|]\\|}\\|`")
         (forward-char 1)
       (apply fn args)))
-  (advice-add 'shm/tab :around #'shm/tab-or-close)
+  (advice-add 'shm/tab :around #'haskell|shm-tab-or-close)
 
   (define-keys :map shm-map
              ("C-c C-^") ("C-c 6" . shm/swing-up)
@@ -13,6 +13,7 @@
              ("C-c j" . shm/swing-down)))
 
 (with-eval-after-load 'hindent
+  ;; Rewrite function
   (defun hindent-reformat-decl ()
     "Work with `align'"
     (interactive)
@@ -23,9 +24,9 @@
           (hindent-reformat-region beg end t)
           (align beg end)))))
 
-  (defun force-hindent-indent-size (org-fn)
+  (defun haskell|force-indent-size (org-fn)
     (list* "--tab-size" "4" (apply org-fn '())))
-  (advice-add 'hindent-extra-arguments :around #'force-hindent-indent-size))
+  (advice-add 'hindent-extra-arguments :around #'haskell|force-indent-size))
 
 (with-eval-after-load 'haskell-mode
   (setq
@@ -43,7 +44,9 @@
    haskell-stylish-on-save nil
    company-ghc-show-info t)
 
-  (hare-init)
+  (when haskell|hare-path
+    (autoload 'hare-init haskell|hare-path nil t)
+    (hare-init))
   (remap-keybindings "C-c C-r" "C-c r" haskell-mode-map)
 
   (define-keys :map haskell-mode-map
@@ -62,31 +65,34 @@
     ("C-c '" . company-ghc-complete-by-hoogle)
     ("C-c ;" . company-ghc-complete-in-module))
 
-  (defun haskell-cabal-mode-setup ()
+  (defhook haskell|cabal-setup (haskell-cabal-mode-hook)
     (rainbow-delimiters-mode 1)
     (add-to-list 'company-backends 'company-cabal))
-  (add-hook 'haskell-cabal-mode-hook #'haskell-cabal-mode-setup)
 
-  (defun haskell-mode-setup ()
+  (defhook haskell|setup (haskell-mode-hook)
     (rainbow-delimiters-mode 1)
     (haskell-decl-scan-mode 1)
     (unless (buffer-temporary-p)
-      (ghc-init)
+      (when haskell|has-ghc-mod-p
+        (ghc-init)
+        (add-to-list 'company-backends 'company-ghc))
 
       (define-key haskell-mode-map
         (kbd "C-c <tab>") 'haskell-process-do-info)
       (define-key haskell-mode-map
         (kbd "C-c C-t") 'haskell-process-do-type)
-      (add-to-list 'company-backends 'company-ghc)
-      (haskell-doc-mode 1))
-    (hindent-mode 1)
-    ;; haskell-indentation-mode is incompatible with shm
-    ;; (haskell-indentation-mode -1)
-    (turn-on-haskell-indent)
-    (hl-line-mode -1)
-    (structured-haskell-mode 1))
 
-  (add-hook 'haskell-mode-hook #'haskell-mode-setup))
+      (haskell-doc-mode 1))
+
+    (when haskell|has-hindent-p
+      (hindent-mode 1))
+
+    (turn-on-haskell-indent)
+    (if haskell|has-shm-p
+        (structured-haskell-mode 1)
+      ;; haskell-indentation-mode is incompatible with shm
+      (haskell-indentation-mode 1))
+    (hl-line-mode -1)))
 
 (with-eval-after-load 'haskell-cabal
   (define-keys :map haskell-cabal-mode-map

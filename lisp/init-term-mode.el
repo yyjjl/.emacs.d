@@ -83,7 +83,7 @@ none exists, or if the current buffer is already a term."
       (unless (eq major-mode 'term-mode)
         (pop-to-buffer
          (term|local-shell (or (and arg default-directory)
-                               (and (bound-and-true-p cmake-ide-enabled)
+                               (and (bound-and-true-p cpp|cmake-ide-enabled)
                                     cmake-ide-build-dir)
                                (ignore-errors (projectile-project-root))))))
     (term|remote-shell)))

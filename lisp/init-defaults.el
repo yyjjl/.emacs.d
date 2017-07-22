@@ -51,8 +51,8 @@
       kept-old-versions 2)
 
 ;; Use the system clipboard
-(setq x-select-enable-clipboard t
-      x-select-enable-primary t)
+(setq select-enable-clipboard t
+      select-enable-primary t)
 
 ;; Donot make backups of files, not safe
 (setq vc-make-backup-files nil)
@@ -63,9 +63,9 @@
 
 ;; history
 (setq history-length 100)
-;; kill-ring is too big
-(setq savehist-additional-variables '(search-ring regexp-search-ring))
-(savehist-mode 1)
+;; Use `session' can do this
+;; (setq savehist-additional-variables '(search-ring regexp-search-ring))
+;; (savehist-mode 1)
 
 (setq-default initial-scratch-message
               (concat ";; Welcome to Emacs " (or user-login-name "") " !!!"))
@@ -89,7 +89,7 @@
 (add-hook 'comint-output-filter-functions
           'comint-watch-for-password-prompt)
 
-;; display long lines in truncated style (end line with $)
+;; Display long lines in truncated style (end line with $)
 (defhook core|truncate-lines-setup (grep-mode-hook)
   (toggle-truncate-lines 1))
 
@@ -128,12 +128,10 @@
   ;; auto insert closing pair
   (electric-pair-mode 1)
   (electric-layout-mode 1)
-  ;; eldoc, show API doc in minibuffer echo area
-  (eldoc-mode 1)
   (show-paren-mode 1)
   (hs-minor-mode 1)
   (hl-line-mode 1)
-  (when (< (buffer-size) emacs|large-buffer-size)
+  (when (< (buffer-size) core|large-buffer-size)
     (highlight-indentation-mode 1))
   ;; show trailing spaces in a programming mode
   (setq show-trailing-whitespace t))
