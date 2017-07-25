@@ -35,8 +35,8 @@
 ;; (package-initialize 'no-activate)
 (require 'init-packages)
 
-(ignore-errors (load-file (core|expand-var "init-env-vars.el")))
 (require 'init-vars)
+(load-file (core|expand-var "init-env-vars.el"))
 (require 'init-auto-mode)
 (require 'init-defaults)
 ;; setup emacs outlooking
@@ -49,6 +49,7 @@
 (require 'init-company)
 (require 'init-hydra)
 (require 'init-term-mode)
+(require 'init-eshell)
 ;; 'yasnippet', 'flycheck' ...
 (require 'init-main-misc)
 (require 'init-semantic)

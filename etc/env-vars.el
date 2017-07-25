@@ -59,7 +59,9 @@
                              (expand-file-name "irony-server" (ref irony-path)))))
 
 (env|layer (haskell "Variable for haskell ")
-           (var hare-path (find-library-in-directory "hare.el" "~/.cabal/share"))
+           (var hare-path (ignore-errors
+                            (find-library-in-directory
+                             "hare.el" "~/.cabal/share")))
            (var has-stylish-haskell-p (executable-find "stylish-haskell"))
            (var has-hastags-p (executable-find "hastags"))
            (var has-ghc-mod-p (executable-find "ghc-mod"))

@@ -89,6 +89,7 @@
    page-break-lines
    ;; Show information in header-line for `semantic-mode'
    stickyfunc-enhance
+   eshell-prompt-extras
    unicode-fonts))
 
 ;; latex

@@ -167,7 +167,7 @@ Does not indent buffer, because it is used for a
   "Show message buffer."
   (interactive)
   (popwin:popup-buffer (get-buffer "*Messages*")))
-p
+
 (defun core|current-font-face ()
   "Get the font face under cursor."
   (interactive)

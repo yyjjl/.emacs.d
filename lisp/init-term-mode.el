@@ -76,6 +76,7 @@
         (when proc (set-process-sentinel proc (term|wrap-sentinel)))))
     buf))
 
+;; `eshell' setup
 (defun term|eshell-autoclose ()
   (let ((window (get-buffer-window)))
     (when (and (window-live-p window)
@@ -88,29 +89,21 @@
   (let ((buf (or (term|last-buffer (buffer-list) 'eshell-mode dir)
                  (get-buffer-create (term|get-buffer-name "*eshell-%d*")))))
     (with-current-buffer buf
-      (unless (eq 'eshell-mode 'major-mode)
-        (let ((default-directory dir))
-          (eshell-mode)
-          (add-hook 'kill-buffer-hook #'term|eshell-autoclose nil :local))))
+      (cd dir)
+      (unless (eq 'eshell-mode major-mode)
+        (eshell-mode)
+        (add-hook 'kill-buffer-hook #'term|eshell-autoclose nil :local)))
     buf))
-;; `eshell' setup
-(defun eshell-ctrl-d-hack (fn &rest args)
-  "When there is no input and press ctrl-d, exit eshell"
-  (let ((no-input-p (save-excursion
-                      (goto-char (or eshell-last-output-end (point-max)))
-                      (re-search-forward "\\s-+" (point-max) t)
-                      (equal (point) (point-max)))))
-    (if no-input-p
-        (kill-buffer)
-      (apply fn args))))
-(advice-add 'eshell-send-eof-to-process :around #'eshell-ctrl-d-hack)
+
+
 (defvar term|use-eshell-p t)
+
 (defun term|pop-shell (&optional arg)
   "Switch to the term buffer last used, or create a new one if
 none exists, or if the current buffer is already a term."
   (interactive "P")
   (if (not (file-remote-p default-directory))
-      (unless (eq major-mode 'term-mode)
+      (unless (memq major-mode '(term-mode eshell-mode))
         (pop-to-buffer
          (funcall (if term|use-eshell-p
                       #'term|local-eshell

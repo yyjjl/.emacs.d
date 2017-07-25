@@ -1,4 +1,5 @@
 (require 'package)
+(require 'subr-x)
 (eval-when-compile
   (require 'cl))
 

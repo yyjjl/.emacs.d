@@ -119,7 +119,10 @@
   (require 'ansi-color)
   (defhook core|colorize-compilation-buffer (compilation-filter-hook)
     (when (eq major-mode 'compilation-mode)
-      (ansi-color-apply-on-region compilation-filter-start (point-max)))))
+      (ansi-color-apply-on-region compilation-filter-start (point-max))))
+  (defhook core|colorsize-eshell-buffer (eshell-output-filter-functions)
+    (ansi-color-apply-on-region eshell-last-output-start
+                                eshell-last-output-end)))
 
 
 ;; Default prog-mode setup
