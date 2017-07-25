@@ -67,7 +67,8 @@
   (git-timemachine--start #'git|ivy-timemachine-show-selected-revision))
 ;; }}
 
-(require 'git-gutter-fringe)
+(when (fboundp 'define-fringe-bitmap)
+  (require 'git-gutter-fringe))
 (with-eval-after-load 'git-gutter
   (when (fboundp 'define-fringe-bitmap)
     (set-face-foreground 'git-gutter-fr:modified "yellow")
