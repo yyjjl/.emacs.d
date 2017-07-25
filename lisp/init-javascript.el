@@ -1,4 +1,4 @@
-(defun js2-print-json-path (&optional hardcoded-array-index)
+(defun js2|print-json-path (&optional hardcoded-array-index)
   "Print the path to the JSON value under point, and save it in the kill ring.
 If HARDCODED-ARRAY-INDEX provided, array index in JSON path is
 replaced with it."

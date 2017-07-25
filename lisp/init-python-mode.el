@@ -46,14 +46,12 @@
 
 (defun python|pytest-file ()
   (interactive)
-  (let ((file (ivy-read "File name: " #'read-file-name-internal
-                        :matcher #'counsel--find-file-matcher)))
+  (let ((file (completing-read "File name: " #'read-file-name-internal)))
     (python|pytest-run file)))
 
 (defun python|pytest-directory ()
   (interactive)
-  (let ((file (ivy-read "Directory name: " #'read-file-name-internal
-                        :matcher #'counsel--find-file-matcher)))
+  (let ((file (completing-read "Directory name: " #'read-file-name-internal)))
     (python|pytest-run (file-name-directory file))))
 
 (defun python|get-class-defs ()

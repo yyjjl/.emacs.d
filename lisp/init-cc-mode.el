@@ -94,6 +94,7 @@
        'cmake-ide-compile
      'compile)))
 
+(setq hide-ifdef-mode-prefix-key (kbd "C-c h"))
 (defun cpp|c++-setup ()
   "C/C++ only setup"
   (local-set-key (kbd "C-c o") 'ff-find-other-file)
@@ -105,6 +106,8 @@
   (local-set-key [f10] 'cpp|compile)
   (local-set-key [f5] 'gdb)
 
+  (hide-ifdef-mode)
+
   (setq cc-search-directories '("."
                                 "/usr/include"
                                 "/usr/local/include/*"
@@ -112,8 +115,8 @@
   ;; Make a #define be left-aligned
   (setq c-electric-pound-behavior '(alignleft))
   (if (derived-mode-p 'c++-mode)
-        (setq-local flycheck-clang-language-standard "c++14")
-      (setq flycheck-clang-language-standard nil))
+      (setq-local flycheck-clang-language-standard "c++14")
+    (setq flycheck-clang-language-standard nil))
 
   (unless (file-remote-p default-directory)
     (when cpp|has-irony-p
@@ -135,6 +138,9 @@
 
 ;; Do not use `c-mode-hook' and `c++-mode-hook', there is a bug
 (defhook cpp|common-setup (c-mode-common-hook)
+  (if (>= (string-to-number c-version) 5.33)
+      (run-hooks 'prog-mode-hook))
+
   (cpp|common-cc-setup)
   (unless (buffer-temporary-p)
     (unless (or (derived-mode-p 'java-mode)

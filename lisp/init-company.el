@@ -23,8 +23,9 @@
   ;; make company-files a work before capf
   (setq-default company-backends
                 '(company-bbdb company-nxml company-css
-                               (company-files company-cmake company-semantic)
+                               (company-files company-cmake)
                                company-capf
+                               ;; company-semantic
                                (company-dabbrev-code
                                 company-gtags
                                 company-etags
@@ -56,7 +57,7 @@
   ;; NOT to load company-mode for certain major modes.
   (setq company-global-modes
         '(not
-          eshell-mode comint-mode erc-mode gud-mode rcirc-mode shell-mode
+          comint-mode erc-mode gud-mode rcirc-mode shell-mode
           minibuffer-inactive-mode)))
 
 (with-eval-after-load 'company-etags

@@ -122,13 +122,9 @@
       (ansi-color-apply-on-region compilation-filter-start (point-max)))))
 
 
-;; default prog-mode setup
+;; Default prog-mode setup
 (defhook core|generic-prog-mode-setup (prog-mode-hook)
   (main|semantic-mode)
-  ;; auto insert closing pair
-  (electric-pair-mode 1)
-  (electric-layout-mode 1)
-  (show-paren-mode 1)
   (hs-minor-mode 1)
   (hl-line-mode 1)
   (when (< (buffer-size) core|large-buffer-size)

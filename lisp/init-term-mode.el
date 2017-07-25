@@ -34,7 +34,7 @@
            (info (with-current-buffer buf
                    (cons major-mode default-directory))))
       (if (and (eq mode (car info))
-              (directory-equal-p (or dir default-directory) (cdr info)))
+               (directory-equal-p (or dir default-directory) (cdr info)))
           buf
         (term|last-buffer (cdr buffers) mode dir)))))
 
@@ -42,6 +42,7 @@
   (let ((index 1) name)
     (setq name (format fmt index))
     (while (buffer-live-p (get-buffer name))
+      (setq name (format fmt index))
       (setq index (1+ index)))
     name))
 
@@ -49,7 +50,7 @@
   "Switch to remote shell"
   (interactive)
   (let ((buf (or (term|last-buffer (buffer-list) 'shell-mode)
-                 (get-buffer-create (term|get-buffer-name "*shell%d*")))))
+                 (get-buffer-create (term|get-buffer-name "*shell-%d*")))))
     (when buf
       (pop-to-buffer buf)
       (set-buffer buf)
@@ -75,6 +76,35 @@
         (when proc (set-process-sentinel proc (term|wrap-sentinel)))))
     buf))
 
+(defun term|eshell-autoclose ()
+  (let ((window (get-buffer-window)))
+    (when (and (window-live-p window)
+               (> (length (window-list)) 1))
+      (delete-window window))))
+
+(defun term|local-eshell (&optional dir)
+  (unless dir
+    (setq dir default-directory))
+  (let ((buf (or (term|last-buffer (buffer-list) 'eshell-mode dir)
+                 (get-buffer-create (term|get-buffer-name "*eshell-%d*")))))
+    (with-current-buffer buf
+      (unless (eq 'eshell-mode 'major-mode)
+        (let ((default-directory dir))
+          (eshell-mode)
+          (add-hook 'kill-buffer-hook #'term|eshell-autoclose nil :local))))
+    buf))
+;; `eshell' setup
+(defun eshell-ctrl-d-hack (fn &rest args)
+  "When there is no input and press ctrl-d, exit eshell"
+  (let ((no-input-p (save-excursion
+                      (goto-char (or eshell-last-output-end (point-max)))
+                      (re-search-forward "\\s-+" (point-max) t)
+                      (equal (point) (point-max)))))
+    (if no-input-p
+        (kill-buffer)
+      (apply fn args))))
+(advice-add 'eshell-send-eof-to-process :around #'eshell-ctrl-d-hack)
+(defvar term|use-eshell-p t)
 (defun term|pop-shell (&optional arg)
   "Switch to the term buffer last used, or create a new one if
 none exists, or if the current buffer is already a term."
@@ -82,10 +112,13 @@ none exists, or if the current buffer is already a term."
   (if (not (file-remote-p default-directory))
       (unless (eq major-mode 'term-mode)
         (pop-to-buffer
-         (term|local-shell (or (and arg default-directory)
-                               (and (bound-and-true-p cpp|cmake-ide-enabled)
-                                    cmake-ide-build-dir)
-                               (ignore-errors (projectile-project-root))))))
+         (funcall (if term|use-eshell-p
+                      #'term|local-eshell
+                    #'term|local-shell)
+                  (or (and arg default-directory)
+                      (and (bound-and-true-p cpp|cmake-ide-enabled)
+                           cmake-ide-build-dir)
+                      (ignore-errors (projectile-project-root))))))
     (term|remote-shell)))
 
 (with-eval-after-load 'multi-term

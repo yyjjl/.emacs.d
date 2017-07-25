@@ -9,8 +9,7 @@
 (defun css|convert-binary-to-code ()
   "Convert binary (image, font...) into css."
   (interactive)
-  (let* ((file (ivy-read "The image path: " #'read-file-name-internal
-                         :matcher #'counsel--find-file-matcher))
+  (let* ((file (completing-read "The image path: " #'read-file-name-internal))
          (file-ext (file-name-extension file))
          (file-base (file-name-sans-extension file))
          (result
@@ -31,8 +30,7 @@
                     file-ext
                     ";base64,"
                     (font-file-to-base64 file)
-                    "\") no-repeat 0 0;"
-                    ))))
+                    "\") no-repeat 0 0;"))))
     (kill-new result)
     (message "css code => clipboard & yank ring")))
 

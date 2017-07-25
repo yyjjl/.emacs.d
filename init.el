@@ -67,6 +67,7 @@
     (require 'init-tags))
 
 (require 'init-cc-mode)
+(require 'init-haskell)
 (require 'init-python-mode)
 (require 'init-lisp)
 (require 'init-web-mode)
@@ -81,7 +82,7 @@
 (require 'init-windows)
 (require 'init-gud)
 
-(require 'init-haskell)
+(require  'init-groups)
 
 ;; Other small tools
 (require 'init-extra)

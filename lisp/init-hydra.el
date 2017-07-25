@@ -72,14 +72,14 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
   ("C-x _" . hydra|resize-window/shrink-window))
 
 (defhydra hydra|rectangle (:body-pre (rectangle-mark-mode 1)
-                           :color pink
-                           :post (deactivate-mark))
+                                     :color pink
+                                     :post (deactivate-mark))
   "
-  ^_p_^     [_k_]kill      [_s_]string
-_b_   _f_   [_q_]quit      [_y_]yank
-  ^_n_^     [_m_]mark      [_w_]copy
-^^^^        [_x_]exchange  [_/_]undo
-^^^^        [_a_]line beg  [_e_]line end
+  ^_p_^         [_k_]kill      [_s_]string
+_b_   _f_       [_q_]quit      [_y_]yank
+  ^_n_^         [_m_]mark      [_w_]copy
+^^^^            [_x_]exchange  [_/_]undo
+^^^^            [_a_]line beg  [_e_]line end [_N_]umber
 "
   ("b" backward-char nil)
   ("f" forward-char nil)
@@ -87,13 +87,15 @@ _b_   _f_   [_q_]quit      [_y_]yank
   ("n" next-line nil)
   ("a" beginning-of-line nil)
   ("e" end-of-line nil)
-  ("x" exchange-point-and-mark nil)
+  ("x" rectangle-exchange-point-and-mark nil)
   ("w" copy-rectangle-as-kill nil)
   ("m" (if (region-active-p)
            (deactivate-mark)
-         (rectangle-mark-mode 1)) nil)
+         (rectangle-mark-mode 1))
+   nil)
   ("y" yank-rectangle nil)
   ("/" undo nil)
+  ("N" rectangle-number-lines nil :exit t)
   ("s" string-rectangle nil)
   ("k" kill-rectangle nil)
   ("q" nil nil))
@@ -120,5 +122,40 @@ _<_ ^✜^ _>_     _q_uit
     ("c" nil))
 
   (define-key ivy-minibuffer-map (kbd "C-j") 'hydra|ivy/body))
+
+(defhydra hydra|outline (:color pink :hint nil)
+  "
+^Hide^             ^Show^           ^Move
+^^^^^^------------------------------------------------------
+_q_: sublevels     _a_: all         _u_: up
+_t_: body          _e_: entry       _n_: next visible
+_o_: other         _i_: children    _p_: previous visible
+_c_: entry         _k_: branches    _f_: forward same level
+_l_: leaves        _s_: subtree     _b_: backward same level
+_d_: subtree
+
+"
+  ;; Hide
+  ("q" outline-hide-sublevels) ; Hide everything but the top-level headings
+  ("t" outline-hide-body) ; Hide everything but headings (all body lines)
+  ("o" outline-hide-other)              ; Hide other branches
+  ("c" outline-hide-entry)              ; Hide this entry's body
+  ("l" outline-hide-leaves) ; Hide body lines in this entry and sub-entries
+  ("d" outline-hide-subtree) ; Hide everything in this entry and sub-entries
+  ;; Show
+  ("a" outline-show-all)                ; Show (expand) everything
+  ("e" outline-show-entry)              ; Show this heading's body
+  ("i" outline-show-children) ; Show this heading's immediate child sub-headings
+  ("k" outline-show-branches) ; Show all sub-headings under this heading
+  ("s" outline-show-subtree) ; Show (expand) everything in this heading & below
+  ;; Move
+  ("u" outline-up-heading)              ; Up
+  ("n" outline-next-visible-heading)    ; Next
+  ("p" outline-previous-visible-heading) ; Previous
+  ("f" outline-forward-same-level)       ; Forward - same level
+  ("b" outline-backward-same-level)      ; Backward - same level
+  ("z" nil "leave"))
+
+(global-set-key (kbd "C-c o") 'hydra|outline/body) ; by example
 
 (provide 'init-hydra)

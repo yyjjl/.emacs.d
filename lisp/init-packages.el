@@ -18,6 +18,8 @@
         ("gnu"   . "https://elpa.emacs-china.org/gnu/")))
 
 ;; core packages
+(package|add '(cmake-ide    flycheck) "melpa-stable")
+
 (package|add
  '(yasnippet
    auto-yasnippet
@@ -28,8 +30,6 @@
    session
 
    multi-term
-
-   flycheck
 
    hydra
    ivy
@@ -50,7 +50,7 @@
 
 ;; edit, mark and jump
 (package|add
- '(;; mark tools
+ '( ;; mark tools
    visual-regexp
    multiple-cursors
    fcitx
@@ -61,6 +61,7 @@
    ;; provide tree style search jump
    avy
    tiny
+   easy-kill
    zzz-to-char))
 
 ;; note
@@ -68,6 +69,7 @@
  '( ;; ipython notebook feature in `org-mode'
    ob-ipython
    org-present
+   org-sticky-header
    ;; export colorful src block in `org-mode'
    htmlize
    zeal-at-point))
@@ -162,8 +164,6 @@
    ggtags
    rtags
    ivy-rtags))
-
-(package|add '(cmake-ide) "melpa-stable")
 
 (package|add
  '(sql-indent

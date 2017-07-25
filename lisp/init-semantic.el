@@ -9,7 +9,7 @@
           ;; global-semantic-idle-local-symbol-highlight-mode
           global-semantic-stickyfunc-mode
           ;; error occurs a lot
-          ;; global-semantic-decoration-mode
+          global-semantic-decoration-mode
           global-semantic-highlight-func-mode
           global-semantic-mru-bookmark-mode))
   (require 'stickyfunc-enhance))
@@ -42,8 +42,7 @@
 (defun main|semantidb-parse (regex dir)
   (interactive (list (read-regexp "File name regex (default nil)" nil)
                      (file-name-directory
-                      (ivy-read "Directory: " #'read-file-name-internal
-                                :matcher #'counsel--find-file-matcher))))
+                      (completing-read "Directory: " #'read-file-name-internal))))
   (main|semanticdb-parse-directory dir regex t)
   (semanticdb-save-all-db))
 

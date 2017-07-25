@@ -14,6 +14,11 @@
   (org-babel-do-load-languages 'org-babel-load-languages
                                '((ipython . t))))
 
+;; Do not load extra modules
+(setq org-modules '(org-info))
+;; Do not load extra backends
+(setq org-export-backends '(ascii html latex beamer))
+(setq org-mouse-1-follows-link nil)
 (with-eval-after-load 'org
   ;; No spell check for embedded snippets
   ;; No spell check for property
@@ -29,26 +34,29 @@
         org-completion-use-ido t
         org-edit-src-content-indentation 0
         org-edit-timestamp-down-means-later t
+        org-catch-invisible-edits 'smart
+        ;; Number of empty lines needed to keep an empty line between
+        ;; collapsed trees.
+        org-cycle-separator-lines 2     ; default = 2
+
         org-agenda-start-on-weekday nil
+        org-agenda-inhibit-startup t       ;; ~50x speedup
+        org-agenda-use-tag-inheritance nil ;; 3-4x speedup
         org-agenda-span 14
         org-agenda-include-diary t
         org-agenda-window-setup 'current-window
+
         org-fast-tag-selection-single-key 'expert
         org-export-kill-product-buffer-when-displayed t
-        ;; org v7
-        org-export-odt-preferred-output-format "doc"
         org-export-with-sub-superscripts t
-        ;; org v8
-        org-odt-preferred-output-format "doc"
         org-tags-column 80
         org-hide-emphasis-markers t
         org-hide-leading-stars t
         ;; org-startup-indented t
-        org-agenda-inhibit-startup t       ;; ~50x speedup
-        org-agenda-use-tag-inheritance nil ;; 3-4x speedup
         ;; org-pretty-entities t
         org-format-latex-options (plist-put org-format-latex-options :scale 1.5)
-        org-highlight-latex-and-related '(latex))
+        org-highlight-latex-and-related '(latex)
+        org-src-fontify-natively t)
 
   ;; Refile targets include this file and any file contributing to the
   ;; agenda - up to 5 levels deep
@@ -64,7 +72,6 @@
                 (sequence "WAITING(w@/!)" "SOMEDAY(S)"
                           "PROJECT(P@)" "|" "CANCELLED(c@/!)"))))
   (setq org-imenu-depth 9)
-  (setq org-src-fontify-natively t)
 
   (unless (featurep 'company-auctex)
     (require 'company-auctex))
@@ -80,6 +87,9 @@
       (annotation (company-auctex-symbol-annotation arg))))
 
   (defhook org|setup (org-mode-hook)
+
+    (org-sticky-header-mode 1)
+
     (make-local-variable 'completion-at-point-functions)
     (add-to-list 'completion-at-point-functions
                  'pcomplete-completions-at-point)
@@ -92,7 +102,7 @@
   (add-hook 'org-src-mode-hook #'(lambda () (flycheck-mode -1)))
 
   (define-keys :map org-mode-map
-    ("C-c o" . ob-ipython-inspect)
+    ("C-c I" . ob-ipython-inspect)
     ("C-c c i" . org-clock-in)
     ("C-c c o" . org-clock-out)
     ("C-c c c" . org-clock-in-last)
@@ -104,12 +114,11 @@
     ("M-," . org-mark-ring-goto)
     ("M-." . org-mark-ring-push)
     ("C-c l" . org-store-link)
-    ([f9] . org-project-publish-this-file-to-html)
+    ([f9] . org-publish-current-file)
     ([f10] . org-publish)
     ([f5] . org-present)
     ("C-c t" . org-todo)
     ("C-c C-t" . nil)))
-
 
 (with-eval-after-load 'org-clock
   ;; Change task state to STARTED when clocking in
@@ -120,32 +129,22 @@
   (setq org-clock-out-remove-zero-time-clocks t))
 
 
-(setq outline-minor-mode-prefix "\C-co")
-(with-eval-after-load 'outline
-  (let ((map (make-sparse-keymap)))
-    (define-keys :map map
-               ("a" . show-all)
-               ("b" . outline-backward-same-level)
-               ("f" . outline-forward-same-level)
-               ("h" . hide-entry)
-               ("d" . hide-subtree)
-               ("s" . show-entry)
-               ("n" . outline-next-visible-heading)
-               ("p" . outline-previous-visible-heading)
-               ("k" . show-branches)
-               ("l" . hide-leaves)
-               ("o" . hide-other)
-               ("q" . hide-sublevels)
-               ("x" . show-subtree)
-               ("t" . hide-body)
-               ("u" . outline-up-heading)
-               ("v" . outline-move-subtree-down)
-               ("6" . outline-move-subtree-up)
-               ("<" . outline-promote)
-               (">" . outline-demote)
-               ("m" . outline-mark-subtree))
-    (define-key outline-minor-mode-map outline-minor-mode-prefix
-      map)))
+(with-eval-after-load 'ox-html
+  (defun org|html-export-with-line-number (fn &rest rest)
+    (when (= (length rest) 5)
+      (let ((num-start (nth 4 rest)))
+        (unless num-start
+          (setq num-start 0))
+        (setcar (nthcdr 4 rest) num-start)))
+    (apply fn rest))
+
+  ;; (advice-add 'org-html-do-format-code
+  ;;             :around #'org|html-export-with-line-number)
+  
+  (setcdr (assoc 'scale org-html-mathjax-options) '("90"))
+  (setcdr (assoc 'align org-html-mathjax-options) '("left"))
+  (setcdr (assoc 'path org-html-mathjax-options)
+          '("../../node_modules/mathjax/MathJax.js")))
 
 (with-eval-after-load 'ox-latex
   (add-to-list 'org-latex-minted-langs '(ipython "python"))
@@ -216,11 +215,16 @@
     (org-present-hide-cursor)
     (org-present-read-only))
   (defhook org|present-exit (org-present-mode-quit-hook)
-    (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
+    (setq org-format-latex-options
+          (plist-put org-format-latex-options :scale 1.5))
     (setq mode-line-format mode-line|default-format)
     (org-present-small)
     (org-remove-inline-images)
     (org-present-show-cursor)
     (org-present-read-write)))
+
+(with-eval-after-load 'org-sticky-header
+  (setq org-sticky-header-full-path 'reversed)
+  (setq org-sticky-header-always-show-header t))
 
 (provide 'init-org)

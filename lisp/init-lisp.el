@@ -16,7 +16,7 @@
   (unless (> (buffer-size) core|large-buffer-size)
     (prettify-symbols-mode 1))
   (lispy-mode 1)
-  (local-set-key (kbd "M-,") 'pop-tag-mark))
+  (local-set-key (kbd "M-,") 'xref-pop-marker-stack))
 
 (defun lisp|racket-setup ()
   (lisp|common-setup)

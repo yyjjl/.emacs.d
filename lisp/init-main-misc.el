@@ -13,10 +13,6 @@
           try-expand-dabbrev-all-buffers
           try-expand-dabbrev-from-kill)))
 
-(with-eval-after-load 'package-safe-delete
-  (setq package-safe-delete-required-packages
-        (hash-table-keys package|required-packages)))
-
 (with-eval-after-load 'projectile
   (setq projectile-completion-system 'ivy))
 
@@ -43,6 +39,8 @@
 
 (defhook main|after-init (after-init-hook)
   (session-initialize)
+  (add-to-list 'session-globals-include 'buffer-group|groups)
+
   (ivy-mode 1)
   (counsel-mode 1)
   (projectile-mode 1)
@@ -59,9 +57,16 @@
   (global-hi-lock-mode 1)
   (global-auto-revert-mode 1)
   (column-number-mode 1)
+
+  (show-paren-mode 1)
+  ;; Auto insert closing pair
+  (electric-pair-mode 1)
+  (electric-layout-mode 1)
+
   (global-page-break-lines-mode 1)
   ;; eldoc, show API doc in minibuffer echo area
-  (global-eldoc-mode 1)
+  ;; enabled by default
+  ;; (global-eldoc-mode 1)
   ;; (global-whitespace-newline-mode 1)
   ;; make zsh work correctly in emacs
   (setq system-uses-terminfo nil)
@@ -87,9 +92,8 @@
   (interactive)
   (let* ((this (current-buffer))
          (this-name (buffer-file-name))
-         (name (ivy-read "New file name: "
-                         'read-file-name-internal
-                         :matcher #'counsel--find-file-matcher)))
+         (name (completing-read "New file name: "
+                                #'read-file-name-internal)))
     (if (and name this-name
             (string= name this-name)
             (not (get-buffer name)))
@@ -101,12 +105,10 @@
         (switch-to-buffer buf)))))
 
 ;; Rename the current file
-(autoload 'counsel--find-file-matcher "counsel")
 (defun core|rename-this-file-and-buffer (new-name)
   "Renames both current buffer and file it's visiting to NEW-NAME."
-  (interactive (list  (ivy-read "New file name: "
-                         'read-file-name-internal
-                         :matcher #'counsel--find-file-matcher)))
+  (interactive (list  (completing-read "New file name: "
+                                       #'read-file-name-internal)))
   (let ((name (buffer-name))
         (filename (buffer-file-name)))
     (unless filename
@@ -165,7 +167,7 @@ Does not indent buffer, because it is used for a
   "Show message buffer."
   (interactive)
   (popwin:popup-buffer (get-buffer "*Messages*")))
-
+p
 (defun core|current-font-face ()
   "Get the font face under cursor."
   (interactive)
@@ -192,6 +194,7 @@ Does not indent buffer, because it is used for a
   ("RET" . newline-and-indent)
   ("M-'" . tiny-expand)
   ("M--" . er/expand-region)
+  ("M-w" . easy-kill)
 
   ("C-}" . main|company-yasnippet)
   ("<backtab>" . company-complete)

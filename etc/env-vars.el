@@ -33,11 +33,12 @@
 (env|open)
 
 (env|layer (emacs "Core variables")
+           (var has-xsel-p (executable-find "xsel"))
            (var use-fcitx-p (executable-find "fcitx")
                 "Whether to use X input method `fcitx'")
            (var locale-is-utf8-p
                 (or (utf8-locale-p (and (executable-find "locale")
-                                             (shell-command-to-string "locale")))
+                                        (shell-command-to-string "locale")))
                     (utf8-locale-p (getenv "LC_ALL"))
                     (utf8-locale-p (getenv "LC_CTYPE"))
                     (utf8-locale-p (getenv "LANG")))))

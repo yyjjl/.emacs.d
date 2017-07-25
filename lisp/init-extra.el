@@ -52,6 +52,24 @@
 
 (global-set-key (kbd "M-Q") 'extra|insert-space-around-chinese)
 
+(defun extra|clipboard-copy (beg end)
+  (interactive "r")
+  (if (display-graphic-p)
+      (kill-new (buffer-substring-no-properties beg end))
+    (if emacs|has-xsel-p
+        (if (= 0 (shell-command-on-region beg end "xsel -ib"))
+            (message "Copy finished")
+          (message "Error occured !!!"))
+      (message "Executable `xsel' not found !!!"))))
+
+(defun extra|clipboard-paste ()
+  (interactive)
+  (if (display-graphic-p)
+      (yank 1)
+    (if emacs|has-xsel-p
+        (shell-command "xsel -ob" t)
+      (message "Executable `xsel' not found !!!"))))
+
 ;; `whitespace-space' setup
 (with-eval-after-load 'whitespace
   (setq whitespace-style '(face spaces tabs newline
@@ -73,10 +91,10 @@
 
 (define-keys
   ;; buffer-mode
-  ("C-c w i" . buf-move-up)
-  ("C-c w k" . buf-move-down)
-  ("C-c w j" . buf-move-left)
-  ("C-c w l" . buf-move-right)
+  ("C-c w u" . buf-move-up)
+  ("C-c w d" . buf-move-down)
+  ("C-c w l" . buf-move-left)
+  ("C-c w r" . buf-move-right)
   ;; `ace-window' and `avy'
   ("C-x o" . ace-window)
   ("C-:" . avy-goto-char)
