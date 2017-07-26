@@ -1,6 +1,7 @@
 (autoload 'LaTeX-math-mode "latex" nil t)
 (defhook latex|setup (LaTeX-mode-hook)
   (company-auctex-init)
+  (turn-off-auto-fill)
   (setq company-backends (delete 'company-dabbrev company-backends))
   (LaTeX-math-mode 1)
   (unless (buffer-temporary-p)
@@ -9,7 +10,7 @@
     (TeX-PDF-mode 1)
     (TeX-fold-mode 1)
     ;; Will conflict with latex-mode
-    (electric-pair-mode -1)
+    (electric-pair-local-mode -1)
 
     (setq TeX-engine 'xetex)
 

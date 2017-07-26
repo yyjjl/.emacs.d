@@ -87,9 +87,6 @@
       (annotation (company-auctex-symbol-annotation arg))))
 
   (defhook org|setup (org-mode-hook)
-
-    (org-sticky-header-mode 1)
-
     (make-local-variable 'completion-at-point-functions)
     (add-to-list 'completion-at-point-functions
                  'pcomplete-completions-at-point)
@@ -222,9 +219,5 @@
     (org-remove-inline-images)
     (org-present-show-cursor)
     (org-present-read-write)))
-
-(with-eval-after-load 'org-sticky-header
-  (setq org-sticky-header-full-path 'reversed)
-  (setq org-sticky-header-always-show-header t))
 
 (provide 'init-org)

@@ -69,7 +69,6 @@
  '( ;; ipython notebook feature in `org-mode'
    ob-ipython
    org-present
-   org-sticky-header
    ;; export colorful src block in `org-mode'
    htmlize
    zeal-at-point))

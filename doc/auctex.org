@@ -1,55 +1,59 @@
 #+TITLE: AUCTeX
 
-* 插入Quotes,Dollars,Braces
-  竖线代表输入点
-  #+BEGIN_EXAMPLE
-  |"      ==> ``
-  ``...|" ==> ``...''
-  ``|"    ==> "
-  ''|"    ==> "
-  #+END_EXAMPLE
-  配置中加入如下代码
-  #+BEGIN_SRC emacs-lisp
-  (setq TeX-electric-math '("$" . "$")
-        LaTeX-electric-left-right-brace t)
-  ;; 注意关闭(electric-pair-mode -1) 会发生冲突
-  #+END_SRC
-  - 输入'$' ==> '$...$'
-  - 输入'$$' ==> '$$...$$'
-  - 这时输入\left,\right会成对出现
+* 编辑
+** 插入 Quotes,Dollars,Braces
+   竖线代表输入点
+   #+BEGIN_EXAMPLE
+   |"      ==> ``
+   ``...|" ==> ``...''
+   ``|"    ==> "
+   ''|"    ==> "
+   #+END_EXAMPLE
+   配置中加入如下代码
+   #+BEGIN_SRC emacs-lisp
+   (setq TeX-electric-math '("$" . "$")
+         LaTeX-electric-left-right-brace t)
+   ;; 注意关闭 (electric-pair-mode -1) 会发生冲突
+   #+END_SRC
+   - 输入'$' ==> '$...$'
+   - 输入'$$' ==> '$$...$$'
+   - 这时输入 \left,\right 会成对出现
+     
+** 标题和字体
+   - 提供快捷方式 ~C-c x~ 前缀, 插入不同的字体
+   - 插入宏 ~C-c RET~
+   - ~C-c s~ 插入标题
+     * If ARG is nil or missing, use the current level.
+     * If ARG is a list (selected by C-u), go downward one level.
+     * If ARG is negative, go up that many levels.
+     * If ARG is positive or zero, use absolute level:
+       + 0 : part
+       + 1 : chapter
+       + 2 : section
+       + 3 : subsection
+       + 4 : subsubsection
+       + 5 : paragraph
+       + 6 : subparagraph
 
-* 标题和字体
-  - 提供快捷方式 ~C-c x~ 前缀,插入不同的字体
-  - 插入宏 ~C-c RET~
-  - ~C-c s~ 插入标题
-    * If ARG is nil or missing, use the current level.
-    * If ARG is a list (selected by C-u), go downward one level.
-    * If ARG is negative, go up that many levels.
-    * If ARG is positive or zero, use absolute level:
-      + 0 : part
-      + 1 : chapter
-      + 2 : section
-      + 3 : subsection
-      + 4 : subsubsection
-      + 5 : paragraph
-      + 6 : subparagraph
+** 插入环境
+   - ~C-c e~ 插入环境
+   - ~C-c ]~ 关闭环境
+   - ~C-M-a/e~ 移到环境头和尾
 
-* 插入环境
-  - ~C-c e~ 插入环境
-  - ~C-c ]~ 关闭环境
-  - ~C-M-a/e~ 移到环境头和尾
-* 插入数学符号
-  虽然有company-mode提示,但是提供更加方便的功能
-  以 ~`~ 为前缀的快捷键.(比如 ~`t~ 代表 \(\tau\))
+** 插入数学符号
+   虽然有 company-mode 提示, 但是提供更加方便的功能
+   以 ~`~ 为前缀的快捷键.(比如 ~`t~ 代表 \(\tau\))
 
-* 选择
-  - ~C-c .~ 选择当前的environment
-  - ~C-c *~ 选择当前的section
-* 注释
-  - ~C-c ;~ 注释/不注释当前区域
-  - ~C-c *~ 注释/不注释当前段落
+** 选择
+   - ~C-c .~ 选择当前的 environment
+   - ~C-c *~ 选择当前的 section
 
-* 填充
-  ~C-c C-q~ 前缀或 ~M-q~
-* Narrowing
-  ~C-x n e/g~
+** 注释
+   - ~C-c ;~ 注释 /不注释当前区域
+   - ~C-c %~ 注释 /不注释当前段落
+
+** 填充
+   ~C-c C-q~ 前缀或 ~M-q~
+
+** Narrowing
+   ~C-x n e/g~, 已经包含在 ~C-x n n (narrow-or-widen-dwim)~ 命令中

@@ -8,8 +8,8 @@
           ;; global-semantic-idle-summary-mode
           ;; global-semantic-idle-local-symbol-highlight-mode
           global-semantic-stickyfunc-mode
-          ;; error occurs a lot
-          global-semantic-decoration-mode
+          ;; Error occurs a lot
+          ;; global-semantic-decoration-mode
           global-semantic-highlight-func-mode
           global-semantic-mru-bookmark-mode))
   (require 'stickyfunc-enhance))

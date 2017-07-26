@@ -14,8 +14,6 @@
 \usepackage{tikz}
 \usepackage{fancyvrb}
 \tolerance=1000
-% \setCJKmainfont{KaiTi}
-% \setmainfont{Times New Roman}
 % 
 \setbeamercovered{transparent}
 \setbeamertemplate{caption}[numbered]
@@ -52,3 +50,8 @@ breaksymbolright=\rotatebox{270}{\small\ensuremath{\curvearrowright}},
 breaksymbolindentright=0pt,
 breaksymbolsepright=0pt
 }
+
+\usefonttheme[onlymath]{serif} 
+
+% \setCJKmainfont{Noto San S Chinese}
+\setmainfont{Ubuntu Mono}

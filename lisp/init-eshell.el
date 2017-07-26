@@ -42,7 +42,7 @@
 
 (with-eval-after-load "esh-opt"
   (autoload 'epe-theme-lambda "eshell-prompt-extras")
-  (setq eshell-highlight-prompt nil
+  (setq eshell-highlight-prompt t
         eshell-prompt-function 'epe-theme-lambda))
 
 (provide 'init-eshell)
