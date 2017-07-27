@@ -5,6 +5,10 @@
 
 (defalias 'perl-mode 'cperl-mode)
 
+(defhook extra|Info-setup (Info-mode-hook)
+  (when (featurep 'info+)
+    (require 'info+)))
+
 (with-eval-after-load 'grep
   (dolist (v core|ignored-directories)
     (add-to-list 'grep-find-ignored-directories v)))
@@ -89,6 +93,15 @@
 (autoload 'doxygen-insert-member-group-region "doxygen" "insert comment for member group" t)
 (autoload 'doxygen-insert-compound-comment "doxygen" "insert comment for compound" t)
 
+(defun extra|never-exit ()
+  (interactive)
+  ;; There is a internal frame
+  (if (= 2 (length (frame-list)))
+      (message "Use M-x `%s' instead"
+               (propertize "save-buffers-and-kill-emacs"
+                           'face 'font-lock-constant-face))
+    (call-interactively 'save-buffers-kill-terminal)))
+
 (define-keys
   ;; buffer-mode
   ("C-c w u" . buf-move-up)
@@ -101,6 +114,8 @@
   ("C-\"" . avy-goto-char-2)
   ("M-g l" . avy-goto-line)
   ("M-g w" . avy-goto-word-1)
-  ("M-g y" . avy-copy-line))
+  ("M-g y" . avy-copy-line)
+
+  ("C-x C-c" . extra|never-exit))
 
 (provide 'init-extra)

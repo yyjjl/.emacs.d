@@ -30,18 +30,12 @@
 ;; Pytest tools
 
 (defvar python|pytest-executable "pytest")
-(defvar python|pytest-cmd-flags "")
-(defconst python|pytest-cmd-fmt "%s %s %s\n")
 
-(defun python|pytest-run (arg)
+(defun python|pytest-run (&rest args)
   (if python|has-pytest-p
-      (let ((pytest-buffer (term|local-shell)))
-        (shell pytest-buffer)
-        (process-send-string (get-buffer-process pytest-buffer)
-                             (format python|pytest-cmd-fmt
-                                     python|pytest-executable
-                                     python|pytest-cmd-flags
-                                     arg)))
+      (let ((pytest-buffer
+             (apply #'term|exec-program (cons python|pytest-executable args))))
+        (pop-to-buffer pytest-buffer))
     (message "'pytest' is not found !!!")))
 
 (defun python|pytest-file ()

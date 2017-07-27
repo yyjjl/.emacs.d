@@ -85,4 +85,15 @@ MAP (default `global-map')."
     (when pair
       (setcdr pair (cons ele (cdr pair))))))
 
+(defvar socks-server '("Default server" "127.0.0.1" 1080 5))
+(defun core|toggle-socket-proxy ()
+  (interactive)
+  (if (eq url-gateway-method 'socks)
+      (let ((method (function-get #'core|toggle-socket-proxy 'method)))
+        (setq url-gateway-method (or method 'native))
+        (message "Use method '%s" url-gateway-method))
+    (function-put #'core|toggle-socket-proxy 'method url-gateway-method)
+    (setq url-gateway-method 'socks)
+    (message "Use socket proxy %s" socks-server)))
+
 (provide 'init-utils)

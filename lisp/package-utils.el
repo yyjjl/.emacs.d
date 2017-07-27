@@ -59,7 +59,6 @@ Archive with high priority will be used when install a package.")
   (advice-add 'package-read-all-archive-contents
               :after #'package|after-read-contents)
 
-  (message "Loading packages ...")
   (package-initialize 'no-activate)
   (when (>= emacs-major-version 25)
     ;; Do not save to init.el
@@ -74,6 +73,7 @@ Archive with high priority will be used when install a package.")
                (unless (package-installed-p pkg)
                  (unless freshed-p
                    (setq freshed-p t)
+                   (ignore-errors (switch-to-buffer "*Messages*"))
                    (package-refresh-contents))
                  (message "Installing package '%s' ..." pkg)
                  (package-install pkg)

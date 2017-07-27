@@ -133,7 +133,8 @@
   ("j" . git|ivy-goto-gutter)
   ("l" . git-link)
   ("c" . git-link-commit)
-  ("m" . git-messenger:popup-message))
+  ("m" . git-messenger:popup-message)
+  ("g" . magit-status))
 
 
 (provide 'init-git)

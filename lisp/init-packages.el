@@ -111,7 +111,8 @@
    git-messenger
    git-gutter git-gutter-fringe
    git-link
-   git-timemachine))
+   git-timemachine
+   magit))
 
 (package|add
  '( ;; auto compile after .el file load or save

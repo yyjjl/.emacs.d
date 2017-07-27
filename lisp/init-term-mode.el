@@ -14,15 +14,31 @@
             (kill-buffer buffer))
         (and fn (funcall fn proc msg))))))
 
+(defun term|exec-program (program &rest args)
+  (let ((buf (generate-new-buffer
+              (concat "*" (file-name-nondirectory program) "*")))
+        (parent-buf (current-buffer)))
+    (with-current-buffer buf
+      (term-mode)
+      (setq term|parent-buffer parent-buf)
+      (term-exec buf program program nil args)
+      (let ((proc (get-buffer-process buf)))
+	(if (and proc (eq 'run (process-status proc)))
+	    (set-process-sentinel proc #'term-sentinel)
+	  (error "Failed to invoke visual command")))
+      (term-char-mode))
+    buf))
+
 (defhook term|shell-setup (shell-mode-hook)
   (let ((proc (ignore-errors (get-buffer-process (current-buffer)))))
     (when proc
       (set-process-sentinel proc
                             (term|wrap-sentinel (process-sentinel proc))))))
 
-(defhook term|term-setup (term-mode-hook)
-  (dirtrack-mode 1)
-  (setq dirtrack-list '("^#.*?in \\(.*?\\) \\[[:0-9]*\\]" 1 nil)))
+;; For zsh ys theme
+;; (defhook term|term-setup (term-mode-hook)
+;;   (setq dirtrack-list term|term-prompt-regexp)
+;;   (dirtrack-mode 1))
 
 (defhook term|utf8-setup (term-exec-hook)
   (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
@@ -46,17 +62,22 @@
       (setq index (1+ index)))
     name))
 
+(defvar-local term|parent-buffer nil)
+(defun term|switch-back ()
+  (interactive)
+  (when term|parent-buffer
+    (pop-to-buffer term|parent-buffer)))
+
 (defun term|remote-shell ()
   "Switch to remote shell"
-  (interactive)
   (let ((buf (or (term|last-buffer (buffer-list) 'shell-mode)
                  (get-buffer-create (term|get-buffer-name "*shell-%d*")))))
     (when buf
-      (pop-to-buffer buf)
-      (set-buffer buf)
-      (unless (eq major-mode 'shell-mode)
-        (let ((explicit-shell-file-name "/bin/bash"))
-          (shell buf))))))
+      (with-current-buffer buf
+        (unless (eq major-mode 'shell-mode)
+          (let ((explicit-shell-file-name "/bin/bash"))
+            (shell buf)))))
+    buf))
 
 (defun term|local-shell (&optional dir)
   (unless (featurep 'multi-term)
@@ -69,32 +90,12 @@
         (setq buf (multi-term-get-buffer)))
       (setq multi-term-buffer-list
             (nconc multi-term-buffer-list (list buf)))
-      (set-buffer buf)
-      ;; Internal handle for `multi-term' buffer.
-      (multi-term-internal)
-      (let ((proc (ignore-errors (get-buffer-process (current-buffer)))))
-        (when proc (set-process-sentinel proc (term|wrap-sentinel)))))
+      (with-current-buffer buf
+        ;; Internal handle for `multi-term' buffer.
+        (multi-term-internal)
+        (let ((proc (ignore-errors (get-buffer-process (current-buffer)))))
+          (when proc (set-process-sentinel proc (term|wrap-sentinel))))))
     buf))
-
-;; `eshell' setup
-(defun term|eshell-autoclose ()
-  (let ((window (get-buffer-window)))
-    (when (and (window-live-p window)
-               (> (length (window-list)) 1))
-      (delete-window window))))
-
-(defun term|local-eshell (&optional dir)
-  (unless dir
-    (setq dir default-directory))
-  (let ((buf (or (term|last-buffer (buffer-list) 'eshell-mode dir)
-                 (get-buffer-create (term|get-buffer-name "*eshell-%d*")))))
-    (with-current-buffer buf
-      (cd dir)
-      (unless (eq 'eshell-mode major-mode)
-        (eshell-mode)
-        (add-hook 'kill-buffer-hook #'term|eshell-autoclose nil :local)))
-    buf))
-
 
 (defvar term|use-eshell-p t)
 
@@ -102,17 +103,21 @@
   "Switch to the term buffer last used, or create a new one if
 none exists, or if the current buffer is already a term."
   (interactive "P")
-  (if (not (file-remote-p default-directory))
-      (unless (memq major-mode '(term-mode eshell-mode))
-        (pop-to-buffer
-         (funcall (if term|use-eshell-p
-                      #'term|local-eshell
-                    #'term|local-shell)
-                  (or (and arg default-directory)
-                      (and (bound-and-true-p cpp|cmake-ide-enabled)
-                           cmake-ide-build-dir)
-                      (ignore-errors (projectile-project-root))))))
-    (term|remote-shell)))
+  (let ((buf (if (not (file-remote-p default-directory))
+                 (unless (memq major-mode '(term-mode eshell-mode))
+                   (funcall (if term|use-eshell-p
+                                #'term|local-eshell
+                              #'term|local-shell)
+                            (or (and arg default-directory)
+                                (and (bound-and-true-p cpp|cmake-ide-enabled)
+                                     cmake-ide-build-dir)
+                                (ignore-errors (projectile-project-root)))))
+               (term|remote-shell)))
+        (parent-buf (current-buffer)))
+    (with-current-buffer buf
+      (local-set-key (kbd "C-c C-z") #'term|switch-back)
+      (setq term|parent-buffer parent-buf))
+    (pop-to-buffer buf)))
 
 (with-eval-after-load 'multi-term
   (setq multi-term-program "/bin/zsh")

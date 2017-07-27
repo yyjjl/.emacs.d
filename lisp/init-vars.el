@@ -44,6 +44,7 @@
   (setq session-save-file (core|expand-var "session.el"))
   (setq smex-save-file (core|expand-var "smex-items.el"))
   (setq srecode-map-save-file (core|expand-var "srecode-map.el"))
-  (setq tramp-persistency-file-name (core|expand-var "tramp.el")))
+  (setq tramp-persistency-file-name (core|expand-var "tramp.el"))
+  (setq url-configuration-directory (core|expand-var "url/")))
 
 (provide 'init-vars)

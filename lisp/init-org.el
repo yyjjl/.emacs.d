@@ -87,6 +87,7 @@
       (annotation (company-auctex-symbol-annotation arg))))
 
   (defhook org|setup (org-mode-hook)
+    (flycheck-mode -1)
     (make-local-variable 'completion-at-point-functions)
     (add-to-list 'completion-at-point-functions
                  'pcomplete-completions-at-point)

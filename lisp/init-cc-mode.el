@@ -38,7 +38,7 @@
   (setq c-basic-offset 4)
   ;; make DEL take all previous whitespace with it
   (c-toggle-hungry-state 1)
-  (c-toggle-auto-newline -1)
+  (c-toggle-auto-newline 1)
   ;; indent
   (highlight-indentation-set-offset 4)
   (cpp|fix-cc-indent-offset 'innamespace [0])

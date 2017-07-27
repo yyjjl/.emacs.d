@@ -31,6 +31,7 @@
           log-edit-mode
           term-mode
           w3m-mode
+          eww-mode
           speedbar-mode
           gnus-summary-mode
           gnus-article-mode
