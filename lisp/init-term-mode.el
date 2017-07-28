@@ -66,11 +66,12 @@
     name))
 
 (defvar-local term|parent-buffer nil)
-(defun term|switch-back ()
-  (interactive)
+(defun term|switch-back (&optional slience)
+  (interactive "P")
   (if (and term|parent-buffer (buffer-live-p term|parent-buffer))
       (pop-to-buffer term|parent-buffer)
-    (message "No parent buffer or it was killed !!!")))
+    (unless slience
+      (message "No parent buffer or it was killed !!!"))))
 
 (defun term|remote-shell ()
   "Switch to remote shell"

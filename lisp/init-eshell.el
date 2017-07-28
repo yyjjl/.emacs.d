@@ -18,20 +18,20 @@
           (add-hook 'kill-buffer-hook #'term|eshell-autoclose nil :local))))
     buf))
 
-(defun eshell-ctrl-d-hack (fn &rest args)
-  "When there is no input and press ctrl-d, exit eshell"
-  (let ((kill-p (and
-                 (save-excursion
-                   (goto-char (line-beginning-position))
-                   (looking-at-p eshell-prompt-regexp))
-                 (save-excursion
-                   (goto-char (or eshell-last-output-end (point-max)))
-                   (re-search-forward "\\s-+" (point-max) t)
-                   (equal (point) (point-max))))))
-    (if kill-p
-        (kill-buffer)
-      (apply fn args))))
-(advice-add 'eshell-send-eof-to-process :around #'eshell-ctrl-d-hack)
+(defun term|eshell-ctrl-d (&optional args)
+  (interactive "p")
+  (if (and (eolp)
+           (save-excursion
+             (goto-char (line-beginning-position))
+             (looking-at-p eshell-prompt-regexp))
+           (save-excursion
+             (goto-char (or eshell-last-output-end (point-max)))
+             (re-search-forward "\\s-+" (point-max) t)
+             (equal (point) (point-max))))
+      (let ((buf (current-buffer)))
+        (term|switch-back t)
+        (kill-buffer buf))
+    (delete-char args)))
 
 (defun eshell/vv (&rest args)
   (let ((args (eshell-flatten-list (eshell-stringify-list args))))
@@ -62,6 +62,8 @@
                 (if (stringp arg) arg "")))))
 
 (defhook term|eshell-setup (eshell-mode-hook)
+  ;; `eshell-mode-map' is a local variable
+  (define-key eshell-mode-map (kbd "C-d") #'term|eshell-ctrl-d)
   (define-key eshell-mode-map (kbd "<tab>") #'completion-at-point)
   (define-key eshell-mode-map (kbd "C-c i e") #'counsel-esh-history))
 
