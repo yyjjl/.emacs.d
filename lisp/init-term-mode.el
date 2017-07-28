@@ -15,6 +15,8 @@
         (and fn (funcall fn proc msg))))))
 
 (defun term|exec-program (program &rest args)
+  (unless (featurep 'term)
+    (require 'term))
   (let ((buf (generate-new-buffer
               (concat "*" (file-name-nondirectory program) "*")))
         (parent-buf (current-buffer)))
@@ -36,9 +38,10 @@
                             (term|wrap-sentinel (process-sentinel proc))))))
 
 ;; For zsh ys theme
+;; (defvar term|zsh-prompt-regexp '("^#.*?in \\(.*?\\) \\(on\\|\\[\\)" 1))
 ;; (defhook term|term-setup (term-mode-hook)
-;;   (setq dirtrack-list term|term-prompt-regexp)
-;;   (dirtrack-mode 1))
+;;   (dirtrack-mode 1)
+;;   (setq dirtrack-list term|zsh-prompt-regexp))
 
 (defhook term|utf8-setup (term-exec-hook)
   (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
@@ -108,7 +111,7 @@ none exists, or if the current buffer is already a term."
                    (funcall (if term|use-eshell-p
                                 #'term|local-eshell
                               #'term|local-shell)
-                            (or (and arg default-directory)
+                            (or (and (not arg) default-directory)
                                 (and (bound-and-true-p cpp|cmake-ide-enabled)
                                      cmake-ide-build-dir)
                                 (ignore-errors (projectile-project-root)))))

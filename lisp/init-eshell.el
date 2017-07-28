@@ -61,6 +61,12 @@
   (setq eshell-last-dir-ring-size 512)
   (setq eshell-destroy-buffer-when-process-dies t))
 
+(with-eval-after-load 'em-term
+  (defvar term|eshell-extra-visual-commands
+    '("ssh" "ipython" "python" "python3" "python2" "root"))
+  (dolist (cmd term|eshell-extra-visual-commands)
+    (add-to-list 'eshell-visual-commands cmd)))
+
 (with-eval-after-load 'esh-opt
   (autoload 'epe-theme-lambda "eshell-prompt-extras")
   (setq eshell-highlight-prompt t

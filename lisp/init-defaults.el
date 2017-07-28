@@ -76,8 +76,9 @@
 (defvar core|recentf-enabled-p t)
 (setq recentf-keep '((lambda (fn)
                        (and core|recentf-enabled-p
-                           (or (file-readable-p fn)
-                               (file-remote-p fn))))))
+                            ;; The order must be kept
+                            (or (file-remote-p fn)
+                                (file-readable-p fn))))))
 (setq recentf-max-saved-items 2048
       recentf-exclude (list "/tmp/" "/ssh:" "/sudo:" emacs|var-direcotry))
 

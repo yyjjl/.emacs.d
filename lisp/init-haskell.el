@@ -6,23 +6,26 @@
   (advice-add 'shm/tab :around #'haskell|shm-tab-or-close)
 
   (define-keys :map shm-map
-             ("C-c C-^") ("C-c 6" . shm/swing-up)
-             ("C-c C-_") ("C-c -" . shm/insert-underscore)
-             ("C-c C-e") ("C-c C-j")
-             ("C-c e" . shm/export)
-             ("C-c j" . shm/swing-down)))
+    ("C-." . shm/forward-node)
+    ("C-," . shm/backward-node)
+    ("C-?" . shm/describe-mode)
+    ("C-c C-^") ("C-c 6" . shm/swing-up)
+    ("C-c C-_") ("C-c -" . shm/insert-underscore)
+    ("C-c C-e") ("C-c C-j")
+    ("C-c e" . shm/export)
+    ("C-c j" . shm/swing-down)))
 
 (with-eval-after-load 'hindent
   ;; Rewrite function
-  (defun hindent-reformat-decl ()
-    "Work with `align'"
-    (interactive)
-    (let ((start-end (hindent-decl-points)))
-      (when start-end
-        (let ((beg (car start-end))
-              (end (cdr start-end)))
-          (hindent-reformat-region beg end t)
-          (align beg end)))))
+  ;; (defun hindent-reformat-decl ()
+  ;;   "Work with `align'"
+  ;;   (interactive)
+  ;;   (let ((start-end (hindent-decl-points)))
+  ;;     (when start-end
+  ;;       (let ((beg (car start-end))
+  ;;             (end (cdr start-end)))
+  ;;         (hindent-reformat-region beg end t)
+  ;;         (align beg end)))))
 
   (defun haskell|force-indent-size (org-fn)
     (list* "--tab-size" "4" (apply org-fn '())))
@@ -50,6 +53,7 @@
   (remap-keybindings "C-c C-r" "C-c r" haskell-mode-map)
 
   (define-keys :map haskell-mode-map
+    ("C-c C-d" . ghc-browse-document)
     ("C-c b" . haskell-mode-stylish-buffer)
     ("C-c s" . haskell-sort-imports)
     ("M-." . haskell-mode-tag-find)
@@ -63,7 +67,8 @@
     ("C-c a b" . haskell-process-cabal-build)
     ("C-c a a" . haskell-process-cabal)
     ("C-c '" . company-ghc-complete-by-hoogle)
-    ("C-c ;" . company-ghc-complete-in-module))
+    ("C-c ;" . company-ghc-complete-in-module)
+    ("C-c C-c" . company-ghc-clear-failed-cache))
 
   (defhook haskell|cabal-setup (haskell-cabal-mode-hook)
     (rainbow-delimiters-mode 1)
@@ -93,6 +98,10 @@
       ;; haskell-indentation-mode is incompatible with shm
       (haskell-indentation-mode 1))
     (hl-line-mode -1)))
+
+(with-eval-after-load 'ghc-check
+  (setq ghc-check-command 'hlint)
+  (fset 'ghc-check-syntax (lambda () "Do nothing")))
 
 (with-eval-after-load 'haskell-cabal
   (define-keys :map haskell-cabal-mode-map

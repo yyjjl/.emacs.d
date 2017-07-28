@@ -256,6 +256,10 @@
      (diredp-dir-heading ((((background dark))
                            (:inherit font-lock-keyword-face))))
 
+     (haskell-keyword-face ((t (:inherit font-lock-builtin-face))))
+     (haskell-type-face ((t (:inherit font-lock-constant-face))))
+     (haskell-constructor-face  ((t (:inherit font-lock-type-face))))
+
      (semantic-highlight-func-current-tag-face ((t (:background "gray5"))))
      (linum-highlight-face ((t (:inherit default :foreground "orange red"))))
      (shm-current-face ((t (:inherit hl-sexp-face))))

@@ -56,8 +56,7 @@
   (setq company-auto-complete nil)
   ;; NOT to load company-mode for certain major modes.
   (setq company-global-modes
-        '(not eshell-mode
-              comint-mode erc-mode gud-mode rcirc-mode shell-mode
+        '(not eshell-mode comint-mode erc-mode gud-mode rcirc-mode shell-mode
               minibuffer-inactive-mode)))
 
 (with-eval-after-load 'company-etags
