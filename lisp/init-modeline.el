@@ -82,11 +82,11 @@ and `buffer-file-coding-system'"
 
 (defun mode-line|process ()
   "Display buffer process status."
-  (let ((proc (get-buffer-process (current-buffer))))
-    (if (not proc) ""
-      (if (process-live-p proc)
-          (format " {:run %s} " (process-id proc))
-        (format " {:exit %s} " (process-exit-status proc))))))
+  (let ((proc (get-buffer-process (current-buffer)))
+        (msg (format-mode-line mode-line-process)))
+    (if (and proc (process-live-p proc))
+        (format " {%s@%s} " msg (process-id proc))
+      (format " {%s} " msg))))
 
 (defvar mode-line|center-margin 3)
 (defvar mode-line|special-string-function nil)

@@ -14,9 +14,16 @@
             (kill-buffer buffer))
         (and fn (funcall fn proc msg))))))
 
-(defun term|exec-program (program &rest args)
+(defun term|exec-sentinel (proc msg)
+  (term-sentinel proc msg)
+  (setq buffer-read-only t)
+  (local-set-key (kbd "q") 'kill-this-buffer))
+
+(defun term|exec-program (program args &optional sentinel)
   (unless (featurep 'term)
     (require 'term))
+  (unless sentinel
+    (setq sentinel #'term|exec-sentinel))
   (let ((buf (generate-new-buffer
               (concat "*" (file-name-nondirectory program) "*")))
         (parent-buf (current-buffer)))
@@ -25,9 +32,9 @@
       (setq term|parent-buffer parent-buf)
       (term-exec buf program program nil args)
       (let ((proc (get-buffer-process buf)))
-	(if (and proc (eq 'run (process-status proc)))
-	    (set-process-sentinel proc #'term-sentinel)
-	  (error "Failed to invoke visual command")))
+        (if (and proc (eq 'run (process-status proc)))
+            (set-process-sentinel proc sentinel)
+          (error "Failed to invoke visual command")))
       (term-char-mode))
     buf))
 
@@ -108,6 +115,8 @@
   "Switch to the term buffer last used, or create a new one if
 none exists, or if the current buffer is already a term."
   (interactive "P")
+  (unless (featurep 'multi-term)
+    (require 'multi-term))
   (let ((buf (if (not (file-remote-p default-directory))
                  (unless (memq major-mode '(term-mode eshell-mode))
                    (funcall (if term|use-eshell-p
@@ -125,8 +134,8 @@ none exists, or if the current buffer is already a term."
     (pop-to-buffer buf)))
 
 (with-eval-after-load 'multi-term
-  ;; Bind useful keystroke
-  (add-hook 'term-mode-hook #'multi-term-keystroke-setup)
+  (add-hook 'term-mode-hook 'multi-term-keystroke-setup)
+
   (setq multi-term-program "/bin/zsh")
   (setq term-unbind-key-list '("C-x" "<ESC>" "C-y" "C-h" "C-c"))
   (setq term-bind-key-alist

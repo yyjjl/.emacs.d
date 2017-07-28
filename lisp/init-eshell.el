@@ -42,7 +42,7 @@
   (let ((args (eshell-flatten-list (eshell-stringify-list args))))
     (condition-case err
         (save-current-buffer
-          (switch-to-buffer (apply #'term|exec-program args))
+          (switch-to-buffer (term|exec-program (car args) (cdr args)))
           (local-set-key (kbd "C-c C-z") #'term|switch-back))
       (error (progn (message "Error: %s" err) nil)))))
 
@@ -74,7 +74,8 @@
 
 (with-no-warnings
   (setq eshell-last-dir-ring-size 512)
-  (setq eshell-destroy-buffer-when-process-dies nil))
+  (setq eshell-destroy-buffer-when-process-dies nil)
+  (setq eshell-escape-control-x nil))
 
 (with-eval-after-load 'em-term
   (defvar term|eshell-extra-visual-commands

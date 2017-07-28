@@ -34,7 +34,7 @@
 (defun python|pytest-run (&rest args)
   (if python|has-pytest-p
       (let ((pytest-buffer
-             (apply #'term|exec-program (cons python|pytest-executable args))))
+             (term|exec-program python|pytest-executable args)))
         (pop-to-buffer pytest-buffer))
     (message "'pytest' is not found !!!")))
 
