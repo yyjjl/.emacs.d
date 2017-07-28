@@ -68,8 +68,9 @@
 (defvar-local term|parent-buffer nil)
 (defun term|switch-back ()
   (interactive)
-  (when term|parent-buffer
-    (pop-to-buffer term|parent-buffer)))
+  (if (and term|parent-buffer (buffer-live-p term|parent-buffer))
+      (pop-to-buffer term|parent-buffer)
+    (message "No parent buffer or it was killed !!!")))
 
 (defun term|remote-shell ()
   "Switch to remote shell"

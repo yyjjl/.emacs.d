@@ -33,6 +33,14 @@
       (apply fn args))))
 (advice-add 'eshell-send-eof-to-process :around #'eshell-ctrl-d-hack)
 
+(defun eshell/vv (&rest args)
+  (let ((args (eshell-flatten-list (eshell-stringify-list args))))
+    (condition-case err
+        (save-current-buffer
+          (switch-to-buffer (apply #'term|exec-program args))
+          (local-set-key (kbd "C-c C-z") #'term|switch-back))
+      (error (progn (message "Error: %s" err) nil)))))
+
 (defun eshell/j (&optional arg)
   (let ((mm (make-hash-table :test #'equal))
         candidates)
