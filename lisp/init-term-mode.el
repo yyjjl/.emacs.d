@@ -125,6 +125,8 @@ none exists, or if the current buffer is already a term."
     (pop-to-buffer buf)))
 
 (with-eval-after-load 'multi-term
+  ;; Bind useful keystroke
+  (add-hook 'term-mode-hook #'multi-term-keystroke-setup)
   (setq multi-term-program "/bin/zsh")
   (setq term-unbind-key-list '("C-x" "<ESC>" "C-y" "C-h" "C-c"))
   (setq term-bind-key-alist

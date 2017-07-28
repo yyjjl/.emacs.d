@@ -33,6 +33,11 @@
         (kill-buffer buf))
     (delete-char args)))
 
+(defun term|eshell-after-process-quit (&rest args)
+  (setq buffer-read-only t)
+  (local-set-key (kbd "q") 'kill-this-buffer))
+(advice-add 'eshell-term-sentinel :after #'term|eshell-after-process-quit)
+
 (defun eshell/vv (&rest args)
   (let ((args (eshell-flatten-list (eshell-stringify-list args))))
     (condition-case err
@@ -69,7 +74,7 @@
 
 (with-no-warnings
   (setq eshell-last-dir-ring-size 512)
-  (setq eshell-destroy-buffer-when-process-dies t))
+  (setq eshell-destroy-buffer-when-process-dies nil))
 
 (with-eval-after-load 'em-term
   (defvar term|eshell-extra-visual-commands
