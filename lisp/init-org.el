@@ -52,6 +52,25 @@ With a prefix BELOW move point to lower block."
     ("/" . org|split-src-block)))
 
 (with-eval-after-load 'ob-ipython
+  ;; Fix encoding error
+  (defun ob-ipython--inspect-request (code &optional pos detail)
+    (let ((url-request-data (encode-coding-string
+                             (json-encode `((code . ,code)
+                                            (pos . ,(or pos (length code)))
+                                            (detail . ,(or detail 0))))
+                             'utf-8))
+          (url-request-method "POST"))
+      (with-current-buffer (url-retrieve-synchronously
+                            ;; TODO: hardcoded the default session here
+                            (format "http://%s:%d/inspect/default"
+                                    ob-ipython-driver-hostname
+                                    ob-ipython-driver-port))
+        (if (>= (url-http-parse-response) 400)
+            (ob-ipython--dump-error (buffer-string))
+          (goto-char url-http-end-of-headers)
+          (let ((json-array-type 'list))
+            (json-read))))))
+
   ;; Don't prompt me to confirm everytime I want to evaluate a block
   (setq org-confirm-babel-evaluate nil)
 

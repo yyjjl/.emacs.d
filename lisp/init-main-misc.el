@@ -52,7 +52,6 @@
   ;; global-modes
   ;; `linum-mode' is slow
   ;; (global-linum-mode 1)
-  (global-vim-empty-lines-mode 1)
   (global-company-mode 1)
   (global-flycheck-mode 1)
   (global-subword-mode 1)

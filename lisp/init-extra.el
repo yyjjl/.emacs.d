@@ -104,10 +104,10 @@
 
 (define-keys
   ;; buffer-mode
-  ("C-c w u" . buf-move-up)
-  ("C-c w d" . buf-move-down)
-  ("C-c w l" . buf-move-left)
-  ("C-c w r" . buf-move-right)
+  ("C-c w k" . buf-move-up)
+  ("C-c w j" . buf-move-down)
+  ("C-c w h" . buf-move-left)
+  ("C-c w l" . buf-move-right)
   ;; `ace-window' and `avy'
   ("C-x o" . ace-window)
   ("C-:" . avy-goto-char)

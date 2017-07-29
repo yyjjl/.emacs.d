@@ -59,9 +59,14 @@ HTML file converted from org file."
        ,@(mapcar (lambda (key)
                    (let ((k (car key))
                          (f (cdr key)))
-                     `(define-key ,sym
-                        ,(if (vectorp k) k `(kbd ,(concat prefix " " k))) ',f)))
-                 (remove-keywords keys)))))
+                     (if (stringp k)
+                         `(define-key ,sym
+                            ,(if (vectorp k) k `(kbd ,(concat prefix " " k))) ',f)
+                       (let ((sym2 (gensym)))
+                         `(dolist (,sym2 ,key)
+                            (define-key ,sym (kbd (car ,sym2)) (cdr ,sym2)))))))
+                 (remove-keywords keys))
+       ,sym)))
 
 (defun remap-keybindings (old-key new-key &optional map)
   "Remap keybindings whose prefix is OLD-KEY to NEW-KEY in

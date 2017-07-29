@@ -40,4 +40,5 @@
     (unless (memq major-mode main|linum-disabled-modes)
       (apply fn args)))
   (advice-add 'linum-mode :around #'main|disable-linum-mode))
+
 (provide 'init-linum-mode)

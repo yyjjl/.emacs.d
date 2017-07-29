@@ -194,7 +194,6 @@
 
 (with-eval-after-load 'cc-mode
   (require 'cmake-ide)
-
   (rtags-enable-standard-keybindings)
   ;; C-c(3) r(114) make all Upper case to lower-case
   (let ((m (assoc 114 (assoc 3 c-mode-base-map))))

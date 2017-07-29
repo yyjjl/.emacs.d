@@ -2,6 +2,9 @@
   (semantic-add-system-include "/usr/include/c++/5/" 'c++-mode)
   (semantic-add-system-include "/usr/include/" 'c++-mode)
   (semantic-add-system-include "/usr/include/" 'c-mode)
+
+  ;; It's too slow, when file is large
+  ;; (require 'stickyfunc-enhance)
   (setq semantic-default-submodes
         '(global-semantic-idle-scheduler-mode
           global-semanticdb-minor-mode
@@ -11,8 +14,7 @@
           ;; Error occurs a lot
           ;; global-semantic-decoration-mode
           global-semantic-highlight-func-mode
-          global-semantic-mru-bookmark-mode))
-  (require 'stickyfunc-enhance))
+          global-semantic-mru-bookmark-mode)))
 
 (with-eval-after-load "db-file"
   ;; Fix remote file problem

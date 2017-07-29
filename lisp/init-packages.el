@@ -87,9 +87,9 @@
    ;; ^L beautifier
    page-break-lines
    ;; Show information in header-line for `semantic-mode'
-   stickyfunc-enhance
+   ;; It's too slow, when file is large
+   ;; stickyfunc-enhance
    eshell-prompt-extras
-   vim-empty-lines-mode
    unicode-fonts))
 
 ;; latex

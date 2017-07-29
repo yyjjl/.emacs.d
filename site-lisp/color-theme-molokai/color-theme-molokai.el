@@ -262,7 +262,7 @@
 
      (semantic-highlight-func-current-tag-face ((t (:background "gray5"))))
      (linum-highlight-face ((t (:inherit default :foreground "orange red"))))
-     (shm-current-face ((t (:inherit hl-sexp-face))))
+     (shm-current-face ((t (:underline (:style line :color "blue")))))
      (ivy-highlight-face ((t (:background "#444155")))))))
 
 (provide 'color-theme-molokai)

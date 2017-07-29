@@ -16,8 +16,10 @@
 
 (defun term|exec-sentinel (proc msg)
   (term-sentinel proc msg)
-  (setq buffer-read-only t)
-  (local-set-key (kbd "q") 'kill-this-buffer))
+  (let ((buf (and proc (process-buffer proc))))
+    (when (buffer-live-p buf)
+      (setq buffer-read-only t)
+      (local-set-key (kbd "q") 'kill-this-buffer))))
 
 (defun term|exec-program (program args &optional sentinel)
   (unless (featurep 'term)

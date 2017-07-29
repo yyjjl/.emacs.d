@@ -106,4 +106,91 @@ Emacs Lisp."
               :initial-input default
               :preselect default)))
 
+(defun lisp|transpose-sexp (n)
+  (when (/= n 0)
+    (let ((bounds (bounds-of-thing-at-point 'sexp)))
+      (if bounds
+          (progn
+            (let ((dist (or (and bounds (- (cdr bounds) (point))) 0)))
+              (unless dist
+                (forward-char 1))
+              (transpose-sexps n)
+              (backward-char dist)))
+        (message "Not in a sexp")))))
+
+(defun lisp|transpose-sexp-down (&optional n)
+  (interactive "P")
+  (unless n (setq n 1))
+  (lisp|transpose-sexp n))
+
+(defhydra hydra|sexp (:exit nil)
+  "Sexp"
+  ("SPC" (if (region-active-p)
+             (deactivate-mark)
+           (mark-sexp)) "mark")
+  ("." lisp|transpose-sexp-down "->")
+  ("," lisp|transpose-sexp-up "<-"))
+
+(defun lisp|transpose-sexp-up (&optional n)
+  (interactive "P")
+  (unless n (setq n 1))
+  (lisp|transpose-sexp (- 0 n)))
+
+(define-keys
+  ( "C->" . hydra|sexp/lisp|transpose-sexp-down)
+  ( "C-<" . hydra|sexp/lisp|transpose-sexp-up))
+
+(defun lisp|try-enable-lispy (map &optional level)
+  (unless level (setq level 3))
+  (define-keys :map map
+    ;; navigation
+    ("l" . special-lispy-right)
+    ("h" . special-lispy-left)
+    ("f" . special-lispy-flow)
+    ("j" . special-lispy-down)
+    ("k" . special-lispy-up)
+    ("d" . special-lispy-different)
+    ("P" . special-lispy-paste)
+    ("y" . special-lispy-occur)
+    ;; more transformations
+    ("w" . special-lispy-move-up)
+    ("s" . special-lispy-move-down)
+    ;; marking
+    ("a" . special-lispy-ace-symbol)
+    ("H" . special-lispy-ace-symbol-replace)
+    ("m" . special-lispy-mark-list)
+    ;; dialect-specific
+    ("A" . special-lispy-beginning-of-defun)
+    ("c" . special-lispy-clone)
+    ("q" . special-lispy-ace-paren)
+    ("Q" . special-lispy-ace-char)
+    ("v" . special-lispy-view)
+    ("t" . special-lispy-teleport)
+    ("n" . special-lispy-new-copy)
+    ("b" . special-lispy-back)
+    ;; digit argument
+    (mapcar (lambda (x) `(,(format "%d" x) . special-digit-argument))
+            (number-sequence 0 9)))
+  (if (> level 1)
+      (define-keys :map map
+        ;; Paredit transformations
+        ("/" . special-lispy-splice)
+        ("+" . special-lispy-join)))
+  (if (> level 2)
+      (define-keys :map map
+        ("-" . special-lispy-ace-subword)
+        ("\"" . lispy-quotes)))
+  map)
+
+(defvar lisp|lispy-enable-alist '((haskell-mode . 1)
+                                  (:all . 3)))
+
+(defhook lisp|lispy-generic-setup (prog-mode-hook)
+  (let ((level (cdr-safe (or (assoc major-mode lisp|lispy-enable-alist)
+                             (assoc :all lisp|lispy-enable-alist)))))
+    (when level
+      (use-local-map (lisp|try-enable-lispy
+                      (copy-keymap (current-local-map))
+                      level)))))
+
 (provide 'init-lisp)
