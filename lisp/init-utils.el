@@ -13,7 +13,8 @@ Optional argument BODY is the function body."
                           (when (consp hook)
                             (setq extra (cdr hook))
                             (setq hook (car hook)))
-                          `(add-hook ',hook #',name ,@extra))) hooks))))
+                          `(add-hook ',hook #',name ,@extra)))
+                      hooks))))
 
 (defun read-file-as-string (filename)
   "Read file named FILENAME as string."
@@ -53,13 +54,14 @@ HTML file converted from org file."
 (cl-defmacro define-keys
     (&rest keys &key (prefix "") (map 'global-map) &allow-other-keys)
   "Define multiple keys in one expression"
-  `(progn
-     ,@(mapcar (lambda (key)
-                 (let ((k (car key))
-                       (f (cdr key)))
-                   `(define-key ,map
-                      ,(if (vectorp k) k `(kbd ,(concat prefix " " k))) ',f)))
-               (remove-keywords keys))))
+  (let ((sym (gensym)))
+    `(let ((,sym ,map))
+       ,@(mapcar (lambda (key)
+                   (let ((k (car key))
+                         (f (cdr key)))
+                     `(define-key ,sym
+                        ,(if (vectorp k) k `(kbd ,(concat prefix " " k))) ',f)))
+                 (remove-keywords keys)))))
 
 (defun remap-keybindings (old-key new-key &optional map)
   "Remap keybindings whose prefix is OLD-KEY to NEW-KEY in

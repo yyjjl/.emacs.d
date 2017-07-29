@@ -11,6 +11,42 @@ With a prefix BELOW move point to lower block."
     (when (not below)
       (org-babel-previous-src-block))))
 
+(defun org|ipython-track-move (n)
+  (let ((search-func (if (> n 0)
+                         #'re-search-forward
+                       (setq n (- 0 n))
+                       #'re-search-backward))
+        found)
+    (while (and (> n 0)
+                (setq found (apply search-func '("^-+> \\([0-9]+\\)" nil t))))
+      (setq n (1- n)))
+    (when found
+      (require 'pulse)
+      (pulse-momentary-highlight-one-line (line-beginning-position))
+      (buffer-substring (line-beginning-position) (line-end-position)))))
+
+(defun org|ipython-track-prev (&optional n)
+  (interactive "P")
+  (let ((str (org|ipython-track-move (or n -1))))
+    (if str (setq header-line-format str)
+      (message "No previous frame"))))
+
+(defun org|ipython-track-next (&optional n)
+  (interactive "P")
+  (let ((str (org|ipython-track-move (or n 1))))
+    (if str (setq header-line-format str)
+      (message "No next frame"))))
+
+(defun org|ipython-track-setup (fn &rest args)
+  (let ((buf (apply fn args)))
+    (with-current-buffer buf
+      (use-local-map (copy-keymap special-mode-map))
+      (define-keys :map (current-local-map)
+        ("p" . org|ipython-track-prev)
+        ("n" . org|ipython-track-next)))))
+(advice-add 'ob-ipython--create-traceback-buffer
+            :around #'org|ipython-track-setup)
+
 (with-eval-after-load 'ob
   (define-keys :map org-babel-map
     ("/" . org|split-src-block)))

@@ -83,8 +83,6 @@
 (require 'init-windows)
 (require 'init-gud)
 
-(require  'init-groups)
-
 ;; Other small tools
 (require 'init-extra)
 
