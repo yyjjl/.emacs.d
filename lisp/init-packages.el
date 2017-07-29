@@ -38,7 +38,7 @@
    counsel-projectile
    ;; counsel-M-x need smex to get history
    smex
-
+   
    ;; delete packages safely
    ;; emacs 25 has builtin support
    ;; package-safe-delete
@@ -89,6 +89,7 @@
    ;; Show information in header-line for `semantic-mode'
    stickyfunc-enhance
    eshell-prompt-extras
+   vim-empty-lines-mode
    unicode-fonts))
 
 ;; latex

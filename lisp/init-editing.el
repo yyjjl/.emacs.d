@@ -77,12 +77,12 @@ grab matched string and insert them into `kill-ring'"
   ("C-=" . mc/mark-next-like-this)
   ("C--" . mc/mark-previous-like-this))
 
-(define-keys :prefix "C-c v"
-  ("q" . vr/query-replace)
-  ("r" . vr/replace)
-  ("m" . vr/mc-mark))
 
 (define-keys :prefix "C-c m"
+  ("q" . vr/query-replace)
+  ("R" . vr/replace)
+  ("v" . vr/mc-mark)
+
   ("P" . mc/mark-pop)
   ("m" . mc/mark-all-like-this-dwim)
   ("l" . mc/edit-lines)

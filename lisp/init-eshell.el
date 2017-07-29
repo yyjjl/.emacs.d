@@ -38,6 +38,21 @@
   (local-set-key (kbd "q") 'kill-this-buffer))
 (advice-add 'eshell-term-sentinel :after #'term|eshell-after-process-quit)
 
+(defun eshell/ccat (filename)
+  "Like cat(1) but with syntax highlighting."
+  (let* ((recentf-enabled-p nil)
+         (existing-buffer (get-file-buffer filename))
+         (buffer (find-file-noselect filename)))
+    (eshell-print (with-current-buffer buffer
+                    (if (fboundp 'font-lock-ensure)
+                        (font-lock-ensure)
+                      (with-no-warnings
+                        (font-lock-fontify-buffer)))
+                    (buffer-string)))
+    (unless existing-buffer
+      (kill-buffer buffer))
+    nil))
+
 (defun eshell/vv (&rest args)
   (let ((args (eshell-flatten-list (eshell-stringify-list args))))
     (condition-case err

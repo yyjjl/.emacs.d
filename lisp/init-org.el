@@ -1,3 +1,20 @@
+(defun org|split-src-block (&optional below)
+  "Split the current src block.
+With a prefix BELOW move point to lower block."
+  (interactive "P")
+  (let* ((el (org-element-context))
+         (language (org-element-property :language el))
+         (parameters (org-element-property :parameters el)))
+    (beginning-of-line)
+    (insert (format "#+END_SRC\n#+BEGIN_SRC %s %s\n" language parameters))
+    (beginning-of-line)
+    (when (not below)
+      (org-babel-previous-src-block))))
+
+(with-eval-after-load 'ob
+  (define-keys :map org-babel-map
+    ("/" . org|split-src-block)))
+
 (with-eval-after-load 'ob-ipython
   ;; Don't prompt me to confirm everytime I want to evaluate a block
   (setq org-confirm-babel-evaluate nil)
@@ -9,10 +26,7 @@
                    (not (and proc (process-live-p proc)))))
         (kill-buffer buf)))
     ;; Display/update images in the buffer after I evaluate
-    (org-display-inline-images t))
-
-  (org-babel-do-load-languages 'org-babel-load-languages
-                               '((ipython . t))))
+    (org-display-inline-images t)))
 
 ;; Do not load extra modules
 (setq org-modules '(org-info))
@@ -20,6 +34,14 @@
 (setq org-export-backends '(ascii html latex beamer))
 (setq org-mouse-1-follows-link nil)
 (with-eval-after-load 'org
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               '((ipython . t)
+                                 (python . t)
+                                 (emacs-lisp . t)
+                                 (js . t)
+                                 (sh . t)
+                                 (perl . t)
+                                 (haskell . t)))
   ;; No spell check for embedded snippets
   ;; No spell check for property
   ;; Please note flyspell only use ispell-word
@@ -58,6 +80,8 @@
         org-highlight-latex-and-related '(latex)
         org-src-fontify-natively t)
 
+  (add-to-list 'org-babel-tangle-lang-exts '("ipython" . "py"))
+
   ;; Refile targets include this file and any file contributing to the
   ;; agenda - up to 5 levels deep
   (setq org-refile-targets '((nil :maxlevel . 5)
@@ -81,8 +105,8 @@
     (interactive (list 'interactive))
     (cl-case command
       (interactive (company-begin-backend 'company-org-symbols))
-      (prefix  (and (org-inside-LaTeX-fragment-p)
-                    (company-grab-word)))
+      (prefix (and (org-inside-LaTeX-fragment-p)
+                   (company-grab-word)))
       (candidates (company-auctex-symbol-candidates arg))
       (annotation (company-auctex-symbol-annotation arg))))
 
@@ -97,10 +121,13 @@
     (setq truncate-lines nil)
     (setq word-wrap t))
 
-  (add-hook 'org-src-mode-hook #'(lambda () (flycheck-mode -1)))
+  (defhook org|src-setup (org-src-mode-hook)
+    (when (eq major-mode 'python-mode)
+      (local-set-key (kbd "C-c h") #'ob-ipython-inspect))
+    (flycheck-mode -1))
 
   (define-keys :map org-mode-map
-    ("C-c I" . ob-ipython-inspect)
+    ("C-c h" . ob-ipython-inspect)
     ("C-c c i" . org-clock-in)
     ("C-c c o" . org-clock-out)
     ("C-c c c" . org-clock-in-last)
@@ -112,7 +139,9 @@
     ("M-," . org-mark-ring-goto)
     ("M-." . org-mark-ring-push)
     ("C-c l" . org-store-link)
-    ([f9] . org-publish-current-file)
+    ([f9] . (lambda () (interactive)
+              (save-excursion
+                (org-publish-current-file))))
     ([f10] . org-publish)
     ([f5] . org-present)
     ("C-c t" . org-todo)

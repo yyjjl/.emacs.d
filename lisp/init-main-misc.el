@@ -50,7 +50,9 @@
   ;; enable popwin-mode
   (popwin-mode 1)
   ;; global-modes
-  (global-linum-mode 1)
+  ;; `linum-mode' is slow
+  ;; (global-linum-mode 1)
+  (global-vim-empty-lines-mode 1)
   (global-company-mode 1)
   (global-flycheck-mode 1)
   (global-subword-mode 1)
@@ -174,6 +176,16 @@ Does not indent buffer, because it is used for a
   (let ((rlt (format "%S" (get-text-property (point) 'face))))
     (kill-new rlt)
     (message "%s => yank ring" rlt)))
+
+(defun core|num-to-string ()
+  "Convert number at point to string"
+  (interactive)
+  (let* ((bounds (bounds-of-thing-at-point 'sexp))
+         (num (and bounds (thing-at-point 'number))))
+    (when num
+      (goto-char (car bounds))
+      (kill-region (car bounds) (cdr bounds))
+      (insert num))))
 
 (define-keys
   ("M-s c" . aya-create)

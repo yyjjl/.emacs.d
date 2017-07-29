@@ -2,7 +2,7 @@
 # name: ipython config
 # key: ipyc
 # --
-#+BEGIN_SRC ipython :session $1
+#+BEGIN_SRC ipython :session $1 :tangle no
 %matplotlib inline
 %config InlineBackend.figure_format = '${2:svg}'
 $0

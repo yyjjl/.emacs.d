@@ -1,0 +1,18 @@
+# -*- mode: snippet -*-
+# name: ipython import
+# key: ipyi
+# --
+#+BEGIN_SRC ipython :session $1 :exports code
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+${2:def row_to_org(arr):
+    line = "|".join(str(item) for item in arr)
+    return "|{}|".format(line)
+
+
+def df_to_org(df):
+    return "\n".join([row_to_org(df.columns)] +
+                     [row_to_org(row) for row in df.values])}
+$0
+#+END_SRC

@@ -86,7 +86,9 @@ and `buffer-file-coding-system'"
         (msg (format-mode-line mode-line-process)))
     (if (and proc (process-live-p proc))
         (format " {%s@%s} " msg (process-id proc))
-      (format " {%s} " msg))))
+      (if (> (length msg) 0)
+          (format " {%s} " msg)
+        ""))))
 
 (defvar mode-line|center-margin 3)
 (defvar mode-line|special-string-function nil)

@@ -3,7 +3,7 @@
   (setq ispell-program-name "aspell"))
  (spelling|has-hunspell-p
   (setq ispell-program-name "hunspell")
-  ;; just reset dictionary to the safe one "en_US" for hunspell.  if
+  ;; Just reset dictionary to the safe one "en_US" for hunspell.  if
   ;; we need use different dictionary, we specify it in command line
   ;; arguments
   (setq ispell-local-dictionary "en_US")

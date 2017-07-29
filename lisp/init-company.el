@@ -25,7 +25,7 @@
                 '(company-bbdb company-nxml company-css
                                (company-files company-cmake)
                                company-capf
-                               ;; company-semantic
+                               company-semantic
                                (company-dabbrev-code
                                 company-gtags
                                 company-etags
@@ -35,7 +35,8 @@
   ;; company should be case sensitive
   (setq company-dabbrev-downcase nil)
   (setq company-dabbrev-ignore-case nil)
-  (setq company-dabbrev-code-ignore-case t)
+  (setq company-dabbrev-code-ignore-case nil)
+  (setq company-dabbrev-code-other-buffers t)
   (setq company-show-numbers t)
   (setq company-idle-delay 0.3)
   (setq company-clang-insert-arguments nil)
