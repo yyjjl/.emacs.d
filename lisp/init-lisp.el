@@ -183,9 +183,10 @@ Emacs Lisp."
   map)
 
 (defvar lisp|lispy-enable-alist '((haskell-mode . 1)
+                                  (latex-mode . 2)
                                   (:all . 3)))
 
-(defhook lisp|lispy-generic-setup (prog-mode-hook)
+(defhook lisp|lispy-generic-setup (prog-mode-hook LaTeX-mode-hook)
   (let ((level (cdr-safe (or (assoc major-mode lisp|lispy-enable-alist)
                              (assoc :all lisp|lispy-enable-alist)))))
     (when level

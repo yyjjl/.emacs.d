@@ -42,7 +42,8 @@
                     (utf8-locale-p (getenv "LC_ALL"))
                     (utf8-locale-p (getenv "LC_CTYPE"))
                     (utf8-locale-p (getenv "LANG"))))
-           (var has-mpv-p (executable-find "mplayer")))
+           (var has-mpv-p (executable-find "mplayer"))
+           (var plantuml-jar-path (file-exists-p "/usr/share/plantuml/plantuml.jar")))
 
 (env|layer (git "Git support")
            (var has-git-p (executable-find "git")))

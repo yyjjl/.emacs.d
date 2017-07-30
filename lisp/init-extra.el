@@ -8,7 +8,7 @@
 (defalias 'perl-mode 'cperl-mode)
 
 (defhook extra|Info-setup (Info-mode-hook)
-  (when (featurep 'info+)
+  (unless (featurep 'info+)
     (require 'info+)))
 
 (with-eval-after-load 'grep
@@ -107,8 +107,9 @@
 (with-eval-after-load 'emms
   (emms-all)
   (emms-mode-line 0)
-  (emms-playing-time-disable-display)
-  ;; (setq emms-playing-time-display-format " (%s) ")
+  (emms-playing-time-enable-display)
+  (setq emms-playing-time-display-format " (%s) ")
+  (setq emms-lyrics-display-format " %s ")
   (setq emms-mode-line-format "%s")
   (setq emms-source-file-default-directory "~/music/")
   (setq emms-player-list '(emms-player-mplayer))

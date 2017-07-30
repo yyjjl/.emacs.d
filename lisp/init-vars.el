@@ -17,6 +17,7 @@
 (defvar core|large-buffer-size (* 1024 1024))
 
 (with-no-warnings
+  (setq TeX-auto-global (core|expand-var "auctex/"))
   (setq emms-directory (core|expand-var "emms"))
   (setq abbrev-file-name (core|expand-var "abbrev.el"))
   (setq auto-save-list-file-prefix (core|expand-var "auto-save-list/.saves-"))

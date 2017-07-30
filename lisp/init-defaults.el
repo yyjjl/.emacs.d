@@ -7,7 +7,7 @@
 ;; time management
 (setq display-time-24hr-format t)
 (setq display-time-day-and-date t)
-(display-time-mode)
+;; (display-time-mode)
 
 (setq-default buffers-menu-max-size 30
               case-fold-search t
@@ -77,6 +77,9 @@
 (defvar core|recentf-enabled-p t)
 (setq recentf-keep '((lambda (fn)
                        (and core|recentf-enabled-p
+                            (not (string-match-p
+                                  (concat "^" emacs|var-direcotry)
+                                  fn))
                             ;; The order must be kept
                             (or (file-remote-p fn)
                                 (file-readable-p fn))))))

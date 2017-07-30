@@ -64,6 +64,7 @@
    avy
    tiny
    easy-kill
+   figlet
    zzz-to-char))
 
 ;; note

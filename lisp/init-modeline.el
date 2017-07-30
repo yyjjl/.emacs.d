@@ -19,7 +19,7 @@ If buffer file is a remote file, host-address will be showed"
                               (propertize (concat "(" (cadr host) ")")
                                           'face font-lock-string-face)
                             ""))))
-    (concat num " %[" real-id "%]")))
+    (concat " " num " %[" real-id "%]")))
 
 (defun mode-line|buffer-major-mode ()
   "Display buffer major mode in mode-line."
@@ -90,7 +90,7 @@ and `buffer-file-coding-system'"
           (format " {%s} " msg)
         ""))))
 
-(defvar mode-line|center-margin 3)
+(defvar mode-line|center-margin 1)
 (defvar mode-line|default-format '("%e" (:eval (mode-line|generate))))
 (defun mode-line|generate ()
   "Generate mode-line."
@@ -109,12 +109,12 @@ and `buffer-file-coding-system'"
            (lw (string-width lhs))
            (cw (string-width chs))
            (rw (string-width rhs))
-           (tw (window-total-width))
+           (tw (+ 2 (window-total-width)))
            (margin (/ (- tw (+ lw rw cw)) 2)))
       (if (>= margin mode-line|center-margin)
-          (format (format " %%s%%%ds%%%ds" (+ cw margin) (+ rw  margin 1))
+          (format (format "%%s%%%ds%%%ds" (+ cw margin) (- tw (+ lw cw margin)))
                   lhs chs rhs)
-        (format (format " %%s%%%ds" (+ 1 (- tw lw)))
+        (format (format "%%s%%%ds" (- tw lw))
                 lhs rhs)))))
 
 ;; Setup `mode-line-format'

@@ -14,8 +14,7 @@
 
     (setq TeX-engine 'xetex)
 
-    (outline-minor-mode 1)
-    (hide-body)))
+    (outline-minor-mode 1)))
 
 (with-eval-after-load 'tex
   (defun latex|build ()
@@ -63,6 +62,10 @@
           (forward-char)
         (self-insert-command 1))))
 
+  (defun latex|force-update-style ()
+    (interactive)
+    (TeX-update-style t))
+
   (defun latex|font-bold () (interactive) (TeX-font nil ?\C-b))
   (defun latex|font-medium () (interactive) (TeX-font nil ?\C-m))
   (defun latex|font-code () (interactive) (TeX-font nil ?\C-t))
@@ -90,6 +93,7 @@
     ("]" . latex|skip-close-pair)
     ("C-c b" . latex|build)
     ("C-c h" . TeX-doc)
+    ("C-c C-l" . latex|force-update-style)
     ("C-c C-s") ("C-c s" . LaTeX-section)
     ("C-c C-e") ("C-c e" . LaTeX-environment)
     ("C-c x b" . latex|font-bold)
