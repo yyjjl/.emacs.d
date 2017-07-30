@@ -91,17 +91,7 @@ and `buffer-file-coding-system'"
         ""))))
 
 (defvar mode-line|center-margin 3)
-(defvar mode-line|special-string-function nil)
 (defvar mode-line|default-format '("%e" (:eval (mode-line|generate))))
-(defun mode-line|special-string ()
-  (propertize (cond ((stringp mode-line|special-string-function)
-                     mode-line|special-string-function)
-                    ((or (functionp mode-line|special-string-function)
-                         (fboundp mode-line|special-string-function))
-                     (funcall mode-line|special-string-function))
-                    (t ""))
-              'face 'font-lock-doc-face))
-(make-variable-buffer-local 'mode-line|special-string-function)
 (defun mode-line|generate ()
   "Generate mode-line."
   (unless (bound-and-true-p eldoc-mode-line-string)
@@ -110,9 +100,7 @@ and `buffer-file-coding-system'"
                          (mode-line|process)
                          (mode-line|buffer-major-mode)
                          (mode-line|buffer-status))))
-           (chs (concat (propertize (or display-time-string "")
-                                    'face 'font-lock-negation-char-face)
-                        (mode-line|special-string)))
+           (chs (format-mode-line global-mode-string))
            (rhs (format-mode-line
                  (concat (mode-line|vc) " "
                          (mode-line|flycheck) " "

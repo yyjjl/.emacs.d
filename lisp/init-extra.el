@@ -1,5 +1,7 @@
 ;; prolog system
 (setq prolog-system 'swi)
+;; pulse
+(setq pulse-delay 0.05)
 ;; csv
 (setq csv-separators '("," ";" "|" " "))
 
@@ -101,6 +103,50 @@
                (propertize "save-buffers-and-kill-emacs"
                            'face 'font-lock-constant-face))
     (call-interactively 'save-buffers-kill-terminal)))
+
+(with-eval-after-load 'emms
+  (emms-all)
+  (emms-mode-line 0)
+  (emms-playing-time-disable-display)
+  ;; (setq emms-playing-time-display-format " (%s) ")
+  (setq emms-mode-line-format "%s")
+  (setq emms-source-file-default-directory "~/music/")
+  (setq emms-player-list '(emms-player-mplayer))
+
+  (add-hook 'emms-playlist-mode-hook #'emms-mark-mode)
+
+  (autoload 'epe-fish-path "eshell-prompt-extras"))
+
+(when emacs|has-mpv-p
+  (require 'emms)
+  (defun extra|emms-current-name ()
+    (concat (propertize
+             (epe-fish-path (or (emms-mode-line-playlist-current)
+                                ""))
+             'face 'font-lock-constant-face)))
+  (defhydra hydra|emms (:color pink :hint nil)
+    "
+%s(extra|emms-current-name)
+[_=_/_-_]volume raise/lower  [_d_/_D_]play directory subtree/current
+[_p_]rev [_n_]ext            [_t_/_T_]oggle repeat playlist/track
+[_s_]top [_P_]ause/Continue  [_r_]andom
+[_SPC_]Select playlist     [_RET_]Open playlist buffer                [_q_]uit
+"
+    ("n" emms-next)
+    ("p" emms-previous)
+    ("s" emms-stop :exit t)
+    ("P" emms-pause)
+    ("r" emms-random)
+    ("d" emms-play-directory-tree)
+    ("D" emms-play-directory)
+    ("SPC" emms-play-playlist)
+    ("RET" emms-playlist-mode-go :exit t)
+    ("t" emms-toggle-repeat-playlist)
+    ("T" emms-toggle-repeat-track)
+    ("-" emms-volume-lower)
+    ("=" emms-volume-raise)
+    ("q" nil nil))
+  (global-set-key [f10] #'hydra|emms/body))
 
 (define-keys
   ;; buffer-mode

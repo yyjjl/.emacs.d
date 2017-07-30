@@ -71,6 +71,7 @@
         (message "Can not find where is the class")))))
 
 (with-eval-after-load 'python
+  (add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
   (setq python-shell-prompt-detect-failure-warning nil)
   (elpy-enable)
   (remove-hook 'python-mode-hook 'elpy-mode))

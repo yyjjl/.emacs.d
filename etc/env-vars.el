@@ -41,7 +41,8 @@
                                         (shell-command-to-string "locale")))
                     (utf8-locale-p (getenv "LC_ALL"))
                     (utf8-locale-p (getenv "LC_CTYPE"))
-                    (utf8-locale-p (getenv "LANG")))))
+                    (utf8-locale-p (getenv "LANG"))))
+           (var has-mpv-p (executable-find "mplayer")))
 
 (env|layer (git "Git support")
            (var has-git-p (executable-find "git")))

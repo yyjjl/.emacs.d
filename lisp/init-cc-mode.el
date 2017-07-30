@@ -103,8 +103,7 @@
   (local-set-key (kbd "C-c C-v") 'semantic-decoration-include-visit)
   (local-set-key (kbd "C-c C-c") 'cmake-ide-run-cmake)
   (local-set-key [f9] 'cpp|try-use-rtags)
-  (local-set-key [f10] 'cpp|compile)
-  (local-set-key [f5] 'gdb)
+  (local-set-key [f5] 'cpp|compile)
 
   (hide-ifdef-mode)
 

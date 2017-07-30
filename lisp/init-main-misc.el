@@ -196,6 +196,7 @@ Does not indent buffer, because it is used for a
   ("C-x R" . core|rename-this-file-and-buffer)
   ("C-x D" . core|delete-this-file)
   ("C-x W" . core|copy-this-file-to-new-file)
+  ("C-x F" . core|copy-file-name)
   ("C-x c" . core|cleanup-buffer-safe)
 
   ("C-c 4" . ispell-word)
@@ -211,6 +212,7 @@ Does not indent buffer, because it is used for a
   ("<backtab>" . company-complete)
   ([f6] . main|toggle-company-ispell)
   ([f7] . core|create-scratch-buffer)
+  ([f12] . linum-mode)
   ;; ("C-=" . text-scale-increase)
   ;; ("C--" . text-scale-decrease))
   )

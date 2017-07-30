@@ -17,15 +17,15 @@
 
 (with-eval-after-load 'hindent
   ;; Rewrite function
-  ;; (defun hindent-reformat-decl ()
-  ;;   "Work with `align'"
-  ;;   (interactive)
-  ;;   (let ((start-end (hindent-decl-points)))
-  ;;     (when start-end
-  ;;       (let ((beg (car start-end))
-  ;;             (end (cdr start-end)))
-  ;;         (hindent-reformat-region beg end t)
-  ;;         (align beg end)))))
+  (defun hindent-reformat-decl ()
+    "Work with `align'"
+    (interactive)
+    (let ((start-end (hindent-decl-points)))
+      (when start-end
+        (let ((beg (car start-end))
+              (end (cdr start-end)))
+          (hindent-reformat-region beg end t)
+          (align beg end)))))
 
   (defun haskell|force-indent-size (org-fn)
     (list* "--tab-size" "4" (apply org-fn '())))
@@ -112,10 +112,13 @@
              ("C-c C-k" . haskell-interactive-mode-clear)))
 
 (with-eval-after-load 'haskell-font-lock
+  ;; Do not use too much symbols
+  ;; Keep this single-character symbols
   (setq haskell-font-lock-symbols-alist
-        (append haskell-font-lock-symbols-alist
-                '(("*" . "×")
-                  ("/" . "÷")))))
+        '(("\\" . "λ")
+          ("*" . "×")
+          ("/" . "÷")
+          ("." "∘" haskell-font-lock-dot-is-not-composition))))
 
 (with-eval-after-load 'idris-mode
   (require 'haskell-font-lock)

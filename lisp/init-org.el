@@ -11,7 +11,10 @@ With a prefix BELOW move point to lower block."
     (when (not below)
       (org-babel-previous-src-block))))
 
-(defun org|ipython-track-move (n)
+(defvar org|ipython-parent-buffer nil)
+(defvar org|ipython-src-block nil)
+(defvar-local org|ipython-error-line 0)
+(defun org|ipython-trace-move (n)
   (let ((search-func (if (> n 0)
                          #'re-search-forward
                        (setq n (- 0 n))
@@ -20,32 +23,74 @@ With a prefix BELOW move point to lower block."
     (while (and (> n 0)
                 (setq found (apply search-func '("^-+> \\([0-9]+\\)" nil t))))
       (setq n (1- n)))
-    (when found
-      (require 'pulse)
-      (pulse-momentary-highlight-one-line (line-beginning-position))
-      (buffer-substring (line-beginning-position) (line-end-position)))))
+    found))
 
-(defun org|ipython-track-prev (&optional n)
+(defun org|ipython-trace-prev (&optional n)
   (interactive "P")
-  (let ((str (org|ipython-track-move (or n -1))))
-    (if str (setq header-line-format str)
-      (message "No previous frame"))))
+  (unless (org|ipython-trace-move (or (and n (- 0 n)) -1))
+    (message "No previous frame")))
 
-(defun org|ipython-track-next (&optional n)
+(defun org|ipython-trace-next (&optional n)
   (interactive "P")
-  (let ((str (org|ipython-track-move (or n 1))))
-    (if str (setq header-line-format str)
-      (message "No next frame"))))
+  (unless (org|ipython-trace-move (or n 1))
+    (message "No next frame")))
 
-(defun org|ipython-track-setup (fn &rest args)
-  (let ((buf (apply fn args)))
-    (with-current-buffer buf
-      (use-local-map (copy-keymap special-mode-map))
-      (define-keys :map (current-local-map)
-        ("p" . org|ipython-track-prev)
-        ("n" . org|ipython-track-next)))))
+(defun org|ipython-jump (lineno &optional do-jump)
+  (interactive (list (or org|ipython-error-line 0) t))
+  (if (and (buffer-live-p org|ipython-parent-buffer)
+           org|ipython-src-block)
+      (let ((p (org-element-property :begin org|ipython-src-block))
+            (window (if do-jump
+                        (progn (pop-to-buffer org|ipython-parent-buffer)
+                               (selected-window))
+                      (display-buffer org|ipython-parent-buffer))))
+        (with-selected-window window
+          (goto-char p)
+          (forward-line lineno)
+          (recenter)
+          (require 'pulse)
+          (pulse-momentary-highlight-one-line (line-beginning-position))
+          (point)))
+    (message "Parent buffer killed or Can not find src block !!!")))
+
+(defun org|ipython-trace-bury-buffer ()
+  (interactive)
+  (org|ipython-jump org|ipython-error-line)
+  (call-interactively 'quit-window))
+
+(defun org|ipython-before-execute (&rest args)
+  (setq org|ipython-parent-buffer (current-buffer))
+  (setq org|ipython-src-block (org-element-context)))
+
+(advice-add 'org-babel-execute:ipython
+            :before #'org|ipython-before-execute)
+
+(defun org|ipython-trace-setup (fn &rest args)
+  (with-current-buffer (apply fn args)
+    (use-local-map (copy-keymap special-mode-map))
+    (define-keys :map (current-local-map)
+      ("q" . org|ipython-trace-bury-buffer)
+      ("p" . org|ipython-trace-prev)
+      ("n" . org|ipython-trace-next)
+      ("j" . org|ipython-jump))
+
+    (goto-char (point-min))
+    (if (re-search-forward "-+> \\([0-9]+\\)" nil t)
+        (setq org|ipython-error-line (string-to-number (match-string 1)))
+      (goto-char (point-min))
+      (when (re-search-forward "SyntaxError:" nil t)
+        (goto-char (point-min))
+        ;; Get the line number
+        (when (re-search-forward "File.*, line \\([0-9]+\\)" nil t)
+          (goto-char (match-end 0))
+          (setq org|ipython-error-line (string-to-number (match-string 1))))))
+    (goto-char (point-min))
+    (setq header-line-format
+          (format "Error at line: %d, press `j' to jump to location"
+                  org|ipython-error-line))))
+
 (advice-add 'ob-ipython--create-traceback-buffer
-            :around #'org|ipython-track-setup)
+            :around #'org|ipython-trace-setup)
 
 (with-eval-after-load 'ob
   (define-keys :map org-babel-map
@@ -222,7 +267,7 @@ With a prefix BELOW move point to lower block."
 
   ;; (advice-add 'org-html-do-format-code
   ;;             :around #'org|html-export-with-line-number)
-  
+
   (setcdr (assoc 'scale org-html-mathjax-options) '("90"))
   (setcdr (assoc 'align org-html-mathjax-options) '("left"))
   (setcdr (assoc 'path org-html-mathjax-options)
