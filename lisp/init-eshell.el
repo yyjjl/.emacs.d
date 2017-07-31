@@ -101,14 +101,15 @@
 
 (with-eval-after-load 'em-term
   (defvar term|eshell-extra-visual-commands
-    '("ssh" "ipython" "ipytohn3" "python" "python3" "python2" "root"))
+    '("ssh" "ipython" "ipython3" "python" "python3" "python2" "root"))
   (dolist (cmd term|eshell-extra-visual-commands)
     (add-to-list 'eshell-visual-commands cmd)))
 
 (with-eval-after-load 'esh-opt
   (autoload 'epe-theme-lambda "eshell-prompt-extras")
-  (setq eshell-highlight-prompt t
-        eshell-prompt-function 'epe-theme-lambda))
+  (when window-system
+    (setq eshell-highlight-prompt t
+          eshell-prompt-function 'epe-theme-lambda)))
 
 
 
