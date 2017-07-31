@@ -38,14 +38,12 @@
    counsel-projectile
    ;; counsel-M-x need smex to get history
    smex
-   
    ;; delete packages safely
    ;; emacs 25 has builtin support
    ;; package-safe-delete
    ;; show key bindings while pressing
    which-key
    dired+
-   info+
    ibuffer-vc))
 
 ;; edit, mark and jump
@@ -93,6 +91,7 @@
    ;; It's too slow, when file is large
    ;; stickyfunc-enhance
    eshell-prompt-extras
+   xterm-color
    unicode-fonts))
 
 ;; latex

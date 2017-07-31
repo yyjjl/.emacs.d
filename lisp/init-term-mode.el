@@ -130,10 +130,11 @@ none exists, or if the current buffer is already a term."
                                 (ignore-errors (projectile-project-root)))))
                (term|remote-shell)))
         (parent-buf (current-buffer)))
-    (with-current-buffer buf
-      (local-set-key (kbd "C-c C-z") #'term|switch-back)
-      (setq term|parent-buffer parent-buf))
-    (pop-to-buffer buf)))
+    (when buf
+      (with-current-buffer buf
+        (local-set-key (kbd "C-c C-z") #'term|switch-back)
+        (setq term|parent-buffer parent-buf))
+      (pop-to-buffer buf))))
 
 (with-eval-after-load 'multi-term
   (add-hook 'term-mode-hook 'multi-term-keystroke-setup)

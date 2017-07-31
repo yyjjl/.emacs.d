@@ -212,6 +212,7 @@ Does not indent buffer, because it is used for a
   ("<backtab>" . company-complete)
   ([f6] . main|toggle-company-ispell)
   ([f7] . core|create-scratch-buffer)
+  ([f11] . toggle-frame-maximized)
   ([f12] . linum-mode)
   ;; ("C-=" . text-scale-increase)
   ;; ("C--" . text-scale-decrease))

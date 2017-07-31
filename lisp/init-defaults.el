@@ -121,13 +121,14 @@
 
 ;; ANSI-escape coloring in compilation-mode
 (ignore-errors
+  (autoload 'xterm-color-filter "xterm-color")
+
+  (setq compilation-environment '("TERM=xterm-256color"))
+  (setq xterm-color-preserve-properties t)
   (require 'ansi-color)
   (defhook core|colorize-compilation-buffer (compilation-filter-hook)
     (when (eq major-mode 'compilation-mode)
-      (ansi-color-apply-on-region compilation-filter-start (point-max))))
-  (defhook core|colorsize-eshell-buffer (eshell-output-filter-functions)
-    (ansi-color-apply-on-region eshell-last-output-start
-                                eshell-last-output-end)))
+      (ansi-color-apply-on-region compilation-filter-start (point-max)))))
 
 
 ;; Default prog-mode setup

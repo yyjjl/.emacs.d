@@ -7,10 +7,6 @@
 
 (defalias 'perl-mode 'cperl-mode)
 
-(defhook extra|Info-setup (Info-mode-hook)
-  (unless (featurep 'info+)
-    (require 'info+)))
-
 (with-eval-after-load 'grep
   (dolist (v core|ignored-directories)
     (add-to-list 'grep-find-ignored-directories v)))

@@ -28,9 +28,7 @@
              (goto-char (or eshell-last-output-end (point-max)))
              (re-search-forward "\\s-+" (point-max) t)
              (equal (point) (point-max))))
-      (let ((buf (current-buffer)))
-        (term|switch-back t)
-        (kill-buffer buf))
+      (kill-buffer)
     (delete-char args)))
 
 (defun term|eshell-after-process-quit (proc msg)
@@ -84,6 +82,7 @@
                 (if (stringp arg) arg "")))))
 
 (defhook term|eshell-setup (eshell-mode-hook)
+  (setq xterm-color-preserve-properties t)
   ;; `eshell-mode-map' is a local variable
   (define-key eshell-mode-map (kbd "C-d") #'term|eshell-ctrl-d)
   (define-key eshell-mode-map (kbd "<tab>") #'completion-at-point)
@@ -94,9 +93,15 @@
   (setq eshell-destroy-buffer-when-process-dies nil)
   (setq eshell-escape-control-x nil))
 
+(with-eval-after-load 'esh-mode
+  (add-to-list 'eshell-preoutput-filter-functions
+               'xterm-color-filter)
+  (setq eshell-output-filter-functions
+        (delete 'eshell-handle-ansi-color eshell-output-filter-functions)))
+
 (with-eval-after-load 'em-term
   (defvar term|eshell-extra-visual-commands
-    '("ssh" "ipython" "python" "python3" "python2" "root"))
+    '("ssh" "ipython" "ipytohn3" "python" "python3" "python2" "root"))
   (dolist (cmd term|eshell-extra-visual-commands)
     (add-to-list 'eshell-visual-commands cmd)))
 
