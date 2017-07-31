@@ -91,7 +91,24 @@ MAP (default `global-map')."
     (when pair
       (setcdr pair (cons ele (cdr pair))))))
 
+(defun pair-match-p (str)
+  (let ((i 0) (count 0) char escaped-p quoted-p prime-p)
+    (while (< i (length str))
+      (setq char (aref str i))
+      (if (and (not escaped-p) (eq char ?\\))
+          (setq escaped-p t)
+        (unless escaped-p
+          (case char
+            ((?\{ ?\( ?\[)
+             (setq count (1+ count)))
+            ((?\} ?\) ?\])
+             (setq count (1- count)))
+            (?\' (setq prime-p (not prime-p)))
+            (?\" (setq quoted-p (not quoted-p))))))
+      (setq i (1+ i)))
+    (not (or quoted-p prime-p (> count 0)))))
 (defvar socks-server '("Default server" "127.0.0.1" 1080 5))
+
 (defun core|toggle-socket-proxy ()
   (interactive)
   (if (eq url-gateway-method 'socks)
@@ -101,5 +118,6 @@ MAP (default `global-map')."
     (function-put #'core|toggle-socket-proxy 'method url-gateway-method)
     (setq url-gateway-method 'socks)
     (message "Use socket proxy %s" socks-server)))
+
 
 (provide 'init-utils)

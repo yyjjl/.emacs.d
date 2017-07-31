@@ -31,6 +31,16 @@
       (kill-buffer)
     (delete-char args)))
 
+(defun term|eshell-return (&rest args)
+  (interactive "P")
+  (if (pair-match-p (buffer-substring-no-properties eshell-last-output-end
+                                                    (point)))
+      (progn
+        (goto-char (point-max))
+        (insert " ")
+        (apply #'eshell-send-input args))
+    (insert "\n")))
+
 (defun term|eshell-after-process-quit (proc msg)
   (let ((buf (and proc (process-buffer proc))))
     (when (buffer-live-p buf)
@@ -81,12 +91,26 @@
       (ivy-read "Directory history: " candidates :initial-input
                 (if (stringp arg) arg "")))))
 
+(defun term|complete-buffer ()
+  (save-excursion
+    (when (re-search-backward "#<\\(?:buffer +\\)?\\(.*\\)" eshell-last-output-end t)
+      (let ((prefix (match-string 1)))
+        (list (match-beginning 1)
+              (match-end 1)
+              (loop for buf in (buffer-list)
+                    for buf-name = (buffer-name buf)
+                    if (string-prefix-p prefix buf-name)
+                    collect buf-name))))))
+
 (defhook term|eshell-setup (eshell-mode-hook)
+  (add-to-list 'completion-at-point-functions #'term|complete-buffer)
   (setq xterm-color-preserve-properties t)
   ;; `eshell-mode-map' is a local variable
-  (define-key eshell-mode-map (kbd "C-d") #'term|eshell-ctrl-d)
-  (define-key eshell-mode-map (kbd "<tab>") #'completion-at-point)
-  (define-key eshell-mode-map (kbd "C-c i e") #'counsel-esh-history))
+  (define-keys :map eshell-mode-map
+    ("C-d" . term|eshell-ctrl-d)
+    ("RET" . term|eshell-return)
+    ("<tab>" . completion-at-point)
+    ("C-c i e" . counsel-esh-history)))
 
 (with-no-warnings
   (setq eshell-last-dir-ring-size 512)
