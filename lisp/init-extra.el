@@ -91,21 +91,11 @@
 (autoload 'doxygen-insert-member-group-region "doxygen" "insert comment for member group" t)
 (autoload 'doxygen-insert-compound-comment "doxygen" "insert comment for compound" t)
 
-(defun extra|never-exit ()
-  (interactive)
-  ;; There is a internal frame
-  (if (= 2 (length (frame-list)))
-      (message "Use M-x `%s' instead"
-               (propertize "save-buffers-and-kill-emacs"
-                           'face 'font-lock-constant-face))
-    (call-interactively 'save-buffers-kill-terminal)))
-
 (with-eval-after-load 'emms
   (emms-all)
   (emms-mode-line 0)
-  (emms-playing-time-enable-display)
-  (setq emms-playing-time-display-format " (%s) ")
-  (setq emms-lyrics-display-format " %s ")
+  (emms-playing-time-disable-display)
+  ;; (setq emms-playing-time-display-format " (%s) ")
   (setq emms-mode-line-format "%s")
   (setq emms-source-file-default-directory "~/music/")
   (setq emms-player-list '(emms-player-mplayer))
@@ -143,7 +133,7 @@
     ("-" emms-volume-lower)
     ("=" emms-volume-raise)
     ("q" nil nil))
-  (global-set-key [f10] #'hydra|emms/body))
+  (global-set-key [f12] #'hydra|emms/body))
 
 (define-keys
   ;; buffer-mode
@@ -157,8 +147,6 @@
   ("C-\"" . avy-goto-char-2)
   ("M-g l" . avy-goto-line)
   ("M-g w" . avy-goto-word-1)
-  ("M-g y" . avy-copy-line)
-
-  ("C-x C-c" . extra|never-exit))
+  ("M-g y" . avy-copy-line))
 
 (provide 'init-extra)

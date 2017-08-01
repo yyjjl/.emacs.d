@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: automata-path
+# key: ap
+# --
+\path
+(${1:from}) edge ${2:[${3:edge-props}]} node ${4:[${5:text-props}]} (${6:to});

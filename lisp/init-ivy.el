@@ -43,6 +43,7 @@ for a file to visit if current buffer is not visiting a file."
         '((swiper . ivy--regex-plus)
           ;; fuzzy make ivy so slow
           (counsel-unicode-char . ivy--regex-plus)
+          (counsel-imenu . ivy--regex-plus)
           ;; fuzzy search doesn't perform well
           (counsel-descbinds . ivy--regex-plus)
           (t . main|ivy--regex-fuzzy)))
@@ -62,7 +63,7 @@ for a file to visit if current buffer is not visiting a file."
   (setq counsel-find-file-ignore-regexp
         (concat
          ;; file names beginning with # or .
-         "\\(?:\\`[#.]\\)"
+         "\\(?:\\`[#]\\)"
          ;; file names ending with # or ~
          "\\|\\(?:[#~]\\'\\)"))
 

@@ -51,7 +51,8 @@
   (popwin-mode 1)
   ;; global-modes
   ;; `linum-mode' is slow
-  ;; (global-linum-mode 1)
+  (global-linum-mode 1)
+  (beginend-setup-all)
   (global-company-mode 1)
   (global-flycheck-mode 1)
   (global-subword-mode 1)
@@ -212,8 +213,6 @@ Does not indent buffer, because it is used for a
   ("<backtab>" . company-complete)
   ([f6] . main|toggle-company-ispell)
   ([f7] . core|create-scratch-buffer)
-  ([f11] . toggle-frame-maximized)
-  ([f12] . linum-mode)
   ;; ("C-=" . text-scale-increase)
   ;; ("C--" . text-scale-decrease))
   )

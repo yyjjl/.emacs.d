@@ -18,8 +18,6 @@
         ("gnu"   . "https://elpa.emacs-china.org/gnu/")))
 
 ;; core packages
-(package|add '(cmake-ide    flycheck) "melpa-stable")
-
 (package|add
  '(yasnippet
    auto-yasnippet
@@ -44,7 +42,16 @@
    ;; show key bindings while pressing
    which-key
    dired+
+   emms
    ibuffer-vc))
+
+(package|add
+ '(cmake-ide
+   flycheck
+   company-irony company-irony-c-headers
+   flycheck-irony
+   irony
+   irony-eldoc) "melpa-stable")
 
 ;; edit, mark and jump
 (package|add
@@ -52,8 +59,8 @@
    visual-regexp
    multiple-cursors
    fcitx
-   emms
 
+   beginend
    expand-region
    ;; wgrep allows you to edit a grep buffer and apply those changes
    ;; to the file buffer.
@@ -162,9 +169,7 @@
 
 (package|add
  '(irony-eldoc
-   irony
-   company-irony company-irony-c-headers
-   flycheck-irony clang-format
+   irony clang-format
    ggtags
    rtags
    ivy-rtags))

@@ -33,6 +33,7 @@
                         (name . "^\\*Completions\\*$")
                         (name . "^\\*Compile-Log\\*$")
                         (name . "^\\*Man .*\\*$")))
+           ("emacs-var" (filename . ".emacs.d/var"))
            ("emacs-config" (filename . ".emacs.d"))
            ("code" (or (mode . c++-mode)
                        (mode . c-mode)

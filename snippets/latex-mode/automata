@@ -1,0 +1,24 @@
+# -*- mode: snippet -*-
+# name: automata
+# key: automata
+# --
+\documentclass{standalone}
+\usepackage{amsmath,amsfonts,amssymb,amsthm,bm,upgreek}
+\usepackage{pgf}
+\usepackage{tikz}
+
+\usetikzlibrary{arrows,automata, calc, shapes, shapes.geometric, fit}
+\usepackage[utf8]{inputenc}
+
+\tikzset{every state/.style = {draw=red!50,very thick,fill=red!10}}
+\tikzset{accepting/.style = {double,draw=green!50,fill=green!10}}
+\tikzset{->,>=stealth',shorten >=1pt,
+  auto,node distance=2cm, semithick,
+  initial distance=6ex,
+  accepting distance=6ex}
+
+\begin{document}
+\begin{tikzpicture}[]
+  $0
+\end{tikzpicture}
+\end{document}

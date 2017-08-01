@@ -111,7 +111,7 @@
           (when proc (set-process-sentinel proc (term|wrap-sentinel))))))
     buf))
 
-(defvar term|use-eshell-p t)
+(defvar term|use-eshell-p nil)
 
 (defun term|pop-shell (&optional arg)
   "Switch to the term buffer last used, or create a new one if

@@ -16,24 +16,25 @@ justification=raggedright,singlelinecheck=false]{caption}
 \usepackage{enumitem}
 \hypersetup{colorlinks=true}
 \geometry{top=2.54cm,bottom=2.54cm,left=3cm,right=3cm}
-\renewcommand\appendixname{附录}
-\renewcommand\abstractname{}%摘要
-\renewcommand\tablename{表}
-\renewcommand\figurename{图}
+\renewcommand\appendixname{${1:附录}}
+\renewcommand\abstractname{${2:摘要}} %
+\renewcommand\tablename{${3:表}}
+\renewcommand\figurename{${4:图}}
 \captionsetup{justification=centering}
 \linespread{1.6}
 \renewcommand{\labelenumi}{\alph{enumi}.}
 \leftmargini=20mm
 
 \begin{document}
-\title{\bf\heiti\zihao{2}$1\vspace{15mm}}
-\author{\fangsong\zihao{4}$2\vspace{2mm}}
+\title{\bf\heiti\zihao{2} $5\vspace{15mm}}
+\author{\fangsong\zihao{4} $6\vspace{2mm}}
 % \date{\today}
 
 \maketitle
-\tableofcontents
+${7:\tableofcontents}
 \songti\zihao{-4}
 
+$0
 
 \appendix
 \end{document}

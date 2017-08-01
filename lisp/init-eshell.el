@@ -93,7 +93,9 @@
 
 (defun term|complete-buffer ()
   (save-excursion
-    (when (re-search-backward "#<\\(?:buffer +\\)?\\(.*\\)" eshell-last-output-end t)
+    (when (and (> (point) eshell-last-output-end)
+               (re-search-backward "#<\\(?:buffer +\\)?\\(.*\\)"
+                                   eshell-last-output-end t))
       (let ((prefix (match-string 1)))
         (list (match-beginning 1)
               (match-end 1)
@@ -125,7 +127,7 @@
 
 (with-eval-after-load 'em-term
   (defvar term|eshell-extra-visual-commands
-    '("ssh" "ipython" "ipython3" "python" "python3" "python2" "root"))
+    '("ssh" "ipython" "ipython3" "python" "python3" "python2" "root" "gdb"))
   (dolist (cmd term|eshell-extra-visual-commands)
     (add-to-list 'eshell-visual-commands cmd)))
 

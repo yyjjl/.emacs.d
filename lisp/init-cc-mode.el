@@ -38,7 +38,7 @@
   (setq c-basic-offset 4)
   ;; make DEL take all previous whitespace with it
   (c-toggle-hungry-state 1)
-  (c-toggle-auto-newline 1)
+  ;; (c-toggle-auto-newline 1)
   ;; indent
   (highlight-indentation-set-offset 4)
   (cpp|fix-cc-indent-offset 'innamespace [0])
@@ -103,7 +103,8 @@
   (local-set-key (kbd "C-c C-v") 'semantic-decoration-include-visit)
   (local-set-key (kbd "C-c C-c") 'cmake-ide-run-cmake)
   (local-set-key [f9] 'cpp|try-use-rtags)
-  (local-set-key [f5] 'cpp|compile)
+  (local-set-key [f10] 'cpp|compile)
+  (local-set-key [f5] 'gdb)
 
   (hide-ifdef-mode)
 
@@ -136,15 +137,18 @@
       (cpp|c++-normal-setup))))
 
 ;; Do not use `c-mode-hook' and `c++-mode-hook', there is a bug
+(defvar-local cpp|initialized-p nil)
 (defhook cpp|common-setup (c-mode-common-hook)
-  (if (>= (string-to-number c-version) 5.33)
-      (run-hooks 'prog-mode-hook))
+  (unless cpp|initialized-p
+    (setq cpp|initialized-p t)
+    (if (>= (string-to-number c-version) 5.33)
+        (run-hooks 'prog-mode-hook))
 
-  (cpp|common-cc-setup)
-  (unless (buffer-temporary-p)
-    (unless (or (derived-mode-p 'java-mode)
-                (derived-mode-p 'groovy-mode))
-      (cpp|c++-setup))))
+    (cpp|common-cc-setup)
+    (unless (buffer-temporary-p)
+      (unless (or (derived-mode-p 'java-mode)
+                  (derived-mode-p 'groovy-mode))
+        (cpp|c++-setup)))))
 
 (with-eval-after-load 'irony
   (add-hook 'flycheck-mode-hook 'flycheck-irony-setup)

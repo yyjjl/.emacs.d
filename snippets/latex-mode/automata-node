@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: automata-node
+# key: an
+# --
+\node[${1:state}] (${2:id}) ${3:[${4:position}]} {$0};

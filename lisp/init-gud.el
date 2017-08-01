@@ -17,53 +17,130 @@
   (if (derived-mode-p 'gud-mode)
       (delete-overlay gud|current-overlay)))
 
-(add-hook 'gdb-mode-hook
-          #'(lambda ()
-              (add-hook 'kill-buffer-hook #'gud|kill-overlay)))
-
 ;; Move the cursor to the end of last line if it's gud-mode {{
 (defun gud|move-to-end (&rest args)
   (when (eq major-mode 'gud-mode)
     (goto-char (point-max))))
 
 (advice-add 'switch-to-buffer :after #'gud|move-to-end)
+(advice-add 'pop-to-buffer :after #'gud|move-to-end)
 (advice-add 'select-window-by-number :after #'gud|move-to-end)
 (advice-add 'windmove-do-window-select :after #'gud|move-to-end)
 ;; }}
 
+(defmacro gud|gdb-display (type &optional width-split)
+  (unless width-split (setq width-split 3))
+  (let ((name (intern (format "gud|%s" type))))
+    `(progn
+       (defun ,name (&optional no-select)
+         (interactive "P")
+         (let ((pos (if (> (frame-total-cols) (* 2 (frame-total-lines)))
+                        'right
+                      'bottom))
+               (buf (gdb-get-buffer-create ',type)))
+           (if (get-buffer-window buf)
+               (pop-to-buffer buf)
+             (popwin:popup-buffer buf
+                                  :noselect no-select
+                                  :width (/ (frame-total-cols) ,width-split)
+                                  :position pos))))
+       #',name)))
+
+(defun gud|gdb-pop-to-source-buffer ()
+  (interactive)
+  (when (or gud-last-last-frame gdb-show-main)
+    (let ((buf (pop-to-buffer (if gud-last-last-frame
+                                  (gud-find-file (car gud-last-last-frame))
+                                (gud-find-file gdb-main-file)))))
+      (setq gdb-source-window (get-buffer-window buf)))))
+
+(defvar gud|source-mode-map
+  (define-keys :map (make-sparse-keymap)
+    (", i" . (gud|gdb-display gdb-inferior-io))
+    (", g" . gdb-display-gdb-buffer)
+    (", b" . (gud|gdb-display gdb-breakpoints-buffer))
+    (", t" . (gud|gdb-display gdb-threads-buffer))
+    (", r" . (gud|gdb-display gdb-registers-buffer))
+    (", s" . (gud|gdb-display gdb-stack-buffer))
+    (", d" . (gud|gdb-display gdb-disassembly-buffer))
+    (", m" . (gud|gdb-display gdb-memory-buffer))
+    ("q" . gud|source-mode)
+    ("=" .  gud-break)
+    ("-" . gud-remove)
+    ("t" . gud-tbreak)
+    ("s" . gud-step)
+    ("n" . gud-next)
+    ("i n" . gud-nexti)
+    ("i s" . gud-stepi)
+    ("j" . gud-jump)
+    ("f" . gud-finish)
+    ("<" . gud-up)
+    (">" . gud-down)
+    ("c" . gud-cont)
+    ("u" . gud-until)
+    ("r" . gud-run)
+    ("C" . gud-call)
+    ("p" . gud-print)
+    ("*" . gud-pstar)
+    ("w" . gud-watch)
+    ("x" . (lambda () (interactive)
+             (when (and (yes-or-no-p "Quit process"))
+               (gud-call "quit"))))))
+
+(defvar-local gud|source-buffer-status nil)
+(defvar-local gud|source-buffer-list nil)
+
+(define-minor-mode gud|source-mode "minor mode for source file"
+  :init-value nil
+  :lighter "GS"
+  :keymap gud|source-mode-map
+  (if gud|source-mode
+      (progn
+        (setq gud|source-buffer-status
+              (list buffer-read-only header-line-format))
+        (setq header-line-format "GUD source file, press `q' to exit")
+        (setq buffer-read-only t))
+    (when gud|source-buffer-status
+      (setq buffer-read-only (car gud|source-buffer-status))
+      (setq header-line-format (cadr gud|source-buffer-status))))
+  (force-mode-line-update))
+
+(defun gud|find-file-hack (fn file)
+  (let ((buf (apply fn `(,file))))
+    (when (and buf gud-comint-buffer)
+      (with-current-buffer gud-comint-buffer
+        (add-to-list 'gud|source-buffer-list buf))
+      (with-current-buffer buf
+        (when  (not gud|source-mode)
+          (gud|source-mode 1)))
+      buf)))
+(advice-add 'gud-find-file :around #'gud|find-file-hack)
+
+(defun gud|sentinel-hack (proc msg)
+  (let ((buf (process-buffer proc)))
+    (when (and (buffer-live-p buf)
+               (memq (process-status proc) '(signal exit)))
+      (dolist (src-buf (with-current-buffer buf gud|source-buffer-list))
+        (when (buffer-live-p src-buf)
+          (with-current-buffer src-buf
+            (when gud|source-mode
+              (gud|source-mode -1))))))))
+
+(advice-add 'gud-sentinel :after #'gud|sentinel-hack)
+
+
 (with-eval-after-load 'gud
-  (defvar gud|last-cmd nil)
-  (defun gud|run-cmd (&optional cmd)
-    (if cmd
-        (progn (call-interactively cmd)
-               (setq gud|last-cmd cmd))
-      (if gud|last-cmd
-          (call-interactively gud|last-cmd)
-        (message "No last gud cmd !!!"))))
-  (defhydra hydra|gud-cmd (:exit nil :color pink
-                                 :body-pre (setq hydra-lv nil)
-                                 :post (setq hydra-lv t))
-    "GDB"
-    ("=" (gud|run-cmd 'gud-break))
-    ("-" (gud|run-cmd 'gud-remove))
-    ("t" (gud|run-cmd 'gud-tbreak))
-    ("s" (gud|run-cmd 'gud-step))
-    ("n" (gud|run-cmd 'gud-next))
-    ("i" (gud|run-cmd 'gud-stepi))
-    ("j" (gud|run-cmd 'gud-jump))
-    ("f" (gud|run-cmd 'gud-finish))
-    ("<" (gud|run-cmd 'gud-up))
-    (">" (gud|run-cmd 'gud-down))
-    ("c" (gud|run-cmd 'gud-cont))
-    ("u" (gud|run-cmd 'gud-until))
-    ("p" (gud|run-cmd 'gud-print))
-    ("w" (gud|run-cmd 'gud-watch))
-    ("RET" (gud|run-cmd) "last")
-    ("q" nil "quit"))
   (add-hook 'gud-mode-hook
-            '(lambda ()
-               (define-key global-map (kbd  "C-x a") 'hydra|gud-cmd/body)
-               (setq comint-prompt-read-only t)
-               (setq gdb-many-windows t))))
+            (lambda ()
+              (add-hook 'kill-buffer-hook #'gud|kill-overlay nil :local)
+              (setq comint-prompt-read-only t))))
+
+(with-eval-after-load 'gdb-mi
+  (setq gdb-show-main t)
+  (fset 'gdb-display-buffer
+        'display-buffer)
+  (add-hook 'gdb-mode-hook
+            (lambda ()
+              (local-set-key (kbd "C-c C-z") #'gud|gdb-pop-to-source-buffer))))
 
 (provide 'init-gud)
