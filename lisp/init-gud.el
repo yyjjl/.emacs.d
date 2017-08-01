@@ -4,14 +4,19 @@
     ov)
   "Overlay variable for GUD highlighting.")
 
-(defun gud|highlight-current-line (true-file line)
+(defun gud|highlight-current-line (fn true-file line)
   "Highlight current line."
   (let* ((ov gud|current-overlay)
-         (bf (gud-find-file true-file)))
-    (with-current-buffer bf
-      (move-overlay ov (line-beginning-position) (line-beginning-position 2)
-                    (current-buffer)))))
-(advice-add 'gud-display-line :after #'gud|highlight-current-line)
+         (buf (gud-find-file true-file))
+         (pos (with-current-buffer buf (point)))
+         (ret (funcall fn true-file line)))
+    (with-current-buffer buf
+      (move-overlay ov
+                    (line-beginning-position) (line-beginning-position 2)
+                    (current-buffer))
+      (goto-char pos))
+    ret))
+(advice-add 'gud-display-line :around #'gud|highlight-current-line)
 
 (defun gud|kill-overlay ()
   (if (derived-mode-p 'gud-mode)
@@ -106,7 +111,7 @@
   (force-mode-line-update))
 
 (defun gud|find-file-hack (fn file)
-  (let ((buf (apply fn `(,file))))
+  (let ((buf (funcall fn file)))
     (when (and buf gud-comint-buffer)
       (with-current-buffer gud-comint-buffer
         (add-to-list 'gud|source-buffer-list buf))
@@ -133,7 +138,9 @@
   (add-hook 'gud-mode-hook
             (lambda ()
               (add-hook 'kill-buffer-hook #'gud|kill-overlay nil :local)
-              (setq comint-prompt-read-only t))))
+              ;; `gud-print' need prompt can be modified
+              ;; (setq comint-prompt-read-only t)
+              )))
 
 (with-eval-after-load 'gdb-mi
   (setq gdb-show-main t)
