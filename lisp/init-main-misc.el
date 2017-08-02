@@ -168,7 +168,14 @@ Does not indent buffer, because it is used for a
 (defun core|show-messages-buffer ()
   "Show message buffer."
   (interactive)
-  (popwin:popup-buffer (get-buffer "*Messages*")))
+  (popup-to-buffer (get-buffer "*Messages*")))
+
+(defun core|show-dired-buffer ()
+  "Show message buffer."
+  (interactive)
+  (popup-to-buffer
+   (dired-noselect (or (ignore-errors (projectile-project-root))
+                       default-directory))))
 
 (defun core|current-font-face ()
   "Get the font face under cursor."
@@ -191,7 +198,8 @@ Does not indent buffer, because it is used for a
   ("M-s c" . aya-create)
   ("M-s y" . aya-expand)
 
-  ("C-x m" . core|show-messages-buffer)
+  ("C-x , m" . core|show-messages-buffer)
+  ("C-x , d" . core|show-dired-buffer)
   ("C-r" . isearch-backward-regexp)
   ("C-M-r" . isearch-backeard)
   ("C-x R" . core|rename-this-file-and-buffer)

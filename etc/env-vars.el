@@ -42,8 +42,7 @@
                     (utf8-locale-p (getenv "LC_ALL"))
                     (utf8-locale-p (getenv "LC_CTYPE"))
                     (utf8-locale-p (getenv "LANG"))))
-           (var has-mpv-p (executable-find "mplayer"))
-           (var plantuml-jar-path (file-exists-p "/usr/share/plantuml/plantuml.jar")))
+           (var has-mpv-p (executable-find "mplayer")))
 
 (env|layer (git "Git support")
            (var has-git-p (executable-find "git")))
@@ -80,5 +79,10 @@
 
 (env|layer (tags "Tags")
            (var has-ggtags-p (executable-find "global")))
+
+(env|layer (term "Term support")
+           (var zsh-path (executable-find "zsh"))
+           (var bash-path (executable-find "bash"))
+           (var use-eshell-p nil))
 
 (env|close "../var/init-env-vars.el")

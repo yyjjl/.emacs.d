@@ -109,7 +109,7 @@ and `buffer-file-coding-system'"
            (lw (string-width lhs))
            (cw (string-width chs))
            (rw (string-width rhs))
-           (tw (+ 2 (window-total-width)))
+           (tw (+ 1 (window-total-width)))
            (margin (/ (- tw (+ lw rw cw)) 2)))
       (if (>= margin mode-line|center-margin)
           (format (format "%%s%%%ds%%%ds" (+ cw margin) (- tw (+ lw cw margin)))

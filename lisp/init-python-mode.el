@@ -3,6 +3,7 @@
   (local-set-key (kbd "C-c t t") 'python|pytest-file)
   (local-set-key (kbd "C-c t d") 'python|pytest-directory)
   (local-set-key (kbd "C-c B") 'py-isort-buffer)
+  (local-set-key (kbd "C-c M-d") 'python|generate-doc-at-point)
   ;; emacs 24.4 only
   (setq electric-indent-chars (delq ?: electric-indent-chars))
   (unless (buffer-temporary-p)
@@ -48,9 +49,44 @@
   (let ((file (completing-read "Directory name: " #'read-file-name-internal)))
     (python|pytest-run (file-name-directory file))))
 
+(defun python|generate-doc (params indent)
+  (setq indent (concat "\n" indent))
+  (string-join (mapcar (lambda (token)
+                         (let ((param (split-string token "=" t " +"))
+                               default)
+                           (setq default (cadr param))
+                           (setq param (car param))
+                           (concat "@param " param
+                                   (if default
+                                       (format " (default: %s): " default)
+                                     ": ")
+                                   indent "@type " param ": ")))
+                       (split-string params "," t " +"))
+               indent))
+
+(defun python|generate-doc-at-point ()
+  (interactive)
+  (let (params indent)
+    (save-excursion
+      (if (re-search-backward
+           "^\\( *\\)def[^(]+(\\([^\n]*\\)): *$" nil t)
+          (progn
+            (setq params (match-string-no-properties 2))
+            (setq indent (concat (match-string-no-properties 1)
+                                 (make-string python-indent-offset
+                                              (string-to-char " ")))))
+        (message "Can not find `def'")))
+    (when params
+      (insert "\"\"\""
+              "\n" indent
+              (python|generate-doc params indent)
+              "\n" indent
+              "\"\"\""))))
+
 (defun python|get-class-defs ()
   (interactive)
-  (let* ((indent (make-string 4 (string-to-char " "))))
+  (let* ((indent (make-string python-indent-offset
+                              (string-to-char " "))))
     (save-excursion
       (forward-line 1)
       (if (re-search-backward "^\\( *\\)class.+\n")

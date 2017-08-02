@@ -70,6 +70,22 @@ HTML file converted from org file."
                  (remove-keywords keys))
        ,sym)))
 
+(defun popup-to-buffer (buffer &optional no-select width-split height-split)
+  (unless width-split (setq width-split 3))
+  (let ((pos (if (> (frame-total-cols) (* 2 (frame-total-lines)))
+                 'right
+               'bottom)))
+    (if (get-buffer-window buffer)
+        (pop-to-buffer buffer)
+      (popwin:popup-buffer
+       buffer
+       :noselect no-select
+       :width (floor (/ (frame-total-cols) width-split))
+       :height (if height-split
+                   (floor (/ (frame-total-lines) height-split))
+                 popwin:popup-window-height)
+       :position pos))))
+
 (defun remap-keybindings (old-key new-key &optional map)
   "Remap keybindings whose prefix is OLD-KEY to NEW-KEY in
 MAP (default `global-map')."

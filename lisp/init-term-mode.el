@@ -15,11 +15,13 @@
         (and fn (funcall fn proc msg))))))
 
 (defun term|exec-sentinel (proc msg)
-  (term-sentinel proc msg)
-  (let ((buf (and proc (process-buffer proc))))
-    (when (buffer-live-p buf)
-      (setq buffer-read-only t)
-      (local-set-key (kbd "q") 'kill-this-buffer))))
+  (and (memq (process-status proc) '(signal exit))
+       (let ((buf (and proc (process-buffer proc))))
+         (when (buffer-live-p buf)
+           (with-current-buffer buf
+             (setq buffer-read-only t)
+             (local-set-key (kbd "q") 'kill-this-buffer)))))
+  (term-sentinel proc msg))
 
 (defun term|exec-program (program args &optional sentinel)
   (unless (featurep 'term)
@@ -111,8 +113,6 @@
           (when proc (set-process-sentinel proc (term|wrap-sentinel))))))
     buf))
 
-(defvar term|use-eshell-p nil)
-
 (defun term|pop-shell (&optional arg)
   "Switch to the term buffer last used, or create a new one if
 none exists, or if the current buffer is already a term."
@@ -134,13 +134,13 @@ none exists, or if the current buffer is already a term."
       (with-current-buffer buf
         (local-set-key (kbd "C-c C-z") #'term|switch-back)
         (setq term|parent-buffer parent-buf))
-      (pop-to-buffer buf))))
+      (popup-to-buffer buf nil 2.5 2))))
 
 (with-eval-after-load 'multi-term
   (add-hook 'term-mode-hook 'multi-term-keystroke-setup)
 
-  (setq multi-term-program "/bin/zsh")
-  (setq term-unbind-key-list '("C-x" "<ESC>" "C-y" "C-h" "C-c"))
+  (setq multi-term-program (or term|zsh-path term|bash-path))
+  (setq term-unbind-key-list '("C-x" "<ESC>" "C-y" "C-h" "C-c" "C-g"))
   (setq term-bind-key-alist
         (append term-bind-key-alist
                 '(("C-c C-n" . multi-term)

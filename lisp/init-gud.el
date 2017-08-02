@@ -39,16 +39,7 @@
     `(progn
        (defun ,name (&optional no-select)
          (interactive "P")
-         (let ((pos (if (> (frame-total-cols) (* 2 (frame-total-lines)))
-                        'right
-                      'bottom))
-               (buf (gdb-get-buffer-create ',type)))
-           (if (get-buffer-window buf)
-               (pop-to-buffer buf)
-             (popwin:popup-buffer buf
-                                  :noselect no-select
-                                  :width (/ (frame-total-cols) ,width-split)
-                                  :position pos))))
+         (popup-to-buffer (gdb-get-buffer-create ',type) no-select ,width-split))
        #',name)))
 
 (defun gud|gdb-pop-to-source-buffer ()

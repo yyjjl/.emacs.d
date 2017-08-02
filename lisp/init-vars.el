@@ -24,6 +24,7 @@
   (setq cmake-ide-build-pool-dir (core|expand-var "cmake-projects/" t))
   (setq cmake-ide-rdm-executable (core|expand-var "rtags/bin/rdm"))
   (setq company-statistics-file (core|expand-var "company-statistics-cache.el"))
+  (setq custom-file (core|expand-var "customs.el"))
   (setq emms-directory (core|expand-var "emms"))
   (setq eshell-directory-name (core|expand-var "eshell/"))
   (setq flycheck-eslintrc (core|expand-etc ".eslintrc"))

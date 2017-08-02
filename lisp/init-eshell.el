@@ -44,8 +44,9 @@
 (defun term|eshell-after-process-quit (proc msg)
   (let ((buf (and proc (process-buffer proc))))
     (when (buffer-live-p buf)
-      (setq buffer-read-only t)
-      (local-set-key (kbd "q") 'kill-this-buffer))))
+      (with-current-buffer buf
+        (setq buffer-read-only t)
+        (local-set-key (kbd "q") 'kill-this-buffer)))))
 (advice-add 'eshell-term-sentinel :after #'term|eshell-after-process-quit)
 
 (defun eshell/ccat (filename)
