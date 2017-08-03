@@ -35,7 +35,7 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
     (org-try-structure-completion)
     (when mod (insert mod) (forward-line)))
 
-   (defhydra hydra|org-move (:color pink :hint nil)
+  (defhydra hydra|org-move (:color pink :hint nil)
     "org move"
     ("u" outline-up-heading "up")              ; Up
     ("n" outline-next-visible-heading "next")  ; Next
@@ -48,7 +48,7 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
 
   (define-keys :map org-mode-map
     ("<" . (lambda () (interactive)
-             (if (looking-back "^\\s-*")
+             (if (looking-back "^\\s-*" (line-beginning-position))
                  (hydra|org-template/body)
                (self-insert-command 1))))
     ("C-c C-u" . hydra|org-move/outline-up-heading)
@@ -157,5 +157,95 @@ _d_: subtree
   ("z" nil "leave"))
 
 (global-set-key (kbd "C-c o") 'hydra|outline/body) ; by example
+
+(defhydra hydra|move ()
+  "move"
+  ("q" nil :exit t)
+  ("n" next-line)
+  ("p" previous-line)
+  ("f" forward-char)
+  ("b" backward-char)
+  ("a" beginning-of-line)
+  ("e" move-end-of-line)
+  ("v" scroll-up-command)
+  ;; Converting M-v to V here by analogy.
+  ("V" scroll-down-command)
+  ("[" backward-page)
+  ("]" forward-page)
+  ("l" recenter-top-bottom))
+(global-set-key (kbd "C-v") #'hydra|move/scroll-up-command)
+(global-set-key (kbd "M-v") #'hydra|move/scroll-down-command)
+
+(defhydra hydra|next-error (global-map "C-x")
+  "
+Compilation errors:
+_n_: next error        _<_: first error
+_p_: previous error    _q_uit
+"
+  ("`" next-error     nil)
+  ("n" next-error     nil :bind nil)
+  ("p" previous-error nil :bind nil)
+  ("<" first-error    nil :bind nil)
+  ("q" nil            nil :color blue))
+(global-set-key (kbd "M-g n") #'hydra|next-error/next-error)
+(global-set-key (kbd "M-g p") #'hydra|next-error/previous-error)
+
+(defvar x-hydra-timer nil)
+(defvar x-hydra-delay 0.5)
+(defvar x-hydra-last-prefix nil)
+(defvar-local x-hydra-last-buffer-undo-list nil)
+(defun x-hydra-quit (&optional no-hydra-quit)
+  (when x-hydra-timer
+    (cancel-timer x-hydra-timer)
+    (setq x-hydra-timer nil))
+  (unless no-hydra-quit
+    (hydra-keyboard-quit)))
+
+(defun x-hydra-pre ()
+  (setq x-hydra-timer (timer-create))
+  (setq x-hydra-last-buffer-undo-list buffer-undo-list)
+  (hydra-set-property 'x-hydra :verbosity 0)
+  (unless buffer-read-only (insert "x"))
+  (timer-set-time x-hydra-timer
+                  (timer-relative-time (current-time) x-hydra-delay))
+  (timer-set-function x-hydra-timer 'x-hydra-quit)
+  (timer-activate x-hydra-timer))
+
+(defun x-hydra-dispatch (char)
+  (interactive "c")
+  (setq char (- char 96))
+  (let ((cmd (if x-hydra-last-prefix
+                 (list x-hydra-last-prefix char)
+               (list char))))
+    (setq unread-command-events cmd))
+  (setq x-hydra-last-prefix nil))
+
+(defmacro x-hydra-lambda-body (char)
+  `(progn
+     (setq x-hydra-last-prefix ,char)
+     (ignore-errors
+       (let ((inhibit-message t))
+         (undo)
+         (setq buffer-undo-list x-hydra-last-buffer-undo-list)))
+     (x-hydra-quit t)
+     (setq unread-command-events (list ,char))))
+
+(defhydra x-hydra (:body-pre x-hydra-pre
+                             :color blue)
+  ("x" (x-hydra-lambda-body ?\C-x))
+  ("c" (x-hydra-lambda-body ?\C-c))
+  ("z" (x-hydra-lambda-body ?\C-z))
+  ("h" (x-hydra-lambda-body ?\C-h)))
+
+(setq x-hydra/keymap
+      (define-keys :map (make-sparse-keymap)
+        ("x" . x-hydra/lambda-x-and-exit)
+        ("c" . x-hydra/lambda-c-and-exit)
+        ("z" . x-hydra/lambda-z-and-exit)
+        ("h" . x-hydra/lambda-h-and-exit)))
+
+(global-set-key "x" #'x-hydra/body)
+(global-set-key (kbd "C-x x") #'x-hydra-dispatch)
+(global-set-key (kbd "C-c x") #'x-hydra-dispatch)
 
 (provide 'init-hydra)

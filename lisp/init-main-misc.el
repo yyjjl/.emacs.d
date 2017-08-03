@@ -50,8 +50,6 @@
   ;; enable popwin-mode
   (popwin-mode 1)
   ;; global-modes
-  ;; `linum-mode' is slow
-  (global-linum-mode 1)
   (beginend-setup-all)
   (global-company-mode 1)
   (global-flycheck-mode 1)
@@ -128,7 +126,7 @@
 If ARG = 0 copy the current directory.  If ARG > 0 copy the file
 name without directory.  If ARG < 0 copy the file name without
 directory and extension."
-  (interactive "P")
+  (interactive "p")
   (let ((path (buffer-file-name)))
     (if (not path)
         (setq path default-directory)
@@ -205,7 +203,7 @@ Does not indent buffer, because it is used for a
   ("C-x R" . core|rename-this-file-and-buffer)
   ("C-x D" . core|delete-this-file)
   ("C-x W" . core|copy-this-file-to-new-file)
-  ("C-x F" . core|copy-file-name)
+  ("C-x f" . core|copy-file-name)
   ("C-x c" . core|cleanup-buffer-safe)
 
   ("C-c 4" . ispell-word)
@@ -221,7 +219,6 @@ Does not indent buffer, because it is used for a
   ("<backtab>" . company-complete)
   ([f6] . main|toggle-company-ispell)
   ([f7] . core|create-scratch-buffer)
-  ;; ("C-=" . text-scale-increase)
-  ;; ("C--" . text-scale-decrease))
-  )
+  ("C-<up>" . text-scale-increase)
+  ("C-<down>" . text-scale-decrease))
 (provide 'init-main-misc)

@@ -67,6 +67,9 @@ Emacs Lisp."
 
 
 
+(with-eval-after-load 'lispy
+  (define-key lispy-mode-map "z" #'special-lispy-x)
+  (define-key lispy-mode-map "x" #'x-hydra/body))
 
 ;; Highlight current sexp. Prevent flickery behaviour due to
 ;; `hl-sexp-mode' un-highlighting before each command

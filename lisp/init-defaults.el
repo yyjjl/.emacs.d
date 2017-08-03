@@ -137,6 +137,7 @@
   (hs-minor-mode 1)
   (hl-line-mode 1)
   (when (< (buffer-size) core|large-buffer-size)
+    (linum-mode)
     ;; (highlight-indentation-current-column-mode 1)
     (highlight-indentation-mode 1))
   ;; show trailing spaces in a programming mode

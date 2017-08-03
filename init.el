@@ -49,7 +49,8 @@
 (require 'init-company)
 (require 'init-hydra)
 (require 'init-term-mode)
-(require 'init-eshell)
+(when term|use-eshell-p
+  (require 'init-eshell))
 ;; 'yasnippet', 'flycheck' ...
 (require 'init-main-misc)
 (require 'init-semantic)

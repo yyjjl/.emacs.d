@@ -143,9 +143,10 @@
   ("C-c w l" . buf-move-right)
   ;; `ace-window' and `avy'
   ("C-x o" . ace-window)
-  ("C-:" . avy-goto-char)
-  ("C-\"" . avy-goto-char-2)
+  ("M-g 1" . avy-goto-char)
+  ("M-g 2" . avy-goto-char-2)
   ("M-g l" . avy-goto-line)
+  ("M-g s" . avy-goto-symbol-1)
   ("M-g w" . avy-goto-word-1)
   ("M-g y" . avy-copy-line))
 
