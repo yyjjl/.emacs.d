@@ -26,51 +26,57 @@
 (add-to-list 'load-path emacs|config-directory)
 
 ;;* Core features {{
+;; All packages required in this section are defined in `init-packages'
 (require 'init-outlooking)
 ;; Some important tool functions
 (require 'init-utils)
 
 ;; Set some important variables
 ;; Load all packages
-;; (package-initialize 'no-activate)
+;; (package-initialize)
 (require 'init-packages)
-
 (require 'init-vars)
 (load-file (core|expand-var "init-env-vars.el"))
 (require 'init-auto-mode)
 (require 'init-defaults)
-;; setup emacs outlooking
+;; Setup emacs outlooking
 (require 'init-color-theme)
 (require 'init-modeline)
-;; }}
-
-;;* Main features {{
 (require 'init-ivy)
 (require 'init-company)
 (require 'init-hydra)
 (require 'init-term-mode)
-(when term|use-eshell-p
-  (require 'init-eshell))
-;; 'yasnippet', 'flycheck' ...
+;; `yasnippet', `flycheck' ...
 (require 'init-main-misc)
 (require 'init-semantic)
 (require 'init-linum-mode)
 (require 'init-hs-minor-mode)
-(require 'init-org)
-(require 'init-latex)
 ;; }}
+
+;;* Optional features {{
+;; All packages required in this section are defined in their init files
+(require 'init-org)
+
+(when term|use-eshell-p
+  (require 'init-eshell))
+
+(when latex|use-latex-p
+  (require 'init-latex))
 
 (if git|has-git-p
     (require 'init-git))
+
 (if (or spelling|has-aspell-p
         spelling|has-hunspell-p)
     (require 'init-spelling))
+
 (if tags|has-ggtags-p
     (require 'init-tags))
 
-(require 'init-cc-mode)
+;; Programming modes
+(require 'init-cpp)
 (require 'init-haskell)
-(require 'init-python-mode)
+(require 'init-python)
 (require 'init-lisp)
 (require 'init-web-mode)
 (require 'init-sh)
@@ -86,6 +92,7 @@
 
 ;; Other small tools
 (require 'init-extra)
+;; }}
 
 ;; Locales (setting them earlier in this file doesn 't work in X)
 (when (or window-system emacs|locale-is-utf8-p)

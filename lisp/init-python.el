@@ -1,3 +1,8 @@
+(package|require 'elpy)
+(package|require 'py-isort)
+
+
+
 (defhook python|setup (python-mode-hook)
   (local-set-key (kbd "C-c b") 'elpy-autopep8-fix-code)
   (local-set-key (kbd "C-c t t") 'python|pytest-file)
@@ -112,4 +117,4 @@
   (elpy-enable)
   (remove-hook 'python-mode-hook 'elpy-mode))
 
-(provide 'init-python-mode)
+(provide 'init-python)

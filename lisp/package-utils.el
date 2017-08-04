@@ -1,3 +1,4 @@
+(setq package-enable-at-startup nil)
 (require 'package)
 (require 'subr-x)
 (eval-when-compile
@@ -20,9 +21,13 @@ Archive with high priority will be used when install a package.")
                                 pkg-dir))))
     (when buf (kill-buffer buf))))
 
-(defun package|add (pkgs &optional archive)
+(defun package|add (pkgs)
   (dolist (pkg pkgs)
-    (puthash pkg archive package|required-packages)))
+    (let (archive)
+      (when (consp pkg)
+        (setq archive (cadr pkg))
+        (setq pkg (car pkg)))
+      (puthash pkg archive package|required-packages))))
 
 (defsubst package|archive-priority (archive)
   (length (member (package-desc-archive archive) package|priority-alist)))

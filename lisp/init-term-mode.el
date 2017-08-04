@@ -119,22 +119,25 @@ none exists, or if the current buffer is already a term."
   (interactive "P")
   (unless (featurep 'multi-term)
     (require 'multi-term))
-  (let ((buf (if (not (file-remote-p default-directory))
-                 (unless (memq major-mode '(term-mode eshell-mode))
+  (if (memq major-mode '(eshell-mode term-mode shell-mode))
+      (popwin:close-popup-window)
+    (let ((buf (if (not (file-remote-p default-directory))
                    (funcall (if term|use-eshell-p
                                 #'term|local-eshell
                               #'term|local-shell)
                             (or (and (not arg) default-directory)
                                 (and (bound-and-true-p cpp|cmake-ide-enabled)
                                      cmake-ide-build-dir)
-                                (ignore-errors (projectile-project-root)))))
-               (term|remote-shell)))
-        (parent-buf (current-buffer)))
-    (when buf
-      (with-current-buffer buf
-        (local-set-key (kbd "C-c C-z") #'term|switch-back)
-        (setq term|parent-buffer parent-buf))
-      (popup-to-buffer buf nil 2.5 2))))
+                                (ignore-errors (projectile-project-root))))
+                 (term|remote-shell)))
+          (parent-buf (current-buffer)))
+      (when buf
+        (with-current-buffer buf
+          (local-set-key (kbd "C-c C-z") #'term|switch-back)
+          (setq term|parent-buffer parent-buf))
+        (if (get-buffer-window buf :this)
+            (pop-to-buffer buf)
+          (popup-to-buffer buf nil 2.5 2))))))
 
 (with-eval-after-load 'multi-term
   (add-hook 'term-mode-hook 'multi-term-keystroke-setup)

@@ -39,7 +39,6 @@
 
 (defhook main|after-init (after-init-hook)
   (session-initialize)
-  (add-to-list 'session-globals-include 'buffer-group|groups)
 
   (ivy-mode 1)
   (counsel-mode 1)
@@ -68,8 +67,6 @@
   ;; enabled by default
   ;; (global-eldoc-mode 1)
   ;; (global-whitespace-newline-mode 1)
-  ;; make zsh work correctly in emacs
-  (setq system-uses-terminfo nil)
 
   (when emacs|use-fcitx-p
     (fcitx-aggressive-setup))
@@ -211,9 +208,6 @@ Does not indent buffer, because it is used for a
   ("C-x C-b" . ibuffer)
   ("M-/" . hippie-expand)
   ("RET" . newline-and-indent)
-  ("M-'" . tiny-expand)
-  ("M--" . er/expand-region)
-  ("M-w" . easy-kill)
 
   ("C-}" . main|company-yasnippet)
   ("<backtab>" . company-complete)

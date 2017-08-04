@@ -1,3 +1,7 @@
+(package|require 'ggtags)
+
+
+
 (with-eval-after-load 'ggtags
   (setq gtags-suggested-key-mapping t)
   (setq ggtags-mode-prefix-key "\C-cg")

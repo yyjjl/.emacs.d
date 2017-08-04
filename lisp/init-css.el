@@ -1,3 +1,10 @@
+;; Colorize strings that represent colors
+(package|require 'rainbow-mode)
+(package|require 'css-eldoc)
+(when js2|has-web-beautify-p
+  (package|require 'web-beautify))
+
+
 
 (defun font-file-to-base64 (file)
   (if (file-exists-p file)
@@ -38,15 +45,12 @@
   (save-excursion
     (imenu--generic-function '((nil "^ *\\([^ ]+\\) *{ *$" 1)))))
 
-
-(dolist (hook '(css-mode-hook sass-mode-hook))
-  (add-hook hook
-            '(lambda ()
-               (rainbow-mode 1)
-               (when (require 'css-eldoc nil t)
-                 (turn-on-css-eldoc))
-               (unless (buffer-temporary-p)
-                 (setq imenu-create-index-function 'css|imenu-make-index)))))
+(defhook css|setup (css-mode-hook sass-mode-hook)
+  (rainbow-mode 1)
+  (when (require 'css-eldoc nil t)
+    (turn-on-css-eldoc))
+  (unless (buffer-temporary-p)
+    (setq imenu-create-index-function 'css|imenu-make-index)))
 
 (with-eval-after-load 'css-mode
   (define-key css-mode-map (kbd "C-c b") #'web-beautify-css))

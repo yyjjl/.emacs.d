@@ -1,3 +1,19 @@
+;; Haskell
+(package|require 'haskell-mode)
+(when haskell|has-ghc-mod-p
+  (package|require 'company-ghc)
+  (package|require 'ghc))
+(when haskell|has-shm-p
+  (package|require 'shm))
+(when haskell|has-hindent-p
+  (package|require 'hindent))
+(when haskell|has-cabal-p
+  (package|require 'company-cabal))
+(when haskell|has-idris-p
+  (package|require 'idris-mode))
+
+
+
 (with-eval-after-load 'shm
   (defun haskell|shm-tab-or-close (fn &rest args)
     (if (looking-at ")\\|]\\|}\\|`")

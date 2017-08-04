@@ -1,3 +1,8 @@
+;; Improve `dired-mode'
+(package|require 'dired+)
+
+
+
 (defun dired|git-command-in-shell (command &optional arg file-list)
   "Run a shell command `git COMMAND`' on the marked files.
 if no files marked, always operate on current line in dired-mode

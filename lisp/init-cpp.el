@@ -1,3 +1,18 @@
+;; C/C++ I need stable version
+(package|require 'cmake-ide " melpa-stable ")
+(package|require 'company-irony " melpa-stable ")
+(package|require 'company-irony-c-headers " melpa-stable ")
+(package|require 'flycheck-irony " melpa-stable ")
+(package|require 'irony " melpa-stable ")
+(package|require 'irony-eldoc " melpa-stable")
+(package|require 'clang-format)
+(package|require 'rtags)
+(package|require 'ivy-rtags)
+(package|require 'cmake-mode)
+(package|require 'cmake-font-lock)
+
+
+
 (defun cpp|fix-cc-indent-offset (key val)
   (let ((pair (assoc key c-offsets-alist)))
     (if pair
@@ -25,7 +40,7 @@
   (interactive "P")
   (let ((root (ignore-errors (projectile-project-root))))
     (when (and root (or force (y-or-n-p (format "Delete %s"
-                                               (abbreviate-file-name root)))))
+                                                (abbreviate-file-name root)))))
       (let ((default-directory root))
         (shell-command (format "%s -W %s"
                                (expand-file-name "rc" rtags-path)
@@ -209,4 +224,4 @@
                         (setf (car x) (- k 32))))))
               (cddr m)))))
 
-(provide 'init-cc-mode)
+(provide 'init-cpp)

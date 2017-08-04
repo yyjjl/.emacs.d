@@ -1,3 +1,13 @@
+(package|require 'js-doc)
+(package|require 'js2-mode)
+(package|require 'js-comint)
+(package|require 'js2-refactor)
+(when js2|has-web-beautify-p
+  (package|require 'web-beautify))
+(when js2|has-tern-p
+  (package|require 'company-tern)
+  (package|require 'tern))
+
 (defun js2|print-json-path (&optional hardcoded-array-index)
   "Print the path to the JSON value under point, and save it in the kill ring.
 If HARDCODED-ARRAY-INDEX provided, array index in JSON path is
@@ -38,14 +48,18 @@ replaced with it."
       (message "No JSON path found!"))
     result))
 
+(with-eval-after-load 'js2-mode
+  (when js2|has-web-beautify-p
+    (define-key js2-mode-map (kbd "C-c b") 'web-beautify-js)))
+
 (defhook js2|setup (js2-mode-hook)
   (js2-imenu-extras-mode)
-  (setq mode-name "JavaScript2")
+  (setq mode-name "JS2")
   (js2r-add-keybindings-with-prefix "C-c j")
-  (define-key js2-mode-map (kbd "C-c b") 'web-beautify-js)
   (js2-refactor-mode 1)
-  (unless (buffer-temporary-p)
 
+  (unless (and (buffer-temporary-p)
+               js2|has-tern-p)
     (tern-mode 1)
     (add-to-list 'company-backends 'company-tern)))
 

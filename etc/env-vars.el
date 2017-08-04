@@ -1,88 +1,141 @@
 ;; Add current directory to `load-path'
 (add-to-list 'load-path (file-name-directory load-file-name))
-
 (require 'env-defs)
 
-(defun find-library-in-directory (name dir)
-  (setq dir (expand-file-name dir))
-  (let ((files (directory-files dir))
-        file
-        lib-path)
-    (while (and (not lib-path) files)
-      (setq file (pop files))
-      (unless (member file '("." ".."))
-        (setq lib-path
-              (if (file-directory-p file)
-                  (ignore-errors (find-library-in-directory name file))
-                (and (string= file name)
-                     (expand-file-name file dir))))))))
+(var emacs|locale-is-utf8-p
+     :value (or (utf8-locale-p (and (executable-find "locale")
+                                    (shell-command-to-string "locale")))
+                (utf8-locale-p (getenv "LC_ALL"))
+                (utf8-locale-p (getenv "LC_CTYPE"))
+                (utf8-locale-p (getenv "LANG"))))
 
-(defun utf8-locale-p (v)
-  "Return whether locale string V relates to a utf-8 locale."
-  (and v (string-match "utf-8" v)))
+;; ----------------------------------------
+;;* Misc
+;; ----------------------------------------
+(var emacs|has-xsel-p
+     :value (executable-find "xsel")
+     :doc "Use `xsel' to copy/paste in terminal thoungh system clipboard")
+(var emacs|use-fcitx-p
+     :value (executable-find "fcitx")
+     :doc "Whether to use X input method `fcitx'")
+(var emacs|has-mpv-p
+     :value (executable-find "mplayer")
+     :doc "In order to use `emms' package, need a music player")
 
-(defun python-has-module (modules &optional script)
-  "Check python whether has MODULES"
-  (shell-command-to-string
-   (format "python3 %s %s"
-           (or script (env|expand-etc "has-module.py"))
-           (string-join (mapcar (lambda (x)
-                                  (if (symbolp x) (symbol-name x) x)) modules)
-                        " "))))
+;; ----------------------------------------
+;;* Git
+;; ----------------------------------------
+(var git|has-git-p
+     :value (executable-find "git")
+     :doc "Whether has `git'")
 
-(env|open)
+;; ----------------------------------------
+;;* Spellcheck
+;; ----------------------------------------
+;; Only one of `aspell' and `hunspell' is needed
+(var spelling|has-aspell-p
+     :value (executable-find "aspell")
+     :doc "Use for spellcheck")
+(var spelling|has-hunspell-p
+     :value (executable-find "hunspell")
+     :doc "Use for spellcheck")
 
-(env|layer (emacs "Core variables")
-           (var has-xsel-p (executable-find "xsel"))
-           (var use-fcitx-p (executable-find "fcitx")
-                "Whether to use X input method `fcitx'")
-           (var locale-is-utf8-p
-                (or (utf8-locale-p (and (executable-find "locale")
-                                        (shell-command-to-string "locale")))
-                    (utf8-locale-p (getenv "LC_ALL"))
-                    (utf8-locale-p (getenv "LC_CTYPE"))
-                    (utf8-locale-p (getenv "LANG"))))
-           (var has-mpv-p (executable-find "mplayer")))
+;; ----------------------------------------
+;;* C/C++
+;; ----------------------------------------
+(var cpp|rtags-path
+     :value (env|expand-var "rtags/bin/")
+     :doc "Rtags directory")
+(var cpp|irony-path
+     :value (env|expand-var "irony/bin")
+     :doc "irony directory")
+(var cpp|has-rtags-p
+     :value (file-exists-p
+             (expand-file-name "rdm" cpp|rtags-path))
+     :doc "Rtags support, indexing c++ projects")
+(var cpp|has-irony-p
+     :value (file-exists-p
+             (expand-file-name "irony-server" cpp|irony-path))
+     :doc "Irony support, context sensitive c++ completions")
 
-(env|layer (git "Git support")
-           (var has-git-p (executable-find "git")))
+;; ----------------------------------------
+;;* Haskell
+;; ----------------------------------------
+(var haskell|hare-path
+     :value (ignore-errors
+              (find-library-in-directory "hare.el" "~/.cabal/share"))
+     :doc "Hare is a haskell refacting tool")
+(var haskell|has-stylish-haskell-p
+     :value (executable-find "stylish-haskell")
+     :doc "Like clang-format, format haskell file")
+(var haskell|has-hastags-p
+     :value (executable-find "hastags")
+     :doc "Tag haskell file, jump to defination")
+(var haskell|has-ghc-mod-p
+     :value (executable-find "ghc-mod")
+     :doc "Haskell context sensitive completions")
+(var haskell|has-shm-p
+     :value (executable-find "structured-haskell-mode")
+     :doc "Great tool to edit haskell file")
+(var haskell|has-hindent-p
+     :value (executable-find "hindent")
+     :doc "Indent haskell expression")
+(var haskell|has-cabal-p
+     :value (executable-find "cabal")
+     :doc "Haskell cabal support")
+(var haskell|has-idris-p
+     :value (executable-find "idris")
+     :doc "Idris language support")
 
-(env|layer (spelling "Variables for spelling check")
-           (var has-aspell-p (executable-find "aspell"))
-           (var has-hunspell-p (executable-find "hunspell")))
+;; ----------------------------------------
+;;* Python
+;; ----------------------------------------
+(var python|has-pytest-p
+     :value (executable-find "pytest")
+     :doc "Use for python unit test ")
 
-(env|layer (cpp "Variables for c/c++ languages support")
-           (var rtags-path (env|expand-var "rtags/bin/"))
-           (var irony-path (env|expand-var "irony/bin"))
-           (var has-rtags-p (file-exists-p
-                             (expand-file-name "rdm" (ref rtags-path))))
-           (var has-irony-p (file-exists-p
-                             (expand-file-name "irony-server" (ref irony-path)))))
+;; ----------------------------------------
+;;* Lisp
+;; ----------------------------------------
+(var lisp|has-racket-p
+     :value (executable-find "racket")
+     :doc "Racket support")
 
-(env|layer (haskell "Variable for haskell ")
-           (var hare-path (ignore-errors
-                            (find-library-in-directory
-                             "hare.el" "~/.cabal/share")))
-           (var has-stylish-haskell-p (executable-find "stylish-haskell"))
-           (var has-hastags-p (executable-find "hastags"))
-           (var has-ghc-mod-p (executable-find "ghc-mod"))
-           (var has-shm-p  (executable-find "structured-haskell-mode"))
-           (var has-hindent-p (executable-find "hindent"))
-           (var has-cabal-p (executable-find "cabal"))
-           (var has-idris-p (executable-find "idris")))
+;; ----------------------------------------
+;;* Tags
+;; ----------------------------------------
+(var tags|has-ggtags-p
+     :value (executable-find "global")
+     :doc "Tag multiple languages")
 
-(env|layer (python "Variable for python")
-           (var has-pytest-p (executable-find "pytest")))
+;; ----------------------------------------
+;;* Terminal
+;; ----------------------------------------
+(var term|zsh-path
+     :value (executable-find "zsh")
+     :doc "Zsh path")
+(var term|bash-path
+     :value (executable-find "bash")
+     :doc "Bash path")
+(var term|use-eshell-p
+     :value nil
+     :doc "Non-nil means to use eshell as default terminal")
 
-(env|layer (lisp "Variable for lisp")
-           (var has-racket-p (executable-find "racket")))
+;; ----------------------------------------
+;;* Latex
+;; ----------------------------------------
+(var latex|use-latex-p
+     :value t
+     :doc "Whether to use latex packages")
 
-(env|layer (tags "Tags")
-           (var has-ggtags-p (executable-find "global")))
+;; ----------------------------------------
+;;* Javascript
+;; ----------------------------------------
+(var js2|has-tern-p
+     :value (executable-find "tern")
+     :doc "Js context sensitive completion")
+(var js2|has-web-beautify-p
+     :value (executable-find "js-beautify")
+     :doc "Like clang-format")
 
-(env|layer (term "Term support")
-           (var zsh-path (executable-find "zsh"))
-           (var bash-path (executable-find "bash"))
-           (var use-eshell-p nil))
-
-(env|close "../var/init-env-vars.el")
+(env|write-file "../var/init-env-vars.el")

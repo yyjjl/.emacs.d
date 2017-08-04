@@ -1,4 +1,8 @@
-(require 'package-utils)
+(setq package-enable-at-startup nil)
+(require 'package)
+(require 'subr-x)
+(eval-when-compile
+  (require 'cl))
 
 ;; add site-package's path to `load-path'
 (if (fboundp 'normal-top-level-add-to-load-path)
@@ -17,185 +21,129 @@
         ("melpa" . "https://elpa.emacs-china.org/melpa/")
         ("gnu"   . "https://elpa.emacs-china.org/gnu/")))
 
-;; core packages
-(package|add
- '(yasnippet
-   auto-yasnippet
-   ;; code completion framework
-   company
-   company-statistics
-   ;; save session to disk
-   session
+(defvar package|use-priority-p nil
+  "Non-nil means to use priority defined in variable `package|priority-alist'.
+Archive with high priority will be used when install a package.")
 
-   multi-term
+(defvar package|priority-alist nil "Package archive priority.")
+(defvar package|required-packages (make-hash-table) "All packages required.")
 
-   hydra
-   ivy
-   swiper
-   counsel
-   counsel-projectile
-   ;; counsel-M-x need smex to get history
-   smex
-   ;; delete packages safely
-   ;; emacs 25 has builtin support
-   ;; package-safe-delete
-   ;; show key bindings while pressing
-   which-key
-   dired+
-   emms
-   ibuffer-vc))
+(defun package|autoclose-autoloads (name pkg-dir)
+  "Auto close *-autoloads.el after a package installed."
+  (let ((buf (find-file-existing
+              (expand-file-name (concat (if (symbolp name)
+                                            (symbol-name name)
+                                          name)
+                                        "-autoloads.el")
+                                pkg-dir))))
+    (when buf (kill-buffer buf))))
 
-(package|add
- '(cmake-ide
-   flycheck
-   company-irony company-irony-c-headers
-   flycheck-irony
-   irony
-   irony-eldoc) "melpa-stable")
+(defvar package|content-freshed-p nil)
+(defun package|require (pkg-name &optional archive location)
+  (cond ((eq location 'built-in) t)
+        (location (add-to-list 'load-path location))
+        (t
+         (puthash pkg-name archive package|required-packages)
+         (unless (package-installed-p pkg-name)
+           (unless package|content-freshed-p
+             (package-refresh-contents)
+             (setq package|content-freshed-p t))
+           (message "Installing package '%s' ..." pkg-name)
+           (package-install pkg-name)
+           (message "Package'%s' installed " pkg-name)))))
 
-;; edit, mark and jump
-(package|add
- '( ;; mark tools
-   visual-regexp
-   multiple-cursors
-   fcitx
+(defsubst package|archive-priority (archive)
+  (length (member (package-desc-archive archive) package|priority-alist)))
 
-   beginend
-   expand-region
-   ;; wgrep allows you to edit a grep buffer and apply those changes
-   ;; to the file buffer.
-   wgrep
-   ;; provide tree style search jump
-   avy
-   tiny
-   easy-kill
-   figlet
-   zzz-to-char))
+(defun package|get-archive (name archives)
+  (unless (null archives)
+    (if (string= name (package-desc-archive (car archives)))
+        (car archives)
+      (package|get-archive name (cdr archives)))))
 
-;; note
-(package|add
- '( ;; ipython notebook feature in `org-mode'
-   ob-ipython
-   org-present
-   ;; export colorful src block in `org-mode'
-   htmlize
-   zeal-at-point))
+(defun package|set-archive (pkg &optional archive-name)
+  " Set right archive content for PKG. "
+  (let ((pkg-archives (cdr pkg)) archive)
+    (when archive-name
+      (setq archive (package|get-archive archive-name pkg-archives)))
+    (when (and (not archive) package|use-priority-p)
+      (setq archive (car (sort pkg-archives
+                               (lambda (pkg1 pkg2)
+                                 (> (package|archive-priority pkg1)
+                                    (package|archive-priority pkg2)))))))
+    (when archive
+      (setf (cdr pkg) (list archive)))))
 
-;; outlooking
-(package|add
- '(color-theme
-   ;; Highlight braces with their depth
-   rainbow-delimiters
-   ;; Numbering windows
-   window-numbering
-   ;; Highlight indentation
-   highlight-indentation
-   ;; Colorize strings that represent colors
-   rainbow-mode
-   ;; ^L beautifier
-   page-break-lines
-   ;; Show information in header-line for `semantic-mode'
-   ;; It's too slow, when file is large
-   ;; stickyfunc-enhance
-   eshell-prompt-extras
-   xterm-color
-   unicode-fonts))
+(defun package|after-read-contents ()
+  (dolist (pkg package-archive-contents)
+    (package|set-archive pkg (gethash (car pkg) package|required-packages))))
 
-;; latex
-(package|add
- '(auctex
-   company-auctex))
+;; Setup to select right archive
+(when package|use-priority-p
+  (setq package|priority-alist (mapcar #'car package-archives)))
+(advice-add 'package-generate-autoloads
+            :after #'package|autoclose-autoloads)
+(advice-add 'package-read-all-archive-contents
+            :after #'package|after-read-contents)
 
-;; buffer and window
-(package|add
- '(;; Manage popup windows
-   popwin
-   ;; Move buffers between windows
-   buffer-move
-   ;; Quick switch window
-   ace-window))
+(package-initialize)
 
-(package|add
- '(gitignore-mode
-   gitconfig-mode
-   git-messenger
-   git-gutter git-gutter-fringe
-   git-link
-   git-timemachine
-   magit))
+(when (>= emacs-major-version 25)
+  ;; Do not save to init.el
+  (fset 'package--save-selected-packages
+        (lambda (value)
+          (when value
+            (setq package-selected-packages value))))
+  (setq package-selected-packages (hash-table-keys package|required-packages)))
 
-(package|add
- '( ;; auto compile after .el file load or save
-   auto-compile
-   ;; pair edit
-   lispy
-   racket-mode
-   macrostep
-   ;; slime
-   ;; slime-company
-   hl-sexp))
+;; ----------------------------------------
+;; Core packages
+;; ----------------------------------------
+(package|require 'yasnippet)
+(package|require 'auto-yasnippet)
+;; Code completion framework
+(package|require 'company)
+(package|require 'company-statistics)
+(package|require 'flycheck " melpa-stable ")
+;; Save session to disk
+(package|require 'session)
+;; Improve `term-mode'
+(package|require 'multi-term)
+(package|require 'hydra)
+(package|require 'ivy)
+(package|require 'swiper)
+(package|require 'counsel)
+(package|require 'projectile)
+(package|require 'counsel-projectile)
+;; `counsel-M-x' need smex to get history
+(package|require 'smex)
+;; Delete packages safely
+;; In Emacs 25 has builtin support
+;; (package|require 'package-safe-delete)
+;; Show key bindings when pressing
+(package|require 'which-key)
+(package|require 'color-theme)
+;; Numbering windows
+(package|require 'window-numbering)
+;; Manage popup windows
+(package|require 'popwin)
+;; Input method
+(package|require 'fcitx)
+;; Highlight braces with their depth
+(package|require 'rainbow-delimiters)
+;; Highlight indentation
+(package|require 'highlight-indentation)
+;; ^L beautifier
+(package|require 'page-break-lines)
+;; Show information in header-line for `semantic-mode'
+;; It's too slow, when file is large
+;; (package|require 'stickyfunc-enhance)
+(package|require 'xterm-color)
+(package|require 'unicode-fonts)
+(package|require 'beginend)
 
-(package|add
- '( ;; js company backend
-   company-tern
-   js-doc
-   web-mode web-beautify
-   company-web
-   ;; optional package add support for angluar 1.x
-   ac-html-angular
-   ac-html-bootstrap
-   js2-mode
-   js-comint
-   js2-refactor
-   tern
-   css-eldoc
-   emmet-mode
-
-   restclient
-   company-restclient))
-
-(package|add
- '(elpy
-   ob-ipython
-   py-isort))
-
-(package|add
- '(company-ghc
-   ghc
-   haskell-mode
-   shm hindent
-   company-cabal
-   idris-mode))
-
-(package|add
- '(irony-eldoc
-   irony clang-format
-   ggtags
-   rtags
-   ivy-rtags))
-
-(package|add
- '(sql-indent
-   ;; yaml format
-   yaml-mode
-   ;; haml format
-   haml-mode
-   markdown-mode
-   crontab-mode
-   csv-mode
-   sass-mode
-   less-css-mode
-   scss-mode
-   glsl-mode
-   lua-mode
-   go-mode
-   groovy-mode
-   cmake-mode cmake-font-lock
-   php-mode
-   gnuplot-mode
-   csharp-mode
-   graphviz-dot-mode))
-
-(package|load-all)
+(defhook package|after-init (after-init-hook)
+  (setq package-selected-packages
+        (hash-table-keys package|required-packages)))
 
 (provide 'init-packages)

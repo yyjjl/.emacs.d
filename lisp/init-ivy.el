@@ -1,5 +1,3 @@
-(require 's)
-
 (defun counsel-kill-buffer (&optional arg)
   "Kill buffer with ivy backends."
   (interactive "P")

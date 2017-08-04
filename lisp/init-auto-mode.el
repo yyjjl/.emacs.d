@@ -19,7 +19,6 @@ file `PATTERNS'."
                "\\.gradle\\'")
 
 (add-auto-mode 'crontab-mode
-               "crontab.*\\'"
                "\\.?cron\\(tab\\)?\\'")
 
 ;; cmake

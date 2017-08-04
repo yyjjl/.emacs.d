@@ -14,7 +14,7 @@ If buffer file is a remote file, host-address will be showed"
                     (if (buffer-narrowed-p)
                         (concat ">" num-str "<") num-str))
                 ""))
-         (real-id (concat (propertize "%b" 'face font-lock-keyword-face)
+         (real-id (concat (propertize "%b" 'face 'font-lock-keyword-face)
                           (if (and host (cdr host))
                               (propertize (concat "(" (cadr host) ")")
                                           'face font-lock-string-face)
@@ -23,7 +23,7 @@ If buffer file is a remote file, host-address will be showed"
 
 (defun mode-line|buffer-major-mode ()
   "Display buffer major mode in mode-line."
-  (propertize " %m "
+  (propertize "%m"
               'face 'font-lock-builtin-face
               'help-echo (symbol-name major-mode)
               'mouse-face 'mode-line-highlight
@@ -50,7 +50,7 @@ and `buffer-file-coding-system'"
                           'face nil
                           'help-echo "Buffer has been modified")))
           (when buffer-read-only
-            (propertize "read-only|"
+            (propertize "ro|"
                         'face nil
                         'help-echo "Buffer is read-only"))
           (let ((buf-coding (format "%s" buffer-file-coding-system)))
@@ -97,19 +97,19 @@ and `buffer-file-coding-system'"
   (unless (bound-and-true-p eldoc-mode-line-string)
     (let* ((lhs (format-mode-line
                  (concat (mode-line|buffer-id)
-                         (mode-line|process)
-                         (mode-line|buffer-major-mode)
+                         (mode-line|process) " "
+                         (mode-line|buffer-major-mode) " "
                          (mode-line|buffer-status))))
            (chs (format-mode-line global-mode-string))
            (rhs (format-mode-line
                  (concat (mode-line|vc) " "
                          (mode-line|flycheck) " "
-                         (propertize "%I [%l:%c] %p%% "
+                         (propertize "%I [L%l:C%c] %p%% "
                                      'face 'font-lock-constant-face))))
            (lw (string-width lhs))
            (cw (string-width chs))
            (rw (string-width rhs))
-           (tw (+ 1 (window-total-width)))
+           (tw (window-total-width))
            (margin (/ (- tw (+ lw rw cw)) 2)))
       (if (>= margin mode-line|center-margin)
           (format (format "%%s%%%ds%%%ds" (+ cw margin) (- tw (+ lw cw margin)))

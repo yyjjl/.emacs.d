@@ -1,3 +1,15 @@
+;; Auto compile after .el file load or save
+(package|require 'auto-compile)
+;; pair edit
+(package|require 'lispy)
+(package|require 'racket-mode)
+(package|require 'macrostep)
+;; slime
+;; slime-company
+(package|require 'hl-sexp)
+
+
+
 (defhook lisp|minibuffer-setup (minibuffer-setup-hook minibuffer-exit-hook)
   (if (and (not (bound-and-true-p lispy-mode))
            (memq this-command

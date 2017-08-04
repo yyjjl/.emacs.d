@@ -1,3 +1,12 @@
+;; IPython notebook feature in `org-mode'
+(package|require 'ob-ipython)
+(package|require 'org-present)
+;; Export colorful src block in `org-mode'
+(package|require 'htmlize)
+(package|require 'company-auctex)
+
+
+
 (defun org|split-src-block (&optional below)
   "Split the current src block.
 With a prefix BELOW move point to lower block."
@@ -48,8 +57,6 @@ With a prefix BELOW move point to lower block."
           (goto-char p)
           (forward-line lineno)
           (recenter)
-          (require 'pulse)
-          (pulse-momentary-highlight-one-line (line-beginning-position))
           (point)))
     (message "Parent buffer killed or Can not find src block !!!")))
 

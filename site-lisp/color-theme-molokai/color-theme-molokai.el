@@ -39,17 +39,22 @@
      (escape-glyph ((t (:foreground "#E6DB74"))))
      (minibuffer-prompt ((t (:foreground "#AE81EF"))))
 
-     (mode-line-inactive ((t (:foreground "#F8F8F2" :background "#2d2d2d"))))
+     (mode-line ((t (:foreground
+                     "#F8F8F2" :background "#2d2d2d"
+                     :box (:line-width 5 :color "#2d2d2d")))))
      (mode-line-buffer-id ((t (:background "#000000" :weight semi-bold))))
-     (mode-line ((t (:foreground "#BCBCBC" :background "#181818"))))
-     (mode-line-highlight ((t (:background "#020303"))))
+     (mode-line-inactive ((t (:foreground
+                              "#BCBCBC" :background "#1b1d1e"
+                              :box (:line-width 5 :color "#1b1d1e")))))
+     (mode-line-highlight ((t (:background "black"
+                                           :box (:line-width 5 :color "black")))))
      (mode-line-mousable ((t (:foreground "#BCBCBC" :background "#000000"))))
      (mode-line-mousable-minor-mode
       ((t (:foreground "#BCBCBC" :background "#000000"))))
      (header-line ((t (:forground "grey90" :background "#2d2d2d"))))
 
      (font-lock-builtin-face ((t (:foreground "#A6E22E"))))
-     (font-lock-comment-face ((t (:foreground "#465457" :slant italic))))
+     (font-lock-comment-face ((t (:foreground "#75715E" :slant italic))))
      (font-lock-comment-delimiter-face ((t (:foreground "#345678" :slant italic))))
      (font-lock-constant-face ((t (:foreground "#AE81FF"))))
      (font-lock-doc-face ((t (:foreground "#06DB74" :slant italic))))
@@ -78,7 +83,7 @@
      (icompletep-nb-candidates ((t (:foreground "#AE81FF"))))
      (isearch ((t (:foreground "#C4BE89" :background "#000000"))))
      (isearch-fail ((t (:foreground "#FFFFFF" :background "#333333"))))
-     (lazy-highlight ((t (:foreground "#465457" :background "#000000"))))
+     (lazy-highlight ((t (:inherit font-lock-comment-face :background "#000000"))))
      (markdown-italic-face ((t (:slant italic))))
      (markdown-bold-face ((t (:weight bold))))
      (markdown-header-face ((t (:weight normal))))
@@ -96,7 +101,7 @@
      (markdown-reference-face ((t (:foreground "#66D9EF"))))
      (markdown-url-face ((t (:foreground "#E6DB74"))))
      (markdown-link-title-face ((t (:foreground "#F92672"))))
-     (markdown-comment-face ((t (:foreground "#465457"))))
+     (markdown-comment-face ((t (:inherit font-lock-comment-face))))
      (markdown-math-face ((t (:foreground "#AE81FF" :slant italic))))
      (mumamo-background-chunk-major ((t (:background "#272822"))))
      (mumamo-background-chunk-submode ((t (:background "#1B1D1E"))))

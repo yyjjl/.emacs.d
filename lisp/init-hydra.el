@@ -246,6 +246,5 @@ _p_: previous error    _q_uit
 
 (global-set-key "x" #'x-hydra/body)
 (global-set-key (kbd "C-x x") #'x-hydra-dispatch)
-(global-set-key (kbd "C-c x") #'x-hydra-dispatch)
 
 (provide 'init-hydra)

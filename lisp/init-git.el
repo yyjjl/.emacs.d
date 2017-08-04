@@ -1,3 +1,14 @@
+(package|require 'gitignore-mode)
+(package|require 'gitconfig-mode)
+(package|require 'git-messenger)
+(package|require 'git-gutter)
+(package|require 'git-gutter-fringe)
+(package|require 'git-link)
+(package|require 'git-timemachine)
+(package|require 'magit)
+
+
+
 ;; @see http://blog.binchen.org/posts/enhance-emacs-git-gutter-with-ivy-mode.html
 ;; {{ git gutter with ivy
 (defun git|reshape-gutter (gutter)

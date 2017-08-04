@@ -1,3 +1,7 @@
+(package|require 'eshell-prompt-extras)
+
+
+
 ;; `eshell' setup
 (defun term|eshell-autoclose ()
   (let ((window (get-buffer-window)))

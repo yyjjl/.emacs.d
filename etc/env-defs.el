@@ -8,58 +8,50 @@
 (defsubst env|expand-etc (name)
   (expand-file-name name (expand-file-name "etc" user-emacs-directory)))
 
-(defvar env|all-docs (make-hash-table))
-(defvar env|all-variables (make-hash-table))
+(defvar env|all-variables nil)
 (defvar env|current-layer nil)
 
-(defun env|open ()
-  (clrhash env|all-docs)
-  (clrhash env|all-variables)
-  (setq env|current-layer nil))
-
-(defun env|close (file)
+(defun env|write-file (file)
   (setq file (expand-file-name file (file-name-directory load-file-name)))
   (let ((backup-enable-predicate (lambda (name) nil)))
     (with-temp-buffer
-      (maphash (lambda (layer-name layer-doc)
-                 (setq layer-doc (car layer-doc))
-                 (insert (format ";; For '%s'\n" layer-name))
-                 (insert (env|format-message layer-doc) "\n")
-                 (dolist (var (gethash layer-name env|all-variables))
-                   (insert (pp-to-string `(defvar ,@var)))))
-               env|all-docs)
+      (dolist (declaration env|all-variables)
+        (insert (pp-to-string `(defvar ,@declaration))))
       (insert (format "\n\n(provide '%s)\n" (file-name-base file)))
       (write-file file)
       (byte-compile-file file))))
 
-(cl-defmacro env|layer ((name &optional doc-string) &rest body)
-  (when (stringp name) (setq name (intern name)))
-  (setq env|current-layer name)
-  (env|put doc-string env|all-docs)
-  `(progn ,@body))
+(cl-defmacro var (var-sym &key (value t) (doc ""))
+  `(progn
+     (setq ,var-sym ,value)
+     (message "`%s' => %s" ',var-sym ,var-sym)
+     (add-to-list 'env|all-variables (list ',var-sym ,var-sym ,doc))))
 
-(cl-defun env|wrap-name
-    (name &optional (prefix "") (suffix "") (layer env|current-layer))
-  (intern (format "%s|%s%s%s" layer prefix name suffix)))
+(defun find-library-in-directory (name dir)
+  (setq dir (expand-file-name dir))
+  (let ((files (directory-files dir))
+        file
+        lib-path)
+    (while (and (not lib-path) files)
+      (setq file (pop files))
+      (unless (member file '("." ".."))
+        (setq lib-path
+              (if (file-directory-p file)
+                  (ignore-errors (find-library-in-directory name file))
+                (and (string= file name)
+                     (expand-file-name file dir))))))))
 
-(cl-defun env|put (v table &optional (k env|current-layer))
-  (let ((val (gethash k table)))
-    (puthash k (if val (cons v val) `(,v)) table)))
+(defun utf8-locale-p (v)
+  "Return whether locale string V relates to a utf-8 locale."
+  (and v (string-match "utf-8" v)))
 
-(defun env|format-message (msg)
-  (if msg (concat ";; " (replace-regexp-in-string
-                         "\n" "\n;; "
-                         (string-trim-right msg)))
-    ""))
-
-(cl-defmacro ref (name &optional (layer env|current-layer))
-  (env|wrap-name name "" "" layer))
-
-(cl-defmacro var (name form &optional doc)
-  (let ((var-sym (env|wrap-name name)))
-    `(progn
-       (setq ,var-sym ,form)
-       (message "`%s' => %s" ',var-sym ,var-sym)
-       (env|put (list ',var-sym ,var-sym ,doc) env|all-variables))))
+(defun python-has-module (modules &optional script)
+  "Check python whether has MODULES"
+  (shell-command-to-string
+   (format "python3 %s %s"
+           (or script (env|expand-etc "has-module.py"))
+           (string-join (mapcar (lambda (x)
+                                  (if (symbolp x) (symbol-name x) x)) modules)
+                        " "))))
 
 (provide 'env-defs)

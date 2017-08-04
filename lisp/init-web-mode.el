@@ -1,3 +1,14 @@
+(package|require 'emmet-mode)
+(package|require 'web-mode)
+(when js2|has-web-beautify-p
+  (package|require 'web-beautify))
+(package|require 'company-web)
+;; Optional package add support for angluar 1.x
+;; (package|require 'ac-html-angular)
+;; (package|require 'ac-html-bootstrap)
+
+
+
 ;; flyspell set up for web-mode
 (defun web|flyspell-verify ()
   (let ((f (get-text-property (- (point) 1) 'face)))

@@ -1,3 +1,7 @@
+(package|require 'ibuffer-vc)
+
+
+
 (with-eval-after-load 'ibuffer
   ;; Use human readable Size column instead of original one
   (define-ibuffer-column size-h

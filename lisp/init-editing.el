@@ -1,3 +1,16 @@
+(package|require 'expand-region)
+;; Mark tools
+(package|require 'visual-regexp)
+(package|require 'multiple-cursors)
+;; `wgrep' allows you to edit a grep buffer and apply those changes
+;; to the file buffer.
+(package|require 'wgrep)
+;; provide tree style search jump
+(package|require 'avy)
+(package|require 'easy-kill)
+
+
+
 (defvar core|narrow-dwim-alist
   '((org-mode org-narrow-to-subtree org-narrow-to-element)
     (latex-mode LaTeX-narrow-to-environment TeX-narrow-to-group)))
@@ -149,5 +162,17 @@ grab matched string and insert them into `kill-ring'"
     ("C-c s w" . artist-select-op-copy-rectangle)
     ("C-c s y" . artist-select-op-paste)
     ("C-c s f" . artist-select-op-flood-fill)))
+
+;; `avy' jump commands
+(define-keys
+  ("M--" . er/expand-region)
+  ("M-w" . easy-kill)
+
+  ("M-g 1" . avy-goto-char)
+  ("M-g 2" . avy-goto-char-2)
+  ("M-g l" . avy-goto-line)
+  ("M-g s" . avy-goto-symbol-1)
+  ("M-g w" . avy-goto-word-1)
+  ("M-g y" . avy-copy-line))
 
 (provide 'init-editing)

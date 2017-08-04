@@ -1,3 +1,8 @@
+(package|require 'auctex)
+(package|require 'company-auctex)
+
+
+
 (autoload 'LaTeX-math-mode "latex" nil t)
 (defhook latex|setup (LaTeX-mode-hook)
   (company-auctex-init)

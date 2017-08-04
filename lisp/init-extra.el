@@ -1,3 +1,33 @@
+(package|require 'restclient)
+(package|require 'company-restclient)
+(when emacs|has-mpv-p
+  (package|require 'emms))
+(package|require 'sql-indent)
+;; yaml format
+(package|require 'yaml-mode)
+;; haml format
+(package|require 'haml-mode)
+(package|require 'markdown-mode)
+(package|require 'crontab-mode)
+(package|require 'csv-mode)
+(package|require 'sass-mode)
+(package|require 'less-css-mode)
+(package|require 'scss-mode)
+(package|require 'glsl-mode)
+(package|require 'lua-mode)
+(package|require 'go-mode)
+(package|require 'groovy-mode)
+(package|require 'php-mode)
+(package|require 'gnuplot-mode)
+(package|require 'csharp-mode)
+(package|require 'graphviz-dot-mode)
+;; Move buffers between windows
+(package|require 'buffer-move)
+(package|require 'zeal-at-point)
+(package|require 'figlet)
+
+
+
 ;; prolog system
 (setq prolog-system 'swi)
 ;; pulse
@@ -86,10 +116,14 @@
   (add-to-list 'calc-language-alist '(org-mode . latex)))
 
 ;; `doxygen' setup
-(autoload 'doxygen-insert-function-comment "doxygen" "insert comment for the function at point" t)
-(autoload 'doxygen-insert-file-comment "doxygen" "insert comment for file" t)
-(autoload 'doxygen-insert-member-group-region "doxygen" "insert comment for member group" t)
-(autoload 'doxygen-insert-compound-comment "doxygen" "insert comment for compound" t)
+(autoload 'doxygen-insert-function-comment
+  "doxygen" "insert comment for the function at point" t)
+(autoload 'doxygen-insert-file-comment
+  "doxygen" "insert comment for file" t)
+(autoload 'doxygen-insert-member-group-region
+  "doxygen" "insert comment for member group" t)
+(autoload 'doxygen-insert-compound-comment
+  "doxygen" "insert comment for compound" t)
 
 (with-eval-after-load 'emms
   (emms-all)
@@ -140,14 +174,6 @@
   ("C-c w k" . buf-move-up)
   ("C-c w j" . buf-move-down)
   ("C-c w h" . buf-move-left)
-  ("C-c w l" . buf-move-right)
-  ;; `ace-window' and `avy'
-  ("C-x o" . ace-window)
-  ("M-g 1" . avy-goto-char)
-  ("M-g 2" . avy-goto-char-2)
-  ("M-g l" . avy-goto-line)
-  ("M-g s" . avy-goto-symbol-1)
-  ("M-g w" . avy-goto-word-1)
-  ("M-g y" . avy-copy-line))
+  ("C-c w l" . buf-move-right))
 
 (provide 'init-extra)
