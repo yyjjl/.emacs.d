@@ -17,6 +17,8 @@
           global-semantic-mru-bookmark-mode)))
 
 (with-eval-after-load "db-file"
+  (when (< emacs-major-version 25)
+    (fset 'cl-defmethod 'defmethod))
   ;; Fix remote file problem
   (cl-defmethod semanticdb-live-p ((obj semanticdb-project-database))
     "Return non-nil if the file associated with OBJ is live.

@@ -134,16 +134,13 @@
   (setq emms-source-file-default-directory "~/music/")
   (setq emms-player-list '(emms-player-mplayer))
 
-  (add-hook 'emms-playlist-mode-hook #'emms-mark-mode)
-
-  (autoload 'epe-fish-path "eshell-prompt-extras"))
+  (add-hook 'emms-playlist-mode-hook #'emms-mark-mode))
 
 (when emacs|has-mpv-p
   (require 'emms)
   (defun extra|emms-current-name ()
     (concat (propertize
-             (epe-fish-path (or (emms-mode-line-playlist-current)
-                                ""))
+             (abbreviate-file-name (emms-mode-line-playlist-current))
              'face 'font-lock-constant-face)))
   (defhydra hydra|emms (:color pink :hint nil)
     "

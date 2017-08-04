@@ -23,9 +23,11 @@
 (with-eval-after-load 'elpy
   (remap-keybindings "C-c C-r" "C-c r" elpy-mode-map)
   (setcar elpy-test-discover-runner-command "python3")
+  (if python|has-ipython-p
+      (setq python-shell-interpreter "ipython"
+            python-shell-interpreter-args "--simple-prompt -i")
+    (setq python-shell-interpreter "python3"))
   (setq elpy-rpc-backend "jedi"
-        python-shell-interpreter "ipython"
-        python-shell-interpreter-args "--simple-prompt -i"
         elpy-rpc-python-command "python3"
         elpy-modules (delete 'elpy-module-flymake elpy-modules))
   (define-keys :map elpy-mode-map
@@ -112,7 +114,9 @@
         (message "Can not find where is the class")))))
 
 (with-eval-after-load 'python
-  (add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
+  (when (boundp 'python-shell-completion-native-disabled-interpreters)
+    (add-to-list 'python-shell-completion-native-disabled-interpreters
+                 "jupyter"))
   (setq python-shell-prompt-detect-failure-warning nil)
   (elpy-enable)
   (remove-hook 'python-mode-hook 'elpy-mode))

@@ -93,6 +93,9 @@
 (var python|has-pytest-p
      :value (executable-find "pytest")
      :doc "Use for python unit test ")
+(var python|has-ipython-p
+     :value (executable-find "ipython3")
+     :doc "Use for python unit test ")
 
 ;; ----------------------------------------
 ;;* Lisp
