@@ -13,6 +13,8 @@
     (message "You need install either aspell or hunspell for ispell")))
 
 (with-eval-after-load 'flyspell
+  (advice-add 'flyspell-post-command-hook :around #'core|ignore-error)
+  (define-key flyspell-mode-map (kbd "C-.") nil)
   ;; Better performance
   (setq flyspell-issue-message-flag nil)
 

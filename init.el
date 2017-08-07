@@ -11,7 +11,8 @@
 (defvar emacs|site-packages-directory
   (expand-file-name "site-lisp" user-emacs-directory))
 ;; Some configuration file in this directory
-(defvar emacs|etc-direcotry (expand-file-name "etc" user-emacs-directory))
+(defvar emacs|etc-direcotry
+  (expand-file-name "etc" user-emacs-directory))
 ;; All data and external executable file in this direcotry
 (defvar emacs|var-direcotry (expand-file-name "var" user-emacs-directory))
 ;; All configuration in this directory

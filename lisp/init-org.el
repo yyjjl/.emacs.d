@@ -178,7 +178,7 @@ With a prefix BELOW move point to lower block."
         org-fast-tag-selection-single-key 'expert
         org-export-kill-product-buffer-when-displayed t
         org-export-with-sub-superscripts t
-        org-tags-column 80
+        org-tags-column -65
         org-hide-emphasis-markers t
         org-hide-leading-stars t
         ;; org-startup-indented t
@@ -203,6 +203,18 @@ With a prefix BELOW move point to lower block."
                 (sequence "WAITING(w@/!)" "SOMEDAY(S)"
                           "PROJECT(P@)" "|" "CANCELLED(c@/!)"))))
   (setq org-imenu-depth 9)
+
+  (setq org-capture-templates
+        `(("w" "Working" checkitem
+           (file+headline ,(core|expand-var "org/tasks.org") "Working on [/]")
+           " [ ] Task %^{Description}\n  %a\n  %i\n  %?")
+          ("i" "Idea" entry
+           (file+datetree ,(core|expand-var "org/ideas.org"))
+           "* Idea %^{Description}  %^g\n  %U\n  %a\n  %i\n  %?")))
+
+  (defun org|open-capture ()
+    (interactive)
+    (counsel-find-file (core|expand-var "org/")))
 
   (unless (featurep 'company-auctex)
     (require 'company-auctex))
@@ -356,5 +368,8 @@ With a prefix BELOW move point to lower block."
     (org-remove-inline-images)
     (org-present-show-cursor)
     (org-present-read-write)))
+
+(global-set-key [C-f9] #'org-capture)
+(global-set-key [M-f9] #'org|open-capture)
 
 (provide 'init-org)

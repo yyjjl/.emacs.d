@@ -14,11 +14,13 @@ If buffer file is a remote file, host-address will be showed"
                     (if (buffer-narrowed-p)
                         (concat ">" num-str "<") num-str))
                 ""))
-         (real-id (concat (propertize "%b" 'face 'font-lock-keyword-face)
-                          (if (and host (cdr host))
-                              (propertize (concat "(" (cadr host) ")")
-                                          'face font-lock-string-face)
-                            ""))))
+         (real-id (concat
+                   (propertize (format-mode-line mode-line-buffer-identification)
+                    'face 'font-lock-keyword-face)
+                   (if (and host (cdr host))
+                       (propertize (concat "(" (cadr host) ")")
+                                   'face font-lock-string-face)
+                     ""))))
     (concat " " num " %[" real-id "%]")))
 
 (defun mode-line|buffer-major-mode ()

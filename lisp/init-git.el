@@ -9,6 +9,9 @@
 
 
 
+(with-eval-after-load 'magit
+  (setq magit-completing-read-function 'ivy-completing-read))
+
 ;; @see http://blog.binchen.org/posts/enhance-emacs-git-gutter-with-ivy-mode.html
 ;; {{ git gutter with ivy
 (defun git|reshape-gutter (gutter)

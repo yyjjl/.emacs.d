@@ -21,6 +21,7 @@
   (setq auto-save-list-file-prefix (core|expand-var "auto-save-list/.saves-"))
   (setq backup-directory-alist (list (cons "." (core|expand-var "backups/"))))
   (setq bookmark-default-file (core|expand-var "bookmarks.el"))
+  (setq calc-settings-file (core|expand-var "calc.el"))
   (setq cmake-ide-build-pool-dir (core|expand-var "cmake-projects/" t))
   (setq cmake-ide-rdm-executable (core|expand-var "rtags/bin/rdm"))
   (setq company-statistics-file (core|expand-var "company-statistics-cache.el"))

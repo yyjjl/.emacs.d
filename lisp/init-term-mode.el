@@ -84,9 +84,9 @@
     (unless slience
       (message "No parent buffer or it was killed !!!"))))
 
-(defun term|remote-shell ()
+(defun term|remote-shell (&optional force)
   "Switch to remote shell"
-  (let ((buf (or (term|last-buffer (buffer-list) 'shell-mode)
+  (let ((buf (or (and (not force) (term|last-buffer (buffer-list) 'shell-mode))
                  (get-buffer-create (term|get-buffer-name "*shell-%d*")))))
     (when buf
       (with-current-buffer buf
@@ -95,10 +95,11 @@
             (shell buf)))))
     buf))
 
-(defun term|local-shell (&optional dir)
+(defun term|local-shell (&optional dir force)
   (unless (featurep 'multi-term)
     (require 'multi-term nil t))
-  (let ((buf (term|last-buffer (buffer-list) 'term-mode dir)))
+  (let ((buf (and (not force)
+                  (term|last-buffer (buffer-list) 'term-mode dir))))
     (unless buf
       (if dir
           (let ((default-directory dir))
@@ -116,20 +117,20 @@
 (defun term|pop-shell (&optional arg)
   "Switch to the term buffer last used, or create a new one if
 none exists, or if the current buffer is already a term."
-  (interactive "P")
+  (interactive "p")
   (unless (featurep 'multi-term)
     (require 'multi-term))
   (if (memq major-mode '(eshell-mode term-mode shell-mode))
       (popwin:close-popup-window)
     (let ((buf (if (not (file-remote-p default-directory))
                    (funcall (if term|use-eshell-p
-                                #'term|local-eshell
-                              #'term|local-shell)
-                            (or (and (not arg) default-directory)
+                                #'term|local-eshell #'term|local-shell)
+                            (or (and (equal arg 4) default-directory)
                                 (and (bound-and-true-p cpp|cmake-ide-enabled)
                                      cmake-ide-build-dir)
-                                (ignore-errors (projectile-project-root))))
-                 (term|remote-shell)))
+                                (ignore-errors (projectile-project-root)))
+                            (equal arg 16))
+                 (term|remote-shell (equal arg 16))))
           (parent-buf (current-buffer)))
       (when buf
         (with-current-buffer buf

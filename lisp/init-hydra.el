@@ -69,7 +69,7 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
   ("C-x {" . hydra|resize-window/shrink-window-horizontally)
   ("C-x }" . hydra|resize-window/enlarge-window-horizontally)
   ("C-x ^" . hydra|resize-window/enlarge-window)
-  ("C-x _" . hydra|resize-window/shrink-window))
+  ("C-x -" . hydra|resize-window/shrink-window))
 
 (defhydra hydra|rectangle (:body-pre (rectangle-mark-mode 1)
                                      :color pink
@@ -158,21 +158,54 @@ _d_: subtree
 
 (global-set-key (kbd "C-c o") 'hydra|outline/body) ; by example
 
-(defhydra hydra|move ()
-  "move"
+(defvar current-forward-thing 'char)
+(defun current-forward-thing ()
+  current-forward-thing)
+(defun forward-thing* (&optional N)
+  (interactive "p")
+  (forward-thing current-forward-thing N))
+
+(defun backward-thing* (&optional N)
+  (interactive "p")
+  (forward-thing current-forward-thing (when (numberp N) (- 0 N))))
+
+(defhydra hydra|move (:body-pre (setq current-forward-thing 'char)
+                                :color pink
+                                :hint nil)
+  "
+Current thing: %s(current-forward-thing)
+[_p_/_n_] line     [_u_/_v_] scroll   [_b_/_f_] thing
+[_-_/_=_] sexp     [_a_/_e_] line begin/end
+[_(_/_)_] sentence [_[_/_]_] page     [_{_/_}_] paragraph
+[_SPC_/_x_] mark   [_l_] center     [,] change thing    [_q_] quit
+"
   ("q" nil :exit t)
   ("n" next-line)
   ("p" previous-line)
-  ("f" forward-char)
-  ("b" backward-char)
+  ("f" forward-thing*)
+  ("b" backward-thing*)
   ("a" beginning-of-line)
   ("e" move-end-of-line)
+  (", s" (setq current-forward-thing 'symbol))
+  (", c" (setq current-forward-thing 'char))
+  (", w" (setq current-forward-thing 'word))
+  (", d" (setq current-forward-thing 'defun))
+  (", l" (setq current-forward-thing 'list))
   ("v" scroll-up-command)
-  ;; Converting M-v to V here by analogy.
-  ("V" scroll-down-command)
+  ("u" scroll-down-command)
+  ("-" backward-sexp)
+  ("(" backward-sentence)
   ("[" backward-page)
+  ("{" backward-paragraph)
   ("]" forward-page)
+  ("}" forward-paragraph)
+  (")" forward-sentence)
+  ("=" forward-sexp)
+  ("SPC" set-mark-command)
+  ("x" exchange-point-and-mark)
   ("l" recenter-top-bottom))
+
+(global-set-key (kbd "C-.") #'hydra|move/body)
 (global-set-key (kbd "C-v") #'hydra|move/scroll-up-command)
 (global-set-key (kbd "M-v") #'hydra|move/scroll-down-command)
 

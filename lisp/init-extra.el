@@ -33,7 +33,7 @@
 ;; pulse
 (setq pulse-delay 0.05)
 ;; csv
-(setq csv-separators '("," ";" "|" " "))
+(setq csv-separators '(", " ";" "|" " "))
 
 (defalias 'perl-mode 'cperl-mode)
 
@@ -61,7 +61,7 @@
   (add-to-list 'company-backends 'company-restclient))
 
 (defconst extra|ascii-before-chinese
-  (rx (group-n 1 (in "a-zA-Z0-9!@#$%^&\\-+|)\\]}\\:;?><.,"))
+  (rx (group-n 1 (in "a-zA-Z0-9!@#$%^&\\-+|)\\]}\\:;?><.,/"))
       (group-n 2 (category chinese-two-byte))))
 (defconst extra|ascii-after-chinese
   (rx (group-n 1 (category chinese-two-byte))
@@ -127,13 +127,15 @@
 
 (with-eval-after-load 'emms
   (emms-all)
-  (emms-mode-line 0)
+  (emms-mode-line -1)
   (emms-playing-time-disable-display)
   ;; (setq emms-playing-time-display-format " (%s) ")
   (setq emms-mode-line-format "%s")
+  (setq emms-lyrics-display-p nil)
   (setq emms-source-file-default-directory "~/music/")
   (setq emms-player-list '(emms-player-mplayer))
 
+  (advice-add 'emms-lyrics-display-handler :around #'core|ignore-error)
   (add-hook 'emms-playlist-mode-hook #'emms-mark-mode))
 
 (when emacs|has-mpv-p

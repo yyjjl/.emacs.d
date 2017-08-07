@@ -186,11 +186,11 @@
                                     ;; :background "#455A64"
                                     :weight bold
                                     :overline t
-                                    ;; :height 1.3
+                                    :height 1.3
                                     ))))
      (org-level-2 ((class (:inherit outline-2
                                     ;; :background "#35575b"
-                                    ;; :height 1.2
+                                    :height 1.2
                                     ))))
      (org-level-3 ((class (:inherit outline-3 :height 1.1))))
      (org-level-4 ((class (:inherit outline-4))))

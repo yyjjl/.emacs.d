@@ -52,7 +52,6 @@ Emacs Lisp."
 (defun lisp|elisp-setup ()
   (lisp|common-setup)
   (flycheck-mode -1)
-  (define-key emacs-lisp-mode-map (kbd "C-c e") 'macrostep-expand)
 
   (setq company-backends (remove 'company-capf company-backends))
   (add-to-list 'company-backends 'company-elisp)
@@ -120,6 +119,11 @@ Emacs Lisp."
               (racket--get-namespace-symbols)
               :initial-input default
               :preselect default)))
+
+(with-eval-after-load 'elisp-mode
+  (define-key emacs-lisp-mode-map (kbd "C-c e") 'macrostep-expand))
+(with-eval-after-load 'lisp-interaction-mode
+  (define-key lisp-interaction-mode-map (kbd "C-c e") 'macrostep-expand))
 
 (defun lisp|transpose-sexp (n)
   (when (/= n 0)

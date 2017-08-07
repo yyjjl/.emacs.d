@@ -138,5 +138,8 @@ MAP (default `global-map')."
     (setq url-gateway-method 'socks)
     (message "Use socket proxy %s" socks-server)))
 
+(defun core|ignore-error (fn &rest args)
+  (ignore-errors (apply fn args)))
+
 
 (provide 'init-utils)

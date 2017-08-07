@@ -71,8 +71,7 @@
   (when emacs|use-fcitx-p
     (fcitx-aggressive-setup))
 
-  (winner-mode 1)
-  (message "Emacs setup time: %s" (emacs-init-time)))
+  (winner-mode 1))
 
 ;; Delete the current file
 (defun core|delete-this-file ()
