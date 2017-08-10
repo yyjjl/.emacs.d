@@ -1,3 +1,65 @@
+(defun main|semantic--create (tags depth &optional class result)
+  "Write the contents of TAGS to the current buffer."
+  (let ((class class)
+        (stylefn #'semantic-format-tag-summarize)
+        cur-type)
+    (dolist (tag tags)
+      (when (listp tag)
+        (case (setq cur-type (semantic-tag-class tag))
+          ((function variable type)
+           (let ((spaces (make-string (* depth 2) ?\s))
+                 (type-p (eq cur-type 'type)))
+             (unless (and (> depth 0) (not type-p))
+               (setq class nil))
+             (push (concat
+                    (if (and class (not type-p))
+                        (format "%s%s(%s) "
+                                spaces (if (> depth 0) "=> " "") class)
+                      spaces)
+                    ;; Save the tag for later
+                    (propertize (funcall stylefn tag nil t)
+                                'semantic-tag tag))
+                   result)
+             (when type-p
+               (setq class (car tag)))
+             ;; Recurse to children
+             (unless (eq cur-type 'function)
+               (setq result
+                     (main|semantic--create (semantic-tag-components tag)
+                                            (1+ depth)
+                                            class
+                                            result)))))
+          ;; Catch-all
+          (t
+           (push (propertize (funcall stylefn tag nil t) 'semantic-tag tag)
+                 result))))))
+  result)
+
+(defun counsel-semantic-or-imenu ()
+  "Jump to a semantic tag in the current buffer."
+  (interactive)
+  (if (semantic-active-p)
+      (progn
+        (when (semantic-parse-tree-needs-update-p)
+          (semantic-parse-tree-set-needs-update))
+        (ivy-read
+         "tag: " (nreverse (main|semantic--create (semantic-fetch-tags) 0))
+         :preselect (thing-at-point 'symbol)
+         :require-match t
+         :action
+         (lambda (candidate)
+           (let* ((pos (if (string-prefix-p " " candidate)
+                           (next-single-property-change 0
+                                                        'semantic-tag candidate
+                                                        (length candidate))
+                         0))
+                  (tag (get-text-property pos
+                                          'semantic-tag
+                                          candidate)))
+             (semantic-go-to-tag tag)))
+         :caller 'counsel-semantic-or-imenu))
+    (call-interactively #'counsel-imenu)))
+
 (defun counsel-kill-buffer (&optional arg)
   "Kill buffer with ivy backends."
   (interactive "P")
@@ -80,7 +142,7 @@ for a file to visit if current buffer is not visiting a file."
     ("l l" . counsel-load-library)
     ("l t" . counsel-load-theme)
     ("u" . counsel-unicode-char)
-    ("i" . counsel-imenu)
+    ("i" . counsel-semantic-or-imenu)
     ("l p" . counsel-list-processes)
     ("R" . counsel-linux-app)
     ("v" . counsel-set-variable)

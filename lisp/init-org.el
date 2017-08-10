@@ -160,6 +160,7 @@ With a prefix BELOW move point to lower block."
 
   ;; Various preferences
   (setq org-log-done t
+        org-use-speed-commands t
         org-completion-use-ido t
         org-edit-src-content-indentation 0
         org-edit-timestamp-down-means-later t

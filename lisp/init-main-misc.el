@@ -14,7 +14,8 @@
           try-expand-dabbrev-from-kill)))
 
 (with-eval-after-load 'projectile
-  (setq projectile-completion-system 'ivy))
+  (setq projectile-completion-system 'ivy)
+  (setq projectile-enable-caching t))
 
 (with-eval-after-load 'winner
   (global-set-key (kbd "C-c w [") 'winner-undo)
@@ -35,7 +36,7 @@
 (with-eval-after-load 'fcitx
   ;; init fcitx prefix keys
   (setq fcitx-use-dbus t)
-  (fcitx-prefix-keys-add "C-h" "M-g"))
+  (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c"))
 
 (defhook main|after-init (after-init-hook)
   (session-initialize)

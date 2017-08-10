@@ -121,11 +121,11 @@ none exists, or if the current buffer is already a term."
   (unless (featurep 'multi-term)
     (require 'multi-term))
   (if (memq major-mode '(eshell-mode term-mode shell-mode))
-      (popwin:close-popup-window)
+      (ignore-errors (popwin:close-popup-window))
     (let ((buf (if (not (file-remote-p default-directory))
                    (funcall (if term|use-eshell-p
                                 #'term|local-eshell #'term|local-shell)
-                            (or (and (equal arg 4) default-directory)
+                            (or (and (not (equal arg 4)) default-directory)
                                 (and (bound-and-true-p cpp|cmake-ide-enabled)
                                      cmake-ide-build-dir)
                                 (ignore-errors (projectile-project-root)))

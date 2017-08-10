@@ -54,7 +54,7 @@
      (header-line ((t (:forground "grey90" :background "#2d2d2d"))))
 
      (font-lock-builtin-face ((t (:foreground "#A6E22E"))))
-     (font-lock-comment-face ((t (:foreground "#75715E" :slant italic))))
+     (font-lock-comment-face ((t (:foreground "#465457" :slant italic))))
      (font-lock-comment-delimiter-face ((t (:foreground "#345678" :slant italic))))
      (font-lock-constant-face ((t (:foreground "#AE81FF"))))
      (font-lock-doc-face ((t (:foreground "#06DB74" :slant italic))))
