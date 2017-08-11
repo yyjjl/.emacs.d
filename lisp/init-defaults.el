@@ -23,7 +23,7 @@
               line-spacing 0.2
               mouse-yank-at-point t
               set-mark-command-repeat-pop t
-              tooltip-delay 1.5
+              tooltip-delay 1
               ;; bad idea, could accidentally edit others' code
               ;; require-final-newline t
               truncate-lines nil
@@ -75,16 +75,16 @@
 (transient-mark-mode t)
 (recentf-mode 1)
 (defvar core|recentf-enabled-p t)
-(setq recentf-keep '((lambda (fn)
-                       (and core|recentf-enabled-p
-                            (not (string-match-p
-                                  (concat "^" emacs|var-direcotry)
-                                  fn))
-                            ;; The order must be kept
-                            (or (file-remote-p fn)
-                                (file-readable-p fn))))))
+(defun core|recentf-ignore-p (fn)
+  (and core|recentf-enabled-p
+       ;; The order must be kept
+       (or (file-remote-p fn)
+           (file-readable-p fn))))
+(setq recentf-keep '(core|recentf-ignore-p))
 (setq recentf-max-saved-items 2048
-      recentf-exclude (list "/tmp/" "/ssh:" "/sudo:" emacs|var-direcotry))
+      recentf-exclude (list "/tmp/" "/ssh:" "/sudo:"
+                            emacs|var-direcotry
+                            (expand-file-name package-user-dir)))
 
 ;; `midnight-mode' purges buffers which haven't been displayed in 3 days
 (require 'midnight)
@@ -121,10 +121,7 @@
 
 ;; ANSI-escape coloring in compilation-mode
 (ignore-errors
-  (autoload 'xterm-color-filter "xterm-color")
-
   (setq compilation-environment '("TERM=xterm-256color"))
-  (setq xterm-color-preserve-properties t)
   (require 'ansi-color)
   (defhook core|colorize-compilation-buffer (compilation-filter-hook)
     (when (eq major-mode 'compilation-mode)
@@ -137,7 +134,6 @@
   (hs-minor-mode 1)
   (hl-line-mode 1)
   (when (< (buffer-size) core|large-buffer-size)
-    (linum-mode)
     ;; (highlight-indentation-current-column-mode 1)
     (highlight-indentation-mode 1))
   ;; show trailing spaces in a programming mode

@@ -29,32 +29,6 @@ Optional argument ARG is used to toggle narrow functions."
                (message "Use command `%s'" cmd)
                (funcall cmd))))))
 
-(defun comment-current-line (&optional arg)
-  "Comment current line."
-  (save-excursion
-    (beginning-of-line)
-    (set-mark-command nil)
-    (end-of-line)
-    (if arg
-        (call-interactively #'uncomment-region)
-      (call-interactively #'comment-region))))
-
-(defun comment-region-or-line ()
-  "If `mark-active' is non-nil, call `comment-region'. Otherwise
-call `comment-current-line'."
-  (interactive "*")
-  (if mark-active
-      (call-interactively 'comment-region)
-    (comment-current-line)))
-
-(defun uncomment-region-or-line ()
-    "If `mark-active' is non-nil, call
-`uncomment-region'. Otherwise call `comment-current-line' with argument t."
-  (interactive "*")
-  (if mark-active
-      (call-interactively 'uncomment-region)
-    (comment-current-line t)))
-
 (defun core|grab-regexp (regexp)
   "Grab strings matching REGEXP to list."
   (let ((s (buffer-string))
@@ -80,13 +54,10 @@ grab matched string and insert them into `kill-ring'"
     items))
 
 (define-keys
-  ("C-c c" . comment-region-or-line)
-  ("C-c u" . uncomment-region-or-line)
+  ("M-;" . evilnc-comment-or-uncomment-lines)
   ("C-x n n" . core|narrow-or-widen-dwim)
   ("C-x K" . core|kill-regexp)
 
-  ("M-z" . zzz-to-char)
-  ("M-Z" . zzz-up-to-char)
   ("C-=" . mc/mark-next-like-this)
   ("C--" . mc/mark-previous-like-this))
 

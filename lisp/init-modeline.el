@@ -122,6 +122,11 @@ and `buffer-file-coding-system'"
 ;; Setup `mode-line-format'
 (window-numbering-mode 1)
 (setq-default mode-line-format mode-line|default-format)
+(setq-default frame-title-format
+              '(:eval (let ((fn (buffer-file-name)))
+                        (if fn
+                            (abbreviate-file-name fn)
+                          (buffer-name)))))
 
 (require 'uniquify)
 

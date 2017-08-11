@@ -1,4 +1,4 @@
-;; kill the buffer when terminal is exited
+;; Kill the buffer when terminal is exited
 (defun term|wrap-sentinel (&optional _fn)
   (lexical-let ((fn _fn)
                 (kill-window-p (= 1 (length (window-list)))))
@@ -77,12 +77,11 @@
     name))
 
 (defvar-local term|parent-buffer nil)
-(defun term|switch-back (&optional slience)
-  (interactive "P")
+(defun term|switch-back ()
+  (interactive)
   (if (and term|parent-buffer (buffer-live-p term|parent-buffer))
       (pop-to-buffer term|parent-buffer)
-    (unless slience
-      (message "No parent buffer or it was killed !!!"))))
+    (message "No parent buffer or it was killed !!!")))
 
 (defun term|remote-shell (&optional force)
   "Switch to remote shell"
@@ -120,11 +119,11 @@ none exists, or if the current buffer is already a term."
   (interactive "p")
   (unless (featurep 'multi-term)
     (require 'multi-term))
-  (if (memq major-mode '(eshell-mode term-mode shell-mode))
-      (ignore-errors (popwin:close-popup-window))
+  (unless (memq major-mode '(eshell-mode term-mode shell-mode))
     (let ((buf (if (not (file-remote-p default-directory))
                    (funcall (if term|use-eshell-p
-                                #'term|local-eshell #'term|local-shell)
+                                #'term|local-eshell
+                              #'term|local-shell)
                             (or (and (not (equal arg 4)) default-directory)
                                 (and (bound-and-true-p cpp|cmake-ide-enabled)
                                      cmake-ide-build-dir)
@@ -134,11 +133,9 @@ none exists, or if the current buffer is already a term."
           (parent-buf (current-buffer)))
       (when buf
         (with-current-buffer buf
-          (local-set-key (kbd "C-c C-z") #'term|switch-back)
+          (local-set-key [f8] #'term|switch-back)
           (setq term|parent-buffer parent-buf))
-        (if (get-buffer-window buf :this)
-            (pop-to-buffer buf)
-          (popup-to-buffer buf nil 2.5 2))))))
+        (pop-to-buffer buf)))))
 
 (with-eval-after-load 'multi-term
   (add-hook 'term-mode-hook 'multi-term-keystroke-setup)

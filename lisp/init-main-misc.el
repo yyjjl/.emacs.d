@@ -62,7 +62,7 @@
   ;; Auto insert closing pair
   (electric-pair-mode 1)
   (electric-layout-mode 1)
-
+  (global-linum-mode 1)
   (global-page-break-lines-mode 1)
   ;; eldoc, show API doc in minibuffer echo area
   ;; enabled by default
@@ -163,14 +163,7 @@ Does not indent buffer, because it is used for a
 (defun core|show-messages-buffer ()
   "Show message buffer."
   (interactive)
-  (popup-to-buffer (get-buffer "*Messages*")))
-
-(defun core|show-dired-buffer ()
-  "Show message buffer."
-  (interactive)
-  (popup-to-buffer
-   (dired-noselect (or (ignore-errors (projectile-project-root))
-                       default-directory))))
+  (popup-to-buffer (get-buffer "*Messages*") nil 2.5))
 
 (defun core|current-font-face ()
   "Get the font face under cursor."
@@ -193,8 +186,7 @@ Does not indent buffer, because it is used for a
   ("M-s c" . aya-create)
   ("M-s y" . aya-expand)
 
-  ("C-x , m" . core|show-messages-buffer)
-  ("C-x , d" . core|show-dired-buffer)
+  ("C-x m" . core|show-messages-buffer)
   ("C-r" . isearch-backward-regexp)
   ("C-M-r" . isearch-backeard)
   ("C-x R" . core|rename-this-file-and-buffer)

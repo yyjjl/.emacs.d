@@ -51,8 +51,7 @@
   (semanticdb-save-all-db))
 
 (defun main|semantic-mode ()
-  (if (or (> (buffer-size) core|large-buffer-size)
-          (file-remote-p default-directory))
+  (if (file-remote-p default-directory)
       (semantic-mode -1)
     (semantic-mode 1)))
 

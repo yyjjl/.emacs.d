@@ -1,4 +1,5 @@
 (package|require 'eshell-prompt-extras)
+(package|require 'xterm-color)
 
 
 

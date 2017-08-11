@@ -37,7 +37,8 @@
           gnus-article-mode
           calendar-mode))
   (defun main|disable-linum-mode (fn &rest args)
-    (unless (memq major-mode main|linum-disabled-modes)
+    (unless (or (memq major-mode main|linum-disabled-modes)
+                (> (buffer-size) core|large-buffer-size))
       (apply fn args)))
   (advice-add 'linum-mode :around #'main|disable-linum-mode))
 

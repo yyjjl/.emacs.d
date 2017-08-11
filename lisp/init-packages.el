@@ -138,9 +138,9 @@ Archive with high priority will be used when install a package.")
 ;; Show information in header-line for `semantic-mode'
 ;; It's too slow, when file is large
 ;; (package|require 'stickyfunc-enhance)
-(package|require 'xterm-color)
 (package|require 'unicode-fonts)
 (package|require 'beginend)
+(package|require 'evil-nerd-commenter)
 
 (defhook package|after-init (after-init-hook)
   (setq package-selected-packages
