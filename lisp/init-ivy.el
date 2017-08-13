@@ -92,6 +92,9 @@ for a file to visit if current buffer is not visiting a file."
     (find-file (concat "/sudo:root@localhost:" buffer-file-name))))
 
 (with-eval-after-load 'ivy
+  (require 'ivy-hydra)
+  (setq ivy-dispatching-done-columns 3)
+
   (defun main|ivy--regex-fuzzy (str)
     "Remove space from STR"
     (ivy--regex-fuzzy (if (stringp str)
@@ -109,14 +112,9 @@ for a file to visit if current buffer is not visiting a file."
           (t . main|ivy--regex-fuzzy)))
   (setq ivy-initial-inputs-alist nil)
   (setq ivy-use-virtual-buffers t)
-
   (define-keys :map ivy-minibuffer-map
-    ("C-o" . ivy-immediate-done)
-    ("C-n" . ivy-next-line)
-    ("C-p" . ivy-previous-line)
-    ("C-b" . backward-char)
-    ("C-f" . forward-char)
-    ("C-SPC" . set-mark-command)))
+    ("C-j" . ivy-immediate-done)
+    ("C-M-j" . ivy-done)))
 
 (with-eval-after-load 'counsel
   (setq counsel-find-file-at-point t)
@@ -136,7 +134,9 @@ for a file to visit if current buffer is not visiting a file."
   (define-keys
     ("C-s" . counsel-grep-or-swiper)
     ("C-x C-f" . counsel-find-file)
-    ("C-x k" . counsel-kill-buffer))
+    ("C-x k" . counsel-kill-buffer)
+    ("C-c w -" . ivy-pop-view)
+    ("C-c w =" . ivy-push-view))
   (define-keys :prefix "C-c i"
     ("r" . ivy-resume)
     ("l l" . counsel-load-library)

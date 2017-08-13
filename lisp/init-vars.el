@@ -14,7 +14,7 @@
                                    ".git" ".cvs" ".svn" ".hg" "elpa"))
 ;; When buffer's size bigger than `core|large-buffer-size', it will
 ;; close some features to speed up emacs performance
-(defvar core|large-buffer-size (* 10 1024))
+(defvar core|large-buffer-size (* 100 1024))
 
 (with-no-warnings
   (setq abbrev-file-name (core|expand-var "abbrev.el"))

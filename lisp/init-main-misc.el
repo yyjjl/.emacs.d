@@ -5,6 +5,9 @@
                 '(idle-change save mode-enabled))
   (setq flycheck-mode-line-prefix ""))
 
+(with-eval-after-load 'session
+  (add-to-list 'session-globals-include 'ivy-views))
+
 (with-eval-after-load 'hippie-exp
   (setq hippie-expand-try-functions-list
         '(try-complete-file-name-partially
@@ -207,4 +210,5 @@ Does not indent buffer, because it is used for a
   ([f7] . core|create-scratch-buffer)
   ("C-<up>" . text-scale-increase)
   ("C-<down>" . text-scale-decrease))
+
 (provide 'init-main-misc)

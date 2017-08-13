@@ -70,6 +70,10 @@
 
 (setq-default initial-scratch-message
               (concat ";; Welcome to Emacs " (or user-login-name "") " !!!"))
+(setq-default initial-buffer-choice (core|expand-var "org/*note*"))
+;; Make scratch buffer un-killable
+(defhook core|unkillable-scratch-buffer (kill-buffer-query-functions)
+  (not (equal (buffer-name (current-buffer)) "*note*")))
 
 ;; recentf-mode
 (transient-mark-mode t)
@@ -79,7 +83,8 @@
   (and core|recentf-enabled-p
        ;; The order must be kept
        (or (file-remote-p fn)
-           (file-readable-p fn))))
+           (file-readable-p fn))
+       (file-writable-p fn)))
 (setq recentf-keep '(core|recentf-ignore-p))
 (setq recentf-max-saved-items 2048
       recentf-exclude (list "/tmp/" "/ssh:" "/sudo:"
@@ -107,14 +112,6 @@
         (outline-toggle-children)
       (funcall fn arg))))
 (advice-add 'indent-for-tab-command :around #'core|indent-for-tab)
-
-;; make scratch buffer un-killable
-(defhook core|unkillable-scratch-buffer (kill-buffer-query-functions)
-  (if (equal (buffer-name (current-buffer)) "*scratch*")
-      (progn
-        (delete-region (point-min) (point-max))
-        nil)
-    t))
 
 ;; turns on auto-fill-mode, don't use text-mode-hook
 (add-hook 'change-log-mode-hook 'turn-on-auto-fill)
@@ -146,13 +143,13 @@
 (defhook core|minibuffer-exit (minibuffer-exit-hook)
   (setq gc-cons-threshold emacs|gc-cons-threshold))
 
-;; tramp setup
+;; `tramp' setup
 (with-eval-after-load 'tramp
   (setq tramp-default-method "ssh")
   (setq backup-enable-predicate
         (lambda (name)
           (and (normal-backup-enable-predicate name)
-              (not (file-remote-p name 'method)))))
+               (not (file-remote-p name 'method)))))
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
   (setq tramp-chunksize 8192)
   (setq tramp-verbose 1)

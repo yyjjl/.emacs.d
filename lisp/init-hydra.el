@@ -101,28 +101,6 @@ _b_   _f_       [_q_]quit      [_y_]yank
   ("q" nil nil))
 (define-key global-map (kbd "C-x SPC") 'hydra|rectangle/body)
 
-(with-eval-after-load 'ivy
-  (defhydra hydra|ivy (:hint nil :color pink)
-    "
-^^^^^^          ^Actions^       ^Quit^
-^^^^^^--------------------------------------------
-^ ^ _p_ ^ ^     _SPC_ repeat     _c_ancel
-_<_ ^✜^ _>_     _q_uit
-^ ^ _n_ ^ ^
-"
-    ;; arrows
-    ("<" ivy-beginning-of-buffer)
-    ("n" ivy-next-line)
-    ("p" ivy-previous-line)
-    (">" ivy-end-of-buffer)
-    ;; actions
-    ("SPC" hydra-repeat)
-    ;; exit
-    ("q" keyboard-escape-quit :exit t)
-    ("c" nil))
-
-  (define-key ivy-minibuffer-map (kbd "C-j") 'hydra|ivy/body))
-
 (defhydra hydra|outline (:color pink :hint nil)
   "
 ^Hide^             ^Show^           ^Move

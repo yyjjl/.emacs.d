@@ -126,8 +126,8 @@ MAP (default `global-map')."
             (?\" (setq quoted-p (not quoted-p))))))
       (setq i (1+ i)))
     (not (or quoted-p prime-p (> count 0)))))
-(defvar socks-server '("Default server" "127.0.0.1" 1080 5))
 
+(defvar socks-server '("Default server" "127.0.0.1" 1080 5))
 (defun core|toggle-socket-proxy ()
   (interactive)
   (if (eq url-gateway-method 'socks)
