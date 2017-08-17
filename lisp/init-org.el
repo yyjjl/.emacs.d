@@ -149,15 +149,6 @@ With a prefix BELOW move point to lower block."
                                  (sh . t)
                                  (perl . t)
                                  (haskell . t)))
-  ;; No spell check for embedded snippets
-  ;; No spell check for property
-  ;; Please note flyspell only use ispell-word
-  (defun org|flyspell-verify (fn &rest args)
-    (and (apply fn args)
-         (not (org-in-src-block-p))
-         (not (org-at-property-p))))
-  (advice-add 'org-mode-flyspell-verify :around #'org|flyspell-verify)
-
   ;; Various preferences
   (setq org-log-done t
         org-use-speed-commands t
@@ -180,10 +171,12 @@ With a prefix BELOW move point to lower block."
         org-export-kill-product-buffer-when-displayed t
         org-export-with-sub-superscripts t
         org-tags-column -65
-        org-hide-emphasis-markers t
+        org-hide-emphasis-markers nil
         org-hide-leading-stars t
+        org-startup-folded 'showall
         ;; org-startup-indented t
-        ;; org-pretty-entities t
+        org-pretty-entities t
+        org-pretty-entities-include-sub-superscripts nil
         org-format-latex-options (plist-put org-format-latex-options :scale 1.5)
         org-highlight-latex-and-related '(latex)
         org-src-fontify-natively t)
@@ -205,18 +198,6 @@ With a prefix BELOW move point to lower block."
                           "PROJECT(P@)" "|" "CANCELLED(c@/!)"))))
   (setq org-imenu-depth 9)
 
-  (setq org-capture-templates
-        `(("w" "Working" checkitem
-           (file+headline ,(core|expand-var "org/tasks.org") "Working on [/]")
-           " [ ] Task %^{Description}\n  %a\n  %i\n  %?")
-          ("i" "Idea" entry
-           (file+datetree ,(core|expand-var "org/ideas.org"))
-           "* Idea %^{Description}  %^g\n  %U\n  %a\n  %i\n  %?")))
-
-  (defun org|open-capture ()
-    (interactive)
-    (counsel-find-file (core|expand-var "org/")))
-
   (unless (featurep 'company-auctex)
     (require 'company-auctex))
   (defun company-org-symbols (command &optional arg &rest ignored)
@@ -236,7 +217,6 @@ With a prefix BELOW move point to lower block."
     (add-to-list 'completion-at-point-functions
                  'pcomplete-completions-at-point)
     (add-to-list 'company-backends 'company-org-symbols)
-    (setq-local company-backends (remove 'company-dabbrev company-backends))
     ;; Display wrapped lines instead of truncated lines
     (setq truncate-lines nil)
     (setq word-wrap t))

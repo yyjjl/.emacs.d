@@ -29,8 +29,6 @@
 (put 'web-mode 'flyspell-mode-predicate 'web|flyspell-verify)
 
 (defhook web|setup (web-mode-hook)
-  (ignore-errors (spelling|enable))
-
   (add-to-list 'company-backends 'company-web-html)
   ;;     (add-to-list 'company-backends 'company-web-jade)
   ;;     (add-to-list 'company-backends 'company-web-slim)

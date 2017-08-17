@@ -13,8 +13,23 @@
     (message "You need install either aspell or hunspell for ispell")))
 
 (with-eval-after-load 'flyspell
-  (advice-add 'flyspell-post-command-hook :around #'core|ignore-error)
+  (defhook spelling|disable-on-the-fly (flyspell-mode-hook)
+    "Do not check spelling when typing."
+    (remove-hook 'post-command-hook #'flyspell-post-command-hook t)
+    (remove-hook 'pre-command-hook #'flyspell-pre-command-hook t)
+    (remove-hook 'after-change-functions #'flyspell-after-change-function t))
+
+  (setq flyspell-large-region 1)
+  (defun flyspell-dwim ()
+    "Check spelling manually."
+    (interactive)
+    (if (region-active-p)
+        (flyspell-region (region-beginning) (region-end))
+      (flyspell-region (line-beginning-position)
+                       (line-end-position))))
+
   (define-key flyspell-mode-map (kbd "C-.") nil)
+  (define-key flyspell-mode-map (kbd "C-;") #'flyspell-dwim)
   ;; Better performance
   (setq flyspell-issue-message-flag nil)
 
@@ -48,11 +63,8 @@
   (advice-add 'ispell-word :around #'spelling|set-extra-args)
   (advice-add 'flyspell-auto-correct-word :around #'spelling|set-extra-args))
 
-(defun spelling|enable ()
-  (when (bound-and-true-p ispell-program-name)
-    (flyspell-mode 1)))
-
-;; Add auto spell-checking in comments for all programming language modes
+;; Add auto spell-checking in comments and strings for all programming
+;; language modes
 (when (bound-and-true-p ispell-program-name)
   (add-hook 'prog-mode-hook 'flyspell-prog-mode)
   (add-hook 'text-mode-hook 'flyspell-mode))

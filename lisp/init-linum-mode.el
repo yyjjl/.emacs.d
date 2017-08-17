@@ -5,6 +5,8 @@
           dictionary-mode
           erc-mode
           org-mode
+          Custom-mode
+          messages-buffer-mode
           browse-kill-ring-mode
           etags-select-mode
           dired-mode

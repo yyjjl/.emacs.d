@@ -104,7 +104,7 @@ Archive with high priority will be used when install a package.")
 ;; Code completion framework
 (package|require 'company)
 (package|require 'company-statistics)
-(package|require 'flycheck " melpa-stable ")
+(package|require 'flycheck "melpa-stable")
 ;; Save session to disk
 (package|require 'session)
 ;; Improve `term-mode'

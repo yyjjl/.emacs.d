@@ -50,7 +50,7 @@
 ;; `yasnippet', `flycheck' ...
 (require 'init-main-misc)
 (require 'init-semantic)
-(require 'init-linum-mode)
+;; (require 'init-linum-mode)
 (require 'init-hs-minor-mode)
 ;; }}
 

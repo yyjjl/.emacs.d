@@ -30,7 +30,8 @@
               truncate-partial-width-windows nil
               ;; visible-bell has some issue
               visible-bell nil
-              speedbar-use-images nil)
+              speedbar-use-images nil
+              large-file-warning-threshold (* 512 1024 1024))
 
 (setq system-time-locale "C")
 (setq imenu-max-item-length 1024)

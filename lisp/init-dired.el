@@ -41,6 +41,9 @@ The app is chosen from your OS's preference."
               file-list))))))
 
 (with-eval-after-load 'dired
+  (defhook dired|setup (dired-mode-hook)
+    (dired-hide-details-mode 1))
+
   (setq dired-dwim-target t)
   ;; search file name only when focus is over file
   (setq dired-isearch-filenames 'dwim)

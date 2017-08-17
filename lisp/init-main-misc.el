@@ -65,10 +65,10 @@
   ;; Auto insert closing pair
   (electric-pair-mode 1)
   (electric-layout-mode 1)
-  (global-linum-mode 1)
+  ;; `linum-mode' is slow
+  ;; (global-linum-mode 1)
   (global-page-break-lines-mode 1)
-  ;; eldoc, show API doc in minibuffer echo area
-  ;; enabled by default
+  ;;`eldoc', show API doc in minibuffer echo area enabled by default
   ;; (global-eldoc-mode 1)
   ;; (global-whitespace-newline-mode 1)
 
@@ -185,6 +185,15 @@ Does not indent buffer, because it is used for a
       (kill-region (car bounds) (cdr bounds))
       (insert num))))
 
+(defun main|restore-files (&optional num)
+  (interactive "p")
+  (if recentf-mode
+      (let (buf)
+        (dolist (file (-take (or num 1) recentf-list))
+          (setq buf (find-file-noselect file)))
+        (switch-to-buffer buf))
+    (message "`recentf-mode' must be turned on !!!")))
+
 (define-keys
   ("M-s c" . aya-create)
   ("M-s y" . aya-expand)
@@ -194,9 +203,11 @@ Does not indent buffer, because it is used for a
   ("C-M-r" . isearch-backeard)
   ("C-x R" . core|rename-this-file-and-buffer)
   ("C-x D" . core|delete-this-file)
+  ("C-x C-d" . find-name-dired)
   ("C-x W" . core|copy-this-file-to-new-file)
   ("C-x f" . core|copy-file-name)
   ("C-x c" . core|cleanup-buffer-safe)
+  ("C-x ," . main|restore-files)
 
   ("C-c 4" . ispell-word)
   ("C-c q" . auto-fill-mode)

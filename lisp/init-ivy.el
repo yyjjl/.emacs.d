@@ -63,15 +63,16 @@
 (defun counsel-kill-buffer (&optional arg)
   "Kill buffer with ivy backends."
   (interactive "P")
-  (ivy-read (format  "Kill buffer (default %s) :" (buffer-name))
-            'internal-complete-buffer
-            :preselect (buffer-name (current-buffer))
-            :action (if arg
-                        (lambda () (let ((kill-buffer-hook nil))
-                                 (kill-buffer)))
-                      #'kill-buffer)
-            :keymap counsel-find-file-map
-            :caller 'counsel-kill-buffer))
+  (let ((ivy-use-virtual-buffers nil))
+    (ivy-read (format  "Kill buffer (default %s) :" (buffer-name))
+              'internal-complete-buffer
+              :preselect (buffer-name (current-buffer))
+              :action (if arg
+                          (lambda () (let ((kill-buffer-hook nil))
+                                   (kill-buffer)))
+                        #'kill-buffer)
+              :keymap counsel-find-file-map
+              :caller 'counsel-kill-buffer)))
 
 (defun counsel-sudo-edit (&optional arg)
   "Edit currently visited file as root.
@@ -95,21 +96,10 @@ for a file to visit if current buffer is not visiting a file."
   (require 'ivy-hydra)
   (setq ivy-dispatching-done-columns 3)
 
-  (defun main|ivy--regex-fuzzy (str)
-    "Remove space from STR"
-    (ivy--regex-fuzzy (if (stringp str)
-                          (replace-regexp-in-string " " "" str)
-                        str)))
-
   (setq ivy-count-format "(%d/%d) ")
   (setq ivy-re-builders-alist
-        '((swiper . ivy--regex-plus)
-          ;; fuzzy make ivy so slow
-          (counsel-unicode-char . ivy--regex-plus)
-          (counsel-imenu . ivy--regex-plus)
-          ;; fuzzy search doesn't perform well
-          (counsel-descbinds . ivy--regex-plus)
-          (t . main|ivy--regex-fuzzy)))
+        '(;; Use regex as default
+          (t . ivy--regex-plus)))
   (setq ivy-initial-inputs-alist nil)
   (setq ivy-use-virtual-buffers t)
   (define-keys :map ivy-minibuffer-map

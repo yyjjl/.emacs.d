@@ -7,7 +7,7 @@
 (defhook latex|setup (LaTeX-mode-hook)
   (company-auctex-init)
   (turn-off-auto-fill)
-  (setq company-backends (delete 'company-dabbrev company-backends))
+  ;; (setq company-backends (delete 'company-dabbrev company-backends))
   (LaTeX-math-mode 1)
   (unless (buffer-temporary-p)
     (turn-on-reftex)

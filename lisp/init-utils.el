@@ -141,5 +141,10 @@ MAP (default `global-map')."
 (defun core|ignore-error (fn &rest args)
   (ignore-errors (apply fn args)))
 
+(defun derived-mode-parents (mode)
+  (let (parents)
+    (while (setq mode (get mode 'derived-mode-parent))
+      (push mode parents))
+    parents))
 
 (provide 'init-utils)

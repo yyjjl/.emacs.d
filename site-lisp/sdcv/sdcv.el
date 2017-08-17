@@ -244,10 +244,9 @@ the beginning of the buffer."
 
   (ignore-errors
     (setq buffer-read-only t)
-    (hide-body)
     (goto-char (point-min))
     (forward-line 1)
-    (show-entry)))
+    (show-all)))
 
 (defun sdcv-mode-scroll-up-one-line ()
   (interactive)
@@ -326,25 +325,26 @@ characters are stripped.")
   (let ((process (get-process sdcv-process-name)))
     (when (null process)
       (with-current-buffer (get-buffer-create
-			    sdcv-process-buffer-name)
-	(erase-buffer)
-	(setq process (apply 'start-process
-			     sdcv-process-name
-			     sdcv-process-buffer-name
-			     sdcv-program-path
-			     (sdcv-generate-dictionary-argument)))
-	;; kill the initial prompt
-	(let ((i 0))
-	  (message "starting sdcv...")
-	  (while (and (not (sdcv-match-tail sdcv-word-prompts))
-		      (< i sdcv-wait-timeout))
-	    (sleep-for sdcv-wait-interval)
-	    (setq i (+ i sdcv-wait-interval)))
-	  (unless (< i sdcv-wait-timeout)
-	    ;; timeout
-	    (kill-process process)
-	    (error "ERROR: timeout waiting for sdcv"))
-	  (erase-buffer))))
+                            sdcv-process-buffer-name)
+        (erase-buffer)
+        (setq process (apply 'start-process
+                             sdcv-process-name
+                             sdcv-process-buffer-name
+                             sdcv-program-path
+                             (sdcv-generate-dictionary-argument)))
+        (set-process-query-on-exit-flag process nil)
+        ;; kill the initial prompt
+        (let ((i 0))
+          (message "starting sdcv...")
+          (while (and (not (sdcv-match-tail sdcv-word-prompts))
+                      (< i sdcv-wait-timeout))
+            (sleep-for sdcv-wait-interval)
+            (setq i (+ i sdcv-wait-interval)))
+          (unless (< i sdcv-wait-timeout)
+            ;; timeout
+            (kill-process process)
+            (error "ERROR: timeout waiting for sdcv"))
+          (erase-buffer))))
     process))
 
 (defun sdcv-buffer-tail (length)

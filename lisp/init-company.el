@@ -34,8 +34,9 @@
                                company-dabbrev))
   ;; company should be case sensitive
   (setq company-dabbrev-downcase nil)
-  (setq company-dabbrev-ignore-case nil)
-  (setq company-dabbrev-code-ignore-case nil)
+  (setq company-dabbrev-ignore-case t)
+  (setq company-dabbrev-code-ignore-case t)
+  (setq company-dabbrev-char-regexp "[0-9a-zA-Z-_]")
   (setq company-dabbrev-code-other-buffers t)
   (setq company-show-numbers t)
   (setq company-idle-delay 0.3)
