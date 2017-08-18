@@ -145,6 +145,7 @@ With a prefix BELOW move point to lower block."
                                '((ipython . t)
                                  (python . t)
                                  (emacs-lisp . t)
+                                 (dot . t)
                                  (js . t)
                                  (sh . t)
                                  (perl . t)
@@ -173,6 +174,7 @@ With a prefix BELOW move point to lower block."
         org-tags-column -65
         org-hide-emphasis-markers nil
         org-hide-leading-stars t
+        org-hide-block-startup t
         org-startup-folded 'showall
         ;; org-startup-indented t
         org-pretty-entities t
@@ -182,6 +184,7 @@ With a prefix BELOW move point to lower block."
         org-src-fontify-natively t)
 
   (add-to-list 'org-babel-tangle-lang-exts '("ipython" . "py"))
+  (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
 
   ;; Refile targets include this file and any file contributing to the
   ;; agenda - up to 5 levels deep

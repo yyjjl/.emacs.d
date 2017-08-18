@@ -107,6 +107,8 @@ for a file to visit if current buffer is not visiting a file."
     ("C-M-j" . ivy-done)))
 
 (with-eval-after-load 'counsel
+  (setq counsel-yank-pop-separator
+      "\n------------------------------------------------------------\n")
   (setq counsel-find-file-at-point t)
   (setq counsel-find-file-ignore-regexp
         (concat

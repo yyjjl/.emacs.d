@@ -1,12 +1,10 @@
-(package|require 'elpy)
+(package|require 'elpy "melpa-stable")
 (package|require 'py-isort)
 
 
 
 (defhook python|setup (python-mode-hook)
   (local-set-key (kbd "C-c b") 'elpy-autopep8-fix-code)
-  (local-set-key (kbd "C-c t t") 'python|pytest-file)
-  (local-set-key (kbd "C-c t d") 'python|pytest-directory)
   (local-set-key (kbd "C-c B") 'py-isort-buffer)
   (local-set-key (kbd "C-c M-d") 'python|generate-doc-at-point)
   ;; emacs 24.4 only
@@ -24,9 +22,8 @@
   (remap-keybindings "C-c C-r" "C-c r" elpy-mode-map)
   (setcar elpy-test-discover-runner-command "python3")
   (if python|has-ipython-p
-      (setq python-shell-interpreter "ipython"
-            python-shell-interpreter-args "--simple-prompt -i")
-    (setq python-shell-interpreter "python3"))
+      (elpy-use-ipython)
+    (elpy-use-cpython "python3"))
   (setq elpy-rpc-backend "jedi"
         elpy-rpc-python-command "python3"
         elpy-modules (delete 'elpy-module-flymake elpy-modules))
@@ -35,26 +32,6 @@
     ("C-c C-p" . nil)))
 
 
-;; Pytest tools
-
-(defvar python|pytest-executable "pytest")
-
-(defun python|pytest-run (&rest args)
-  (if python|has-pytest-p
-      (let ((pytest-buffer
-             (term|exec-program python|pytest-executable args)))
-        (pop-to-buffer pytest-buffer))
-    (message "'pytest' is not found !!!")))
-
-(defun python|pytest-file ()
-  (interactive)
-  (let ((file (completing-read "File name: " #'read-file-name-internal)))
-    (python|pytest-run file)))
-
-(defun python|pytest-directory ()
-  (interactive)
-  (let ((file (completing-read "Directory name: " #'read-file-name-internal)))
-    (python|pytest-run (file-name-directory file))))
 
 (defun python|generate-doc (params indent)
   (setq indent (concat "\n" indent))

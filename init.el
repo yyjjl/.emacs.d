@@ -2,7 +2,7 @@
   (require 'cl)
   (require 'cl-lib))
 
-(defvar emacs|gc-cons-threshold (* 100 1024 1024))
+(defvar emacs|gc-cons-threshold (* 1000 1024 1024))
 ;; Save `file-name-handler-alist' temporarily and set it to nil which
 ;; means on every .el and .elc file loaded during start up, it hasn't
 ;; to runs those regexps against the filename.

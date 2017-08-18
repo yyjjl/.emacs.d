@@ -10,6 +10,7 @@
 (package|require 'ivy-rtags "melpa-stable")
 (package|require 'cmake-mode)
 (package|require 'cmake-font-lock)
+(package|require 'modern-cpp-font-lock)
 
 
 
@@ -123,6 +124,8 @@
 
   (hide-ifdef-mode)
 
+  (modern-c++-font-lock-mode 1)
+
   (setq cc-search-directories '("."
                                 "/usr/include"
                                 "/usr/local/include/*"
@@ -133,7 +136,8 @@
       (setq-local flycheck-clang-language-standard "c++14")
     (setq flycheck-clang-language-standard nil))
 
-  (unless (file-remote-p default-directory)
+  (unless (or (file-remote-p default-directory)
+              (> (buffer-size) core|large-buffer-size))
     (when cpp|has-irony-p
       (add-to-list 'company-backends '(company-irony :with company-files))
       (add-to-list 'company-backends 'company-irony-c-headers)
