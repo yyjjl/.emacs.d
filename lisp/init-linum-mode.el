@@ -40,7 +40,7 @@
           calendar-mode))
   (defun main|disable-linum-mode (fn &rest args)
     (unless (or (memq major-mode main|linum-disabled-modes)
-                (> (buffer-size) core|large-buffer-size))
+                (> (buffer-size) main|large-buffer-size))
       (apply fn args)))
   (advice-add 'linum-mode :around #'main|disable-linum-mode))
 

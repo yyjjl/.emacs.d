@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: bgcolored-text
+# key: bgc
+# --
+{{{bgcolor(${1:blue},$2)}}}$0

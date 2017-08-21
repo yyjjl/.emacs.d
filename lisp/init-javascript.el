@@ -54,7 +54,7 @@ replaced with it."
 
 (defhook js2|setup (js2-mode-hook)
   (js2-imenu-extras-mode)
-  (setq mode-name "JS2")
+  (setq mode-name "Js2")
   (js2r-add-keybindings-with-prefix "C-c j")
   (js2-refactor-mode 1)
 

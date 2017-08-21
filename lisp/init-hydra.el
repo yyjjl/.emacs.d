@@ -99,7 +99,6 @@ _b_   _f_       [_q_]quit      [_y_]yank
   ("s" string-rectangle nil)
   ("k" kill-rectangle nil)
   ("q" nil nil))
-(define-key global-map (kbd "C-x SPC") 'hydra|rectangle/body)
 
 (defhydra hydra|outline (:color pink :hint nil)
   "
@@ -147,14 +146,15 @@ _d_: subtree
   (interactive "p")
   (forward-thing current-forward-thing (when (numberp N) (- 0 N))))
 
-(defhydra hydra|move (:body-pre (setq current-forward-thing 'char)
-                                :color pink
-                                :hint nil)
+
+(defhydra hydra|move (:pre (setq current-forward-thing 'char)
+                           :color pink
+                           :hint nil)
   "
 Current thing: %s(current-forward-thing)
 [_p_/_n_] line     [_u_/_v_] scroll   [_b_/_f_] thing
-[_-_/_=_] sexp     [_a_/_e_] line begin/end
-[_(_/_)_] sentence [_[_/_]_] page     [_{_/_}_] paragraph
+[_(_/_)_] sexp     [_a_/_e_] line begin/end
+[_[_/_]_] page     [_{_/_}_] paragraph
 [_SPC_/_x_] mark   [_l_] center     [,] change thing    [_q_] quit
 "
   ("q" nil :exit t)
@@ -171,14 +171,12 @@ Current thing: %s(current-forward-thing)
   (", l" (setq current-forward-thing 'list))
   ("v" scroll-up-command)
   ("u" scroll-down-command)
-  ("-" backward-sexp)
-  ("(" backward-sentence)
+  ("(" backward-sexp)
   ("[" backward-page)
   ("{" backward-paragraph)
   ("]" forward-page)
   ("}" forward-paragraph)
-  (")" forward-sentence)
-  ("=" forward-sexp)
+  (")" forward-sexp)
   ("SPC" set-mark-command)
   ("x" exchange-point-and-mark)
   ("l" recenter-top-bottom))

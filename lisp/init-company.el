@@ -22,16 +22,15 @@
   (company-statistics-mode 1)
   ;; make company-files a work before capf
   (setq-default company-backends
-                '(company-bbdb company-nxml company-css
-                               (company-files company-cmake)
-                               company-capf
-                               company-semantic
-                               (company-dabbrev-code
-                                company-gtags
-                                company-etags
-                                company-keywords)
-                               company-oddmuse
-                               company-dabbrev))
+                '(company-nxml
+                  company-css
+                  (company-files company-cmake)
+                  company-capf
+                  (company-dabbrev-code
+                   company-etags
+                   company-gtags
+                   company-keywords)
+                  company-dabbrev))
   ;; company should be case sensitive
   (setq company-dabbrev-downcase nil)
   (setq company-dabbrev-ignore-case t)
@@ -43,7 +42,7 @@
   (setq company-clang-insert-arguments nil)
   (setq company-require-match nil)
   (setq company-etags-ignore-case t)
-  (setq company-minimum-prefix-length 2)
+  (setq company-minimum-prefix-length 3)
   (setq company-tooltip-align-annotations t)
 
   (define-keys :map company-active-map

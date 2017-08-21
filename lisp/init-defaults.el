@@ -71,22 +71,22 @@
 
 (setq-default initial-scratch-message
               (concat ";; Welcome to Emacs " (or user-login-name "") " !!!"))
-(setq-default initial-buffer-choice (core|expand-var "org/*note*"))
+(setq-default initial-buffer-choice (main|expand-var "org/*note*"))
 ;; Make scratch buffer un-killable
-(defhook core|unkillable-scratch-buffer (kill-buffer-query-functions)
+(defhook main|unkillable-scratch-buffer (kill-buffer-query-functions)
   (not (equal (buffer-name (current-buffer)) "*note*")))
 
 ;; recentf-mode
 (transient-mark-mode t)
 (recentf-mode 1)
-(defvar core|recentf-enabled-p t)
-(defun core|recentf-ignore-p (fn)
-  (and core|recentf-enabled-p
+(defvar main|recentf-enabled-p t)
+(defun main|recentf-ignore-p (fn)
+  (and main|recentf-enabled-p
        ;; The order must be kept
        (or (file-remote-p fn)
            (file-readable-p fn))
        (file-writable-p fn)))
-(setq recentf-keep '(core|recentf-ignore-p))
+(setq recentf-keep '(main|recentf-ignore-p))
 (setq recentf-max-saved-items 2048
       recentf-exclude (list "/tmp/" "/ssh:" "/sudo:"
                             emacs|var-direcotry
@@ -101,18 +101,18 @@
           'comint-watch-for-password-prompt)
 
 ;; Display long lines in truncated style (end line with $)
-(defhook core|truncate-lines-setup (grep-mode-hook)
+(defhook main|truncate-lines-setup (grep-mode-hook)
   (toggle-truncate-lines 1))
 
 ;; tab to skip close pair
-(defun core|indent-for-tab (fn &optional arg)
+(defun main|indent-for-tab (fn &optional arg)
   (if (looking-at "`\\|\"\\|}\\|\\$")
       (forward-char 1)
     (if (save-excursion (forward-line 0)
                         (and outline-minor-mode (looking-at-p outline-regexp)))
         (outline-toggle-children)
       (funcall fn arg))))
-(advice-add 'indent-for-tab-command :around #'core|indent-for-tab)
+(advice-add 'indent-for-tab-command :around #'main|indent-for-tab)
 
 ;; turns on auto-fill-mode, don't use text-mode-hook
 (add-hook 'change-log-mode-hook 'turn-on-auto-fill)
@@ -121,27 +121,26 @@
 (ignore-errors
   (setq compilation-environment '("TERM=xterm-256color"))
   (require 'ansi-color)
-  (defhook core|colorize-compilation-buffer (compilation-filter-hook)
+  (defhook main|colorize-compilation-buffer (compilation-filter-hook)
     (when (eq major-mode 'compilation-mode)
       (ansi-color-apply-on-region compilation-filter-start (point-max)))))
 
 
 ;; Default prog-mode setup
-(defhook core|generic-prog-mode-setup (prog-mode-hook)
+(defhook main|generic-prog-mode-setup (prog-mode-hook)
   (main|semantic-mode)
   (hs-minor-mode 1)
-  (hl-line-mode 1)
-  (when (< (buffer-size) core|large-buffer-size)
+  (when (< (buffer-size) main|large-buffer-size)
     ;; (highlight-indentation-current-column-mode 1)
     (highlight-indentation-mode 1))
   ;; show trailing spaces in a programming mode
   (setq show-trailing-whitespace t))
 
-(defhook core|minibuffer-setup (minibuffer-setup-hook)
+(defhook main|minibuffer-setup (minibuffer-setup-hook)
   (local-set-key (kbd "C-k") 'kill-line)
   (setq gc-cons-threshold most-positive-fixnum))
 
-(defhook core|minibuffer-exit (minibuffer-exit-hook)
+(defhook main|minibuffer-exit (minibuffer-exit-hook)
   (setq gc-cons-threshold emacs|gc-cons-threshold))
 
 ;; `tramp' setup

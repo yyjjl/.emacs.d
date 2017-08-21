@@ -31,7 +31,7 @@
   (let ((dir (file-name-as-directory dir)))
     (dolist (file (directory-files dir))
       (unless (or (member file '("." ".."))
-                  (member file core|ignored-directories))
+                  (member file main|ignored-directories))
         (let ((full-file (expand-file-name file dir)))
           (condition-case err
               (if (and (file-directory-p full-file) recursive-p)

@@ -141,6 +141,28 @@ With a prefix BELOW move point to lower block."
 (setq org-export-backends '(ascii html latex beamer))
 (setq org-mouse-1-follows-link nil)
 (with-eval-after-load 'org
+
+  ;; Highlight `{{{color(<color>, <text>}}}' form
+  (font-lock-add-keywords
+   'org-mode
+   '(("{{{[ \n]*\\(bg\\)?color[ \n]*(\\([#0-9a-zA-Z]+\\)[ \n]*,\\([^,]+?\\))}}}"
+      (2 (progn
+           (put-text-property (match-beginning 2) (match-end 2)
+                              'display '((raise 0.5)))
+           font-lock-builtin-face)
+         t t)
+      (3 (let ((bg (match-string 1))
+               (color (match-string 2)))
+           (add-text-properties (match-beginning 0) (match-beginning 2)
+                                '(invisible org-link))
+           (add-text-properties (match-end 3) (match-end 0)
+                                '(invisible org-link))
+           (add-text-properties (- (match-beginning 3) 1) (match-beginning 3)
+                                '(invisible org-link))
+           (list (if (equal bg "bg") :background :foreground) color))
+         prepend t)))
+   'append)
+
   (org-babel-do-load-languages 'org-babel-load-languages
                                '((ipython . t)
                                  (python . t)
@@ -149,6 +171,7 @@ With a prefix BELOW move point to lower block."
                                  (js . t)
                                  (sh . t)
                                  (perl . t)
+                                 (latex . t)
                                  (haskell . t)))
   ;; Various preferences
   (setq org-log-done t
@@ -159,15 +182,13 @@ With a prefix BELOW move point to lower block."
         org-catch-invisible-edits 'smart
         ;; Number of empty lines needed to keep an empty line between
         ;; collapsed trees.
-        org-cycle-separator-lines 2     ; default = 2
-
+        org-cycle-separator-lines 2 ;; default = 2
         org-agenda-start-on-weekday nil
         org-agenda-inhibit-startup t       ;; ~50x speedup
         org-agenda-use-tag-inheritance nil ;; 3-4x speedup
         org-agenda-span 14
         org-agenda-include-diary t
         org-agenda-window-setup 'current-window
-
         org-fast-tag-selection-single-key 'expert
         org-export-kill-product-buffer-when-displayed t
         org-export-with-sub-superscripts t
@@ -175,7 +196,6 @@ With a prefix BELOW move point to lower block."
         org-hide-emphasis-markers nil
         org-hide-leading-stars t
         org-hide-block-startup t
-        org-startup-folded 'showall
         ;; org-startup-indented t
         org-pretty-entities t
         org-pretty-entities-include-sub-superscripts nil
@@ -214,7 +234,13 @@ With a prefix BELOW move point to lower block."
       (candidates (company-auctex-symbol-candidates arg))
       (annotation (company-auctex-symbol-annotation arg))))
 
+
   (defhook org|setup (org-mode-hook)
+    ;; Fix font-lock bug in `org-mode' 8.2.10
+    (let ((macros (assoc "{{{.+}}}" org-font-lock-keywords)))
+      (when macros
+        (setcar macros "{{{.+?}}}")))
+
     (flycheck-mode -1)
     (make-local-variable 'completion-at-point-functions)
     (add-to-list 'completion-at-point-functions

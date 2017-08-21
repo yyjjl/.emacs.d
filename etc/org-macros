@@ -1,0 +1,4 @@
+# -*-mode: org-*-
+
+#+macro: color @@html:<span style="color:$1;">$2</span>@@@@latex:\textcolor{$1}{$2}@@
+#+macro: bgcolor @@html:<span style="background-color:$1;">$2</span>@@@@latex:$2@@

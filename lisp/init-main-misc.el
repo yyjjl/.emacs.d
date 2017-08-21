@@ -20,10 +20,6 @@
   (setq projectile-completion-system 'ivy)
   (setq projectile-enable-caching t))
 
-(with-eval-after-load 'winner
-  (global-set-key (kbd "C-c w [") 'winner-undo)
-  (global-set-key (kbd "C-c w ]") 'winner-redo))
-
 (with-eval-after-load 'yasnippet
   (add-to-list 'auto-mode-alist '("\\.yasnippet\\'" . snippet-mode))
   (setq yas-prompt-functions '(yas-completing-prompt)))
@@ -59,15 +55,16 @@
   (global-subword-mode 1)
   (global-hi-lock-mode 1)
   (global-auto-revert-mode 1)
-  (column-number-mode 1)
+  (global-hl-line-mode 1)
+  (global-page-break-lines-mode 1)
 
+  (column-number-mode 1)
   (show-paren-mode 1)
   ;; Auto insert closing pair
   (electric-pair-mode 1)
   (electric-layout-mode 1)
   ;; `linum-mode' is slow
   ;; (global-linum-mode 1)
-  (global-page-break-lines-mode 1)
   ;;`eldoc', show API doc in minibuffer echo area enabled by default
   ;; (global-eldoc-mode 1)
   ;; (global-whitespace-newline-mode 1)
@@ -78,7 +75,7 @@
   (winner-mode 1))
 
 ;; Delete the current file
-(defun core|delete-this-file ()
+(defun main|delete-this-file ()
   "Delete the current file, and kill the buffer."
   (interactive)
   (or (buffer-file-name) (error "No file is currently being edited"))
@@ -87,7 +84,7 @@
     (delete-file (buffer-file-name))
     (kill-this-buffer)))
 
-(defun core|copy-this-file-to-new-file ()
+(defun main|copy-this-file-to-new-file ()
   "Copy current file to a new file without close original file."
   (interactive)
   (let* ((this (current-buffer))
@@ -105,7 +102,7 @@
         (switch-to-buffer buf)))))
 
 ;; Rename the current file
-(defun core|rename-this-file-and-buffer (new-name)
+(defun main|rename-this-file-and-buffer (new-name)
   "Renames both current buffer and file it's visiting to NEW-NAME."
   (interactive (list  (completing-read "New file name: "
                                        #'read-file-name-internal)))
@@ -121,25 +118,23 @@
         (set-visited-file-name new-name)
         (set-buffer-modified-p nil)))))
 
-(defun core|copy-file-name (&optional arg)
+(defun main|copy-file-name (&optional arg)
   "Copy current file name to king ring.
 If ARG = 0 copy the current directory.  If ARG > 0 copy the file
 name without directory.  If ARG < 0 copy the file name without
 directory and extension."
   (interactive "p")
   (let ((path (buffer-file-name)))
-    (if (not path)
-        (setq path default-directory)
-      (when arg
-        (cond ((= arg 0) (setq path (file-name-directory path)))
-              ((> arg 0) (setq path (file-name-nondirectory path)))
-              ((< arg 0) (setq path (file-name-base path))))))
+    (cond ((= arg 0) (setq path (buffer-file-name)))
+          ((= arg 4) (setq path default-directory))
+          ((= arg 16) (setq path (file-name-nondirectory path)))
+          ((< arg 0) (setq path (file-name-base path))))
     (if path
         (progn (message "Copy => %s" path)
                (kill-new path))
       (message "Nothing to do"))))
 
-(defun core|create-scratch-buffer ()
+(defun main|create-scratch-buffer ()
   "Create a new scratch buffer to work in.
 \(could be *scratch* - *scratchX*)."
   (interactive)
@@ -154,7 +149,7 @@ directory and extension."
     (switch-to-buffer (get-buffer-create bufname))
     (lisp-interaction-mode)))
 
-(defun core|cleanup-buffer-safe ()
+(defun main|cleanup-buffer-safe ()
   "Perform a bunch of safe operations on the whitespace content of a buffer.
 Does not indent buffer, because it is used for a
 `before-save-hook', and that might be bad."
@@ -163,19 +158,19 @@ Does not indent buffer, because it is used for a
   (delete-trailing-whitespace)
   (set-buffer-file-coding-system 'utf-8))
 
-(defun core|show-messages-buffer ()
+(defun main|show-messages-buffer ()
   "Show message buffer."
   (interactive)
   (popup-to-buffer (get-buffer "*Messages*") nil 2.5))
 
-(defun core|current-font-face ()
+(defun main|current-font-face ()
   "Get the font face under cursor."
   (interactive)
   (let ((rlt (format "%S" (get-text-property (point) 'face))))
     (kill-new rlt)
     (message "%s => yank ring" rlt)))
 
-(defun core|num-to-string ()
+(defun main|num-to-string ()
   "Convert number at point to string"
   (interactive)
   (let* ((bounds (bounds-of-thing-at-point 'sexp))
@@ -198,15 +193,15 @@ Does not indent buffer, because it is used for a
   ("M-s c" . aya-create)
   ("M-s y" . aya-expand)
 
-  ("C-x m" . core|show-messages-buffer)
+  ("C-x m" . main|show-messages-buffer)
   ("C-r" . isearch-backward-regexp)
   ("C-M-r" . isearch-backeard)
-  ("C-x R" . core|rename-this-file-and-buffer)
-  ("C-x D" . core|delete-this-file)
+  ("C-x R" . main|rename-this-file-and-buffer)
+  ("C-x D" . main|delete-this-file)
   ("C-x C-d" . find-name-dired)
-  ("C-x W" . core|copy-this-file-to-new-file)
-  ("C-x f" . core|copy-file-name)
-  ("C-x c" . core|cleanup-buffer-safe)
+  ("C-x W" . main|copy-this-file-to-new-file)
+  ("C-x f" . main|copy-file-name)
+  ("C-x c" . main|cleanup-buffer-safe)
   ("C-x ," . main|restore-files)
 
   ("C-c 4" . ispell-word)
@@ -218,8 +213,11 @@ Does not indent buffer, because it is used for a
   ("C-}" . main|company-yasnippet)
   ("<backtab>" . company-complete)
   ([f6] . main|toggle-company-ispell)
-  ([f7] . core|create-scratch-buffer)
+  ([f7] . main|create-scratch-buffer)
   ("C-<up>" . text-scale-increase)
-  ("C-<down>" . text-scale-decrease))
+  ("C-<down>" . text-scale-decrease)
+
+  ("C-c w [" . winner-undo)
+  ("C-c w ]" . winner-redo))
 
 (provide 'init-main-misc)

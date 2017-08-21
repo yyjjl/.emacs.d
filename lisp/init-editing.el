@@ -11,17 +11,17 @@
 
 
 
-(defvar core|narrow-dwim-alist
+(defvar main|narrow-dwim-alist
   '((org-mode org-narrow-to-subtree org-narrow-to-element)
     (latex-mode LaTeX-narrow-to-environment TeX-narrow-to-group)))
-(defun core|narrow-or-widen-dwim (&optional arg)
+(defun main|narrow-or-widen-dwim (&optional arg)
   "If the buffer is narrowed, it widens.
 Otherwise,it narrows to region, or Org subtree.
 Optional argument ARG is used to toggle narrow functions."
   (interactive "P")
   (cond ((buffer-narrowed-p) (widen))
         ((region-active-p) (narrow-to-region (region-beginning) (region-end)))
-        (t (let ((cmd (cdr (assoc major-mode core|narrow-dwim-alist))))
+        (t (let ((cmd (cdr (assoc major-mode main|narrow-dwim-alist))))
              (if cmd
                  (setq cmd (if arg (cadr cmd) (car cmd)))
                (setq cmd (if arg #'narrow-to-page #'narrow-to-defun)))
@@ -29,7 +29,7 @@ Optional argument ARG is used to toggle narrow functions."
                (message "Use command `%s'" cmd)
                (funcall cmd))))))
 
-(defun core|grab-regexp (regexp)
+(defun main|grab-regexp (regexp)
   "Grab strings matching REGEXP to list."
   (let ((s (buffer-string))
         (pos 0)
@@ -42,21 +42,21 @@ Optional argument ARG is used to toggle narrow functions."
     items))
 
 (autoload 'string-join "subr-x")
-(defun core|kill-regexp (regexp)
+(defun main|kill-regexp (regexp)
   "Find all strings matching REGEXP in current buffer.
 grab matched string and insert them into `kill-ring'"
   (interactive
    (let ((regexp (read-regexp "grep regex: ")))
      (list regexp)))
-  (let ((items (core|grab-regexp regexp)))
+  (let ((items (main|grab-regexp regexp)))
     (kill-new (string-join items "\n"))
     (message "matched strings => kill-ring")
     items))
 
 (define-keys
   ("M-;" . evilnc-comment-or-uncomment-lines)
-  ("C-x n n" . core|narrow-or-widen-dwim)
-  ("C-x K" . core|kill-regexp)
+  ("C-x n n" . main|narrow-or-widen-dwim)
+  ("C-x K" . main|kill-regexp)
 
   ("C-=" . mc/mark-next-like-this)
   ("C--" . mc/mark-previous-like-this))

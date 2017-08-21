@@ -18,7 +18,7 @@ Optional argument BODY is the function body."
 
 (defun read-file-as-string (filename)
   "Read file named FILENAME as string."
-  (let ((core|recentf-enabled-p nil))
+  (let ((main|recentf-enabled-p nil))
     (with-temp-buffer
       (insert-file-contents filename)
       (buffer-string))))
@@ -36,12 +36,12 @@ Optional argument BODY is the function body."
             (setq mode (get mode 'derived-mode-parent)))
           mode))))
 
-(defvar core|load-user-major-mode-hook t)
+(defvar main|load-user-major-mode-hook t)
 (defun buffer-temporary-p ()
   "If function `buffer-file-name' return nil or a temp file or
 HTML file converted from org file."
   (let ((filename (buffer-file-name)))
-    (or (not core|load-user-major-mode-hook)
+    (or (not main|load-user-major-mode-hook)
         (not filename)
         (string-match (concat "^" temporary-file-directory) filename))))
 
@@ -128,17 +128,17 @@ MAP (default `global-map')."
     (not (or quoted-p prime-p (> count 0)))))
 
 (defvar socks-server '("Default server" "127.0.0.1" 1080 5))
-(defun core|toggle-socket-proxy ()
+(defun main|toggle-socket-proxy ()
   (interactive)
   (if (eq url-gateway-method 'socks)
-      (let ((method (function-get #'core|toggle-socket-proxy 'method)))
+      (let ((method (function-get #'main|toggle-socket-proxy 'method)))
         (setq url-gateway-method (or method 'native))
         (message "Use method '%s" url-gateway-method))
-    (function-put #'core|toggle-socket-proxy 'method url-gateway-method)
+    (function-put #'main|toggle-socket-proxy 'method url-gateway-method)
     (setq url-gateway-method 'socks)
     (message "Use socket proxy %s" socks-server)))
 
-(defun core|ignore-error (fn &rest args)
+(defun main|ignore-error (fn &rest args)
   (ignore-errors (apply fn args)))
 
 (defun derived-mode-parents (mode)

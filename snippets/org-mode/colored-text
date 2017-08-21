@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: colored-text
+# key: col
+# --
+{{{color(${1:red},$2)}}}$0

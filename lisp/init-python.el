@@ -26,7 +26,8 @@
     (elpy-use-cpython "python3"))
   (setq elpy-rpc-backend "jedi"
         elpy-rpc-python-command "python3"
-        elpy-modules (delete 'elpy-module-flymake elpy-modules))
+        elpy-modules (delete 'elpy-module-flymake elpy-modules)
+        elpy-test-runner 'elpy-test-pytest-runner)
   (define-keys :map elpy-mode-map
     ("C-c C-n" . nil)
     ("C-c C-p" . nil)))

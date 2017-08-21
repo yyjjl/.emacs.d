@@ -42,18 +42,19 @@
          (popup-to-buffer (gdb-get-buffer-create ',type) no-select ,width-split))
        #',name)))
 
-(defun gud|gdb-pop-to-source-buffer ()
+(defun gud|pop-to-source-buffer ()
   (interactive)
-  (when (or gud-last-last-frame gdb-show-main)
-    (let ((buf (pop-to-buffer (if gud-last-last-frame
-                                  (gud-find-file (car gud-last-last-frame))
-                                (gud-find-file gdb-main-file)))))
-      (setq gdb-source-window (get-buffer-window buf)))))
+  (when gud-last-last-frame
+    (pop-to-buffer (gud-find-file (car gud-last-last-frame)))))
+
+(defun gud|display-comint-buffer ()
+  (interactive)
+  (pop-to-buffer gud-comint-buffer))
 
 (defvar gud|source-mode-map
   (define-keys :map (make-sparse-keymap)
     (", i" . (gud|gdb-display gdb-inferior-io))
-    (", g" . gdb-display-gdb-buffer)
+    (", g" . gud|display-comint-buffer)
     (", b" . (gud|gdb-display gdb-breakpoints-buffer))
     (", t" . (gud|gdb-display gdb-threads-buffer))
     (", r" . (gud|gdb-display gdb-registers-buffer))
@@ -129,16 +130,13 @@
   (add-hook 'gud-mode-hook
             (lambda ()
               (add-hook 'kill-buffer-hook #'gud|kill-overlay nil :local)
+              (local-set-key (kbd "C-c C-z") #'gud|pop-to-source-buffer)
               ;; `gud-print' need prompt can be modified
               ;; (setq comint-prompt-read-only t)
               )))
 
 (with-eval-after-load 'gdb-mi
   (setq gdb-show-main t)
-  (fset 'gdb-display-buffer
-        'display-buffer)
-  (add-hook 'gdb-mode-hook
-            (lambda ()
-              (local-set-key (kbd "C-c C-z") #'gud|gdb-pop-to-source-buffer))))
+  (fset 'gdb-display-buffer 'display-buffer))
 
 (provide 'init-gud)

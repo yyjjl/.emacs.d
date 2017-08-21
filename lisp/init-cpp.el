@@ -100,7 +100,6 @@
                                " "
                                (file-name-nondirectory filename) " -o "
                                (file-name-base filename)))))))
-  (when tags|has-ggtags-p (ggtags-mode 1))
   (when cpp|has-irony-p (irony-eldoc)))
 
 (defun cpp|compile ()
@@ -126,10 +125,10 @@
 
   (modern-c++-font-lock-mode 1)
 
-  (setq cc-search-directories '("."
-                                "/usr/include"
-                                "/usr/local/include/*"
-                                "../*/include"))
+  (when tags|has-ggtags-p
+    (ggtags-mode 1)
+    (setq completion-at-point-functions '(t)))
+
   ;; Make a #define be left-aligned
   (setq c-electric-pound-behavior '(alignleft))
   (if (derived-mode-p 'c++-mode)
@@ -137,11 +136,12 @@
     (setq flycheck-clang-language-standard nil))
 
   (unless (or (file-remote-p default-directory)
-              (> (buffer-size) core|large-buffer-size))
+              (bound-and-true-p cpp|setup-literally)
+              (> (buffer-size) main|large-buffer-size))
     (when cpp|has-irony-p
-      (add-to-list 'company-backends '(company-irony :with company-files))
-      (add-to-list 'company-backends 'company-irony-c-headers)
-
+      (add-to-list 'company-backends #'company-irony)
+      (add-to-list 'company-backends #'company-irony-c-headers)
+      (add-to-list 'company-backends #'company-files)
       (irony-mode 1))
     ;; Make sure rdm is running
     (when cpp|has-rtags-p
@@ -149,8 +149,6 @@
 
     (if (cmake-ide--locate-cmakelists)
         (progn
-          ;; From `cmake-ide--mode-hook'
-          (add-hook 'find-file-hook #'cmake-ide-maybe-run-cmake nil 'local)
           (setq-local cpp|cmake-ide-enabled t)
           (cpp|rtags-setup))
       (cpp|c++-normal-setup))))
@@ -214,8 +212,10 @@
   (setq rtags-completions-enabled nil
         rtags-autostart-diagnostics nil))
 
+(put 'cmake-ide-build-dir 'safe-local-variable #'stringp)
 (with-eval-after-load 'cc-mode
   (require 'cmake-ide)
+
   (rtags-enable-standard-keybindings)
   ;; C-c(3) r(114) make all Upper case to lower-case
   (let ((m (assoc 114 (assoc 3 c-mode-base-map))))

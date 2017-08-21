@@ -25,7 +25,7 @@
 (defun lisp|common-setup ()
   "Enable features useful in any Lisp mode."
   (rainbow-delimiters-mode 1)
-  (unless (> (buffer-size) core|large-buffer-size)
+  (unless (> (buffer-size) main|large-buffer-size)
     (prettify-symbols-mode 1))
   (lispy-mode 1)
   (local-set-key (kbd "M-,") 'xref-pop-marker-stack))

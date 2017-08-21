@@ -23,8 +23,9 @@
 (package|require 'graphviz-dot-mode)
 ;; Move buffers between windows
 (package|require 'buffer-move)
-(package|require 'zeal-at-point)
 (package|require 'figlet)
+(package|require 'zeal-at-point)
+(package|require 'skeletor)
 
 
 
@@ -38,7 +39,7 @@
 (defalias 'perl-mode 'cperl-mode)
 
 (with-eval-after-load 'grep
-  (dolist (v core|ignored-directories)
+  (dolist (v main|ignored-directories)
     (add-to-list 'grep-find-ignored-directories v)))
 
 ;; Zeal at point
@@ -111,6 +112,16 @@
   (setcdr (assoc 'tab-mark whitespace-display-mappings)
           '(9 [8594] [92 9])))
 
+(with-eval-after-load 'skeletor
+  (setq skeletor-completing-read-function 'ivy-completing-read)
+
+  (skeletor-define-template "cpp-cmake"
+    :title "C++ Project (CMake)"
+    :default-license "^gpl"
+    :after-creation (lambda (dir) (skeletor-async-shell-command "mkdir build"))))
+(global-set-key (kbd "C-c p n") 'skeletor-create-project)
+(global-set-key (kbd "C-c p N") 'skeletor-create-project-at)
+
 ;; `calc' setup
 (with-eval-after-load 'calc
   (add-to-list 'calc-language-alist '(org-mode . latex)))
@@ -135,7 +146,7 @@
   (setq emms-source-file-default-directory "~/music/")
   (setq emms-player-list '(emms-player-mplayer))
 
-  (advice-add 'emms-lyrics-display-handler :around #'core|ignore-error)
+  (advice-add 'emms-lyrics-display-handler :around #'main|ignore-error)
   (add-hook 'emms-playlist-mode-hook #'emms-mark-mode))
 
 (when emacs|has-mpv-p

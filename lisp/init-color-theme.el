@@ -1,11 +1,11 @@
 (require 'color-theme)
 (require 'color-theme-molokai)
 
-(defun core|disable-themes-first (&rest args)
+(defun main|disable-themes-first (&rest args)
   ;; Diable all themes
   (dolist (i custom-enabled-themes)
     (disable-theme i)))
-(advice-add 'load-theme :before #'core|disable-themes-first)
+(advice-add 'load-theme :before #'main|disable-themes-first)
 
 ;; Load molokai theme
 (color-theme-molokai)
