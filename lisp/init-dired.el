@@ -49,6 +49,7 @@ The app is chosen from your OS's preference."
   (setq dired-isearch-filenames 'dwim)
   (setq dired-recursive-copies 'always)
   (setq dired-recursive-deletes 'always)
+  (setq wdired-allow-to-change-permissions t)
 
   (define-key dired-mode-map ")" 'dired-omit-mode)
   (define-key dired-mode-map "E" 'dired|open-externally)

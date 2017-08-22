@@ -10,13 +10,38 @@
 ;; Load molokai theme
 (color-theme-molokai)
 
-;; Set font family and font size
-(add-to-list 'default-frame-alist `(font . ,emacs|default-font-name))
 (when (or window-system (daemonp))
   (run-with-idle-timer 1 nil #'unicode-fonts-setup))
 
 ;; This line must be after color-theme-molokai! Don't know why.
 (setq color-theme-illegal-faces
       "^\\(w3-\\|dropdown-\\|info-\\|linum\\|yas-\\|font-lock-\\)")
+
+(require 'uniquify)
+
+(setq uniquify-buffer-name-style 'reverse)
+(setq uniquify-separator " • ")
+(setq uniquify-after-kill-buffer-p t)
+(setq uniquify-ignore-buffers-re "^\\*")
+
+(when (fboundp 'define-fringe-bitmap)
+  (define-fringe-bitmap 'right-curly-arrow
+    [#b11111111
+     #b11111111
+     #b00000011
+     #b00000011
+     #b00000011
+     #b00000011
+     #b00000011
+     #b00000011])
+  (define-fringe-bitmap 'left-curly-arrow
+    [#b11000000
+     #b11000000
+     #b11000000
+     #b11000000
+     #b11000000
+     #b11000000
+     #b11111111
+     #b11111111]))
 
 (provide 'init-color-theme)

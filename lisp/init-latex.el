@@ -9,6 +9,9 @@
   (turn-off-auto-fill)
   ;; (setq company-backends (delete 'company-dabbrev company-backends))
   (LaTeX-math-mode 1)
+
+  (orgtbl-mode 1)
+
   (unless (buffer-temporary-p)
     (turn-on-reftex)
     (TeX-source-correlate-mode 1)
@@ -92,6 +95,7 @@
     ("d" . TeX-fold-dwim) ("C-o")
     ("P" . TeX-fold-paragraph) ("C-p")
     ("R" . TeX-fold-region) ("C-r"))
+  (define-key LaTeX-mode-map (kbd "C-c t") org-table-extra-map)
   (define-keys :map LaTeX-mode-map
     ("}" . latex|skip-close-pair)
     (")" . latex|skip-close-pair)

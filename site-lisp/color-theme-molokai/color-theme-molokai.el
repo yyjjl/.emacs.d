@@ -40,18 +40,20 @@
      (minibuffer-prompt ((t (:foreground "#AE81EF"))))
 
      (mode-line ((t (:foreground
-                     "#F8F8F2" :background "#2d2d2d"
-                     :box (:line-width 5 :color "#2d2d2d")))))
+                     "#F8F8F2" :background "#2D2D2D"
+                     :box (:line-width 5 :color "#2D2D2D")))))
      (mode-line-buffer-id ((t (:background "#000000" :weight semi-bold))))
      (mode-line-inactive ((t (:foreground
-                              "#BCBCBC" :background "#1b1d1e"
-                              :box (:line-width 5 :color "#1b1d1e")))))
+                              "#BCBCBC" :background "#1B1D1E"
+                              :box (:line-width 5 :color "#1B1D1E")))))
+     (mode-line-numbering-face ((t (:box (:line-width 5 :color "black")
+                                         :background "black"))))
      (mode-line-highlight ((t (:background "black"
                                            :box (:line-width 5 :color "black")))))
      (mode-line-mousable ((t (:foreground "#BCBCBC" :background "#000000"))))
      (mode-line-mousable-minor-mode
       ((t (:foreground "#BCBCBC" :background "#000000"))))
-     (header-line ((t (:forground "grey90" :background "#2d2d2d"))))
+     (header-line ((t (:forground "grey90" :background "#2D2D2D"))))
 
      (font-lock-builtin-face ((t (:foreground "#A6E22E"))))
      (font-lock-comment-face ((t (:foreground "grey" :slant italic))))
@@ -118,14 +120,14 @@
       ((t (:foreground "#000000" :background "#FD971F"))))
      (show-paren-mismatch
       ((t (:foreground "#960050" :background "#1E0010"))))
-     (widget-inactive-face ((t (:background "#ff0000"))))
+     (widget-inactive-face ((t (:background "#FF0000"))))
      (woman-addition ((t (:foreground "#AE81FF"))))
      (woman-bold ((t (:foreground "#F92672"))))
      (woman-italic ((t (:foreground "#A6E22E"))))
      (woman-unknown ((t (:foreground "#66D9EF"))))
 
      ;; Rainbow-delimiters
-     (rainbow-delimiters-depth-1-face ((t (:foreground "#e91e63"))))
+     (rainbow-delimiters-depth-1-face ((t (:foreground "#E91E63"))))
      (rainbow-delimiters-depth-2-face ((t (:foreground "#2196F3"))))
      (rainbow-delimiters-depth-3-face ((t (:foreground "#EF6C00"))))
      (rainbow-delimiters-depth-4-face ((t (:foreground "#B388FF"))))
@@ -138,9 +140,9 @@
       ((t (:foreground "#F8F8F2" :background "#EF6C00"))))
      ;; Company autocomplete
 
-     (company-scrollbar-bg ((t (:background "#3f4346"))))
+     (company-scrollbar-bg ((t (:background "#3F4346"))))
      (company-scrollbar-fg ((t (:background "#333638"))))
-     (company-tooltip ((t (:inherit default :weight bold  :background "#1c1f26"))))
+     (company-tooltip ((t (:inherit default :weight bold  :background "#1C1F26"))))
      (company-tooltip-annotation ((t (:weight normal :foreground "orange"))))
      (company-tooltip-annotation-selection
       ((t (:weight normal :foreground "red"))))
@@ -148,48 +150,48 @@
       ((t (:inherit font-lock-constant-face :underline t))))
      (company-tooltip-selection ((t (:inherit font-lock-keyword-face
                                               :weight bold
-                                              :background "#4b5053"))))
+                                              :background "#4B5053"))))
 
      (regex-tool-matched-face ((t (:foreground nil :background nil
                                                :inherit match))))
-     (eldoc-highlight-function-argument ((t (:foreground "#86dc2f"
+     (eldoc-highlight-function-argument ((t (:foreground "#86DC2F"
                                                          :weight bold))))
      (hl-sexp-face ((t (:background "gray5"))))
      (hl-line ((t (:background "gray5"))))
-     (org-block ((t (:foreground "#8bc34a" :background "#1c1f26"))))
-     (org-block-background ((t (:background "#1c1f26"))))
-     (org-code ((t (:foreground "#8bc34a" :background "#1c1f26"))))
-     (org-column ((t (:background "#37474f"))))
+     (org-block ((t (:foreground "#8BC34A" :background "#1C1F26"))))
+     (org-block-background ((t (:background "#1C1F26"))))
+     (org-code ((t (:foreground "#8BC34A" :background "#1C1F26"))))
+     (org-column ((t (:background "#37474F"))))
      (org-column-title ((t (:inherit org-column :weight bold :underline t))))
-     (org-date ((t (:foreground "#80cbc4" :underline t))))
-     (org-document-info ((t (:foreground "#81d4fa" :height 1.35))))
-     (org-document-info-keyword ((t (:foreground "#8bc34a" :height 1.35))))
+     (org-date ((t (:foreground "#80CBC4" :underline t))))
+     (org-document-info ((t (:foreground "#81D4FA" :height 1.35))))
+     (org-document-info-keyword ((t (:foreground "#8BC34A" :height 1.35))))
      (org-document-title ((t (:weight bold :height 1.35 :foreground "purple4"))))
-     (org-done ((t (:foreground "#8bc34a" :bold t :background "#1b5e20"))))
-     (org-ellipsis ((t (:foreground "#81d4df"))))
-     (org-meta-line ((t (:foreground "#9f8766"))))
-     (org-footnote ((t (:foreground "#4dd0e1"))))
-     (org-formula ((t (:foreground "#f36c60"))))
-     (org-link ((t (:foreground "#b39ddb" :underline t))))
-     (org-scheduled ((t (:foreground "#8bc34a"))))
-     (org-scheduled-previously ((t (:foreground "#ff9800"))))
-     (org-scheduled-today ((t (:foreground "#8bc34a"))))
-     (org-special-keyword ((t (:foreground "#b0bec5"))))
-     (org-table ((t (:foreground "#e3f2fd" :background "#1c1f26"))))
-     (org-todo ((t (:foreground "#ffab91" :bold t :background "#dd2c00"))))
-     (org-upcoming-deadline ((t (:foreground "#ff9800"))))
-     (org-warning ((t (:weight bold :foreground "#f36c60"))))
-     (org-block-begin-line ((t (:foreground "#b3e5fc" :background "#1e2930"))))
-     (org-block-end-line ((t (:foreground "#b3e5fc" :background "#1e2930"))))
+     (org-done ((t (:foreground "#8BC34A" :bold t :background "#1B5E20"))))
+     (org-ellipsis ((t (:foreground "#81D4DF"))))
+     (org-meta-line ((t (:foreground "#9F8766"))))
+     (org-footnote ((t (:foreground "#4DD0E1"))))
+     (org-formula ((t (:foreground "#F36C60"))))
+     (org-link ((t (:foreground "#B39DDB" :underline t))))
+     (org-scheduled ((t (:foreground "#8BC34A"))))
+     (org-scheduled-previously ((t (:foreground "#FF9800"))))
+     (org-scheduled-today ((t (:foreground "#8BC34A"))))
+     (org-special-keyword ((t (:foreground "#B0BEC5"))))
+     (org-table ((t (:foreground "#E3F2FD" :background "#1C1F26"))))
+     (org-todo ((t (:foreground "#FFAB91" :bold t :background "#DD2C00"))))
+     (org-upcoming-deadline ((t (:foreground "#FF9800"))))
+     (org-warning ((t (:weight bold :foreground "#F36C60"))))
+     (org-block-begin-line ((t (:foreground "#B3E5FC" :background "#1E2930"))))
+     (org-block-end-line ((t (:foreground "#B3E5FC" :background "#1E2930"))))
 
      (org-level-1 ((class (:inherit outline-1
-                                    ;; :background "#455A64"
+                                    :background "grey20"
                                     :weight bold
                                     :overline t
                                     ;; :height 1.3
                                     ))))
      (org-level-2 ((class (:inherit outline-2
-                                    ;; :background "#35575b"
+                                    :background "grey20"
                                     ;; :height 1.2
                                     ))))
      (org-level-3 ((class (:inherit outline-3 :height 1.1))))
@@ -202,16 +204,16 @@
 
      (window-numbering-face ((t (:foreground "DeepPink" :weight bold))))
 
-     (popup-enu-selection-face ((t (:background "#5e5079"
-                                                :foreground "#b2b2b2"))))
-     (popup-face ((t (:background "#34323e" :foreground "#9a9aba"))))
+     (popup-enu-selection-face ((t (:background "#5E5079"
+                                                :foreground "#B2B2B2"))))
+     (popup-face ((t (:background "#34323E" :foreground "#9A9ABA"))))
      (popup-isearch-match ((t (:inherit match))))
-     (popup-menu-face ((t (:background "#34323e" :foreground "#9a9aba"))))
+     (popup-menu-face ((t (:background "#34323E" :foreground "#9A9ABA"))))
      (popup-menu-mouse-face ((t (:inherit highlight))))
      (popup-scroll-bar-background-face ((t (:background "#212026"))))
-     (popup-scroll-bar-foreground-face ((t (:background "#5d4d7a"))))
+     (popup-scroll-bar-foreground-face ((t (:background "#5D4D7A"))))
      (popup-tip-face
-      ((t (:background "#5e5079" :foreground "#b2b2b2"
+      ((t (:background "#5E5079" :foreground "#B2B2B2"
                        :bold nil :italic nil :underline nil))))
 
      (web-mode-builtin-face ((t (:inherit font-lock-builtin-face))))
@@ -229,34 +231,34 @@
      (web-mode-type-face ((t (:inherit font-lock-type-face))))
      (web-mode-warning-face ((t (:inherit font-lock-warning-face))))
 
-     (whitespace-empty ((t (:background nil :foreground "#9f8766"))))
-     (whitespace-indentation ((t (:background nil :foreground "#dc752f"))))
-     (whitespace-line ((t (:background nil :foreground "#c56ec3"))))
-     (whitespace-newline ((t (:background nil :foreground "#c56ec3"))))
-     (whitespace-space ((t (:background nil :foreground "#5d4d7a"))))
-     (whitespace-space-after-tab ((t (:background nil :foreground "#9f8766"))))
-     (whitespace-space-before-tab ((t (:background nil :foreground "#9f8766"))))
+     (whitespace-empty ((t (:background nil :foreground "#9F8766"))))
+     (whitespace-indentation ((t (:background nil :foreground "#DC752F"))))
+     (whitespace-line ((t (:background nil :foreground "#C56EC3"))))
+     (whitespace-newline ((t (:background nil :foreground "#C56EC3"))))
+     (whitespace-space ((t (:background nil :foreground "#5D4D7A"))))
+     (whitespace-space-after-tab ((t (:background nil :foreground "#9F8766"))))
+     (whitespace-space-before-tab ((t (:background nil :foreground "#9F8766"))))
      (whitespace-tab ((t (:background nil))))
-     (whitespace-trailing ((t (:background "#dc752f"))))
+     (whitespace-trailing ((t (:background "#DC752F"))))
 
 ;;;;; flycheck
      (flycheck-error
       ((((supports :underline (:style line)))
-        (:underline (:style line :color "#e0211d")))
-       (t (:background "#e0211d" :weight bold :underline t))))
-     (flycheck-error-list-checker-name ((t (:foreground "#4f97d7"))))
-     (flycheck-fringe-error ((t (:foreground "#e0211d" :weight bold))))
-     (flycheck-fringe-info ((t (:foreground "#4f97d7" :weight bold))))
-     (flycheck-fringe-warning ((t (:foreground "#dc752f" :weight bold))))
+        (:underline (:style line :color "#E0211D")))
+       (t (:background "#E0211D" :weight bold :underline t))))
+     (flycheck-error-list-checker-name ((t (:foreground "#4F97D7"))))
+     (flycheck-fringe-error ((t (:foreground "#E0211D" :weight bold))))
+     (flycheck-fringe-info ((t (:foreground "#4F97D7" :weight bold))))
+     (flycheck-fringe-warning ((t (:foreground "#DC752F" :weight bold))))
      (flycheck-running ((t (:weight normal :foreground "Green"))))
      (flycheck-info
       ((((supports :underline (:style line)))
-        (:underline (:style line :color "#4f97d7")))
-       (t (:background "#4f97d7" :weight bold :underline t))))
+        (:underline (:style line :color "#4F97D7")))
+       (t (:background "#4F97D7" :weight bold :underline t))))
      (flycheck-warning
       ((((supports :underline (:style line)))
-        (:underline (:style line :color "#dc752f")))
-       (t (:background "#dc752f" :weight bold :underline t))))
+        (:underline (:style line :color "#DC752F")))
+       (t (:background "#DC752F" :weight bold :underline t))))
 
      (diredp-dir-heading ((((background dark))
                            (:inherit font-lock-keyword-face))))

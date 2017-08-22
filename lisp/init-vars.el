@@ -17,10 +17,12 @@
 (defvar main|large-buffer-size (* 1024 1024))
 
 (with-no-warnings
+  (setq TeX-auto-global (main|expand-var "auctex/"))
   (setq abbrev-file-name (main|expand-var "abbrev.el"))
   (setq auto-save-list-file-prefix (main|expand-var "auto-save-list/.saves-"))
   (setq backup-directory-alist (list (cons "." (main|expand-var "backups/"))))
   (setq bookmark-default-file (main|expand-var "bookmarks.el"))
+  (setq bmkp-bmenu-state-file (main|expand-var "bmkp-state.el"))
   (setq calc-settings-file (main|expand-var "calc.el"))
   (setq cmake-ide-build-pool-dir (main|expand-var "cmake-projects/" t))
   (setq cmake-ide-rdm-executable (main|expand-var "rtags/bin/rdm"))
@@ -50,7 +52,6 @@
   (setq smex-save-file (main|expand-var "smex-items.el"))
   (setq srecode-map-save-file (main|expand-var "srecode-map.el"))
   (setq tramp-persistency-file-name (main|expand-var "tramp.el"))
-  (setq TeX-auto-global (main|expand-var "auctex/"))
   (setq url-configuration-directory (main|expand-var "url/")))
 
 (provide 'init-vars)

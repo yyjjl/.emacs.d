@@ -2,7 +2,7 @@
   (require 'cl)
   (require 'cl-lib))
 
-(defvar emacs|gc-cons-threshold (* 1000 1024 1024))
+(defvar emacs|gc-cons-threshold (* 100 1024 1024))
 ;; Save `file-name-handler-alist' temporarily and set it to nil which
 ;; means on every .el and .elc file loaded during start up, it hasn't
 ;; to runs those regexps against the filename.
@@ -11,14 +11,13 @@
 (defvar emacs|site-packages-directory
   (expand-file-name "site-lisp" user-emacs-directory))
 ;; Some configuration file in this directory
-(defvar emacs|etc-direcotry
-  (expand-file-name "etc" user-emacs-directory))
+(defvar emacs|etc-direcotry (expand-file-name "etc" user-emacs-directory))
 ;; All data and external executable file in this direcotry
 (defvar emacs|var-direcotry (expand-file-name "var" user-emacs-directory))
 ;; All configuration in this directory
 (defvar emacs|config-directory (expand-file-name "lisp" user-emacs-directory))
-;; Font size and family seeting
-(defvar emacs|default-font-name "Ubuntu Mono-13")
+;; Font size and family setting
+(defvar emacs|default-font-name nil)
 
 (setq file-name-handler-alist nil)
 ;; Don't GC during startup to save time
@@ -32,22 +31,26 @@
 ;; Some important tool functions
 (require 'init-utils)
 
-;; Set some important variables
 ;; Load all packages
 ;; (package-initialize)
 (require 'init-packages)
+
+;; Set some important variables
 (require 'init-vars)
-(load-file (core|expand-var "init-env-vars.el"))
+;; Set envrionment variables
+(load-file (main|expand-var "init-env-vars.el"))
+;; Set `auto-mode-alist'
 (require 'init-auto-mode)
+;; Set default options
 (require 'init-defaults)
 ;; Setup emacs outlooking
 (require 'init-color-theme)
 (require 'init-modeline)
+
 (require 'init-ivy)
 (require 'init-company)
 (require 'init-hydra)
 (require 'init-term-mode)
-;; `yasnippet', `flycheck' ...
 (require 'init-main-misc)
 (require 'init-semantic)
 ;; (require 'init-linum-mode)
@@ -67,8 +70,9 @@
 (if git|has-git-p
     (require 'init-git))
 
-(if (or spelling|has-aspell-p
-        spelling|has-hunspell-p)
+(if (and spelling|enabled-p
+         (or spelling|has-aspell-p
+             spelling|has-hunspell-p))
     (require 'init-spelling))
 
 (if tags|has-ggtags-p
@@ -108,7 +112,7 @@
   (load-file (expand-file-name "private.el" user-emacs-directory)))
 (ignore-errors (load-file custom-file))
 
-;; restore `file-name-handler-alist'
+;; Restore `file-name-handler-alist'
 (setq file-name-handler-alist emacs|file-name-handler-alist)
 
 ;; Don't disable narrowing commands

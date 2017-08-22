@@ -1,6 +1,7 @@
 ;; IPython notebook feature in `org-mode'
 (package|require 'ob-ipython)
 (package|require 'org-present)
+(package|require 'org-bullets)
 ;; Export colorful src block in `org-mode'
 (package|require 'htmlize)
 (package|require 'company-auctex)
@@ -135,11 +136,21 @@ With a prefix BELOW move point to lower block."
     ;; Display/update images in the buffer after I evaluate
     (org-display-inline-images t)))
 
+(setq org-bullets-bullet-list '("#"))
 ;; Do not load extra modules
 (setq org-modules '(org-info))
 ;; Do not load extra backends
 (setq org-export-backends '(ascii html latex beamer))
 (setq org-mouse-1-follows-link nil)
+(defvar org-table-extra-map
+  (define-keys :map (make-sparse-keymap)
+    ("t" . orgtbl-insert-radio-table)
+    ("c" . org-table-create)
+    ("I" . org-table-import)
+    ("e" . org-table-export)
+    ("d" . org-table-delete-column)
+    ("i" . org-table-insert-column)
+    ("r" . org-table-show-reference)))
 (with-eval-after-load 'org
 
   ;; Highlight `{{{color(<color>, <text>}}}' form
@@ -241,6 +252,8 @@ With a prefix BELOW move point to lower block."
       (when macros
         (setcar macros "{{{.+?}}}")))
 
+    (org-bullets-mode 1)
+
     (flycheck-mode -1)
     (make-local-variable 'completion-at-point-functions)
     (add-to-list 'completion-at-point-functions
@@ -255,6 +268,7 @@ With a prefix BELOW move point to lower block."
       (local-set-key (kbd "C-c h") #'ob-ipython-inspect))
     (flycheck-mode -1))
 
+  (define-key org-mode-map (kbd "C-c t") org-table-extra-map)
   (define-keys :map org-mode-map
     ("C-c h" . ob-ipython-inspect)
     ("C-c c i" . org-clock-in)
@@ -273,8 +287,7 @@ With a prefix BELOW move point to lower block."
                 (org-publish-current-file))))
     ([f10] . org-publish)
     ([f5] . org-present)
-    ("C-c t" . org-todo)
-    ("C-c C-t" . nil)))
+    ("C-c C-t" . org-todo)))
 
 (with-eval-after-load 'org-clock
   ;; Change task state to STARTED when clocking in

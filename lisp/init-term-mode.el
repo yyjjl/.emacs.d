@@ -48,12 +48,6 @@
       (set-process-sentinel proc
                             (term|wrap-sentinel (process-sentinel proc))))))
 
-;; For zsh ys theme
-;; (defvar term|zsh-prompt-regexp '("^#.*?in \\(.*?\\) \\(on\\|\\[\\)" 1))
-;; (defhook term|term-setup (term-mode-hook)
-;;   (dirtrack-mode 1)
-;;   (setq dirtrack-list term|zsh-prompt-regexp))
-
 (defhook term|utf8-setup (term-exec-hook)
   (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
 

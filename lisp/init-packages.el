@@ -100,7 +100,6 @@ Archive with high priority will be used when install a package.")
 ;; Core packages
 ;; ----------------------------------------
 (package|require 'yasnippet)
-(package|require 'auto-yasnippet)
 ;; Code completion framework
 (package|require 'company)
 (package|require 'company-statistics)
@@ -140,8 +139,9 @@ Archive with high priority will be used when install a package.")
 ;; It's too slow, when file is large
 ;; (package|require 'stickyfunc-enhance)
 (package|require 'unicode-fonts)
-(package|require 'beginend)
 (package|require 'evil-nerd-commenter)
+(package|require 'with-editor)
+(package|require 'bookmark+)
 
 (defhook package|after-init (after-init-hook)
   (setq package-selected-packages

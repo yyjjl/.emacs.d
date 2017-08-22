@@ -32,10 +32,32 @@
 (with-eval-after-load 'popwin
   (global-set-key (kbd "C-z") popwin:keymap))
 
+;; `tramp' setup
+(with-eval-after-load 'tramp
+  (setq tramp-default-method "ssh")
+  (setq backup-enable-predicate
+        (lambda (name)
+          (and (normal-backup-enable-predicate name)
+               (not (file-remote-p name 'method)))))
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+  (setq tramp-chunksize 8192)
+  (setq tramp-verbose 1)
+  ;; @see https://github.com/syl20bnr/spacemacs/issues/1921
+  (setq tramp-ssh-controlmaster-options
+        "-o ControlMaster=auto -o ControlPath='tramp.%%C' -o ControlPersist=no"))
+
 (with-eval-after-load 'fcitx
   ;; init fcitx prefix keys
   (setq fcitx-use-dbus t)
   (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c"))
+
+(autoload 'with-editor-export-editor "with-editor" nil nil)
+(defhook main|shell-setup (shell-mode-hook eshell-mode-hook term-exec-hook)
+  (with-editor-export-editor)
+  (case major-mode
+    (shell-mode (comint-clear-buffer))
+    (term-mode (insert "clear")
+               (term-send-input))))
 
 (defhook main|after-init (after-init-hook)
   (session-initialize)
@@ -49,7 +71,6 @@
   ;; enable popwin-mode
   (popwin-mode 1)
   ;; global-modes
-  (beginend-setup-all)
   (global-company-mode 1)
   (global-flycheck-mode 1)
   (global-subword-mode 1)
@@ -190,9 +211,6 @@ Does not indent buffer, because it is used for a
     (message "`recentf-mode' must be turned on !!!")))
 
 (define-keys
-  ("M-s c" . aya-create)
-  ("M-s y" . aya-expand)
-
   ("C-x m" . main|show-messages-buffer)
   ("C-r" . isearch-backward-regexp)
   ("C-M-r" . isearch-backeard)

@@ -39,6 +39,9 @@
 (var spelling|has-hunspell-p
      :value (executable-find "hunspell")
      :doc "Use for spellcheck")
+(var spelling|enabled-p
+     :value nil
+     :doc "Wheter to use spellcheck")
 
 ;; ----------------------------------------
 ;;* C/C++

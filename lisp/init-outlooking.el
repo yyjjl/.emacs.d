@@ -13,6 +13,9 @@
   (menu-bar-mode -1))
 ;; Do not show mode-line until setup finished
 (setq-default mode-line-format nil)
+;; Set font family and font size
+(when emacs|default-font-name
+  (add-to-list 'default-frame-alist `(font . ,emacs|default-font-name)))
 
 (custom-set-faces
  '(default ((t (:foreground "#F8F8F2" :background "#1B1D1E"))))

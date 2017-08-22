@@ -152,7 +152,6 @@ for a file to visit if current buffer is not visiting a file."
     ("L" . counsel-locate)
     ("d b" . counsel-descbinds)
     ("d f" . counsel-describe-face)
-    ("b" . counsel-bookmark)
     ("f s" . counsel-find-symbol)
     ("f f" . counsel-faces)
     ("c w" . counsel-colors-web)

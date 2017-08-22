@@ -2,21 +2,10 @@
 (package|require 'company-restclient)
 (when emacs|has-mpv-p
   (package|require 'emms))
-(package|require 'sql-indent)
-;; yaml format
-(package|require 'yaml-mode)
-;; haml format
-(package|require 'haml-mode)
 (package|require 'markdown-mode)
 (package|require 'crontab-mode)
 (package|require 'csv-mode)
-(package|require 'sass-mode)
-(package|require 'less-css-mode)
-(package|require 'scss-mode)
 (package|require 'glsl-mode)
-(package|require 'lua-mode)
-(package|require 'go-mode)
-(package|require 'groovy-mode)
 (package|require 'php-mode)
 (package|require 'gnuplot-mode)
 (package|require 'csharp-mode)

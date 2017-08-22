@@ -1,47 +1,19 @@
-(with-eval-after-load 'linum
+(package|require 'nlinum)
+
+
+
+(with-eval-after-load 'nlinum
   (setq main|linum-disabled-modes
-        '(eshell-mode
-          shell-mode
-          dictionary-mode
-          erc-mode
-          org-mode
-          Custom-mode
-          messages-buffer-mode
-          browse-kill-ring-mode
-          etags-select-mode
-          dired-mode
-          help-mode
-          text-mode
-          fundamental-mode
-          jabber-roster-mode
-          jabber-chat-mode
-          inferior-js-mode
-          inferior-python-mode
-          inferior-scheme-mode
-          twittering-mode
-          compilation-mode
-          weibo-timeline-mode
-          woman-mode
-          Info-mode
-          calc-mode
-          calc-trail-mode
-          comint-mode
-          gnus-group-mode
-          inf-ruby-mode
-          gud-mode
-          vc-git-log-edit-mode
-          log-edit-mode
-          term-mode
-          w3m-mode
-          eww-mode
-          speedbar-mode
-          gnus-summary-mode
-          gnus-article-mode
-          calendar-mode))
+        '(org-mode))
+
   (defun main|disable-linum-mode (fn &rest args)
-    (unless (or (memq major-mode main|linum-disabled-modes)
-                (> (buffer-size) main|large-buffer-size))
+    (when (and (not (memq major-mode main|linum-disabled-modes))
+               (or (derived-mode-p 'prog-mode)
+                   (derived-mode-p 'text-mode))
+               (< (buffer-size) main|large-buffer-size))
       (apply fn args)))
-  (advice-add 'linum-mode :around #'main|disable-linum-mode))
+  (advice-add 'nlinum-mode :around #'main|disable-linum-mode))
+;; Slow down emacs
+(global-nlinum-mode 1)
 
 (provide 'init-linum-mode)

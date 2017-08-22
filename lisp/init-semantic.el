@@ -14,7 +14,8 @@
           ;; Error occurs a lot
           ;; global-semantic-decoration-mode
           global-semantic-highlight-func-mode
-          global-semantic-mru-bookmark-mode)))
+          ;; global-semantic-mru-bookmark-mode
+          )))
 
 (with-eval-after-load "db-file"
   (when (< emacs-major-version 25)

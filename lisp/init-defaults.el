@@ -1,13 +1,13 @@
 (setq history-delete-duplicates t)
-;; use 'y' instead of 'yes'
+;; Use 'y' instead of 'yes'
 (fset 'yes-or-no-p 'y-or-n-p)
-;; no automatic new line when scrolling down at buffer bottom
+;; No automatic new line when scrolling down at buffer bottom
 (setq next-line-add-newlines nil)
 
-;; time management
-(setq display-time-24hr-format t)
-(setq display-time-day-and-date t)
-;; (display-time-mode)
+;; Time management
+(setq display-time-24hr-format t
+      display-time-day-and-date t)
+(display-time-mode 1)
 
 (setq-default buffers-menu-max-size 30
               case-fold-search t
@@ -24,18 +24,18 @@
               mouse-yank-at-point t
               set-mark-command-repeat-pop t
               tooltip-delay 1
-              ;; bad idea, could accidentally edit others' code
+              ;; Bad idea, could accidentally edit others' code
               ;; require-final-newline t
               truncate-lines nil
               truncate-partial-width-windows nil
-              ;; visible-bell has some issue
+              ;; Visible-bell has some issue
               visible-bell nil
               speedbar-use-images nil
               large-file-warning-threshold (* 512 1024 1024))
 
 (setq system-time-locale "C")
 (setq imenu-max-item-length 1024)
-;; key value
+;; key-value
 (setq minibuffer-prompt-properties
       '(read-only t
         point-entered minibuffer-avoid-prompt
@@ -44,10 +44,10 @@
 (setq global-auto-revert-non-file-buffers t
       auto-revert-verbose nil)
 
-;; don't clobber symbol links
+;; Don't clobber symbol links
 (setq backup-by-coping t
       delete-old-versions t
-      ;; use versioned backups
+      ;; Use versioned backups
       version-control t
       kept-new-versions 6
       kept-old-versions 2)
@@ -56,14 +56,14 @@
 (setq select-enable-clipboard t
       select-enable-primary t)
 
-;; Donot make backups of files, not safe
+;; Don't make backups of files, not safe
 (setq vc-make-backup-files nil)
 
-;; automatic save place of each buffer
+;; Automatic save place of each buffer
 (setq-default save-place t)
 (require 'saveplace)
 
-;; history
+;; History
 (setq history-length 100)
 ;; Use `session' can do this
 ;; (setq savehist-additional-variables '(search-ring regexp-search-ring))
@@ -76,8 +76,10 @@
 (defhook main|unkillable-scratch-buffer (kill-buffer-query-functions)
   (not (equal (buffer-name (current-buffer)) "*note*")))
 
-;; recentf-mode
-(transient-mark-mode t)
+(transient-mark-mode 1)
+(delete-selection-mode 1)
+
+;; `recentf-mode'
 (recentf-mode 1)
 (defvar main|recentf-enabled-p t)
 (defun main|recentf-ignore-p (fn)
@@ -104,9 +106,9 @@
 (defhook main|truncate-lines-setup (grep-mode-hook)
   (toggle-truncate-lines 1))
 
-;; tab to skip close pair
+;; Tab to skip close pair
 (defun main|indent-for-tab (fn &optional arg)
-  (if (looking-at "`\\|\"\\|}\\|\\$")
+  (if (looking-at "`\\|'\\|\"\\|}\\|)\\|\\$")
       (forward-char 1)
     (if (save-excursion (forward-line 0)
                         (and outline-minor-mode (looking-at-p outline-regexp)))
@@ -114,7 +116,7 @@
       (funcall fn arg))))
 (advice-add 'indent-for-tab-command :around #'main|indent-for-tab)
 
-;; turns on auto-fill-mode, don't use text-mode-hook
+;; Turns on `auto-fill-mode', don't use `text-mode-hook'
 (add-hook 'change-log-mode-hook 'turn-on-auto-fill)
 
 ;; ANSI-escape coloring in compilation-mode
@@ -142,19 +144,5 @@
 
 (defhook main|minibuffer-exit (minibuffer-exit-hook)
   (setq gc-cons-threshold emacs|gc-cons-threshold))
-
-;; `tramp' setup
-(with-eval-after-load 'tramp
-  (setq tramp-default-method "ssh")
-  (setq backup-enable-predicate
-        (lambda (name)
-          (and (normal-backup-enable-predicate name)
-               (not (file-remote-p name 'method)))))
-  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
-  (setq tramp-chunksize 8192)
-  (setq tramp-verbose 1)
-  ;; @see https://github.com/syl20bnr/spacemacs/issues/1921
-  (setq tramp-ssh-controlmaster-options
-        "-o ControlMaster=auto -o ControlPath='tramp.%%C' -o ControlPersist=no"))
 
 (provide 'init-defaults)
