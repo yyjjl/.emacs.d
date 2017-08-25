@@ -7,7 +7,7 @@
 ;; Time management
 (setq display-time-24hr-format t
       display-time-day-and-date t)
-(display-time-mode 1)
+;; (display-time-mode 1)
 
 (setq-default buffers-menu-max-size 30
               case-fold-search t
@@ -108,7 +108,7 @@
 
 ;; Tab to skip close pair
 (defun main|indent-for-tab (fn &optional arg)
-  (if (looking-at "`\\|'\\|\"\\|}\\|)\\|\\$")
+  (if (looking-at "`\\|'\\|\"\\|}\\|\\$")
       (forward-char 1)
     (if (save-excursion (forward-line 0)
                         (and outline-minor-mode (looking-at-p outline-regexp)))

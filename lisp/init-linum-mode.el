@@ -5,6 +5,7 @@
 (with-eval-after-load 'nlinum
   (setq main|linum-disabled-modes
         '(org-mode))
+  (setq nlinum-highlight-current-line t)
 
   (defun main|disable-linum-mode (fn &rest args)
     (when (and (not (memq major-mode main|linum-disabled-modes))

@@ -129,7 +129,8 @@
   (emms-all)
   (emms-mode-line -1)
   (emms-playing-time-disable-display)
-  ;; (setq emms-playing-time-display-format " (%s) ")
+  (emms-lyrics-disable)
+
   (setq emms-mode-line-format "%s")
   (setq emms-lyrics-display-p nil)
   (setq emms-source-file-default-directory "~/music/")

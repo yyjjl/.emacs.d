@@ -18,8 +18,6 @@
   (add-to-list 'default-frame-alist `(font . ,emacs|default-font-name)))
 
 (custom-set-faces
- '(default ((t (:foreground "#F8F8F2" :background "#1B1D1E"))))
- '(mode-line-inactive ((t (:foreground "#F8F8F2" :background "#2d2d2d"))))
- '(mode-line ((t (:foreground "#BCBCBC" :background "#181818")))))
+ '(default ((t (:foreground "#F8F8F2" :background "#1B1D1E")))))
 
 (provide 'init-outlooking)

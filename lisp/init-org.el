@@ -1,5 +1,6 @@
 ;; IPython notebook feature in `org-mode'
 (package|require 'ob-ipython)
+(package|require 'ox-pandoc)
 (package|require 'org-present)
 (package|require 'org-bullets)
 ;; Export colorful src block in `org-mode'
@@ -140,7 +141,7 @@ With a prefix BELOW move point to lower block."
 ;; Do not load extra modules
 (setq org-modules '(org-info))
 ;; Do not load extra backends
-(setq org-export-backends '(ascii html latex beamer))
+(setq org-export-backends '(html latex beamer pandoc))
 (setq org-mouse-1-follows-link nil)
 (defvar org-table-extra-map
   (define-keys :map (make-sparse-keymap)
@@ -296,7 +297,6 @@ With a prefix BELOW move point to lower block."
   (setq org-clock-into-drawer t)
   ;; Removes clocked tasks with 0:00 duration
   (setq org-clock-out-remove-zero-time-clocks t))
-
 
 (with-eval-after-load 'ox-html
   (defun org|html-export-with-line-number (fn &rest rest)

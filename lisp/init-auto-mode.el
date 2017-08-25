@@ -40,7 +40,7 @@ file `PATTERNS'."
 (add-auto-mode 'sh-mode
                "\\.basj_profile\\'" "\\.bash_history\\'"
                "\\.sh\\'" "\\.bash\\'" "\\.bashrc.local\\'"
-               "\\.zsh\\'" "\\.bashrc\\'")
+               "\\.zsh\\'" "\\.bashrc\\'" "\\.zshrc\\'")
 
 (add-auto-mode 'web-mode
                "\\.phtml\\'" "\\.cmp\\'" "\\.app\\'"

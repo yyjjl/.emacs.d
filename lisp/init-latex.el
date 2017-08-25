@@ -9,7 +9,9 @@
   (turn-off-auto-fill)
   ;; (setq company-backends (delete 'company-dabbrev company-backends))
   (LaTeX-math-mode 1)
-
+  ;; Fix conflit with `orgtbl-mode'
+  (define-key LaTeX-math-mode-map "``" (lambda () (interactive)
+                                         (insert-char ?\`)))
   (orgtbl-mode 1)
 
   (unless (buffer-temporary-p)

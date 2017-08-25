@@ -1,9 +1,10 @@
 (defun mode-line|window-number ()
-  (let* ((num-str (concat
-                   " "
+  (let* ((narrow-p (buffer-narrowed-p))
+         (num-str (concat
+                   (if narrow-p "<" " ")
                    (and (bound-and-true-p window-numbering-mode)
                         (ignore-errors (window-numbering-get-number-string)))
-                   " ")))
+                   (if narrow-p ">" " "))))
     (add-face-text-property 0 (length num-str)
                             '(:inherit mode-line-numbering-face)
                             nil num-str)
@@ -13,7 +14,6 @@
   "Display buffer id in mode-line.
 Default format 'window-number %[%b (host-address) %]'
 If function `window-numbering-mode' enabled window-number will be showed.
-If buffer is narrowed, there will be a '><' around window-number.
 If buffer file is a remote file, host-address will be showed"
   (let* ((host (and default-directory
                     (let ((tmp (file-remote-p default-directory)))
@@ -55,8 +55,6 @@ and `buffer-file-coding-system'"
             (propertize "M|" 'help-echo "Buffer has been modified"))
           (when buffer-read-only
             (propertize "R|" 'help-echo "Buffer is read-only"))
-          (when (buffer-narrowed-p)
-            (propertize "N|" 'help-echo "Buffer is read-only"))
           (propertize (symbol-name buffer-file-coding-system)
                       'help-echo "Buffer encoding")
           ")"))

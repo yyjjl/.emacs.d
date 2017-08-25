@@ -1,3 +1,8 @@
+;; Add below code to .zshrc to make term-mode track directory changes
+;;   if [ -n "$INSIDE_EMACS" ];then
+;;       chpwd() {print -P "\033AnSiTc %d"}
+;;   fi
+
 ;; Kill the buffer when terminal is exited
 (defun term|wrap-sentinel (&optional _fn)
   (lexical-let ((fn _fn)

@@ -53,7 +53,7 @@
      (mode-line-mousable ((t (:foreground "#BCBCBC" :background "#000000"))))
      (mode-line-mousable-minor-mode
       ((t (:foreground "#BCBCBC" :background "#000000"))))
-     (header-line ((t (:forground "grey90" :background "#2D2D2D"))))
+     (header-line ((t (:foreground "grey90" :background "#2D2D2D"))))
 
      (font-lock-builtin-face ((t (:foreground "#A6E22E"))))
      (font-lock-comment-face ((t (:foreground "grey" :slant italic))))
@@ -161,6 +161,7 @@
      (org-block ((t (:foreground "#8BC34A" :background "#1C1F26"))))
      (org-block-background ((t (:background "#1C1F26"))))
      (org-code ((t (:foreground "#8BC34A" :background "#1C1F26"))))
+     (org-checkbox ((t (:foreground "#8BC34A"))))
      (org-column ((t (:background "#37474F"))))
      (org-column-title ((t (:inherit org-column :weight bold :underline t))))
      (org-date ((t (:foreground "#80CBC4" :underline t))))
@@ -202,7 +203,7 @@
      (org-level-8 ((class (:inherit outline-8))))
      (org-level-9 ((class (:inherit outline-9))))
 
-     (window-numbering-face ((t (:foreground "DeepPink" :weight bold))))
+     (window-numbering-face ((t (:foreground "green" :weight bold))))
 
      (popup-enu-selection-face ((t (:background "#5E5079"
                                                 :foreground "#B2B2B2"))))
@@ -273,4 +274,3 @@
      (ivy-highlight-face ((t (:background "#444155")))))))
 
 (provide 'color-theme-molokai)
-
