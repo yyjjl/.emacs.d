@@ -1,10 +1,10 @@
-(package|require 'auctex)
-(package|require 'company-auctex)
+(require! 'auctex)
+(require! 'company-auctex)
 
 
 
 (autoload 'LaTeX-math-mode "latex" nil t)
-(defhook latex|setup (LaTeX-mode-hook)
+(define-hook! latex|setup (LaTeX-mode-hook)
   (company-auctex-init)
   (turn-off-auto-fill)
   ;; (setq company-backends (delete 'company-dabbrev company-backends))
@@ -14,7 +14,7 @@
                                          (insert-char ?\`)))
   (orgtbl-mode 1)
 
-  (unless (buffer-temporary-p)
+  (unless (buffer-temporary?)
     (turn-on-reftex)
     (TeX-source-correlate-mode 1)
     (TeX-PDF-mode 1)
@@ -27,7 +27,7 @@
     (outline-minor-mode 1)))
 
 (with-eval-after-load 'tex
-  (defun latex|build ()
+  (defun latex/build ()
     (interactive)
     (let ((TeX-save-query nil))
       (TeX-save-document (TeX-master-file)))
@@ -64,7 +64,7 @@
 
   (require 'tex-fold)
 
-  (defun latex|skip-close-pair ()
+  (defun latex/skip-close-pair ()
     (interactive)
     (let ((char (char-after)))
       (if (and (equal char (string-to-char (this-command-keys)))
@@ -72,25 +72,25 @@
           (forward-char)
         (self-insert-command 1))))
 
-  (defun latex|force-update-style ()
+  (defun latex/force-update-style ()
     (interactive)
     (TeX-update-style t))
 
-  (defun latex|font-bold () (interactive) (TeX-font nil ?\C-b))
-  (defun latex|font-medium () (interactive) (TeX-font nil ?\C-m))
-  (defun latex|font-code () (interactive) (TeX-font nil ?\C-t))
-  (defun latex|font-emphasis () (interactive) (TeX-font nil ?\C-e))
-  (defun latex|font-italic () (interactive) (TeX-font nil ?\C-i))
-  (defun latex|font-clear () (interactive) (TeX-font nil ?\C-d))
-  (defun latex|font-calligraphic () (interactive) (TeX-font nil ?\C-a))
-  (defun latex|font-small-caps () (interactive) (TeX-font nil ?\C-c))
-  (defun latex|font-sans-serif () (interactive) (TeX-font nil ?\C-f))
-  (defun latex|font-normal () (interactive) (TeX-font nil ?\C-n))
-  (defun latex|font-serif () (interactive) (TeX-font nil ?\C-r))
-  (defun latex|font-oblique () (interactive) (TeX-font nil ?\C-s))
-  (defun latex|font-upright () (interactive) (TeX-font nil ?\C-u))
+  (defun latex/font-bold () (interactive) (TeX-font nil ?\C-b))
+  (defun latex/font-medium () (interactive) (TeX-font nil ?\C-m))
+  (defun latex/font-code () (interactive) (TeX-font nil ?\C-t))
+  (defun latex/font-emphasis () (interactive) (TeX-font nil ?\C-e))
+  (defun latex/font-italic () (interactive) (TeX-font nil ?\C-i))
+  (defun latex/font-clear () (interactive) (TeX-font nil ?\C-d))
+  (defun latex/font-calligraphic () (interactive) (TeX-font nil ?\C-a))
+  (defun latex/font-small-caps () (interactive) (TeX-font nil ?\C-c))
+  (defun latex/font-sans-serif () (interactive) (TeX-font nil ?\C-f))
+  (defun latex/font-normal () (interactive) (TeX-font nil ?\C-n))
+  (defun latex/font-serif () (interactive) (TeX-font nil ?\C-r))
+  (defun latex/font-oblique () (interactive) (TeX-font nil ?\C-s))
+  (defun latex/font-upright () (interactive) (TeX-font nil ?\C-u))
 
-  (define-keys :map TeX-fold-keymap
+  (define-key! :map TeX-fold-keymap
     ("B" . TeX-fold-buffer) ("C-b")
     ("c" . TeX-fold-comment) ("C-c")
     ("e" . TeX-fold-env) ("C-e")
@@ -98,28 +98,28 @@
     ("P" . TeX-fold-paragraph) ("C-p")
     ("R" . TeX-fold-region) ("C-r"))
   (define-key LaTeX-mode-map (kbd "C-c t") org-table-extra-map)
-  (define-keys :map LaTeX-mode-map
-    ("}" . latex|skip-close-pair)
-    (")" . latex|skip-close-pair)
-    ("]" . latex|skip-close-pair)
-    ("C-c b" . latex|build)
+  (define-key! :map LaTeX-mode-map
+    ("}" . latex/skip-close-pair)
+    (")" . latex/skip-close-pair)
+    ("]" . latex/skip-close-pair)
+    ("C-c b" . latex/build)
     ("C-c h" . TeX-doc)
-    ("C-c C-l" . latex|force-update-style)
+    ("C-c C-l" . latex/force-update-style)
     ("C-c C-s") ("C-c s" . LaTeX-section)
     ("C-c C-e") ("C-c e" . LaTeX-environment)
-    ("C-c x b" . latex|font-bold)
-    ("C-c x m" . latex|font-medium)
-    ("C-c x c" . latex|font-code)
-    ("C-c x e" . latex|font-emphasis)
-    ("C-c x i" . latex|font-italic)
-    ("C-c x c" . latex|font-clear)
-    ("C-c x C" . latex|font-calligraphic)
-    ("C-c x s m" . latex|font-small)
-    ("C-c x s a" . latex|font-sans)
-    ("C-c x n" . latex|font-normal)
-    ("C-c x s e" . latex|font-serif)
-    ("C-c x o" . latex|font-oblique)
-    ("C-c x u" . latex|font-upright)))
+    ("C-c x b" . latex/font-bold)
+    ("C-c x m" . latex/font-medium)
+    ("C-c x c" . latex/font-code)
+    ("C-c x e" . latex/font-emphasis)
+    ("C-c x i" . latex/font-italic)
+    ("C-c x c" . latex/font-clear)
+    ("C-c x C" . latex/font-calligraphic)
+    ("C-c x s m" . latex/font-small)
+    ("C-c x s a" . latex/font-sans)
+    ("C-c x n" . latex/font-normal)
+    ("C-c x s e" . latex/font-serif)
+    ("C-c x o" . latex/font-oblique)
+    ("C-c x u" . latex/font-upright)))
 
 (with-eval-after-load 'preview
   (setq preview-auto-cache-preamble t
@@ -133,7 +133,7 @@
                        (face-attribute 'default :background))
   (setq preview-map
         (let ((map (make-sparse-keymap)))
-          (define-keys :map map
+          (define-key! :map map
                      ("p" . preview-at-point)
                      ("r" . preview-region)
                      ("b" . preview-buffer)

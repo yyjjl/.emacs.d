@@ -1,19 +1,19 @@
-(package|require 'nlinum)
+(require! 'nlinum)
 
 
 
 (with-eval-after-load 'nlinum
-  (setq main|linum-disabled-modes
+  (setq core/linum-disabled-modes
         '(org-mode))
   (setq nlinum-highlight-current-line t)
 
-  (defun main|disable-linum-mode (fn &rest args)
-    (when (and (not (memq major-mode main|linum-disabled-modes))
+  (defun core*disable-linum-mode ($fn &rest $args)
+    (when (and (not (memq major-mode core/linum-disabled-modes))
                (or (derived-mode-p 'prog-mode)
                    (derived-mode-p 'text-mode))
-               (< (buffer-size) main|large-buffer-size))
-      (apply fn args)))
-  (advice-add 'nlinum-mode :around #'main|disable-linum-mode))
+               (< (buffer-size) core-large-buffer-size))
+      (apply $fn $args)))
+  (advice-add 'nlinum-mode :around #'core*disable-linum-mode))
 ;; Slow down emacs
 (global-nlinum-mode 1)
 

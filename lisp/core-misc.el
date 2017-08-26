@@ -1,6 +1,15 @@
+;; Default prog-mode setup
+(define-hook! core|generic-prog-mode-setup (prog-mode-hook)
+  (hs-minor-mode 1)
+  (when (< (buffer-size) core-large-buffer-size)
+    ;; (highlight-indentation-current-column-mode 1)
+    (highlight-indentation-mode 1))
+  ;; show trailing spaces in a programming mode
+  (setq show-trailing-whitespace t))
+
 (setq flycheck-keymap-prefix (kbd "C-c f"))
 (with-eval-after-load 'flycheck
-  ;; do not check during newline
+  ;; Do not check during newline
   (setq-default flycheck-check-syntax-automatically
                 '(idle-change save mode-enabled))
   (setq flycheck-mode-line-prefix ""))
@@ -27,11 +36,6 @@
 (with-eval-after-load 'isearch
   (define-key isearch-mode-map (kbd "C-o") 'isearch-occur))
 
-;; `popwin' setup
-(autoload 'popwin-mode "popwin" nil t)
-(with-eval-after-load 'popwin
-  (global-set-key (kbd "C-z") popwin:keymap))
-
 ;; `tramp' setup
 (with-eval-after-load 'tramp
   (setq tramp-default-method "ssh")
@@ -51,52 +55,8 @@
   (setq fcitx-use-dbus t)
   (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c"))
 
-(autoload 'with-editor-export-editor "with-editor" nil nil)
-(defhook main|shell-setup (shell-mode-hook eshell-mode-hook term-exec-hook)
-  (with-editor-export-editor)
-  (case major-mode
-    (shell-mode (comint-clear-buffer))
-    (term-mode (insert "clear")
-               (term-send-input))))
-
-(defhook main|after-init (after-init-hook)
-  (session-initialize)
-
-  (ivy-mode 1)
-  (counsel-mode 1)
-  (projectile-mode 1)
-  (counsel-projectile-on)
-  (which-key-mode 1)
-  (yas-global-mode 1)
-  ;; enable popwin-mode
-  (popwin-mode 1)
-  ;; global-modes
-  (global-company-mode 1)
-  (global-flycheck-mode 1)
-  (global-subword-mode 1)
-  (global-hi-lock-mode 1)
-  (global-auto-revert-mode 1)
-  (global-hl-line-mode 1)
-  (global-page-break-lines-mode 1)
-
-  (column-number-mode 1)
-  (show-paren-mode 1)
-  ;; Auto insert closing pair
-  (electric-pair-mode 1)
-  (electric-layout-mode 1)
-  ;; `linum-mode' is slow
-  ;; (global-linum-mode 1)
-  ;;`eldoc', show API doc in minibuffer echo area enabled by default
-  ;; (global-eldoc-mode 1)
-  ;; (global-whitespace-newline-mode 1)
-
-  (when emacs|use-fcitx-p
-    (fcitx-aggressive-setup))
-
-  (winner-mode 1))
-
 ;; Delete the current file
-(defun main|delete-this-file ()
+(defun core/delete-this-file ()
   "Delete the current file, and kill the buffer."
   (interactive)
   (or (buffer-file-name) (error "No file is currently being edited"))
@@ -105,7 +65,7 @@
     (delete-file (buffer-file-name))
     (kill-this-buffer)))
 
-(defun main|copy-this-file-to-new-file ()
+(defun core/copy-this-file-to-new-file ()
   "Copy current file to a new file without close original file."
   (interactive)
   (let* ((this (current-buffer))
@@ -123,7 +83,7 @@
         (switch-to-buffer buf)))))
 
 ;; Rename the current file
-(defun main|rename-this-file-and-buffer (new-name)
+(defun core/rename-this-file-and-buffer (new-name)
   "Renames both current buffer and file it's visiting to NEW-NAME."
   (interactive (list  (completing-read "New file name: "
                                        #'read-file-name-internal)))
@@ -139,7 +99,7 @@
         (set-visited-file-name new-name)
         (set-buffer-modified-p nil)))))
 
-(defun main|copy-file-name (&optional arg)
+(defun core/copy-file-name (&optional arg)
   "Copy current file name to king ring.
 If ARG = 0 copy the current directory.  If ARG > 0 copy the file
 name without directory.  If ARG < 0 copy the file name without
@@ -155,11 +115,11 @@ directory and extension."
                (kill-new path))
       (message "Nothing to do"))))
 
-(defun main|create-scratch-buffer ()
-  "Create a new scratch buffer to work in.
-\(could be *scratch* - *scratchX*)."
+(defun core/create-scratch-buffer ()
+  "Create a new scratch buffer to work in. (could be *scratch* - *scratchX*)."
   (interactive)
   (let ((n 0)
+        (mode major-mode)
         bufname)
     (while (progn
              (setq bufname (concat "*scratch"
@@ -167,10 +127,10 @@ directory and extension."
                                    "*"))
              (setq n (1+ n))
              (get-buffer bufname)))
-    (switch-to-buffer (get-buffer-create bufname))
-    (lisp-interaction-mode)))
+    (pop-to-buffer (get-buffer-create bufname))
+    (funcall mode)))
 
-(defun main|cleanup-buffer-safe ()
+(defun core/cleanup-buffer-safe ()
   "Perform a bunch of safe operations on the whitespace content of a buffer.
 Does not indent buffer, because it is used for a
 `before-save-hook', and that might be bad."
@@ -179,19 +139,14 @@ Does not indent buffer, because it is used for a
   (delete-trailing-whitespace)
   (set-buffer-file-coding-system 'utf-8))
 
-(defun main|show-messages-buffer ()
-  "Show message buffer."
-  (interactive)
-  (popup-to-buffer (get-buffer "*Messages*") nil 2.5))
-
-(defun main|current-font-face ()
+(defun core/current-font-face ()
   "Get the font face under cursor."
   (interactive)
   (let ((rlt (format "%S" (get-text-property (point) 'face))))
     (kill-new rlt)
     (message "%s => yank ring" rlt)))
 
-(defun main|num-to-string ()
+(defun core/num-to-string ()
   "Convert number at point to string"
   (interactive)
   (let* ((bounds (bounds-of-thing-at-point 'sexp))
@@ -201,7 +156,7 @@ Does not indent buffer, because it is used for a
       (kill-region (car bounds) (cdr bounds))
       (insert num))))
 
-(defun main|restore-files (&optional num)
+(defun core/restore-files (&optional num)
   (interactive "p")
   (if recentf-mode
       (let (buf)
@@ -210,17 +165,28 @@ Does not indent buffer, because it is used for a
         (switch-to-buffer buf))
     (message "`recentf-mode' must be turned on !!!")))
 
-(define-keys
-  ("C-x m" . main|show-messages-buffer)
+(defvar socks-server '("Default server" "127.0.0.1" 1080 5))
+(defun core/toggle-socket-proxy ()
+  (interactive)
+  (if (eq url-gateway-method 'socks)
+      (let ((method (function-get #'main|toggle-socket-proxy 'method)))
+        (setq url-gateway-method (or method 'native))
+        (message "Use method '%s" url-gateway-method))
+    (function-put #'main|toggle-socket-proxy 'method url-gateway-method)
+    (setq url-gateway-method 'socks)
+    (message "Use socket proxy %s" socks-server)))
+
+(define-key!
+  ("C-x m" . popwin:messages)
   ("C-r" . isearch-backward-regexp)
-  ("C-M-r" . isearch-backeard)
-  ("C-x R" . main|rename-this-file-and-buffer)
-  ("C-x D" . main|delete-this-file)
-  ("C-x C-d" . find-name-dired)
-  ("C-x W" . main|copy-this-file-to-new-file)
-  ("C-x f" . main|copy-file-name)
-  ("C-x c" . main|cleanup-buffer-safe)
-  ("C-x ," . main|restore-files)
+  ("C-M-r" . isearch-backward)
+  ("C-x R" . core/rename-this-file-and-buffer)
+  ("C-x D" . core/delete-this-file)
+  ("C-x C-d" . file-name-dired)
+  ("C-x W" . core/copy-this-file-to-new-file)
+  ("C-x f" . core/copy-file-name)
+  ("C-x c" . core/cleanup-buffer-safe)
+  ("C-x ," . core/restore-files)
 
   ("C-c 4" . ispell-word)
   ("C-c q" . auto-fill-mode)
@@ -228,14 +194,14 @@ Does not indent buffer, because it is used for a
   ("M-/" . hippie-expand)
   ("RET" . newline-and-indent)
 
-  ("C-}" . main|company-yasnippet)
+  ("C-}" . core/company-yasnippet)
   ("<backtab>" . company-complete)
-  ([f6] . main|toggle-company-ispell)
-  ([f7] . main|create-scratch-buffer)
+  ([f6] . core/toggle-company-ispell)
+  ([f7] . core/create-scratch-buffer)
   ("C-<up>" . text-scale-increase)
   ("C-<down>" . text-scale-decrease)
 
   ("C-c w [" . winner-undo)
   ("C-c w ]" . winner-redo))
 
-(provide 'init-main-misc)
+(provide 'core-misc)

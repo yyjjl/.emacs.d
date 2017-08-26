@@ -1,4 +1,4 @@
-(package|require 'ibuffer-vc)
+(require! 'ibuffer-vc)
 
 
 
@@ -28,7 +28,7 @@
                           (mode . muse-mode)
                           (mode . org-mode)
                           (mode . org-agenda-mode)))
-           ("text" (predicate . (buffer-derived-mode-p 'text-mode)))
+           ("text" (predicate . (derived-mode? 'text-mode)))
            ("emacs" (or (name . "^\\*scratch\\*$")
                         (name . "^\\*Messages\\*$")
                         (name . "^\\*Help\\*$")
@@ -42,7 +42,7 @@
            ("code" (or (mode . c++-mode)
                        (mode . c-mode)
                        (mode . java-mode)
-                       (predicate . (buffer-derived-mode-p 'prog-mode))))
+                       (predicate . (derived-mode? 'prog-mode))))
            ("process" (or (predicate . (get-buffer-process (current-buffer)))
                           (mode . eshell-mode)))
            ("gnus" (or (mode . message-mode)
@@ -53,7 +53,7 @@
                        (mode . gnus-article-mode)
                        (name . "^\\.bbdb$")
                        (name . "^\\.newsrc-dribble"))))))
-  (defhook ibuffer|setup (ibuffer-mode-hook)
+  (define-hook! ibuffer|setup (ibuffer-mode-hook)
     (ibuffer-vc-set-filter-groups-by-vc-root)
     (unless (eq ibuffer-sorting-mode 'filename/process)
       (ibuffer-do-sort-by-filename/process))

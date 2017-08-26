@@ -1,9 +1,9 @@
 ;; When splitting window, show (other-buffer) in the new window
-(defun window|wrap-split-function (split-function)
-  (lexical-let ((s-f split-function))
+(defun window|wrap-split-function ($split-function)
+  (lexical-let ((sf $split-function))
     (lambda ()
       (interactive)
-      (funcall s-f)
+      (funcall sf)
       (set-window-buffer (next-window) (other-buffer)))))
 
 (global-set-key (kbd "C-x 2") (window|wrap-split-function 'split-window-vertically))

@@ -1,7 +1,7 @@
 (require 'hydra)
 
 (with-eval-after-load 'org
-  (defhydra hydra|org-template (:color blue :hint nil)
+  (defhydra hydra-org-template (:color blue :hint nil)
     "
 _c_enter  _q_uote     _E_macs-lisp    _L_aTeX:
 _l_atex   _e_xample   _C_pp           _i_ndex:
@@ -9,33 +9,33 @@ _a_scii   _v_erse     _I_NCLUDE:      _j_avascript
 _s_rc     _S_hell     ^ ^             _H_TML:
 _h_tml    ^ ^         ^ ^             _A_SCII:
 "
-    ("s" (org|hot-expand "<s"))
-    ("e" (org|hot-expand "<e"))
-    ("q" (org|hot-expand "<q"))
-    ("v" (org|hot-expand "<v"))
-    ("c" (org|hot-expand "<c"))
-    ("l" (org|hot-expand "<l"))
-    ("h" (org|hot-expand "<h"))
-    ("a" (org|hot-expand "<a"))
-    ("L" (org|hot-expand "<L"))
-    ("i" (org|hot-expand "<i"))
-    ("E" (org|hot-expand "<s" "emacs-lisp"))
-    ("C" (org|hot-expand "<s" "cpp"))
-    ("S" (org|hot-expand "<s" "sh"))
-    ("j" (org|hot-expand "<s" "javascipt"))
-    ("I" (org|hot-expand "<I"))
-    ("H" (org|hot-expand "<H"))
-    ("A" (org|hot-expand "<A"))
+    ("s" (org/hot-expand "<s"))
+    ("e" (org/hot-expand "<e"))
+    ("q" (org/hot-expand "<q"))
+    ("v" (org/hot-expand "<v"))
+    ("c" (org/hot-expand "<c"))
+    ("l" (org/hot-expand "<l"))
+    ("h" (org/hot-expand "<h"))
+    ("a" (org/hot-expand "<a"))
+    ("L" (org/hot-expand "<L"))
+    ("i" (org/hot-expand "<i"))
+    ("E" (org/hot-expand "<s" "emacs-lisp"))
+    ("C" (org/hot-expand "<s" "cpp"))
+    ("S" (org/hot-expand "<s" "sh"))
+    ("j" (org/hot-expand "<s" "javascipt"))
+    ("I" (org/hot-expand "<I"))
+    ("H" (org/hot-expand "<H"))
+    ("A" (org/hot-expand "<A"))
     ("<" self-insert-command "ins")
     ("o" nil "quit"))
 
-  (defun org|hot-expand (str &optional mod)
+  (defun org/hot-expand ($str &optional $mod)
     "Expand org template."
-    (insert str)
+    (insert $str)
     (org-try-structure-completion)
-    (when mod (insert mod) (forward-line)))
+    (when $mod (insert $mod) (forward-line)))
 
-  (defhydra hydra|org-move (:color pink :hint nil)
+  (defhydra hydra-org-move (:color pink :hint nil)
     "org move"
     ("u" outline-up-heading "up")              ; Up
     ("n" outline-next-visible-heading "next")  ; Next
@@ -46,18 +46,18 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
     ("<tab>" org-cycle "cycle")
     ("RET" nil))
 
-  (define-keys :map org-mode-map
+  (define-key! :map org-mode-map
     ("<" . (lambda () (interactive)
              (if (looking-back "^\\s-*" (line-beginning-position))
-                 (hydra|org-template/body)
+                 (hydra-org-template/body)
                (self-insert-command 1))))
-    ("C-c C-u" . hydra|org-move/outline-up-heading)
-    ("C-c C-n" . hydra|org-move/outline-next-visible-heading)
-    ("C-c C-p" . hydra|org-move/outline-previous-visible-heading)
-    ("C-c C-f" . hydra|org-move/outline-forward-same-level)
-    ("C-c C-b" . hydra|org-move/outline-backward-same-level)))
+    ("C-c C-u" . hydra-org-move/outline-up-heading)
+    ("C-c C-n" . hydra-org-move/outline-next-visible-heading)
+    ("C-c C-p" . hydra-org-move/outline-previous-visible-heading)
+    ("C-c C-f" . hydra-org-move/outline-forward-same-level)
+    ("C-c C-b" . hydra-org-move/outline-backward-same-level)))
 
-(defhydra hydra|resize-window (:color pink)
+(defhydra hydra-resize-window (:color pink)
   "shrink"
   ("{" shrink-window-horizontally "-><-")
   ("}" enlarge-window-horizontally "<-->")
@@ -65,13 +65,13 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
   ("-" shrink-window "shrink")
   ("RET" nil "quit"))
 
-(define-keys
-  ("C-x {" . hydra|resize-window/shrink-window-horizontally)
-  ("C-x }" . hydra|resize-window/enlarge-window-horizontally)
-  ("C-x ^" . hydra|resize-window/enlarge-window)
-  ("C-x -" . hydra|resize-window/shrink-window))
+(define-key!
+  ("C-x {" . hydra-resize-window/shrink-window-horizontally)
+  ("C-x }" . hydra-resize-window/enlarge-window-horizontally)
+  ("C-x ^" . hydra-resize-window/enlarge-window)
+  ("C-x -" . hydra-resize-window/shrink-window))
 
-(defhydra hydra|rectangle (:body-pre (rectangle-mark-mode 1)
+(defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
                                      :color pink
                                      :post (deactivate-mark))
   "
@@ -100,7 +100,7 @@ _b_   _f_       [_q_]quit      [_y_]yank
   ("k" kill-rectangle nil)
   ("q" nil nil))
 
-(defhydra hydra|outline (:color pink :hint nil)
+(defhydra hydra-outline (:color pink :hint nil)
   "
 ^Hide^             ^Show^           ^Move
 ^^^^^^------------------------------------------------------
@@ -133,7 +133,7 @@ _d_: subtree
   ("b" outline-backward-same-level)      ; Backward - same level
   ("z" nil "leave"))
 
-(global-set-key (kbd "C-c o") 'hydra|outline/body) ; by example
+(global-set-key (kbd "C-c o") 'hydra-outline/body) ; by example
 
 (defvar current-forward-thing 'char)
 (defun current-forward-thing ()
@@ -147,7 +147,7 @@ _d_: subtree
   (forward-thing current-forward-thing (when (numberp N) (- 0 N))))
 
 
-(defhydra hydra|move (:pre (setq current-forward-thing 'char)
+(defhydra hydra-move (:pre (setq current-forward-thing 'char)
                            :color pink
                            :hint nil)
   "
@@ -181,11 +181,11 @@ Current thing: %s(current-forward-thing)
   ("x" exchange-point-and-mark)
   ("l" recenter-top-bottom))
 
-(global-set-key (kbd "C-.") #'hydra|move/body)
-(global-set-key (kbd "C-v") #'hydra|move/scroll-up-command)
-(global-set-key (kbd "M-v") #'hydra|move/scroll-down-command)
+(global-set-key (kbd "C-.") #'hydra-move/body)
+(global-set-key (kbd "C-v") #'hydra-move/scroll-up-command)
+(global-set-key (kbd "M-v") #'hydra-move/scroll-down-command)
 
-(defhydra hydra|next-error (global-map "C-x")
+(defhydra hydra-next-error (global-map "C-x")
   "
 Compilation errors:
 _n_: next error        _<_: first error
@@ -196,8 +196,8 @@ _p_: previous error    _q_uit
   ("p" previous-error nil :bind nil)
   ("<" first-error    nil :bind nil)
   ("q" nil            nil :color blue))
-(global-set-key (kbd "M-g n") #'hydra|next-error/next-error)
-(global-set-key (kbd "M-g p") #'hydra|next-error/previous-error)
+(global-set-key (kbd "M-g n") #'hydra-next-error/next-error)
+(global-set-key (kbd "M-g p") #'hydra-next-error/previous-error)
 
 (defvar x-hydra-timer nil)
 (defvar x-hydra-delay 0.5)
@@ -247,7 +247,7 @@ _p_: previous error    _q_uit
   ("h" (x-hydra-lambda-body ?\C-h)))
 
 (setq x-hydra/keymap
-      (define-keys :map (make-sparse-keymap)
+      (define-key! :map (make-sparse-keymap)
         ("x" . x-hydra/lambda-x-and-exit)
         ("c" . x-hydra/lambda-c-and-exit)
         ("z" . x-hydra/lambda-z-and-exit)
@@ -256,4 +256,4 @@ _p_: previous error    _q_uit
 (global-set-key "x" #'x-hydra/body)
 (global-set-key (kbd "C-x x") #'x-hydra-dispatch)
 
-(provide 'init-hydra)
+(provide 'core-hydra)

@@ -1,11 +1,11 @@
-(package|require 'gitignore-mode)
-(package|require 'gitconfig-mode)
-(package|require 'git-messenger)
-(package|require 'git-gutter)
-(package|require 'git-gutter-fringe)
-(package|require 'git-link)
-(package|require 'git-timemachine)
-(package|require 'magit)
+(require! 'gitignore-mode)
+(require! 'gitconfig-mode)
+(require! 'git-messenger)
+(require! 'git-gutter)
+(require! 'git-gutter-fringe)
+(require! 'git-link)
+(require! 'git-timemachine)
+(require! 'magit)
 
 
 
@@ -15,16 +15,16 @@
 ;; @see
 ;; http://blog.binchen.org/posts/enhance-emacs-git-gutter-with-ivy-mode.html
 ;; {{ git gutter with ivy
-(defun git|reshape-gutter (gutter)
+(defun git/reshape-gutter ($gutter)
   "Re-shape GUTTER for `ivy-read'."
-  (let* ((linenum-start (aref gutter 3))
-         (linenum-end (aref gutter 4))
+  (let* ((linenum-start (aref $gutter 3))
+         (linenum-end (aref $gutter 4))
          (target-line "")
          (target-linenum 1)
          (tmp-line "")
          (max-line-length 0))
     (save-excursion
-      ;; find out the longest stripped line in the gutter
+      ;; find out the longest stripped line in the $gutter
       (while (<= linenum-start linenum-end)
         (forward-line 1)
         (setq tmp-line (replace-regexp-in-string
@@ -39,14 +39,14 @@
         (setq linenum-start (1+ linenum-start))))
     ;; build (key . linenum-start)
     (cons (format "%s %d: %s"
-                  (if (eq 'deleted (aref gutter 1)) "-" "+")
+                  (if (eq 'deleted (aref $gutter 1)) "-" "+")
                   target-linenum target-line)
           target-linenum)))
 
-(defun git|ivy-goto-gutter ()
+(defun git/ivy-goto-gutter ()
   (interactive)
   (if git-gutter:diffinfos
-      (let* ((collection (mapcar 'git|reshape-gutter
+      (let* ((collection (mapcar 'git/reshape-gutter
                                  git-gutter:diffinfos)))
         (ivy-read "git-gutters:"
                   collection
@@ -59,7 +59,7 @@
 ;; @see
 ;; http://blog.binchen.org/posts/new-git-timemachine-ui-based-on-ivy-mode.html
 ;; {{ git-timemachine
-(defun git|ivy-timemachine-show-selected-revision ()
+(defun git/ivy-timemachine-show-selected-revision ()
   "Show last (current) revision of file."
   (interactive)
   (let (collection)
@@ -74,12 +74,12 @@
               :action (lambda (rev)
                         (git-timemachine-show-revision (cdr rev))))))
 
-(defun git|ivy-timemachine ()
+(defun git/ivy-timemachine ()
   "Open git snapshot with the selected version.  Based on `ivy-mode'."
   (interactive)
   (unless (featurep 'git-timemachine)
     (require 'git-timemachine))
-  (git-timemachine--start #'git|ivy-timemachine-show-selected-revision))
+  (git-timemachine--start #'git/ivy-timemachine-show-selected-revision))
 ;; }}
 
 (when (fboundp 'define-fringe-bitmap)
@@ -122,30 +122,30 @@
 
 ;; This setup function must run before `semantic-mode' invoke to avoid
 ;; a error
-(defhook git|generic-prog-mode-setup ((prog-mode-hook :append))
+(define-hook! git|generic-prog-mode-setup ((prog-mode-hook :append))
   (unless (or (file-remote-p default-directory)
-              (buffer-temporary-p)
-              (> (buffer-size) main|large-buffer-size))
+              (buffer-temporary?)
+              (> (buffer-size) core-large-buffer-size))
     (git-gutter-mode 1)))
 
 (with-eval-after-load 'git-messenger
   (setq git-messenger:show-detail t))
 
 
-(defhook (git|message-kill-commit-id msg) (git-messenger:after-popup-hook)
+(define-hook! (git|message-kill-commit-id msg) (git-messenger:after-popup-hook)
   ;; extract commit id and put into the kill ring
   (when (string-match "\\(commit *: *\\)\\([0-9a-z]+\\)" msg)
     (kill-new (match-string 2 msg))
     (message "commit hash %s => kill-ring" (match-string 2 msg))))
 
-(define-keys :prefix "C-x g"
+(define-key! :prefix "C-x g"
   ("h" . git-gutter:popup-hunk)
   ("s" . git-gutter:stage-hunk)
   ("r" . git-gutter:revert-hunk)
-  ("t" . git|ivy-timemachine)
+  ("t" . git/ivy-timemachine)
   ("n" . git-gutter:next-hunk)
   ("p" . git-gutter:previous-hunk)
-  ("j" . git|ivy-goto-gutter)
+  ("j" . git/ivy-goto-gutter)
   ("l" . git-link)
   ("c" . git-link-commit)
   ("m" . git-messenger:popup-message)

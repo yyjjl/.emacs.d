@@ -1,15 +1,14 @@
 ;; IPython notebook feature in `org-mode'
-(package|require 'ob-ipython)
-(package|require 'ox-pandoc)
-(package|require 'org-present)
-(package|require 'org-bullets)
+(require! 'ob-ipython)
+(require! 'ox-pandoc)
+(require! 'org-bullets)
 ;; Export colorful src block in `org-mode'
-(package|require 'htmlize)
-(package|require 'company-auctex)
+(require! 'htmlize)
+(require! 'company-auctex)
 
 
 
-(defun org|split-src-block (&optional below)
+(defun org/split-src-block (&optional below)
   "Split the current src block.
 With a prefix BELOW move point to lower block."
   (interactive "P")
@@ -22,87 +21,89 @@ With a prefix BELOW move point to lower block."
     (when (not below)
       (org-babel-previous-src-block))))
 
-(defvar org|ipython-parent-buffer nil)
-(defvar org|ipython-src-block nil)
-(defvar-local org|ipython-error-line 0)
-(defun org|ipython-trace-move (n)
-  (let ((search-func (if (> n 0)
+(defvar org--ipython-parent-buffer nil)
+(defvar org--ipython-src-block nil)
+(defvar-local org--ipython-error-line 0)
+
+(defun org%ipython-trace-move ($n)
+  (let ((search-func (if (> $n 0)
                          #'re-search-forward
-                       (setq n (- 0 n))
+                       (setq $n (- 0 $n))
                        #'re-search-backward))
         found)
-    (while (and (> n 0)
-                (setq found (apply search-func '("^-+> \\([0-9]+\\)" nil t))))
-      (setq n (1- n)))
+    (while (and (> $n 0)
+                (setq found
+                      (apply search-func '("^-+> \\([0-9]+\\)" nil t))))
+      (setq $n (1- $n)))
     found))
 
-(defun org|ipython-trace-prev (&optional n)
+(defun org/ipython-trace-prev (&optional $n)
   (interactive "P")
-  (unless (org|ipython-trace-move (or (and n (- 0 n)) -1))
+  (unless (org%ipython-trace-move (or (and $n (- 0 $n)) -1))
     (message "No previous frame")))
 
-(defun org|ipython-trace-next (&optional n)
+(defun org/ipython-trace-next (&optional $n)
   (interactive "P")
-  (unless (org|ipython-trace-move (or n 1))
+  (unless (org%ipython-trace-move (or $n 1))
     (message "No next frame")))
 
-(defun org|ipython-jump (lineno &optional do-jump)
-  (interactive (list (or org|ipython-error-line 0) t))
-  (if (and (buffer-live-p org|ipython-parent-buffer)
-           org|ipython-src-block)
-      (let ((p (org-element-property :begin org|ipython-src-block))
-            (window (if do-jump
-                        (progn (pop-to-buffer org|ipython-parent-buffer)
+(defun org/ipython-jump ($lineno &optional $do-jump)
+  (interactive (list (or org--ipython-error-line 0) t))
+  (if (and (buffer-live-p org--ipython-parent-buffer)
+           org--ipython-src-block)
+      (let ((p (org-element-property :begin org--ipython-src-block))
+            (window (if $do-jump
+                        (progn (pop-to-buffer org--ipython-parent-buffer)
                                (selected-window))
-                      (display-buffer org|ipython-parent-buffer))))
+                      (display-buffer org--ipython-parent-buffer))))
         (with-selected-window window
           (goto-char p)
-          (forward-line lineno)
+          (forward-line $lineno)
           (recenter)
           (point)))
     (message "Parent buffer killed or Can not find src block !!!")))
 
-(defun org|ipython-trace-bury-buffer ()
+(defun org/ipython-trace-bury-buffer ()
   (interactive)
-  (org|ipython-jump org|ipython-error-line)
+  (org/ipython-jump org--ipython-error-line)
   (call-interactively 'quit-window))
 
-(defun org|ipython-before-execute (&rest args)
-  (setq org|ipython-parent-buffer (current-buffer))
-  (setq org|ipython-src-block (org-element-context)))
+(defun org*ipython-before-execute (&rest $args)
+  (setq org--ipython-parent-buffer (current-buffer))
+  (setq org--ipython-src-block (org-element-context)))
 
 (advice-add 'org-babel-execute:ipython
-            :before #'org|ipython-before-execute)
+            :before #'org*ipython-before-execute)
 
-(defun org|ipython-trace-setup (fn &rest args)
-  (with-current-buffer (apply fn args)
+(defun org*ipython-trace-setup ($fn &rest $args)
+  (with-current-buffer (apply $fn $args)
     (use-local-map (copy-keymap special-mode-map))
-    (define-keys :map (current-local-map)
-      ("q" . org|ipython-trace-bury-buffer)
-      ("p" . org|ipython-trace-prev)
-      ("n" . org|ipython-trace-next)
-      ("j" . org|ipython-jump))
+    (define-key! :map (current-local-map)
+      ("q" . org/ipython-trace-bury-buffer)
+      ("p" . org/ipython-trace-prev)
+      ("n" . org/ipython-trace-next)
+      ("j" . org/ipython-jump))
 
     (goto-char (point-min))
     (if (re-search-forward "-+> \\([0-9]+\\)" nil t)
-        (setq org|ipython-error-line (string-to-number (match-string 1)))
+        (setq org--ipython-error-line (string-to-number (match-string 1)))
       (goto-char (point-min))
       (when (re-search-forward "SyntaxError:" nil t)
         (goto-char (point-min))
         ;; Get the line number
         (when (re-search-forward "File.*, line \\([0-9]+\\)" nil t)
           (goto-char (match-end 0))
-          (setq org|ipython-error-line (string-to-number (match-string 1))))))
+          (setq org--ipython-error-line (string-to-number (match-string 1))))))
     (goto-char (point-min))
     (setq header-line-format
           (format "Error at line: %d, press `j' to jump to location"
-                  org|ipython-error-line))))
+                  org--ipython-error-line))))
 
 (advice-add 'ob-ipython--create-traceback-buffer
-            :around #'org|ipython-trace-setup)
+            :around #'org*ipython-trace-setup)
 
 (with-eval-after-load 'ob
-  (define-keys :map org-babel-map
+  (define-key! :map org-babel-map
     ("/" . org|split-src-block)))
 
 (with-eval-after-load 'ob-ipython
@@ -128,7 +129,7 @@ With a prefix BELOW move point to lower block."
   ;; Don't prompt me to confirm everytime I want to evaluate a block
   (setq org-confirm-babel-evaluate nil)
 
-  (defhook org|babel-after-execute ((org-babel-after-execute-hook :append))
+  (define-hook! org|babel-after-execute ((org-babel-after-execute-hook :append))
     (dolist (buf (buffer-list))
       (when (and (string-prefix-p " *http " (buffer-name buf))
                  (let ((proc (get-buffer-process buf)))
@@ -144,7 +145,7 @@ With a prefix BELOW move point to lower block."
 (setq org-export-backends '(html latex beamer pandoc))
 (setq org-mouse-1-follows-link nil)
 (defvar org-table-extra-map
-  (define-keys :map (make-sparse-keymap)
+  (define-key! :map (make-sparse-keymap)
     ("t" . orgtbl-insert-radio-table)
     ("c" . org-table-create)
     ("I" . org-table-import)
@@ -153,7 +154,6 @@ With a prefix BELOW move point to lower block."
     ("i" . org-table-insert-column)
     ("r" . org-table-show-reference)))
 (with-eval-after-load 'org
-
   ;; Highlight `{{{color(<color>, <text>}}}' form
   (font-lock-add-keywords
    'org-mode
@@ -196,7 +196,7 @@ With a prefix BELOW move point to lower block."
         ;; collapsed trees.
         org-cycle-separator-lines 2 ;; default = 2
         org-agenda-start-on-weekday nil
-        org-agenda-inhibit-startup t       ;; ~50x speedup
+        org-agenda-inhibit-startup t ;; ~50x speedup
         org-agenda-use-tag-inheritance nil ;; 3-4x speedup
         org-agenda-span 14
         org-agenda-include-diary t
@@ -205,6 +205,7 @@ With a prefix BELOW move point to lower block."
         org-export-kill-product-buffer-when-displayed t
         org-export-with-sub-superscripts t
         org-tags-column -65
+        org-ellipsis "  "
         org-hide-emphasis-markers nil
         org-hide-leading-stars t
         org-hide-block-startup t
@@ -247,7 +248,7 @@ With a prefix BELOW move point to lower block."
       (annotation (company-auctex-symbol-annotation arg))))
 
 
-  (defhook org|setup (org-mode-hook)
+  (define-hook! org|setup (org-mode-hook)
     ;; Fix font-lock bug in `org-mode' 8.2.10
     (let ((macros (assoc "{{{.+}}}" org-font-lock-keywords)))
       (when macros
@@ -264,13 +265,13 @@ With a prefix BELOW move point to lower block."
     (setq truncate-lines nil)
     (setq word-wrap t))
 
-  (defhook org|src-setup (org-src-mode-hook)
+  (define-hook! org|src-setup (org-src-mode-hook)
     (when (eq major-mode 'python-mode)
       (local-set-key (kbd "C-c h") #'ob-ipython-inspect))
     (flycheck-mode -1))
 
   (define-key org-mode-map (kbd "C-c t") org-table-extra-map)
-  (define-keys :map org-mode-map
+  (define-key! :map org-mode-map
     ("C-c h" . ob-ipython-inspect)
     ("C-c c i" . org-clock-in)
     ("C-c c o" . org-clock-out)
@@ -290,16 +291,8 @@ With a prefix BELOW move point to lower block."
     ([f5] . org-present)
     ("C-c C-t" . org-todo)))
 
-(with-eval-after-load 'org-clock
-  ;; Change task state to STARTED when clocking in
-  (setq org-clock-in-switch-to-state "STARTED")
-  ;; Save clock data and notes in the LOGBOOK drawer
-  (setq org-clock-into-drawer t)
-  ;; Removes clocked tasks with 0:00 duration
-  (setq org-clock-out-remove-zero-time-clocks t))
-
 (with-eval-after-load 'ox-html
-  (defun org|html-export-with-line-number (fn &rest rest)
+  (defun org*html-export-with-line-number (fn &rest rest)
     (when (= (length rest) 5)
       (let ((num-start (nth 4 rest)))
         (unless num-start
@@ -308,7 +301,7 @@ With a prefix BELOW move point to lower block."
     (apply fn rest))
 
   ;; (advice-add 'org-html-do-format-code
-  ;;             :around #'org|html-export-with-line-number)
+  ;;             :around #'org*html-export-with-line-number)
 
   (setcdr (assoc 'scale org-html-mathjax-options) '("90"))
   (setcdr (assoc 'align org-html-mathjax-options) '("left"))
@@ -335,7 +328,7 @@ With a prefix BELOW move point to lower block."
           ("" "amsmath,amsfonts,amssymb,amsthm,bm,upgreek" t)
           ("mathscr" "eucal" t)
           ("" "geometry" t)))
-  (let ((common (read-file-as-string
+  (let ((common (read-file-content!
                  (expand-file-name "common" org-template-directory))))
     (add-to-list 'org-latex-classes
                  `("cn-article"
@@ -361,38 +354,12 @@ With a prefix BELOW move point to lower block."
                `("cn-beamer"
                  ,(s-replace "[ORG-TEMPLATE-DIR]"
                              org-template-directory
-                             (read-file-as-string
+                             (read-file-content!
                               (expand-file-name "beamer" org-template-directory)))
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                  ("\\paragraph{%s}" . "\\paragraph*{%s}")
                  ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
-
-(with-eval-after-load 'org-present
-  (define-keys :map org-present-mode-keymap
-    ("<down>" . scroll-down-line)
-    ("<up>" . scroll-up-line)
-    ("q" . org-present-quit))
-  (setq org-present-text-scale 2)
-
-  (defhook org|present-setup (org-present-mode-hook)
-    (setq org-format-latex-options (plist-put org-format-latex-options :scale 2))
-    (setq mode-line-format nil)
-    (org-present-big)
-    (org-display-inline-images)
-    (org-present-hide-cursor)
-    (org-present-read-only))
-  (defhook org|present-exit (org-present-mode-quit-hook)
-    (setq org-format-latex-options
-          (plist-put org-format-latex-options :scale 1.5))
-    (setq mode-line-format mode-line|default-format)
-    (org-present-small)
-    (org-remove-inline-images)
-    (org-present-show-cursor)
-    (org-present-read-write)))
-
-(global-set-key [C-f9] #'org-capture)
-(global-set-key [M-f9] #'org|open-capture)
 
 (provide 'init-org)

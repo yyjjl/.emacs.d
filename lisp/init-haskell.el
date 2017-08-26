@@ -1,27 +1,27 @@
 ;; Haskell
-(package|require 'haskell-mode)
-(when haskell|has-ghc-mod-p
-  (package|require 'company-ghc)
-  (package|require 'ghc))
-(when haskell|has-shm-p
-  (package|require 'shm))
-(when haskell|has-hindent-p
-  (package|require 'hindent))
-(when haskell|has-cabal-p
-  (package|require 'company-cabal))
-(when haskell|has-idris-p
-  (package|require 'idris-mode))
+(require! 'haskell-mode)
+(when haskell-has-ghc-mod-p
+  (require! 'company-ghc)
+  (require! 'ghc))
+(when haskell-has-shm-p
+  (require! 'shm))
+(when haskell-has-hindent-p
+  (require! 'hindent))
+(when haskell-has-cabal-p
+  (require! 'company-cabal))
+(when haskell-has-idris-p
+  (require! 'idris-mode))
 
 
 
 (with-eval-after-load 'shm
-  (defun haskell|shm-tab-or-close (fn &rest args)
+  (defun haskell*shm-tab-or-close (fn &rest args)
     (if (looking-at ")\\|]\\|}\\|`")
         (forward-char 1)
       (apply fn args)))
-  (advice-add 'shm/tab :around #'haskell|shm-tab-or-close)
+  (advice-add 'shm/tab :around #'haskell*shm-tab-or-close)
 
-  (define-keys :map shm-map
+  (define-key! :map shm-map
     ("C-." . shm/forward-node)
     ("C-," . shm/backward-node)
     ("C-?" . shm/describe-mode)
@@ -43,9 +43,9 @@
           (hindent-reformat-region beg end t)
           (align beg end)))))
 
-  (defun haskell|force-indent-size (org-fn)
-    (list* "--tab-size" "4" (apply org-fn '())))
-  (advice-add 'hindent-extra-arguments :around #'haskell|force-indent-size))
+  (defun haskell*force-indent-size ($fn)
+    (list* "--tab-size" "4" (apply $fn '())))
+  (advice-add 'hindent-extra-arguments :around #'haskell*force-indent-size))
 
 (with-eval-after-load 'haskell-mode
   (setq
@@ -63,12 +63,12 @@
    haskell-stylish-on-save nil
    company-ghc-show-info t)
 
-  (when haskell|hare-path
-    (autoload 'hare-init haskell|hare-path nil t)
+  (when haskell-hare-path
+    (autoload 'hare-init haskell-hare-path nil t)
     (hare-init))
-  (remap-keybindings "C-c C-r" "C-c r" haskell-mode-map)
+  (remap! "C-c C-r" "C-c r" haskell-mode-map)
 
-  (define-keys :map haskell-mode-map
+  (define-key! :map haskell-mode-map
     ("C-c C-d" . ghc-browse-document)
     ("C-c b" . haskell-mode-stylish-buffer)
     ("C-c s" . haskell-sort-imports)
@@ -86,15 +86,15 @@
     ("C-c ;" . company-ghc-complete-in-module)
     ("C-c C-c" . company-ghc-clear-failed-cache))
 
-  (defhook haskell|cabal-setup (haskell-cabal-mode-hook)
+  (define-hook! haskell|cabal-setup (haskell-cabal-mode-hook)
     (rainbow-delimiters-mode 1)
     (add-to-list 'company-backends 'company-cabal))
 
-  (defhook haskell|setup (haskell-mode-hook)
+  (define-hook! haskell|setup (haskell-mode-hook)
     (rainbow-delimiters-mode 1)
     (haskell-decl-scan-mode 1)
-    (unless (buffer-temporary-p)
-      (when haskell|has-ghc-mod-p
+    (unless (buffer-temporary?)
+      (when haskell-has-ghc-mod-p
         (ghc-init)
         (add-to-list 'company-backends 'company-ghc))
 
@@ -105,11 +105,11 @@
 
       (haskell-doc-mode 1))
 
-    (when haskell|has-hindent-p
+    (when haskell-has-hindent-p
       (hindent-mode 1))
 
     (turn-on-haskell-indent)
-    (if haskell|has-shm-p
+    (if haskell-has-shm-p
         (structured-haskell-mode 1)
       ;; haskell-indentation-mode is incompatible with shm
       (haskell-indentation-mode 1))
@@ -120,7 +120,7 @@
   (fset 'ghc-check-syntax (lambda () "Do nothing")))
 
 (with-eval-after-load 'haskell-cabal
-  (define-keys :map haskell-cabal-mode-map
+  (define-key! :map haskell-cabal-mode-map
              ("C-c a c" . haskell-compile)
              ("C-c a a" . haskell-process-cabal )
              ("C-c C-c" . haskell-process-cabal-build)

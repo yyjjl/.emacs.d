@@ -1,27 +1,26 @@
-(package|require 'expand-region)
+(require! 'expand-region)
 ;; Mark tools
-(package|require 'visual-regexp)
-(package|require 'multiple-cursors)
+(require! 'visual-regexp)
+(require! 'multiple-cursors)
 ;; `wgrep' allows you to edit a grep buffer and apply those changes
 ;; to the file buffer.
-(package|require 'wgrep)
+(require! 'wgrep)
 ;; provide tree style search jump
-(package|require 'avy)
-(package|require 'easy-kill)
+(require! 'avy)
 
 
 
-(defvar main|narrow-dwim-alist
+(defvar core-narrow-dwim-alist
   '((org-mode org-narrow-to-subtree org-narrow-to-element)
     (latex-mode LaTeX-narrow-to-environment TeX-narrow-to-group)))
-(defun main|narrow-or-widen-dwim (&optional arg)
+(defun core/narrow-or-widen-dwim (&optional arg)
   "If the buffer is narrowed, it widens.
 Otherwise,it narrows to region, or Org subtree.
 Optional argument ARG is used to toggle narrow functions."
   (interactive "P")
   (cond ((buffer-narrowed-p) (widen))
         ((region-active-p) (narrow-to-region (region-beginning) (region-end)))
-        (t (let ((cmd (cdr (assoc major-mode main|narrow-dwim-alist))))
+        (t (let ((cmd (cdr (assoc major-mode core-narrow-dwim-alist))))
              (if cmd
                  (setq cmd (if arg (cadr cmd) (car cmd)))
                (setq cmd (if arg #'narrow-to-page #'narrow-to-defun)))
@@ -29,7 +28,7 @@ Optional argument ARG is used to toggle narrow functions."
                (message "Use command `%s'" cmd)
                (funcall cmd))))))
 
-(defun main|grab-regexp (regexp)
+(defun core/grab-regexp (regexp)
   "Grab strings matching REGEXP to list."
   (let ((s (buffer-string))
         (pos 0)
@@ -41,28 +40,27 @@ Optional argument ARG is used to toggle narrow functions."
       (add-to-list 'items item))
     items))
 
-(autoload 'string-join "subr-x")
-(defun main|kill-regexp (regexp)
+(defun core/kill-regexp (regexp)
   "Find all strings matching REGEXP in current buffer.
 grab matched string and insert them into `kill-ring'"
   (interactive
    (let ((regexp (read-regexp "grep regex: ")))
      (list regexp)))
-  (let ((items (main|grab-regexp regexp)))
+  (let ((items (core/grab-regexp regexp)))
     (kill-new (string-join items "\n"))
     (message "matched strings => kill-ring")
     items))
 
-(define-keys
+(define-key!
   ("M-;" . evilnc-comment-or-uncomment-lines)
-  ("C-x n n" . main|narrow-or-widen-dwim)
-  ("C-x K" . main|kill-regexp)
+  ("C-x n n" . core/narrow-or-widen-dwim)
+  ("C-x K" . core/kill-regexp)
 
   ("C-=" . mc/mark-next-like-this)
   ("C--" . mc/mark-previous-like-this))
 
 
-(define-keys :prefix "C-c m"
+(define-key! :prefix "C-c m"
   ("q" . vr/query-replace)
   ("R" . vr/replace)
   ("v" . vr/mc-mark)
@@ -89,7 +87,7 @@ grab matched string and insert them into `kill-ring'"
     ("b" picture-motion-reverse "backward")
     ("C-SPC" set-mark-command "mark")
     ("RET" nil nil))
-  (define-keys :map picture-mode-map
+  (define-key! :map picture-mode-map
     ("C-d" . picture-delete-char)
     ("C-c C-f") ("C-c C-b")
     ("C-c a" . artist-mode)
@@ -99,7 +97,7 @@ grab matched string and insert them into `kill-ring'"
     ("C-p" . hydra|picture-move/picture-move-up)))
 
 (with-eval-after-load 'artist
-  (define-keys :map artist-mode-map
+  (define-key! :map artist-mode-map
     ("p" . artist-previous-line)
     ("n" . artist-next-line)
     ("b" . artist-backward-char)
@@ -135,9 +133,8 @@ grab matched string and insert them into `kill-ring'"
     ("C-c s f" . artist-select-op-flood-fill)))
 
 ;; `avy' jump commands
-(define-keys
+(define-key!
   ("M--" . er/expand-region)
-  ("M-w" . easy-kill)
 
   ("M-g 1" . avy-goto-char)
   ("M-g 2" . avy-goto-char-2)

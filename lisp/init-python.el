@@ -1,15 +1,15 @@
-(package|require 'elpy "melpa-stable")
-(package|require 'py-isort)
+(require! 'elpy "melpa-stable")
+(require! 'py-isort)
 
 
 
-(defhook python|setup (python-mode-hook)
+(define-hook! python|setup (python-mode-hook)
   (local-set-key (kbd "C-c b") 'elpy-autopep8-fix-code)
   (local-set-key (kbd "C-c B") 'py-isort-buffer)
-  (local-set-key (kbd "C-c M-d") 'python|generate-doc-at-point)
+  (local-set-key (kbd "C-c M-d") 'python/generate-doc-at-point)
   ;; emacs 24.4 only
   (setq electric-indent-chars (delq ?: electric-indent-chars))
-  (unless (buffer-temporary-p)
+  (unless (buffer-temporary?)
     ;; run command `pip install jedi flake8 importmagic` in shell,
     ;; or just check https://github.com/jorgenschaefer/elpy
     (semantic-idle-summary-mode -1)
@@ -19,23 +19,23 @@
   (setq py-isort-options '("--lines=100")))
 
 (with-eval-after-load 'elpy
-  (remap-keybindings "C-c C-r" "C-c r" elpy-mode-map)
+  (remap! "C-c C-r" "C-c r" elpy-mode-map)
   (setcar elpy-test-discover-runner-command "python3")
-  (if python|has-ipython-p
+  (if python-has-ipython-p
       (elpy-use-ipython)
     (elpy-use-cpython "python3"))
   (setq elpy-rpc-backend "jedi"
         elpy-rpc-python-command "python3"
         elpy-modules (delete 'elpy-module-flymake elpy-modules)
         elpy-test-runner 'elpy-test-pytest-runner)
-  (define-keys :map elpy-mode-map
+  (define-key! :map elpy-mode-map
     ("C-c C-n" . nil)
     ("C-c C-p" . nil)))
 
 
 
-(defun python|generate-doc (params indent)
-  (setq indent (concat "\n" indent))
+(defun python/generate-doc ($params $indent)
+  (setq $indent (concat "\n" $indent))
   (string-join (mapcar (lambda (token)
                          (let ((param (split-string token "=" t " +"))
                                default)
@@ -45,11 +45,11 @@
                                    (if default
                                        (format " (default: %s): " default)
                                      ": ")
-                                   indent "@type " param ": ")))
-                       (split-string params "," t " +"))
-               indent))
+                                   $indent "@type " param ": ")))
+                       (split-string $params "," t " +"))
+               $indent))
 
-(defun python|generate-doc-at-point ()
+(defun python/generate-doc-at-point ()
   (interactive)
   (let (params indent)
     (save-excursion

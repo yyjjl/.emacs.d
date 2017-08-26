@@ -1,34 +1,15 @@
-(package|require 'emmet-mode)
-(package|require 'web-mode)
-(when js2|has-web-beautify-p
-  (package|require 'web-beautify))
-(package|require 'company-web)
+(require! 'emmet-mode)
+(require! 'web-mode)
+(when js2-has-web-beautify-p
+  (require! 'web-beautify))
+(require! 'company-web)
 ;; Optional package add support for angluar 1.x
-;; (package|require 'ac-html-angular)
-;; (package|require 'ac-html-bootstrap)
+;; (require! 'ac-html-angular)
+;; (require! 'ac-html-bootstrap)
 
 
 
-;; flyspell set up for web-mode
-(defun web|flyspell-verify ()
-  (let ((f (get-text-property (- (point) 1) 'face)))
-    (not (memq f '(web-mode-html-attr-value-face
-                   web-mode-html-tag-face
-                   web-mode-html-attr-name-face
-                   web-mode-constant-face
-                   web-mode-doctype-face
-                   web-mode-keyword-face
-                   web-mode-comment-face ;; focus on get html label right
-                   web-mode-function-name-face
-                   web-mode-variable-name-face
-                   web-mode-css-property-name-face
-                   web-mode-css-selector-face
-                   web-mode-css-color-face
-                   web-mode-type-face
-                   web-mode-block-control-face)))))
-(put 'web-mode 'flyspell-mode-predicate 'web|flyspell-verify)
-
-(defhook web|setup (web-mode-hook)
+(define-hook! web|setup (web-mode-hook)
   (add-to-list 'company-backends 'company-web-html)
   ;;     (add-to-list 'company-backends 'company-web-jade)
   ;;     (add-to-list 'company-backends 'company-web-slim)
@@ -55,10 +36,10 @@
           ;; angular imenu
           (" \\(ng-[a-z]*\\)=\"\\([^\"]+\\)" 1 2 "=")))
   (define-key web-mode-map (kbd "C-c b") #'web-beautify-html)
-  (remap-keybindings "C-c C-a" "C-c a" web-mode-map)
-  (remap-keybindings "C-c C-d" "C-c d" web-mode-map)
-  (remap-keybindings "C-c C-e" "C-c e" web-mode-map)
-  (remap-keybindings "C-c C-t" "C-c t" web-mode-map))
+  (remap! "C-c C-a" "C-c a" web-mode-map)
+  (remap! "C-c C-d" "C-c d" web-mode-map)
+  (remap! "C-c C-e" "C-c e" web-mode-map)
+  (remap! "C-c C-t" "C-c t" web-mode-map))
 
 (add-hook 'html-mode-hook 'emmet-mode)
 (add-hook 'sgml-mode-hook 'emmet-mode)

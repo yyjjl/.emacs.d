@@ -1,34 +1,36 @@
 ;; C/C++ I need stable version
-(package|require 'cmake-ide "melpa-stable")
-(package|require 'irony "melpa-stable")
-(package|require 'company-irony "melpa-stable")
-(package|require 'company-irony-c-headers "melpa-stable")
-(package|require 'flycheck-irony "melpa-stable")
-(package|require 'irony-eldoc "melpa-stable")
-(package|require 'clang-format)
-(package|require 'rtags "melpa-stable")
-(package|require 'ivy-rtags "melpa-stable")
-(package|require 'cmake-mode)
-(package|require 'cmake-font-lock)
-(package|require 'modern-cpp-font-lock)
+(require! 'cmake-ide "melpa-stable")
+(require! 'irony "melpa-stable")
+(require! 'company-irony "melpa-stable")
+(require! 'company-irony-c-headers "melpa-stable")
+(require! 'flycheck-irony "melpa-stable")
+(require! 'irony-eldoc "melpa-stable")
+(require! 'clang-format)
+(require! 'rtags "melpa-stable")
+(require! 'ivy-rtags "melpa-stable")
+(require! 'cmake-mode)
+(require! 'cmake-font-lock)
+(require! 'modern-cpp-font-lock)
 
 
 
-(defun cpp|fix-cc-indent-offset (key val)
-  (let ((pair (assoc key c-offsets-alist)))
+(defun cpp/fix-cc-indent-offset ($key $val)
+  (let ((pair (assoc $key c-offsets-alist)))
     (if pair
-        (setcdr pair val)
-      (push (cons key val) c-offsets-alist))))
+        (setcdr pair $val)
+      (push (cons $key $val) c-offsets-alist))))
 
 ;; Makefile support for rtags
-(defvar-local cpp|cmake-ide-enabled nil)
-(defsubst cpp|locate-makefile (&optional makefile-name)
-  (locate-dominating-file default-directory (or makefile-name "Makefile")))
-(defun cpp|rtags-indexing-with-makefile (&optional name)
+(defvar-local cpp-cmake-ide-enabled nil)
+
+(defsubst cpp/locate-makefile (&optional $makefile-name)
+  (locate-dominating-file default-directory (or $makefile-name "Makefile")))
+
+(defun cpp/rtags-indexing-with-makefile (&optional $name)
   (interactive)
   (if (rtags-is-indexed)
       (message "Project indexed already !!")
-    (let ((root (cpp|locate-makefile name)))
+    (let ((root (cpp/locate-makefile $name)))
       (if root
           (let ((default-directory root) ret)
             (equal (shell-command (format "make -nk|%s -c -"
@@ -37,18 +39,18 @@
         (message "Makefile not found !!!")
         nil))))
 
-(defun cpp|remove-project-rtags-cache (&optional force)
+(defun cpp/remove-project-rtags-cache (&optional $force)
   (interactive "P")
   (let ((root (ignore-errors (projectile-project-root))))
-    (when (and root (or force (y-or-n-p (format "Delete %s"
-                                                (abbreviate-file-name root)))))
+    (when (and root (or $force (y-or-n-p (format "Delete %s"
+                                                 (abbreviate-file-name root)))))
       (let ((default-directory root))
         (shell-command (format "%s -W %s"
                                (expand-file-name "rc" rtags-path)
                                default-directory))
-        (cpp|c++-normal-setup)))))
+        (cpp/c++-normal-setup)))))
 
-(defun cpp|common-cc-setup ()
+(defun cpp/common-cc-setup ()
   "Setup shared by all languages (java/groovy/c++ ...)"
   (turn-on-auto-fill)
   (setq c-basic-offset 4)
@@ -57,37 +59,37 @@
   ;; (c-toggle-auto-newline 1)
   ;; indent
   (highlight-indentation-set-offset 4)
-  (cpp|fix-cc-indent-offset 'innamespace [0])
-  (cpp|fix-cc-indent-offset 'substatement-open 0)
-  (cpp|fix-cc-indent-offset 'func-decl-cont 0)
-  (cpp|fix-cc-indent-offset 'case-label 4))
+  (cpp/fix-cc-indent-offset 'innamespace [0])
+  (cpp/fix-cc-indent-offset 'substatement-open 0)
+  (cpp/fix-cc-indent-offset 'func-decl-cont 0)
+  (cpp/fix-cc-indent-offset 'case-label 4))
 
-(defun cpp|rtags-setup ()
-  (setq-local eldoc-documentation-function 'cpp|rtags-eldoc)
+(defun cpp/rtags-setup ()
+  (setq-local eldoc-documentation-function 'cpp/rtags-eldoc)
   (local-set-key (kbd "M-.") 'rtags-find-symbol-at-point)
   (local-set-key (kbd "M-,") 'rtags-location-stack-back)
   (local-set-key (kbd "M-n") 'rtags-next-match)
   (local-set-key (kbd "M-p") 'rtags-previous-match)
   (local-set-key (kbd "C-c .") 'rtags-symbol-type)
-  (local-set-key (kbd "C-c C-k") 'cpp|remove-project-rtags-cache)
-  (when cpp|has-irony-p (irony-eldoc -1))
-  (when tags|has-ggtags-p (ggtags-mode -1)))
+  (local-set-key (kbd "C-c C-k") 'cpp/remove-project-rtags-cache)
+  (when cpp-has-irony-p (irony-eldoc -1))
+  (when tags-has-ggtags-p (ggtags-mode -1)))
 
-(defun cpp|try-use-rtags ()
+(defun cpp/try-use-rtags ()
   (interactive)
-  (if cpp|has-rtags-p
-      (if cpp|cmake-ide-enabled
+  (if cpp-has-rtags-p
+      (if cpp-cmake-ide-enabled
           (progn (cmake-ide-run-cmake)
-                 (cpp|rtags-setup))
-        (when (cpp|rtags-indexing-with-makefile)
+                 (cpp/rtags-setup))
+        (when (cpp/rtags-indexing-with-makefile)
           (message "Rtags is ready !!")
-          (cpp|rtags-setup)))
+          (cpp/rtags-setup)))
     (message "Rtags not found !!!")))
 
-(defun cpp|c++-normal-setup ()
+(defun cpp/c++-normal-setup ()
   (setq-local compile-command
               '(ignore-errors
-                 (let ((root (cpp|locate-makefile)))
+                 (let ((root (cpp/locate-makefile)))
                    (if root (concat "make -C " root)
                      (let ((filename (buffer-file-name)))
                        (concat "g++ "
@@ -100,32 +102,32 @@
                                " "
                                (file-name-nondirectory filename) " -o "
                                (file-name-base filename)))))))
-  (when cpp|has-irony-p (irony-eldoc)))
+  (when cpp-has-irony-p (irony-eldoc)))
 
-(defun cpp|compile ()
+(defun cpp/compile ()
   (interactive)
   (call-interactively
-   (if cpp|cmake-ide-enabled
+   (if cpp-cmake-ide-enabled
        'cmake-ide-compile
      'compile)))
 
 (setq hide-ifdef-mode-prefix-key (kbd "C-c h"))
-(defun cpp|c++-setup ()
+(defun cpp/c++-setup ()
   "C/C++ only setup"
   (local-set-key (kbd "C-c o") 'ff-find-other-file)
   (local-set-key (kbd "C-c b") 'clang-format-buffer)
   (local-set-key (kbd "C-c C-j") 'semantic-ia-fast-jump)
   (local-set-key (kbd "C-c C-v") 'semantic-decoration-include-visit)
   (local-set-key (kbd "C-c C-c") 'cmake-ide-run-cmake)
-  (local-set-key [f9] 'cpp|try-use-rtags)
-  (local-set-key [f10] 'cpp|compile)
+  (local-set-key [f9] 'cpp/try-use-rtags)
+  (local-set-key [f10] 'cpp/compile)
   (local-set-key [f5] 'gdb)
 
   (hide-ifdef-mode)
 
   (modern-c++-font-lock-mode 1)
 
-  (when tags|has-ggtags-p
+  (when tags-has-ggtags-p
     (ggtags-mode 1)
     (setq completion-at-point-functions '(t)))
 
@@ -136,36 +138,36 @@
     (setq flycheck-clang-language-standard nil))
 
   (unless (or (file-remote-p default-directory)
-              (bound-and-true-p cpp|setup-literally)
-              (> (buffer-size) main|large-buffer-size))
-    (when cpp|has-irony-p
+              (bound-and-true-p cpp/setup-literally)
+              (> (buffer-size) core-large-buffer-size))
+    (when cpp-has-irony-p
       (add-to-list 'company-backends #'company-irony)
       (add-to-list 'company-backends #'company-irony-c-headers)
       (add-to-list 'company-backends #'company-files)
       (irony-mode 1))
     ;; Make sure rdm is running
-    (when cpp|has-rtags-p
+    (when cpp-has-rtags-p
       (rtags-start-process-unless-running))
 
     (if (cmake-ide--locate-cmakelists)
         (progn
-          (setq-local cpp|cmake-ide-enabled t)
-          (cpp|rtags-setup))
-      (cpp|c++-normal-setup))))
+          (setq-local cpp-cmake-ide-enabled t)
+          (cpp/rtags-setup))
+      (cpp/c++-normal-setup))))
 
 ;; Do not use `c-mode-hook' and `c++-mode-hook', there is a bug
-(defvar-local cpp|initialized-p nil)
-(defhook cpp|common-setup (c-mode-common-hook)
-  (unless cpp|initialized-p
-    (setq cpp|initialized-p t)
+(defvar-local cpp/initialized-p nil)
+(define-hook! cpp/common-setup (c-mode-common-hook)
+  (unless cpp/initialized-p
+    (setq cpp/initialized-p t)
     (if (>= (string-to-number c-version) 5.33)
         (run-hooks 'prog-mode-hook))
 
-    (cpp|common-cc-setup)
-    (unless (buffer-temporary-p)
+    (cpp/common-cc-setup)
+    (unless (buffer-temporary?)
       (unless (or (derived-mode-p 'java-mode)
                   (derived-mode-p 'groovy-mode))
-        (cpp|c++-setup)))))
+        (cpp/c++-setup)))))
 
 (with-eval-after-load 'irony
   (add-hook 'flycheck-mode-hook 'flycheck-irony-setup)
@@ -174,7 +176,7 @@
           "-I/usr/lib/gcc/x86_64-linux-gnu/5/include/"
           "-std=c++14"))
 
-  (defun cpp|irony-setup (irony-mode-hook)
+  (defun cpp/irony-setup (irony-mode-hook)
     (define-key irony-mode-map [remap completion-at-point]
       'irony-completion-at-point-async)
     (define-key irony-mode-map [remap complete-symbol]
@@ -192,7 +194,7 @@
   (setq cmake-ide-build-pool-use-persistent-naming t))
 
 (with-eval-after-load 'rtags
-  (defun cpp|rtags-eldoc ()
+  (defun cpp/rtags-eldoc ()
     (when (and (not (nth 4 (syntax-ppss)))
                (let ((text (thing-at-point 'symbol)))
                  (when (and text (sequencep text))

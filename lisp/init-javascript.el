@@ -1,14 +1,16 @@
-(package|require 'js-doc)
-(package|require 'js2-mode)
-(package|require 'js-comint)
-(package|require 'js2-refactor)
-(when js2|has-web-beautify-p
-  (package|require 'web-beautify))
-(when js2|has-tern-p
-  (package|require 'company-tern)
-  (package|require 'tern))
+(require! 'js-doc)
+(require! 'js2-mode)
+(require! 'js-comint)
+(require! 'js2-refactor)
+(when js2-has-web-beautify-p
+  (require! 'web-beautify))
+(when js2-has-tern-p
+  (require! 'company-tern)
+  (require! 'tern))
 
-(defun js2|print-json-path (&optional hardcoded-array-index)
+
+
+(defun js2/print-json-path (&optional $hardcoded-array-index)
   "Print the path to the JSON value under point, and save it in the kill ring.
 If HARDCODED-ARRAY-INDEX provided, array index in JSON path is
 replaced with it."
@@ -30,7 +32,7 @@ replaced with it."
         (push (js2-get-element-index-from-array-node
                previous-node
                current-node
-               hardcoded-array-index)
+               $hardcoded-array-index)
               result))
        ;; Other nodes are ignored
        (t))
@@ -49,34 +51,19 @@ replaced with it."
     result))
 
 (with-eval-after-load 'js2-mode
-  (when js2|has-web-beautify-p
+  (when js2-has-web-beautify-p
     (define-key js2-mode-map (kbd "C-c b") 'web-beautify-js)))
 
-(defhook js2|setup (js2-mode-hook)
+(define-hook! js2|setup (js2-mode-hook)
   (js2-imenu-extras-mode)
   (setq mode-name "Js2")
   (js2r-add-keybindings-with-prefix "C-c j")
   (js2-refactor-mode 1)
 
-  (unless (and (buffer-temporary-p)
-               js2|has-tern-p)
+  (unless (and (buffer-temporary?)
+               js2-has-tern-p)
     (tern-mode 1)
     (add-to-list 'company-backends 'company-tern)))
-
-;;  `flyspell' setup for js2-mode
-(defun js2|flyspell-verify ()
-  (let* ((f (get-text-property (- (point) 1) 'face)))
-    ;; Only words with following font face will be checked
-    (memq f '(js2-function-call
-              js2-function-param
-              js2-object-property
-              font-lock-variable-name-face
-              font-lock-string-face
-              font-lock-function-name-face
-              font-lock-builtin-face
-              rjsx-tag
-              rjsx-attr))))
-(put 'js2-mode 'flyspell-mode-predicate 'js2|flyspell-verify)
 
 (setq-default js2-use-font-lock-faces t
               js2-mode-must-byte-compile nil

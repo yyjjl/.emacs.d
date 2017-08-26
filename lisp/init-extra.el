@@ -1,20 +1,20 @@
-(package|require 'restclient)
-(package|require 'company-restclient)
-(when emacs|has-mpv-p
-  (package|require 'emms))
-(package|require 'markdown-mode)
-(package|require 'crontab-mode)
-(package|require 'csv-mode)
-(package|require 'glsl-mode)
-(package|require 'php-mode)
-(package|require 'gnuplot-mode)
-(package|require 'csharp-mode)
-(package|require 'graphviz-dot-mode)
+(require! 'restclient)
+(require! 'company-restclient)
+(when emacs-has-mpv-p
+  (require! 'emms))
+(require! 'markdown-mode)
+(require! 'crontab-mode)
+(require! 'csv-mode)
+(require! 'glsl-mode)
+(require! 'php-mode)
+(require! 'gnuplot-mode)
+(require! 'csharp-mode)
+(require! 'graphviz-dot-mode)
 ;; Move buffers between windows
-(package|require 'buffer-move)
-(package|require 'figlet)
-(package|require 'zeal-at-point)
-(package|require 'skeletor)
+(require! 'buffer-move)
+(require! 'figlet)
+(require! 'zeal-at-point)
+(require! 'skeletor)
 
 
 
@@ -28,7 +28,7 @@
 (defalias 'perl-mode 'cperl-mode)
 
 (with-eval-after-load 'grep
-  (dolist (v main|ignored-directories)
+  (dolist (v core-ignored-directories)
     (add-to-list 'grep-find-ignored-directories v)))
 
 ;; Zeal at point
@@ -44,51 +44,51 @@
 
 ;; `restclient-mode'
 (with-eval-after-load 'restclient
-  (define-keys :map restclient-mode-map
+  (define-key! :map restclient-mode-map
     ("M-p" . restclient-jump-prev)
     ("M-n" . restclient-jump-next)))
-(defhook extra|restclient-setup (restclient-mode-hook)
+(define-hook! extra|restclient-setup (restclient-mode-hook)
   (add-to-list 'company-backends 'company-restclient))
 
-(defconst extra|ascii-before-chinese
+(defconst extra-ascii-before-chinese
   (rx (group-n 1 (in "a-zA-Z0-9!@#$%^&\\-+|)\\]}\\:;?><.,/"))
       (group-n 2 (category chinese-two-byte))))
-(defconst extra|ascii-after-chinese
+(defconst extra-ascii-after-chinese
   (rx (group-n 1 (category chinese-two-byte))
       (group-n 2 (in "a-zA-Z0-9@#$%^&\\-+|(\\[{\\></"))))
 
-(defun extra|insert-space-around-chinese (&optional start end)
+(defun extra/insert-space-around-chinese (&optional $start $end)
   (interactive)
   (if (region-active-p)
-      (setq start (region-beginning)
-            end (region-end))
-    (setq start (point-min)
-          end (point-max)))
+      (setq $start (region-beginning)
+            $end (region-end))
+    (setq $start (point-min)
+          $end (point-max)))
   (save-excursion
-    (goto-char start)
-    (while (re-search-forward extra|ascii-before-chinese end t)
+    (goto-char $start)
+    (while (re-search-forward extra-ascii-before-chinese $end t)
       (replace-match "\\1 \\2" nil nil))
-    (goto-char start)
-    (while (re-search-forward extra|ascii-after-chinese end t)
+    (goto-char $start)
+    (while (re-search-forward extra-ascii-after-chinese $end t)
       (replace-match "\\1 \\2" nil nil))))
 
-(global-set-key (kbd "M-Q") 'extra|insert-space-around-chinese)
+(global-set-key (kbd "M-Q") 'extra/insert-space-around-chinese)
 
-(defun extra|clipboard-copy (beg end)
+(defun extra/clipboard-copy ($beg $end)
   (interactive "r")
   (if (display-graphic-p)
-      (kill-new (buffer-substring-no-properties beg end))
-    (if emacs|has-xsel-p
-        (if (= 0 (shell-command-on-region beg end "xsel -ib"))
+      (kill-new (buffer-substring-no-properties $beg $end))
+    (if emacs-has-xsel-p
+        (if (= 0 (shell-command-on-region $beg $end "xsel -ib"))
             (message "Copy finished")
           (message "Error occured !!!"))
       (message "Executable `xsel' not found !!!"))))
 
-(defun extra|clipboard-paste ()
+(defun extra/clipboard-paste ()
   (interactive)
   (if (display-graphic-p)
       (yank 1)
-    (if emacs|has-xsel-p
+    (if emacs-has-xsel-p
         (shell-command "xsel -ob" t)
       (message "Executable `xsel' not found !!!"))))
 
@@ -115,16 +115,6 @@
 (with-eval-after-load 'calc
   (add-to-list 'calc-language-alist '(org-mode . latex)))
 
-;; `doxygen' setup
-(autoload 'doxygen-insert-function-comment
-  "doxygen" "insert comment for the function at point" t)
-(autoload 'doxygen-insert-file-comment
-  "doxygen" "insert comment for file" t)
-(autoload 'doxygen-insert-member-group-region
-  "doxygen" "insert comment for member group" t)
-(autoload 'doxygen-insert-compound-comment
-  "doxygen" "insert comment for compound" t)
-
 (with-eval-after-load 'emms
   (emms-all)
   (emms-mode-line -1)
@@ -136,16 +126,16 @@
   (setq emms-source-file-default-directory "~/music/")
   (setq emms-player-list '(emms-player-mplayer))
 
-  (advice-add 'emms-lyrics-display-handler :around #'main|ignore-error)
+  (advice-add 'emms-lyrics-display-handler :around #'core/ignore-error)
   (add-hook 'emms-playlist-mode-hook #'emms-mark-mode))
 
-(when emacs|has-mpv-p
+(when emacs-has-mpv-p
   (require 'emms)
   (defun extra|emms-current-name ()
     (concat (propertize
              (abbreviate-file-name (emms-mode-line-playlist-current))
              'face 'font-lock-constant-face)))
-  (defhydra hydra|emms (:color pink :hint nil)
+  (defhydra hydra-emms (:color pink :hint nil)
     "
 %s(extra|emms-current-name)
 [_=_/_-_]volume raise/lower  [_d_/_D_]play directory subtree/current
@@ -167,9 +157,9 @@
     ("-" emms-volume-lower)
     ("=" emms-volume-raise)
     ("q" nil nil))
-  (global-set-key [f12] #'hydra|emms/body))
+  (global-set-key [f12] #'hydra-emms/body))
 
-(define-keys
+(define-key!
   ;; buffer-mode
   ("C-c w k" . buf-move-up)
   ("C-c w j" . buf-move-down)

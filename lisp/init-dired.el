@@ -1,9 +1,9 @@
 ;; Improve `dired-mode'
-(package|require 'dired+)
+(require! 'dired+)
 
 
 
-(defun dired|git-command-in-shell (command &optional arg file-list)
+(defun dired/git-command-in-shell ($command &optional $arg $file-list)
   "Run a shell command `git COMMAND`' on the marked files.
 if no files marked, always operate on current line in dired-mode
 "
@@ -14,13 +14,13 @@ if no files marked, always operate on current line in dired-mode
       (dired-read-shell-command "git command on %s: " current-prefix-arg files)
       current-prefix-arg
       files)))
-  (unless (string-match "[*?][ \t]*\\'" command)
-    (setq command (concat command " *")))
-  (setq command (concat "git " command))
-  (dired-do-shell-command command arg file-list)
-  (message command))
+  (unless (string-match "[*?][ \t]*\\'" $command)
+    (setq $command (concat $command " *")))
+  (setq $command (concat "git " $command))
+  (dired-do-shell-command $command $arg $file-list)
+  (message $command))
 
-(defun dired|open-externally ()
+(defun dired/open-externally ()
   "Open the current file or dired marked files in external app.
 The app is chosen from your OS's preference."
   (interactive)
@@ -41,7 +41,7 @@ The app is chosen from your OS's preference."
               file-list))))))
 
 (with-eval-after-load 'dired
-  (defhook dired|setup (dired-mode-hook)
+  (define-hook! dired|setup (dired-mode-hook)
     (dired-hide-details-mode 1))
 
   (setq dired-dwim-target t)
@@ -52,7 +52,7 @@ The app is chosen from your OS's preference."
   (setq wdired-allow-to-change-permissions t)
 
   (define-key dired-mode-map ")" 'dired-omit-mode)
-  (define-key dired-mode-map "E" 'dired|open-externally)
+  (define-key dired-mode-map "E" 'dired/open-externally)
 
   (require 'dired-x)
   (require 'dired+)

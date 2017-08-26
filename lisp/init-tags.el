@@ -1,4 +1,4 @@
-(package|require 'ggtags)
+(require! 'ggtags)
 
 
 
@@ -7,7 +7,7 @@
   (setq ggtags-mode-prefix-key "\C-cg")
   (setq ggtags-mode-prefix-map
         (let ((m (make-sparse-keymap)))
-          (define-keys :map m
+          (define-key! :map m
             ("D" . ggtags-delete-tags)
             ("p" . ggtags-prev-mark)
             ("n" . ggtags-next-mark)
