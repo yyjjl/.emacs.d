@@ -7,7 +7,7 @@
 
 (setq file-name-handler-alist nil)
 ;; Don't GC during startup to save time
-(setq gc-cons-threshold (* 1024 1024 1024)
+(setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 0.6)
 
 ;; NO tool bar or scroll bar

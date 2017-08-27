@@ -169,6 +169,18 @@ Does not indent buffer, because it is used for a
         (switch-to-buffer buf))
     (message "`recentf-mode' must be turned on !!!")))
 
+(defun core/occur-dwim ()
+  (interactive)
+  (if (region-active-p)
+      (push (buffer-substring-no-properties
+             (region-beginning)
+             (region-end))
+            regexp-history)
+    (let ((sym (thing-at-point 'symbol)))
+      (when (stringp sym)
+        (push (concat "\\_<" (regexp-quote sym) "\\_>") regexp-history))))
+  (call-interactively 'occur))
+
 (defvar socks-server '("Default server" "127.0.0.1" 1080 5))
 (defun core/toggle-socket-proxy ()
   (interactive)
@@ -196,6 +208,8 @@ Does not indent buffer, because it is used for a
   ("C-c q" . auto-fill-mode)
   ("C-x C-b" . ibuffer)
   ("M-/" . hippie-expand)
+  ("M-s o" . core/occur-dwim)
+  ("M-s e" . iedit-mode)
   ("RET" . newline-and-indent)
 
   ("C-}" . core/company-yasnippet)

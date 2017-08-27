@@ -26,12 +26,15 @@
           (completion-list-mode :noselect t)
           (compilation-mode :noselect t)
           (grep-mode :noselect t)
-          (occur-mode :noselect t)
+          occur-mode
+          ivy-occur-mode
           ("*Pp Macroexpand Output*" :noselect t)
           "*sdcv*"
           "*Shell Command Output*"
           "*vc-diff*"
           "*vc-change-log*"
+          "*lispy-message*"
+          ("^\\*magit:.*" :regexp t :stick t)
           ("^\\*anything.*\\*$" :regexp t)))
   (defun core*popup-auto-select-psotion (&rest $args)
     (setq popwin:popup-window-position

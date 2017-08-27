@@ -1,10 +1,10 @@
 (defun mode-line%window-number ()
   (let* ((narrow-p (buffer-narrowed-p))
          (num-str (concat
-                    (if narrow-p "<" " ")
-                    (and (bound-and-true-p window-numbering-mode)
-                         (ignore-errors (window-numbering-get-number-string)))
-                    (if narrow-p ">" " "))))
+                   (if narrow-p "<" " ")
+                   (and (bound-and-true-p window-numbering-mode)
+                        (ignore-errors (window-numbering-get-number-string)))
+                   (if narrow-p ">" " "))))
     (add-face-text-property 0 (length num-str)
                             '(:inherit mode-line-window-number)
                             nil num-str)
@@ -16,16 +16,16 @@ Default format 'window-number %[%b (host-address) %]'
 If function `window-numbering-mode' enabled window-number will be showed.
 If buffer file is a remote file, host-address will be showed"
   (let* ((host (and default-directory
-                     (let ((tmp (file-remote-p default-directory)))
-                       (and tmp (split-string tmp ":")))))
+                    (let ((tmp (file-remote-p default-directory)))
+                      (and tmp (split-string tmp ":")))))
          (real-id (concat
-                    (propertize
-                     (format-mode-line  mode-line-buffer-identification)
-                     'face 'font-lock-keyword-face)
-                    (if (and host (cdr host))
-                        (propertize (concat "(" (cadr host) ")")
-                                    'face font-lock-string-face)
-                      ""))))
+                   (propertize
+                    (format-mode-line  mode-line-buffer-identification)
+                    'face 'font-lock-keyword-face)
+                   (if (and host (cdr host))
+                       (propertize (concat "(" (cadr host) ")")
+                                   'face font-lock-string-face)
+                     ""))))
     (list " %[" real-id "%] ")))
 
 (defun mode-line%buffer-major-mode ()
@@ -65,17 +65,18 @@ and `buffer-file-coding-system'"
   (if (bound-and-true-p flycheck-mode)
       (list
        (pcase flycheck-last-status-change
-         (`not-checked (propertize "waiting" 'face 'font-lock-comment-face))
-         (`no-checker  (propertize "no-checker" 'face 'font-lock-comment-face))
-         (`running (propertize "running" 'face  'font-lock-doc-face))
-         (`errored (propertize "error" 'face  'flycheck-fringe-error))
-         (`interrupted (propertize "interrupted" 'face  'flycheck-fringe-warning))
+         (`not-checked (propertize "Waiting" 'face 'font-lock-comment-face))
+         (`no-checker  (propertize "No" 'face 'font-lock-comment-face))
+         (`running (propertize "Running" 'face  'font-lock-doc-face))
+         (`errored (propertize "Error" 'face  'flycheck-fringe-error))
+         (`interrupted (propertize "Interrupted"
+                                   'face  'flycheck-fringe-warning))
          (`suspicious (propertize "???" 'face 'flycheck-fringe-error))
          (`finished (let-alist (flycheck-count-errors flycheck-current-errors)
-                      (concat (propertize (format "e%s" (or .error 0))
+                      (concat (propertize (format "E%s" (or .error 0))
                                           'face 'flycheck-fringe-error)
                               " "
-                              (propertize (format "w%s" (or .warning 0))
+                              (propertize (format "W%s" (or .warning 0))
                                           'face 'flycheck-fringe-warning)))))
        " ")))
 
@@ -137,12 +138,13 @@ and `buffer-file-coding-system'"
   (unless (bound-and-true-p eldoc-mode-line-string)
     (let ((bn (buffer-name)))
       (apply #'mode-line%create
-             (cond ((or (not (equal (selected-window) mode-line--current-window))
-                        (eq major-mode 'term-mode)
+             (cond ((or (not (equal (selected-window)
+                                    mode-line--current-window)))
+                    mode-line--inactive-config)
+                   ((or (memq major-mode '(dired-mode
+                                           lisp-interaction-mode))
                         (and (not (derived-mode-p 'text-mode 'prog-mode))
                              (string-match-p "^\\*" bn)))
-                    mode-line--inactive-config)
-                   ((eq major-mode 'dired-mode)
                     mode-line--speical-config)
                    (t mode-line--default-config))))))
 

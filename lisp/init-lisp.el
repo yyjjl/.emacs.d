@@ -45,9 +45,11 @@
 Emacs Lisp."
   (make-local-variable 'hippie-expand-try-functions-list)
   (add-to-list 'hippie-expand-try-functions-list
-               'try-complete-lisp-symbol t)
+               'try-complete-lisp-symbol
+               :append)
   (add-to-list 'hippie-expand-try-functions-list
-               'try-complete-lisp-symbol-partially t))
+               'try-complete-lisp-symbol-partially
+               :append))
 
 (defun lisp/elisp-setup ()
   (lisp/common-setup)
