@@ -93,12 +93,6 @@
 
  vc-make-backup-files nil)
 
-;; Be quiet at startup; don't load or display anything unnecessary
-(advice-add #'display-startup-echo-area-message :override #'ignore)
-(setq inhibit-startup-message t
-      inhibit-startup-echo-area-message user-login-name
-      initial-scratch-message nil)
-
 ;; Suppress GUI features
 (setq use-file-dialog nil)
 (setq use-dialog-box nil)
@@ -147,14 +141,14 @@
   (toggle-truncate-lines 1))
 
 ;; Tab to skip close pair
-(defun core%indent-for-tab (-fn &optional -arg)
+(defun core%indent-for-tab ($fn &optional $arg)
   (if (looking-at "`\\|'\\|\"\\|}\\|\\$")
       (forward-char 1)
     (if (save-excursion
           (forward-line 0)
           (and outline-minor-mode (looking-at-p outline-regexp)))
         (outline-toggle-children)
-      (funcall -fn -arg))))
+      (funcall $fn $arg))))
 (advice-add 'indent-for-tab-command :around #'core%indent-for-tab)
 
 ;; Turns on `auto-fill-mode', don't use `text-mode-hook'
@@ -181,6 +175,9 @@
         gc-cons-percentage 0.1)
   ;; Load private configuration
   (ignore-errors (load-file custom-file))
-  (find-file (expand-var! "org/*note*")))
+  (run-with-timer 1 nil
+                  (lambda () (find-file (expand-var! "org/*note*")))))
+
+
 
 (provide 'core-defaults)

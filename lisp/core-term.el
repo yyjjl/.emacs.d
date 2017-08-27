@@ -141,21 +141,20 @@ none exists, or if the current buffer is already a term."
   (setq multi-term-dedicated-close-back-to-open-buffer-p t))
 
 (autoload 'with-editor-export-editor "with-editor" nil nil)
-(define-hook! core/shell-setup (shell-mode-hook eshell-mode-hook term-exec-hook)
-  (with-editor-export-editor)
-  (case major-mode
-    (shell-mode (comint-clear-buffer))
-    (term-mode (insert "clear")
-               (term-send-input))))
 
 (define-hook! term/shell-setup (shell-mode-hook)
+  (with-editor-export-editor)
+  (comint-clear-buffer)
   (let ((proc (ignore-errors (get-buffer-process (current-buffer)))))
     (when proc
       (set-process-sentinel proc
                             (term/wrap-sentinel (process-sentinel proc))))))
 
 (define-hook! term/utf8-setup (term-exec-hook)
-  (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
+  (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix)
+  (with-editor-export-editor)
+  (insert "clear")
+  (term-send-input))
 
 (global-set-key [f8] 'term/pop-shell)
 

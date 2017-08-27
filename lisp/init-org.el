@@ -255,15 +255,12 @@ With a prefix BELOW move point to lower block."
         (setcar macros "{{{.+?}}}")))
 
     (org-bullets-mode 1)
+    (auto-fill-mode -1)
 
-    (flycheck-mode -1)
     (make-local-variable 'completion-at-point-functions)
     (add-to-list 'completion-at-point-functions
                  'pcomplete-completions-at-point)
-    (add-to-list 'company-backends 'company-org-symbols)
-    ;; Display wrapped lines instead of truncated lines
-    (setq truncate-lines nil)
-    (setq word-wrap t))
+    (add-to-list 'company-backends 'company-org-symbols))
 
   (define-hook! org|src-setup (org-src-mode-hook)
     (when (eq major-mode 'python-mode)

@@ -26,50 +26,44 @@ If buffer file is a remote file, host-address will be showed"
                         (propertize (concat "(" (cadr host) ")")
                                     'face font-lock-string-face)
                       ""))))
-    (concat " %[" real-id "%] ")))
+    (list " %[" real-id "%] ")))
 
 (defun mode-line%buffer-major-mode ()
   "Display buffer major mode in mode-line."
-  (propertize "%m "
-              'face 'font-lock-builtin-face
-              'mouse-face 'mode-line-highlight
-              'local-map
-              (let ((map (make-sparse-keymap)))
-                (define-key map [mode-line mouse-2]
-                  'describe-mode)
-                (define-key map [mode-line down-mouse-1]
-                  `(menu-item
-                    ,(purecopy "Menu Bar")
-                    ignore
-                    :filter (lambda (_) (mouse-menu-major-mode-map))))
-                map)))
+  (propertize "%m " 'face 'font-lock-builtin-face))
 
 (defun mode-line%buffer-status ()
   "Display buffer status.
 Whether it is temporary file, whether it is modified, whether is read-only,
 and `buffer-file-coding-system'"
-  (concat "("
-          (when (and (boundp 'text-scale-mode-amount)
-                     (/= text-scale-mode-amount 0))
-            (format "%+d|" text-scale-mode-amount))
-          (when (or defining-kbd-macro executing-kbd-macro) "macro|")
-          (when (buffer-temporary?) "t|")
-          (when (buffer-modified-p) "m|")
-          (when buffer-read-only "r|")
-          (when (eq major-mode 'image-mode)
-            (cl-destructuring-bind (width . height)
-                (image-size (image-get-display-property) :pixels)
-              (format "%dx%d|" width height)))
-          (let ((buf-coding (format "%s" buffer-file-coding-system)))
-            (if (string-match "\\(dos\\|unix\\|mac\\)" buf-coding)
-                (match-string 1 buf-coding)
-              buf-coding))
-          ")"))
+  (list "("
+        (when (and (boundp 'text-scale-mode-amount)
+                   (/= text-scale-mode-amount 0))
+          (propertize (format "%+d " text-scale-mode-amount)
+                      'face font-lock-doc-face))
+        (when (or defining-kbd-macro executing-kbd-macro)
+          (propertize "Macro "
+                      'face font-lock-variable-name-face))
+        (when (buffer-temporary?)
+          (propertize "Tmp " 'face font-lock-comment-face))
+        (when (buffer-modified-p)
+          (propertize "Mod " 'face font-lock-negation-char-face))
+        (when buffer-read-only
+          (propertize "RO " 'face font-lock-string-face))
+        (when (eq major-mode 'image-mode)
+          (cl-destructuring-bind (width . height)
+              (image-size (image-get-display-property) :pixels)
+            (format "%dx%d " width height)))
+        (let ((buf-coding (format "%s" buffer-file-coding-system)))
+          (upcase (if (string-match "\\(dos\\|unix\\|mac\\)" buf-coding)
+                      (match-string 1 buf-coding)
+                    buf-coding)))
+        ")"))
 
 (defun mode-line%flycheck ()
   "Display flycheck status in mode-line."
   (if (bound-and-true-p flycheck-mode)
-      (concat
+      (list
        (pcase flycheck-last-status-change
          (`not-checked (propertize "waiting" 'face 'font-lock-comment-face))
          (`no-checker  (propertize "no-checker" 'face 'font-lock-comment-face))
@@ -120,7 +114,7 @@ and `buffer-file-coding-system'"
 
 (defun mode-line%create (left right)
   (let* ((lhs (format-mode-line (mapcar #'funcall left)))
-         (chs (format-mode-line global-mode-string))
+         (chs (format-mode-line mode-line-misc-info))
          (rhs (format-mode-line (mapcar #'funcall right)))
          (tail (propertize (mode-line%tail) 'face 'font-lock-constant-face))
          (lw (string-width lhs))
@@ -134,7 +128,8 @@ and `buffer-file-coding-system'"
                     chs
                     (make-string (max 0 (- tw (+ lw cw rw margin))) ?\s))
             (make-string (max mode-line--center-margin
-                              (- tw (+ lw rw))) ?\s)))
+                              (- tw (+ lw rw)))
+                         ?\s)))
     (list lhs chs rhs tail)))
 
 (defun mode-line%generate ()

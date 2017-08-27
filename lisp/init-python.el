@@ -21,12 +21,11 @@
 (with-eval-after-load 'elpy
   (remap! "C-c C-r" "C-c r" elpy-mode-map)
   (setcar elpy-test-discover-runner-command "python3")
-  (if python-has-ipython-p
-      (elpy-use-ipython)
-    (elpy-use-cpython "python3"))
+  (elpy-use-cpython "python3")
   (setq elpy-rpc-backend "jedi"
         elpy-rpc-python-command "python3"
-        elpy-modules (delete 'elpy-module-flymake elpy-modules)
+        elpy-modules (delete 'elpy-module-django
+                             (delete 'elpy-module-flymake elpy-modules))
         elpy-test-runner 'elpy-test-pytest-runner)
   (define-key! :map elpy-mode-map
     ("C-c C-n" . nil)
@@ -94,7 +93,9 @@
 (with-eval-after-load 'python
   (when (boundp 'python-shell-completion-native-disabled-interpreters)
     (add-to-list 'python-shell-completion-native-disabled-interpreters
-                 "jupyter"))
+                 "jupyter")
+    (add-to-list 'python-shell-completion-native-disabled-interpreters
+                 "python3"))
   (setq python-shell-prompt-detect-failure-warning nil)
   (elpy-enable)
   (remove-hook 'python-mode-hook 'elpy-mode))

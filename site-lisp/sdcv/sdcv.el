@@ -197,7 +197,7 @@ Turning on Text mode runs the normal hook `sdcv-mode-hook'."
 (defun sdcv-next-dictionary ()
   "Jump to next dictionary."
   (interactive)
-  (show-all)
+  (outline-show-all)
   (if (search-forward-regexp "^-->.*\n-" nil t) ;don't show error when search failed
       (progn
         (call-interactively 'previous-line)
@@ -207,7 +207,7 @@ Turning on Text mode runs the normal hook `sdcv-mode-hook'."
 (defun sdcv-previous-dictionary ()
   "Jump to previous dictionary."
   (interactive)
-  (show-all)
+  (outline-show-all)
   (if (search-backward-regexp "^-->.*\n-" nil t) ;don't show error when search failed
       (progn
         (forward-char 1)
@@ -246,7 +246,7 @@ the beginning of the buffer."
     (setq buffer-read-only t)
     (goto-char (point-min))
     (forward-line 1)
-    (show-all)))
+    (outline-show-all)))
 
 (defun sdcv-mode-scroll-up-one-line ()
   (interactive)
@@ -261,7 +261,7 @@ the beginning of the buffer."
     (save-excursion
       (beginning-of-line nil)
       (when (looking-at outline-regexp)
-        (show-entry)))))
+        (outline-show-entry)))))
 ;; I decide not to fold the definition entry when
 ;; doing previous-line. So `sdcv-mode-previous-line'
 ;; is only an alias of `previous-line'.
@@ -301,7 +301,7 @@ produce some output.")
 sdcv's output.")
 
 (defconst sdcv-process-name "%sdcv-mode-process%")
-(defconst sdcv-process-buffer-name "*sdcv-mode-process*")
+(defconst sdcv-process-buffer-name " *sdcv-mode-process*")
 
 (defvar sdcv-word-prompts '("Enter word or phrase: "
 			    "请输入单词或短语："

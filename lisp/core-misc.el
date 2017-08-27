@@ -7,6 +7,10 @@
   ;; show trailing spaces in a programming mode
   (setq show-trailing-whitespace t))
 
+(define-hook! core|generic-text-mode-setup (text-mode-hook)
+  (auto-fill-mode 1)
+  (flycheck-mode -1))
+
 (setq flycheck-keymap-prefix (kbd "C-c f"))
 (with-eval-after-load 'flycheck
   ;; Do not check during newline

@@ -17,21 +17,22 @@
   (setq popwin:popup-window-height 0.4)
   (setq popwin:special-display-config
         '("*Backtrace*"
-         ("*Warnings*" :noselect t)
-         ("*info*" :stick t)
-         (term-mode :stick t :width 0.5)
-         (dired-mode :width 30 :position left)
-         ("*Miniedit Help*" :noselect t)
-         (help-mode :position bottom)
-         (completion-list-mode :noselect t)
-         (compilation-mode :noselect t)
-         (grep-mode :noselect t)
-         (occur-mode :noselect t)
-         ("*Pp Macroexpand Output*" :noselect t)
-         "*Shell Command Output*"
-         "*vc-diff*"
-         "*vc-change-log*"
-         ("^\\*anything.*\\*$" :regexp t)))
+          ("*Warnings*" :noselect t)
+          ("*info*" :stick t)
+          (term-mode :stick t :width 0.5)
+          (dired-mode :width 30 :position left)
+          ("*Miniedit Help*" :noselect t)
+          (help-mode :position bottom)
+          (completion-list-mode :noselect t)
+          (compilation-mode :noselect t)
+          (grep-mode :noselect t)
+          (occur-mode :noselect t)
+          ("*Pp Macroexpand Output*" :noselect t)
+          "*sdcv*"
+          "*Shell Command Output*"
+          "*vc-diff*"
+          "*vc-change-log*"
+          ("^\\*anything.*\\*$" :regexp t)))
   (defun core*popup-auto-select-psotion (&rest $args)
     (setq popwin:popup-window-position
           (if (> (frame-width) split-width-threshold)
