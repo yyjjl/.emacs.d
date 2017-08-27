@@ -187,7 +187,7 @@
  '(org-level-8 ((t (:inherit outline-8))))
  '(org-level-9 ((t (:inherit outline-9))))
 
- '(window-numbering-face ((t (:foreground "green" :weight bold))))
+ '(window-numbering-face ((t (:foreground "DeepPink" :weight bold))))
 
  '(popup-enu-selection-face ((t (:background "#5E5079"
                                             :foreground "#B2B2B2"))))

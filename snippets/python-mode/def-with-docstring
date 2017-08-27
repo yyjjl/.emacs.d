@@ -10,6 +10,6 @@ def ${1:name}($2):
                  (if (re-search-forward "[ ]+")
                      (match-string 0)
                    "    "))))
-  (python|generate-doc yas-text indent))}
+  (python/generate-doc yas-text indent))}
     """
     $0

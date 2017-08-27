@@ -105,10 +105,13 @@ for a file to visit if current buffer is not visiting a file."
         '( ;; Use regex as default
           (t . ivy--regex-plus)))
   (setq ivy-initial-inputs-alist nil)
-  (setq ivy-use-virtual-buffers t))
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-virtual-abbreviate 'full))
 
 (with-eval-after-load 'counsel
-  (define-key! ("C-s" . counsel-grep-or-swiper)
+  (define-key!
+    ("C-x j j" . counsel-bookmark)
+    ("C-s" . counsel-grep-or-swiper)
     ("C-x C-f" . counsel-find-file)
     ("C-x k" . counsel-kill-buffer)
     ("C-c w -" . ivy-pop-view)

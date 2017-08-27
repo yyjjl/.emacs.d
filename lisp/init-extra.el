@@ -130,8 +130,8 @@
   (add-hook 'emms-playlist-mode-hook #'emms-mark-mode))
 
 (when emacs-has-mpv-p
-  (require 'emms)
   (defun extra|emms-current-name ()
+    (unless (featurep 'emms (require 'emms)))
     (concat (propertize
              (abbreviate-file-name (emms-mode-line-playlist-current))
              'face 'font-lock-constant-face)))

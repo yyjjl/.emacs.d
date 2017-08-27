@@ -49,9 +49,17 @@ If buffer file is a remote file, host-address will be showed"
 Whether it is temporary file, whether it is modified, whether is read-only,
 and `buffer-file-coding-system'"
   (concat "("
-          (when (buffer-temporary?) "T|")
-          (when (buffer-modified-p) "M|")
-          (when buffer-read-only "R|")
+          (when (and (boundp 'text-scale-mode-amount)
+                     (/= text-scale-mode-amount 0))
+            (format "%+d|" text-scale-mode-amount))
+          (when (or defining-kbd-macro executing-kbd-macro) "macro|")
+          (when (buffer-temporary?) "t|")
+          (when (buffer-modified-p) "m|")
+          (when buffer-read-only "r|")
+          (when (eq major-mode 'image-mode)
+            (cl-destructuring-bind (width . height)
+                (image-size (image-get-display-property) :pixels)
+              (format "%dx%d|" width height)))
           (let ((buf-coding (format "%s" buffer-file-coding-system)))
             (if (string-match "\\(dos\\|unix\\|mac\\)" buf-coding)
                 (match-string 1 buf-coding)
@@ -70,10 +78,10 @@ and `buffer-file-coding-system'"
          (`interrupted (propertize "interrupted" 'face  'flycheck-fringe-warning))
          (`suspicious (propertize "???" 'face 'flycheck-fringe-error))
          (`finished (let-alist (flycheck-count-errors flycheck-current-errors)
-                      (concat (propertize (format "E%s" (or .error 0))
+                      (concat (propertize (format "e%s" (or .error 0))
                                           'face 'flycheck-fringe-error)
-                              "|"
-                              (propertize (format "W%s" (or .warning 0))
+                              " "
+                              (propertize (format "w%s" (or .warning 0))
                                           'face 'flycheck-fringe-warning)))))
        " ")))
 
@@ -84,13 +92,12 @@ and `buffer-file-coding-system'"
 
 (defun mode-line%process ()
   "Display buffer process status."
-  (let ((proc (get-buffer-process (current-buffer)))
-        (msg (format-mode-line mode-line-process)))
-    (if (and proc (process-live-p proc))
-        (format "{%s@%s} " msg (process-id proc))
-      (if (> (length msg) 0)
-          (format "{%s} " msg)
-        ""))))
+  (let ((proc (get-buffer-process (current-buffer))))
+    (if proc (list "{" mode-line-process "} ")
+      "")))
+
+(defun mode-line%tail ()
+  (if (buffer-file-name) "[L%l C%c %p %I]" "[L%l C%c %p]"))
 
 (defvar mode-line--center-margin 1)
 (defvar mode-line-default-format '("%e" (:eval (mode-line%generate))))
@@ -100,19 +107,22 @@ and `buffer-file-coding-system'"
                                      mode-line%buffer-status)
                                     (mode-line%flycheck
                                      mode-line%process
-                                     mode-line%vc)
-                                    "[L%l C%c %p/%I]"))
+                                     mode-line%vc)))
 (defvar mode-line--speical-config '((mode-line%window-number
                                      mode-line%buffer-id
-                                     mode-line%buffer-major-mode)
-                                    (mode-line%process)
-                                    "[L%l %p]"))
+                                     mode-line%buffer-major-mode
+                                     mode-line%buffer-status)
+                                    (mode-line%process)))
+(defvar mode-line--inactive-config '((mode-line%window-number
+                                      mode-line%buffer-id
+                                      mode-line%buffer-major-mode)
+                                     (mode-line%process)))
 
-(defun mode-line%create (left right &optional tail)
-  (let* ((lhs (format-mode-line (mapconcat #'funcall left "")))
+(defun mode-line%create (left right)
+  (let* ((lhs (format-mode-line (mapcar #'funcall left)))
          (chs (format-mode-line global-mode-string))
-         (rhs (format-mode-line (mapconcat #'funcall right "")))
-         (tail (propertize tail 'face 'font-lock-constant-face))
+         (rhs (format-mode-line (mapcar #'funcall right)))
+         (tail (propertize (mode-line%tail) 'face 'font-lock-constant-face))
          (lw (string-width lhs))
          (cw (string-width chs))
          (rw (+ (string-width rhs) (length (format-mode-line tail))))
@@ -123,7 +133,8 @@ and `buffer-file-coding-system'"
               (list (make-string margin ?\s)
                     chs
                     (make-string (max 0 (- tw (+ lw cw rw margin))) ?\s))
-            (make-string (max 0 (- tw (+ lw rw))) ?\s)))
+            (make-string (max mode-line--center-margin
+                              (- tw (+ lw rw))) ?\s)))
     (list lhs chs rhs tail)))
 
 (defun mode-line%generate ()
@@ -131,10 +142,23 @@ and `buffer-file-coding-system'"
   (unless (bound-and-true-p eldoc-mode-line-string)
     (let ((bn (buffer-name)))
       (apply #'mode-line%create
-             (if (or (memq major-mode '(term-mode dired-mode))
-                     (string-match-p "^\\*" bn))
-                 mode-line--speical-config
-               mode-line--default-config)))))
+             (cond ((or (not (equal (selected-window) mode-line--current-window))
+                        (eq major-mode 'term-mode)
+                        (and (not (derived-mode-p 'text-mode 'prog-mode))
+                             (string-match-p "^\\*" bn)))
+                    mode-line--inactive-config)
+                   ((eq major-mode 'dired-mode)
+                    mode-line--speical-config)
+                   (t mode-line--default-config))))))
+
+(defvar mode-line--current-window (frame-selected-window))
+(defun mode-line*set-selected-window (&rest _)
+  "Sets `+doom-modeline-current-window' appropriately"
+  (let ((win (frame-selected-window)))
+    (unless (minibuffer-window-active-p win)
+      (setq mode-line--current-window win))))
+(advice-add #'select-window :after #'mode-line*set-selected-window)
+
 
 ;; Setup `mode-line-format'
 (define-hook! mode-line|after-init-hook (after-init-hook)

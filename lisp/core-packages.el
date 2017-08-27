@@ -114,7 +114,6 @@ Archive with high priority will be used when install a package.")
 (require! 'unicode-fonts)
 (require! 'evil-nerd-commenter)
 (require! 'with-editor)
-(require! 'bookmark+)
 (require! 'popwin)
 
 (require 'core-hydra)

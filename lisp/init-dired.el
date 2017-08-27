@@ -42,6 +42,7 @@ The app is chosen from your OS's preference."
 
 (with-eval-after-load 'dired
   (define-hook! dired|setup (dired-mode-hook)
+    (setq mode-line-buffer-identification '("%b"))
     (dired-hide-details-mode 1))
 
   (setq dired-dwim-target t)
