@@ -1,6 +1,6 @@
 (require 'package)
 
-(defvar package-use-priority? nil
+(defvar package-use-priority? t
   "Non-nil means to use priority defined in variable `package|priority-alist'.
 Archive with high priority will be used when install a package.")
 
@@ -115,6 +115,9 @@ Archive with high priority will be used when install a package.")
 (require! 'evil-nerd-commenter)
 (require! 'with-editor)
 (require! 'popwin)
+(require! 'easy-kill)
+(require! 'ace-link)
+(require! 'pinyinlib)
 
 (require 'core-hydra)
 (require 'core-ivy)
@@ -162,6 +165,8 @@ Archive with high priority will be used when install a package.")
   ;; (global-eldoc-mode 1)
 
   (when emacs-use-fcitx-p
-    (fcitx-aggressive-setup)))
+    (fcitx-aggressive-setup))
+
+  (ace-link-setup-default))
 
 (provide 'core-packages)

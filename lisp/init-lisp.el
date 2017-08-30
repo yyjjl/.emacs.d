@@ -1,8 +1,10 @@
+(defvar! lisp-has-racket-p (executable-find "racket") "Racket support")
 ;; Auto compile after .el file load or save
 (require! 'auto-compile)
 ;; pair edit
 (require! 'lispy)
-(require! 'racket-mode)
+(when lisp-has-racket-p
+  (require! 'racket-mode))
 (require! 'macrostep)
 ;; slime
 ;; slime-company
@@ -10,11 +12,13 @@
 
 
 
-(define-hook! lisp|minibuffer-setup (minibuffer-setup-hook minibuffer-exit-hook)
+(define-hook! lisp|minibuffer-setup (minibuffer-setup-hook
+                                     minibuffer-exit-hook)
   (if (and (not (bound-and-true-p lispy-mode))
            (memq this-command
                  '(eval-expression
                    pp-eval-expression
+                   core/eval-and-replace
                    eval-expression-with-eldoc
                    ibuffer-do-eval
                    ibuffer-do-view-and-eval)))
@@ -79,10 +83,6 @@ Emacs Lisp."
     (add-hook hook #'lisp/common-setup)))
 
 
-
-(with-eval-after-load 'lispy
-  (define-key lispy-mode-map "z" #'special-lispy-x)
-  (define-key lispy-mode-map "x" #'x-hydra/body))
 
 ;; Highlight current sexp. Prevent flickery behaviour due to
 ;; `hl-sexp-mode' un-highlighting before each command

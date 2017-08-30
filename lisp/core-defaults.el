@@ -93,6 +93,8 @@
 
  vc-make-backup-files nil)
 
+;; be quiet at startup; don't load or display anything unnecessary
+(advice-add #'display-startup-echo-area-message :override #'ignore)
 ;; Suppress GUI features
 (setq use-file-dialog nil)
 (setq use-dialog-box nil)
@@ -122,6 +124,12 @@
 (transient-mark-mode 1)
 (delete-selection-mode 1)
 (recentf-mode 1)
+(ignore-errors
+  (progn
+    (setq history-length 1000)
+    (setq savehist-additional-variables
+          '(search-ring regexp-search-ring))
+    (savehist-mode 1)))
 
 ;; Don't echo passwords when communicating with interactive programs:
 (add-hook 'comint-output-filter-functions 'comint-watch-for-password-prompt)
@@ -176,7 +184,9 @@
   ;; Load private configuration
   (ignore-errors (load-file custom-file))
   (run-with-timer 1 nil
-                  (lambda () (find-file (expand-var! "org/*note*")))))
+                  (lambda ()
+                    (find-file (expand-var! "org/*note*"))
+                    (message "Init Time: %s" (emacs-init-time)))))
 
 
 

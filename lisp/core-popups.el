@@ -1,7 +1,8 @@
-
 (defun core/popup-dired (dir)
   (interactive (list default-directory))
-  (popwin:display-buffer (dired-noselect dir)))
+  (popwin:display-buffer (dired-noselect dir))
+  (dired%add-window (selected-window))
+  (popwin:stop-close-popup-window-timer))
 
 (defun core/popup-dired-root ()
   (interactive)
@@ -10,32 +11,29 @@
 (autoload 'popwin-mode "popwin" nil t)
 (with-eval-after-load 'popwin
   (global-set-key (kbd "C-z") popwin:keymap)
+  (global-set-key (kbd "C-x m") #'popwin:messages)
   (define-key! :map popwin:keymap
     ("d" . core/popup-dired)
     ("r" . core/popup-dired-root))
+
   (setq popwin:popup-window-width 0.3)
   (setq popwin:popup-window-height 0.4)
   (setq popwin:special-display-config
         '("*Backtrace*"
           ("*Warnings*" :noselect t)
-          ("*info*" :stick t)
-          (term-mode :stick t :width 0.5)
+          ("*info*" :stick t :width 0.5)
           (dired-mode :width 30 :position left)
-          ("*Miniedit Help*" :noselect t)
+          (term-mode :stick t :width 0.5)
           (help-mode :position bottom)
           (completion-list-mode :noselect t)
           (compilation-mode :noselect t)
           (grep-mode :noselect t)
-          occur-mode
+          ((lambda (mode) (derived-mode? 'comint-mode mode)) :width 0.5 :stick t)
+          (occur-mode :stick t)
           ivy-occur-mode
-          ("*Pp Macroexpand Output*" :noselect t)
-          "*sdcv*"
-          "*Shell Command Output*"
-          "*vc-diff*"
-          "*vc-change-log*"
-          "*lispy-message*"
           ("^\\*magit:.*" :regexp t :stick t)
-          ("^\\*anything.*\\*$" :regexp t)))
+          ;; Capture all other temp buffer
+          ("^\\*.*?\\*" :regexp t)))
   (defun core*popup-auto-select-psotion (&rest $args)
     (setq popwin:popup-window-position
           (if (> (frame-width) split-width-threshold)

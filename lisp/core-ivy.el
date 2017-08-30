@@ -1,3 +1,19 @@
+(autoload 'pinyinlib-build-regexp-char "pinyinlib" nil nil)
+(defun core/pinyin-regexp-helper (char)
+  (cond ((equal char ?\s) ".*")
+        (t (or (pinyinlib-build-regexp-char char) ""))))
+
+(defun core%pinyinlib-build-regexp-string (str)
+  (when (and (> (length str) 0)
+             (equal (substring str 0 1) "!"))
+    (mapconcat 'core/pinyin-regexp-helper
+               (cdr (string-to-list str))
+               "")))
+
+(defun core/re-builder-pinyin (str)
+  (or (core%pinyinlib-build-regexp-string str)
+      (ivy--regex-plus str)))
+
 (defun core/semantic--create ($tags $depth &optional $class $result)
   "Write the contents of TAGS to the current buffer."
   (let ((class $class)
@@ -103,15 +119,27 @@ for a file to visit if current buffer is not visiting a file."
   (setq ivy-count-format "(%d/%d) ")
   (setq ivy-re-builders-alist
         '( ;; Use regex as default
+          (swiper . core/re-builder-pinyin)
+          (swiper-multi . core/re-builder-pinyin)
+          (counsel-find-file . core/re-builder-pinyin)
           (t . ivy--regex-plus)))
+
   (setq ivy-initial-inputs-alist nil)
   (setq ivy-use-virtual-buffers t)
   (setq ivy-virtual-abbreviate 'full))
 
+(defun swiper/dispatch (&optional $arg)
+  (interactive "p")
+  (call-interactively
+   (cond
+    ((eq $arg 4) #'swiper-multi)
+    ((eq $arg 16) #'swiper-all)
+    (t #'counsel-grep-or-swiper))))
+
 (with-eval-after-load 'counsel
   (define-key!
     ("C-x j j" . counsel-bookmark)
-    ("C-s" . counsel-grep-or-swiper)
+    ("C-s" . swiper/dispatch)
     ("C-x C-f" . counsel-find-file)
     ("C-x k" . counsel-kill-buffer)
     ("C-c w -" . ivy-pop-view)

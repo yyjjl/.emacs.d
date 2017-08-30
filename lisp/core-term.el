@@ -1,3 +1,8 @@
+(defvar! term-zsh-path (executable-find "zsh")
+  "Zsh path")
+(defvar! term-bash-path (executable-find "bash")
+  "Bash path")
+
 ;; Add below code to .zshrc to make term-mode track directory changes
 ;;   if [ -n "$INSIDE_EMACS" ];then
 ;;       chpwd() {print -P "\033AnSiTc %d"}
@@ -135,7 +140,7 @@ none exists, or if the current buffer is already a term."
   (setq term-bind-key-alist
         (append term-bind-key-alist
                 '(("C-c C-n" . multi-term)
-                  ("C-s" . swiper)
+                  ("C-s" . swiper/dispatch)
                   ("M-]" . multi-term-next)
                   ("M-[" . multi-term-prev))))
   (setq multi-term-dedicated-close-back-to-open-buffer-p t))

@@ -44,11 +44,13 @@ Optional argument ARG is used to toggle narrow functions."
   "Find all strings matching REGEXP in current buffer.
 grab matched string and insert them into `kill-ring'"
   (interactive
-   (let ((regexp (read-regexp "grep regex: ")))
+   (let ((regexp (read-regexp (format "grep regex (default: %s): "
+                                      (car regexp-history))
+                              (car regexp-history))))
      (list regexp)))
   (let ((items (core/grab-regexp regexp)))
     (kill-new (string-join items "\n"))
-    (message "matched strings => kill-ring")
+    (message "matched %d strings => kill-ring" (length items))
     items))
 
 (define-key!

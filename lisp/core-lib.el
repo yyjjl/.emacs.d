@@ -75,31 +75,6 @@ body."
        (defalias ',sym (function ,func))
        ,@forms)))
 
-(defvar core--settings nil)
-(defmacro define-setting! ($key &rest $forms)
-  "Define a setting macro. Like `defmacro', this should return a
-form to be executed when called with `call-setting!'. FORMS are not
-evaluated until `call-setting!' calls it."
-  (declare (indent defun) (doc-string 3))
-  (unless (keywordp $key)
-    (error "Not a valid property name: %s" $key))
-  (let ((fn (intern (format "core%%set%s" $key))))
-    `(progn
-       (defun ,fn ,@$forms)
-       (cl-pushnew ',(cons $key fn) core--settings :test #'eq :key #'car))))
-
-(defmacro call-setting! ($key &rest $args)
-  "Set an option defined by `define-setting!'. Skip if doesn't exist."
-  (declare (indent defun))
-  (unless $args
-    (error "Empty set! for %s" $key))
-  (let ((fn (cdr (assq $key core--settings))))
-    (if fn
-        (apply fn $args)
-      (when core-debug-mode
-        (message "No setting found for %s" $key)
-        nil))))
-
 (defmacro define-key! (&rest $args)
   "Define multiple keys in one expression"
   (declare (indent defun))
@@ -147,7 +122,7 @@ file `PATTERNS'."
 
 (defun derived-mode? ($modes &optional $buf)
   (unless $buf (setq $buf (current-buffer)))
-  (when (buffer-live-p $buf)
+  (when (buffer-live-p (get-buffer $buf))
     (with-current-buffer $buf
       (derived-mode-p $modes))))
 
@@ -177,23 +152,6 @@ HTML file converted from org file."
   (let ((pair (memq $val $list)))
     (when pair
       (setcdr pair (cons $ele (cdr pair))))))
-
-(defun pair-match? ($str)
-  (let ((i 0)
-        (count 0)
-        char escaped-p quoted-p prime-p)
-    (while (< i (length $str))
-      (setq char (aref $str i))
-      (if (and (not escaped-p) (eq char ?\\))
-          (setq escaped-p t)
-        (unless escaped-p
-          (case char
-            ((?\{ ?\( ?\[) (incf count))
-            ((?\} ?\) ?\]) (decf count))
-            (?\' (setq prime-p (not prime-p)))
-            (?\" (setq quoted-p (not quoted-p))))))
-      (incf i))
-    (not (or quoted-p prime-p (/= count 0)))))
 
 (defsubst expand-var! ($name &optional $make-p)
   (let ((val (expand-file-name $name emacs-var-direcotry)))

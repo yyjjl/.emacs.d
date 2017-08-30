@@ -1,3 +1,8 @@
+(defvar! js2-has-tern-p (executable-find "tern")
+  "Js context sensitive completion")
+(defvar! js2-has-web-beautify-p (executable-find "js-beautify")
+  "Like clang-format")
+
 (require! 'js-doc)
 (require! 'js2-mode)
 (require! 'js-comint)

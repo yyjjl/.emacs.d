@@ -1,4 +1,23 @@
 ;; Haskell
+(defvar! haskell-hare-path
+  (ignore-errors (find-library-in-directory "hare.el" "~/.cabal/share"))
+  "Hare is a haskell refacting tool")
+(defvar! haskell-has-stylish-haskell-p
+  (executable-find "stylish-haskell")
+  "Like clang-format, format haskell file")
+(defvar! haskell-has-hastags-p (executable-find "hastags")
+  "Tag haskell file, jump to defination")
+(defvar! haskell-has-ghc-mod-p (executable-find "ghc-mod")
+  "Haskell context sensitive completions")
+(defvar! haskell-has-shm-p (executable-find "structured-haskell-mode")
+  "Great tool to edit haskell file")
+(defvar! haskell-has-hindent-p (executable-find "hindent")
+  "Indent haskell expression")
+(defvar! haskell-has-cabal-p (executable-find "cabal")
+  "Haskell cabal support")
+(defvar! haskell-has-idris-p (executable-find "idris")
+  "Idris language support")
+
 (require! 'haskell-mode)
 (when haskell-has-ghc-mod-p
   (require! 'company-ghc)

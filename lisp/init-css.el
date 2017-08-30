@@ -1,3 +1,6 @@
+(defvar! js2-has-web-beautify-p (executable-find "js-beautify")
+  "Like clang-format")
+
 ;; Colorize strings that represent colors
 (require! 'rainbow-mode)
 (require! 'css-eldoc)

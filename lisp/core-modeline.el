@@ -107,17 +107,24 @@ and `buffer-file-coding-system'"
                                      mode-line%buffer-id
                                      mode-line%buffer-major-mode
                                      mode-line%buffer-status)
-                                    (mode-line%process)))
+                                    (mode-line%process)
+                                    :no-tail
+                                    :no-center))
 (defvar mode-line--inactive-config '((mode-line%window-number
                                       mode-line%buffer-id
                                       mode-line%buffer-major-mode)
-                                     (mode-line%process)))
+                                     (mode-line%process)
+                                     :no-tail
+                                     :no-center))
 
-(defun mode-line%create (left right)
+(defun mode-line%create (left right &optional no-tail? no-center?)
   (let* ((lhs (format-mode-line (mapcar #'funcall left)))
-         (chs (format-mode-line mode-line-misc-info))
+         (chs (if no-center? ""
+                  (propertize (format-mode-line mode-line-misc-info)
+                              'face font-lock-string-face)))
          (rhs (format-mode-line (mapcar #'funcall right)))
-         (tail (propertize (mode-line%tail) 'face 'font-lock-constant-face))
+         (tail (if no-tail? ""
+                 (propertize (mode-line%tail) 'face 'font-lock-constant-face)))
          (lw (string-width lhs))
          (cw (string-width chs))
          (rw (+ (string-width rhs) (length (format-mode-line tail))))
@@ -136,11 +143,11 @@ and `buffer-file-coding-system'"
 (defun mode-line%generate ()
   "Generate mode-line."
   (unless (bound-and-true-p eldoc-mode-line-string)
-    (let ((bn (buffer-name)))
+    (let ((bn (buffer-name))
+          (active? (equal (selected-window)
+                          mode-line--current-window)))
       (apply #'mode-line%create
-             (cond ((or (not (equal (selected-window)
-                                    mode-line--current-window)))
-                    mode-line--inactive-config)
+             (cond ((not active?) mode-line--inactive-config)
                    ((or (memq major-mode '(dired-mode
                                            lisp-interaction-mode))
                         (and (not (derived-mode-p 'text-mode 'prog-mode))
@@ -162,6 +169,10 @@ and `buffer-file-coding-system'"
   (window-numbering-mode 1)
   (setq-default mode-line-format mode-line-default-format)
   (setq-default mode-line-buffer-identification '("%b"))
+  (setq-default mode-line-misc-info
+                '((global-mode-string ("" global-mode-string " "))
+                  (projectile-mode ("" projectile-mode-line " "))
+                  (iedit-mode (:eval (format "Iedit:%d" (iedit-counter))))))
   (setq-default frame-title-format
                 '(:eval (let ((fn (buffer-file-name)))
                           (if fn

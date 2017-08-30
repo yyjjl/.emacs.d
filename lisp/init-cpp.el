@@ -1,3 +1,14 @@
+(defvar! cpp-rtags-path (expand-var! "rtags/bin/")
+  "Rtags directory")
+(defvar! cpp-irony-path (expand-var! "irony/bin")
+  "irony directory")
+(defvar! cpp-has-rtags-p
+  (file-exists-p (expand-file-name "rdm" cpp-rtags-path))
+  "Rtags support, indexing c++ projects")
+(defvar! cpp-has-irony-p
+  (file-exists-p (expand-file-name "irony-server" cpp-irony-path))
+  "Irony support, context sensitive c++ completions")
+
 ;; C/C++ I need stable version
 (require! 'cmake-ide "melpa-stable")
 (require! 'irony)

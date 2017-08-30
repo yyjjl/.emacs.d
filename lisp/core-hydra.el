@@ -133,7 +133,7 @@ _d_: subtree
   ("b" outline-backward-same-level)      ; Backward - same level
   ("z" nil "leave"))
 
-(global-set-key (kbd "C-c o") 'hydra-outline/body) ; by example
+(global-set-key (kbd "C-c o") 'hydra-outline/body)
 
 (defvar current-forward-thing 'char)
 (defun current-forward-thing ()
@@ -147,15 +147,12 @@ _d_: subtree
   (forward-thing current-forward-thing (when (numberp N) (- 0 N))))
 
 
-(defhydra hydra-move (:pre (setq current-forward-thing 'char)
-                           :color pink
-                           :hint nil)
+(defhydra hydra-move (:color pink :hint nil)
   "
 Current thing: %s(current-forward-thing)
-[_p_/_n_] line     [_u_/_v_] scroll   [_b_/_f_] thing
-[_(_/_)_] sexp     [_a_/_e_] line begin/end
-[_[_/_]_] page     [_{_/_}_] paragraph
-[_SPC_/_x_] mark   [_l_] center     [,] change thing    [_q_] quit
+[_p_/_n_] line      [_u_/_v_] scroll   [_b_/_f_] thing
+[_a_/_e_] begin/end [_m_/_x_] mark     [_SPC_] scroll
+[_l_] center      [,] change thing    [_q_] quit
 "
   ("q" nil :exit t)
   ("n" next-line)
@@ -170,14 +167,9 @@ Current thing: %s(current-forward-thing)
   (", d" (setq current-forward-thing 'defun))
   (", l" (setq current-forward-thing 'list))
   ("v" scroll-up-command)
+  ("SPC" scroll-up-command)
   ("u" scroll-down-command)
-  ("(" backward-sexp)
-  ("[" backward-page)
-  ("{" backward-paragraph)
-  ("]" forward-page)
-  ("}" forward-paragraph)
-  (")" forward-sexp)
-  ("SPC" set-mark-command)
+  ("m" set-mark-command)
   ("x" exchange-point-and-mark)
   ("l" recenter-top-bottom))
 
@@ -185,75 +177,97 @@ Current thing: %s(current-forward-thing)
 (global-set-key (kbd "C-v") #'hydra-move/scroll-up-command)
 (global-set-key (kbd "M-v") #'hydra-move/scroll-down-command)
 
-(defhydra hydra-next-error (global-map "C-x")
+(defhydra hydra-next-error (:color pink :hint nil)
   "
 Compilation errors:
 _n_: next error        _<_: first error
-_p_: previous error    _q_uit
+_p_: previous error
+_q_uit
 "
-  ("`" next-error     nil)
-  ("n" next-error     nil :bind nil)
-  ("p" previous-error nil :bind nil)
-  ("<" first-error    nil :bind nil)
-  ("q" nil            nil :color blue))
+  ("`" next-error)
+  ("n" next-error)
+  ("p" previous-error)
+  ("<" first-error)
+  ("q" nil :color blue))
 (global-set-key (kbd "M-g n") #'hydra-next-error/next-error)
+(global-set-key (kbd "C-x `") #'hydra-next-error/next-error)
 (global-set-key (kbd "M-g p") #'hydra-next-error/previous-error)
 
-(defvar x-hydra-timer nil)
-(defvar x-hydra-delay 0.5)
-(defvar x-hydra-last-prefix nil)
-(defvar-local x-hydra-last-buffer-undo-list nil)
-(defun x-hydra-quit (&optional no-hydra-quit)
-  (when x-hydra-timer
-    (cancel-timer x-hydra-timer)
-    (setq x-hydra-timer nil))
+(defvar comma-hydra-timer nil)
+(defvar comma-hydra-delay 0.5)
+(defvar comma-hydra-char ",")
+(defvar-local comma-hydra-last-buffer-undo-list nil)
+(defun comma-hydra-quit (&optional no-hydra-quit)
+  (when comma-hydra-timer
+    (cancel-timer comma-hydra-timer)
+    (setq comma-hydra-timer nil))
   (unless no-hydra-quit
     (hydra-keyboard-quit)))
 
-(defun x-hydra-pre ()
-  (setq x-hydra-timer (timer-create))
-  (setq x-hydra-last-buffer-undo-list buffer-undo-list)
-  (hydra-set-property 'x-hydra :verbosity 0)
-  (unless buffer-read-only (insert "x"))
-  (timer-set-time x-hydra-timer
-                  (timer-relative-time (current-time) x-hydra-delay))
-  (timer-set-function x-hydra-timer 'x-hydra-quit)
-  (timer-activate x-hydra-timer))
+(defun comma-hydra-pre ()
+  ;; Make sure timer is canceled
+  (comma-hydra-quit t)
+  (setq comma-hydra-timer (timer-create))
+  (setq comma-hydra-last-buffer-undo-list buffer-undo-list)
+  (hydra-set-property 'comma-hydra :verbosity 0)
+  (unless buffer-read-only (insert comma-hydra-char))
+  ;; Start timer
+  (timer-set-time comma-hydra-timer
+                  (timer-relative-time (current-time) comma-hydra-delay))
+  (timer-set-function comma-hydra-timer 'comma-hydra-quit)
+  (timer-activate comma-hydra-timer))
 
-(defun x-hydra-dispatch (char)
-  (interactive "c")
-  (setq char (- char 96))
-  (let ((cmd (if x-hydra-last-prefix
-                 (list x-hydra-last-prefix char)
-               (list char))))
-    (setq unread-command-events cmd))
-  (setq x-hydra-last-prefix nil))
-
-(defmacro x-hydra-lambda-body (char)
+(defmacro comma-hydra-lambda-body ($cmd-or-keys)
   `(progn
-     (setq x-hydra-last-prefix ,char)
-     (ignore-errors
-       (let ((inhibit-message t))
-         (undo)
-         (setq buffer-undo-list x-hydra-last-buffer-undo-list)))
-     (x-hydra-quit t)
-     (setq unread-command-events (list ,char))))
+     (unless buffer-read-only
+       (ignore-errors
+         (let ((inhibit-message t))
+           (undo)
+           (setq buffer-undo-list comma-hydra-last-buffer-undo-list))))
+     (comma-hydra-quit t)
+     ,(if (functionp $cmd-or-keys)
+          `(call-interactively #',$cmd-or-keys)
+        `(setq unread-command-events
+               ', (mapcar (lambda (c) (cons t c))
+                          (listify-key-sequence (kbd $cmd-or-keys)))))))
 
-(defhydra x-hydra (:body-pre x-hydra-pre
-                             :color blue)
-  ("x" (x-hydra-lambda-body ?\C-x))
-  ("c" (x-hydra-lambda-body ?\C-c))
-  ("z" (x-hydra-lambda-body ?\C-z))
-  ("h" (x-hydra-lambda-body ?\C-h)))
+(defmacro comma-hydra-define ($char &rest $binds)
+  (declare (indent 1))
+  (let (form1 form2)
+    (dolist (bind $binds)
+      (let* ((key (car bind))
+             (def (cadr bind))
+             (fn (intern (format "comma-hydra/lambda-%s-and-exit" key))))
+        (push `(,key (comma-hydra-lambda-body ,def)) form1)
+        (push (cons key fn) form2)))
+    `(progn
+       (setq comma-hydra-char ,$char)
+       (defhydra comma-hydra (:body-pre comma-hydra-pre :color blue)
+         ,@form1)
+       (setq comma-hydra/keymap
+             (define-key! :map (make-sparse-keymap)
+               ,@form2)))))
 
-(setq x-hydra/keymap
-      (define-key! :map (make-sparse-keymap)
-        ("x" . x-hydra/lambda-x-and-exit)
-        ("c" . x-hydra/lambda-c-and-exit)
-        ("z" . x-hydra/lambda-z-and-exit)
-        ("h" . x-hydra/lambda-h-and-exit)))
+(defun comma-hydra-invoker ()
+  (interactive)
+  (if (or (bound-and-true-p iedit-mode)
+          (bound-and-true-p multiple-cursors-mode)
+          defining-kbd-macro
+          executing-kbd-macro)
+      (unless buffer-read-only (insert comma-hydra-char))
+    (call-interactively 'comma-hydra/body)))
 
-(global-set-key "x" #'x-hydra/body)
-(global-set-key (kbd "C-x x") #'x-hydra-dispatch)
+(comma-hydra-define ","
+  ("f" find-file)
+  ("," ivy-switch-buffer)
+  ("4" "C-x 4")
+  ("5" "C-x 5")
+  ("i" "C-c i")
+  ("p" "C-c p")
+  ("b" "C-c b"))
+
+(global-set-key "," #'comma-hydra-invoker)
+(define-hook! comma-hydra|setup-hook (c-mode-common-hook)
+  (local-set-key "," #'comma-hydra-invoker))
 
 (provide 'core-hydra)

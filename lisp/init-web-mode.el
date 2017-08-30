@@ -1,3 +1,6 @@
+(defvar! js2-has-web-beautify-p (executable-find "js-beautify")
+  "Like clang-format")
+
 (require! 'emmet-mode)
 (require! 'web-mode)
 (when js2-has-web-beautify-p

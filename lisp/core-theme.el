@@ -44,8 +44,7 @@
  '(font-lock-comment-delimiter-face ((t (:foreground "#345678" :slant italic))))
  '(font-lock-constant-face ((t (:foreground "#AE81FF"))))
  '(font-lock-doc-face ((t (:foreground "#06DB74" :slant italic))))
- '(font-lock-function-name-face
-  ((t (:foreground "#F92672" :slant italic :weight bold))))
+ '(font-lock-function-name-face ((t (:foreground "#F92672" :weight bold))))
  '(font-lock-keyword-face ((t (:foreground "#66D9EF" :weight bold))))
  '(font-lock-negation-char-face ((t (:foreground "#CD7673" :weight bold))))
  '(font-lock-preprocessor-face ((t (:foreground "#A6E22E" :weight bold))))
@@ -55,7 +54,7 @@
  '(font-lock-regexp-grouping-construct ((t ( :weight bold))))
  '(font-lock-string-face ((t (:foreground "#E6DB74"))))
  '(font-lock-type-face ((t (:foreground "#66D9EF" :weight bold))))
- '(font-lock-variable-name-face ((t (:foreground "#F92672"))))
+ '(font-lock-variable-name-face ((t (:foreground "#fd971f"))))
  '(font-lock-warning-face ((t (:foreground "#FFFFFF"
                                           :background "#333333"))))
  '(fringe ((t (:background "#1B1D1E"))))

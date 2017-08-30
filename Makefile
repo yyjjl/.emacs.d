@@ -1,2 +1,2 @@
 all:
-	emacs -Q --script ~/.emacs.d/etc/env-vars.el
+	echo "Nothing to do"

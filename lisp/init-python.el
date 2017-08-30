@@ -1,3 +1,8 @@
+(defvar! python-has-pytest-p (executable-find "pytest")
+  "Use for python unit test ")
+(defvar! python-has-ipython-p (executable-find "ipython3")
+  "Use for python unit test ")
+
 (require! 'elpy "melpa-stable")
 (require! 'py-isort)
 

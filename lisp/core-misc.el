@@ -181,6 +181,23 @@ Does not indent buffer, because it is used for a
         (push (concat "\\_<" (regexp-quote sym) "\\_>") regexp-history))))
   (call-interactively 'occur))
 
+(defun core/eval-and-replace ($start $end)
+  (interactive "r")
+  (let ((value (eval
+                `(let ((it (buffer-substring $start $end)))
+                   ,(if (bound-and-true-p
+                         mc--executing-command-for-fake-cursor)
+                        (read (car read-expression-history))
+                      (read--expression "Expression(it): "
+                                        "(eval (read it))")))
+                lexical-binding)))
+    (delete-region $start $end)
+    (save-excursion
+      (goto-char $start)
+      (print value (current-buffer))
+      (activate-mark 1)
+      (goto-char $start))))
+
 (defvar socks-server '("Default server" "127.0.0.1" 1080 5))
 (defun core/toggle-socket-proxy ()
   (interactive)
@@ -193,7 +210,6 @@ Does not indent buffer, because it is used for a
     (message "Use socket proxy %s" socks-server)))
 
 (define-key!
-  ("C-x m" . popwin:messages)
   ("C-r" . isearch-backward-regexp)
   ("C-M-r" . isearch-backward)
   ("C-x R" . core/rename-this-file-and-buffer)
@@ -208,8 +224,12 @@ Does not indent buffer, because it is used for a
   ("C-c q" . auto-fill-mode)
   ("C-x C-b" . ibuffer)
   ("M-/" . hippie-expand)
+  ("M-w" . easy-kill)
+
   ("M-s o" . core/occur-dwim)
-  ("M-s e" . iedit-mode)
+  ("M-s i" . iedit-mode)
+  ("M-s e" . core/eval-and-replace)
+
   ("RET" . newline-and-indent)
 
   ("C-}" . core/company-yasnippet)
