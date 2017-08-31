@@ -34,9 +34,9 @@
                           :box (:line-width 5 :color "#1B1D1E")))))
  '(mode-line-highlight ((t (:background "black"
                                        :box (:line-width 5 :color "black")))))
- '(mode-line-mousable ((t (:foreground "#BCBCBC" :background "#000000"))))
- '(mode-line-mousable-minor-mode
-  ((t (:foreground "#BCBCBC" :background "#000000"))))
+ ;; ;; '(mode-line-mousable ((t (:foreground "#BCBCBC" :background "#000000"))))
+ ;; '(mode-line-mousable-minor-mode
+ ;;  ((t (:foreground "#BCBCBC" :background "#000000"))))
  '(header-line ((t (:foreground "grey90" :background "#2D2D2D"))))
 
  '(font-lock-builtin-face ((t (:foreground "#A6E22E"))))

@@ -1,30 +1,30 @@
 ;; When splitting window, show (other-buffer) in the new window
-(defun window|wrap-split-function ($split-function)
+(defun window%wrap-split-function ($split-function)
   (lexical-let ((sf $split-function))
     (lambda ()
       (interactive)
       (funcall sf)
       (set-window-buffer (next-window) (other-buffer)))))
 
-(global-set-key (kbd "C-x 2") (window|wrap-split-function 'split-window-vertically))
-(global-set-key (kbd "C-x 3") (window|wrap-split-function 'split-window-horizontally))
+(global-set-key (kbd "C-x 2") (window%wrap-split-function 'split-window-vertically))
+(global-set-key (kbd "C-x 3") (window%wrap-split-function 'split-window-horizontally))
 
 
 ;; Rearrange split windows
-(defun window|split-horizontally ()
+(defun window%split-horizontally ()
   (interactive)
   (save-excursion
     (delete-other-windows)
-    (funcall (window|wrap-split-function 'split-window-horizontally))))
+    (funcall (window%wrap-split-function 'split-window-horizontally))))
 
-(defun window|split-vertically ()
+(defun window%split-vertically ()
   (interactive)
   (save-excursion
     (delete-other-windows)
-    (funcall (window|wrap-split-function 'split-window-vertically))))
+    (funcall (window%wrap-split-function 'split-window-vertically))))
 
-(global-set-key "\C-x|" 'window|split-horizontally)
-(global-set-key "\C-x_" 'window|split-vertically)
+(global-set-key "\C-x|" 'window%split-horizontally)
+(global-set-key "\C-x_" 'window%split-vertically)
 
 (defun toggle-window-split ()
   (interactive)

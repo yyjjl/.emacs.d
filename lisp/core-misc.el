@@ -202,10 +202,10 @@ Does not indent buffer, because it is used for a
 (defun core/toggle-socket-proxy ()
   (interactive)
   (if (eq url-gateway-method 'socks)
-      (let ((method (function-get #'main|toggle-socket-proxy 'method)))
+      (let ((method (function-get #'core/toggle-socket-proxy 'method)))
         (setq url-gateway-method (or method 'native))
         (message "Use method '%s" url-gateway-method))
-    (function-put #'main|toggle-socket-proxy 'method url-gateway-method)
+    (function-put #'core/toggle-socket-proxy 'method url-gateway-method)
     (setq url-gateway-method 'socks)
     (message "Use socket proxy %s" socks-server)))
 
@@ -227,7 +227,7 @@ Does not indent buffer, because it is used for a
   ("M-w" . easy-kill)
 
   ("M-s o" . core/occur-dwim)
-  ("M-s i" . iedit-mode)
+  ("M-i" . iedit-mode)
   ("M-s e" . core/eval-and-replace)
 
   ("RET" . newline-and-indent)

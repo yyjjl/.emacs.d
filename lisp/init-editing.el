@@ -1,7 +1,7 @@
 (require! 'expand-region)
 ;; Mark tools
-(require! 'visual-regexp)
 (require! 'multiple-cursors)
+
 ;; `wgrep' allows you to edit a grep buffer and apply those changes
 ;; to the file buffer.
 (require! 'wgrep)
@@ -59,29 +59,23 @@ grab matched string and insert them into `kill-ring'"
   ("C-x K" . core/kill-regexp)
 
   ("C-=" . mc/mark-next-like-this)
-  ("C--" . mc/mark-previous-like-this))
-
+  ("C--" . mc/mark-previous-like-this)
+  ("C-+" . mc/skip-to-next-like-this)
+  ("C-_" . mc/skip-to-previous-like-this))
 
 (define-key! :prefix "C-c m"
-  ("q" . vr/query-replace)
-  ("R" . vr/replace)
-  ("v" . vr/mc-mark)
-
   ("P" . mc/mark-pop)
   ("m" . mc/mark-all-like-this-dwim)
   ("l" . mc/edit-lines)
   ("e" . mc/edit-ends-of-lines)
   ("a" . mc/edit-beginnings-of-lines)
-  ("n" . mc/skip-to-next-like-this)
-  ("p" . mc/skip-to-previous-like-this)
-  ("r" . mc/mark-all-in-region-regexp)
   ("i" . mc/insert-numbers)
   ("L" . mc/insert-letters)
   ("s" . mc/sort-regions)
   ("R" . mc/reverse-regions))
 
 (with-eval-after-load 'picture
-  (defhydra hydra|picture-move ()
+  (defhydra hydra-picture-move ()
     "move"
     ("n" picture-move-down "down")
     ("p" picture-move-up "up")
@@ -93,10 +87,10 @@ grab matched string and insert them into `kill-ring'"
     ("C-d" . picture-delete-char)
     ("C-c C-f") ("C-c C-b")
     ("C-c a" . artist-mode)
-    ("C-f" . hydra|picture-move/picture-motion)
-    ("C-b" . hydra|picture-move/picture-motion-reverse)
-    ("C-n" . hydra|picture-move/picture-move-down)
-    ("C-p" . hydra|picture-move/picture-move-up)))
+    ("C-f" . hydra-picture-move/picture-motion)
+    ("C-b" . hydra-picture-move/picture-motion-reverse)
+    ("C-n" . hydra-picture-move/picture-move-down)
+    ("C-p" . hydra-picture-move/picture-move-up)))
 
 (with-eval-after-load 'artist
   (define-key! :map artist-mode-map

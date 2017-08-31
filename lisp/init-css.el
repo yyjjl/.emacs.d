@@ -16,7 +16,7 @@
     ""))
 
 ;; Colourise CSS colour literals
-(defun css|convert-binary-to-code ()
+(defun css/convert-binary-to-code ()
   "Convert binary (image, font...) into css."
   (interactive)
   (let* ((file (completing-read "The image path: " #'read-file-name-internal))

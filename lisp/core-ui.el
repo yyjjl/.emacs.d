@@ -5,6 +5,7 @@
   (run-with-idle-timer 1 nil #'unicode-fonts-setup))
 
 (blink-cursor-mode -1)
+(tooltip-mode -1)
 
 (require 'uniquify)
 

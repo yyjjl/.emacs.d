@@ -130,14 +130,14 @@
   (add-hook 'emms-playlist-mode-hook #'emms-mark-mode))
 
 (when emacs-has-mpv-p
-  (defun extra|emms-current-name ()
+  (defun extra/emms-current-name ()
     (unless (featurep 'emms (require 'emms)))
     (concat (propertize
              (abbreviate-file-name (emms-mode-line-playlist-current))
              'face 'font-lock-constant-face)))
   (defhydra hydra-emms (:color pink :hint nil)
     "
-%s(extra|emms-current-name)
+%s(extra/emms-current-name)
 [_=_/_-_]volume raise/lower  [_d_/_D_]play directory subtree/current
 [_p_]rev [_n_]ext            [_t_/_T_]oggle repeat playlist/track
 [_s_]top [_P_]ause/Continue  [_r_]andom

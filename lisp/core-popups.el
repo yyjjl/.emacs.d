@@ -16,21 +16,22 @@
     ("d" . core/popup-dired)
     ("r" . core/popup-dired-root))
 
-  (setq popwin:popup-window-width 0.3)
+  (setq popwin:popup-window-width 0.4)
   (setq popwin:popup-window-height 0.4)
+  (setq popwin:popup-window-dedicated-p t)
   (setq popwin:special-display-config
         '("*Backtrace*"
           ("*Warnings*" :noselect t)
           ("*info*" :stick t :width 0.5)
           (dired-mode :width 30 :position left)
           (term-mode :stick t :width 0.5)
+          ((lambda (mode) (derived-mode? 'comint-mode mode)) :width 0.5 :stick t)
           (help-mode :position bottom)
           (completion-list-mode :noselect t)
           (compilation-mode :noselect t)
-          (grep-mode :noselect t)
-          ((lambda (mode) (derived-mode? 'comint-mode mode)) :width 0.5 :stick t)
+          (grep-mode :select t)
           (occur-mode :stick t)
-          ivy-occur-mode
+          ("^\\*ivy-occur .*" :regexp t :stick t)
           ("^\\*magit:.*" :regexp t :stick t)
           ;; Capture all other temp buffer
           ("^\\*.*?\\*" :regexp t)))
@@ -39,7 +40,7 @@
           (if (> (frame-width) split-width-threshold)
               'right
             'bottom)))
-  (advice-add 'popwin:popup-buffer :before
+  (advice-add 'popwin:display-buffer-1 :before
               (function core*popup-auto-select-psotion)))
 
 (provide 'core-popups)

@@ -104,7 +104,7 @@ With a prefix BELOW move point to lower block."
 
 (with-eval-after-load 'ob
   (define-key! :map org-babel-map
-    ("/" . org|split-src-block)))
+    ("/" . org/split-src-block)))
 
 (with-eval-after-load 'ob-ipython
   ;; Fix encoding error

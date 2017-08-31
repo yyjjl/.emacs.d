@@ -112,7 +112,7 @@
       buf)))
 (advice-add 'gud-find-file :around #'gud*find-file-hack)
 
-(defun gud|sentinel-hack ($proc $msg)
+(defun gud*sentinel-hack ($proc $msg)
   (let ((buf (process-buffer $proc)))
     (when (and (buffer-live-p buf)
                (memq (process-status $proc) '(signal exit)))
@@ -122,7 +122,7 @@
             (when gud-source-mode
               (gud-source-mode -1))))))))
 
-(advice-add 'gud-sentinel :after #'gud|sentinel-hack)
+(advice-add 'gud-sentinel :after #'gud*sentinel-hack)
 
 
 (with-eval-after-load 'gud
