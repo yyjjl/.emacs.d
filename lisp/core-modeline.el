@@ -171,7 +171,6 @@ and `buffer-file-coding-system'"
   (setq-default mode-line-buffer-identification '("%b"))
   (setq-default mode-line-misc-info
                 '((global-mode-string ("" global-mode-string " "))
-                  (projectile-mode ("" projectile-mode-line " "))
                   (iedit-mode (:eval (format "Iedit:%d" (iedit-counter))))))
   (setq-default frame-title-format
                 '(:eval (let ((fn (buffer-file-name)))

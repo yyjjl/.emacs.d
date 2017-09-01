@@ -23,7 +23,7 @@
     ("C-p" . company-select-previous)
     ("M-n" . company-next-page)
     ("M-p" . company-previous-page))
-  
+
   (company-statistics-mode 1)
   ;; Make company-files a work before capf
   (setq-default company-backends
@@ -56,8 +56,8 @@
   (setq company-auto-complete nil)
   ;; NOT to load company-mode for certain major modes.
   (setq company-global-modes
-        '(not eshell-mode comint-mode erc-mode gud-mode rcirc-mode shell-mode
-              inferior-python-mode
+        '(not eshell-mode comint-mode erc-mode
+              gud-mode rcirc-mode shell-mode
               minibuffer-inactive-mode)))
 
 (provide 'core-company)

@@ -58,3 +58,5 @@ projectile.cache
 private.el
 /lisp.old
 /emojis
+
+/site-lisp/delphin

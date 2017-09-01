@@ -59,6 +59,28 @@
   (setq fcitx-use-dbus t)
   (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c"))
 
+;; Smart tab
+(defun core%indent-for-tab ($fn &rest $arg)
+  (cond ((use-region-p) (apply $fn $arg))
+        ;; Skip close paren
+        ((or (and (not lispy-mode)
+                  (memq (char-after) '(?\) ?\} ?\$ ?\])))
+             (memq (char-after) '(?\' ?\` ?\")))
+         (forward-char 1))
+        ;; Toggle outline
+        ((save-excursion
+           (forward-line 0)
+           (and outline-minor-mode (looking-at-p outline-regexp)))
+         (outline-toggle-children))
+        ;; Trigger completions
+        ((and (not lispy-mode)
+              (looking-back "\\(?:\\s_\\|\\sw\\)\\{2,\\}\\(?:\\.\\|->\\)?"
+                            (max (point-min) (- (point) 5)))
+              (call-interactively #'hippie-expand)))
+        ;; Default behavior
+        (t (apply $fn $arg))))
+(advice-add 'indent-for-tab-command :around #'core%indent-for-tab)
+
 ;; Delete the current file
 (defun core/delete-this-file ()
   "Delete the current file, and kill the buffer."
@@ -214,7 +236,7 @@ Does not indent buffer, because it is used for a
   ("C-M-r" . isearch-backward)
   ("C-x R" . core/rename-this-file-and-buffer)
   ("C-x D" . core/delete-this-file)
-  ("C-x C-d" . file-name-dired)
+  ("C-x C-d" . find-name-dired)
   ("C-x W" . core/copy-this-file-to-new-file)
   ("C-x f" . core/copy-file-name)
   ("C-x c" . core/cleanup-buffer-safe)

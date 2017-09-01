@@ -106,15 +106,17 @@
       (concat ";; Welcome to Emacs " (or user-login-name "") " !!!"))
 
 (defvar core-recentf-enabled? t)
-(defun core%recentf-ignore? (-fn)
+(defun core%recentf-keep? (-fn)
   (and core-recentf-enabled?
        ;; The order must be kept
        (or (file-remote-p -fn)
            (file-readable-p -fn))
        (file-writable-p -fn)))
-(setq recentf-keep '(core%recentf-ignore?))
+(setq recentf-keep '(core%recentf-keep?))
 (setq recentf-max-saved-items 2048
-      recentf-exclude (list "/tmp/" "/ssh:" "/sudo:" emacs-var-direcotry))
+      recentf-exclude (list "/tmp/" "/ssh:" "/sudo:" "\\.elc$"
+                            (file-truename package-user-dir)
+                            emacs-var-direcotry))
 
 ;; Purges buffers which haven't been displayed in 3 days
 (midnight-mode 1)
@@ -123,7 +125,7 @@
 ;; (display-time-mode 1)
 (transient-mark-mode 1)
 (delete-selection-mode 1)
-(recentf-mode 1)
+
 (ignore-errors
   (progn
     (setq history-length 1000)
@@ -147,17 +149,6 @@
 ;; Display long lines in truncated style (end line with $)
 (define-hook! core|truncate-lines-setup (grep-mode-hook)
   (toggle-truncate-lines 1))
-
-;; Tab to skip close pair
-(defun core%indent-for-tab ($fn &optional $arg)
-  (if (looking-at "`\\|'\\|\"\\|}\\|\\$")
-      (forward-char 1)
-    (if (save-excursion
-          (forward-line 0)
-          (and outline-minor-mode (looking-at-p outline-regexp)))
-        (outline-toggle-children)
-      (funcall $fn $arg))))
-(advice-add 'indent-for-tab-command :around #'core%indent-for-tab)
 
 ;; Turns on `auto-fill-mode', don't use `text-mode-hook'
 (add-hook 'change-log-mode-hook 'turn-on-auto-fill)

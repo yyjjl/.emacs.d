@@ -130,7 +130,7 @@ none exists, or if the current buffer is already a term."
         (with-current-buffer buf
           (local-set-key [f8] #'term/switch-back)
           (setq term/parent-buffer parent-buf))
-        (popwin:display-buffer buf)))))
+        (display-buffer buf)))))
 
 (with-eval-after-load 'multi-term
   (add-hook 'term-mode-hook 'multi-term-keystroke-setup)

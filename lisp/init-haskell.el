@@ -34,11 +34,7 @@
 
 
 (with-eval-after-load 'shm
-  (defun haskell*shm-tab-or-close (fn &rest args)
-    (if (looking-at ")\\|]\\|}\\|`")
-        (forward-char 1)
-      (apply fn args)))
-  (advice-add 'shm/tab :around #'haskell*shm-tab-or-close)
+  (advice-add 'shm/tab :around #'core%indent-for-tab)
 
   (define-key! :map shm-map
     ("C-." . shm/forward-node)

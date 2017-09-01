@@ -76,6 +76,17 @@ Archive with high priority will be used when install a package.")
            (package-install $pkg-name)
            (message "Package'%s' installed " $pkg-name)))))
 
+(defun core/compile-config ()
+  (interactive)
+  (dolist (file (append
+                 (directory-files emacs-config-directory :full "\\.el$")
+                 (directory-files-recursively emacs-site-packages-directory
+                                              "\\.el$")))
+    (byte-compile-file file))
+  (byte-compile-file user-init-file)
+  (byte-compile-file custom-file)
+  (message "Compile finished"))
+
 (package-initialize t)
 
 ;; ----------------------------------------
@@ -119,7 +130,6 @@ Archive with high priority will be used when install a package.")
 (require! 'ace-link)
 (require! 'pinyinlib)
 
-(require 'core-hydra)
 (require 'core-ivy)
 (require 'core-company)
 (require 'core-popups)
@@ -127,6 +137,7 @@ Archive with high priority will be used when install a package.")
 (require 'core-semantic)
 (require 'core-hideshow)
 (require 'core-misc)
+(require 'core-hydra)
 
 (define-hook! package|after-init-hook (after-init-hook)
   (when (>= emacs-major-version 25)
@@ -138,6 +149,7 @@ Archive with high priority will be used when install a package.")
           (hash-table-keys package--required-packages))))
 
 (define-hook! core|setup-hook (emacs-startup-hook)
+  (recentf-mode 1)
   (session-initialize)
   (winner-mode 1)
   (ivy-mode 1)

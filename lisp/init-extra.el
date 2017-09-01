@@ -15,8 +15,11 @@
 (require! 'figlet)
 (require! 'zeal-at-point)
 (require! 'skeletor)
+(require! 'help-fns+)
 
 
+
+(require 'help-fns+)
 
 ;; prolog system
 (setq prolog-system 'swi)

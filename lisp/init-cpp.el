@@ -53,8 +53,9 @@
 (defun cpp/remove-project-rtags-cache (&optional $force)
   (interactive "P")
   (let ((root (ignore-errors (projectile-project-root))))
-    (when (and root (or $force (y-or-n-p (format "Delete %s"
-                                                 (abbreviate-file-name root)))))
+    (when (and root (or $force
+                        (y-or-n-p (format "Delete %s"
+                                          (abbreviate-file-name root)))))
       (let ((default-directory root))
         (shell-command (format "%s -W %s"
                                (expand-file-name "rc" rtags-path)
@@ -228,6 +229,8 @@
 (put 'cmake-ide-build-dir 'safe-local-variable #'stringp)
 (with-eval-after-load 'cc-mode
   (require 'cmake-ide)
+  ;; Smart tab
+  (advice-add 'c-indent-line-or-region :around #'core%indent-for-tab)
 
   (rtags-enable-standard-keybindings)
   ;; C-c(3) r(114) make all Upper case to lower-case
