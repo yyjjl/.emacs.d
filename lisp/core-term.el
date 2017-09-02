@@ -10,58 +10,33 @@
 
 ;; Kill the buffer when terminal is exited
 (defun term/wrap-sentinel (&optional _fn)
-  (lexical-let ((fn _fn)
-                (kill-window-p (= 1 (length (window-list)))))
+  (lexical-let ((fn _fn))
     (lambda ($proc $msg)
-      (if (memq (process-status $proc) '(signal exit))
-          (let* ((buffer (process-buffer $proc))
-                 (window (get-buffer-window buffer)))
-            (and fn (funcall fn $proc $msg))
-            (when (and (window-live-p window)
-                       (> (length (window-list)) 1)
-                       kill-window-p)
-              (delete-window window))
-            (kill-buffer buffer))
-        (and fn (funcall fn $proc $msg))))))
+      (and fn (funcall fn $proc $msg))
+      (when (memq (process-status $proc) '(signal exit))
+          (let ((buffer (process-buffer $proc)))
+            (kill-buffer buffer))))))
 
-(defun term/exec-sentinel ($proc $msg)
-  (and (memq (process-status $proc) '(signal exit))
-       (let ((buf (and $proc (process-buffer $proc))))
-         (when (buffer-live-p buf)
-           (with-current-buffer buf
-             (setq buffer-read-only t)
-             (local-set-key (kbd "q") 'kill-this-buffer)))))
-  (term-sentinel $proc $msg))
-
-(defun term/exec-program ($program $args &optional $sentinel)
+(defun term/exec-program ($program $args &optional $name $sentinel)
   (unless (featurep 'term)
     (require 'term))
   (unless $sentinel
-    (setq $sentinel #'term/exec-sentinel))
-  (let ((buf (generate-new-buffer
-              (concat "*" (file-name-nondirectory $program) "*")))
+    (setq $sentinel (term/wrap-sentinel #'term-sentinel)))
+  (unless $name
+    (setq $name (term/get-buffer-name
+                 (concat "*" (file-name-nondirectory $program) "<%s>*"))))
+  (let ((buf (generate-new-buffer $name))
         (parent-buf (current-buffer)))
     (with-current-buffer buf
       (term-mode)
-      (setq term/parent-buffer parent-buf)
-      (term-exec buf $program $program nil $args)
+      (setq term--parent-buffer parent-buf)
+      (term-exec buf $name $program nil $args)
       (let ((proc (get-buffer-process buf)))
         (if (and proc (eq 'run (process-status proc)))
             (set-process-sentinel proc $sentinel)
-          (error "Failed to invoke visual command")))
+          (error "Failed to invoke command")))
       (term-char-mode))
     buf))
-
-(defun term/last-buffer (buffers mode &optional dir)
-  "Return most recently used term buffer."
-  (when buffers
-    (let* ((buf (car buffers))
-           (info (with-current-buffer buf
-                   (cons major-mode default-directory))))
-      (if (and (eq mode (car info))
-               (directory-equal? (or dir default-directory) (cdr info)))
-          buf
-        (term/last-buffer (cdr buffers) mode dir)))))
 
 (defun term/get-buffer-name (fmt)
   (let ((index 1) name)
@@ -71,42 +46,60 @@
       (setq index (1+ index)))
     name))
 
-(defvar-local term/parent-buffer nil)
+(defvar-local term--parent-buffer nil)
 (defun term/switch-back ()
   (interactive)
-  (if (and term/parent-buffer (buffer-live-p term/parent-buffer))
-      (pop-to-buffer term/parent-buffer)
+  (if (and term--parent-buffer (buffer-live-p term--parent-buffer))
+      (pop-to-buffer term--parent-buffer)
     (message "No parent buffer or it was killed !!!")))
 
-(defun term/remote-shell (&optional $force)
-  "Switch to remote shell"
-  (let ((buf (or (and (not $force)
-                      (term/last-buffer (buffer-list) 'shell-mode))
-                 (get-buffer-create (term/get-buffer-name "*shell-%d*")))))
-    (when buf
+(defun term/get-ssh-info ($arg)
+  (let ((user (file-remote-p default-directory 'user))
+        (host (file-remote-p default-directory 'host))
+        (method (file-remote-p default-directory 'method))
+        port)
+    (when (and method (not (member method '("sshx" "ssh"))))
+      (error "Can not open ssh connection for method `%s'" method))
+    (when (or (= $arg 4) (not user))
+      (setq user (read-string "User: " user)))
+    (when (or (= $arg 4) (not host))
+      (setq user (read-string "Host: " host)))
+    (when (= $arg 4)
+      (setq port (read-string "Port: " "22")))
+    (list user host port (>= $arg 16))))
+
+(defvar-local term--ssh-info nil)
+(defun term/ssh ($user $host &optional $port $force)
+  (interactive (term/get-ssh-info (or (car-safe current-prefix-arg) 0)))
+  (let ((args (list (format "%s@%s" $user $host)
+                    (format "-p %s" (or $port 22)))))
+    (let ((buf (or  (and (not $force)
+                         (car (--filter (with-current-buffer it
+                                          (and (eq major-mode 'term-mode)
+                                               (equal args term--ssh-info)))
+                                        (buffer-list))))
+                    (term/exec-program "ssh" args))))
       (with-current-buffer buf
-        (unless (eq major-mode 'shell-mode)
-          (let ((explicit-shell-file-name "/bin/bash"))
-            (shell buf)))))
-    buf))
+        (setq term--ssh-info args))
+      buf)))
 
 (defun term/local-shell (&optional $dir $force)
   (unless (featurep 'multi-term)
     (require 'multi-term nil t))
-  (let ((buf (and (not $force)
-                  (term/last-buffer (buffer-list) 'term-mode $dir))))
-    (unless buf
-      (if $dir
-          (let ((default-directory $dir))
-            (setq buf (multi-term-get-buffer)))
-        (setq buf (multi-term-get-buffer)))
-      (setq multi-term-buffer-list
-            (nconc multi-term-buffer-list (list buf)))
-      (with-current-buffer buf
-        ;; Internal handle for `multi-term' buffer.
-        (multi-term-internal)
-        (let ((proc (ignore-errors (get-buffer-process (current-buffer)))))
-          (when proc (set-process-sentinel proc (term/wrap-sentinel))))))
+  (unless $dir
+    (setq $dir default-directory))
+  (let ((buf (or (and (not $force)
+                      (car (--filter (with-current-buffer it
+                                       (and (eq major-mode 'term-mode)
+                                            (directory-equal? $dir default-directory)))
+                                     (buffer-list))))
+                 (let ((default-directory $dir))
+                   (multi-term-get-buffer)))))
+    (setq multi-term-buffer-list
+          (nconc multi-term-buffer-list (list buf)))
+    (with-current-buffer buf
+      ;; Internal handle for `multi-term' buffer.
+      (multi-term-internal))
     buf))
 
 (defun term/pop-shell (&optional $arg)
@@ -124,37 +117,34 @@ none exists, or if the current buffer is already a term."
                              cmake-ide-build-dir)
                         (ignore-errors (projectile-project-root)))
                     (equal $arg 16))
-                 (term/remote-shell (equal $arg 16))))
+                 (apply #'term/ssh (term/get-ssh-info $arg))))
           (parent-buf (current-buffer)))
       (when buf
         (with-current-buffer buf
           (local-set-key [f8] #'term/switch-back)
-          (setq term/parent-buffer parent-buf))
-        (display-buffer buf)))))
+          (setq term--parent-buffer parent-buf))
+        (pop-to-buffer buf)))))
 
 (with-eval-after-load 'multi-term
   (add-hook 'term-mode-hook 'multi-term-keystroke-setup)
 
   (setq multi-term-program (or term-zsh-path term-bash-path))
-  (setq term-unbind-key-list '("C-x" "<ESC>" "C-y" "C-h" "C-c" "C-g"))
   (setq term-bind-key-alist
         (append term-bind-key-alist
-                '(("C-c C-n" . multi-term)
-                  ("C-s" . swiper/dispatch)
+                '(("C-s" . swiper/dispatch)
                   ("M-]" . multi-term-next)
-                  ("M-[" . multi-term-prev))))
+                  ("M-[" . multi-term-prev)
+                  ("C-g" . keyboard-quit))))
   (setq multi-term-dedicated-close-back-to-open-buffer-p t))
 
-(autoload 'with-editor-export-editor "with-editor" nil nil)
+(define-hook! term|utf8-setup (term-exec-hook)
+  (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
 
-(define-hook! term/shell-setup (shell-mode-hook)
-  (let ((proc (ignore-errors (get-buffer-process (current-buffer)))))
+(define-hook! term|autoclose-buffer (comint-mode-hook)
+  (let ((proc (get-buffer-process (current-buffer))))
     (when proc
       (set-process-sentinel proc
                             (term/wrap-sentinel (process-sentinel proc))))))
-
-(define-hook! term/utf8-setup (term-exec-hook)
-  (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
 
 (global-set-key [f8] 'term/pop-shell)
 

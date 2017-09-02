@@ -30,7 +30,7 @@
           (compilation-mode :noselect t)
           ;; Capture all other temp buffer
           ("^\\*.*?\\*" :regexp t :stick t)))
-  (defun core*popup-auto-select-psotion (&rest $args)
+  (defun core*popup-auto-select-position (&rest $args)
     (setq popwin:popup-window-position
           (if (> (frame-width) split-width-threshold)
               'right
@@ -39,6 +39,6 @@
           (if (= (length (window-list-1)) 1) 0.5 0.33)))
 
   (advice-add 'popwin:display-buffer-1 :before
-              (function core*popup-auto-select-psotion)))
+              (function core*popup-auto-select-position)))
 
 (provide 'core-popups)

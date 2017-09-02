@@ -11,22 +11,29 @@
 
 
 ;; Rearrange split windows
-(defun window%split-horizontally ()
+(defun window/split-horizontally ()
   (interactive)
   (save-excursion
     (delete-other-windows)
     (funcall (window%wrap-split-function 'split-window-horizontally))))
 
-(defun window%split-vertically ()
+(defun window/split-vertically ()
   (interactive)
   (save-excursion
     (delete-other-windows)
     (funcall (window%wrap-split-function 'split-window-vertically))))
 
-(global-set-key "\C-x|" 'window%split-horizontally)
-(global-set-key "\C-x_" 'window%split-vertically)
+(defun window/delete-other-window ()
+  (interactive)
+  (if (equal (selected-window) popwin:popup-window)
+      (popwin:one-window)
+    (delete-other-windows)))
 
-(defun toggle-window-split ()
+(global-set-key "\C-x|" 'window/split-horizontally)
+(global-set-key "\C-x_" 'window/split-vertically)
+(global-set-key "\C-x1" 'window/delete-other-window)
+
+(defun window/toggle-window-split ()
   (interactive)
   (if (= (count-windows) 2)
       (let* ((this-win-buffer (window-buffer))

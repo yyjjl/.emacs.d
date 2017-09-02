@@ -15,7 +15,9 @@
           ;; global-semantic-decoration-mode
           global-semantic-highlight-func-mode
           ;; global-semantic-mru-bookmark-mode
-          )))
+          ))
+  (add-to-list 'semantic-inhibit-functions
+               (lambda () (file-remote-p default-directory))))
 
 (defun core/semanticdb-parse-directory ($dir &optional $regex $recursive?)
   (let ((dir (file-name-as-directory $dir)))
@@ -39,7 +41,5 @@
                       (completing-read "Directory: " #'read-file-name-internal))))
   (core/semanticdb-parse-directory $dir $regex t)
   (semanticdb-save-all-db))
-
-(semantic-mode 1)
 
 (provide 'core-semantic)

@@ -15,17 +15,22 @@
 Default format 'window-number %[%b (host-address) %]'
 If function `window-numbering-mode' enabled window-number will be showed.
 If buffer file is a remote file, host-address will be showed"
-  (let* ((host (and default-directory
-                    (let ((tmp (file-remote-p default-directory)))
-                      (and tmp (split-string tmp ":")))))
+  (let* ((method (file-remote-p default-directory 'method))
+         (sudo? (member method '("su" "sudo")))
+         (host (and default-directory
+                    (let ((dir (file-remote-p default-directory)))
+                      (if (and method (not sudo?))
+                          (cadr (split-string dir ":"))
+                        method))))
          (real-id (concat
+                   (when host
+                     (propertize (concat "[" host "]")
+                                 'face font-lock-string-face))
                    (propertize
                     (format-mode-line  mode-line-buffer-identification)
-                    'face 'font-lock-keyword-face)
-                   (if (and host (cdr host))
-                       (propertize (concat "(" (cadr host) ")")
-                                   'face font-lock-string-face)
-                     ""))))
+                    'face (if sudo?
+                              'font-lock-function-name-face
+                            'font-lock-keyword-face)))))
     (list " %[" real-id "%] ")))
 
 (defun mode-line%buffer-major-mode ()
@@ -55,9 +60,9 @@ and `buffer-file-coding-system'"
               (image-size (image-get-display-property) :pixels)
             (format "%dx%d " width height)))
         (let ((buf-coding (format "%s" buffer-file-coding-system)))
-          (upcase (if (string-match "\\(dos\\|unix\\|mac\\)" buf-coding)
-                      (match-string 1 buf-coding)
-                    buf-coding)))
+          (capitalize (if (string-match "\\(dos\\|unix\\|mac\\)" buf-coding)
+                          (match-string 1 buf-coding)
+                        buf-coding)))
         ")"))
 
 (defun mode-line%flycheck ()

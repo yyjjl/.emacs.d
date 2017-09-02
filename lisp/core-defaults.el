@@ -106,12 +106,12 @@
       (concat ";; Welcome to Emacs " (or user-login-name "") " !!!"))
 
 (defvar core-recentf-enabled? t)
-(defun core%recentf-keep? (-fn)
+(defun core%recentf-keep? ($fn)
   (and core-recentf-enabled?
        ;; The order must be kept
-       (or (file-remote-p -fn)
-           (file-readable-p -fn))
-       (file-writable-p -fn)))
+       (or (file-remote-p $fn)
+           (and (file-readable-p $fn)
+                (file-writable-p $fn)))))
 (setq recentf-keep '(core%recentf-keep?))
 (setq recentf-max-saved-items 2048
       recentf-exclude (list "/tmp/" "/ssh:" "/sudo:" "\\.elc$"

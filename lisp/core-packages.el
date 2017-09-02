@@ -130,6 +130,7 @@ Archive with high priority will be used when install a package.")
 (require! 'ace-link)
 (require! 'pinyinlib)
 
+(require 'dash)
 (require 'core-ivy)
 (require 'core-company)
 (require 'core-popups)
@@ -178,6 +179,8 @@ Archive with high priority will be used when install a package.")
 
   (when emacs-use-fcitx-p
     (fcitx-aggressive-setup))
+
+  (semantic-mode 1)
 
   (ace-link-setup-default))
 
