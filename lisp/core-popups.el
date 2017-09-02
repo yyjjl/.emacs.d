@@ -8,13 +8,21 @@
   (interactive)
   (core/popup-dired (projectile-project-root)))
 
+(defun core/popwin-fix-window ()
+  (interactive)
+  (when (window-live-p popwin:popup-window)
+    (message "Set %s to normal window" popwin:popup-window)
+    (setq popwin:popup-window nil)
+    (popwin:pop-context)))
+
 (autoload 'popwin-mode "popwin" nil t)
 (with-eval-after-load 'popwin
   (global-set-key (kbd "C-z") popwin:keymap)
   (global-set-key (kbd "C-x m") #'popwin:messages)
   (define-key! :map popwin:keymap
     ("d" . core/popup-dired)
-    ("r" . core/popup-dired-root))
+    ("r" . core/popup-dired-root)
+    ("1" . core/popwin-fix-window))
 
   (setq popwin:popup-window-width 0.33)
   (setq popwin:popup-window-height 0.4)

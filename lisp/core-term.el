@@ -3,6 +3,9 @@
 (defvar! term-bash-path (executable-find "bash")
   "Bash path")
 
+(eval-when-compile
+  (require 'dash))
+
 ;; Add below code to .zshrc to make term-mode track directory changes
 ;;   if [ -n "$INSIDE_EMACS" ];then
 ;;       chpwd() {print -P "\033AnSiTc %d"}

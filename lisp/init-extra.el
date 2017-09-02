@@ -3,7 +3,6 @@
 (when emacs-has-mpv-p
   (require! 'emms))
 (require! 'markdown-mode)
-(require! 'crontab-mode)
 (require! 'csv-mode)
 (require! 'glsl-mode)
 (require! 'php-mode)

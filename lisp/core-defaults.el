@@ -115,7 +115,6 @@
 (setq recentf-keep '(core%recentf-keep?))
 (setq recentf-max-saved-items 2048
       recentf-exclude (list "/tmp/" "/ssh:" "/sudo:" "\\.elc$"
-                            (file-truename package-user-dir)
                             emacs-var-direcotry))
 
 ;; Purges buffers which haven't been displayed in 3 days

@@ -1,6 +1,6 @@
 (require 'package)
 
-(defvar package-use-priority? t
+(defvar package-use-priority? nil
   "Non-nil means to use priority defined in variable `package|priority-alist'.
 Archive with high priority will be used when install a package.")
 
@@ -10,7 +10,6 @@ Archive with high priority will be used when install a package.")
 (defvar package--required-packages (make-hash-table)
   "All packages required.")
 
-(setq package-enable-at-startup nil)
 ;; Use mirror in China
 ;; The index of archive represents its priority
 (setq package-archives
@@ -73,21 +72,27 @@ Archive with high priority will be used when install a package.")
              (package-refresh-contents)
              (setq package--content-freshed? t))
            (message "Installing package '%s' ..." $pkg-name)
-           (package-install $pkg-name)
-           (message "Package'%s' installed " $pkg-name)))))
+           (let ((inhibit-message t))
+             (package-install $pkg-name))))))
 
-(defun core/compile-config ()
-  (interactive)
+(defun core/compile-config (&optional no-message?)
+  (interactive "P")
+  (message "Compile configuration files ...")
   (dolist (file (append
                  (directory-files emacs-config-directory :full "\\.el$")
                  (directory-files-recursively emacs-site-packages-directory
-                                              "\\.el$")))
-    (byte-compile-file file))
-  (byte-compile-file user-init-file)
-  (byte-compile-file custom-file)
+                                              "\\.el$")
+                 (list user-init-file
+                       custom-file)))
+    (when file
+      (condition-case err
+          (let ((inhibit-message no-message?))
+            (byte-compile-file file))
+        (error (message "Error: %s" err)
+               (backtrace)))))
   (message "Compile finished"))
 
-(package-initialize t)
+(package-initialize)
 
 ;; ----------------------------------------
 ;; Core packages
@@ -130,7 +135,6 @@ Archive with high priority will be used when install a package.")
 (require! 'ace-link)
 (require! 'pinyinlib)
 
-(require 'dash)
 (require 'core-ivy)
 (require 'core-company)
 (require 'core-popups)
@@ -147,9 +151,10 @@ Archive with high priority will be used when install a package.")
           (lambda ($value) (when $value (setq package-selected-packages $value))))
 
     (setq package-selected-packages
-          (hash-table-keys package--required-packages))))
+          (hash-table-keys package--required-packages)))
+  (add-to-list 'recentf-exclude (file-truename package-user-dir)))
 
-(define-hook! core|setup-hook (emacs-startup-hook)
+(define-hook! core|setup-hook (after-init-hook)
   (recentf-mode 1)
   (session-initialize)
   (winner-mode 1)

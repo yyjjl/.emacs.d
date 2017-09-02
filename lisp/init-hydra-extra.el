@@ -1,3 +1,6 @@
+(eval-when-compile
+  (require 'hydra))
+
 (defvar comma-hydra-timer nil)
 (defvar comma-hydra-delay 0.5)
 (defvar comma-hydra-char ",")

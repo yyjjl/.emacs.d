@@ -1,4 +1,5 @@
-(require 'hydra)
+(eval-when-compile
+  (require 'hydra))
 
 (with-eval-after-load 'org
   (defhydra hydra-org-template (:color blue :hint nil)
