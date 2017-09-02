@@ -1,2 +1,2 @@
 all:
-	echo "Nothing to do"
+	@emacs -Q --script etc/setup/setup-emacs.el

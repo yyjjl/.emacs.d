@@ -8,6 +8,6 @@
   #+BEGIN_SRC sh
   # copy this configuration to ~/.emacs.d
   cd ~/.emacs.d/ || exit 1
-  make && emacs
+  make
   #+END_SRC
   Packages will be download automatically.

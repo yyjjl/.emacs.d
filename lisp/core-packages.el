@@ -71,7 +71,7 @@ Archive with high priority will be used when install a package.")
            (unless package--content-freshed?
              (package-refresh-contents)
              (setq package--content-freshed? t))
-           (message "Installing package '%s' ..." $pkg-name)
+           (message "Installing package `%s' ..." $pkg-name)
            (let ((inhibit-message t))
              (package-install $pkg-name))))))
 
