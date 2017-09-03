@@ -130,7 +130,7 @@ none exists, or if the current buffer is already a term."
 
 (with-eval-after-load 'multi-term
   (add-hook 'term-mode-hook 'multi-term-keystroke-setup)
-
+  (setq multi-term-scroll-to-bottom-on-output t)
   (setq multi-term-program (or term-zsh-path term-bash-path))
   (setq term-bind-key-alist
         (append term-bind-key-alist

@@ -93,7 +93,9 @@ body."
                     (if (vectorp key)
                         key
                       (kbd (concat prefix " " key)))
-                    (list 'function func))
+                    (if (symbolp func)
+                        `(function ,func)
+                      func))
               forms)))
     `(let ((,sym ,map))
        ,@forms

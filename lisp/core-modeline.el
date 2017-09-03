@@ -101,26 +101,34 @@ and `buffer-file-coding-system'"
 
 (defvar mode-line--center-margin 1)
 (defvar mode-line-default-format '("%e" (:eval (mode-line%generate))))
-(defvar mode-line--default-config '((mode-line%window-number
-                                     mode-line%buffer-id
-                                     mode-line%buffer-major-mode
-                                     mode-line%buffer-status)
-                                    (mode-line%flycheck
-                                     mode-line%process
-                                     mode-line%vc)))
-(defvar mode-line--speical-config '((mode-line%window-number
-                                     mode-line%buffer-id
-                                     mode-line%buffer-major-mode
-                                     mode-line%buffer-status)
-                                    (mode-line%process)
-                                    :no-tail
-                                    :no-center))
-(defvar mode-line--inactive-config '((mode-line%window-number
-                                      mode-line%buffer-id
-                                      mode-line%buffer-major-mode)
-                                     (mode-line%process)
-                                     :no-tail
-                                     :no-center))
+(defvar mode-line-config-alist
+  '((mode-line%inactive? (mode-line%window-number
+                          mode-line%buffer-id
+                          mode-line%buffer-major-mode)
+                         (mode-line%process)
+                         :no-tail
+                         :no-center)
+    (mode-line%use-special? (mode-line%window-number
+                             mode-line%buffer-id
+                             mode-line%buffer-major-mode
+                             mode-line%buffer-status)
+                            (mode-line%process)
+                            :no-tail
+                            :no-center)
+    (t (mode-line%window-number
+        mode-line%buffer-id
+        mode-line%buffer-major-mode
+        mode-line%buffer-status)
+       (mode-line%flycheck
+        mode-line%process
+        mode-line%vc))))
+(defun mode-line%inactive? (bn)
+  (not (equal (selected-window) mode-line--current-window)))
+
+(defun mode-line%use-special? (bn)
+  (or (memq major-mode '(dired-mode lisp-interaction-mode))
+      (and (not (derived-mode-p 'text-mode 'prog-mode))
+           (string-match-p "^\\*" bn))))
 
 (defun mode-line%create (left right &optional no-tail? no-center?)
   (let* ((lhs (format-mode-line (mapcar #'funcall left)))
@@ -148,17 +156,16 @@ and `buffer-file-coding-system'"
 (defun mode-line%generate ()
   "Generate mode-line."
   (unless (bound-and-true-p eldoc-mode-line-string)
-    (let ((bn (buffer-name))
-          (active? (equal (selected-window)
-                          mode-line--current-window)))
-      (apply #'mode-line%create
-             (cond ((not active?) mode-line--inactive-config)
-                   ((or (memq major-mode '(dired-mode
-                                           lisp-interaction-mode))
-                        (and (not (derived-mode-p 'text-mode 'prog-mode))
-                             (string-match-p "^\\*" bn)))
-                    mode-line--speical-config)
-                   (t mode-line--default-config))))))
+    (let ((config-alist mode-line-config-alist)
+          config
+          mode-line)
+      (while (and config-alist
+                  (setq config (pop config-alist)))
+        (when (or (eq (car config) t)
+                  (funcall (car config) (buffer-name)))
+          (setq config-alist nil)
+          (setq mode-line (apply #'mode-line%create (cdr config)))))
+      mode-line)))
 
 (defvar mode-line--current-window (frame-selected-window))
 (defun mode-line*set-selected-window (&rest _)

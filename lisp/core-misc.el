@@ -1,6 +1,7 @@
 ;; Default prog-mode setup
 (define-hook! core|generic-prog-mode-setup (prog-mode-hook)
   (hs-minor-mode 1)
+  (hi-lock-mode 1)
   (when (< (buffer-size) core-large-buffer-size)
     ;; (highlight-indentation-current-column-mode 1)
     (highlight-indentation-mode 1))
@@ -55,8 +56,8 @@
         "-o ControlMaster=auto -o ControlPath='tramp.%%C' -o ControlPersist=no"))
 
 (with-eval-after-load 'fcitx
-  ;; init fcitx prefix keys
-  (setq fcitx-use-dbus t)
+  ;; Init fcitx prefix keys
+  (setq fcitx-use-dbus nil)
   (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c"))
 
 ;; Smart tab

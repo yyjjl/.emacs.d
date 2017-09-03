@@ -1,7 +1,8 @@
 (deftheme molokai "Molokai theme")
 
 (defface mode-line-window-number
-  '((t (:box (:line-width 5 :color "black") :background "black")))
+  '((t (:background "black"
+                    :box (:line-width 5 :color "black"))))
   "Window number in mode-line")
 
 (custom-theme-set-faces
@@ -26,14 +27,13 @@
  '(escape-glyph ((t (:foreground "#E6DB74"))))
  '(minibuffer-prompt ((t (:foreground "#AE81EF"))))
 
- '(mode-line ((t (:foreground
-                 "#F8F8F2" :background "#2D2D2D"
-                 :box (:line-width 5 :color "#2D2D2D")))))
+ '(mode-line ((t (:foreground "#F8F8F2" :background "#2D2D2D"
+                              :box (:line-width 5 :color "#2D2D2D")))))
  '(mode-line-inactive ((t (:foreground
-                          "#BCBCBC" :background "#1B1D1E"
-                          :box (:line-width 5 :color "#1B1D1E")))))
+                           "#BCBCBC" :background "#1B1D1E"
+                           :box (:line-width 5 :color "#1B1D1E")))))
  '(mode-line-highlight ((t (:background "black"
-                                       :box (:line-width 5 :color "black")))))
+                                        :box (:line-width 5 :color "black")))))
  ;; ;; '(mode-line-mousable ((t (:foreground "#BCBCBC" :background "#000000"))))
  ;; '(mode-line-mousable-minor-mode
  ;;  ((t (:foreground "#BCBCBC" :background "#000000"))))
