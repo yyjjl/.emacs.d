@@ -1,14 +1,24 @@
 (require! 'exwm)
+(require! 'symon)
 (require 'exwm)
 (require 'exwm-config)
 (require 'exwm-systemtray)
 
 (add-to-list 'package-selected-packages 'exwm)
+(add-to-list 'package-selected-packages 'symon)
 
-(display-time-mode 1)
+(with-eval-after-load 'symon
+  (setq symon-monitors
+        '(symon-current-time-monitor
+          symon-linux-memory-monitor
+          symon-linux-cpu-monitor
+          symon-linux-network-rx-monitor
+          symon-linux-network-tx-monitor
+          symon-linux-battery-monitor)))
+(symon-mode)
 
 ;; Set workspace number
-(setq exwm-workspace-number 2)
+(setq exwm-workspace-number 4)
 
 ;; Set floating window border
 (setq exwm-floating-border-width 1)
@@ -58,12 +68,15 @@
 
 (push ?\C-z exwm-input-prefix-keys)
 (push ?\C-g exwm-input-prefix-keys)
+(push ?\C-q exwm-input-prefix-keys)
+(setq exwm-input-prefix-keys
+      (delete ?\C-c exwm-input-prefix-keys))
+(define-key exwm-mode-map [?\C-q] #'exwm-input-send-next-key)
+(define-key exwm-mode-map (kbd "C-x RET") #'exwm-workspace-move-window)
 
 (defvar exwm--command-history nil)
 (defun exwm-run-command (command)
-  (interactive (list (read-shell-command "Command: "
-                                         (car-safe exwm--command-history)
-                                         'exwm--command-history)))
+  (interactive (list (read-shell-command "$ " nil 'exwm--command-history)))
   (start-process-shell-command command nil command))
 
 (defun exwm/switch-buffer (&optional $same-app?)
@@ -100,10 +113,8 @@
                    (expand-file-name "~/.xsession")))))
 
 (define-hook! exwm|floating-setup-hook (exwm-floating-setup-hook)
-  (with-current-buffer (window-buffer)
-    (force-mode-line-update)
-    (when (string-match "unity-control-center.*" exwm-instance-name)
-      (exwm-floating--unset-floating exwm--id))))
+  (when (string-match "unity-control-center.*" exwm-instance-name)
+    (exwm-floating--unset-floating exwm--id)))
 
 (define-hook! exwm|auto-rename-buffer (exwm-update-class-hook
                                        exwm-update-title-hook)
@@ -138,25 +149,35 @@
 
 (with-eval-after-load 'popwin
   (define-key! :map popwin:keymap
-    ("g" . (define-exwm-app! "google-chrome"))
+    ("g" . (define-exwm-app! "chrome" "google-chrome"))
     ("n" . (define-exwm-app! "nautilus"))
     ("p" . (define-exwm-app! "evince"))
     ("c" . (define-exwm-app! "unity-control-center"))
     ("t" . (define-exwm-app! "gnome-terminal"))))
 
-(define-key!
-  ([XF86KbdBrightnessDown] . (define-exwm-command! "kbdbacklight.sh down"))
-  ([XF86KbdBrightnessUp] . (define-exwm-command! "kbdbacklight.sh up"))
-  ([XF86AudioMute] . (define-exwm-command!
-                       "amixer -D pulse set Master 1+ toggle"))
-  ([XF86AudioLowerVolume] . (define-exwm-command!
-                              "amixer -D pulse set Master 5%-"))
-  ([XF86AudioRaiseVolume] . (define-exwm-command!
-                              "amixer -D pulse set Master 5%+"))
-  ([print] . (lambda!
-               (start-process-shell-command "gnome-screenshot"
-                                            nil "gnome-screenshot"))))
-
+(exwm-input-set-key [XF86KbdBrightnessDown]
+                    (define-exwm-command! "kbdbacklight.sh down"))
+(exwm-input-set-key [XF86KbdBrightnessUp]
+                    (define-exwm-command! "kbdbacklight.sh up"))
+(exwm-input-set-key [XF86AudioMute]
+                    (define-exwm-command!
+                      "amixer -D pulse set Master 1+ toggle"))
+(exwm-input-set-key [XF86AudioLowerVolume]
+                    (define-exwm-command!
+                      "amixer -D pulse set Master 5%-"))
+(exwm-input-set-key [XF86AudioRaiseVolume]
+                    (define-exwm-command!
+                      "amixer -D pulse set Master 5%+"))
+(exwm-input-set-key [print]
+                    (lambda!
+                      (start-process-shell-command "gnome-screenshot"
+                                                   nil "gnome-screenshot")))
+(exwm-input-set-key (kbd "s-r") #'exwm-reset)
+(exwm-input-set-key (kbd "s-w") #'exwm-workspace-switch)
+(exwm-input-set-key (kbd "s-1") (lambda! (exwm-workspace-switch 0)))
+(exwm-input-set-key (kbd "s-2") (lambda! (exwm-workspace-switch 1)))
+(exwm-input-set-key (kbd "s-3") (lambda! (exwm-workspace-switch 2)))
+(exwm-input-set-key (kbd "s-4") (lambda! (exwm-workspace-switch 3)))
 (exwm-input-set-key (kbd "s-&") #'exwm-run-command)
 (exwm-input-set-key (kbd "M-<tab>") #'exwm/switch-buffer)
 (exwm-input-set-key (kbd "M-`") (lambda! (exwm/switch-buffer t)))
@@ -175,10 +196,9 @@
 (exwm-input-set-simulation-keys
  '(([?\C-p] . up)
    ([?\C-n] . down)
-   ([?\C-a] . home)
-   ([?\C-e] . end)
-   ([?\C-y] . ?\C-v)
-   ([?\M-w] . ?\C-c)))
+   ([?\C-b] . left)
+   ([?\C-f] . right)
+   ([?\C-y] . ?\C-v)))
 
 ;; Don't delete it
 (exwm-enable)
