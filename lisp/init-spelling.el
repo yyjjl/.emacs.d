@@ -86,11 +86,20 @@
                 rjsx-attr))))
   (put 'js2-mode 'flyspell-mode-predicate 'js2|flyspell-verify)
 
+  (defun spelling/flyspell-line-or-region ($start $end)
+    (interactive (if (region-active-p)
+                     (list (region-beginning)
+                           (region-end))
+                   (list (line-beginning-position)
+                         (line-end-position))))
+    (flyspell-region $start $end))
+
   (setq flyspell-issue-message-flag nil
         flyspell-large-region 1)
   (define-key flyspell-mode-map (kbd "C-,") nil)
   (define-key flyspell-mode-map (kbd "C-M-i") nil)
-  (define-key flyspell-mode-map (kbd "C-;") 'flyspell-buffer))
+  (define-key flyspell-mode-map (kbd "C-;")
+    #'spelling/flyspell-line-or-region))
 
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 (add-hook 'text-mode-hook 'flyspell-mode)

@@ -97,9 +97,9 @@
                  (eq (buffer-local-value 'major-mode buffer) 'term-mode)))
            :size 0.4 :align below :select t :inhibit-autoclose t)
           (help-mode :align below :select t)
-          (ivy-occur-grep-mode :inhibit-close t :select t :align core%shackle-align)
-          (grep-mode :inhibit-close t :select t :align core%shackle-align)
-          (occur-mode :inhibit-close t :select t :align core%shackle-align)
+          (ivy-occur-grep-mode :inhibit-autoclose t :select t :align core%shackle-align)
+          (grep-mode :inhibit-autoclose t :select t :align core%shackle-align)
+          (occur-mode :inhibit-autoclose t :select t :align core%shackle-align)
           ("^\\*.*?\\*" :regexp t :select t :align core%shackle-align))))
 
 (provide 'core-popups)
