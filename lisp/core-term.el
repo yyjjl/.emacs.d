@@ -41,11 +41,11 @@
       (term-char-mode))
     buf))
 
-(defun term/get-buffer-name (fmt)
+(defun term/get-buffer-name ($fmt)
   (let ((index 1) name)
-    (setq name (format fmt index))
+    (setq name (format $fmt index))
     (while (buffer-live-p (get-buffer name))
-      (setq name (format fmt index))
+      (setq name (format $fmt index))
       (setq index (1+ index)))
     name))
 

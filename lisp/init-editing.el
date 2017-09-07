@@ -13,7 +13,7 @@
 (defvar core-narrow-dwim-alist
   '((org-mode org-narrow-to-subtree org-narrow-to-element)
     (latex-mode LaTeX-narrow-to-environment TeX-narrow-to-group)))
-(defun core/narrow-or-widen-dwim (&optional arg)
+(defun core/narrow-or-widen-dwim (&optional $arg)
   "If the buffer is narrowed, it widens.
 Otherwise,it narrows to region, or Org subtree.
 Optional argument ARG is used to toggle narrow functions."
@@ -22,25 +22,25 @@ Optional argument ARG is used to toggle narrow functions."
         ((region-active-p) (narrow-to-region (region-beginning) (region-end)))
         (t (let ((cmd (cdr (assoc major-mode core-narrow-dwim-alist))))
              (if cmd
-                 (setq cmd (if arg (cadr cmd) (car cmd)))
-               (setq cmd (if arg #'narrow-to-page #'narrow-to-defun)))
+                 (setq cmd (if $arg (cadr cmd) (car cmd)))
+               (setq cmd (if $arg #'narrow-to-page #'narrow-to-defun)))
              (when cmd
                (message "Use command `%s'" cmd)
                (funcall cmd))))))
 
-(defun core/grab-regexp (regexp)
+(defun core/grab-regexp ($regexp)
   "Grab strings matching REGEXP to list."
   (let ((s (buffer-string))
         (pos 0)
         item
         items)
-    (while (setq pos (string-match regexp s pos))
+    (while (setq pos (string-match $regexp s pos))
       (setq item (match-string-no-properties 0 s))
       (setq pos (+ pos (length item)))
       (add-to-list 'items item))
     items))
 
-(defun core/kill-regexp (regexp)
+(defun core/kill-regexp ($regexp)
   "Find all strings matching REGEXP in current buffer.
 grab matched string and insert them into `kill-ring'"
   (interactive
@@ -48,7 +48,7 @@ grab matched string and insert them into `kill-ring'"
                                       (car regexp-history))
                               (car regexp-history))))
      (list regexp)))
-  (let ((items (core/grab-regexp regexp)))
+  (let ((items (core/grab-regexp $regexp)))
     (kill-new (string-join items "\n"))
     (message "matched %d strings => kill-ring" (length items))
     items))

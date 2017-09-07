@@ -154,14 +154,7 @@
 (with-eval-after-load 'idris-mode
   (require 'haskell-font-lock)
   (font-lock-add-keywords 'idris-mode
-                          (haskell-font-lock-symbols-keywords))
-  (push 'idris-compiler-notes-mode
-        popwin:special-display-config)
-  (push '(idris-repl-mode
-          :height 0.4
-          :noselect nil
-          :position bottom)
-        popwin:special-display-config))
+                          (haskell-font-lock-symbols-keywords)))
 
 (with-eval-after-load 'align
   (add-to-list 'align-rules-list

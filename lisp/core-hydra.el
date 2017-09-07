@@ -139,13 +139,13 @@ _d_: subtree
 (defvar current-forward-thing 'char)
 (defun current-forward-thing ()
   current-forward-thing)
-(defun forward-thing* (&optional N)
+(defun forward-thing* (&optional $N)
   (interactive "p")
-  (forward-thing current-forward-thing N))
+  (forward-thing current-forward-thing $N))
 
-(defun backward-thing* (&optional N)
+(defun backward-thing* (&optional $N)
   (interactive "p")
-  (forward-thing current-forward-thing (when (numberp N) (- 0 N))))
+  (forward-thing current-forward-thing (when (numberp $N) (- 0 $N))))
 
 (defhydra hydra-move (:color pink :hint nil)
   "

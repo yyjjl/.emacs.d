@@ -9,7 +9,7 @@
 
 
 
-(defun org/split-src-block (&optional below)
+(defun org/split-src-block (&optional $below)
   "Split the current src block.
 With a prefix BELOW move point to lower block."
   (interactive "P")
@@ -19,7 +19,7 @@ With a prefix BELOW move point to lower block."
     (beginning-of-line)
     (insert (format "#+END_SRC\n#+BEGIN_SRC %s %s\n" language parameters))
     (beginning-of-line)
-    (when (not below)
+    (when (not $below)
       (org-babel-previous-src-block))))
 
 (defvar org--ipython-parent-buffer nil)
@@ -109,11 +109,11 @@ With a prefix BELOW move point to lower block."
 
 (with-eval-after-load 'ob-ipython
   ;; Fix encoding error
-  (defun ob-ipython--inspect-request (code &optional pos detail)
+  (defun ob-ipython--inspect-request ($code &optional $pos $detail)
     (let ((url-request-data (encode-coding-string
-                             (json-encode `((code . ,code)
-                                            (pos . ,(or pos (length code)))
-                                            (detail . ,(or detail 0))))
+                             (json-encode `((code . ,$code)
+                                            (pos . ,(or $pos (length $code)))
+                                            (detail . ,(or $detail 0))))
                              'utf-8))
           (url-request-method "POST"))
       (with-current-buffer (url-retrieve-synchronously
@@ -159,9 +159,12 @@ With a prefix BELOW move point to lower block."
   (font-lock-add-keywords
    'org-mode
    '(("{{{[ \n]*\\(bg\\)?color[ \n]*(\\([#0-9a-zA-Z]+\\)[ \n]*,\\([^,]+?\\))}}}"
-      (2 (progn
+      (2 (let ((table-p (save-excursion
+                          (forward-line 0)
+                          (looking-at-p org-table-dataline-regexp))))
            (put-text-property (match-beginning 2) (match-end 2)
-                              'display '((raise 0.5)))
+                              'display
+                              (nth (if table-p 3 1) org-script-display))
            font-lock-builtin-face)
          t t)
       (3 (let ((bg (match-string 1))
@@ -243,16 +246,16 @@ With a prefix BELOW move point to lower block."
 
   (unless (featurep 'company-auctex)
     (require 'company-auctex))
-  (defun company-org-symbols (command &optional arg &rest ignored)
+  (defun company-org-symbols ($command &optional $arg &rest $ignored)
     "Complete math symbol in LaTeX fragments, better than
 `pcomplete'"
     (interactive (list 'interactive))
-    (cl-case command
+    (cl-case $command
       (interactive (company-begin-backend 'company-org-symbols))
       (prefix (and (org-inside-LaTeX-fragment-p)
                    (company-grab-word)))
-      (candidates (company-auctex-symbol-candidates arg))
-      (annotation (company-auctex-symbol-annotation arg))))
+      (candidates (company-auctex-symbol-candidates $arg))
+      (annotation (company-auctex-symbol-annotation $arg))))
 
   (define-hook! org|setup (org-mode-hook)
     (org-bullets-mode 1)
@@ -293,13 +296,13 @@ With a prefix BELOW move point to lower block."
     ("C-c C-t" . org-todo)))
 
 (with-eval-after-load 'ox-html
-  (defun org*html-export-with-line-number (fn &rest rest)
-    (when (= (length rest) 5)
-      (let ((num-start (nth 4 rest)))
+  (defun org*html-export-with-line-number ($fn &rest $rest)
+    (when (= (length $rest) 5)
+      (let ((num-start (nth 4 $rest)))
         (unless num-start
           (setq num-start 0))
         (setcar (nthcdr 4 rest) num-start)))
-    (apply fn rest))
+    (apply $fn $rest))
 
   (advice-add 'org-html-do-format-code
               :around #'org*html-export-with-line-number))

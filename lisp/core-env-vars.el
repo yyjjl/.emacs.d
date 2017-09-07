@@ -2,9 +2,9 @@
   (declare (doc-string 3))
   `(defvar ,name (eval-when-compile ,value) ,doc))
 
-(defun find-library-in-directory (name dir)
-  (setq dir (expand-file-name dir))
-  (let ((files (directory-files dir))
+(defun find-library-in-directory ($name $dir)
+  (setq $dir (expand-file-name $dir))
+  (let ((files (directory-files $dir))
         file
         lib-path)
     (while (and (not lib-path) files)
@@ -12,18 +12,18 @@
       (unless (member file '("." ".."))
         (setq lib-path
               (if (file-directory-p file)
-                  (ignore-errors (find-library-in-directory name file))
-                (and (string= file name)
-                     (expand-file-name file dir))))))))
+                  (ignore-errors (find-library-in-directory $name file))
+                (and (string= file $name)
+                     (expand-file-name file $dir))))))))
 
-(defun python-has-module (modules &optional script)
+(defun python-has-module ($modules &optional $script)
   "Check python whether has MODULES"
   (shell-command-to-string
    (format "python3 %s %s"
-           (or script (expand-etc! "has-module.py"))
+           (or $script (expand-etc! "has-module.py"))
            (string-join (mapcar (lambda (x)
                                   (if (symbolp x) (symbol-name x) x))
-                                modules)
+                                $modules)
                         " "))))
 
 (defvar! emacs-has-xsel-p (executable-find "xsel")

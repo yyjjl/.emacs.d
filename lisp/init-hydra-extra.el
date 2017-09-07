@@ -5,11 +5,11 @@
 (defvar comma-hydra-delay 0.5)
 (defvar comma-hydra-char ",")
 (defvar-local comma-hydra-last-buffer-undo-list nil)
-(defun comma-hydra-quit (&optional no-hydra-quit)
+(defun comma-hydra-quit (&optional $no-hydra-quit)
   (when comma-hydra-timer
     (cancel-timer comma-hydra-timer)
     (setq comma-hydra-timer nil))
-  (unless no-hydra-quit
+  (unless $no-hydra-quit
     (hydra-keyboard-quit)))
 
 (defun comma-hydra-pre ()

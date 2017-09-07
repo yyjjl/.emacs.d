@@ -23,15 +23,8 @@
     (delete-other-windows)
     (funcall (window%wrap-split-function 'split-window-vertically))))
 
-(defun window/delete-other-window ()
-  (interactive)
-  (if (equal (selected-window) popwin:popup-window)
-      (popwin:one-window)
-    (delete-other-windows)))
-
 (global-set-key "\C-x|" 'window/split-horizontally)
 (global-set-key "\C-x_" 'window/split-vertically)
-(global-set-key "\C-x1" 'window/delete-other-window)
 
 (defun window/toggle-window-split ()
   (interactive)

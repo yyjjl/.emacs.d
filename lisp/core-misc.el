@@ -106,33 +106,33 @@
         (switch-to-buffer buf)))))
 
 ;; Rename the current file
-(defun core/rename-this-file-and-buffer (new-name)
+(defun core/rename-this-file-and-buffer ($new-name)
   "Renames both current buffer and file it's visiting to NEW-NAME."
-  (interactive (list  (completing-read "New file name: "
-                                       #'read-file-name-internal)))
+  (interactive (list (completing-read "New file name: "
+                                      #'read-file-name-internal)))
   (let ((name (buffer-name))
         (filename (buffer-file-name)))
     (unless filename
       (error "Buffer '%s' is not visiting a file!" name))
-    (if (get-buffer new-name)
-        (message "A buffer named '%s' already exists!" new-name)
+    (if (get-buffer $new-name)
+        (message "A buffer named '%s' already exists!" $new-name)
       (progn
-        (rename-file filename new-name 1)
-        (rename-buffer new-name)
-        (set-visited-file-name new-name)
+        (rename-file filename $new-name :ok-if-already-exists)
+        (rename-buffer $new-name)
+        (set-visited-file-name $new-name)
         (set-buffer-modified-p nil)))))
 
-(defun core/copy-file-name (&optional arg)
+(defun core/copy-file-name (&optional $arg)
   "Copy current file name to king ring.
 If ARG = 0 copy the current directory.  If ARG > 0 copy the file
 name without directory.  If ARG < 0 copy the file name without
 directory and extension."
   (interactive "p")
   (let ((path (buffer-file-name)))
-    (cond ((= arg 0) (setq path (buffer-file-name)))
-          ((= arg 4) (setq path default-directory))
-          ((= arg 16) (setq path (file-name-nondirectory path)))
-          ((< arg 0) (setq path (file-name-base path))))
+    (cond ((= $arg 0) (setq path (buffer-file-name)))
+          ((= $arg 4) (setq path default-directory))
+          ((= $arg 16) (setq path (file-name-nondirectory path)))
+          ((< $arg 0) (setq path (file-name-base path))))
     (if path
         (progn (message "Copy => %s" path)
                (kill-new path))
@@ -179,11 +179,11 @@ Does not indent buffer, because it is used for a
       (kill-region (car bounds) (cdr bounds))
       (insert num))))
 
-(defun core/restore-files (&optional num)
+(defun core/restore-files (&optional $num)
   (interactive "p")
   (if recentf-mode
       (let (buf)
-        (dolist (file (-take (or num 1) recentf-list))
+        (dolist (file (-take (or $num 1) recentf-list))
           (setq buf (find-file-noselect file)))
         (switch-to-buffer buf))
     (message "`recentf-mode' must be turned on !!!")))

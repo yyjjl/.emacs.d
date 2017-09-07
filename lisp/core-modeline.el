@@ -123,21 +123,21 @@ and `buffer-file-coding-system'"
        (mode-line%flycheck
         mode-line%process
         mode-line%vc))))
-(defun mode-line%inactive? (bn)
+(defun mode-line%inactive? ($bn)
   (not mode-line-active?))
 
-(defun mode-line%use-special? (bn)
+(defun mode-line%use-special? ($bn)
   (or (memq major-mode '(dired-mode lisp-interaction-mode))
       (and (not (derived-mode-p 'text-mode 'prog-mode))
-           (string-match-p "^\\*" bn))))
+           (string-match-p "^\\*" $bn))))
 
-(defun mode-line%create (left right &optional no-tail? no-center?)
-  (let* ((lhs (format-mode-line (mapcar #'funcall left)))
-         (chs (if no-center? ""
+(defun mode-line%create ($left $right &optional $no-tail? $no-center?)
+  (let* ((lhs (format-mode-line (mapcar #'funcall $left)))
+         (chs (if $no-center? ""
                 (propertize (format-mode-line mode-line-misc-info)
                             'face font-lock-string-face)))
-         (rhs (format-mode-line (mapcar #'funcall right)))
-         (tail (if no-tail? ""
+         (rhs (format-mode-line (mapcar #'funcall $right)))
+         (tail (if $no-tail? ""
                  (propertize (mode-line%tail) 'face 'font-lock-constant-face)))
          (lw (string-width lhs))
          (cw (string-width chs))

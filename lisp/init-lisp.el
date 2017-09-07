@@ -110,19 +110,19 @@ Emacs Lisp."
 
 (with-eval-after-load 'racket-mode
   ;; Hide error message when racket script is not loaded
-  (defun lisp/racket-complete-at-point-advice (fn &rest args)
+  (defun lisp/racket-complete-at-point-advice ($fn &rest $args)
     (when (and (buffer-file-name) (racket--in-repl-or-its-file-p))
-      (let ((result (apply fn args)))
+      (let ((result (apply $fn $args)))
         (when result
           (delete 'racket--get-type (delete :company-docsig result))))))
   (advice-add 'racket-complete-at-point
               :around #'lisp/racket-complete-at-point-advice)
   ;; Use `ivy' as default completion backends
-  (defun racket--read-identifier (prompt default)
-    (ivy-read prompt
+  (defun racket--read-identifier ($prompt $default)
+    (ivy-read $prompt
               (racket--get-namespace-symbols)
-              :initial-input default
-              :preselect default)))
+              :initial-input $default
+              :preselect $default)))
 
 (with-eval-after-load 'elisp-mode
   (define-key emacs-lisp-mode-map (kbd "C-c e") 'macrostep-expand)

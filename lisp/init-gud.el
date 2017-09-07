@@ -38,7 +38,7 @@
     `(progn
        (defun ,name (&optional no-select)
          (interactive "P")
-         (popwin:popup-buffer (gdb-get-buffer-create ',$type)))
+         (display-buffer (gdb-get-buffer-create ',$type)))
        #',name)))
 
 (defun gud/pop-to-source-buffer ()
