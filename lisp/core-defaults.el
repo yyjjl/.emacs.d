@@ -129,7 +129,7 @@
   (progn
     (setq history-length 1000)
     (setq savehist-additional-variables
-          '(search-ring regexp-search-ring))
+          '(search-ring regexp-search-ring ivy-views))
     (savehist-mode 1)))
 
 ;; Don't echo passwords when communicating with interactive programs:
@@ -173,10 +173,11 @@
         gc-cons-percentage 0.1)
   ;; Load private configuration
   (ignore-errors (load-file custom-file))
+  (message "Init Time: %s" (emacs-init-time))
   (run-with-timer 1 nil
                   (lambda ()
-                    (find-file (expand-var! "org/*note*"))
-                    (message "Init Time: %s" (emacs-init-time)))))
+                    (find-file-noselect (expand-var! "org/*note*"))
+                    (enable-theme 'molokai))))
 
 
 

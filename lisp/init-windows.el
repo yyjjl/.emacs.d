@@ -58,4 +58,42 @@
           (select-window first-win)
           (if this-win-2nd (other-window 1))))))
 
+
+(defun window%split-n ($window $n $align)
+  (when (> $n 1)
+    (let ((split-function (if (eq $align :vertical)
+                              #'split-window-vertically
+                            #'split-window-horizontally))
+          (size (if (eq $align :vertical)
+                    (window-height $window)
+                  (window-width $window))))
+      (dotimes (_ (- $n 1))
+        (with-selected-window $window
+          (setq $window
+                (funcall split-function (round (/ size $n)))))))))
+
+(defun window/split-window-two-panel ($align $num1 $num2 ratio)
+  (interactive (list (read-char "`-' or `|' :")
+                     (max (read-number "First: ") 1)
+                     (max (read-number "Second: ") 1)
+                     (if current-prefix-arg
+                         (min 0.7 (max 0.3 (read-number "Ratio(0.3-0.7): ")))
+                       0.5)))
+  (delete-other-windows)
+  (let ((orig-window (selected-window))
+        new-window
+        align)
+    (cond
+     ((eq $align ?-)
+      (setq new-window (split-window-vertically (round (* ratio (window-height))))
+            align :horizontal))
+     ((eq $align ?|)
+      (setq new-window (split-window-horizontally (round (* ratio (window-width))))
+            align :vertical))
+     (t
+      (message "Nothing to do !!!")))
+    (when align
+      (window%split-n orig-window $num1 align)
+      (window%split-n new-window $num2 align))))
+
 (provide 'init-windows)

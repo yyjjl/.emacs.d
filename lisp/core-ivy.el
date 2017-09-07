@@ -1,18 +1,18 @@
-(autoload 'pinyinlib-build-regexp-char "pinyinlib" nil nil)
-(defun core/pinyin-regexp-helper (char)
-  (cond ((equal char ?\s) ".*")
-        (t (or (pinyinlib-build-regexp-char char) ""))))
+;; (autoload 'pinyinlib-build-regexp-char "pinyinlib" nil nil)
+;; (defun core/pinyin-regexp-helper (char)
+;;   (cond ((equal char ?\s) ".*")
+;;         (t (or (pinyinlib-build-regexp-char char) ""))))
 
-(defun core%pinyinlib-build-regexp-string (str)
-  (when (and (> (length str) 0)
-             (equal (substring str 0 1) "!"))
-    (mapconcat 'core/pinyin-regexp-helper
-               (cdr (string-to-list str))
-               "")))
+;; (defun core%pinyinlib-build-regexp-string (str)
+;;   (when (and (> (length str) 0)
+;;              (equal (substring str 0 1) "!"))
+;;     (mapconcat 'core/pinyin-regexp-helper
+;;                (cdr (string-to-list str))
+;;                "")))
 
-(defun core/re-builder-pinyin (str)
-  (or (core%pinyinlib-build-regexp-string str)
-      (ivy--regex-plus str)))
+;; (defun core/re-builder-pinyin (str)
+;;   (or (core%pinyinlib-build-regexp-string str)
+;;       (ivy--regex-plus str)))
 
 (defun core/semantic--create ($tags $depth &optional $class $result)
   "Write the contents of TAGS to the current buffer."
@@ -119,9 +119,9 @@ for a file to visit if current buffer is not visiting a file."
   (setq ivy-count-format "(%d/%d) ")
   (setq ivy-re-builders-alist
         '( ;; Use regex as default
-          (swiper . core/re-builder-pinyin)
-          (swiper-multi . core/re-builder-pinyin)
-          (counsel-find-file . core/re-builder-pinyin)
+          ;; (swiper . core/re-builder-pinyin)
+          ;; (swiper-multi . core/re-builder-pinyin)
+          ;; (counsel-find-file . core/re-builder-pinyin)
           (t . ivy--regex-plus)))
 
   (setq ivy-initial-inputs-alist nil)
@@ -142,8 +142,8 @@ for a file to visit if current buffer is not visiting a file."
     ("C-s" . swiper/dispatch)
     ("C-x C-f" . counsel-find-file)
     ("C-x k" . counsel-kill-buffer)
-    ("C-c w -" . ivy-pop-view)
-    ("C-c w =" . ivy-push-view))
+    ("C-x w -" . ivy-pop-view)
+    ("C-x w =" . ivy-push-view))
   (define-key! :prefix "C-c i"
     ("r" . ivy-resume)
     ("l l" . counsel-load-library)

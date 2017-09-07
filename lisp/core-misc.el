@@ -1,7 +1,7 @@
 ;; Default prog-mode setup
-(define-hook! core|generic-prog-mode-setup (prog-mode-hook)
+(define-hook! core|generic-prog-mode-setup (prog-mode-hook
+                                            LaTeX-mode-hook)
   (hs-minor-mode 1)
-  (hi-lock-mode 1)
   (when (< (buffer-size) core-large-buffer-size)
     ;; (highlight-indentation-current-column-mode 1)
     (highlight-indentation-mode 1))
@@ -18,9 +18,6 @@
   (setq-default flycheck-check-syntax-automatically
                 '(idle-change save mode-enabled))
   (setq flycheck-mode-line-prefix ""))
-
-(with-eval-after-load 'session
-  (add-to-list 'session-globals-include 'ivy-views))
 
 (with-eval-after-load 'hippie-exp
   (setq hippie-expand-try-functions-list
@@ -62,11 +59,11 @@
 
 ;; Smart tab
 (defun core%indent-for-tab ($fn &rest $arg)
-  (cond ((use-region-p) (apply $fn $arg))
+  (cond ((or (not (called-interactively-p 'interactive))
+             (use-region-p))
+         (apply $fn $arg))
         ;; Skip close paren
-        ((or (and (not lispy-mode)
-                  (memq (char-after) '(?\) ?\} ?\$ ?\])))
-             (memq (char-after) '(?\' ?\` ?\")))
+        ((memq (char-after) '(?\) ?\} ?\$ ?\] ?\' ?\` ?\"))
          (forward-char 1))
         ;; Toggle outline
         ((save-excursion
@@ -74,10 +71,9 @@
            (and outline-minor-mode (looking-at-p outline-regexp)))
          (outline-toggle-children))
         ;; Trigger completions
-        ((and (not lispy-mode)
-              (looking-back "\\(?:\\s_\\|\\sw\\)\\{2,\\}\\(?:\\.\\|->\\)?"
-                            (max (point-min) (- (point) 5)))
-              (call-interactively #'hippie-expand)))
+        ((looking-back "\\(?:\\s_\\|\\sw\\)\\{2,\\}\\(?:\\.\\|->\\)?"
+                       (max (point-min) (- (point) 5)))
+         (call-interactively #'hippie-expand))
         ;; Default behavior
         (t (apply $fn $arg))))
 (advice-add 'indent-for-tab-command :around #'core%indent-for-tab)
@@ -247,7 +243,6 @@ Does not indent buffer, because it is used for a
   ("C-c q" . auto-fill-mode)
   ("C-x C-b" . ibuffer)
   ("M-/" . hippie-expand)
-  ("M-w" . easy-kill)
 
   ("M-s o" . core/occur-dwim)
   ("M-i" . iedit-mode)
@@ -262,7 +257,7 @@ Does not indent buffer, because it is used for a
   ("C-<up>" . text-scale-increase)
   ("C-<down>" . text-scale-decrease)
 
-  ("C-c w [" . winner-undo)
-  ("C-c w ]" . winner-redo))
+  ("C-x w [" . winner-undo)
+  ("C-x w ]" . winner-redo))
 
 (provide 'core-misc)

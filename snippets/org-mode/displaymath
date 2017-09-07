@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: displaymath
+# key: dl
+# --
+
+\begin{displaymath}
+  $0        
+\end{displaymath}

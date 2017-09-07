@@ -2,8 +2,10 @@
 
 (defface mode-line-window-number
   '((t (:background "black"
-                    :box (:line-width 5 :color "black"))))
-  "Window number in mode-line")
+                    :box (:line-width 5 :color "black")
+                    )))
+  "Window number in mode-line"
+  :group 'mode-line)
 
 (custom-theme-set-faces
  'molokai
@@ -28,12 +30,15 @@
  '(minibuffer-prompt ((t (:foreground "#AE81EF"))))
 
  '(mode-line ((t (:foreground "#F8F8F2" :background "#2D2D2D"
-                              :box (:line-width 5 :color "#2D2D2D")))))
+                              :box (:line-width 5 :color "#2D2D2D")
+                              ))))
  '(mode-line-inactive ((t (:foreground
                            "#BCBCBC" :background "#1B1D1E"
-                           :box (:line-width 5 :color "#1B1D1E")))))
+                           :box (:line-width 5 :color "#1B1D1E")
+                           ))))
  '(mode-line-highlight ((t (:background "black"
-                                        :box (:line-width 5 :color "black")))))
+                                        :box (:line-width 5 :color "black")
+                                        ))))
  ;; ;; '(mode-line-mousable ((t (:foreground "#BCBCBC" :background "#000000"))))
  ;; '(mode-line-mousable-minor-mode
  ;;  ((t (:foreground "#BCBCBC" :background "#000000"))))
@@ -50,13 +55,13 @@
  '(font-lock-preprocessor-face ((t (:foreground "#A6E22E" :weight bold))))
  '(font-lock-reference-face ((t (:foreground "#AE81FF"))))
  '(font-lock-regexp-grouping-backslash
-  ((t (:foreground "#AE81FF" :weight bold))))
+   ((t (:foreground "#AE81FF" :weight bold))))
  '(font-lock-regexp-grouping-construct ((t ( :weight bold))))
  '(font-lock-string-face ((t (:foreground "#E6DB74"))))
  '(font-lock-type-face ((t (:foreground "#66D9EF" :weight bold))))
  '(font-lock-variable-name-face ((t (:foreground "#fd971f"))))
  '(font-lock-warning-face ((t (:foreground "#FFFFFF"
-                                          :background "#333333"))))
+                                           :background "#333333"))))
  '(fringe ((t (:background "#1B1D1E"))))
  '(highlight-indentation-face ((t (:background "#111213"))))
  ;; (vertical-border ((t (:foreground "#111213"))))
@@ -100,9 +105,9 @@
  '(outline-8 ((t (:foreground "#A6E22E"))))
  '(secondary-selection ((t (:background "#272822"))))
  '(show-paren-match
-  ((t (:foreground "#000000" :background "#FD971F"))))
+   ((t (:foreground "#000000" :background "#FD971F"))))
  '(show-paren-mismatch
-  ((t (:foreground "#960050" :background "#1E0010"))))
+   ((t (:foreground "#960050" :background "#1E0010"))))
  '(widget-inactive-face ((t (:background "#FF0000"))))
  '(woman-addition ((t (:foreground "#AE81FF"))))
  '(woman-bold ((t (:foreground "#F92672"))))
@@ -120,7 +125,7 @@
  '(rainbow-delimiters-depth-8-face ((t (:foreground "#795548"))))
  '(rainbow-delimiters-depth-9-face ((t (:foreground "#DCE775"))))
  '(rainbow-delimiters-unmatched-face
-  ((t (:foreground "#F8F8F2" :background "#EF6C00"))))
+   ((t (:foreground "#F8F8F2" :background "#EF6C00"))))
  ;; Company autocomplete
 
  '(company-scrollbar-bg ((t (:background "#3F4346"))))
@@ -128,17 +133,17 @@
  '(company-tooltip ((t (:inherit default :weight bold  :background "#1C1F26"))))
  '(company-tooltip-annotation ((t (:weight normal :foreground "orange"))))
  '(company-tooltip-annotation-selection
-  ((t (:weight normal :foreground "red"))))
+   ((t (:weight normal :foreground "red"))))
  '(company-tooltip-common
-  ((t (:inherit font-lock-constant-face :underline t))))
+   ((t (:inherit font-lock-constant-face :underline t))))
  '(company-tooltip-selection ((t (:inherit font-lock-keyword-face
-                                          :weight bold
-                                          :background "#4B5053"))))
+                                           :weight bold
+                                           :background "#4B5053"))))
 
  '(regex-tool-matched-face ((t (:foreground nil :background nil
-                                           :inherit match))))
+                                            :inherit match))))
  '(eldoc-highlight-function-argument ((t (:foreground "#86DC2F"
-                                                     :weight bold))))
+                                                      :weight bold))))
  '(hl-sexp-face ((t (:background "gray5"))))
  '(hl-line ((t (:background "gray5"))))
  '(org-block ((t (:foreground "#8BC34A" :background "#1C1F26"))))
@@ -169,15 +174,13 @@
  '(org-block-end-line ((t (:foreground "#B3E5FC" :background "#1E2930"))))
 
  '(org-level-1 ((t (:inherit outline-1
-                                :background "grey20"
-                                :weight bold
-                                :overline t
-                                ;; :height 1.3
-                                ))))
+                             :background "grey20"
+                             :weight bold
+                             :overline t
+                             :height 1.3))))
  '(org-level-2 ((t (:inherit outline-2
-                                :background "grey20"
-                                ;; :height 1.2
-                                ))))
+                             :background "grey20"
+                             :height 1.2))))
  '(org-level-3 ((t (:inherit outline-3 :height 1.1))))
  '(org-level-4 ((t (:inherit outline-4))))
  '(org-level-5 ((t (:inherit outline-5))))
@@ -189,7 +192,7 @@
  '(window-numbering-face ((t (:foreground "DeepPink" :weight bold))))
 
  '(popup-enu-selection-face ((t (:background "#5E5079"
-                                            :foreground "#B2B2B2"))))
+                                             :foreground "#B2B2B2"))))
  '(popup-face ((t (:background "#34323E" :foreground "#9A9ABA"))))
  '(popup-isearch-match ((t (:inherit match))))
  '(popup-menu-face ((t (:background "#34323E" :foreground "#9A9ABA"))))
@@ -197,8 +200,8 @@
  '(popup-scroll-bar-background-face ((t (:background "#212026"))))
  '(popup-scroll-bar-foreground-face ((t (:background "#5D4D7A"))))
  '(popup-tip-face
-  ((t (:background "#5E5079" :foreground "#B2B2B2"
-                   :bold nil :italic nil :underline nil))))
+   ((t (:background "#5E5079" :foreground "#B2B2B2"
+                    :bold nil :italic nil :underline nil))))
 
  '(web-mode-builtin-face ((t (:inherit font-lock-builtin-face))))
  '(web-mode-comment-face ((t (:inherit font-lock-comment-face))))
@@ -206,7 +209,7 @@
  '(web-mode-doctype-face ((t (:inherit font-lock-comment-face))))
  '(web-mode-function-name-face ((t (:inherit font-lock-function-name-face))))
  '(web-mode-html-attr-name-face ((t (:inherit font-lock-function-name-face
-                                             :bold nil))))
+                                              :bold nil))))
  '(web-mode-html-attr-value-face ((t (:inherit font-lock-doc-face))))
  '(web-mode-html-tag-face ((t (:inherit font-lock-keyword-face :bold nil))))
  '(web-mode-keyword-face ((t (:inherit font-lock-keyword-face ))))
@@ -227,30 +230,31 @@
 
 ;;;;; flycheck
  '(flycheck-error
-  ((((supports :underline (:style line)))
-    (:underline (:style line :color "#E0211D")))
-   (t (:background "#E0211D" :weight bold :underline t))))
+   ((((supports :underline (:style line)))
+     (:underline (:style line :color "#E0211D")))
+    (t (:background "#E0211D" :weight bold :underline t))))
  '(flycheck-error-list-checker-name ((t (:foreground "#4F97D7"))))
  '(flycheck-fringe-error ((t (:foreground "#E0211D" :weight bold))))
  '(flycheck-fringe-info ((t (:foreground "#4F97D7" :weight bold))))
  '(flycheck-fringe-warning ((t (:foreground "#DC752F" :weight bold))))
  '(flycheck-running ((t (:weight normal :foreground "Green"))))
  '(flycheck-info
-  ((((supports :underline (:style line)))
-    (:underline (:style line :color "#4F97D7")))
-   (t (:background "#4F97D7" :weight bold :underline t))))
+   ((((supports :underline (:style line)))
+     (:underline (:style line :color "#4F97D7")))
+    (t (:background "#4F97D7" :weight bold :underline t))))
  '(flycheck-warning
-  ((((supports :underline (:style line)))
-    (:underline (:style line :color "#DC752F")))
-   (t (:background "#DC752F" :weight bold :underline t))))
+   ((((supports :underline (:style line)))
+     (:underline (:style line :color "#DC752F")))
+    (t (:background "#DC752F" :weight bold :underline t))))
 
  '(diredp-dir-heading ((((background dark))
-                       (:inherit font-lock-keyword-face))))
+                        (:inherit font-lock-keyword-face))))
 
  '(haskell-keyword-face ((t (:inherit font-lock-builtin-face))))
  '(haskell-type-face ((t (:inherit font-lock-constant-face))))
  '(haskell-constructor-face  ((t (:inherit font-lock-type-face))))
 
+ '(nlinum-current-line ((t (:inherit font-lock-variable-name-face))))
  '(semantic-highlight-func-current-tag-face ((t (:background "gray5"))))
  '(shm-current-face ((t (:underline (:style line :color "blue")))))
  '(ivy-highlight-face ((t (:background "#444155")))))

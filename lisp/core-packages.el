@@ -129,11 +129,10 @@ Archive with high priority will be used when install a package.")
 (require! 'page-break-lines)
 (require! 'unicode-fonts)
 (require! 'evil-nerd-commenter)
-(require! 'with-editor)
+;; (require! 'with-editor)
 (require! 'popwin)
-(require! 'easy-kill)
-(require! 'ace-link)
-(require! 'pinyinlib)
+(require! 'exwm)
+;; (require! 'pinyinlib)
 
 (require 'core-ivy)
 (require 'core-company)
@@ -184,8 +183,6 @@ Archive with high priority will be used when install a package.")
   (when emacs-use-fcitx-p
     (fcitx-aggressive-setup))
 
-  (semantic-mode 1)
-
-  (ace-link-setup-default))
+  (semantic-mode 1))
 
 (provide 'core-packages)

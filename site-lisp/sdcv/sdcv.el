@@ -149,6 +149,19 @@ and `sdcv-dictionary-path'."
         (sdcv-mode)))
     buffer))
 
+(defvar sdcv-iterm-regexp-partial ").*?-->\\(.*\\)")
+(defun sdcv-goto-number ($num)
+  (interactive (list (this-command-keys)))
+  (let ((regexp (concat $num sdcv-iterm-regexp-partial))
+        word)
+    (save-excursion
+      (goto-char (point-min))
+      (when (re-search-forward regexp nil t)
+        (setq word (match-string 1))))
+    (if word
+        (sdcv-search-word word)
+      (sdcv-search))))
+
 ;;; ==================================================================
 ;;; The very major mode
 (defvar sdcv-mode-font-lock-keywords
@@ -183,6 +196,8 @@ and `sdcv-dictionary-path'."
     (define-key map "H" 'hide-body)
     (define-key map "h" 'show-entry)
     (define-key map "s" 'hide-entry)
+    (dotimes (i 10)
+      (define-key map (number-to-string i) #'sdcv-goto-number))
     map)
   "Keymap for `sdcv-mode'.")
 

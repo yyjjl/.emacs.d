@@ -164,6 +164,9 @@ HTML file converted from org file."
 (defsubst expand-etc! ($name)
   (expand-file-name $name emacs-etc-direcotry))
 
+(defsubst expand-tmp! ($name)
+  (expand-file-name $name temporary-file-directory))
+
 (defsubst directory-equal? ($d1 $d2)
   (equal (file-truename (concat $d1 "/"))
          (file-truename (concat $d2 "/"))))

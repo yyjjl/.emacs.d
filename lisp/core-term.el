@@ -143,7 +143,7 @@ none exists, or if the current buffer is already a term."
 (define-hook! term|utf8-setup (term-exec-hook)
   (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
 
-(define-hook! term|autoclose-buffer (comint-mode-hook)
+(define-hook! term|autoclose-buffer (comint-exec-hook)
   (let ((proc (get-buffer-process (current-buffer))))
     (when proc
       (set-process-sentinel proc

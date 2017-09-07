@@ -14,11 +14,9 @@
 (require! 'figlet)
 (require! 'zeal-at-point)
 (require! 'skeletor)
-(require! 'help-fns+)
+(require! 'slime)
 
 
-
-(require 'help-fns+)
 
 ;; prolog system
 (setq prolog-system 'swi)
@@ -28,6 +26,14 @@
 (setq csv-separators '(", " ";" "|" " "))
 
 (defalias 'perl-mode 'cperl-mode)
+
+(setq inferior-lisp-program "ccl")
+
+(with-eval-after-load 'slime
+  (setq slime-contribs '(slime-fancy))
+  (setq slime-protocol-version 'ignore)
+  (setq slime-net-coding-system 'utf-8-unix)
+  (setq slime-complete-symbol*-fancy t))
 
 (with-eval-after-load 'grep
   (dolist (v core-ignored-directories)
@@ -163,9 +169,9 @@
 
 (define-key!
   ;; buffer-mode
-  ("C-c w k" . buf-move-up)
-  ("C-c w j" . buf-move-down)
-  ("C-c w h" . buf-move-left)
-  ("C-c w l" . buf-move-right))
+  ("C-x w k" . buf-move-up)
+  ("C-x w j" . buf-move-down)
+  ("C-x w h" . buf-move-left)
+  ("C-x w l" . buf-move-right))
 
 (provide 'init-extra)

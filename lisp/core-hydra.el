@@ -211,7 +211,7 @@ Current thing: %s(current-forward-thing)
   "
 Compilation errors:
 _n_: next error        _<_: first error
-_p_: previous error
+_p_: previous error    _`_: next error
 _q_uit
 "
   ("`" next-error)

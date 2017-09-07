@@ -2,6 +2,7 @@
 (require! 'ob-ipython)
 (require! 'ox-pandoc)
 (require! 'org-bullets)
+(require! 'org-edit-latex)
 ;; Export colorful src block in `org-mode'
 (require! 'htmlize)
 (require! 'company-auctex)
@@ -175,6 +176,12 @@ With a prefix BELOW move point to lower block."
          prepend t)))
    'append)
 
+  (setq org-entities
+        (append
+         '(("rangle" "\\rangle" t "\\rangle" "\\rangle" "\\rangle" "❭")
+           ("langle" "\\langle" t "\\langle" "\\langle" "\\langle" "❬"))
+         org-entities))
+
   (org-babel-do-load-languages 'org-babel-load-languages
                                '((ipython . t)
                                  (python . t)
@@ -196,7 +203,7 @@ With a prefix BELOW move point to lower block."
         ;; collapsed trees.
         org-cycle-separator-lines 2 ;; default = 2
         org-agenda-start-on-weekday nil
-        org-agenda-inhibit-startup t ;; ~50x speedup
+        org-agenda-inhibit-startup t       ;; ~50x speedup
         org-agenda-use-tag-inheritance nil ;; 3-4x speedup
         org-agenda-span 14
         org-agenda-include-diary t
@@ -211,7 +218,7 @@ With a prefix BELOW move point to lower block."
         org-hide-block-startup t
         ;; org-startup-indented t
         org-pretty-entities t
-        org-pretty-entities-include-sub-superscripts nil
+        org-pretty-entities-include-sub-superscripts t
         org-format-latex-options (plist-put org-format-latex-options :scale 1.5)
         org-highlight-latex-and-related '(latex)
         org-src-fontify-natively t)
@@ -247,19 +254,13 @@ With a prefix BELOW move point to lower block."
       (candidates (company-auctex-symbol-candidates arg))
       (annotation (company-auctex-symbol-annotation arg))))
 
-
   (define-hook! org|setup (org-mode-hook)
-    ;; Fix font-lock bug in `org-mode' 8.2.10
-    (let ((macros (assoc "{{{.+}}}" org-font-lock-keywords)))
-      (when macros
-        (setcar macros "{{{.+?}}}")))
-
     (org-bullets-mode 1)
     (auto-fill-mode -1)
 
     (make-local-variable 'completion-at-point-functions)
     (add-to-list 'completion-at-point-functions
-                 'pcomplete-completions-at-point)
+                 '(lambda () (ignore-errors pcomplete-completions-at-point)))
     (add-to-list 'company-backends 'company-org-symbols))
 
   (define-hook! org|src-setup (org-src-mode-hook)
@@ -267,17 +268,20 @@ With a prefix BELOW move point to lower block."
       (local-set-key (kbd "C-c h") #'ob-ipython-inspect))
     (flycheck-mode -1))
 
+  (defun org/open-pdf (&optional $arg)
+    (interactive "P")
+    (let* ((-fn (buffer-file-name))
+           (fn (and -fn
+                    (concat (file-name-sans-extension -fn)
+                            ".pdf"))))
+      (if (and fn (not $arg) (file-exists-p fn))
+          (find-file fn)
+        (counsel-find-file (file-name-base -fn)))))
+
   (define-key org-mode-map (kbd "C-c t") org-table-extra-map)
   (define-key! :map org-mode-map
     ("C-c h" . ob-ipython-inspect)
-    ("C-c c i" . org-clock-in)
-    ("C-c c o" . org-clock-out)
-    ("C-c c c" . org-clock-in-last)
-    ("C-c c e" . org-clock-modify-effort-estimate)
-    ("C-c c q" . org-clock-cancel)
-    ("C-c c g" . org-clock-goto)
-    ("C-c c d" . org-clock-display)
-    ("C-c c r" . org-clock-report)
+    ("C-c v" . org/open-pdf)
     ("M-," . org-mark-ring-goto)
     ("M-." . org-mark-ring-push)
     ("C-c l" . org-store-link)
@@ -297,13 +301,8 @@ With a prefix BELOW move point to lower block."
         (setcar (nthcdr 4 rest) num-start)))
     (apply fn rest))
 
-  ;; (advice-add 'org-html-do-format-code
-  ;;             :around #'org*html-export-with-line-number)
-
-  (setcdr (assoc 'scale org-html-mathjax-options) '("90"))
-  (setcdr (assoc 'align org-html-mathjax-options) '("left"))
-  (setcdr (assoc 'path org-html-mathjax-options)
-          '("../../node_modules/mathjax/MathJax.js")))
+  (advice-add 'org-html-do-format-code
+              :around #'org*html-export-with-line-number))
 
 (with-eval-after-load 'ox-latex
   (add-to-list 'org-latex-minted-langs '(ipython "python"))

@@ -100,6 +100,7 @@ and `buffer-file-coding-system'"
   (if (buffer-file-name) "[L%l C%c %p %I]" "[L%l C%c %p]"))
 
 (defvar mode-line--center-margin 1)
+(defvar mode-line-active? nil)
 (defvar mode-line-default-format '("%e" (:eval (mode-line%generate))))
 (defvar mode-line-config-alist
   '((mode-line%inactive? (mode-line%window-number
@@ -123,7 +124,7 @@ and `buffer-file-coding-system'"
         mode-line%process
         mode-line%vc))))
 (defun mode-line%inactive? (bn)
-  (not (equal (selected-window) mode-line--current-window)))
+  (not mode-line-active?))
 
 (defun mode-line%use-special? (bn)
   (or (memq major-mode '(dired-mode lisp-interaction-mode))
@@ -133,8 +134,8 @@ and `buffer-file-coding-system'"
 (defun mode-line%create (left right &optional no-tail? no-center?)
   (let* ((lhs (format-mode-line (mapcar #'funcall left)))
          (chs (if no-center? ""
-                  (propertize (format-mode-line mode-line-misc-info)
-                              'face font-lock-string-face)))
+                (propertize (format-mode-line mode-line-misc-info)
+                            'face font-lock-string-face)))
          (rhs (format-mode-line (mapcar #'funcall right)))
          (tail (if no-tail? ""
                  (propertize (mode-line%tail) 'face 'font-lock-constant-face)))
@@ -155,6 +156,8 @@ and `buffer-file-coding-system'"
 
 (defun mode-line%generate ()
   "Generate mode-line."
+  (setq mode-line-active?
+        (equal (selected-window) mode-line--current-window))
   (unless (bound-and-true-p eldoc-mode-line-string)
     (let ((config-alist mode-line-config-alist)
           config

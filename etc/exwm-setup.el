@@ -1,36 +1,36 @@
 (require! 'exwm)
-(require! 'symon)
 (require 'exwm)
 (require 'exwm-config)
-(require 'exwm-systemtray)
+(require 'exwm-randr)
+
+(setq exwm-randr-workspace-output-plist '(0 "eDP-1" 1 "HDMI-1"))
+(add-hook 'exwm-randr-screen-change-hook
+          (lambda ()
+            (start-process-shell-command
+             "xrandr" nil "xrandr --output eDP-1 --right-of HDMI-1 --auto")))
+
+(setq fcitx-use-dbus nil)
 
 (add-to-list 'package-selected-packages 'exwm)
-(add-to-list 'package-selected-packages 'symon)
-
-(with-eval-after-load 'symon
-  (setq symon-monitors
-        '(symon-current-time-monitor
-          symon-linux-memory-monitor
-          symon-linux-cpu-monitor
-          symon-linux-network-rx-monitor
-          symon-linux-network-tx-monitor
-          symon-linux-battery-monitor)))
-(symon-mode)
 
 ;; Set workspace number
 (setq exwm-workspace-number 4)
 
+(defvar exwm-buffer-name-format "[EXWM: %s] %s")
+(defvar exwm-buffer-name-regexp "^ ?\\[EXWM: ")
+
 ;; Set floating window border
 (setq exwm-floating-border-width 1)
-(setq exwm-floating-border-color "#1b1d1e")
+(setq exwm-floating-border-color "black")
 
-(defun mode-line%exwm-window? (bn)
-  (eq major-mode 'exwm-mode))
+(defun exwm%exwm-window? (bn &optional action)
+  (with-current-buffer bn
+    (eq major-mode 'exwm-mode)))
 
 (defun exwm%create-button (button-line
-                                    button-name
-                                    button-face
-                                    mouse-1-action)
+                           button-name
+                           button-face
+                           mouse-1-action)
   (propertize button-name
               'face button-face
               'mouse-face 'mode-line-highlight
@@ -59,18 +59,29 @@
          'mode-line "[T]" 'flycheck-fringe-warning
          '(exwm-floating-toggle-floating))))
 
+(defun exwm*mode-line-workspace (fn)
+  (when mode-line-active?
+    (set-window-parameter (selected-window)
+                          'workspace-index
+                          exwm-workspace-current-index))
+  (let ((index (window-parameter (selected-window) 'workspace-index)))
+    (list (funcall fn)
+          (propertize (format " <W%s>" (or index "?"))
+                      'face font-lock-string-face))))
+
+(advice-add 'mode-line%window-number :around #'exwm*mode-line-workspace)
+
+
 (add-to-list 'mode-line-config-alist
-             '(mode-line%exwm-window? (mode-line%window-number
-                                       mode-line%exwm-button
-                                       mode-line%buffer-id)
-                                      ()
-                                      :no-tail))
+             '(exwm%exwm-window? (mode-line%window-number
+                                  mode-line%exwm-button
+                                  mode-line%buffer-id)
+                                 ()
+                                 :no-tail))
 
 (push ?\C-z exwm-input-prefix-keys)
 (push ?\C-g exwm-input-prefix-keys)
 (push ?\C-q exwm-input-prefix-keys)
-(setq exwm-input-prefix-keys
-      (delete ?\C-c exwm-input-prefix-keys))
 (define-key exwm-mode-map [?\C-q] #'exwm-input-send-next-key)
 (define-key exwm-mode-map (kbd "C-x RET") #'exwm-workspace-move-window)
 
@@ -82,25 +93,34 @@
 (defun exwm/switch-buffer (&optional $same-app?)
   (interactive "P")
   (let ((ivy-wrap t)
-        (apps (--map (buffer-name (cdr it)) exwm--id-buffer-alist)))
+        (apps (--filter
+               (and (not (string-match-p "^ " it))
+                    (or (not $same-app?)
+                        (string-match-p (concat exwm-buffer-name-regexp
+                                                exwm-class-name)
+                                        it)))
+               (--map (buffer-name (cdr it))
+                      exwm--id-buffer-alist))))
     (if (not apps)
         (message "No apps !!")
-      (unless exwm-instance-name
-        (switch-to-buffer (car apps)))
+      (add-to-list 'apps (buffer-name))
       (ivy-read "Switch app: "
                 apps
-                :initial-input (and $same-app? exwm-instance-name)
+                :preselect (buffer-name)
                 :require-match t
-                :action (lambda (x)
-                          (delete-other-windows)
-                          (switch-to-buffer x))
+                :action (lambda (buffer)
+                          (let ((win (get-buffer-window buffer)))
+                            (if (window-live-p win)
+                                (select-window win)
+                              (switch-to-buffer buffer))))
                 :keymap (let ((map (make-sparse-keymap)))
-                          (define-key map (this-command-keys) #'ivy-next-line-and-call)
+                          (define-key map (this-command-keys)
+                            #'ivy-next-line-and-call)
                           map)))))
 
 (defun exwm/use-exwm ()
   (interactive)
-  (let ((file (expand-file-name "~/.xsession")))
+  (let ((file (expand-file-name "~/.xinitrc")))
     (when (file-exists-p file)
       (rename-file file
                    (expand-file-name "~/.xsessionrc")))))
@@ -110,7 +130,7 @@
   (let ((file (expand-file-name "~/.xsessionrc")))
     (when (file-exists-p file)
       (rename-file file
-                   (expand-file-name "~/.xsession")))))
+                   (expand-file-name "~/.xinitrc")))))
 
 (define-hook! exwm|floating-setup-hook (exwm-floating-setup-hook)
   (when (string-match "unity-control-center.*" exwm-instance-name)
@@ -119,13 +139,14 @@
 (define-hook! exwm|auto-rename-buffer (exwm-update-class-hook
                                        exwm-update-title-hook)
   (exwm-workspace-rename-buffer
-   (concat "[EXWM: " exwm-instance-name "] " exwm-title)))
+   (format exwm-buffer-name-format exwm-class-name exwm-title)))
 
 (defun exwm*which-key-hack ($fn &rest $args)
-  (unless (bound-and-true-p exwm-instance-name)
+  (unless (bound-and-true-p exwm-class-name)
+    (exwm-layout--refresh)
     (apply $fn $args)))
 (advice-add 'which-key--create-buffer-and-show :around #'exwm*which-key-hack)
-
+(setq which-key-echo-keystrokes 0.5)
 
 (defmacro define-exwm-command! (cmd)
   `(lambda!
@@ -133,27 +154,30 @@
 
 (defmacro define-exwm-app! ($app &optional $name)
   (unless $name (setq $name $app))
-  `(lambda (&optional $force)
+  `(defun ,(intern (format "exwm/switch-to-%s" $app)) (&optional $force)
      (interactive "P")
      (let ((targets
             (and (not $force)
-                 (--filter (string-match ,(format "^\\[EXWM: .*?%s.*?\\]" $name)
-                                         it)
-                           (mapcar #'buffer-name (buffer-list)))))
+                 (--filter (string-match-p
+                            ,(concat exwm-buffer-name-regexp $name)
+                            it)
+                           (--map (buffer-name (cdr it))
+                                  exwm--id-buffer-alist))))
            target)
        (if targets
-           (switch-to-buffer (if (= 1 (length targets))
-                                 (car targets)
-                               (ivy-read ,(format "[%s]: " $app) targets)))
+           (exwm-workspace-switch-to-buffer
+            (if (= 1 (length targets))
+                (car targets)
+              (ivy-read ,(format "[%s]: " $app) targets)))
          (exwm-run-command ,$app)))))
 
 (with-eval-after-load 'popwin
   (define-key! :map popwin:keymap
-    ("g" . (define-exwm-app! "chrome" "google-chrome"))
-    ("n" . (define-exwm-app! "nautilus"))
-    ("p" . (define-exwm-app! "evince"))
-    ("c" . (define-exwm-app! "unity-control-center"))
-    ("t" . (define-exwm-app! "gnome-terminal"))))
+    ("g" . (define-exwm-app! "chrome" "Google-chrome"))
+    ("n" . (define-exwm-app! "nautilus" "Nautilus"))
+    ("p" . (define-exwm-app! "evince" "Evince"))
+    ("c" . (define-exwm-app! "unity-control-center" "Unity-control-center"))
+    ("t" . (define-exwm-app! "gnome-terminal" "Gnome-terminal"))))
 
 (exwm-input-set-key [XF86KbdBrightnessDown]
                     (define-exwm-command! "kbdbacklight.sh down"))
@@ -184,9 +208,7 @@
 (exwm-input-set-key [f8] #'term/pop-shell)
 (dotimes (i 10)
   (exwm-input-set-key (kbd (format "M-%d" i))
-                      `(lambda ()
-                         (interactive)
-                         (,(intern (format "select-window-%d" i))))))
+                      (symbol-function (intern (format "select-window-%d" 1)))))
 
 ;; The following example demonstrates how to use simulation keys to mimic the
 ;; behavior of Emacs. The argument to `exwm-input-set-simulation-keys' is a
@@ -198,13 +220,13 @@
    ([?\C-n] . down)
    ([?\C-b] . left)
    ([?\C-f] . right)
-   ([?\C-y] . ?\C-v)))
+   ([?\C-y] . ?\C-v)
+   ([?\C-w] . ?\C-x)
+   ([?\M-w] . ?\C-c)))
 
 ;; Don't delete it
 (exwm-enable)
-
-(setq exwm-systemtray-height 24)
-(exwm-systemtray-enable)
+(exwm-randr-enable)
 
 (fset 'save-buffers-kill-terminal 'save-buffers-kill-emacs)
 

@@ -187,12 +187,6 @@
         '("-Wall"
           "-I/usr/lib/gcc/x86_64-linux-gnu/5/include/"
           "-std=c++14"))
-
-  (defun cpp/irony-setup (irony-mode-hook)
-    (define-key irony-mode-map [remap completion-at-point]
-      'irony-completion-at-point-async)
-    (define-key irony-mode-map [remap complete-symbol]
-      'irony-completion-at-point-async))
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
 
 (autoload 'cmake-font-lock-activate "cmake-font-lock" nil t)

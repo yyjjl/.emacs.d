@@ -41,19 +41,6 @@ The app is chosen from your OS's preference."
               file-list))))))
 
 (with-eval-after-load 'dired
-  (defvar dired--window-list nil)
-  (defun dired/quit-window (&optional kill)
-    (interactive "P")
-    (if (member (selected-window) dired--window-list)
-        (delete-window)
-      (quit-window kill)))
-
-  (defun dired%add-window (window)
-    (setq dired--window-list (loop for win in dired--window-list
-                                   if (window-live-p win)
-                                   collect win))
-    (add-to-list 'dired--window-list window))
-
   (define-hook! dired|setup (dired-mode-hook)
     (setq mode-line-buffer-identification
           '("%b" (dired-omit-mode " (omit)")))
@@ -68,8 +55,7 @@ The app is chosen from your OS's preference."
 
   (define-key! :map dired-mode-map
     (")" . dired-omit-mode)
-    ("E" . dired/open-externally)
-    ("q" . dired/quit-window))
+    ("E" . dired/open-externally))
 
   (require 'dired-x)
   (require 'dired+)

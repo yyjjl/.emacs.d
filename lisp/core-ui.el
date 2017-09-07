@@ -37,7 +37,7 @@
  ;; disable bidirectional text for tiny performance boost
  bidi-display-reordering nil
  blink-matching-paren nil
- cursor-in-non-selected-windows t
+ cursor-in-non-selected-windows nil
  display-line-numbers-width 3
  frame-inhibit-implied-resize t
  ;; Remove continuation arrow on right fringe
