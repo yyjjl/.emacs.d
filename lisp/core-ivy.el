@@ -5,7 +5,7 @@
 
 ;; (defun core%pinyinlib-build-regexp-string (str)
 ;;   (when (and (> (length str) 0)
-;;              (equal (substring str 0 1) "!"))
+;;              (equal (substring str 0 1) "?"))
 ;;     (mapconcat 'core/pinyin-regexp-helper
 ;;                (cdr (string-to-list str))
 ;;                "")))
@@ -112,7 +112,16 @@ for a file to visit if current buffer is not visiting a file."
   (define-key!
     :map ivy-minibuffer-map
     ("C-j" . ivy-immediate-done)
-    ("C-M-j" . ivy-done))
+    ("C-M-j" . ivy-done)
+    ("!" . core/ivy-external-file))
+
+  (defun core/ivy-external-file ()
+    (interactive)
+    (setq ivy--all-candidates
+          (ivy--filter core-external-file-regexp ivy--all-candidates))
+    (setq ivy--all-candidates
+          (ivy--filter ivy-text ivy--all-candidates)))
+
   (require 'ivy-hydra)
   (setq ivy-dispatching-done-columns 3)
 

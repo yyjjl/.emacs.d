@@ -1,4 +1,3 @@
-
 (defun core/last-popup-window ()
   "Display last popup window"
   (interactive)
@@ -24,10 +23,22 @@
   (interactive)
   (display-buffer (get-buffer-create "*Messages*")))
 
+(defun core/popup-messages ()
+  "Display *Messages* buffer"
+  (interactive)
+  (display-buffer (get-buffer-create "*Messages*")))
+
+(defun core/popup-sdcv ()
+  "Display *sdcv* buffer"
+  (interactive)
+  (sdcv-goto-sdcv)
+  (call-interactively #'sdcv-search))
+
 (with-eval-after-load 'shackle
   (defvar shackle-mode-map
     (define-key! :map (make-sparse-keymap)
       ("l" . core/last-popup-window)
+      ("d" . core/popup-sdcv)
       ("RET" . core/fix-popup-window)))
 
   (global-set-key (kbd "C-z") shackle-mode-map)
@@ -86,20 +97,22 @@
   (advice-add 'shackle-display-buffer
               :around #'core*shackle-display-buffer-hack)
 
-
   (setq shackle-default-alignment 'below
         shackle-default-size 0.4
         shackle-default-rule nil
         shackle-rules
-        '(("*sdcv*" :align below :select t :inhibit-autoclose t)
+        '(("*sdcv*" :align below :size 15 :select t)
           ((lambda (buffer)
              (or (derived-mode? 'comint-mode buffer)
                  (eq (buffer-local-value 'major-mode buffer) 'term-mode)))
            :size 0.4 :align below :select t :inhibit-autoclose t)
           (help-mode :align below :select t)
-          (ivy-occur-grep-mode :inhibit-autoclose t :select t :align core%shackle-align)
-          (grep-mode :inhibit-autoclose t :select t :align core%shackle-align)
-          (occur-mode :inhibit-autoclose t :select t :align core%shackle-align)
+          (ivy-occur-grep-mode :inhibit-autoclose t
+                               :select t :align core%shackle-align)
+          (grep-mode :inhibit-autoclose t
+                     :select t :align core%shackle-align)
+          (occur-mode :inhibit-autoclose t
+                      :select t :align core%shackle-align)
           ("^\\*.*?\\*" :regexp t :select t :align core%shackle-align))))
 
 (provide 'core-popups)

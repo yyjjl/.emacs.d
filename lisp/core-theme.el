@@ -2,10 +2,14 @@
 
 (defface mode-line-window-number
   '((t (:background "black"
-                    :box (:line-width 5 :color "black")
-                    )))
+                    :box (:line-width 5 :color "black"))))
   "Window number in mode-line"
   :group 'mode-line)
+
+(defface empty-line-face
+  '((t (:foreground "grey50")))
+  "Window number in mode-line"
+  :group 'fringe)
 
 (custom-theme-set-faces
  'molokai
@@ -30,18 +34,10 @@
  '(minibuffer-prompt ((t (:foreground "#AE81EF"))))
 
  '(mode-line ((t (:foreground "#F8F8F2" :background "#2D2D2D"
-                              :box (:line-width 5 :color "#2D2D2D")
-                              ))))
- '(mode-line-inactive ((t (:foreground
-                           "#BCBCBC" :background "#1B1D1E"
-                           :box (:line-width 5 :color "#1B1D1E")
-                           ))))
- '(mode-line-highlight ((t (:background "black"
-                                        :box (:line-width 5 :color "black")
-                                        ))))
- ;; ;; '(mode-line-mousable ((t (:foreground "#BCBCBC" :background "#000000"))))
- ;; '(mode-line-mousable-minor-mode
- ;;  ((t (:foreground "#BCBCBC" :background "#000000"))))
+                              :box (:line-width 5 :color "#2D2D2D")))))
+ '(mode-line-inactive ((t (:foreground "#BCBCBC" :background "#1B1D1E"
+                                       :box (:line-width 5 :color "#1B1D1E")))))
+ '(mode-line-highlight ((t (:background "black"))))
  '(header-line ((t (:foreground "grey90" :background "#2D2D2D"))))
 
  '(font-lock-builtin-face ((t (:foreground "#A6E22E"))))
@@ -254,6 +250,7 @@
  '(haskell-type-face ((t (:inherit font-lock-constant-face))))
  '(haskell-constructor-face  ((t (:inherit font-lock-type-face))))
 
+ '(easy-kill-selection ((t (:inverse-video t :inherit warning ))))
  '(nlinum-current-line ((t (:inherit font-lock-variable-name-face))))
  '(semantic-highlight-func-current-tag-face ((t (:background "gray5"))))
  '(shm-current-face ((t (:underline (:style line :color "blue")))))

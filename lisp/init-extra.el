@@ -48,7 +48,7 @@
 
 ;; Star dictionary lookup
 (autoload 'sdcv-search "sdcv" nil t)
-(global-set-key (kbd "C-c D") 'sdcv-search)
+(autoload 'sdcv-goto-sdcv "sdcv" nil t)
 
 ;; `restclient-mode'
 (with-eval-after-load 'restclient

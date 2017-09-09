@@ -67,6 +67,7 @@
  line-spacing 0.2
  mouse-yank-at-point t
  set-mark-command-repeat-pop t
+ echo-keystrokes 0.25
  tooltip-delay 1
  ;; Bad idea, could accidentally edit others' code
  ;; require-final-newline t
@@ -119,8 +120,6 @@
 
 ;; Purges buffers which haven't been displayed in 3 days
 (midnight-mode 1)
-;; Automatic save place of each buffer
-(save-place-mode 1)
 ;; (display-time-mode 1)
 (transient-mark-mode 1)
 (delete-selection-mode 1)
@@ -128,9 +127,34 @@
 (ignore-errors
   (progn
     (setq history-length 1000)
-    (setq savehist-additional-variables
-          '(search-ring regexp-search-ring ivy-views))
+    (setq savehist-additional-variables '(ivy-views))
     (savehist-mode 1)))
+
+(defun core%external-file-handler (op &rest args)
+  (let ((file (expand-file-name (car args))))
+    (cond ((eq system-type 'darwin)
+           (shell-command (concat "open " (shell-quote-argument file))))
+          ((eq system-type 'gnu/linux)
+           (let ((process-connection-type nil))
+             (add-to-list 'recentf-list file)
+             (start-process "external-process" nil "xdg-open" file))))
+    (kill-buffer)
+    (let (debug-on-error)
+      (error "Opened %s in external program" (file-name-nondirectory file)))))
+
+(put 'core%external-file-handler 'safe-magic t)
+(put 'core%external-file-handler 'operations '(insert-file-contents))
+
+(defvar core-external-file-extensions
+  '("pdf" "djvu" "dvi" "od[fgpst]" "docx?" "xlsx?"
+    "pptx?" "mkv" "avi" "mp4" "rmvb"))
+(defvar core-external-file-regexp
+  (eval-when-compile
+    (concat "\\.\\(?:"
+            (string-join (append (mapcar #'upcase
+                                         core-external-file-extensions)
+                                 core-external-file-extensions) "\\|")
+            "\\)\\'")))
 
 ;; Don't echo passwords when communicating with interactive programs:
 (add-hook 'comint-output-filter-functions 'comint-watch-for-password-prompt)
@@ -171,6 +195,11 @@
   (setq file-name-handler-alist emacs-file-name-handler-alist
         gc-cons-threshold emacs-gc-cons-threshold
         gc-cons-percentage 0.1)
+
+  (add-to-list 'file-name-handler-alist
+               (cons core-external-file-regexp
+                     #'core%external-file-handler))
+
   ;; Load private configuration
   (ignore-errors (load-file custom-file))
   (message "Init Time: %s" (emacs-init-time))

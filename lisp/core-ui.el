@@ -14,6 +14,17 @@
 (setq uniquify-ignore-buffers-re "^\\*")
 
 (when (fboundp 'define-fringe-bitmap)
+  (define-fringe-bitmap 'empty-line
+    [#b00000000
+     #b00000000
+     #b01110001
+     #b11011011
+     #b10001110
+     #b00000000
+     #b00000000
+     #b00000000]
+    nil nil 'center)
+  (set-fringe-bitmap-face 'empty-line 'empty-line-face)
   (define-fringe-bitmap 'right-curly-arrow
     [#b11111111
      #b11111111

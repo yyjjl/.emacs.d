@@ -116,7 +116,7 @@ Archive with high priority will be used when install a package.")
 ;; `counsel-M-x' need smex to get history
 (require! 'smex)
 ;; Show key bindings when pressing
-(require! 'which-key)
+;; (require! 'which-key)
 (when emacs-use-fcitx-p
   (require! 'fcitx))
 ;; Numbering windows
@@ -129,8 +129,9 @@ Archive with high priority will be used when install a package.")
 (require! 'page-break-lines)
 (require! 'unicode-fonts)
 (require! 'evil-nerd-commenter)
-;; (require! 'with-editor)
 (require! 'shackle)
+(require! 'easy-kill)
+(require! 'beginend)
 (require! 'exwm)
 ;; (require! 'pinyinlib)
 
@@ -161,7 +162,7 @@ Archive with high priority will be used when install a package.")
   (counsel-mode 1)
   (projectile-mode 1)
   (counsel-projectile-on)
-  (which-key-mode 1)
+  ;; (which-key-mode 1)
   (yas-global-mode 1)
   (shackle-mode 1)
   ;; global-modes
@@ -177,12 +178,14 @@ Archive with high priority will be used when install a package.")
   ;; Auto insert closing pair
   (electric-pair-mode 1)
   (electric-layout-mode 1)
+  (electric-indent-mode 1)
   ;;`eldoc', show API doc in minibuffer echo area enabled by default
   ;; (global-eldoc-mode 1)
 
   (when emacs-use-fcitx-p
     (fcitx-aggressive-setup))
 
+  (beginend-setup-all)
   (semantic-mode 1))
 
 (provide 'core-packages)

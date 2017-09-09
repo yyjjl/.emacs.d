@@ -1,4 +1,3 @@
-(require! 'exwm)
 (require 'exwm)
 (require 'exwm-config)
 (require 'exwm-randr)
@@ -87,19 +86,19 @@
 
 (defvar exwm--command-history nil)
 (defun exwm-run-command (command)
-  (interactive (list (read-shell-command "$ " nil 'exwm--command-history)))
+  (interactive (list (read-shell-command "$ " nil)))
   (start-process-shell-command command nil command))
 
 (defun exwm/switch-buffer (&optional $same-app?)
   (interactive "P")
   (let ((ivy-wrap t)
-        (apps (--filter
-               (and (not (string-match-p "^ " it))
-                    (or (not $same-app?)
-                        (string-match-p (concat exwm-buffer-name-regexp
-                                                exwm-class-name)
-                                        it)))
-               (--map (buffer-name (cdr it))
+        (apps (--map (buffer-name (cdr it))
+                     (--filter
+                      (let ((buffer (cdr it)))
+                        (and (not (string-match-p "^ " (buffer-name buffer)))
+                             (or (not $same-app?)
+                                 (equal exwm-class-name
+                                        (buffer-local-value 'exwm-class-name buffer)))))
                       exwm--id-buffer-alist))))
     (if (not apps)
         (message "No apps !!")
@@ -112,7 +111,7 @@
                           (let ((win (get-buffer-window buffer)))
                             (if (window-live-p win)
                                 (select-window win)
-                              (switch-to-buffer buffer))))
+                              (exwm-workspace-switch-to-buffer buffer))))
                 :keymap (let ((map (make-sparse-keymap)))
                           (define-key map (this-command-keys)
                             #'ivy-next-line-and-call)
@@ -141,13 +140,6 @@
   (exwm-workspace-rename-buffer
    (format exwm-buffer-name-format exwm-class-name exwm-title)))
 
-(defun exwm*which-key-hack ($fn &rest $args)
-  (unless (bound-and-true-p exwm-class-name)
-    (exwm-layout--refresh)
-    (apply $fn $args)))
-(advice-add 'which-key--create-buffer-and-show :around #'exwm*which-key-hack)
-(setq which-key-echo-keystrokes 0.5)
-
 (defmacro define-exwm-command! (cmd)
   `(lambda!
      (message "%s" (shell-command-to-string ,cmd))))
@@ -171,13 +163,12 @@
               (ivy-read ,(format "[%s]: " $app) targets)))
          (exwm-run-command ,$app)))))
 
-(with-eval-after-load 'popwin
-  (define-key! :map popwin:keymap
-    ("g" . (define-exwm-app! "chrome" "Google-chrome"))
-    ("n" . (define-exwm-app! "nautilus" "Nautilus"))
-    ("p" . (define-exwm-app! "evince" "Evince"))
-    ("c" . (define-exwm-app! "unity-control-center" "Unity-control-center"))
-    ("t" . (define-exwm-app! "gnome-terminal" "Gnome-terminal"))))
+(define-key! :prefix "C-z"
+  ("g" . (define-exwm-app! "google-chrome" "Google-chrome"))
+  ("n" . (define-exwm-app! "nautilus" "Nautilus"))
+  ("p" . (define-exwm-app! "evince" "Evince"))
+  ("c" . (define-exwm-app! "unity-control-center" "Unity-control-center"))
+  ("t" . (define-exwm-app! "gnome-terminal" "Gnome-terminal")))
 
 (exwm-input-set-key [XF86KbdBrightnessDown]
                     (define-exwm-command! "kbdbacklight.sh down"))
@@ -204,7 +195,7 @@
 (exwm-input-set-key (kbd "s-4") (lambda! (exwm-workspace-switch 3)))
 (exwm-input-set-key (kbd "s-&") #'exwm-run-command)
 (exwm-input-set-key (kbd "M-<tab>") #'exwm/switch-buffer)
-(exwm-input-set-key (kbd "M-`") (lambda! (exwm/switch-buffer t)))
+(exwm-input-set-key (kbd "M-`") (lambda! (exwm/switch-buffer :same-app?)))
 (exwm-input-set-key [f8] #'term/pop-shell)
 (dotimes (i 10)
   (exwm-input-set-key (kbd (format "M-%d" i))

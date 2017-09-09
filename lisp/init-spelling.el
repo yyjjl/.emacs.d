@@ -96,10 +96,11 @@
 
   (setq flyspell-issue-message-flag nil
         flyspell-large-region 1)
-  (define-key flyspell-mode-map (kbd "C-,") nil)
-  (define-key flyspell-mode-map (kbd "C-M-i") nil)
-  (define-key flyspell-mode-map (kbd "C-;")
-    #'spelling/flyspell-line-or-region))
+  (define-key! :map flyspell-mode-map
+    ("C-,")
+    ("C-.")
+    ("C-;")
+    ("C-?" . spelling/flyspell-line-or-region)))
 
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 (add-hook 'text-mode-hook 'flyspell-mode)

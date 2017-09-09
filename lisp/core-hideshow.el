@@ -30,7 +30,7 @@
 (with-eval-after-load 'hideshow
   (setq hs-isearch-open t)
   (setq hs-set-up-overlay 'hs%abstract-overlay)
-  (defun hs%auto-expand ()
+  (defun hs%auto-expand (&rest $args)
     (save-excursion (hs-show-block)))
   (advice-add 'goto-line :after #'hs%auto-expand)
   (advice-add 'find-tag :after #'hs%auto-expand))

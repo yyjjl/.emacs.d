@@ -2,7 +2,6 @@
 (require! 'ob-ipython)
 (require! 'ox-pandoc)
 (require! 'org-bullets)
-(require! 'org-edit-latex)
 ;; Export colorful src block in `org-mode'
 (require! 'htmlize)
 (require! 'company-auctex)
@@ -221,7 +220,7 @@ With a prefix BELOW move point to lower block."
         org-hide-block-startup t
         ;; org-startup-indented t
         org-pretty-entities t
-        org-pretty-entities-include-sub-superscripts t
+        org-pretty-entities-include-sub-superscripts nil
         org-format-latex-options (plist-put org-format-latex-options :scale 1.5)
         org-highlight-latex-and-related '(latex)
         org-src-fontify-natively t)
@@ -252,8 +251,8 @@ With a prefix BELOW move point to lower block."
     (interactive (list 'interactive))
     (cl-case $command
       (interactive (company-begin-backend 'company-org-symbols))
-      (prefix (and (org-inside-LaTeX-fragment-p)
-                   (company-grab-word)))
+      (prefix (ignore-errors (and (org-inside-LaTeX-fragment-p)
+                                  (company-grab-word))))
       (candidates (company-auctex-symbol-candidates $arg))
       (annotation (company-auctex-symbol-annotation $arg))))
 
@@ -296,16 +295,19 @@ With a prefix BELOW move point to lower block."
     ("C-c C-t" . org-todo)))
 
 (with-eval-after-load 'ox-html
+  ;; Org-mode 9.1
+  (setq org-html-keep-old-src t)
   (defun org*html-export-with-line-number ($fn &rest $rest)
     (when (= (length $rest) 5)
       (let ((num-start (nth 4 $rest)))
         (unless num-start
           (setq num-start 0))
-        (setcar (nthcdr 4 rest) num-start)))
+        (setcar (nthcdr 4 $rest) num-start)))
     (apply $fn $rest))
 
-  (advice-add 'org-html-do-format-code
-              :around #'org*html-export-with-line-number))
+  ;; (advice-add 'org-html-do-format-code
+  ;;             :around #'org*html-export-with-line-number)
+  )
 
 (with-eval-after-load 'ox-latex
   (add-to-list 'org-latex-minted-langs '(ipython "python"))

@@ -1,56 +1,49 @@
 ;; When splitting window, show (other-buffer) in the new window
-(defun window%wrap-split-function ($split-function)
-  (lexical-let ((sf $split-function))
-    (lambda ()
-      (interactive)
-      (funcall sf)
-      (set-window-buffer (next-window) (other-buffer)))))
 
-(global-set-key (kbd "C-x 2") (window%wrap-split-function 'split-window-vertically))
-(global-set-key (kbd "C-x 3") (window%wrap-split-function 'split-window-horizontally))
+(defvar window-size-list '("0.25" "0.382" "0.5" "0.618" "0.7"))
+(defun window%split-with-size ($size &optional $vertical?)
+  "Set new window size to $SIZE"
+  (let ((window-size (if $vertical?
+                         (window-body-height)
+                       (window-body-width))))
+    (funcall (if $vertical?
+                 #'split-window-vertically
+               #'split-window-horizontally)
+             (cond ((integerp $size) (- window-size (abs $size)))
+                   ((floatp $size) (round (* (- 1 $size) window-size)))
+                   (t nil)))
+    (set-window-buffer (next-window) (other-buffer))
+    (when (or (and (floatp $size) (> $size 0.5))
+              (and (integerp $size) (> $size (* 0.5 window-size))))
+      (if $vertical?
+          (windmove-down)
+        (windmove-right)))))
 
+(defun window/split-vertically (&optional $arg)
+  (interactive "P")
+  (window%split-with-size (when $arg (string-to-number
+                                      (completing-read "Float or Integer: "
+                                                       window-size-list)))
+                          :vertial))
+
+(defun window/split-horizontally (&optional $arg)
+  (interactive "P")
+  (window%split-with-size (when $arg (string-to-number
+                                      (completing-read "Float or Integer: "
+                                                       window-size-list)))))
 
 ;; Rearrange split windows
-(defun window/split-horizontally ()
-  (interactive)
+(defun window/force-split-horizontally (&optional $arg)
+  (interactive "P")
   (save-excursion
     (delete-other-windows)
-    (funcall (window%wrap-split-function 'split-window-horizontally))))
+    (window/split-horizontally $arg)))
 
-(defun window/split-vertically ()
-  (interactive)
+(defun window/force-split-vertically (&optional $arg)
+  (interactive "P")
   (save-excursion
     (delete-other-windows)
-    (funcall (window%wrap-split-function 'split-window-vertically))))
-
-(global-set-key "\C-x|" 'window/split-horizontally)
-(global-set-key "\C-x_" 'window/split-vertically)
-
-(defun window/toggle-window-split ()
-  (interactive)
-  (if (= (count-windows) 2)
-      (let* ((this-win-buffer (window-buffer))
-             (next-win-buffer (window-buffer (next-window)))
-             (this-win-edges (window-edges (selected-window)))
-             (next-win-edges (window-edges (next-window)))
-             (this-win-2nd (not (and (<= (car this-win-edges)
-                                         (car next-win-edges))
-                                     (<= (cadr this-win-edges)
-                                         (cadr next-win-edges)))))
-             (splitter
-              (if (= (car this-win-edges)
-                     (car (window-edges (next-window))))
-                  'split-window-horizontally
-                'split-window-vertically)))
-        (delete-other-windows)
-        (let ((first-win (selected-window)))
-          (funcall splitter)
-          (if this-win-2nd (other-window 1))
-          (set-window-buffer (selected-window) this-win-buffer)
-          (set-window-buffer (next-window) next-win-buffer)
-          (select-window first-win)
-          (if this-win-2nd (other-window 1))))))
-
+    (window/split-vertically $arg)))
 
 (defun window%split-n ($window $n $align)
   (when (> $n 1)
@@ -88,5 +81,11 @@
     (when align
       (window%split-n orig-window $num1 align)
       (window%split-n new-window $num2 align))))
+
+(define-key! :prefix "C-x"
+  ("2" . window/split-vertically)
+  ("3" . window/split-horizontally)
+  ("|" . window/force-split-horizontally)
+  ("_" . window/force-split-vertically))
 
 (provide 'init-windows)

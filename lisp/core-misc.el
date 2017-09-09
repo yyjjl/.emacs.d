@@ -6,9 +6,11 @@
     ;; (highlight-indentation-current-column-mode 1)
     (highlight-indentation-mode 1))
   ;; show trailing spaces in a programming mode
-  (setq show-trailing-whitespace t))
+  (setq show-trailing-whitespace t)
+  (setq  indicate-empty-lines t))
 
 (define-hook! core|generic-text-mode-setup (text-mode-hook)
+  (setq  indicate-empty-lines t)
   (auto-fill-mode 1)
   (flycheck-mode -1))
 
@@ -55,16 +57,20 @@
 (with-eval-after-load 'fcitx
   ;; Init fcitx prefix keys
   (setq fcitx-use-dbus nil)
-  (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c"))
+  (fcitx-prefix-keys-add "C-h" "M-g" "M-s" 
+                         "M-o" "C-x" "C-c" "C-z"))
 
 ;; Smart tab
+(defvar core--indent-close-list '(?\) ?\} ?\$ ?\] ?\' ?\` ?\"))
 (defun core%indent-for-tab ($fn &rest $arg)
   (cond ((or (not (called-interactively-p 'interactive))
              (use-region-p))
          (apply $fn $arg))
         ;; Skip close paren
-        ((memq (char-after) '(?\) ?\} ?\$ ?\] ?\' ?\` ?\"))
-         (forward-char 1))
+        ((memq (char-after) core--indent-close-list)
+         (apply $fn $arg)
+         (when (memq (char-after) core--indent-close-list)
+           (forward-char 1)))
         ;; Toggle outline
         ((save-excursion
            (forward-line 0)
@@ -87,6 +93,13 @@
                              (file-name-nondirectory buffer-file-name)))
     (delete-file (buffer-file-name))
     (kill-this-buffer)))
+
+(defun core/restore-files ()
+  "Find last opened file"
+  (interactive)
+  (if recentf-mode
+      (find-file (--first (not (get-file-buffer it)) recentf-list))
+    (message "`recentf-mode' must be turned on !!!")))
 
 (defun core/copy-this-file-to-new-file ()
   "Copy current file to a new file without close original file."
@@ -121,22 +134,6 @@
         (rename-buffer $new-name)
         (set-visited-file-name $new-name)
         (set-buffer-modified-p nil)))))
-
-(defun core/copy-file-name (&optional $arg)
-  "Copy current file name to king ring.
-If ARG = 0 copy the current directory.  If ARG > 0 copy the file
-name without directory.  If ARG < 0 copy the file name without
-directory and extension."
-  (interactive "p")
-  (let ((path (buffer-file-name)))
-    (cond ((= $arg 0) (setq path (buffer-file-name)))
-          ((= $arg 4) (setq path default-directory))
-          ((= $arg 16) (setq path (file-name-nondirectory path)))
-          ((< $arg 0) (setq path (file-name-base path))))
-    (if path
-        (progn (message "Copy => %s" path)
-               (kill-new path))
-      (message "Nothing to do"))))
 
 (defun core/create-scratch-buffer ()
   "Create a new scratch buffer to work in. (could be *scratch* - *scratchX*)."
@@ -178,15 +175,6 @@ Does not indent buffer, because it is used for a
       (goto-char (car bounds))
       (kill-region (car bounds) (cdr bounds))
       (insert num))))
-
-(defun core/restore-files (&optional $num)
-  (interactive "p")
-  (if recentf-mode
-      (let (buf)
-        (dolist (file (-take (or $num 1) recentf-list))
-          (setq buf (find-file-noselect file)))
-        (switch-to-buffer buf))
-    (message "`recentf-mode' must be turned on !!!")))
 
 (defun core/occur-dwim ()
   (interactive)
@@ -235,7 +223,6 @@ Does not indent buffer, because it is used for a
   ("C-x D" . core/delete-this-file)
   ("C-x C-d" . find-name-dired)
   ("C-x W" . core/copy-this-file-to-new-file)
-  ("C-x f" . core/copy-file-name)
   ("C-x c" . core/cleanup-buffer-safe)
   ("C-x ," . core/restore-files)
 
@@ -243,6 +230,8 @@ Does not indent buffer, because it is used for a
   ("C-c q" . auto-fill-mode)
   ("C-x C-b" . ibuffer)
   ("M-/" . hippie-expand)
+  ("M-w" . easy-kill)
+  ([remap mark-sexp] . easy-mark)
 
   ("M-s o" . core/occur-dwim)
   ("M-i" . iedit-mode)
