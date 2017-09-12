@@ -99,8 +99,8 @@
   (define-key! :map flyspell-mode-map
     ("C-,")
     ("C-.")
-    ("C-;")
-    ("C-?" . spelling/flyspell-line-or-region)))
+    ("C-M-i")
+    ("C-;" . spelling/flyspell-line-or-region)))
 
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 (add-hook 'text-mode-hook 'flyspell-mode)

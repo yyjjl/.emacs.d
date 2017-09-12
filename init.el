@@ -43,6 +43,7 @@
 
 ;; Some keybindings using when editing
 (require 'init-editing)
+(require 'init-surround)
 (require 'init-dired)
 (require 'init-ibuffer)
 (require 'init-windows)

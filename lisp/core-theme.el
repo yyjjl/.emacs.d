@@ -149,9 +149,9 @@
  '(org-column ((t (:background "#37474F"))))
  '(org-column-title ((t (:inherit org-column :weight bold :underline t))))
  '(org-date ((t (:foreground "#80CBC4" :underline t))))
- '(org-document-info ((t (:foreground "#81D4FA" :height 1.35))))
- '(org-document-info-keyword ((t (:foreground "#8BC34A" :height 1.35))))
- '(org-document-title ((t (:weight bold :height 1.35 :foreground "purple4"))))
+ '(org-document-info ((t (:foreground "#81D4FA"))))
+ '(org-document-info-keyword ((t (:foreground "#8BC34A"))))
+ '(org-document-title ((t (:weight bold :foreground "purple4"))))
  '(org-done ((t (:foreground "#8BC34A" :bold t :background "#1B5E20"))))
  '(org-ellipsis ((t (:foreground "#81D4DF"))))
  '(org-meta-line ((t (:foreground "#9F8766"))))
@@ -172,12 +172,10 @@
  '(org-level-1 ((t (:inherit outline-1
                              :background "grey20"
                              :weight bold
-                             :overline t
-                             :height 1.3))))
+                             :overline t))))
  '(org-level-2 ((t (:inherit outline-2
-                             :background "grey20"
-                             :height 1.2))))
- '(org-level-3 ((t (:inherit outline-3 :height 1.1))))
+                             :background "grey20"))))
+ '(org-level-3 ((t (:inherit outline-3))))
  '(org-level-4 ((t (:inherit outline-4))))
  '(org-level-5 ((t (:inherit outline-5))))
  '(org-level-6 ((t (:inherit outline-6))))

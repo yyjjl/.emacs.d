@@ -101,6 +101,20 @@ body."
        ,@forms
        ,sym)))
 
+(defmacro with-local-minor-mode-map! ($mode &rest $body)
+  "Overrides a minor mode keybinding for the local
+   buffer, by creating or altering keymaps stored in buffer-local
+   `minor-mode-overriding-map-alist'."
+  (declare (indent 1))
+  `(let* ((oldmap (cdr (assoc ,$mode minor-mode-map-alist)))
+          (it (or (cdr (assoc ,$mode minor-mode-overriding-map-alist))
+                  (let ((map (make-sparse-keymap)))
+                    (set-keymap-parent map oldmap)
+                    (push (cons ,$mode map)
+                          minor-mode-overriding-map-alist)
+                    map))))
+     ,@$body))
+
 (defun keyword-get! ($list $key)
   (let (forms)
     (while (and $list (not (eq $key (pop $list)))))

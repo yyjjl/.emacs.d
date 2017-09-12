@@ -4,7 +4,7 @@
 ;; pair edit
 (require! 'lispy)
 (when lisp-has-racket-p
-  (require! 'racket-mode))
+  (require! 'racket-mode "melpa-stable"))
 (require! 'macrostep)
 ;; slime
 ;; slime-company
@@ -26,7 +26,7 @@
     (lispy-mode -1)))
 
 
-(defun lisp/common-setup ()
+(defun lisp|common-setup ()
   "Enable features useful in any Lisp mode."
   (rainbow-delimiters-mode 1)
   (unless (> (buffer-size) core-large-buffer-size)
@@ -34,17 +34,21 @@
   (lispy-mode 1)
   (local-set-key (kbd "M-,") 'xref-pop-marker-stack))
 
-(defun lisp/racket-setup ()
-  (lisp/common-setup)
+(defun lisp|racket-setup ()
+  (lisp|common-setup)
   (rainbow-delimiters-mode 1)
   ;; (setq eldoc-documentation-function 'racket-eldoc-function)
   (when (buffer-temporary?)
     (setq completion-at-point-functions nil))
   (setq flycheck-check-syntax-automatically
-        '(save mode-enabled)))
+        '(save mode-enabled))
+
+  (racket-unicode-input-method-enable)
+  (with-local-minor-mode-map! 'lispy-mode
+    (lispy-define-key it "e" #'racket-eval-sexp)))
 
 ;; Hippie-expand
-(defun lisp/hippie-expand-setup ()
+(defun lisp%hippie-expand-setup ()
   "Locally set `hippie-expand' completion functions for use with
 Emacs Lisp."
   (make-local-variable 'hippie-expand-try-functions-list)
@@ -55,8 +59,8 @@ Emacs Lisp."
                'try-complete-lisp-symbol-partially
                :append))
 
-(defun lisp/elisp-setup ()
-  (lisp/common-setup)
+(defun lisp|elisp-setup ()
+  (lisp|common-setup)
   (flycheck-mode -1)
 
   (setq company-backends (remove 'company-capf company-backends))
@@ -69,18 +73,18 @@ Emacs Lisp."
     (require 'semantic/bovine/el nil t)
     (auto-compile-on-save-mode)
 
-    (lisp/hippie-expand-setup)
+    (lisp%hippie-expand-setup)
 
     (checkdoc-minor-mode)))
 
-(add-hook 'emacs-lisp-mode-hook #'lisp/elisp-setup)
-(add-hook 'racket-mode-hook #'lisp/racket-setup)
+(add-hook 'emacs-lisp-mode-hook #'lisp|elisp-setup)
+(add-hook 'racket-mode-hook #'lisp|racket-setup)
 
 (let ((hooks '(lisp-mode-hook
                inferior-lisp-mode-hook
                lisp-interaction-mode-hook)))
   (dolist (hook hooks)
-    (add-hook hook #'lisp/common-setup)))
+    (add-hook hook #'lisp|common-setup)))
 
 
 
@@ -95,7 +99,7 @@ Emacs Lisp."
   ;; Add keyword `define-hook!'
   (font-lock-add-keywords
    'emacs-lisp-mode
-   '(("(\\(define-hook!\\)\\_>[ 	'(]*\\(\\(?:\\sw\\|\\s_\\)+\\)?"
+   '(("(\\(define-hook!\\)\\_>[         '(]*\\(\\(?:\\sw\\|\\s_\\)+\\)?"
       (1 font-lock-keyword-face)
       (2
        (let ((type (get (intern-soft (match-string 1)) 'lisp-define-type)))
@@ -109,14 +113,23 @@ Emacs Lisp."
       (1 font-lock-constant-face nil nil)))))
 
 (with-eval-after-load 'racket-mode
+  (add-to-list 'lispy-goto-symbol-alist
+               '(racket-mode racket-visit-definition racket-mode))
   ;; Hide error message when racket script is not loaded
-  (defun lisp/racket-complete-at-point-advice ($fn &rest $args)
+  (defun lisp*racket-complete-at-point-advice ($fn &rest $args)
     (when (and (buffer-file-name) (racket--in-repl-or-its-file-p))
       (let ((result (apply $fn $args)))
         (when result
           (delete 'racket--get-type (delete :company-docsig result))))))
   (advice-add 'racket-complete-at-point
-              :around #'lisp/racket-complete-at-point-advice)
+              :around #'lisp*racket-complete-at-point-advice)
+
+  (defun racket-eval-sexp ()
+    (interactive)
+    (unless (region-active-p)
+      (lispy-mark-list 1))
+    (call-interactively #'racket-send-region))
+
   ;; Use `ivy' as default completion backends
   (defun racket--read-identifier ($prompt $default)
     (ivy-read $prompt

@@ -4,12 +4,15 @@
   (if (buffer-live-p shackle-last-buffer)
       (display-buffer shackle-last-buffer)
     (message "Last buffer killed !!")
-    (display-buffer
-     (completing-read "Buffer:"
-                      #'internal-complete-buffer
-                      nil
-                      :require-match
-                      (buffer-name (other-buffer))))))
+    (core/display-buffer)))
+
+(defun core/display-buffer ()
+  (interactive)
+  (display-buffer
+   (completing-read "Buffer:"
+                    #'internal-complete-buffer
+                    nil
+                    :require-match)))
 
 (defun core/fix-popup-window ()
   "Make a popup window not to close when `C-g' pressed"
@@ -31,14 +34,22 @@
 (defun core/popup-sdcv ()
   "Display *sdcv* buffer"
   (interactive)
-  (sdcv-goto-sdcv)
-  (call-interactively #'sdcv-search))
+  (let ((word (if (and transient-mark-mode mark-active)
+                  (buffer-substring-no-properties (region-beginning)
+                                                  (region-end))
+                (sdcv-current-word))))
+    (sdcv-goto-sdcv)
+    (setq word (read-string
+                (format "Word (default %s): " word)
+                nil nil word))
+    (sdcv-search-word word)))
 
 (with-eval-after-load 'shackle
   (defvar shackle-mode-map
     (define-key! :map (make-sparse-keymap)
       ("l" . core/last-popup-window)
       ("d" . core/popup-sdcv)
+      ("b" . core/display-buffer)
       ("RET" . core/fix-popup-window)))
 
   (global-set-key (kbd "C-z") shackle-mode-map)
@@ -102,9 +113,10 @@
         shackle-default-rule nil
         shackle-rules
         '(("*sdcv*" :align below :size 15 :select t)
-          ((lambda (buffer)
-             (or (derived-mode? 'comint-mode buffer)
-                 (eq (buffer-local-value 'major-mode buffer) 'term-mode)))
+          ((:custom
+            (lambda (buffer)
+              (or (derived-mode? 'comint-mode buffer)
+                  (eq (buffer-local-value 'major-mode buffer) 'term-mode))))
            :size 0.4 :align below :select t :inhibit-autoclose t)
           (help-mode :align below :select t)
           (ivy-occur-grep-mode :inhibit-autoclose t

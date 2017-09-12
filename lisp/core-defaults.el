@@ -105,6 +105,7 @@
       display-time-day-and-date t)
 (setq initial-scratch-message
       (concat ";; Welcome to Emacs " (or user-login-name "") " !!!"))
+(setq initial-major-mode 'emacs-lisp-mode)
 
 (defvar core-recentf-enabled? t)
 (defun core%recentf-keep? ($fn)
@@ -122,7 +123,6 @@
 (midnight-mode 1)
 ;; (display-time-mode 1)
 (transient-mark-mode 1)
-(delete-selection-mode 1)
 
 (ignore-errors
   (progn

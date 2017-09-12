@@ -6,7 +6,6 @@
 (require! 'js-doc)
 (require! 'js2-mode)
 (require! 'js-comint)
-(require! 'js2-refactor)
 (when js2-has-web-beautify-p
   (require! 'web-beautify))
 (when js2-has-tern-p
@@ -63,7 +62,6 @@ replaced with it."
   (js2-imenu-extras-mode)
   (setq mode-name "Js2")
   (js2r-add-keybindings-with-prefix "C-c j")
-  (js2-refactor-mode 1)
 
   (unless (and (buffer-temporary?)
                js2-has-tern-p)

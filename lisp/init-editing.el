@@ -1,4 +1,3 @@
-(require! 'expand-region)
 ;; Mark tools
 (require! 'multiple-cursors)
 
@@ -130,8 +129,6 @@ grab matched string and insert them into `kill-ring'"
 
 ;; `avy' jump commands
 (define-key!
-  ("M--" . er/expand-region)
-
   ("M-g 1" . avy-goto-char)
   ("M-g 2" . avy-goto-char-2)
   ("M-g l" . avy-goto-line)

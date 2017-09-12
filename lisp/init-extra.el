@@ -21,7 +21,7 @@
 ;; prolog system
 (setq prolog-system 'swi)
 ;; pulse
-(setq pulse-delay 0.05)
+(setq pulse-delay 0.01)
 ;; csv
 (setq csv-separators '(", " ";" "|" " "))
 
@@ -47,7 +47,7 @@
         (cdr (assoc 'python-mode zeal-at-point-mode-alist)) "python"))
 
 ;; Star dictionary lookup
-(autoload 'sdcv-search "sdcv" nil t)
+(autoload 'sdcv-current-word "sdcv" nil t)
 (autoload 'sdcv-goto-sdcv "sdcv" nil t)
 
 ;; `restclient-mode'

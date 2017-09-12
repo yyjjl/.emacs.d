@@ -44,7 +44,8 @@
     ("C-c C-_") ("C-c -" . shm/insert-underscore)
     ("C-c C-e") ("C-c C-j")
     ("C-c e" . shm/export)
-    ("C-c j" . shm/swing-down)))
+    ("C-c j" . shm/swing-down)
+    ("M-w" . easy-kill)))
 
 (with-eval-after-load 'hindent
   ;; Rewrite function

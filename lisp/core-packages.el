@@ -116,7 +116,7 @@ Archive with high priority will be used when install a package.")
 ;; `counsel-M-x' need smex to get history
 (require! 'smex)
 ;; Show key bindings when pressing
-;; (require! 'which-key)
+(require! 'which-key)
 (when emacs-use-fcitx-p
   (require! 'fcitx))
 ;; Numbering windows
@@ -154,7 +154,7 @@ Archive with high priority will be used when install a package.")
           (hash-table-keys package--required-packages)))
   (add-to-list 'recentf-exclude (file-truename package-user-dir)))
 
-(define-hook! core|setup-hook (after-init-hook)
+(define-hook! core|enable-modes-hook (after-init-hook)
   (recentf-mode 1)
   (session-initialize)
   (winner-mode 1)
@@ -162,7 +162,7 @@ Archive with high priority will be used when install a package.")
   (counsel-mode 1)
   (projectile-mode 1)
   (counsel-projectile-on)
-  ;; (which-key-mode 1)
+  (which-key-mode 1)
   (yas-global-mode 1)
   (shackle-mode 1)
   ;; global-modes

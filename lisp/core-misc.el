@@ -57,7 +57,7 @@
 (with-eval-after-load 'fcitx
   ;; Init fcitx prefix keys
   (setq fcitx-use-dbus nil)
-  (fcitx-prefix-keys-add "C-h" "M-g" "M-s" 
+  (fcitx-prefix-keys-add "C-h" "M-g" "M-s"
                          "M-o" "C-x" "C-c" "C-z"))
 
 ;; Smart tab
