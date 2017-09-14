@@ -164,7 +164,7 @@
          (exwm-run-command ,$app)))))
 
 (define-key! :prefix "C-z"
-  ("g" . (define-exwm-app! "google-chrome" "Google-chrome"))
+  ("g" . (define-exwm-app! "chrome" "Google-chrome"))
   ("n" . (define-exwm-app! "nautilus" "Nautilus"))
   ("p" . (define-exwm-app! "evince" "Evince"))
   ("c" . (define-exwm-app! "unity-control-center" "Unity-control-center"))

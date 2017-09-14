@@ -38,11 +38,14 @@
            " contentId=\"\\([a-zA-Z0-9_]+\\)\"" "=" ">")
           ;; angular imenu
           (" \\(ng-[a-z]*\\)=\"\\([^\"]+\\)" 1 2 "=")))
-  (define-key web-mode-map (kbd "C-c b") #'web-beautify-html)
   (remap! "C-c C-a" "C-c a" web-mode-map)
   (remap! "C-c C-d" "C-c d" web-mode-map)
   (remap! "C-c C-e" "C-c e" web-mode-map)
-  (remap! "C-c C-t" "C-c t" web-mode-map))
+  (remap! "C-c C-t" "C-c t" web-mode-map)
+  (define-key! :map web-mode-map
+    ("C-c b" . web-beautify-html)
+    ("M-n" . web-mode-element-next)
+    ("M-p" . web-mode-element-previous)))
 
 (add-hook 'html-mode-hook 'emmet-mode)
 (add-hook 'sgml-mode-hook 'emmet-mode)

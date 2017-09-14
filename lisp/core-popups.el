@@ -116,7 +116,8 @@
           ((:custom
             (lambda (buffer)
               (or (derived-mode? 'comint-mode buffer)
-                  (eq (buffer-local-value 'major-mode buffer) 'term-mode))))
+                  (memq (buffer-local-value 'major-mode buffer)
+                        '(term-mode inferior-ess-mode)))))
            :size 0.4 :align below :select t :inhibit-autoclose t)
           (help-mode :align below :select t)
           (ivy-occur-grep-mode :inhibit-autoclose t
