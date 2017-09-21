@@ -133,7 +133,9 @@
 
 (define-hook! exwm|floating-setup-hook (exwm-floating-setup-hook)
   (when (string-match "unity-control-center.*" exwm-instance-name)
-    (exwm-floating--unset-floating exwm--id)))
+    (exwm-floating--unset-floating exwm--id))
+  (force-window-update)
+  (exwm-layout--refresh))
 
 (define-hook! exwm|auto-rename-buffer (exwm-update-class-hook
                                        exwm-update-title-hook)

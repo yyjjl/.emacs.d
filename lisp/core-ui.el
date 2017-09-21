@@ -1,5 +1,5 @@
 (require 'core-theme)
-(require 'core-modeline)
+(require 'core-mode-line)
 
 (when (or window-system (daemonp))
   (run-with-idle-timer 1 nil #'unicode-fonts-setup))

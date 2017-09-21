@@ -248,6 +248,9 @@
  '(haskell-type-face ((t (:inherit font-lock-constant-face))))
  '(haskell-constructor-face  ((t (:inherit font-lock-type-face))))
 
+ '(js2-external-variable ((t (:inherit font-lock-negation-char-face))))
+ '(js2-function-call ((t (:inherit font-lock-regexp-grouping-backslash))))
+
  '(easy-kill-selection ((t (:inverse-video t :inherit warning ))))
  '(nlinum-current-line ((t (:inherit font-lock-variable-name-face))))
  '(semantic-highlight-func-current-tag-face ((t (:background "gray5"))))

@@ -6,8 +6,10 @@
         ("C-x t S" . hs-show-all)
         ("C-t" . hs-toggle-hiding)))
 
-(defvar hs--headline-max-len 30 "*Maximum length of `hs-headline' to display.")
-(defvar hs--overlay-map (make-sparse-keymap) "Keymap for hs minor mode overlay.")
+(defvar hs--headline-max-len 30
+  "*Maximum length of `hs-headline' to display.")
+(defvar hs--overlay-map (make-sparse-keymap)
+  "Keymap for hs minor mode overlay.")
 
 (defun hs%display-headline ()
   (let* ((len (length hs-headline))

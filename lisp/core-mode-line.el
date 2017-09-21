@@ -189,9 +189,10 @@ and `buffer-file-coding-system'"
                 '((global-mode-string ("" global-mode-string " "))
                   (iedit-mode (:eval (format "Iedit:%d" (iedit-counter))))))
   (setq-default frame-title-format
-                '(:eval (let ((fn (buffer-file-name)))
-                          (if fn
-                              (abbreviate-file-name fn)
-                            (buffer-name))))))
+                '(:eval (let ((fn (buffer-file-name))
+                              (bn (buffer-name)))
+                          (cond (fn (abbreviate-file-name fn))
+                                ((not (string-match-p "^ " bn)) bn)
+                                (t "*Emacs*"))))))
 
-(provide 'core-modeline)
+(provide 'core-mode-line)

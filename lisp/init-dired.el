@@ -3,23 +3,6 @@
 
 
 
-(defun dired/git-command-in-shell ($command &optional $arg $file-list)
-  "Run a shell command `git COMMAND`' on the marked files.
-if no files marked, always operate on current line in dired-mode
-"
-  (interactive
-   (let ((files (dired-get-marked-files t current-prefix-arg)))
-     (list
-      ;; Want to give feedback whether this file or marked files are used:
-      (dired-read-shell-command "git command on %s: " current-prefix-arg files)
-      current-prefix-arg
-      files)))
-  (unless (string-match "[*?][ \t]*\\'" $command)
-    (setq $command (concat $command " *")))
-  (setq $command (concat "git " $command))
-  (dired-do-shell-command $command $arg $file-list)
-  (message $command))
-
 (defun dired/open-externally ()
   "Open the current file or dired marked files in external app.
 The app is chosen from your OS's preference."

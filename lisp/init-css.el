@@ -1,11 +1,6 @@
-(defvar! js2-has-web-beautify-p (executable-find "js-beautify")
-  "Like clang-format")
-
 ;; Colorize strings that represent colors
 (require! 'rainbow-mode)
 (require! 'css-eldoc)
-(when js2-has-web-beautify-p
-  (require! 'web-beautify))
 
 
 
@@ -54,8 +49,5 @@
     (turn-on-css-eldoc))
   (unless (buffer-temporary?)
     (setq imenu-create-index-function 'css%imenu-make-index)))
-
-(with-eval-after-load 'css-mode
-  (define-key css-mode-map (kbd "C-c b") #'web-beautify-css))
 
 (provide 'init-css)

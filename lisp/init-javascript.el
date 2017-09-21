@@ -1,13 +1,9 @@
 (defvar! js2-has-tern-p (executable-find "tern")
   "Js context sensitive completion")
-(defvar! js2-has-web-beautify-p (executable-find "js-beautify")
-  "Like clang-format")
 
 (require! 'js-doc)
 (require! 'js2-mode)
-(require! 'js-comint)
-(when js2-has-web-beautify-p
-  (require! 'web-beautify))
+(require! 'js2-refactor)
 (when js2-has-tern-p
   (require! 'company-tern)
   (require! 'tern))
@@ -55,52 +51,33 @@ replaced with it."
     result))
 
 (with-eval-after-load 'js2-mode
-  (when js2-has-web-beautify-p
-    (define-key js2-mode-map (kbd "C-c b") 'web-beautify-js)))
+  (setq-default js2-use-font-lock-faces t
+                js2-mode-must-byte-compile nil
+                js2-idle-timer-delay 0.5
+                js2-auto-indent-p nil
+                js2-indent-on-enter-key nil
+                js2-skip-preprocessor-directives t
+                js2-strict-inconsistent-return-warning nil
+                js2-enter-indents-newline nil
+                js2-bounce-indent-p t)
+  (setq-default js2-additional-externs
+                '("$"
+                  "angular" "app" "beforeEach" "browser"
+                  "by" "clearInterval" "clearTimeout"
+                  "inject" "it" "jQuery" "jasmine"
+                  "module"
+                  "process" "require" "setInterval" "setTimeout")))
 
 (define-hook! js2|setup (js2-mode-hook)
   (js2-imenu-extras-mode)
   (setq mode-name "Js2")
-  (js2r-add-keybindings-with-prefix "C-c j")
+  (unless (or (buffer-temporary?)
+              (> (buffer-size) core-large-buffer-size))
+    (js2-refactor-mode 1)
+    (js2r-add-keybindings-with-prefix "`"))
 
-  (unless (and (buffer-temporary?)
-               js2-has-tern-p)
+  (unless (and (buffer-temporary?) js2-has-tern-p)
     (tern-mode 1)
     (add-to-list 'company-backends 'company-tern)))
-
-(setq-default js2-use-font-lock-faces t
-              js2-mode-must-byte-compile nil
-              js2-idle-timer-delay 0.5 ; NOT too big for real time syntax check
-              js2-auto-indent-p nil
-              js2-indent-on-enter-key nil ; annoying instead useful
-              js2-skip-preprocessor-directives t
-              js2-strict-inconsistent-return-warning nil ; return <=> return null
-              js2-enter-indents-newline nil
-              js2-bounce-indent-p t)
-(setq-default js2-additional-externs
-              '("$"
-                "$A" ; salesforce lightning component
-                "AccessifyHTML5" "KeyEvent"
-                "Raphael" "React" "_content" ; Keysnail
-                "angular" "app" "beforeEach" "browser"
-                "by" "clearInterval" "clearTimeout"
-                "command" ; Keysnail
-                "content" ; Keysnail
-                "define" "describe"
-                "display" ; Keysnail
-                "element" "expect"
-                "ext" ; Keysnail
-                "gBrowser" ; Keysnail
-                "goDoCommand" ; Keysnail
-                "hook" ; Keysnail
-                "inject" "it" "jQuery" "jasmine"
-                "key" ; Keysnail
-                "ko" "log" "module"
-                "plugins" ; Keysnail
-                "process" "require" "setInterval" "setTimeout"
-                "shell" ; Keysnail
-                "tileTabs" ; Firefox addon
-                "util" ; Keysnail
-                "utag"))
 
 (provide 'init-javascript)

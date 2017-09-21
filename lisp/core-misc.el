@@ -1,7 +1,10 @@
 ;; Default prog-mode setup
 (define-hook! core|generic-prog-mode-setup (prog-mode-hook
                                             LaTeX-mode-hook)
+  (company-mode 1)
   (hs-minor-mode 1)
+  (flycheck-mode 1)
+  (hl-line-mode 1)
   (when (< (buffer-size) core-large-buffer-size)
     ;; (highlight-indentation-current-column-mode 1)
     (highlight-indentation-mode 1))
@@ -11,8 +14,9 @@
 
 (define-hook! core|generic-text-mode-setup (text-mode-hook)
   (setq  indicate-empty-lines t)
-  (auto-fill-mode 1)
-  (flycheck-mode -1))
+  (hl-line-mode 1)
+  (company-mode 1)
+  (auto-fill-mode 1))
 
 (setq flycheck-keymap-prefix (kbd "C-c f"))
 (with-eval-after-load 'flycheck
@@ -39,6 +43,9 @@
 
 (with-eval-after-load 'isearch
   (define-key isearch-mode-map (kbd "C-o") 'isearch-occur))
+
+(with-eval-after-load 'session
+  (setq session-registers '(t (48 . 57) 45 61 92 96  (97 . 122))))
 
 ;; `tramp' setup
 (with-eval-after-load 'tramp
@@ -115,7 +122,8 @@
       (let ((buf (get-buffer-create name)))
         (with-current-buffer buf
           (insert-buffer-substring this)
-          (write-file (expand-file-name name (file-name-directory this-name))))
+          (write-file (expand-file-name name
+                                        (file-name-directory this-name))))
         (switch-to-buffer buf)))))
 
 ;; Rename the current file
@@ -165,16 +173,6 @@ Does not indent buffer, because it is used for a
   (let ((rlt (format "%S" (get-text-property (point) 'face))))
     (kill-new rlt)
     (message "%s => yank ring" rlt)))
-
-(defun core/num-to-string ()
-  "Convert number at point to string"
-  (interactive)
-  (let* ((bounds (bounds-of-thing-at-point 'sexp))
-         (num (and bounds (thing-at-point 'number))))
-    (when num
-      (goto-char (car bounds))
-      (kill-region (car bounds) (cdr bounds))
-      (insert num))))
 
 (defun core/occur-dwim ()
   (interactive)

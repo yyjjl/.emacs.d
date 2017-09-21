@@ -45,6 +45,7 @@
 
 (with-eval-after-load 'flyspell
   (defun spelling*turn-off-fly ()
+    "Do not check on the fly"
     (remove-hook 'post-command-hook (function flyspell-post-command-hook) t)
     (remove-hook 'pre-command-hook (function flyspell-pre-command-hook) t)
     (remove-hook 'after-change-functions 'flyspell-after-change-function t)

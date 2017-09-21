@@ -60,7 +60,7 @@
         (shell-command (format "%s -W %s"
                                (expand-file-name "rc" rtags-path)
                                default-directory))
-        (cpp/c++-normal-setup)))))
+        (cpp/c++-simple-setup)))))
 
 (defun cpp/common-cc-setup ()
   "Setup shared by all languages (java/groovy/c++ ...)"
@@ -87,7 +87,7 @@
   (when cpp-has-irony-p (irony-eldoc -1))
   (when tags-has-ggtags-p (ggtags-mode -1)))
 
-(defun cpp/try-use-rtags ()
+(defun cpp/try-misc-setup ()
   (interactive)
   (if cpp-has-rtags-p
       (if cpp-cmake-ide-enabled
@@ -96,9 +96,15 @@
         (when (cpp/rtags-indexing-with-makefile)
           (message "Rtags is ready !!")
           (cpp/rtags-setup)))
-    (message "Rtags not found !!!")))
+    (message "Rtags not found !!!"))
+  (when cpp-has-irony-p
+    (unless (featurep 'company-irony-c-headers)
+      (require 'company-irony-c-headers))
+    (setq-local cc-search-directories
+                (company-irony-c-headers--resolved-search-paths t))
+    (message "Setting CC search directories done !!")))
 
-(defun cpp/c++-normal-setup ()
+(defun cpp/c++-simple-setup ()
   (setq-local compile-command
               '(ignore-errors
                  (let ((root (cpp/locate-makefile)))
@@ -131,7 +137,7 @@
   (local-set-key (kbd "C-c C-j") 'semantic-ia-fast-jump)
   (local-set-key (kbd "C-c C-v") 'semantic-decoration-include-visit)
   (local-set-key (kbd "C-c C-c") 'cmake-ide-run-cmake)
-  (local-set-key [f9] 'cpp/try-use-rtags)
+  (local-set-key [f9] 'cpp/try-misc-setup)
   (local-set-key [f10] 'cpp/compile)
   (local-set-key [f5] 'gdb)
 
@@ -156,6 +162,7 @@
       (add-to-list 'company-backends #'company-irony)
       (add-to-list 'company-backends #'company-irony-c-headers)
       (add-to-list 'company-backends #'company-files)
+
       (irony-mode 1))
     ;; Make sure rdm is running
     (when cpp-has-rtags-p
@@ -165,13 +172,13 @@
         (progn
           (setq-local cpp-cmake-ide-enabled t)
           (cpp/rtags-setup))
-      (cpp/c++-normal-setup))))
+      (cpp/c++-simple-setup))))
 
 ;; Do not use `c-mode-hook' and `c++-mode-hook', there is a bug
-(defvar-local cpp/initialized-p nil)
-(define-hook! cpp/common-setup (c-mode-common-hook)
-  (unless cpp/initialized-p
-    (setq cpp/initialized-p t)
+(defvar-local cpp--initialized-p nil)
+(define-hook! cpp|common-setup (c-mode-common-hook)
+  (unless cpp--initialized-p
+    (setq cpp--initialized-p t)
     (if (>= (string-to-number c-version) 5.33)
         (run-hooks 'prog-mode-hook))
 
@@ -184,9 +191,7 @@
 (with-eval-after-load 'irony
   (add-hook 'flycheck-mode-hook 'flycheck-irony-setup)
   (setq irony-additional-clang-options
-        '("-Wall"
-          "-I/usr/lib/gcc/x86_64-linux-gnu/5/include/"
-          "-std=c++14"))
+        '("-Wall" "-std=c++14"))
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
 
 (autoload 'cmake-font-lock-activate "cmake-font-lock" nil t)
@@ -226,16 +231,15 @@
   ;; Smart tab
   (advice-add 'c-indent-line-or-region :around #'core%indent-for-tab)
 
-  (rtags-enable-standard-keybindings)
-  ;; C-c(3) r(114) make all Upper case to lower-case
-  (let ((m (assoc 114 (assoc 3 c-mode-base-map))))
+  (rtags-enable-standard-keybindings nil "`")
+  ;; ?\` all Upper case to lower-case
+  (let ((m (assoc ?\` c-mode-base-map)))
     (ignore-errors
-      (mapcar (lambda (x)
-                (let ((k (car x)))
-                  (if (and (>= k 65) (<= k 90))
-                      (setf (car x) (+ k 32))
-                    (if (and (>= k 97) (<= k 122))
-                        (setf (car x) (- k 32))))))
-              (cddr m)))))
+      (dolist (x (cddr m))
+        (let ((k (car x)))
+          (if (and (>= k ?A) (<= k ?Z))
+              (setf (car x) (+ k 32))
+            (if (and (>= k ?a) (<= k ?z))
+                (setf (car x) (- k 32)))))))))
 
 (provide 'init-cpp)

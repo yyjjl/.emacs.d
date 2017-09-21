@@ -66,12 +66,6 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
   ("-" shrink-window "shrink")
   ("RET" nil "quit"))
 
-(define-key!
-  ("C-x {" . hydra-resize-window/shrink-window-horizontally)
-  ("C-x }" . hydra-resize-window/enlarge-window-horizontally)
-  ("C-x ^" . hydra-resize-window/enlarge-window)
-  ("C-x -" . hydra-resize-window/shrink-window))
-
 (defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
                                      :color pink
                                      :post (deactivate-mark))
@@ -134,11 +128,11 @@ _d_: subtree
   ("b" outline-backward-same-level)      ; Backward - same level
   ("z" nil "leave"))
 
-(global-set-key (kbd "C-c o") 'hydra-outline/body)
-
 (defvar current-forward-thing 'char)
+
 (defun current-forward-thing ()
   current-forward-thing)
+
 (defun forward-thing* (&optional $N)
   (interactive "p")
   (forward-thing current-forward-thing $N))
@@ -203,10 +197,6 @@ Current thing: %s(current-forward-thing)
       (hydra-move-other-window/body)
     (hydra-move/body)))
 
-(global-set-key (kbd "C-.") #'hydra-move-invoker)
-(global-set-key (kbd "C-v") #'hydra-move/scroll-up-command)
-(global-set-key (kbd "M-v") #'hydra-move/scroll-down-command)
-
 (defhydra hydra-next-error (:color pink :hint nil)
   "
 Compilation errors:
@@ -219,8 +209,22 @@ _q_uit
   ("p" previous-error)
   ("<" first-error)
   ("q" nil :color blue))
-(global-set-key (kbd "M-g n") #'hydra-next-error/next-error)
-(global-set-key (kbd "C-x `") #'hydra-next-error/next-error)
-(global-set-key (kbd "M-g p") #'hydra-next-error/previous-error)
+
+(define-key!
+  ("C-x {" . hydra-resize-window/shrink-window-horizontally)
+  ("C-x }" . hydra-resize-window/enlarge-window-horizontally)
+  ("C-x ^" . hydra-resize-window/enlarge-window)
+  ("C-x -" . hydra-resize-window/shrink-window)
+
+  ("C-." . hydra-move-invoker)
+  ("C-v" . hydra-move/scroll-up-command)
+  ("M-v" . hydra-move/scroll-down-command)
+
+  ("C-c o" . 'hydra-outline/body)
+  ("C-x SPC" . 'hydra-rectangle/body)
+
+  ("M-g n" . 'hydra-next-error/next-error)
+  ("C-x `" . 'hydra-next-error/next-error)
+  ("M-g p" . 'hydra-next-error/previous-error))
 
 (provide 'core-hydra)

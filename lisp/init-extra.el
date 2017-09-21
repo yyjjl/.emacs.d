@@ -107,7 +107,7 @@
   (setcdr (assoc 'newline-mark whitespace-display-mappings)
           '(10 [182 10]))
   (setcdr (assoc 'tab-mark whitespace-display-mappings)
-          '(9 [8594] [92 9])))
+          '(9 [8594 9])))
 
 (with-eval-after-load 'skeletor
   (setq skeletor-completing-read-function 'ivy-completing-read)

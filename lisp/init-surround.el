@@ -43,8 +43,7 @@ Use `scan-lists', otherwise use simple algorithm."
 
 (defun core%surround-mark ()
   ;; When `easy-kill' is active
-  (when (and (boundp 'easy-kill-candidate)
-             (easy-kill-get start))
+  (when (ignore-errors (easy-kill-get start))
     (easy-kill-mark-region))
   (setq core--suround-origin-pos nil)
   (let ((from-pair (core%surround-get-pair (read-char))))

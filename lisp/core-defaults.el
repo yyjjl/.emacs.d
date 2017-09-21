@@ -64,7 +64,7 @@
  grep-highlight-matches t
  grep-scroll-output t
  indent-tabs-mode nil
- line-spacing 0.2
+ line-spacing 0.25
  mouse-yank-at-point t
  set-mark-command-repeat-pop t
  echo-keystrokes 0.25
@@ -105,7 +105,6 @@
       display-time-day-and-date t)
 (setq initial-scratch-message
       (concat ";; Welcome to Emacs " (or user-login-name "") " !!!"))
-(setq initial-major-mode 'emacs-lisp-mode)
 
 (defvar core-recentf-enabled? t)
 (defun core%recentf-keep? ($fn)

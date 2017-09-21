@@ -1,10 +1,5 @@
-(defvar! js2-has-web-beautify-p (executable-find "js-beautify")
-  "Like clang-format")
-
 (require! 'emmet-mode)
 (require! 'web-mode)
-(when js2-has-web-beautify-p
-  (require! 'web-beautify))
 (require! 'company-web)
 ;; Optional package add support for angluar 1.x
 ;; (require! 'ac-html-angular)
@@ -43,7 +38,6 @@
   (remap! "C-c C-e" "C-c e" web-mode-map)
   (remap! "C-c C-t" "C-c t" web-mode-map)
   (define-key! :map web-mode-map
-    ("C-c b" . web-beautify-html)
     ("M-n" . web-mode-element-next)
     ("M-p" . web-mode-element-previous)))
 

@@ -108,12 +108,38 @@ for a file to visit if current buffer is not visiting a file."
                 :caller 'counsel-sudo-edit)
     (find-file (concat "/sudo:root@localhost:" buffer-file-name))))
 
+(defun core%ivy-switch-buffer-transformer (str)
+  "Transform STR to more readable format."
+  (let ((buf (get-buffer str))
+        (width (frame-width))
+        (right-side ""))
+    (cond
+     (buf (with-current-buffer buf
+            (setq right-side
+                  (propertize (format "%s" major-mode)
+                              'face 'warning))))
+     ((and (eq ivy-virtual-abbreviate 'full)
+           (file-name-directory str))
+      (setq right-side (abbreviate-file-name (file-name-directory str)))
+      (setq str (propertize (file-name-nondirectory str)
+                            'face 'ivy-virtual))))
+    (concat str
+            (make-string (max 2 (- width (+ (length str)
+                                            (length right-side))))
+                         ?\s)
+            right-side)))
+
 (with-eval-after-load 'ivy
   (define-key!
     :map ivy-minibuffer-map
     ("C-j" . ivy-immediate-done)
     ("C-M-j" . ivy-done)
     ("!" . core/ivy-external-file))
+
+  (dolist (caller '(ivy-switch-buffer
+                    counsel-kill-buffer
+                    internal-complete-buffer))
+    (ivy-set-display-transformer caller #'core%ivy-switch-buffer-transformer))
 
   (defun core/ivy-external-file ()
     (interactive)
@@ -155,17 +181,18 @@ for a file to visit if current buffer is not visiting a file."
     ("C-x w =" . ivy-push-view))
   (define-key! :prefix "C-c i"
     ("r" . ivy-resume)
-    ("l l" . counsel-load-library)
-    ("l t" . counsel-load-theme)
+    ("6" . counsel-up-directory)
+    ("l" . counsel-load-library)
+    ("t" . counsel-load-theme)
+    ("p" . counsel-list-processes)
     ("u" . counsel-unicode-char)
     ("i" . counsel-semantic-or-imenu)
-    ("l p" . counsel-list-processes)
-    ("R" . counsel-linux-app)
+    ("x" . counsel-linux-app)
     ("v" . counsel-set-variable)
     ("j" . counsel-file-jump)
     ("g t" . counsel-git)
+    ("g l" . counsel-git-log)
     ("g g " . counsel-git-grep)
-    ("g r" . counsel-git-grep-recenter)
     ("g q" . counsel-git-grep-query-replace)
     ("g s" . counsel-git-stash)
     ("h" . counsel-shell-command-history)
@@ -178,6 +205,7 @@ for a file to visit if current buffer is not visiting a file."
     ("d f" . counsel-describe-face)
     ("f s" . counsel-find-symbol)
     ("f f" . counsel-faces)
+    ("f l" . counsel-find-library)
     ("c w" . counsel-colors-web)
     ("c e" . counsel-colors-emacs)
     ("e" . counsel-sudo-edit)

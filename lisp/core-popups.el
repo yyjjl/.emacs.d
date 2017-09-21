@@ -8,11 +8,12 @@
 
 (defun core/display-buffer ()
   (interactive)
-  (display-buffer
-   (completing-read "Buffer:"
-                    #'internal-complete-buffer
-                    nil
-                    :require-match)))
+  (let ((ivy-use-virtual-buffers nil))
+    (display-buffer
+     (completing-read "Buffer:"
+                      #'internal-complete-buffer
+                      nil
+                      :require-match))))
 
 (defun core/fix-popup-window ()
   "Make a popup window not to close when `C-g' pressed"

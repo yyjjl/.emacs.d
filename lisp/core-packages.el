@@ -116,7 +116,7 @@ Archive with high priority will be used when install a package.")
 ;; `counsel-M-x' need smex to get history
 (require! 'smex)
 ;; Show key bindings when pressing
-(require! 'which-key)
+;; (require! 'which-key)
 (when emacs-use-fcitx-p
   (require! 'fcitx))
 ;; Numbering windows
@@ -132,7 +132,6 @@ Archive with high priority will be used when install a package.")
 (require! 'shackle)
 (require! 'easy-kill)
 (require! 'beginend)
-(require! 'exwm)
 ;; (require! 'pinyinlib)
 
 (require 'core-ivy)
@@ -148,7 +147,8 @@ Archive with high priority will be used when install a package.")
   (when (>= emacs-major-version 25)
     ;; Do not save to init.el
     (fset 'package--save-selected-packages
-          (lambda ($value) (when $value (setq package-selected-packages $value))))
+          (lambda ($value)
+            (when $value (setq package-selected-packages $value))))
 
     (setq package-selected-packages
           (hash-table-keys package--required-packages)))
@@ -162,15 +162,12 @@ Archive with high priority will be used when install a package.")
   (counsel-mode 1)
   (projectile-mode 1)
   (counsel-projectile-on)
-  (which-key-mode 1)
   (yas-global-mode 1)
   (shackle-mode 1)
+
   ;; global-modes
-  (global-company-mode 1)
-  (global-flycheck-mode 1)
   (global-subword-mode 1)
   (global-auto-revert-mode 1)
-  (global-hl-line-mode 1)
   (global-page-break-lines-mode 1)
 
   (column-number-mode 1)

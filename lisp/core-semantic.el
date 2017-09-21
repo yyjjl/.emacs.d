@@ -27,7 +27,8 @@
         (let ((full-file (expand-file-name file dir)))
           (condition-case err
               (if (and (file-directory-p full-file) $recursive?)
-                  (core/semanticdb-parse-directory full-file $regex $recursive?)
+                  (core/semanticdb-parse-directory full-file
+                                                   $regex $recursive?)
                 (if (or (not $regex)
                         (string= $regex "")
                         (string-match-p $regex file))
@@ -38,7 +39,8 @@
 (defun core/semantidb-parse ($regex $dir)
   (interactive (list (read-regexp "File name regex (default nil)" nil)
                      (file-name-directory
-                      (completing-read "Directory: " #'read-file-name-internal))))
+                      (completing-read "Directory: "
+                                       #'read-file-name-internal))))
   (core/semanticdb-parse-directory $dir $regex t)
   (semanticdb-save-all-db))
 

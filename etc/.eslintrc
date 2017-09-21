@@ -1,6 +1,0 @@
-{
-    "extends":"defaults/configurations/eslint",
-    "env":{
-        "node":true,
-    }   
-}

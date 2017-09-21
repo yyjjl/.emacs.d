@@ -68,6 +68,7 @@
 (comma-hydra-define ","
   ("f" find-file)
   ("i" "C-c i")
+  ("r" "C-x r")
   ("v" "C-c C-v")
   ("4" "C-x 4")
   ("5" "C-x 5")
