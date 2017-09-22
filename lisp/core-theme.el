@@ -141,7 +141,7 @@
  '(eldoc-highlight-function-argument ((t (:foreground "#86DC2F"
                                                       :weight bold))))
  '(hl-sexp-face ((t (:background "gray5"))))
- '(hl-line ((t (:background "gray5"))))
+ '(hl-line ((t (:background "black"))))
  '(org-block ((t (:foreground "#8BC34A" :background "#1C1F26"))))
  '(org-block-background ((t (:background "#1C1F26"))))
  '(org-code ((t (:foreground "#8BC34A" :background "#1C1F26"))))

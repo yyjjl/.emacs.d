@@ -128,17 +128,51 @@ none exists, or if the current buffer is already a term."
           (setq term--parent-buffer parent-buf))
         (pop-to-buffer buf)))))
 
+(defun term%after-prompt? ()
+  (let* ((proc (get-buffer-process (current-buffer)))
+         (mark (and proc (process-mark proc))))
+    (and mark (>= (point) mark))))
+
+(defun term/conditional-send-raw ()
+  (interactive)
+  (let ((command (global-key-binding (this-command-keys))))
+    ;; When `point' is after last output mark, send raw string
+    ;; Otherwise call global binding
+    (call-interactively (if (and command (term%after-prompt?))
+                            #'term-send-raw
+                          command))))
+
 (with-eval-after-load 'multi-term
   (add-hook 'term-mode-hook 'multi-term-keystroke-setup)
   (setq multi-term-scroll-to-bottom-on-output t)
   (setq multi-term-program (or term-zsh-path term-bash-path))
   (setq term-bind-key-alist
-        (append term-bind-key-alist
-                '(("C-s" . swiper/dispatch)
-                  ("M-]" . multi-term-next)
-                  ("M-[" . multi-term-prev)
-                  ("C-g" . keyboard-quit))))
-  (setq multi-term-dedicated-close-back-to-open-buffer-p t))
+        '(("C-c C-c" . term-interrupt-subjob)
+          ("C-c C-e" . term-send-esc)
+          ("C-p" . previous-line)
+          ("C-n" . next-line)
+          ("C-r" . isearch-backward)
+          ("C-m" . term-send-return)
+          ("C-y" . term-paste)
+          ;; ("M-f" . term-send-forward-word)
+          ;; ("M-b" . term-send-backward-word)
+          ("M-o" . term-send-backspace)
+          ("M-p" . term-send-up)
+          ("M-n" . term-send-down)
+          ("M-M" . term-send-forward-kill-word)
+          ("M-N" . term-send-backward-kill-word)
+          ("<C-backspace>" . term-send-backward-kill-word)
+          ("M-r" . term-send-reverse-search-history)
+          ("M-d" . term-send-delete-word)
+          ("M-," . term-send-raw)
+          ("C-s" . swiper/dispatch)
+          ("M-]" . multi-term-next)
+          ("M-[" . multi-term-prev)
+          ("C-g" . keyboard-quit)))
+
+  (setq multi-term-dedicated-close-back-to-open-buffer-p t)
+
+  (define-key term-raw-map [remap term-send-raw] #'term/conditional-send-raw))
 
 (define-hook! term|utf8-setup (term-exec-hook)
   (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))

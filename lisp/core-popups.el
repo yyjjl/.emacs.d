@@ -54,7 +54,7 @@
       ("RET" . core/fix-popup-window)))
 
   (global-set-key (kbd "C-z") shackle-mode-map)
-  (global-set-key (kbd "C-x m") #'core/popup-messages)
+  (global-set-key (kbd "C-x m") #'view-echo-area-messages)
 
   (defun core%shackle-align ()
     "Set default align according to frame size and window number."
@@ -87,6 +87,7 @@
         (delete-window window))))
   ;; Can not be advised `:after', keyboard-quit signal `quit'
   (advice-add 'keyboard-quit :before #'core*close-popup-window)
+  (advice-add 'other-window :before #'core*close-popup-window)
 
   (defun core*shackle-display-buffer-hack ($fn $buffer $alist $plist)
     ;; Set default size

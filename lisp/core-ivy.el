@@ -201,7 +201,6 @@ for a file to visit if current buffer is not visiting a file."
     ("/" . counsel-grep)
     ("s" . counsel-semantic)
     ("L" . counsel-locate)
-    ("d b" . counsel-descbinds)
     ("d f" . counsel-describe-face)
     ("f s" . counsel-find-symbol)
     ("f f" . counsel-faces)

@@ -131,7 +131,6 @@ Archive with high priority will be used when install a package.")
 (require! 'evil-nerd-commenter)
 (require! 'shackle)
 (require! 'easy-kill)
-(require! 'beginend)
 ;; (require! 'pinyinlib)
 
 (require 'core-ivy)
@@ -182,7 +181,6 @@ Archive with high priority will be used when install a package.")
   (when emacs-use-fcitx-p
     (fcitx-aggressive-setup))
 
-  (beginend-setup-all)
   (semantic-mode 1))
 
 (provide 'core-packages)

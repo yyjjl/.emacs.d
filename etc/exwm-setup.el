@@ -6,11 +6,9 @@
 (add-hook 'exwm-randr-screen-change-hook
           (lambda ()
             (start-process-shell-command
-             "xrandr" nil "xrandr --output eDP-1 --right-of HDMI-1 --auto")))
+             "xrandr" nil "xrandr --output eDP-1 --left-of HDMI-1 --auto")))
 
 (setq fcitx-use-dbus nil)
-
-(add-to-list 'package-selected-packages 'exwm)
 
 ;; Set workspace number
 (setq exwm-workspace-number 4)
@@ -166,7 +164,7 @@
          (exwm-run-command ,$app)))))
 
 (define-key! :prefix "C-z"
-  ("g" . (define-exwm-app! "chrome" "Google-chrome"))
+  ("g" . (define-exwm-app! "google-chrome" "Google-chrome"))
   ("n" . (define-exwm-app! "nautilus" "Nautilus"))
   ("p" . (define-exwm-app! "evince" "Evince"))
   ("c" . (define-exwm-app! "unity-control-center" "Unity-control-center"))

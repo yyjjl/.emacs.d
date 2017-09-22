@@ -40,6 +40,18 @@
                      TeX-command-default)))
       (TeX-command command  'TeX-master-file -1)))
 
+  (defun latex/convert-to-svg ()
+    (interactive)
+    (let* ((fn (file-name-base (buffer-file-name)))
+           (output-file (concat fn ".svg"))
+           (core-recentf-enabled? nil))
+      (message (shell-command-to-string
+                (format "pdf2svg %s.pdf %s.svg" fn fn)))
+      (if (file-exists-p output-file)
+          (display-buffer
+           (find-file-noselect output-file))
+        (message "Something wrong !!!"))))
+
   (add-to-list
    'TeX-command-list
    '("XeLaTeX" "%`xelatex -interaction nonstopmode -shell-escape%(mode)%' %t"

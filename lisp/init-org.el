@@ -8,6 +8,12 @@
 
 
 
+(defmacro org/by-backend (&rest body)
+  `(case (or (and (boundp 'org-export-current-backend)
+                  org-export-current-backend)
+             'babel)
+     ,@body))
+
 (defun org/split-src-block (&optional $below)
   "Split the current src block.
 With a prefix BELOW move point to lower block."
@@ -154,6 +160,43 @@ With a prefix BELOW move point to lower block."
     ("i" . org-table-insert-column)
     ("r" . org-table-show-reference)))
 (with-eval-after-load 'org
+  (defun org/tex-file-content (filename)
+    (with-temp-buffer
+      (insert-file-contents-literally filename)
+      (goto-char (point-min))
+      (when (re-search-forward
+             "\\\\begin{document}\\(\\(?:.\\|\n\\)+\\)\\\\end{document}"
+             nil :no-error)
+        (match-string 1))))
+
+  (defun org/tex-file-headers (filename)
+    (with-temp-buffer
+      (insert-file-contents-literally filename)
+      (goto-char (point-min))
+      (let (beg end)
+        (when (re-search-forward
+               "\\\\documentclass\\(?:\\[[^]]+\\] *\\){[^}]+}"
+               nil :no-error)
+          (setq beg (match-end 0)))
+        (when (and beg (re-search-forward "\\\\begin{document}" nil :no-error))
+          (setq end (match-beginning 0)))
+        (when end
+          (split-string (buffer-substring-no-properties beg end)
+                        "\n" t " +")))))
+
+  (defun org*babel-latex-hack (fn body params)
+    (let ((include-fn (cdr (assq :include params)))
+          (headers (assq :headers params)))
+      (when include-fn
+        (setq body (concat (org/tex-file-content include-fn) body))
+        (let ((new-headers (org/tex-file-headers include-fn)))
+          (setq params
+                (if headers
+                    (setcdr headers (append (cdr headers) new-headers))
+                  (push (cons :headers new-headers) params)))))
+      (funcall fn body params)))
+  (advice-add 'org-babel-execute:latex :around #'org*babel-latex-hack)
+
   ;; Highlight `{{{color(<color>, <text>}}}' form
   (font-lock-add-keywords
    'org-mode
@@ -221,9 +264,12 @@ With a prefix BELOW move point to lower block."
         ;; org-startup-indented t
         org-pretty-entities t
         org-pretty-entities-include-sub-superscripts nil
-        org-format-latex-options (plist-put org-format-latex-options :scale 1.5)
+        org-format-latex-options
+        (plist-put org-format-latex-options :scale 1.5)
         org-highlight-latex-and-related '(latex)
-        org-src-fontify-natively t)
+        org-src-fontify-natively t
+        org-latex-create-formula-image-program 'imagemagick
+        org-export-use-babel nil)
 
   (add-to-list 'org-babel-tangle-lang-exts '("ipython" . "py"))
   (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
@@ -289,7 +335,8 @@ With a prefix BELOW move point to lower block."
     ("C-c l" . org-store-link)
     ([f9] . (lambda () (interactive)
               (save-excursion
-                (org-publish-current-file))))
+                (let ((core--buffer-useful nil))
+                  (org-publish-current-file)))))
     ([f10] . org-publish)
     ([f5] . org-present)
     ("C-c C-t" . org-todo)))
