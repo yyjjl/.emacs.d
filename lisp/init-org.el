@@ -265,7 +265,7 @@ With a prefix BELOW move point to lower block."
         org-pretty-entities t
         org-pretty-entities-include-sub-superscripts nil
         org-format-latex-options
-        (plist-put org-format-latex-options :scale 1.5)
+        (plist-put org-format-latex-options :scale 2)
         org-highlight-latex-and-related '(latex)
         org-src-fontify-natively t
         org-latex-create-formula-image-program 'imagemagick

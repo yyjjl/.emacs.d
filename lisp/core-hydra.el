@@ -34,29 +34,7 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
     "Expand org template."
     (insert $str)
     (org-try-structure-completion)
-    (when $mod (insert $mod) (forward-line)))
-
-  (defhydra hydra-org-move (:color pink :hint nil)
-    "org move"
-    ("u" outline-up-heading "up")              ; Up
-    ("n" outline-next-visible-heading "next")  ; Next
-    ("p" outline-previous-visible-heading "prev") ; Previous
-    ("f" outline-forward-same-level "forward") ; Forward - same level
-    ("b" outline-backward-same-level "back")   ; Backward - same level
-    ("q" nil "quit")
-    ("<tab>" org-cycle "cycle")
-    ("RET" nil))
-
-  (define-key! :map org-mode-map
-    ("<" . (lambda () (interactive)
-             (if (looking-back "^\\s-*" (line-beginning-position))
-                 (hydra-org-template/body)
-               (self-insert-command 1))))
-    ("C-c C-u" . hydra-org-move/outline-up-heading)
-    ("C-c C-n" . hydra-org-move/outline-next-visible-heading)
-    ("C-c C-p" . hydra-org-move/outline-previous-visible-heading)
-    ("C-c C-f" . hydra-org-move/outline-forward-same-level)
-    ("C-c C-b" . hydra-org-move/outline-backward-same-level)))
+    (when $mod (insert $mod) (forward-line))))
 
 (defhydra hydra-resize-window (:color pink)
   "shrink"
