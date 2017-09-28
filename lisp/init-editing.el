@@ -52,7 +52,64 @@ grab matched string and insert them into `kill-ring'"
     (message "matched %d strings => kill-ring" (length items))
     items))
 
+;; @see https://emacs.stackexchange.com/questions/8121/automatically-inserting-an-space-when-inserting-a-character-depending-on-the-pre
+(defvar core-punctuation-chars (string-to-list ".,:;?!")
+  "List of charactesr to insert spaces after")
+
+(defvar core-punctuation-ignore-chars
+  (string-to-list "\t ")
+  "List of characters to not auto insert spaces before")
+
+(defun core|insert-space-after-punc ()
+  "If the last entered character is not in `core-punctuation-chars',
+and the prior character is in `core-punctuation-chars', insert a
+space between the two characters."
+  (when (and (not (member (char-before) core-punctuation-chars))
+             (not (member (char-before) core-punctuation-ignore-chars))
+             (not (and (eq major-mode 'org-mode)
+                       (org-in-src-block-p)))
+             (member (char-before (1- (point))) core-punctuation-chars))
+    (backward-char 1)
+    (insert " ")
+    (forward-char 1)))
+
+(define-minor-mode core/space-punctuation-mode
+  "Automatically inserts spaces between some punctuation and
+other characters."
+  :init-value nil
+  :lighter "._a"
+  :keymap nil
+  (make-variable-buffer-local 'post-self-insert-hook)
+  (if core/space-punctuation-mode
+      (add-hook 'post-self-insert-hook 'core|insert-space-after-punc)
+    (remove-hook 'post-self-insert-hook 'core|insert-space-after-punc)))
+
+(add-hook 'text-mode-hook 'core/space-punctuation-mode)
+
+(defconst extra-ascii-before-chinese
+  (rx (group-n 1 (in "a-zA-Z0-9!@#$%^&\\-+|)\\]}\\:;?><.,/"))
+      (group-n 2 (category chinese-two-byte))))
+(defconst extra-ascii-after-chinese
+  (rx (group-n 1 (category chinese-two-byte))
+      (group-n 2 (in "a-zA-Z0-9@#$%^&\\-+|(\\[{\\></"))))
+
+(defun extra/insert-space-around-chinese (&optional $start $end)
+  (interactive)
+  (if (region-active-p)
+      (setq $start (region-beginning)
+            $end (region-end))
+    (setq $start (point-min)
+          $end (point-max)))
+  (save-excursion
+    (goto-char $start)
+    (while (re-search-forward extra-ascii-before-chinese $end t)
+      (replace-match "\\1 \\2" nil nil))
+    (goto-char $start)
+    (while (re-search-forward extra-ascii-after-chinese $end t)
+      (replace-match "\\1 \\2" nil nil))))
+
 (define-key!
+  ("M-Q" . extra/insert-space-around-chinese)
   ("M-;" . evilnc-comment-or-uncomment-lines)
   ("C-x n n" . core/narrow-or-widen-dwim)
   ("C-x K" . core/kill-regexp)

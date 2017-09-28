@@ -132,7 +132,8 @@
   (setq git-messenger:show-detail t))
 
 
-(define-hook! (git|message-kill-commit-id msg) (git-messenger:after-popup-hook)
+(define-hook! (git|message-kill-commit-id msg)
+  (git-messenger:after-popup-hook)
   ;; extract commit id and put into the kill ring
   (when (string-match "\\(commit *: *\\)\\([0-9a-z]+\\)" msg)
     (kill-new (match-string 2 msg))

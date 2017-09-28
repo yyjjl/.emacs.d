@@ -108,39 +108,50 @@ for a file to visit if current buffer is not visiting a file."
                 :caller 'counsel-sudo-edit)
     (find-file (concat "/sudo:root@localhost:" buffer-file-name))))
 
-(defun core%ivy-switch-buffer-transformer (str)
-  "Transform STR to more readable format."
-  (let ((buf (get-buffer str))
-        (width (frame-width))
-        (right-side ""))
-    (cond
-     (buf (with-current-buffer buf
-            (setq right-side
-                  (propertize (format "%s" major-mode)
-                              'face 'warning))))
-     ((and (eq ivy-virtual-abbreviate 'full)
-           (file-name-directory str))
-      (setq right-side (abbreviate-file-name (file-name-directory str)))
-      (setq str (propertize (file-name-nondirectory str)
-                            'face 'ivy-virtual))))
-    (concat str
-            (make-string (max 2 (- width (+ (length str)
-                                            (length right-side))))
-                         ?\s)
-            right-side)))
-
 (with-eval-after-load 'ivy
-  (define-key!
-    :map ivy-minibuffer-map
-    ("C-j" . ivy-immediate-done)
-    ("C-M-j" . ivy-done)
-    ("!" . core/ivy-external-file))
+  (defun core%ivy-switch-buffer-transformer (str)
+    "Transform STR to more readable format."
+    (let ((buf (get-buffer str))
+          (width (frame-width))
+          (right-side ""))
+      (cond
+       (buf (with-current-buffer buf
+              (setq right-side
+                    (propertize (format "%s" major-mode)
+                                'face 'warning))))
+       ((and (eq ivy-virtual-abbreviate 'full)
+             (file-name-directory str))
+        (setq right-side (abbreviate-file-name (file-name-directory str)))
+        (setq str (propertize (file-name-nondirectory str)
+                              'face 'ivy-virtual))))
+      (concat str
+              (make-string (max 2 (- width (+ (length str)
+                                              (length right-side))))
+                           ?\s)
+              right-side)))
+  (defun core%counsel-bookmark-transformer (x)
+    "Transform STR to more readable format."
+    (let ((width (frame-width))
+          (right-side "")
+          (bm (bookmark-get-bookmark-record x)))
+      (when bm
+        (setq right-side
+              (concat (file-name-nondirectory (cdr (assoc 'filename bm)))
+                      (propertize (format " [%d]" (cdr (assoc 'position bm)))
+                                  'face 'warning))))
+      (concat (propertize x 'face 'font-lock-string-face)
+              (make-string (max 2 (- width (+ (length x)
+                                              (length right-side))))
+                           ?\s)
+              right-side)))
 
   (dolist (caller '(ivy-switch-buffer
                     counsel-kill-buffer
                     internal-complete-buffer))
     (ivy-set-display-transformer caller #'core%ivy-switch-buffer-transformer))
 
+  (ivy-set-display-transformer 'counsel-bookmark
+                               #'core%counsel-bookmark-transformer)
   (defun core/ivy-external-file ()
     (interactive)
     (setq ivy--all-candidates
@@ -149,19 +160,25 @@ for a file to visit if current buffer is not visiting a file."
           (ivy--filter ivy-text ivy--all-candidates)))
 
   (require 'ivy-hydra)
-  (setq ivy-dispatching-done-columns 3)
 
+  (setq ivy-dispatching-done-columns 3)
   (setq ivy-count-format "(%d/%d) ")
+
   (setq ivy-re-builders-alist
         '( ;; Use regex as default
           ;; (swiper . core/re-builder-pinyin)
           ;; (swiper-multi . core/re-builder-pinyin)
           ;; (counsel-find-file . core/re-builder-pinyin)
           (t . ivy--regex-plus)))
-
   (setq ivy-initial-inputs-alist nil)
   (setq ivy-use-virtual-buffers t)
-  (setq ivy-virtual-abbreviate 'full))
+  (setq ivy-virtual-abbreviate 'full)
+
+  (define-key!
+    :map ivy-minibuffer-map
+    ("C-j" . ivy-immediate-done)
+    ("C-M-j" . ivy-done)
+    ("!" . core/ivy-external-file)))
 
 (defun swiper/dispatch (&optional $arg)
   (interactive "p")
@@ -181,7 +198,6 @@ for a file to visit if current buffer is not visiting a file."
     ("C-x w =" . ivy-push-view))
   (define-key! :prefix "C-c i"
     ("r" . ivy-resume)
-    ("6" . counsel-up-directory)
     ("l" . counsel-load-library)
     ("t" . counsel-load-theme)
     ("p" . counsel-list-processes)

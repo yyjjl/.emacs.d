@@ -122,6 +122,10 @@
                  "python3"))
   (setq python-shell-prompt-detect-failure-warning nil)
   (elpy-enable)
-  (remove-hook 'python-mode-hook 'elpy-mode))
+  (remove-hook 'python-mode-hook 'elpy-mode)
+
+  (define-hook! python|python-inferior-setup (inferior-python-mode-hook)
+    (remove-hook 'comint-output-filter-functions
+                 #'python-pdbtrack-comint-output-filter-function)))
 
 (provide 'init-python)

@@ -46,12 +46,12 @@
     (sdcv-search-word word)))
 
 (with-eval-after-load 'shackle
-  (defvar shackle-mode-map
-    (define-key! :map (make-sparse-keymap)
-      ("l" . core/last-popup-window)
-      ("d" . core/popup-sdcv)
-      ("b" . core/display-buffer)
-      ("RET" . core/fix-popup-window)))
+  (defvar shackle-mode-map (make-sparse-keymap))
+  (define-key! :map shackle-mode-map
+    ("l" . core/last-popup-window)
+    ("d" . core/popup-sdcv)
+    ("b" . core/display-buffer)
+    ("RET" . core/fix-popup-window))
 
   (global-set-key (kbd "C-z") shackle-mode-map)
   (global-set-key (kbd "C-x m") #'view-echo-area-messages)
@@ -73,18 +73,26 @@
                    (not (minibuffer-window-active-p win)))
           (delete-window win)))))
 
-  (defun core*close-popup-window (&rest _)
-    "When `C-g' pressed, close latest opened popup window"
+  (defun core%clean-window-list ()
     ;; Remove inactive window
     (setq core--shackle-popup-window-list
-          (--filter (window-live-p it) core--shackle-popup-window-list))
+          (--filter (window-live-p (car it))
+                    core--shackle-popup-window-list)))
+
+  (defun core*close-popup-window (&rest _)
+    "When `C-g' pressed, close latest opened popup window"
+    (core%clean-window-list)
     (let ((quit? (called-interactively-p 'interactive))
-          (window (car core--shackle-popup-window-list)))
+          (window (caar core--shackle-popup-window-list))
+          (buffer (cdar core--shackle-popup-window-list)))
       ;; `C-g' can deactivate region
       (when (and (not (region-active-p))
                  (window-live-p window)
+                 (equal (window-buffer window) buffer)
                  (not (one-window-p)))
-        (delete-window window))))
+        (delete-window window)))
+    (core%clean-window-list))
+
   ;; Can not be advised `:after', keyboard-quit signal `quit'
   (advice-add 'keyboard-quit :before #'core*close-popup-window)
   (advice-add 'other-window :before #'core*close-popup-window)
@@ -97,11 +105,13 @@
                   (length (cdr root)))))
       (setq shackle-default-size (min 0.4 (/ 1.0 num))))
 
+    (core%clean-window-list)
+
     (let ((window (funcall $fn $buffer $alist $plist))
-          (inhibit-autoclose? (plist-get $plist :inhibit-autoclose)))
-      (unless inhibit-autoclose?
+          (autoclose? (plist-get $plist :autoclose)))
+      (when autoclose?
         ;; Add to autoclose list
-        (push window core--shackle-popup-window-list))
+        (push (cons window $buffer) core--shackle-popup-window-list))
       (with-current-buffer $buffer
         ;; Record popup window
         (setq core--shackle-popup-window window))
@@ -114,20 +124,19 @@
         shackle-default-size 0.4
         shackle-default-rule nil
         shackle-rules
-        '(("*sdcv*" :align below :size 15 :select t)
+        '(("*sdcv*" :align below :size 15 :select t :autoclose t)
           ((:custom
             (lambda (buffer)
               (or (derived-mode? 'comint-mode buffer)
                   (memq (buffer-local-value 'major-mode buffer)
                         '(term-mode inferior-ess-mode)))))
-           :size 0.4 :align below :select t :inhibit-autoclose t)
-          (help-mode :align below :select t)
-          (ivy-occur-grep-mode :inhibit-autoclose t
-                               :select t :align core%shackle-align)
-          (grep-mode :inhibit-autoclose t
-                     :select t :align core%shackle-align)
-          (occur-mode :inhibit-autoclose t
-                      :select t :align core%shackle-align)
-          ("^\\*.*?\\*" :regexp t :select t :align core%shackle-align))))
+           :size 0.4 :align below :select t)
+          (help-mode :align below :select t :autoclose t)
+          (messages-buffer-mode :select t :align blew :autoclose t)
+          (ivy-occur-grep-mode :select t :align core%shackle-align)
+          (grep-mode :select t :align core%shackle-align)
+          (occur-mode :select t :align core%shackle-align)
+          ("^\\*.*?\\*"
+           :regexp t :select t :align core%shackle-align :autoclose t))))
 
 (provide 'core-popups)

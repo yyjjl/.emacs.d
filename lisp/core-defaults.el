@@ -201,11 +201,7 @@
 
   ;; Load private configuration
   (ignore-errors (load-file custom-file))
-  (message "Init Time: %s" (emacs-init-time))
-  (run-with-timer 1 nil
-                  (lambda ()
-                    (find-file-noselect (expand-var! "org/*note*"))
-                    (enable-theme 'molokai))))
+  (message "Init Time: %s" (emacs-init-time)))
 
 
 

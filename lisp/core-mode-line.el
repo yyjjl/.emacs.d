@@ -104,19 +104,19 @@ and `buffer-file-coding-system'"
 (defvar mode-line-active? nil)
 (defvar mode-line-default-format '("%e" (:eval (mode-line%generate))))
 (defvar mode-line-config-alist
-  '((mode-line%inactive? (mode-line%window-number
-                          mode-line%buffer-id
-                          mode-line%buffer-major-mode)
-                         (mode-line%process)
-                         :no-tail
-                         :no-center)
-    (mode-line%use-special? (mode-line%window-number
+  '((mode-line%use-special? (mode-line%window-number
                              mode-line%buffer-id
                              mode-line%buffer-major-mode
                              mode-line%buffer-status)
                             (mode-line%process)
                             :no-tail
                             :no-center)
+    (mode-line%inactive? (mode-line%window-number
+                          mode-line%buffer-id
+                          mode-line%buffer-major-mode)
+                         (mode-line%process)
+                         nil
+                         :no-center)
     (t (mode-line%window-number
         mode-line%buffer-id
         mode-line%buffer-major-mode
@@ -128,7 +128,7 @@ and `buffer-file-coding-system'"
   (not mode-line-active?))
 
 (defun mode-line%use-special? ($bn)
-  (or (memq major-mode '(dired-mode lisp-interaction-mode))
+  (or (memq major-mode '(dired-mode))
       (and (not (derived-mode-p 'text-mode 'prog-mode))
            (string-match-p "^\\*" $bn))))
 

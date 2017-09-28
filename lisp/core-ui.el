@@ -42,13 +42,15 @@
      #b11000000
      #b11000000
      #b11111111
-     #b11111111]))
+     #b11111111])
+  (set-fringe-bitmap-face 'right-curly-arrow 'warning)
+  (set-fringe-bitmap-face 'left-curly-arrow 'warning))
 
 (setq-default
  ;; disable bidirectional text for tiny performance boost
  bidi-display-reordering nil
  blink-matching-paren nil
- cursor-in-non-selected-windows nil
+ cursor-in-non-selected-windows t
  display-line-numbers-width 3
  frame-inhibit-implied-resize t
  ;; Remove continuation arrow on right fringe

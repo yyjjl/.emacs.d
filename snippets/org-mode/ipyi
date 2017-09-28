@@ -2,7 +2,7 @@
 # name: ipython import
 # key: ipyi
 # --
-#+BEGIN_SRC ipython :session $1 :exports code
+#+begin_src ipython :session $1 :exports code
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -15,4 +15,4 @@ def df_to_org(df):
     return "\n".join([row_to_org(df.columns)] +
                      [row_to_org(row) for row in df.values])}
 $0
-#+END_SRC
+#+end_src

@@ -58,30 +58,6 @@
 (define-hook! extra|restclient-setup (restclient-mode-hook)
   (add-to-list 'company-backends 'company-restclient))
 
-(defconst extra-ascii-before-chinese
-  (rx (group-n 1 (in "a-zA-Z0-9!@#$%^&\\-+|)\\]}\\:;?><.,/"))
-      (group-n 2 (category chinese-two-byte))))
-(defconst extra-ascii-after-chinese
-  (rx (group-n 1 (category chinese-two-byte))
-      (group-n 2 (in "a-zA-Z0-9@#$%^&\\-+|(\\[{\\></"))))
-
-(defun extra/insert-space-around-chinese (&optional $start $end)
-  (interactive)
-  (if (region-active-p)
-      (setq $start (region-beginning)
-            $end (region-end))
-    (setq $start (point-min)
-          $end (point-max)))
-  (save-excursion
-    (goto-char $start)
-    (while (re-search-forward extra-ascii-before-chinese $end t)
-      (replace-match "\\1 \\2" nil nil))
-    (goto-char $start)
-    (while (re-search-forward extra-ascii-after-chinese $end t)
-      (replace-match "\\1 \\2" nil nil))))
-
-(global-set-key (kbd "M-Q") 'extra/insert-space-around-chinese)
-
 (defun extra/clipboard-copy ($beg $end)
   (interactive "r")
   (if (display-graphic-p)

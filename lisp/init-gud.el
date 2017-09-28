@@ -92,13 +92,12 @@
   :keymap gud--source-mode-map
   (if gud-source-mode
       (progn
-        (setq gud--source-buffer-status
-              (list buffer-read-only header-line-format))
-        (setq header-line-format "GUD source file, press `q' to exit")
+        (setq gud--source-buffer-status (list buffer-read-only))
+        (add-hook 'global-mode-string "GS")
         (setq buffer-read-only t))
     (when gud--source-buffer-status
-      (setq buffer-read-only (car gud--source-buffer-status))
-      (setq header-line-format (cadr gud--source-buffer-status))))
+      (remove-hook 'global-mode-string "GS")
+      (setq buffer-read-only (car gud--source-buffer-status))))
   (force-mode-line-update))
 
 (defun gud*find-file-hack ($fn $file)

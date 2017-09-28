@@ -14,7 +14,8 @@
                (< (buffer-size) core-large-buffer-size))
       (apply $fn $args)))
   (advice-add 'nlinum-mode :around #'core*disable-linum-mode))
-;; Slow down emacs
+
+(defalias 'linum-mode 'nlinum-mode)
 (global-nlinum-mode 1)
 
 (provide 'init-linum-mode)

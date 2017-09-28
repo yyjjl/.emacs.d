@@ -10,13 +10,19 @@
     (highlight-indentation-mode 1))
   ;; show trailing spaces in a programming mode
   (setq show-trailing-whitespace t)
-  (setq  indicate-empty-lines t))
+  ;; (setq indicate-empty-lines t)
+  )
 
 (define-hook! core|generic-text-mode-setup (text-mode-hook)
-  (setq  indicate-empty-lines t)
   (hl-line-mode 1)
   (company-mode 1)
-  (auto-fill-mode 1))
+  (auto-fill-mode 1)
+  ;; (setq indicate-empty-lines t)
+  )
+
+(define-hook! core|generic-comint-mode-setup (comint-mode-hook)
+  (company-mode 1)
+  (setq-local company-idle-delay nil))
 
 (setq flycheck-keymap-prefix (kbd "C-c f"))
 (with-eval-after-load 'flycheck
@@ -39,7 +45,8 @@
 
 (with-eval-after-load 'yasnippet
   (add-to-list 'auto-mode-alist '("\\.yasnippet\\'" . snippet-mode))
-  (setq yas-prompt-functions '(yas-completing-prompt)))
+  (setq yas-prompt-functions '(yas-completing-prompt))
+  (setq-default yas-indent-line 'fixed))
 
 (with-eval-after-load 'isearch
   (define-key isearch-mode-map (kbd "C-o") 'isearch-occur))
@@ -68,7 +75,7 @@
                          "M-o" "C-x" "C-c" "C-z"))
 
 ;; Smart tab
-(defvar core--indent-close-list '(?\) ?\} ?\$ ?\] ?\' ?\` ?\"))
+(defvar core--indent-close-list '(?\} ?\$ ?\] ?\' ?\` ?\"))
 (defun core%indent-for-tab ($fn &rest $arg)
   (cond ((or (not (called-interactively-p 'interactive))
              (use-region-p))

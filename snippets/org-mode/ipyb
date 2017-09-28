@@ -2,7 +2,10 @@
 # name: ipython block
 # key: ipyb
 # --
-#+BEGIN_SRC ipython :session ${1::file ${2:figure.svg} }:exports ${3:both} ${4::async t} :tangle yes :comments org
+#+header: :session ${1::ipyfile ${2:figure.svg}}
+#+header: :results raw drawer
+#+header: :tangle yes :comments org
+#+begin_src ipython :exports ${3:both} ${4::async t} 
 $0
-#+END_SRC
+#+end_src
     

@@ -34,7 +34,13 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
     "Expand org template."
     (insert $str)
     (org-try-structure-completion)
-    (when $mod (insert $mod) (forward-line))))
+    (when $mod (insert $mod) (forward-line)))
+
+  (define-key org-mode-map
+    "<" (lambda!
+          (if (looking-back "^\\s-*" (line-beginning-position))
+              (hydra-org-template/body)
+            (self-insert-command 1)))))
 
 (defhydra hydra-resize-window (:color pink)
   "shrink"
