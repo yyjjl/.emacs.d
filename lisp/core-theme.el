@@ -243,6 +243,8 @@
 
  '(diredp-dir-heading ((((background dark))
                         (:inherit font-lock-keyword-face))))
+ '(diredp-file-name ((((background dark))
+                      (:inherit font-lock-comment-face :italic nil))))
 
  '(haskell-keyword-face ((t (:inherit font-lock-builtin-face))))
  '(haskell-type-face ((t (:inherit font-lock-constant-face))))
@@ -252,7 +254,7 @@
  '(js2-function-call ((t (:inherit font-lock-regexp-grouping-backslash))))
 
  '(easy-kill-selection ((t (:inverse-video t :inherit warning ))))
- '(nlinum-current-line ((t (:inherit font-lock-variable-name-face))))
+ '(nlinum-current-line ((t (:inherit font-lock-builtin-face))))
  '(semantic-highlight-func-current-tag-face ((t (:background "gray5"))))
  '(shm-current-face ((t (:underline (:style line :color "blue")))))
  '(ivy-highlight-face ((t (:background "#444155")))))

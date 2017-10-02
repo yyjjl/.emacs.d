@@ -108,27 +108,50 @@ other characters."
     (while (re-search-forward extra-ascii-after-chinese $end t)
       (replace-match "\\1 \\2" nil nil))))
 
+(defun forward-defun (&optional $N)
+  (interactive "p")
+  (forward-thing 'defun $N))
+
+(defun backward-defun (&optional $N)
+  (interactive "p")
+  (forward-thing 'defun (- $N)))
+
 (define-key!
   ("M-Q" . extra/insert-space-around-chinese)
   ("M-;" . evilnc-comment-or-uncomment-lines)
   ("C-x n n" . core/narrow-or-widen-dwim)
   ("C-x K" . core/kill-regexp)
+  ("M-]" . forward-sexp)
+  ("M-[" . backward-sexp)
+  ("C-M-f" . forward-defun)
+  ("C-M-b" . backward-defun)
 
-  ("C-=" . mc/mark-next-like-this)
-  ("C--" . mc/mark-previous-like-this)
-  ("C-+" . mc/skip-to-next-like-this)
-  ("C-_" . mc/skip-to-previous-like-this))
+  ("C-=" . hydra-mc/mc/mark-next-like-this)
+  ("C--" . hydra-mc/mc/mark-previous-like-this))
 
-(define-key! :prefix "C-c m"
-  ("P" . mc/mark-pop)
-  ("m" . mc/mark-all-like-this-dwim)
-  ("l" . mc/edit-lines)
-  ("e" . mc/edit-ends-of-lines)
-  ("a" . mc/edit-beginnings-of-lines)
-  ("i" . mc/insert-numbers)
-  ("L" . mc/insert-letters)
-  ("s" . mc/sort-regions)
-  ("R" . mc/reverse-regions))
+(defhydra hydra-mc (:color pink :hint nil)
+  "
+_=_ next        _-_ previous       _[_ skip-previous  _]_ skip-next
+_e_ end-of-line _a_ begin-of-line  _i_ number         _L_ letter
+_m_ mark-dwim   _s_ sort           _r_ reverse        _v_ align
+_l_ edit        _q_ quit
+"
+  ("=" mc/mark-next-like-this)
+  ("-" mc/mark-previous-like-this)
+  ("[" mc/skip-to-previous-like-this)
+  ("]" mc/skip-to-next-like-this)
+  ("l" mc/edit-lines :exit t)
+  ("e" mc/edit-ends-of-lines :exit t)
+  ("a" mc/edit-beginnings-of-lines :exit t)
+  ("i" mc/insert-numbers :exit t)
+  ("L" mc/insert-letters :exit t)
+  ("m" mc/mark-all-like-this-dwim :exit t)
+  ("s" mc/sort-regions :exit t)
+  ("v" mc/vertical-align :exit t)
+  ("r" mc/reverse-regions :exit t)
+  ("q" nil :exit t))
+
+(global-set-key (kbd "C-c m") #'hydra-mc/body)
 
 (with-eval-after-load 'picture
   (defhydra hydra-picture-move ()

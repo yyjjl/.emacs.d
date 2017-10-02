@@ -109,46 +109,42 @@ for a file to visit if current buffer is not visiting a file."
     (find-file (concat "/sudo:root@localhost:" buffer-file-name))))
 
 (with-eval-after-load 'ivy
-  (defun core%ivy-switch-buffer-transformer (str)
+  (defun core%ivy-switch-buffer-transformer ($left-str)
     "Transform STR to more readable format."
-    (let ((buf (get-buffer str))
-          (width (frame-width))
-          (right-side ""))
+    (let ((buffer (get-buffer $left-str))
+          (right-str ""))
       (cond
-       (buf (with-current-buffer buf
-              (setq right-side
-                    (propertize (format "%s" major-mode)
-                                'face 'warning))))
+       (buffer (setq right-str
+                     (propertize (format "%s"
+                                         (buffer-local-value 'major-mode
+                                                             buffer))
+                                 'face 'warning)))
        ((and (eq ivy-virtual-abbreviate 'full)
-             (file-name-directory str))
-        (setq right-side (abbreviate-file-name (file-name-directory str)))
-        (setq str (propertize (file-name-nondirectory str)
-                              'face 'ivy-virtual))))
-      (concat str
-              (make-string (max 2 (- width (+ (length str)
-                                              (length right-side))))
-                           ?\s)
-              right-side)))
-  (defun core%counsel-bookmark-transformer (x)
+             (file-name-directory $left-str))
+        (setq right-str (abbreviate-file-name
+                         (file-name-directory $left-str)))
+        (setq $left-str (propertize (file-name-nondirectory $left-str)
+                                    'face 'ivy-virtual))))
+      (format-line! $left-str right-str)))
+
+  (defun core%counsel-bookmark-transformer ($left-str)
     "Transform STR to more readable format."
-    (let ((width (frame-width))
-          (right-side "")
-          (bm (bookmark-get-bookmark-record x)))
+    (let ((right-str "")
+          (bm (bookmark-get-bookmark-record $left-str)))
       (when bm
-        (setq right-side
+        (setq right-str
               (concat (file-name-nondirectory (cdr (assoc 'filename bm)))
-                      (propertize (format " [%d]" (cdr (assoc 'position bm)))
+                      (propertize (format " [%d]"
+                                          (cdr (assoc 'position bm)))
                                   'face 'warning))))
-      (concat (propertize x 'face 'font-lock-string-face)
-              (make-string (max 2 (- width (+ (length x)
-                                              (length right-side))))
-                           ?\s)
-              right-side)))
+      (format-line! (propertize $left-str 'face 'font-lock-string-face)
+                    right-str)))
 
   (dolist (caller '(ivy-switch-buffer
                     counsel-kill-buffer
                     internal-complete-buffer))
-    (ivy-set-display-transformer caller #'core%ivy-switch-buffer-transformer))
+    (ivy-set-display-transformer caller
+                                 #'core%ivy-switch-buffer-transformer))
 
   (ivy-set-display-transformer 'counsel-bookmark
                                #'core%counsel-bookmark-transformer)
@@ -212,7 +208,7 @@ for a file to visit if current buffer is not visiting a file."
     ("g q" . counsel-git-grep-query-replace)
     ("g s" . counsel-git-stash)
     ("h" . counsel-shell-command-history)
-    ("m" . counsel-tmm)
+    ("m" . counsel-mark-ring)
     ("a" . counsel-ag)
     ("/" . counsel-grep)
     ("s" . counsel-semantic)
@@ -226,6 +222,7 @@ for a file to visit if current buffer is not visiting a file."
     ("e" . counsel-sudo-edit)
     ("o" . counsel-outline))
 
+  (add-to-list 'counsel-linux-apps-directories "~/.local/share/applications")
   (setq counsel-yank-pop-separator
         "\n------------------------------------------------------------\n")
   (setq counsel-find-file-at-point t)

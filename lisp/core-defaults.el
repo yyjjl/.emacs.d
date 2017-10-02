@@ -45,6 +45,7 @@
  ;; update ui less often
  idle-update-delay 2
  ;; keep the point out of the minibuffer
+ mark-ring-max 128
  minibuffer-prompt-properties
  '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt)
  ;; History & backup settings (save nothing, that's what git is for)

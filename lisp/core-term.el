@@ -141,11 +141,31 @@ none exists, or if the current buffer is already a term."
     (call-interactively (if (and command (term%after-prompt?))
                             #'term-send-raw
                           command))))
+(defun term/define-send-string (string)
+  (interactive)
+  `(lambda!
+     (let ((command (global-key-binding (this-command-keys))))
+       (if (and command (term%after-prompt?))
+           (term-send-raw-string ,string)
+         (call-interactively command)))))
 
 (with-eval-after-load 'multi-term
   (add-hook 'term-mode-hook 'multi-term-keystroke-setup)
   (setq multi-term-scroll-to-bottom-on-output t)
   (setq multi-term-program (or term-zsh-path term-bash-path))
+
+  (defun term-send-backward-word ()
+    (interactive)
+    (if (term%after-prompt?)
+        (term-send-raw-string "\eb")
+      (call-interactively #'backward-word)))
+
+  (defun term-send-forward-word ()
+    (interactive)
+    (if (term%after-prompt?)
+        (term-send-raw-string "\ef")
+      (call-interactively #'forward-word)))
+
   (setq term-bind-key-alist
         '(("C-c C-c" . term-interrupt-subjob)
           ("C-c C-e" . term-send-esc)

@@ -3,4 +3,4 @@
 # key: ap
 # --
 \path
-(${1:from}) edge ${2:[${3:edge-props}]} node ${4:[${5:text-props}]} (${6:to});
+(${1:from}) edge ${2:[${3:edge-props}]} node ${4:[${5:text-props}]} ${6:{${7:text}}} (${8:to});

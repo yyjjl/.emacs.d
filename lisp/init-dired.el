@@ -1,5 +1,6 @@
 ;; Improve `dired-mode'
 (require! 'dired+)
+(require! 'all-the-icons-dired)
 
 
 
@@ -27,6 +28,7 @@ The app is chosen from your OS's preference."
   (define-hook! dired|setup (dired-mode-hook)
     (setq mode-line-buffer-identification
           '("%b" (dired-omit-mode " (omit)")))
+    (all-the-icons-dired-mode 1)
     (dired-hide-details-mode 1))
 
   (setq dired-dwim-target t)

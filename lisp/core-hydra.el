@@ -130,7 +130,9 @@ _d_: subtree
 Current thing: %s(current-forward-thing)
 [_p_/_n_] line      [_u_/_v_] scroll   [_b_/_f_] thing
 [_a_/_e_] begin/end [_m_/_x_] mark     [_SPC_] scroll
-[_l_] center      [,] change thing    [_q_] quit
+[_s_] symbol      [_c_] char         [_e_] list
+[_d_] defun       [_w_] word
+[_l_] center      [_q_] quit
 "
   ("q" nil :exit t)
   ("n" next-line)
@@ -139,11 +141,11 @@ Current thing: %s(current-forward-thing)
   ("b" backward-thing*)
   ("a" beginning-of-line)
   ("e" move-end-of-line)
-  (", s" (setq current-forward-thing 'symbol))
-  (", c" (setq current-forward-thing 'char))
-  (", w" (setq current-forward-thing 'word))
-  (", d" (setq current-forward-thing 'defun))
-  (", l" (setq current-forward-thing 'list))
+  ("s" (setq current-forward-thing 'symbol))
+  ("c" (setq current-forward-thing 'char))
+  ("w" (setq current-forward-thing 'word))
+  ("d" (setq current-forward-thing 'defun))
+  ("e" (setq current-forward-thing 'list))
   ("v" scroll-up-command)
   ("SPC" scroll-up-command)
   ("u" scroll-down-command)
@@ -166,11 +168,13 @@ Current thing: %s(current-forward-thing)
 
 (defhydra hydra-move-other-window (:color pink :hint nil)
   "
-[_p_/_n_] line      [_u_/_v_] scroll [_SPC_] scroll [_q_] quit
+[_u_/_v_] scroll [_SPC_] scroll [_p_/_n_] line [_l_] recenter [_q_] quit
 "
   ("q" nil :exit t)
   ("n" forward-line-other-window)
   ("p" backward-line-other-window)
+  ("l" (with-selected-window (next-window)
+         (recenter-top-bottom)))
   ("v" scroll-other-window)
   ("SPC" scroll-other-window)
   ("u" scroll-other-window-down))

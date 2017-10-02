@@ -134,9 +134,14 @@
           (help-mode :align below :select t :autoclose t)
           (messages-buffer-mode :select t :align blew :autoclose t)
           (ivy-occur-grep-mode :select t :align core%shackle-align)
+          (ivy-occur-mode :select t :align core%shackle-align)
           (grep-mode :select t :align core%shackle-align)
           (occur-mode :select t :align core%shackle-align)
+          ;; Man-mode don't work !!?
+          ("^\\*Man.*\\*$"
+           :regexp t :size 0.5 :select t :align core%shackle-align)
+          (Info-mode :size 0.5 :select t)
           ("^\\*.*?\\*"
-           :regexp t :select t :align core%shackle-align :autoclose t))))
+           :regexp t :noselect t :align core%shackle-align :autoclose t))))
 
 (provide 'core-popups)

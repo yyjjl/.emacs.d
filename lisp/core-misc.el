@@ -41,7 +41,9 @@
 
 (with-eval-after-load 'projectile
   (setq projectile-completion-system 'ivy)
-  (setq projectile-enable-caching t))
+  (setq projectile-enable-caching t)
+  (add-hook 'kill-emacs-hook
+            #'projectile-cleanup-known-projects))
 
 (with-eval-after-load 'yasnippet
   (add-to-list 'auto-mode-alist '("\\.yasnippet\\'" . snippet-mode))
@@ -91,9 +93,11 @@
            (and outline-minor-mode (looking-at-p outline-regexp)))
          (outline-toggle-children))
         ;; Trigger completions
-        ((looking-back "\\(?:\\s_\\|\\sw\\)\\{2,\\}\\(?:\\.\\|->\\)?"
-                       (max (point-min) (- (point) 5)))
-         (call-interactively #'hippie-expand))
+        ((and (looking-back "\\(?:\\s_\\|\\sw\\)\\{2,\\}\\(?:\\.\\|->\\)?"
+                            (max (point-min) (- (point) 5)))
+              (not (memq (get-text-property (- (point) 1) 'face)
+                         '(font-lock-string-face font-lock-doc-face))))
+         (call-interactively 'hippie-expand))
         ;; Default behavior
         (t (apply $fn $arg))))
 (advice-add 'indent-for-tab-command :around #'core%indent-for-tab)
@@ -206,7 +210,7 @@ Does not indent buffer, because it is used for a
     (delete-region $start $end)
     (save-excursion
       (goto-char $start)
-      (print value (current-buffer))
+      (prin1 value (current-buffer))
       (activate-mark 1)
       (goto-char $start))))
 

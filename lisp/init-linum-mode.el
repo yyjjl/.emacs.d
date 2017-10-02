@@ -16,6 +16,6 @@
   (advice-add 'nlinum-mode :around #'core*disable-linum-mode))
 
 (defalias 'linum-mode 'nlinum-mode)
-(global-nlinum-mode 1)
+;; (global-nlinum-mode 1)
 
 (provide 'init-linum-mode)

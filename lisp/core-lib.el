@@ -142,6 +142,15 @@ file `PATTERNS'."
     (with-current-buffer $buf
       (derived-mode-p $modes))))
 
+(defun format-line! ($left-str $right-str)
+  (concat $left-str
+          (make-string (max 2 (- (frame-width)
+                                 (+ (string-width $left-str)
+                                    (string-width $right-str)
+                                    (if window-system 0 1))))
+                       ?\s)
+          $right-str))
+
 (defun remap! ($old $new &optional $map)
   "Remap keybindings whose prefix is OLD-KEY to NEW-KEY in
 MAP (default `global-map')."

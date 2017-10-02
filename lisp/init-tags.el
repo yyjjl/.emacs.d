@@ -22,6 +22,7 @@
           ("SPC" . ggtags-save-to-register)
           ("%" . ggtags-query-replace)))
   (define-key ggtags-mode-map "\C-c" nil)
+  (define-key ggtags-mode-map (kbd "M-]") nil)
   (define-key ggtags-mode-map ggtags-mode-prefix-key ggtags-mode-prefix-map))
 
 (provide 'init-tags)
