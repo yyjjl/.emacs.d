@@ -80,7 +80,6 @@ Emacs Lisp."
 (add-hook 'racket-mode-hook #'lisp|racket-setup)
 
 (let ((hooks '(lisp-mode-hook
-               inferior-lisp-mode-hook
                lisp-interaction-mode-hook)))
   (dolist (hook hooks)
     (add-hook hook #'lisp|common-setup)))

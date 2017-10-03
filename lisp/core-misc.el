@@ -10,15 +10,13 @@
     (highlight-indentation-mode 1))
   ;; show trailing spaces in a programming mode
   (setq show-trailing-whitespace t)
-  ;; (setq indicate-empty-lines t)
-  )
+  (setq indicate-empty-lines t))
 
 (define-hook! core|generic-text-mode-setup (text-mode-hook)
   (hl-line-mode 1)
   (company-mode 1)
   (auto-fill-mode 1)
-  ;; (setq indicate-empty-lines t)
-  )
+  (setq indicate-empty-lines t))
 
 (define-hook! core|generic-comint-mode-setup (comint-mode-hook)
   (company-mode 1)

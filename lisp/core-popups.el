@@ -62,6 +62,8 @@
 
   (defvar core--shackle-popup-window-list nil)
   (defvar-local core--shackle-popup-window nil)
+  (defvar-local core--shackle-autokill? nil)
+  (put 'core--shackle-autokill? 'permanent-local t)
   (put 'core--shackle-popup-window 'permanent-local t)
   (define-hook! core%autoclose-popup-window (kill-buffer-hook)
     "Auto close popup window after buffer killed"
@@ -73,11 +75,14 @@
                    (not (minibuffer-window-active-p win)))
           (delete-window win)))))
 
-  (defun core%clean-window-list ()
+  (defun core%clean-window-list (&optional autokill?)
     ;; Remove inactive window
     (setq core--shackle-popup-window-list
-          (--filter (window-live-p (car it))
-                    core--shackle-popup-window-list)))
+          (loop for (window . buffer) in core--shackle-popup-window-list
+                if (window-live-p window)
+                collect (cons window buffer)
+                else if (and autokill? (buffer-live-p buffer))
+                do (kill-buffer buffer))))
 
   (defun core*close-popup-window (&rest _)
     "When `C-g' pressed, close latest opened popup window"
@@ -91,7 +96,7 @@
                  (equal (window-buffer window) buffer)
                  (not (one-window-p)))
         (delete-window window)))
-    (core%clean-window-list))
+    (core%clean-window-list :autokill))
 
   ;; Can not be advised `:after', keyboard-quit signal `quit'
   (advice-add 'keyboard-quit :before #'core*close-popup-window)
@@ -105,15 +110,18 @@
                   (length (cdr root)))))
       (setq shackle-default-size (min 0.4 (/ 1.0 num))))
 
-    (core%clean-window-list)
+    (core%clean-window-list :autokill)
 
     (let ((window (funcall $fn $buffer $alist $plist))
-          (autoclose? (plist-get $plist :autoclose)))
+          (autoclose? (plist-get $plist :autoclose))
+          (autokill? (plist-get $plist :autokill)))
       (when autoclose?
         ;; Add to autoclose list
         (push (cons window $buffer) core--shackle-popup-window-list))
       (with-current-buffer $buffer
         ;; Record popup window
+        (when (and autoclose? autokill?)
+          (setq core--shackle-autokill? t))
         (setq core--shackle-popup-window window))
       window))
 
@@ -141,7 +149,9 @@
           ("^\\*Man.*\\*$"
            :regexp t :size 0.5 :select t :align core%shackle-align)
           (Info-mode :size 0.5 :select t)
+          (calendar-mode :select t :autoclose t :autokill t)
           ("^\\*.*?\\*"
-           :regexp t :noselect t :align core%shackle-align :autoclose t))))
+           :regexp t :noselect t :align core%shackle-align
+           :autoclose t :autokill t))))
 
 (provide 'core-popups)

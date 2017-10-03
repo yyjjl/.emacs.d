@@ -1,5 +1,11 @@
 (require 'package)
 
+(when (>= emacs-major-version 25)
+  ;; Do not save to init.el
+  (fset 'package--save-selected-packages
+        (lambda ($value)
+          (when $value (setq package-selected-packages $value)))))
+
 (defvar package-use-priority? nil
   "Non-nil means to use priority defined in variable `package|priority-alist'.
 Archive with high priority will be used when install a package.")
@@ -116,7 +122,7 @@ Archive with high priority will be used when install a package.")
 ;; `counsel-M-x' need smex to get history
 (require! 'smex)
 ;; Show key bindings when pressing
-;; (require! 'which-key)
+(require! 'which-key)
 (when emacs-use-fcitx-p
   (require! 'fcitx))
 ;; Numbering windows
@@ -143,14 +149,8 @@ Archive with high priority will be used when install a package.")
 (require 'core-hydra)
 
 (define-hook! package|after-init-hook (after-init-hook)
-  (when (>= emacs-major-version 25)
-    ;; Do not save to init.el
-    (fset 'package--save-selected-packages
-          (lambda ($value)
-            (when $value (setq package-selected-packages $value))))
-
-    (setq package-selected-packages
-          (hash-table-keys package--required-packages)))
+  (setq package-selected-packages
+        (hash-table-keys package--required-packages))
   (add-to-list 'recentf-exclude (file-truename package-user-dir)))
 
 (define-hook! core|enable-modes-hook (after-init-hook)
@@ -181,6 +181,7 @@ Archive with high priority will be used when install a package.")
   (when emacs-use-fcitx-p
     (fcitx-aggressive-setup))
 
+  (which-key-mode 1)
   (semantic-mode 1))
 
 (provide 'core-packages)
