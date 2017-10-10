@@ -1,7 +1,6 @@
 ;; IPython notebook feature in `org-mode'
 (require! 'ob-ipython)
 (require! 'ox-pandoc)
-(require! 'org-bullets)
 ;; Export colorful src block in `org-mode'
 (require! 'htmlize)
 (require! 'company-auctex)
@@ -126,7 +125,6 @@ With a prefix BELOW move point to lower block."
     ;; Display/update images in the buffer after I evaluate
     (org-display-inline-images t)))
 
-(setq org-bullets-bullet-list '("#"))
 ;; Do not load extra modules
 (setq org-modules '(org-info))
 ;; Do not load extra backends
@@ -244,6 +242,7 @@ With a prefix BELOW move point to lower block."
         org-hide-leading-stars t
         org-hide-block-startup t
         ;; org-startup-indented t
+        org-startup-folded 'content
         org-pretty-entities t
         org-pretty-entities-include-sub-superscripts nil
         org-format-latex-options
@@ -285,7 +284,6 @@ With a prefix BELOW move point to lower block."
       (annotation (company-auctex-symbol-annotation $arg))))
 
   (define-hook! org|setup (org-mode-hook)
-    (org-bullets-mode 1)
     (auto-fill-mode -1)
 
     (make-local-variable 'completion-at-point-functions)

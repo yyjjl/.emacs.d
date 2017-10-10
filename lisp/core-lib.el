@@ -129,6 +129,17 @@ body."
       (insert-file-contents $filename)
       (buffer-string))))
 
+(defun open! ($file-list)
+  (cond
+   ((eq system-type 'darwin)
+    (mapc (lambda (path)
+            (shell-command (concat "open " (shell-quote-argument path))))
+          $file-list))
+   ((eq system-type 'gnu/linux)
+    (mapc (lambda (path) (let ((process-connection-type nil))
+                           (start-process "" nil "xdg-open" path)))
+          $file-list))))
+
 (defun add-auto-mode! ($mode &rest $patterns)
   "Add entries to `auto-mode-alist' to use `MODE' for all given
 file `PATTERNS'."

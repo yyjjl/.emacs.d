@@ -91,8 +91,9 @@
   (interactive)
   (if cpp-has-rtags-p
       (if cpp-cmake-ide-enabled
-          (progn (cmake-ide-run-cmake)
-                 (cpp/rtags-setup))
+          (progn
+            (cmake-ide-run-cmake)
+            (cpp/rtags-setup))
         (when (cpp/rtags-indexing-with-makefile)
           (message "Rtags is ready !!")
           (cpp/rtags-setup)))
@@ -141,7 +142,7 @@
   (local-set-key [f10] 'cpp/compile)
   (local-set-key [f5] 'gdb)
 
-  (hide-ifdef-mode)
+  (hide-ifdef-mode 1)
 
   (modern-c++-font-lock-mode 1)
 
@@ -156,7 +157,7 @@
     (setq flycheck-clang-language-standard nil))
 
   (unless (or (file-remote-p default-directory)
-              (bound-and-true-p cpp/setup-literally)
+              (bound-and-true-p cpp-setup-literally)
               (> (buffer-size) core-large-buffer-size))
     (when cpp-has-irony-p
       (add-to-list 'company-backends #'company-irony)

@@ -53,7 +53,7 @@ grab matched string and insert them into `kill-ring'"
     items))
 
 ;; @see https://emacs.stackexchange.com/questions/8121/automatically-inserting-an-space-when-inserting-a-character-depending-on-the-pre
-(defvar core-punctuation-chars (string-to-list ".,:;?!")
+(defvar core-punctuation-chars (string-to-list ",:;?!")
   "List of charactesr to insert spaces after")
 
 (defvar core-punctuation-ignore-chars
@@ -129,29 +129,28 @@ other characters."
   ("C-=" . hydra-mc/mc/mark-next-like-this)
   ("C--" . hydra-mc/mc/mark-previous-like-this))
 
-(defhydra hydra-mc (:color pink :hint nil)
-  "
-_=_ next        _-_ previous       _[_ skip-previous  _]_ skip-next
-_e_ end-of-line _a_ begin-of-line  _i_ number         _L_ letter
-_m_ mark-dwim   _s_ sort           _r_ reverse        _v_ align
-_l_ edit        _q_ quit
-"
-  ("=" mc/mark-next-like-this)
-  ("-" mc/mark-previous-like-this)
-  ("[" mc/skip-to-previous-like-this)
-  ("]" mc/skip-to-next-like-this)
-  ("l" mc/edit-lines :exit t)
-  ("e" mc/edit-ends-of-lines :exit t)
-  ("a" mc/edit-beginnings-of-lines :exit t)
-  ("i" mc/insert-numbers :exit t)
-  ("L" mc/insert-letters :exit t)
-  ("m" mc/mark-all-like-this-dwim :exit t)
-  ("s" mc/sort-regions :exit t)
-  ("v" mc/vertical-align :exit t)
-  ("r" mc/reverse-regions :exit t)
-  ("q" nil :exit t))
+(define-key! :prefix "C-c m"
+  ("P" . mc/mark-pop)
+  ("m" . mc/mark-all-like-this-dwim)
+  ("l" . mc/edit-lines)
+  ("e" . mc/edit-ends-of-lines)
+  ("a" . mc/edit-beginnings-of-lines)
+  ("i" . mc/insert-numbers)
+  ("L" . mc/insert-letters)
+  ("s" . mc/sort-regions)
+  ("v" . mc/vertical-align)
+  ("r" . mc/reverse-regions))
 
-(global-set-key (kbd "C-c m") #'hydra-mc/body)
+(defhydra hydra-mc (:color blue :hint nil)
+  "
+_=_ next    _-_ previous    ___ skip-previous  _+_ skip-next _q_ quit
+"
+  ("=" mc/mark-next-like-this :exit nil)
+  ("-" mc/mark-previous-like-this :exit nil)
+  ("_" mc/skip-to-previous-like-this :exit nil)
+  ("+" mc/skip-to-next-like-this :exit nil)
+  ("RET" nil)
+  ("q" nil))
 
 (with-eval-after-load 'picture
   (defhydra hydra-picture-move ()
@@ -210,10 +209,12 @@ _l_ edit        _q_ quit
 ;; `avy' jump commands
 (define-key!
   ("M-g 1" . avy-goto-char)
+  ("M-g ." . avy-goto-char-in-line)
   ("M-g 2" . avy-goto-char-2)
   ("M-g l" . avy-goto-line)
   ("M-g s" . avy-goto-symbol-1)
   ("M-g w" . avy-goto-word-1)
   ("M-g y" . avy-copy-line))
+(avy-setup-default)
 
 (provide 'init-editing)

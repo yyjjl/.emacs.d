@@ -1,6 +1,6 @@
 (add-to-list 'mode-line-config-alist
              '(exwm%exwm-window? (exwm%mode-line-workspace
-                                  mode-line%exwm-button
+                                  ;; mode-line%exwm-button
                                   mode-line%buffer-id)
                                  ()
                                  :no-tail
@@ -26,22 +26,31 @@
                        ,mouse-1-action)))
                 map)))
 
-(defun mode-line%exwm-button ()
-  (list " "
-        (exwm%create-button
-         'mode-line "[X]" 'error
-         '(kill-buffer))
-        " "
-        (exwm%create-button
-         'mode-line "[-]" 'font-lock-builtin-face
-         '(if (one-window-p)
-              (switch-to-buffer (other-buffer))
-            (delete-window)))
-        ;; " "
-        ;; (exwm%create-button
-        ;;  'mode-line "[T]" 'warning
-        ;;  '(exwm-floating-toggle-floating))
-        ))
+;; (defun mode-line%exwm-button ()
+;;   (list " "
+;;         (exwm%create-button
+;;          'mode-line "[X]" 'error
+;;          '(kill-buffer))
+;;         " "
+;;         (exwm%create-button
+;;          'mode-line "[-]" 'font-lock-builtin-face
+;;          '(if (one-window-p)
+;;               (switch-to-buffer (other-buffer))
+;;             (delete-window)))
+;;         " "
+;;         (exwm%create-button
+;;          'mode-line "[T]" 'warning
+;;          '(exwm-floating-toggle-floating))))
+
+;; set $ws_chrome "2:"
+;; set $ws_nautilus "3:"
+;; set $ws_doc "4:"
+;; set $ws_display "5:"
+;; set $ws_office "6:"
+;; set $ws_remote "7:"
+
+;; (defvar workspace-icon-list
+;;   '("" "" ""))
 
 (defun exwm%mode-line-workspace ()
   (when mode-line-active?
@@ -50,7 +59,7 @@
                           exwm-workspace-current-index))
   (let ((index (window-parameter (selected-window) 'workspace-index)))
     (list (mode-line%window-number)
-          (propertize (format " W%s" (or index "?"))
+          (propertize (format "W%s" (or index "?"))
                       'face font-lock-string-face))))
 
 (provide 'exwm-mode-line)

@@ -33,6 +33,7 @@
   (setq hippie-expand-try-functions-list
         '(try-complete-file-name-partially
           try-complete-file-name
+          try-expand-all-abbrevs
           try-expand-dabbrev
           try-expand-dabbrev-all-buffers
           try-expand-dabbrev-from-kill)))
@@ -77,27 +78,27 @@
 ;; Smart tab
 (defvar core--indent-close-list '(?\} ?\$ ?\] ?\' ?\` ?\"))
 (defun core%indent-for-tab ($fn &rest $arg)
-  (cond ((or (not (called-interactively-p 'interactive))
-             (use-region-p))
-         (apply $fn $arg))
-        ;; Skip close paren
-        ((memq (char-after) core--indent-close-list)
-         (apply $fn $arg)
-         (when (memq (char-after) core--indent-close-list)
-           (forward-char 1)))
-        ;; Toggle outline
-        ((save-excursion
-           (forward-line 0)
-           (and outline-minor-mode (looking-at-p outline-regexp)))
-         (outline-toggle-children))
-        ;; Trigger completions
-        ((and (looking-back "\\(?:\\s_\\|\\sw\\)\\{2,\\}\\(?:\\.\\|->\\)?"
-                            (max (point-min) (- (point) 5)))
-              (not (memq (get-text-property (- (point) 1) 'face)
-                         '(font-lock-string-face font-lock-doc-face))))
-         (call-interactively 'hippie-expand))
-        ;; Default behavior
-        (t (apply $fn $arg))))
+  (let ((old-point (point))
+        (old-tick (buffer-chars-modified-tick)))
+    (apply $fn $arg)
+    (when (and (eq old-point (point))
+               (eq old-tick (buffer-chars-modified-tick))
+               (called-interactively-p 'interactive))
+      (cond ;; Skip close paren
+       ((memq (char-after) core--indent-close-list)
+        (forward-char 1))
+       ;; Toggle outline
+       ((save-excursion
+          (forward-line 0)
+          (and outline-minor-mode (looking-at-p outline-regexp)))
+        (outline-toggle-children))
+       ;; Trigger completions
+       ((and (looking-back "\\(?:\\s_\\|\\sw\\)\\{2,\\}\\(?:.\\|->\\)?"
+                           (max (point-min) (- (point) 5)))
+             (not (memq (get-text-property (- (point) 1) 'face)
+                        '(font-lock-string-face font-lock-doc-face)))
+             (not (eq tab-always-indent 'complete)))
+        (call-interactively 'hippie-expand))))))
 (advice-add 'indent-for-tab-command :around #'core%indent-for-tab)
 
 ;; Delete the current file

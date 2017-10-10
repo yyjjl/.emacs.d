@@ -1,10 +1,4 @@
-(defvar emacs-config-directory
-  (expand-file-name "lisp" user-emacs-directory)
-  "All configuration in this directory")
 (defvar exwm-config-directory (file-name-directory load-file-name))
-
-;; Add `emacs-config-directory' to `load-path'
-(add-to-list 'load-path emacs-config-directory)
 (add-to-list 'load-path exwm-config-directory)
 
 (require 'exwm-init)
@@ -14,16 +8,17 @@
 (require 'exwm-randr)
 (require 'exwm-systemtray)
 
-(defvar exwm-buffer-name-format "[EXWM: %s] %s")
-(defvar exwm-buffer-name-regexp "^ ?\\[EXWM: ")
+(defvar exwm-buffer-name-format "#[%s] %s")
+(defvar exwm-buffer-name-regexp "^ ?#\\[")
 
 (require 'exwm-mode-line)
 (require 'exwm-keybindings)
+(require 'exwm-apps)
 
 (setq exwm-systemtray-height 24)
 (setq exwm-systemtray-icon-gap 5)
 
-(setq exwm-randr-workspace-output-plist '(0 "eDP-1" 1 "HDMI-1"))
+(setq exwm-randr-workspace-output-plist '(0 "eDP-1" 3 "HDMI-1"))
 (add-hook 'exwm-randr-screen-change-hook
           (lambda ()
             (start-process-shell-command
@@ -36,20 +31,6 @@
 ;; Set floating window border
 (setq exwm-floating-border-width 1)
 (setq exwm-floating-border-color "black")
-
-(defun exwm/use-exwm ()
-  (interactive)
-  (let ((file (expand-file-name "~/.xinitrc")))
-    (when (file-exists-p file)
-      (rename-file file
-                   (expand-file-name "~/.xsessionrc")))))
-
-(defun exwm/use-unity ()
-  (interactive)
-  (let ((file (expand-file-name "~/.xsessionrc")))
-    (when (file-exists-p file)
-      (rename-file file
-                   (expand-file-name "~/.xinitrc")))))
 
 (define-hook! exwm|floating-setup-hook (exwm-floating-setup-hook)
   (when (string-match "unity-control-center.*" exwm-instance-name)

@@ -70,10 +70,12 @@
   ("i" "C-c i")
   ("r" "C-x r")
   ("v" "C-c C-v")
+  ("x" "C-c C-x")
   ("4" "C-x 4")
   ("5" "C-x 5")
   ("p" "C-c p")
-  ("b" "C-c b"))
+  ("b" "C-c b")
+  ("," switch-to-buffer))
 
 (global-set-key "," #'comma-hydra-invoker)
 (define-hook! comma-hydra|setup-hook (c-mode-common-hook)

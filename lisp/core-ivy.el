@@ -148,12 +148,6 @@ for a file to visit if current buffer is not visiting a file."
 
   (ivy-set-display-transformer 'counsel-bookmark
                                #'core%counsel-bookmark-transformer)
-  (defun core/ivy-external-file ()
-    (interactive)
-    (setq ivy--all-candidates
-          (ivy--filter core-external-file-regexp ivy--all-candidates))
-    (setq ivy--all-candidates
-          (ivy--filter ivy-text ivy--all-candidates)))
 
   (require 'ivy-hydra)
 
@@ -173,8 +167,7 @@ for a file to visit if current buffer is not visiting a file."
   (define-key!
     :map ivy-minibuffer-map
     ("C-j" . ivy-immediate-done)
-    ("C-M-j" . ivy-done)
-    ("!" . core/ivy-external-file)))
+    ("C-M-j" . ivy-done)))
 
 (defun swiper/dispatch (&optional $arg)
   (interactive "p")
@@ -194,9 +187,10 @@ for a file to visit if current buffer is not visiting a file."
     ("C-x w =" . ivy-push-view))
   (define-key! :prefix "C-c i"
     ("r" . ivy-resume)
-    ("l" . counsel-load-library)
-    ("t" . counsel-load-theme)
-    ("p" . counsel-list-processes)
+    ("l l" . counsel-load-library)
+    ("l t" . counsel-load-theme)
+    ("l p" . counsel-list-processes)
+    ("l f" . counsel-find-library)
     ("u" . counsel-unicode-char)
     ("i" . counsel-semantic-or-imenu)
     ("x" . counsel-linux-app)
@@ -204,23 +198,23 @@ for a file to visit if current buffer is not visiting a file."
     ("j" . counsel-file-jump)
     ("g t" . counsel-git)
     ("g l" . counsel-git-log)
-    ("g g " . counsel-git-grep)
+    ("g g" . counsel-git-grep)
     ("g q" . counsel-git-grep-query-replace)
     ("g s" . counsel-git-stash)
     ("h" . counsel-shell-command-history)
     ("m" . counsel-mark-ring)
     ("a" . counsel-ag)
     ("/" . counsel-grep)
-    ("s" . counsel-semantic)
     ("L" . counsel-locate)
-    ("d f" . counsel-describe-face)
-    ("f s" . counsel-find-symbol)
-    ("f f" . counsel-faces)
-    ("f l" . counsel-find-library)
-    ("c w" . counsel-colors-web)
-    ("c e" . counsel-colors-emacs)
+    ("f" . counsel-describe-face)
+    ("S" . counsel-find-symbol)
+    ("F" . counsel-faces)
+    ("W" . counsel-colors-web)
+    ("E" . counsel-colors-emacs)
     ("e" . counsel-sudo-edit)
-    ("o" . counsel-outline))
+    ("o" . counsel-outline)
+    ("t" . counsel-tmm)
+    ("<tab>" . counsel-company))
 
   (add-to-list 'counsel-linux-apps-directories "~/.local/share/applications")
   (setq counsel-yank-pop-separator

@@ -182,6 +182,6 @@ Archive with high priority will be used when install a package.")
     (fcitx-aggressive-setup))
 
   (which-key-mode 1)
-  (semantic-mode 1))
+  (core/enable-semantic))
 
 (provide 'core-packages)

@@ -2,14 +2,15 @@
 # name: automata
 # key: automata
 # --
-\documentclass{standalone}
+\documentclass[preview]{standalone}
 \usepackage{amsmath,amsfonts,amssymb,amsthm,bm,upgreek}
 \usepackage{pgf}
 \usepackage{tikz}
-
-\usetikzlibrary{arrows,automata, calc, shapes, shapes.geometric, fit}
 \usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usetikzlibrary{arrows,automata, calc, shapes, shapes.geometric, fit}
 
+\captionsetup{labelformat=empty}
 \tikzset{every state/.style = {draw=red!50,very thick,fill=red!10}}
 \tikzset{accepting/.style = {double,draw=green!50,fill=green!10}}
 \tikzset{->,>=stealth',shorten >=1pt,

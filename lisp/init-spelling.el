@@ -40,70 +40,16 @@
       ;; Restore our own ispell arguments
       (setq ispell-extra-args old-ispell-extra-args)
       (ispell-kill-ispell t)))
-  (advice-add 'ispell-word :around #'spelling*set-extra-args)
-  (advice-add 'flyspell-auto-correct-word :around #'spelling*set-extra-args))
+  (advice-add 'ispell-word :around #'spelling*set-extra-args))
 
-(with-eval-after-load 'flyspell
-  (defun spelling*turn-off-fly ()
-    "Do not check on the fly"
-    (remove-hook 'post-command-hook (function flyspell-post-command-hook) t)
-    (remove-hook 'pre-command-hook (function flyspell-pre-command-hook) t)
-    (remove-hook 'after-change-functions 'flyspell-after-change-function t)
-    (remove-hook 'hack-local-variables-hook
-                 #'flyspell-hack-local-variables-hook t))
-  (advice-add 'flyspell-mode-on :after #'spelling*turn-off-fly)
+(defun spelling/ispell-line-or-region ($start $end)
+  (interactive (if (region-active-p)
+                   (list (region-beginning)
+                         (region-end))
+                 (list (line-beginning-position)
+                       (line-end-position))))
+  (ispell-region $start $end))
 
-  ;; flyspell set up for web-mode
-  (defun web|flyspell-verify ()
-    (let ((f (get-text-property (- (point) 1) 'face)))
-      (not (memq f '(web-mode-html-attr-value-face
-                     web-mode-html-tag-face
-                     web-mode-html-attr-name-face
-                     web-mode-constant-face
-                     web-mode-doctype-face
-                     web-mode-keyword-face
-                     web-mode-comment-face ;; focus on get html label right
-                     web-mode-function-name-face
-                     web-mode-variable-name-face
-                     web-mode-css-property-name-face
-                     web-mode-css-selector-face
-                     web-mode-css-color-face
-                     web-mode-type-face
-                     web-mode-block-control-face)))))
-  (put 'web-mode 'flyspell-mode-predicate 'web|flyspell-verify)
-
-  ;;  `flyspell' setup for js2-mode
-  (defun js2|flyspell-verify ()
-    (let* ((f (get-text-property (- (point) 1) 'face)))
-      ;; Only words with following font face will be checked
-      (memq f '(js2-function-call
-                js2-function-param
-                js2-object-property
-                font-lock-variable-name-face
-                font-lock-string-face
-                font-lock-function-name-face
-                font-lock-builtin-face
-                rjsx-tag
-                rjsx-attr))))
-  (put 'js2-mode 'flyspell-mode-predicate 'js2|flyspell-verify)
-
-  (defun spelling/flyspell-line-or-region ($start $end)
-    (interactive (if (region-active-p)
-                     (list (region-beginning)
-                           (region-end))
-                   (list (line-beginning-position)
-                         (line-end-position))))
-    (flyspell-region $start $end))
-
-  (setq flyspell-issue-message-flag nil
-        flyspell-large-region 1)
-  (define-key! :map flyspell-mode-map
-    ("C-,")
-    ("C-.")
-    ("C-M-i")
-    ("C-;" . spelling/flyspell-line-or-region)))
-
-(add-hook 'prog-mode-hook 'flyspell-prog-mode)
-(add-hook 'text-mode-hook 'flyspell-mode)
+(global-set-key (kbd "C-;") #'spelling/ispell-line-or-region)
 
 (provide 'init-spelling)

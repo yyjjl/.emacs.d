@@ -1,5 +1,6 @@
 ;; Improve `dired-mode'
 (require! 'dired+)
+(require! 'dired-narrow)
 (require! 'all-the-icons-dired)
 
 
@@ -14,15 +15,7 @@ The app is chosen from your OS's preference."
          (do-it-p (or (<= (length file-list) 5)
                       (y-or-n-p "Open more than 5 files? "))))
     (when do-it-p
-      (cond
-       ((eq system-type 'darwin)
-        (mapc (lambda (path)
-                (shell-command (concat "open " (shell-quote-argument path))))
-              file-list))
-       ((eq system-type 'gnu/linux)
-        (mapc (lambda (path) (let ((process-connection-type nil))
-                               (start-process "" nil "xdg-open" path)))
-              file-list))))))
+      (open! file-list))))
 
 (with-eval-after-load 'dired
   (define-hook! dired|setup (dired-mode-hook)
@@ -40,7 +33,9 @@ The app is chosen from your OS's preference."
 
   (define-key! :map dired-mode-map
     (")" . dired-omit-mode)
-    ("E" . dired/open-externally))
+    ("E" . dired/open-externally)
+    ("/" . dired-narrow-fuzzy)
+    ("\\" . dired-narrow))
 
   (require 'dired-x)
   (require 'dired+)

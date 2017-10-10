@@ -169,10 +169,9 @@
  '(org-block-begin-line ((t (:foreground "#B3E5FC" :background "#1E2930"))))
  '(org-block-end-line ((t (:foreground "#B3E5FC" :background "#1E2930"))))
 
- '(org-level-1 ((t (:inherit outline-1
+ '(org-level-1 ((t (:inherit outline-1 :weight bold :overline t
                              ;; :background "grey20"
-                             :weight bold
-                             :overline t))))
+                             ))))
  '(org-level-2 ((t (:inherit outline-2
                              ;; :background "grey20"
                              ))))

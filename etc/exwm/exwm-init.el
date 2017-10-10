@@ -1,3 +1,10 @@
+(defvar emacs-config-directory
+  (expand-file-name "lisp" user-emacs-directory)
+  "All configuration in this directory")
+
+;; Add `emacs-config-directory' to `load-path'
+(add-to-list 'load-path emacs-config-directory)
+
 ;; All packages required in this section are defined in `init-packages'
 (require 'core-lib)
 ;; Set some important variables
@@ -37,9 +44,7 @@
 (window-numbering-mode 1)
 (setq-default mode-line-format mode-line-default-format)
 (setq-default mode-line-buffer-identification '("%b"))
-(setq-default mode-line-misc-info
-              '((global-mode-string ("" global-mode-string " "))
-                (iedit-mode (:eval (format "Iedit:%d" (iedit-counter))))))
+(setq-default mode-line-misc-info nil)
 
 
 (provide 'exwm-init)

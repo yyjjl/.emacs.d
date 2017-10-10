@@ -79,7 +79,8 @@
     ;; Remove inactive window
     (setq core--shackle-popup-window-list
           (loop for (window . buffer) in core--shackle-popup-window-list
-                if (window-live-p window)
+                if (and (window-live-p window)
+                        (equal (window-buffer window) buffer))
                 collect (cons window buffer)
                 else if (and autokill? (buffer-live-p buffer))
                 do (kill-buffer buffer))))
@@ -110,8 +111,6 @@
                   (length (cdr root)))))
       (setq shackle-default-size (min 0.4 (/ 1.0 num))))
 
-    (core%clean-window-list :autokill)
-
     (let ((window (funcall $fn $buffer $alist $plist))
           (autoclose? (plist-get $plist :autoclose))
           (autokill? (plist-get $plist :autokill)))
@@ -129,18 +128,18 @@
               :around #'core*shackle-display-buffer-hack)
 
   (setq shackle-default-alignment 'below
-        shackle-default-size 0.4
+        shackle-default-size 0.5
         shackle-default-rule nil
         shackle-rules
-        '(("*sdcv*" :align below :size 15 :select t :autoclose t)
+        '(("*sdcv*" :align t :size 15 :select t :autoclose t)
           ((:custom
             (lambda (buffer)
               (or (derived-mode? 'comint-mode buffer)
                   (memq (buffer-local-value 'major-mode buffer)
                         '(term-mode inferior-ess-mode)))))
-           :size 0.4 :align below :select t)
-          (help-mode :align below :select t :autoclose t)
-          (messages-buffer-mode :select t :align blew :autoclose t)
+           :size 0.4 :align t :select t)
+          (help-mode :align t :select t :autoclose t)
+          (messages-buffer-mode :select t :align t :autoclose t)
           (ivy-occur-grep-mode :select t :align core%shackle-align)
           (ivy-occur-mode :select t :align core%shackle-align)
           (grep-mode :select t :align core%shackle-align)
@@ -152,6 +151,29 @@
           (calendar-mode :select t :autoclose t :autokill t)
           ("^\\*.*?\\*"
            :regexp t :noselect t :align core%shackle-align
-           :autoclose t :autokill t))))
+           :autoclose t :autokill t)))
+  ;; Do not split in popup-buffer
+  (defun display-buffer-pop-up-window (buffer alist)
+    (let ((frame (or (window--frame-usable-p (selected-frame))
+                     (window--frame-usable-p (last-nonminibuffer-frame))))
+          window)
+      (when (and (or (not (frame-parameter frame 'unsplittable))
+                     ;; If the selected frame cannot be split, look at
+                     ;; `last-nonminibuffer-frame'.
+                     (and (eq frame (selected-frame))
+                          (setq frame (last-nonminibuffer-frame))
+                          (window--frame-usable-p frame)
+                          (not (frame-parameter frame 'unsplittable))))
+                 ;; Attempt to split largest or least recently used window.
+                 (setq window (or (let ((win (get-largest-window frame t)))
+                                    (unless (assoc win core--shackle-popup-window-list)
+                                      (window--try-to-split-window win alist)))
+                                  (let ((win (get-lru-window frame t)))
+                                    (unless (assoc win core--shackle-popup-window-list)
+                                      (window--try-to-split-window win alist))))))
+        (prog1 (window--display-buffer
+                buffer window 'window alist display-buffer-mark-dedicated)
+          (unless (cdr (assq 'inhibit-switch-frame alist))
+            (window--maybe-raise-frame (window-frame window))))))))
 
 (provide 'core-popups)

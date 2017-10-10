@@ -1,15 +1,16 @@
 (defun mode-line%window-number ()
-  (let* ((narrow-p (buffer-narrowed-p))
-         (num-str (concat
-                   (if narrow-p "<" " ")
-                   (and (bound-and-true-p window-numbering-mode)
-                        (ignore-errors (window-numbering-get-number-string)))
-                   (if narrow-p ">" " "))))
-    (add-face-text-property 0 (length num-str)
-                            '(:background "black"
-                                          :box (:line-width 5 :color "black"))
-                            nil num-str)
-    num-str))
+  (if (bound-and-true-p window-numbering-mode)
+      (let* ((narrow-p (buffer-narrowed-p))
+             (num-str (concat
+                       (if narrow-p "<" " ")
+                       (ignore-errors (window-numbering-get-number-string))
+                       (if narrow-p ">" " "))))
+        (add-face-text-property 0 (length num-str)
+                                '(:background "black"
+                                              :box (:line-width 5 :color "black"))
+                                nil num-str)
+        num-str)
+    ""))
 
 (defun mode-line%buffer-id ()
   "Display buffer id in mode-line.

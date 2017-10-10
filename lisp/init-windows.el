@@ -71,10 +71,12 @@
         align)
     (cond
      ((eq $align ?-)
-      (setq new-window (split-window-vertically (round (* ratio (window-height))))
+      (setq new-window (split-window-vertically
+                        (round (* ratio (window-height))))
             align :horizontal))
      ((eq $align ?|)
-      (setq new-window (split-window-horizontally (round (* ratio (window-width))))
+      (setq new-window (split-window-horizontally
+                        (round (* ratio (window-width))))
             align :vertical))
      (t
       (message "Nothing to do !!!")))

@@ -44,4 +44,13 @@
   (core/semanticdb-parse-directory $dir $regex t)
   (semanticdb-save-all-db))
 
+(defun core/enable-semantic ()
+  (semantic-mode 1)
+  (remove-hook 'completion-at-point-functions
+               'semantic-analyze-completion-at-point-function)
+  (remove-hook 'completion-at-point-functions
+               'semantic-analyze-notc-completion-at-point-function)
+  (remove-hook 'completion-at-point-functions
+               'semantic-analyze-nolongprefix-completion-at-point-function))
+
 (provide 'core-semantic)
