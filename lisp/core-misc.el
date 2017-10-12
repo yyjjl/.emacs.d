@@ -1,7 +1,6 @@
 ;; Default prog-mode setup
 (define-hook! core|generic-prog-mode-setup (prog-mode-hook
                                             LaTeX-mode-hook)
-  (company-mode 1)
   (hs-minor-mode 1)
   (flycheck-mode 1)
   (hl-line-mode 1)
@@ -14,12 +13,10 @@
 
 (define-hook! core|generic-text-mode-setup (text-mode-hook)
   (hl-line-mode 1)
-  (company-mode 1)
   (auto-fill-mode 1)
   (setq indicate-empty-lines t))
 
 (define-hook! core|generic-comint-mode-setup (comint-mode-hook)
-  (company-mode 1)
   (setq-local company-idle-delay nil))
 
 (setq flycheck-keymap-prefix (kbd "C-c f"))

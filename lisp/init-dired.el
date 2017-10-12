@@ -31,18 +31,20 @@ The app is chosen from your OS's preference."
   (setq dired-recursive-deletes 'always)
   (setq wdired-allow-to-change-permissions t)
 
-  (define-key! :map dired-mode-map
-    (")" . dired-omit-mode)
-    ("E" . dired/open-externally)
-    ("/" . dired-narrow-fuzzy)
-    ("\\" . dired-narrow))
-
   (require 'dired-x)
   (require 'dired+)
   (setq dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$\\|^\\..*$"))
 
 (with-eval-after-load 'dired+
-  (diredp-toggle-find-file-reuse-dir 1))
+  (diredp-toggle-find-file-reuse-dir 1)
+  (define-key! :map dired-mode-map
+    (")" . dired-omit-mode)
+    ("E" . dired/open-externally)
+    ("/" . dired-narrow-fuzzy)
+    ("\\" . dired-narrow)
+    ("M-p" . dired-prev-subdir)
+    ("M-n" . dired-next-subdir)
+    (";" . dired-kill-subdir)))
 
 
 (provide 'init-dired)

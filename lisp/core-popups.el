@@ -122,6 +122,7 @@
         (when (and autoclose? autokill?)
           (setq core--shackle-autokill? t))
         (setq core--shackle-popup-window window))
+      (set-window-dedicated-p window t)
       window))
 
   (advice-add 'shackle-display-buffer
@@ -136,7 +137,10 @@
             (lambda (buffer)
               (or (derived-mode? 'comint-mode buffer)
                   (memq (buffer-local-value 'major-mode buffer)
-                        '(term-mode inferior-ess-mode)))))
+                        '(term-mode inferior-ess-mode))
+                  (let ((case-fold-search t))
+                    (string-match-p "^\\*.*repl.*\\*$"
+                                    (buffer-name buffer))))))
            :size 0.4 :align t :select t)
           (help-mode :align t :select t :autoclose t)
           (messages-buffer-mode :select t :align t :autoclose t)

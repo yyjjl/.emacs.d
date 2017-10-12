@@ -35,6 +35,19 @@
   (setq slime-net-coding-system 'utf-8-unix)
   (setq slime-complete-symbol*-fancy t))
 
+(with-eval-after-load 'graphviz-dot-mode
+  (defun extra/dot-complete ()
+    (let* ((b (save-excursion (skip-chars-backward "a-zA-Z0-9_") (point)))
+           (e (save-excursion (skip-chars-forward "a-zA-Z0-9_") (point)))
+           (graphviz-dot-str (buffer-substring b e))
+           (allcomp (all-completions graphviz-dot-str
+                                     (graphviz-dot-get-keywords))))
+      (list b e allcomp)))
+
+  (setq graphviz-dot-auto-indent-on-semi nil)
+  (define-hook! extra|setup-dot (graphviz-dot-mode-hook)
+    (add-to-list 'completion-at-point-functions 'extra/dot-complete)))
+
 (with-eval-after-load 'grep
   (dolist (v core-ignored-directories)
     (add-to-list 'grep-find-ignored-directories v)))

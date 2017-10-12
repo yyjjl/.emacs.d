@@ -48,7 +48,7 @@
       (message (shell-command-to-string
                 (format "pdf2svg %s.pdf %s.svg" fn fn)))
       (if (file-exists-p output-file)
-          (display-buffer
+          (pop-to-buffer
            (find-file-noselect output-file))
         (message "Something wrong !!!"))))
 

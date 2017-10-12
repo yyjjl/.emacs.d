@@ -163,6 +163,7 @@ Archive with high priority will be used when install a package.")
   (counsel-projectile-on)
   (yas-global-mode 1)
   (shackle-mode 1)
+  (global-company-mode 1)
 
   ;; global-modes
   (global-subword-mode 1)

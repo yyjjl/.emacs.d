@@ -41,6 +41,7 @@
  compilation-always-kill t
  compilation-scroll-output t
  confirm-nonexistent-file-or-buffer t
+ delete-by-moving-to-trash t
  enable-recursive-minibuffers nil
  ;; update ui less often
  idle-update-delay 2

@@ -249,8 +249,7 @@ With a prefix BELOW move point to lower block."
         (plist-put org-format-latex-options :scale 1.8)
         org-highlight-latex-and-related '(latex)
         org-src-fontify-natively t
-        org-latex-create-formula-image-program 'imagemagick
-        org-export-use-babel nil)
+        org-latex-create-formula-image-program 'imagemagick)
 
   (add-to-list 'org-babel-tangle-lang-exts '("ipython" . "py"))
   (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))

@@ -4,7 +4,8 @@
 ;; pair edit
 (require! 'lispy)
 (when lisp-has-racket-p
-  (require! 'racket-mode "melpa-stable"))
+  (require! 'racket-mode "melpa-stable")
+  (require! 'geiser))
 (require! 'macrostep)
 ;; slime
 ;; slime-company
@@ -32,19 +33,6 @@
   (prettify-symbols-mode -1)
   (lispy-mode 1)
   (local-set-key (kbd "M-,") 'xref-pop-marker-stack))
-
-(defun lisp|racket-setup ()
-  (lisp|common-setup)
-  (rainbow-delimiters-mode 1)
-  ;; (setq eldoc-documentation-function 'racket-eldoc-function)
-  (when (buffer-temporary?)
-    (setq completion-at-point-functions nil))
-  (setq flycheck-check-syntax-automatically
-        '(save mode-enabled))
-
-  (racket-unicode-input-method-enable)
-  (with-local-minor-mode-map! 'lispy-mode
-    (lispy-define-key it "e" #'racket-eval-sexp)))
 
 ;; Hippie-expand
 (defun lisp%hippie-expand-setup ()
@@ -80,6 +68,7 @@ Emacs Lisp."
 (add-hook 'racket-mode-hook #'lisp|racket-setup)
 
 (let ((hooks '(lisp-mode-hook
+               scheme-mode-hook
                lisp-interaction-mode-hook)))
   (dolist (hook hooks)
     (add-hook hook #'lisp|common-setup)))
@@ -110,30 +99,8 @@ Emacs Lisp."
      ("\\_<@?\\(\\$\\(?:\\sw\\|\\s_\\)+\\)"
       (1 font-lock-constant-face nil nil)))))
 
-(with-eval-after-load 'racket-mode
-  (add-to-list 'lispy-goto-symbol-alist
-               '(racket-mode racket-visit-definition racket-mode))
-  ;; Hide error message when racket script is not loaded
-  (defun lisp*racket-complete-at-point-advice ($fn &rest $args)
-    (when (and (buffer-file-name) (racket--in-repl-or-its-file-p))
-      (let ((result (apply $fn $args)))
-        (when result
-          (delete 'racket--get-type (delete :company-docsig result))))))
-  (advice-add 'racket-complete-at-point
-              :around #'lisp*racket-complete-at-point-advice)
-
-  (defun racket-eval-sexp ()
-    (interactive)
-    (unless (region-active-p)
-      (lispy-mark-list 1))
-    (call-interactively #'racket-send-region))
-
-  ;; Use `ivy' as default completion backends
-  (defun racket--read-identifier ($prompt $default)
-    (ivy-read $prompt
-              (racket--get-namespace-symbols)
-              :initial-input $default
-              :preselect $default)))
+(with-eval-after-load 'geiser
+  (add-to-list 'lispy-elisp-modes 'scheme-mode))
 
 (with-eval-after-load 'elisp-mode
   (define-key emacs-lisp-mode-map (kbd "C-c e") 'macrostep-expand)
