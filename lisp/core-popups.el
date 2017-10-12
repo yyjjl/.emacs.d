@@ -156,6 +156,7 @@
           ("^\\*.*?\\*"
            :regexp t :noselect t :align core%shackle-align
            :autoclose t :autokill t)))
+
   ;; Do not split in popup-buffer
   (defun display-buffer-pop-up-window (buffer alist)
     (let ((frame (or (window--frame-usable-p (selected-frame))

@@ -15,7 +15,6 @@
   ;; emacs 24.4 only
   (setq electric-indent-chars (delq ?: electric-indent-chars))
   (unless (buffer-temporary?)
-    ;; (prettify-symbols-mode 1)
     ;; run command `pip install jedi flake8 importmagic` in shell,
     ;; or just check https://github.com/jorgenschaefer/elpy
     (semantic-idle-summary-mode -1)
@@ -116,27 +115,6 @@
         (message "Can not find where is the class")))))
 
 (with-eval-after-load 'python
-  ;; (setq python--prettify-symbols-alist
-  ;;       (core/make-symbols-alsit
-  ;;        '(("def" . ?ℱ)
-  ;;          ("not" . ?¬)
-  ;;          ("and" . ?∧)
-  ;;          ("or" . ?∨)
-  ;;          ("in" . ?∈)
-  ;;          ("not in" . ?∉)
-  ;;          ("for" . ?∀)
-  ;;          (">=" . ?≥)
-  ;;          ("<=" . ?≤)
-  ;;          ;; Base Types
-  ;;          ("int" . ?ℤ)
-  ;;          ("float" . ?ℝ)
-  ;;          ("True" . ?𝕋)
-  ;;          ("False" . ?𝔽)
-  ;;          ("*" . ?×)
-  ;;          ("/" . ?÷)
-  ;;          ("lambda" . ?λ)
-  ;;          ("return" . ?⟼))))
-
   (when (boundp 'python-shell-completion-native-disabled-interpreters)
     (add-to-list 'python-shell-completion-native-disabled-interpreters
                  "jupyter")
