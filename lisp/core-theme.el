@@ -256,7 +256,7 @@
  '(easy-kill-selection ((t (:inverse-video t :inherit warning ))))
  '(nlinum-current-line ((t (:inherit font-lock-builtin-face))))
  '(semantic-highlight-func-current-tag-face ((t (:background "gray5"))))
- '(shm-current-face ((t (:underline (:style line :color "blue")))))
+ '(shm-current-face ((t (:inherit hl-line))))
  '(ivy-highlight-face ((t (:background "#444155")))))
 
 (enable-theme 'molokai)

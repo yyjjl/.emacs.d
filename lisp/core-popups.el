@@ -106,10 +106,17 @@
   (defun core*shackle-display-buffer-hack ($fn $buffer $alist $plist)
     ;; Set default size
     (let* ((root (car (window-tree)))
-           (num (if (or (atom root) (car-safe root))
+           ;; If root window is horizontally splitted
+           (num (if (or (atom root) (car root))
                     2
-                  (length (cdr root)))))
-      (setq shackle-default-size (min 0.4 (/ 1.0 num))))
+                  (length (cdr root))))
+           (align (plist-get $plist :align)))
+      (unless align
+        (setq align (core%shackle-align)
+              $plist (plist-put $plist :align align)))
+      (setq shackle-default-size
+            (min (if (memq align '(left right)) 0.5 0.4)
+                 (/ 1.0 num))))
 
     (let ((window (funcall $fn $buffer $alist $plist))
           (autoclose? (plist-get $plist :autoclose))
@@ -132,30 +139,28 @@
         shackle-default-size 0.5
         shackle-default-rule nil
         shackle-rules
-        '(("*sdcv*" :align t :size 15 :select t :autoclose t)
+        '(("*sdcv*" :align below :size 15 :select t :autoclose t)
           ((:custom
             (lambda (buffer)
               (or (derived-mode? 'comint-mode buffer)
                   (memq (buffer-local-value 'major-mode buffer)
-                        '(term-mode inferior-ess-mode))
+                        '(term-mode haskell-interactive-mode))
                   (let ((case-fold-search t))
                     (string-match-p "^\\*.*repl.*\\*$"
                                     (buffer-name buffer))))))
-           :size 0.4 :align t :select t)
-          (help-mode :align t :select t :autoclose t)
-          (messages-buffer-mode :select t :align t :autoclose t)
-          (ivy-occur-grep-mode :select t :align core%shackle-align)
-          (ivy-occur-mode :select t :align core%shackle-align)
-          (grep-mode :select t :align core%shackle-align)
-          (occur-mode :select t :align core%shackle-align)
+           :size 0.4 :align below :select t)
+          (help-mode :align below :select t :autoclose t)
+          (messages-buffer-mode :select t :align below :autoclose t)
+          (ivy-occur-grep-mode :select t)
+          (ivy-occur-mode :select t)
+          (grep-mode :select t)
+          (occur-mode :select t)
           ;; Man-mode don't work !!?
           ("^\\*Man.*\\*$"
-           :regexp t :size 0.5 :select t :align core%shackle-align)
+           :regexp t :size 0.5 :select t)
           (Info-mode :size 0.5 :select t)
           (calendar-mode :select t :autoclose t :autokill t)
-          ("^\\*.*?\\*"
-           :regexp t :noselect t :align core%shackle-align
-           :autoclose t :autokill t)))
+          ("^\\*.*?\\*" :regexp t :noselect t :autoclose t :autokill t)))
 
   ;; Do not split in popup-buffer
   (defun display-buffer-pop-up-window (buffer alist)

@@ -123,8 +123,10 @@ other characters."
   ("C-x K" . core/kill-regexp)
   ("M-]" . forward-sexp)
   ("M-[" . backward-sexp)
-  ("C-M-f" . forward-defun)
-  ("C-M-b" . backward-defun)
+  ("M-e" . forward-defun)
+  ("M-a" . backward-defun)
+  ("C-M-b" . backward-sentence)
+  ("C-M-f" . forward-sentence)
 
   ("C-=" . hydra-mc/mc/mark-next-like-this)
   ("C--" . hydra-mc/mc/mark-previous-like-this))

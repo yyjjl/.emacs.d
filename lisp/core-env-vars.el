@@ -5,6 +5,7 @@
 (defun find-library-in-directory ($name $dir)
   (setq $dir (expand-file-name $dir))
   (let ((files (directory-files $dir))
+        (default-directory $dir)
         file
         lib-path)
     (while (and (not lib-path) files)
@@ -14,7 +15,8 @@
               (if (file-directory-p file)
                   (ignore-errors (find-library-in-directory $name file))
                 (and (string= file $name)
-                     (expand-file-name file $dir))))))))
+                     (expand-file-name file $dir))))))
+    lib-path))
 
 (defun python-has-module ($modules &optional $script)
   "Check python whether has MODULES"
