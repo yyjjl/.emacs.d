@@ -1,5 +1,6 @@
-(set-fontset-font t '(#Xe100 . #Xe16f) "Fira Code Symbol")
-(define-hook! extra|font-setup (after-make-frame-functions)
+;; Set symbol font
+(set-fontset-font t '(57600 . 57711) "Fira Code Symbol")
+(define-hook! (extra|font-setup frame) (after-make-frame-functions)
   (set-fontset-font t '(57600 . 57711) "Fira Code Symbol"))
 
 (defun extra/make-fix-width-symbol (alist)
@@ -59,8 +60,7 @@
 
 (define-hook! extra|prettify-symbols-setup (prog-mode-hook text-mode-hook)
   (setq prettify-symbols-alist
-        fira-code-font-lock-keywords-alist))
-
-(global-prettify-symbols-mode 1)
+        fira-code-font-lock-keywords-alist)
+  (prettify-symbols-mode 1))
 
 (provide 'init-prettify-symbols)

@@ -1,12 +1,11 @@
-(defvar! js2-has-tern-p (executable-find "tern")
-  "Js context sensitive completion")
+(setvar! js2-has-tern-p (executable-find "tern"))
 
-(require! 'js-doc)
-(require! 'js2-mode)
-(require! 'js2-refactor)
-(when js2-has-tern-p
-  (require! 'company-tern)
-  (require! 'tern))
+(require-packages!
+ js-doc
+ js2-mode
+ js2-refactor
+ (tern :when js2-has-tern-p)
+ (company-tern :when js2-has-tern-p))
 
 
 

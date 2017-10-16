@@ -14,8 +14,6 @@
                          hash-table-keys))
   (autoload sym "subr-x" nil nil 'macro))
 
-(defvar core-debug-mode nil)
-
 (defmacro lambda! (&rest $body)
   "A shortcut for inline interactive lambdas."
   (declare (doc-string 1) (indent defun))

@@ -1,7 +1,8 @@
 ;; Improve `dired-mode'
-(require! 'dired+)
-(require! 'dired-narrow)
-(require! 'all-the-icons-dired)
+(require-packages! 
+ dired+
+ dired-narrow
+ all-the-icons-dired)
 
 
 

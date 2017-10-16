@@ -1,19 +1,3 @@
-;; (autoload 'pinyinlib-build-regexp-char "pinyinlib" nil nil)
-;; (defun core/pinyin-regexp-helper (char)
-;;   (cond ((equal char ?\s) ".*")
-;;         (t (or (pinyinlib-build-regexp-char char) ""))))
-
-;; (defun core%pinyinlib-build-regexp-string (str)
-;;   (when (and (> (length str) 0)
-;;              (equal (substring str 0 1) "?"))
-;;     (mapconcat 'core/pinyin-regexp-helper
-;;                (cdr (string-to-list str))
-;;                "")))
-
-;; (defun core/re-builder-pinyin (str)
-;;   (or (core%pinyinlib-build-regexp-string str)
-;;       (ivy--regex-plus str)))
-
 (defun core/semantic--create ($tags $depth &optional $class $result)
   "Write the contents of TAGS to the current buffer."
   (let ((class $class)
@@ -108,38 +92,38 @@ for a file to visit if current buffer is not visiting a file."
                 :caller 'counsel-sudo-edit)
     (find-file (concat "/sudo:root@localhost:" buffer-file-name))))
 
+(defun core%ivy-switch-buffer-transformer ($left-str)
+  "Transform STR to more readable format."
+  (let ((buffer (get-buffer $left-str))
+        (right-str ""))
+    (cond
+     (buffer (setq right-str
+                   (propertize (format "%s"
+                                       (buffer-local-value 'major-mode
+                                                           buffer))
+                               'face 'warning)))
+     ((and (eq ivy-virtual-abbreviate 'full)
+           (file-name-directory $left-str))
+      (setq right-str (abbreviate-file-name
+                       (file-name-directory $left-str)))
+      (setq $left-str (propertize (file-name-nondirectory $left-str)
+                                  'face 'ivy-virtual))))
+    (format-line! $left-str right-str)))
+
+(defun core%counsel-bookmark-transformer ($left-str)
+  "Transform STR to more readable format."
+  (let ((right-str "")
+        (bm (bookmark-get-bookmark-record $left-str)))
+    (when bm
+      (setq right-str
+            (concat (file-name-nondirectory (cdr (assoc 'filename bm)))
+                    (propertize (format " [%d]"
+                                        (cdr (assoc 'position bm)))
+                                'face 'warning))))
+    (format-line! (propertize $left-str 'face 'font-lock-string-face)
+                  right-str)))
+
 (with-eval-after-load 'ivy
-  (defun core%ivy-switch-buffer-transformer ($left-str)
-    "Transform STR to more readable format."
-    (let ((buffer (get-buffer $left-str))
-          (right-str ""))
-      (cond
-       (buffer (setq right-str
-                     (propertize (format "%s"
-                                         (buffer-local-value 'major-mode
-                                                             buffer))
-                                 'face 'warning)))
-       ((and (eq ivy-virtual-abbreviate 'full)
-             (file-name-directory $left-str))
-        (setq right-str (abbreviate-file-name
-                         (file-name-directory $left-str)))
-        (setq $left-str (propertize (file-name-nondirectory $left-str)
-                                    'face 'ivy-virtual))))
-      (format-line! $left-str right-str)))
-
-  (defun core%counsel-bookmark-transformer ($left-str)
-    "Transform STR to more readable format."
-    (let ((right-str "")
-          (bm (bookmark-get-bookmark-record $left-str)))
-      (when bm
-        (setq right-str
-              (concat (file-name-nondirectory (cdr (assoc 'filename bm)))
-                      (propertize (format " [%d]"
-                                          (cdr (assoc 'position bm)))
-                                  'face 'warning))))
-      (format-line! (propertize $left-str 'face 'font-lock-string-face)
-                    right-str)))
-
   (dolist (caller '(ivy-switch-buffer
                     counsel-kill-buffer
                     internal-complete-buffer))

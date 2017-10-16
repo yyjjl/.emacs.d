@@ -1,5 +1,7 @@
-(require! 'auctex)
-(require! 'company-auctex)
+
+(require-packages!
+ auctex
+ company-auctex)
 
 
 

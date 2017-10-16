@@ -81,6 +81,23 @@ Archive with high priority will be used when install a package.")
            (let ((inhibit-message t))
              (package-install $pkg-name))))))
 
+(defmacro require-packages! (&rest pkg-list)
+  (declare (indent nil))
+  (let (forms)
+    (dolist (pkg pkg-list)
+      (push (if (atom pkg)
+                `(require! ',pkg)
+              (let ((when-form (plist-get (cdr pkg) :when))
+                    (form `(require! ',(car pkg)
+                                     ,(plist-get (cdr pkg) :archive)
+                                     ,(plist-get (cdr pkg) :location))))
+                (if when-form
+                    `(if ,when-form ,form)
+                  form)))
+            forms))
+    `(progn
+       ,@(nreverse forms))))
+
 (defun core/compile-config (&optional $no-message?)
   (interactive "P")
   (message "Compile configuration files ...")
@@ -103,41 +120,40 @@ Archive with high priority will be used when install a package.")
 ;; ----------------------------------------
 ;; Core packages
 ;; ----------------------------------------
-(require! 'yasnippet)
-;; Code completion framework
-(require! 'flycheck "melpa-stable")
-(require! 'company)
-(require! 'company-statistics)
-;; Save session to disk
-(require! 'session)
-;; Improve `term-mode'
-(require! 'multi-term)
-(require! 'hydra)
-(require! 'ivy)
-(require! 'counsel)
-(require! 'ivy-hydra)
-(require! 'swiper)
-(require! 'projectile)
-(require! 'counsel-projectile)
-;; `counsel-M-x' need smex to get history
-(require! 'smex)
-;; Show key bindings when pressing
-(require! 'which-key)
-(when emacs-use-fcitx-p
-  (require! 'fcitx))
-;; Numbering windows
-(require! 'window-numbering)
-;; Highlight braces with their depth
-(require! 'rainbow-delimiters)
-;; Highlight indentation
-(require! 'highlight-indentation)
-;; ^L beautifier
-(require! 'page-break-lines)
-(require! 'unicode-fonts)
-(require! 'evil-nerd-commenter)
-(require! 'shackle)
-(require! 'easy-kill)
-;; (require! 'pinyinlib)
+(require-packages!
+ yasnippet
+ (flycheck :archive "melpa-stable")
+ ;; Code completion framework
+ company
+ company-statistics
+ ;; Save session to disk
+ session
+ ;; Improve `term-mode'
+ multi-term
+ hydra
+ ivy
+ counsel
+ ivy-hydra
+ swiper
+ projectile
+ counsel-projectile
+ ;; `counsel-M-x' need smex to get history
+ smex
+ ;; Show key bindings when pressing
+ which-key
+ (fcitx :when emacs-use-fcitx-p)
+ ;; Numbering windows
+ window-numbering
+ ;; Highlight braces with their depth
+ rainbow-delimiters
+ ;; Highlight indentation
+ highlight-indentation
+ ;; ^L beautifier
+ page-break-lines
+ unicode-fonts
+ evil-nerd-commenter
+ shackle
+ easy-kill)
 
 (require 'core-ivy)
 (require 'core-company)

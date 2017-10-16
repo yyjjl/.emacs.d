@@ -1,6 +1,12 @@
-(defmacro defvar! (name value &optional doc)
-  (declare (doc-string 3))
-  `(defvar ,name (eval-when-compile ,value) ,doc))
+(defmacro setvar! (&rest body)
+  (let (forms
+        (setter (if (bound-and-true-p byte-compile-current-file)
+                    'defvar 'setq)))
+    (while (not (null body))
+      (push `(,setter ,(pop body)
+                      (eval-when-compile ,(pop body)))
+            forms))
+    `(progn ,@(nreverse forms))))
 
 (defun find-library-in-directory ($name $dir)
   (setq $dir (expand-file-name $dir))
@@ -27,27 +33,26 @@
                                   (if (symbolp x) (symbol-name x) x))
                                 $modules)
                         " "))))
+(setvar!
+ ;; Use `xsel' to copy/paste in terminal thoungh system clipboard
+ emacs-has-xsel-p (executable-find "xsel")
+ ;; Whether to use X input method `fcitx'
+ emacs-use-fcitx-p (executable-find "fcitx")
+ ;; In order to use `emms' package, you need a music player
+ emacs-has-mpv-p (executable-find "mplayer")
 
-(defvar! emacs-has-xsel-p (executable-find "xsel")
-  "Use `xsel' to copy/paste in terminal thoungh system clipboard")
-(defvar! emacs-use-fcitx-p (executable-find "fcitx")
-  "Whether to use X input method `fcitx'")
-(defvar! emacs-has-mpv-p (executable-find "mplayer")
-  "In order to use `emms' package, you need a music player")
+ ;; Whether has `git'
+ git-has-git-p (executable-find "git")
 
-(defvar! git-has-git-p (executable-find "git")
-  "Whether has `git'")
+ ;; Only one of `aspell' and `hunspell' is needed Use for spellcheck
+ spelling-has-aspell-p (executable-find "aspell")
+ ;; Use for spellcheck
+ spelling-has-hunspell-p (executable-find "hunspell")
 
-;; Only one of `aspell' and `hunspell' is needed
-(defvar! spelling-has-aspell-p (executable-find "aspell")
-  "Use for spellcheck")
-(defvar! spelling-has-hunspell-p (executable-find "hunspell")
-  "Use for spellcheck")
+ ;; Tag multiple languages
+ tags-has-ggtags-p (executable-find "global")
 
-(defvar! tags-has-ggtags-p (executable-find "global")
-  "Tag multiple languages")
-
-(defvar! latex-use-latex-p t
-  "Whether to use latex packages")
+ ;; Whether to use latex packages
+ latex-use-latex-p t)
 
 (provide 'core-env-vars)

@@ -1,20 +1,20 @@
-(require! 'restclient)
-(require! 'company-restclient)
-(when emacs-has-mpv-p
-  (require! 'emms))
-(require! 'markdown-mode)
-(require! 'csv-mode)
-(require! 'glsl-mode)
-(require! 'php-mode)
-(require! 'gnuplot-mode)
-(require! 'csharp-mode)
-(require! 'graphviz-dot-mode)
-;; Move buffers between windows
-(require! 'buffer-move)
-(require! 'figlet)
-(require! 'zeal-at-point)
-(require! 'skeletor)
-(require! 'slime)
+(require-packages!
+ restclient
+ company-restclient
+ (emms :when emacs-has-mpv-p)
+ markdown-mode
+ csv-mode
+ glsl-mode
+ php-mode
+ gnuplot-mode
+ csharp-mode
+ graphviz-dot-mode
+ ;; Move buffers between windows
+ buffer-move
+ figlet
+ zeal-at-point
+ skeletor
+ slime)
 
 
 

@@ -1,11 +1,12 @@
-(require! 'gitignore-mode)
-(require! 'gitconfig-mode)
-(require! 'git-messenger)
-(require! 'git-gutter)
-(require! 'git-gutter-fringe)
-(require! 'git-link)
-(require! 'git-timemachine)
-(require! 'magit)
+(require-packages!
+ gitignore-mode
+ gitconfig-mode
+ git-messenger
+ git-gutter
+ git-gutter-fringe
+ git-link
+ git-timemachine
+ magit)
 
 
 

@@ -1,27 +1,25 @@
-(defvar! cpp-rtags-path (expand-var! "rtags/bin/")
-  "Rtags directory")
-(defvar! cpp-irony-path (expand-var! "irony/bin")
-  "irony directory")
-(defvar! cpp-has-rtags-p
-  (file-exists-p (expand-file-name "rdm" cpp-rtags-path))
-  "Rtags support, indexing c++ projects")
-(defvar! cpp-has-irony-p
-  (file-exists-p (expand-file-name "irony-server" cpp-irony-path))
-  "Irony support, context sensitive c++ completions")
+(setvar!
+ cpp-rtags-path (expand-var! "rtags/bin/")
+ cpp-irony-path (expand-var! "irony/bin")
+ cpp-has-rtags-p (file-exists-p
+                  (expand-file-name "rdm" cpp-rtags-path))
+ cpp-has-irony-p (file-exists-p
+                  (expand-file-name "irony-server" cpp-irony-path)))
 
 ;; C/C++ I need stable version
-(require! 'cmake-ide "melpa-stable")
-(require! 'irony)
-(require! 'irony-eldoc)
-(require! 'company-irony)
-(require! 'company-irony-c-headers)
-(require! 'flycheck-irony)
-(require! 'clang-format)
-(require! 'rtags)
-(require! 'ivy-rtags)
-(require! 'cmake-mode)
-(require! 'cmake-font-lock)
-(require! 'modern-cpp-font-lock)
+(require-packages!
+ (cmake-ide :archive "melpa-stable")
+ irony
+ irony-eldoc
+ company-irony
+ company-irony-c-headers
+ flycheck-irony
+ clang-format
+ rtags
+ ivy-rtags
+ cmake-mode
+ cmake-font-lock
+ modern-cpp-font-lock)
 
 
 
@@ -173,6 +171,7 @@
         (progn
           (setq-local cpp-cmake-ide-enabled t)
           (cpp/rtags-setup))
+      (setq cmake-ide-build-dir nil)
       (cpp/c++-simple-setup))))
 
 ;; Do not use `c-mode-hook' and `c++-mode-hook', there is a bug

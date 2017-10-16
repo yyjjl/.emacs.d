@@ -1,11 +1,11 @@
-;; Mark tools
-(require! 'multiple-cursors)
-
-;; `wgrep' allows you to edit a grep buffer and apply those changes
-;; to the file buffer.
-(require! 'wgrep)
-;; provide tree style search jump
-(require! 'avy)
+(require-packages!
+ ;; Mark tools
+ multiple-cursors
+ ;; `wgrep' allows you to edit a grep buffer and apply those changes
+ ;; to the file buffer.
+ wgrep
+ ;; provide tree style search jump
+ avy)
 
 
 

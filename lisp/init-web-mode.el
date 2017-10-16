@@ -1,6 +1,7 @@
-(require! 'emmet-mode)
-(require! 'web-mode)
-(require! 'company-web)
+(require-packages!
+ emmet-mode
+ web-mode
+ company-web)
 ;; Optional package add support for angluar 1.x
 ;; (require! 'ac-html-angular)
 ;; (require! 'ac-html-bootstrap)

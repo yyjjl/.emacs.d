@@ -1,4 +1,4 @@
-(require! 'nlinum)
+(require-packages! nlinum)
 
 
 

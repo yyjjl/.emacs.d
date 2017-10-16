@@ -1,27 +1,19 @@
 ;; Haskell
-(defvar! haskell-hare-path
-  (ignore-errors (find-library-in-directory "hare.el" "~/.cabal/share"))
-  "Hare is a haskell refacting tool")
-(defvar! haskell-has-stylish-haskell-p
-  (executable-find "stylish-haskell")
-  "Like clang-format, format haskell file")
-(defvar! haskell-has-stack-p (executable-find "stack"))
-(defvar! haskell-has-hindent-p (executable-find "hindent")
-  "Indent haskell expression")
-(defvar! haskell-has-cabal-p (executable-find "cabal")
-  "Haskell cabal support")
-(defvar! haskell-has-idris-p (executable-find "idris")
-  "Idris language support")
+(setvar!
+ haskell-hare-path (ignore-errors
+                     (find-library-in-directory "hare.el" "~/.cabal/share"))
+ haskell-has-stylish-haskell-p (executable-find "stylish-haskell")
+ haskell-has-stack-p (executable-find "stack")
+ haskell-has-hindent-p (executable-find "hindent")
+ haskell-has-cabal-p (executable-find "cabal")
+ haskell-has-idris-p (executable-find "idris"))
 
-(require! 'haskell-mode)
-(when haskell-has-stack-p
-  (require! 'intero))
-(when haskell-has-hindent-p
-  (require! 'hindent))
-(when haskell-has-cabal-p
-  (require! 'company-cabal))
-(when haskell-has-idris-p
-  (require! 'idris-mode))
+(require-packages!
+ haskell-mode
+ (intero :when haskell-has-stack-p)
+ (hindent :when haskell-has-hindent-p)
+ (company-cabal :when haskell-has-cabal-p)
+ (idris-mode :when haskell-has-idris-p))
 
 
 

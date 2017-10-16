@@ -1,10 +1,9 @@
-(defvar! python-has-pytest-p (executable-find "pytest")
-  "Use for python unit test ")
-(defvar! python-has-ipython-p (executable-find "ipython3")
-  "Use for python unit test ")
+(setvar! python-has-pytest-p (executable-find "pytest")
+         python-has-ipython-p (executable-find "ipython3"))
 
-(require! 'elpy "melpa-stable")
-(require! 'py-isort)
+(require-packages!
+ (elpy :archive "melpa-stable")
+ py-isort)
 
 
 
@@ -52,25 +51,6 @@
                                    $indent "@type " param ": ")))
                        (split-string $params "," t " +"))
                $indent))
-
-(defun python/generate-doc-at-point ()
-  (interactive)
-  (let (params indent)
-    (save-excursion
-      (if (re-search-backward
-           "^\\( *\\)def[^(]+(\\([^\n]*\\)): *$" nil t)
-          (progn
-            (setq params (match-string-no-properties 2))
-            (setq indent (concat (match-string-no-properties 1)
-                                 (make-string python-indent-offset
-                                              (string-to-char " ")))))
-        (message "Can not find `def'")))
-    (when params
-      (insert "\"\"\""
-              "\n" indent
-              (python/generate-doc params indent)
-              "\n" indent
-              "\"\"\""))))
 
 (defun python/generate-doc-at-point ()
   (interactive)

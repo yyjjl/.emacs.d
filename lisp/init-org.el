@@ -1,9 +1,12 @@
-;; IPython notebook feature in `org-mode'
-(require! 'ob-ipython)
-(require! 'ox-pandoc)
-;; Export colorful src block in `org-mode'
-(require! 'htmlize)
-(require! 'company-auctex)
+(setvar! org-has-pandoc-p (executable-find "pandoc"))
+
+(require-packages!
+ ;; IPython notebook feature in `org-mode'
+ ob-ipython
+ (ox-pandoc :when org-has-pandoc-p)
+ ;; Export colorful src block in `org-mode'
+ htmlize
+ company-auctex)
 
 
 
@@ -125,6 +128,16 @@ With a prefix BELOW move point to lower block."
     ;; Display/update images in the buffer after I evaluate
     (org-display-inline-images t)))
 
+(defun org/open-pdf (&optional $arg)
+  (interactive "P")
+  (let* ((-fn (buffer-file-name))
+         (fn (and -fn
+                  (concat (file-name-sans-extension -fn)
+                          ".pdf"))))
+    (if (and fn (not $arg) (file-exists-p fn))
+        (find-file fn)
+      (counsel-find-file (file-name-base -fn)))))
+
 ;; Do not load extra modules
 (setq org-modules '(org-info))
 ;; Do not load extra backends
@@ -158,7 +171,8 @@ With a prefix BELOW move point to lower block."
                "\\\\documentclass\\(?:\\[[^]]+\\] *\\){[^}]+}"
                nil :no-error)
           (setq beg (match-end 0)))
-        (when (and beg (re-search-forward "\\\\begin{document}" nil :no-error))
+        (when (and beg (re-search-forward "\\\\begin{document}"
+                                          nil :no-error))
           (setq end (match-beginning 0)))
         (when end
           (split-string (buffer-substring-no-properties beg end)
@@ -249,7 +263,7 @@ With a prefix BELOW move point to lower block."
         (plist-put org-format-latex-options :scale 1.8)
         org-highlight-latex-and-related '(latex)
         org-src-fontify-natively t
-        org-latex-create-formula-image-program 'imagemagick)
+        org-preview-latex-default-process 'imagemagick)
 
   (add-to-list 'org-babel-tangle-lang-exts '("ipython" . "py"))
   (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
@@ -295,16 +309,6 @@ With a prefix BELOW move point to lower block."
       (local-set-key (kbd "C-c h") #'ob-ipython-inspect))
     (flycheck-mode -1))
 
-  (defun org/open-pdf (&optional $arg)
-    (interactive "P")
-    (let* ((-fn (buffer-file-name))
-           (fn (and -fn
-                    (concat (file-name-sans-extension -fn)
-                            ".pdf"))))
-      (if (and fn (not $arg) (file-exists-p fn))
-          (find-file fn)
-        (counsel-find-file (file-name-base -fn)))))
-
   (define-key org-mode-map (kbd "C-c t") org-table-extra-map)
   (define-key! :map org-mode-map
     ("C-c h" . ob-ipython-inspect)
@@ -312,12 +316,12 @@ With a prefix BELOW move point to lower block."
     ("M-," . org-mark-ring-goto)
     ("M-." . org-mark-ring-push)
     ("C-c l" . org-store-link)
+    ([f5] . org/open-pdf)
     ([f9] . (lambda () (interactive)
               (save-excursion
                 (let ((core--buffer-useful nil))
                   (org-publish-current-file)))))
     ([f10] . org-publish)
-    ([f5] . org-present)
     ("C-c C-t" . org-todo)))
 
 (with-eval-after-load 'ox-html

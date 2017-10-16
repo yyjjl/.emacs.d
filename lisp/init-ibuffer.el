@@ -1,4 +1,4 @@
-(require! 'ibuffer-vc)
+(require-packages! ibuffer-vc)
 
 
 

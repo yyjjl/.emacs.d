@@ -1,15 +1,11 @@
-(defvar! lisp-has-racket-p (executable-find "racket") "Racket support")
-;; Auto compile after .el file load or save
-(require! 'auto-compile)
-;; pair edit
-(require! 'lispy)
-(when lisp-has-racket-p
-  (require! 'racket-mode "melpa-stable")
-  (require! 'geiser))
-(require! 'macrostep)
-;; slime
-;; slime-company
-(require! 'hl-sexp)
+(require-packages!
+ ;; Auto compile after .el file load or save
+ auto-compile
+ ;; pair edit
+ lispy
+ macrostep
+ geiser
+ hl-sexp)
 
 
 
@@ -64,7 +60,6 @@ Emacs Lisp."
     (checkdoc-minor-mode)))
 
 (add-hook 'emacs-lisp-mode-hook #'lisp|elisp-setup)
-(add-hook 'racket-mode-hook #'lisp|racket-setup)
 
 (let ((hooks '(lisp-mode-hook
                scheme-mode-hook

@@ -1,10 +1,14 @@
-(defvar! term-zsh-path (executable-find "zsh")
-  "Zsh path")
-(defvar! term-bash-path (executable-find "bash")
-  "Bash path")
+(setvar! term-zsh-path (executable-find "zsh")
+         term-bash-path (executable-find "bash"))
 
 (eval-when-compile
   (require 'dash))
+
+
+
+(defvar term-popup-window nil)
+(defvar-local term--ssh-info nil)
+(defvar-local term--parent-buffer nil)
 
 ;; Add below code to .zshrc to make term-mode track directory changes
 ;;   if [ -n "$INSIDE_EMACS" ];then
@@ -49,7 +53,6 @@
       (setq index (1+ index)))
     name))
 
-(defvar-local term--parent-buffer nil)
 (defun term/switch-back ()
   (interactive)
   (if (and term--parent-buffer (buffer-live-p term--parent-buffer))
@@ -71,39 +74,39 @@
       (setq port (read-string "Port: " "22")))
     (list user host port (>= $arg 16))))
 
-(defvar-local term--ssh-info nil)
 (defun term/ssh ($user $host &optional $port $force)
   (interactive (term/get-ssh-info (or (car-safe current-prefix-arg) 0)))
   (let ((args (list (format "%s@%s" $user $host)
                     (format "-p %s" (or $port 22)))))
-    (let ((buf (or  (and (not $force)
-                         (car (--filter (with-current-buffer it
-                                          (and (eq major-mode 'term-mode)
-                                               (equal args term--ssh-info)))
-                                        (buffer-list))))
-                    (term/exec-program "ssh" args))))
-      (with-current-buffer buf
-        (setq term--ssh-info args))
-      buf)))
+    (or (and (not $force)
+             (car (--filter (with-current-buffer it
+                              (and (eq major-mode 'term-mode)
+                                   (equal args term--ssh-info)))
+                            (buffer-list))))
+        (let ((buffer (term/exec-program "ssh" args)))
+          (with-current-buffer buffer
+            (setq term--ssh-info args))
+          buffer))))
 
-(defun term/local-shell (&optional $dir $force)
-  (unless (featurep 'multi-term)
-    (require 'multi-term nil t))
-  (unless $dir
-    (setq $dir default-directory))
-  (let ((buf (or (and (not $force)
-                      (car (--filter (with-current-buffer it
-                                       (and (eq major-mode 'term-mode)
-                                            (directory-equal? $dir default-directory)))
-                                     (buffer-list))))
-                 (let ((default-directory $dir))
-                   (multi-term-get-buffer)))))
-    (setq multi-term-buffer-list
-          (nconc multi-term-buffer-list (list buf)))
-    (with-current-buffer buf
-      ;; Internal handle for `multi-term' buffer.
-      (multi-term-internal))
-    buf))
+(defun term/local-shell ($directory &optional $force)
+  "If there is a term buffer whose default-directory is $DIRECTORY,
+return that buffer. Otherwise create a new term buffer.
+
+If $FORCE is non-nil create a new term buffer directly."
+  (or (and (not $force)
+           (car (--filter (with-current-buffer it
+                            (and (eq major-mode 'term-mode)
+                                 (directory-equal? $directory
+                                                   default-directory)))
+                          (buffer-list))))
+      (let* ((default-directory $directory)
+             (buffer (multi-term-get-buffer)))
+        (setq multi-term-buffer-list
+              (nconc multi-term-buffer-list (list buffer)))
+        (with-current-buffer buffer
+          ;; Internal handle for `multi-term' buffer.
+          (multi-term-internal))
+        buffer)))
 
 (defun term/pop-shell (&optional $arg)
   "Switch to the term buffer last used, or create a new one if
@@ -112,21 +115,31 @@ none exists, or if the current buffer is already a term."
   (unless (featurep 'multi-term)
     (require 'multi-term))
   (unless (memq major-mode '(eshell-mode term-mode shell-mode))
-    (let ((buf (if (not (file-remote-p default-directory))
-                   (term/local-shell
-                    (or (and (not (equal $arg 4)) default-directory)
-                        (and (bound-and-true-p cpp-cmake-ide-enabled)
-                             (boundp 'cmake-ide-build-dir)
-                             cmake-ide-build-dir)
-                        (ignore-errors (projectile-project-root)))
-                    (equal $arg 16))
-                 (apply #'term/ssh (term/get-ssh-info $arg))))
-          (parent-buf (current-buffer)))
-      (when buf
-        (with-current-buffer buf
+    (let ((buffer (if (file-remote-p default-directory)
+                      (apply #'term/ssh (term/get-ssh-info $arg))
+                    (term/local-shell
+                     (or (and (equal $arg 1)
+                              (boundp 'cmake-ide-build-dir)
+                              cmake-ide-build-dir)
+                         (and (not (equal $arg 4))
+                              (ignore-errors (projectile-project-root)))
+                         default-directory)
+                     (equal $arg 16))))
+          (parent-buffer (current-buffer)))
+      (when buffer
+        (with-current-buffer buffer
           (local-set-key [f8] #'term/switch-back)
-          (setq term--parent-buffer parent-buf))
-        (pop-to-buffer buf)))))
+          (setq term--parent-buffer parent-buffer))
+        (if (and (window-live-p term-popup-window)
+                 (eq 'term-mode
+                     (buffer-local-value 'major-mode
+                                         (window-buffer term-popup-window))))
+            ;; Reuse window
+            (progn
+              (set-window-buffer term-popup-window buffer)
+              (select-window term-popup-window))
+          (pop-to-buffer buffer)
+          (setq term-popup-window (get-buffer-window buffer)))))))
 
 (defun term%after-prompt? ()
   (let* ((proc (get-buffer-process (current-buffer)))

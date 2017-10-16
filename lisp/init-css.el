@@ -1,6 +1,7 @@
-;; Colorize strings that represent colors
-(require! 'rainbow-mode)
-(require! 'css-eldoc)
+(require-packages!
+ ;; Colorize strings that represent colors
+ rainbow-mode
+ css-eldoc)
 
 
 

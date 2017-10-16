@@ -46,7 +46,7 @@
   (setq yas-prompt-functions '(yas-completing-prompt))
   (setq-default yas-indent-line 'fixed))
 
-(with-eval-after-load 'isearch
+(with-eval-after-load "isearch"
   (define-key isearch-mode-map (kbd "C-o") 'isearch-occur))
 
 (with-eval-after-load 'session
