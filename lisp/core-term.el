@@ -163,7 +163,14 @@ none exists, or if the current buffer is already a term."
          (call-interactively command)))))
 
 (with-eval-after-load 'multi-term
+  (defun term*multi-term-switch-internal-hack (&rest _)
+    ;; Reset popup window
+    (setq core--shackle-popup-window (selected-window)))
   (add-hook 'term-mode-hook 'multi-term-keystroke-setup)
+
+  (advice-add 'multi-term-switch-internal :after
+              #'term*multi-term-switch-internal-hack)
+
   (setq multi-term-scroll-to-bottom-on-output t)
   (setq multi-term-program (or term-zsh-path term-bash-path))
 
