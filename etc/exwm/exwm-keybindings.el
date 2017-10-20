@@ -1,5 +1,6 @@
 ;; (setq exwm-input-prefix-keys '(?\M-x ?\M-` ?\M-& ?\M-: ?\C-g ?\C-x ?\C-z))
-(setq exwm-input-prefix-keys '(?\M-x ?\M-` ?\M-& ?\M-: ?\C-g ?\C-x ?\C-z ?\C-u))
+(setq exwm-input-prefix-keys
+      '(?\M-x ?\M-` ?\M-& ?\M-: ?\C-g ?\C-x ?\C-z ?\C-u))
 
 (defvar exwm--command-history nil)
 (defun exwm%run-command (command)
@@ -80,9 +81,9 @@
 (exwm/define-key  "M-<tab>" #'exwm/switch-buffer)
 (exwm/define-key  "M-`" (lambda! (exwm/switch-buffer :same-app?)))
 (exwm/define-key [f12] #'hydra-emms/body)
-(dotimes (i 10)
-  (exwm/define-key (format "M-%d" i)
-                   (intern (format "select-window-%d" i))))
+;; (dotimes (i 10)
+;;   (exwm/define-key (format "M-%d" i)
+;;                    (intern (format "select-window-%d" i))))
 (exwm/define-key "s-1" (lambda! (exwm-workspace-switch 0)))
 (exwm/define-key "s-2" (lambda! (exwm-workspace-switch 1)))
 (exwm/define-key "s-3" (lambda! (exwm-workspace-switch 2)))

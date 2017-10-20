@@ -19,6 +19,7 @@
 (setq exwm-systemtray-icon-gap 5)
 
 (setq exwm-randr-workspace-output-plist '(0 "eDP-1" 3 "HDMI-1"))
+;; Change to hydra
 (add-hook 'exwm-randr-screen-change-hook
           (lambda ()
             (start-process-shell-command

@@ -18,7 +18,8 @@
             processEnvironments: true,
             preview: "TeX"
         },
-        showProcessingMessages: false,
+        // showProcessingMessages: true,
+        messageStyle: "none",
         displayAlign: "%ALIGN",
         displayIndent: "%INDENT",
 

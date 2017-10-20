@@ -58,7 +58,7 @@
        ("~>" . 57703)
        ("~~>" . 57705)))))
 
-(define-hook! extra|prettify-symbols-setup (prog-mode-hook text-mode-hook)
+(define-hook! extra|prettify-symbols-setup (prog-mode-hook)
   (setq prettify-symbols-alist
         fira-code-font-lock-keywords-alist)
   (prettify-symbols-mode 1))

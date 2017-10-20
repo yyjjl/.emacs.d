@@ -1,0 +1,19 @@
+# -*- mode: snippet -*-
+# name: dependency-tree
+# key: dpt
+# --
+\documentclass{standalone}
+\usepackage{tikz-dependency}
+
+\begin{document}
+\begin{dependency}[theme = simple]
+   \begin{deptext}[column sep=1em]
+      ${1:Hello \& world \& ! \\}
+   \end{deptext}
+   \deproot{$2}{ROOT}
+   % \depedge{2}{1}{ATT}
+   % \depedge[edge start x offset=-6pt]{1}{2}{ATT}
+   % \depedge[arc angle=50]{1}{2}{ATT}
+   $0
+\end{dependency}
+\end{document}

@@ -5,6 +5,7 @@
 ;; Add `emacs-config-directory' to `load-path'
 (add-to-list 'load-path emacs-config-directory)
 
+(require 'dash)
 ;; All packages required in this section are defined in `init-packages'
 (require 'core-lib)
 ;; Set some important variables
@@ -41,7 +42,7 @@
 (yas-global-mode 1)
 (shackle-mode 1)
 
-(window-numbering-mode 1)
+;; (window-numbering-mode 1)
 (setq-default mode-line-format mode-line-default-format)
 (setq-default mode-line-buffer-identification '("%b"))
 (setq-default mode-line-misc-info nil)

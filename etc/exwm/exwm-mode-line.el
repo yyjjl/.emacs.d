@@ -1,6 +1,6 @@
 (add-to-list 'mode-line-config-alist
              '(exwm%exwm-window? (exwm%mode-line-workspace
-                                  ;; mode-line%exwm-button
+                                  mode-line%exwm-left-button
                                   mode-line%buffer-id)
                                  ()
                                  :no-tail
@@ -26,21 +26,17 @@
                        ,mouse-1-action)))
                 map)))
 
-;; (defun mode-line%exwm-button ()
-;;   (list " "
-;;         (exwm%create-button
-;;          'mode-line "[X]" 'error
-;;          '(kill-buffer))
-;;         " "
-;;         (exwm%create-button
-;;          'mode-line "[-]" 'font-lock-builtin-face
-;;          '(if (one-window-p)
-;;               (switch-to-buffer (other-buffer))
-;;             (delete-window)))
-;;         " "
-;;         (exwm%create-button
-;;          'mode-line "[T]" 'warning
-;;          '(exwm-floating-toggle-floating))))
+(defun mode-line%exwm-left-button ()
+  (list " "
+        (exwm%create-button
+         'mode-line "[X]" 'error
+         '(kill-buffer))
+        " "
+        (exwm%create-button
+         'mode-line "[-]" 'font-lock-builtin-face
+         '(if (one-window-p)
+              (switch-to-buffer (other-buffer))
+            (delete-window)))))
 
 ;; set $ws_chrome "2:"
 ;; set $ws_nautilus "3:"

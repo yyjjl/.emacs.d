@@ -19,13 +19,13 @@ Optional argument ARG is used to toggle narrow functions."
   (interactive "P")
   (cond ((buffer-narrowed-p) (widen))
         ((region-active-p) (narrow-to-region (region-beginning) (region-end)))
-        (t (let ((cmd (cdr (assoc major-mode core-narrow-dwim-alist))))
-             (if cmd
-                 (setq cmd (if $arg (cadr cmd) (car cmd)))
-               (setq cmd (if $arg #'narrow-to-page #'narrow-to-defun)))
-             (when cmd
-               (message "Use command `%s'" cmd)
-               (funcall cmd))))))
+        (t (let ((cmd-list (cdr (assoc major-mode core-narrow-dwim-alist))))
+             (if cmd-list
+                 (setq cmd-list (if $arg (cadr cmd-list) (car cmd-list)))
+               (setq cmd-list (if $arg #'narrow-to-page #'narrow-to-defun)))
+             (when cmd-list
+               (message "Use command `%s'" cmd-list)
+               (funcall cmd-list))))))
 
 (defun core/grab-regexp ($regexp)
   "Grab strings matching REGEXP to list."

@@ -153,44 +153,6 @@ With a prefix BELOW move point to lower block."
     ("i" . org-table-insert-column)
     ("r" . org-table-show-reference)))
 (with-eval-after-load 'org
-  (defun org/tex-file-content (filename)
-    (with-temp-buffer
-      (insert-file-contents-literally filename)
-      (goto-char (point-min))
-      (when (re-search-forward
-             "\\\\begin{document}\\(\\(?:.\\|\n\\)+\\)\\\\end{document}"
-             nil :no-error)
-        (match-string 1))))
-
-  (defun org/tex-file-headers (filename)
-    (with-temp-buffer
-      (insert-file-contents-literally filename)
-      (goto-char (point-min))
-      (let (beg end)
-        (when (re-search-forward
-               "\\\\documentclass\\(?:\\[[^]]+\\] *\\){[^}]+}"
-               nil :no-error)
-          (setq beg (match-end 0)))
-        (when (and beg (re-search-forward "\\\\begin{document}"
-                                          nil :no-error))
-          (setq end (match-beginning 0)))
-        (when end
-          (split-string (buffer-substring-no-properties beg end)
-                        "\n" t " +")))))
-
-  (defun org*babel-latex-hack (fn body params)
-    (let ((include-fn (cdr (assq :include params)))
-          (headers (assq :headers params)))
-      (when include-fn
-        (setq body (concat (org/tex-file-content include-fn) body))
-        (let ((new-headers (org/tex-file-headers include-fn)))
-          (setq params
-                (if headers
-                    (setcdr headers (append (cdr headers) new-headers))
-                  (push (cons :headers new-headers) params)))))
-      (funcall fn body params)))
-  (advice-add 'org-babel-execute:latex :around #'org*babel-latex-hack)
-
   ;; Highlight `{{{color(<color>, <text>}}}' form
   (font-lock-add-keywords
    'org-mode
@@ -260,7 +222,7 @@ With a prefix BELOW move point to lower block."
         org-pretty-entities t
         org-pretty-entities-include-sub-superscripts nil
         org-format-latex-options
-        (plist-put org-format-latex-options :scale 1.8)
+        (plist-put org-format-latex-options :scale 1.6)
         org-highlight-latex-and-related '(latex)
         org-src-fontify-natively t
         org-preview-latex-default-process 'imagemagick)
@@ -309,12 +271,29 @@ With a prefix BELOW move point to lower block."
       (local-set-key (kbd "C-c h") #'ob-ipython-inspect))
     (flycheck-mode -1))
 
+  (defun org/next-item (&optional $N)
+    (interactive "p")
+    (let ((cmd (if (> $N 0) #'org-next-item #'org-previous-item))
+          (col (current-column))
+          (N (abs $N)))
+      (condition-case err
+          (while (>= (decf N) 0)
+            (funcall cmd))
+        (error (message "%s" err)))
+      (move-to-column col)))
+
+  (defun org/previous-item (&optional $N)
+    (interactive "p")
+    (org/next-item (- $N)))
+
   (define-key org-mode-map (kbd "C-c t") org-table-extra-map)
   (define-key! :map org-mode-map
     ("C-c h" . ob-ipython-inspect)
     ("C-c v" . org/open-pdf)
     ("M-," . org-mark-ring-goto)
     ("M-." . org-mark-ring-push)
+    ("M-n" . org/next-item)
+    ("M-p" . org/previous-item)
     ("C-c l" . org-store-link)
     ([f5] . org/open-pdf)
     ([f9] . (lambda () (interactive)

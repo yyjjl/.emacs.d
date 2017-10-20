@@ -57,7 +57,10 @@
                                           'semantic-tag
                                           candidate)))
              (semantic-go-to-tag tag)))
-         :caller 'counsel-semantic-or-imenu))
+         :caller 'counsel-semantic-or-imenu
+         :keymap (define-key! :map (make-sparse-keymap)
+                   ("C-n" . ivy-next-line-and-call)
+                   ("C-p" . ivy-previous-line-and-call))))
     (call-interactively #'counsel-imenu)))
 
 (defun counsel-kill-buffer (&optional $arg)

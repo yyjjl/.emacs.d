@@ -2,6 +2,7 @@
  restclient
  company-restclient
  (emms :when emacs-has-mpv-p)
+ (emms-player-mpv :when emacs-has-mpv-p)
  markdown-mode
  csv-mode
  glsl-mode
@@ -57,7 +58,8 @@
 (global-set-key (kbd "C-h Z") 'zeal-at-point-search)
 (with-eval-after-load 'zeal-at-point
   (setf (cdr (assoc 'c++-mode zeal-at-point-mode-alist)) "cpp"
-        (cdr (assoc 'python-mode zeal-at-point-mode-alist)) "python"))
+        (cdr (assoc 'python-mode zeal-at-point-mode-alist)) "python")
+  (add-to-list 'zeal-at-point-mode-alist '(cmake-mode . "cmake")))
 
 ;; Star dictionary lookup
 (autoload 'sdcv-current-word "sdcv" nil t)
@@ -121,18 +123,43 @@
   (setq emms-mode-line-format "%s")
   (setq emms-lyrics-display-p nil)
   (setq emms-source-file-default-directory "~/music/")
-  (setq emms-player-list '(emms-player-mplayer))
+  (defvar emms-default-playlist
+    (expand-file-name "all.pls" emms-source-file-default-directory))
+  (setq emms-player-list '(emms-player-vlc))
+
+  (advice-add 'emms-lyrics-display-handler :around #'core/ignore-error)
+  (add-hook 'emms-playlist-mode-hook #'emms-mark-mode))
+(with-eval-after-load 'emms
+  (require 'emms-player-mpv)
+  (emms-all)
+  (emms-mode-line -1)
+  (emms-playing-time-disable-display)
+  (emms-lyrics-disable)
+
+  (setq emms-mode-line-format "%s")
+  (setq emms-lyrics-display-p nil)
+  (setq emms-source-file-default-directory "~/music/")
+  (defvar emms-default-playlist
+    (expand-file-name "all.pls" emms-source-file-default-directory))
+  (setq emms-player-list '(emms-player-mpv))
 
   (advice-add 'emms-lyrics-display-handler :around #'core/ignore-error)
   (add-hook 'emms-playlist-mode-hook #'emms-mark-mode))
 
 (when emacs-has-mpv-p
   (defun extra/emms-current-name ()
-    (unless (featurep 'emms (require 'emms)))
     (concat (propertize
              (abbreviate-file-name (emms-mode-line-playlist-current))
              'face 'font-lock-constant-face)))
-  (defhydra hydra-emms (:color pink :hint nil)
+  (defhydra hydra-emms
+    ( ;; options
+     :color pink
+     :hint nil
+     :body-pre
+     (unless (and (fboundp 'emms-playlist-current-selected-track)
+                  (emms-playlist-current-selected-track))
+       (unless (featurep 'emms) (require 'emms))
+       (emms-play-playlist emms-default-playlist)))
     "
 %s(extra/emms-current-name)
 [_=_/_-_]volume raise/lower  [_d_/_D_]play directory subtree/current

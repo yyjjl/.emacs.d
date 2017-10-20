@@ -42,10 +42,6 @@
                 nil nil word))
     (sdcv-search-word word)))
 
-(defun core%shackle-align ()
-  "Set default align according to frame size and window number."
-  (if (> (frame-width) (or split-width-threshold 1000)) 'right 'below))
-
 (defun core%clean-window-list ()
   ;; Remove inactive window
   (setq core--shackle-popup-window-list
@@ -88,14 +84,19 @@
                 (length (cdr root))))
          (align (plist-get $plist :align)))
     (unless align
-      (setq align (core%shackle-align)
+      (setq align (if (> (frame-width)
+                         (or split-width-threshold 120))
+                      'right
+                    'below)
             $plist (plist-put $plist :align align)))
     (setq shackle-default-size
           (min (if (memq align '(left right)) 0.5 0.4)
-               (/ 1.0 num)))))
+               (/ 1.0 num)))
+    $plist))
 
 (defun core*shackle-display-buffer-hack ($fn $buffer $alist $plist)
-  (core%preapre-to-display $plist)
+  (setq $plist (core%preapre-to-display $plist))
+
   (core%clean-window-list)
   (let ((window (funcall $fn $buffer $alist $plist))
         (autoclose? (plist-get $plist :autoclose))
@@ -162,6 +163,6 @@
           (occur-mode :select t)
           ;; Man buffers' major-mode is set after buffer created
           ("^\\*Man.*\\*$" :regexp t :size 0.5 :select t)
-          ("^\\*.*?\\*$" :regexp t :noselect t :autoclose t :autokill t))))
+          ("^\\*.*?\\*$" :regexp t :select t :autoclose t :autokill t))))
 
 (provide 'core-popups)
