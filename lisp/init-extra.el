@@ -46,6 +46,8 @@
       (list b e allcomp)))
 
   (setq graphviz-dot-auto-indent-on-semi nil)
+  (setq graphviz-dot-indent-width 4)
+
   (define-hook! extra|setup-dot (graphviz-dot-mode-hook)
     (add-to-list 'completion-at-point-functions 'extra/dot-complete)))
 
@@ -142,6 +144,7 @@
   (defvar emms-default-playlist
     (expand-file-name "all.pls" emms-source-file-default-directory))
   (setq emms-player-list '(emms-player-mpv))
+  (add-to-list 'emms-player-mpv-parameters "--no-video")
 
   (advice-add 'emms-lyrics-display-handler :around #'core/ignore-error)
   (add-hook 'emms-playlist-mode-hook #'emms-mark-mode))

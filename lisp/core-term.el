@@ -118,10 +118,10 @@ none exists, or if the current buffer is already a term."
     (let ((buffer (if (file-remote-p default-directory)
                       (apply #'term/ssh (term/get-ssh-info $arg))
                     (term/local-shell
-                     (or (and (equal $arg 1)
+                     (or (and (not (equal $arg 1))
                               (boundp 'cmake-ide-build-dir)
                               cmake-ide-build-dir)
-                         (and (not (equal $arg 4))
+                         (and (not (equal $arg 1))
                               (ignore-errors (projectile-project-root)))
                          default-directory)
                      (equal $arg 16))))

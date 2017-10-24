@@ -286,6 +286,16 @@ With a prefix BELOW move point to lower block."
     (interactive "p")
     (org/next-item (- $N)))
 
+  (defun org*fill-paragraph-hack (fn &optional arg1 arg2)
+    (when (fboundp #'extra/insert-space-around-chinese)
+      (let ((element (org-element-at-point)))
+        (extra/insert-space-around-chinese
+         (min (point-max)
+              (org-element-property :contents-end element))
+         (max (point-min)
+              (org-element-property :contents-begin element))))))
+  (advice-add 'org-fill-paragraph :after #'org*fill-paragraph-hack)
+
   (define-key org-mode-map (kbd "C-c t") org-table-extra-map)
   (define-key! :map org-mode-map
     ("C-c h" . ob-ipython-inspect)
