@@ -1,11 +1,10 @@
-(setvar! org-has-pandoc-p (executable-find "pandoc"))
-
 (require-packages!
+ org
  ;; IPython notebook feature in `org-mode'
  ob-ipython
- (ox-pandoc :when org-has-pandoc-p)
  ;; Export colorful src block in `org-mode'
  htmlize
+ poporg
  company-auctex)
 
 
@@ -381,5 +380,7 @@ With a prefix BELOW move point to lower block."
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                  ("\\paragraph{%s}" . "\\paragraph*{%s}")
                  ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+
+(global-set-key (kbd "C-c '") #'poporg-dwim)
 
 (provide 'init-org)

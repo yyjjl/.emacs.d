@@ -84,18 +84,17 @@
                 (length (cdr root))))
          (align (plist-get $plist :align)))
     (unless align
-      (setq align (if (> (frame-width)
-                         (or split-width-threshold 120))
-                      'right
-                    'below)
-            $plist (plist-put $plist :align align)))
+      (setq shackle-default-alignment
+            (if (> (frame-width)
+                   (or split-width-threshold 120))
+                'right
+              'below)))
     (setq shackle-default-size
           (min (if (memq align '(left right)) 0.5 0.4)
-               (/ 1.0 num)))
-    $plist))
+               (/ 1.0 num)))))
 
 (defun core*shackle-display-buffer-hack ($fn $buffer $alist $plist)
-  (setq $plist (core%preapre-to-display $plist))
+  (core%preapre-to-display $plist)
 
   (core%clean-window-list)
   (let ((window (funcall $fn $buffer $alist $plist))
@@ -162,8 +161,9 @@
           (grep-mode :select t)
           (occur-mode :select t)
           (ibuffer-mode :select t)
-          ;; Man buffers' major-mode is set after buffer created
+          ;; Man buffers' major-mode is set after buffer displayed
           ("^\\*Man.*\\*$" :regexp t :size 0.5 :select t)
+          (poporg-mode :size 0.5 :select t)
           ("^\\*.*?\\*$" :regexp t :select t :autoclose t :autokill t))))
 
 (provide 'core-popups)

@@ -55,15 +55,4 @@
 (exwm-randr-enable)
 (exwm-systemtray-enable)
 
-(require! 'symon)
-(require 'symon)
-(setq symon-delay 2)
-(setq symon-sparkline-type 'plain)
-(add-to-list 'symon-monitors
-             'symon-linux-battery-monitor :append)
-(add-to-list 'symon-monitors
-             'symon-current-time-monitor :append)
-(symon-mode 1)
-(add-to-list 'package-selected-packages 'symon)
-
 (fset 'save-buffers-kill-terminal 'save-buffers-kill-emacs)

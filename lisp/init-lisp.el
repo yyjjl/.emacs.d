@@ -134,8 +134,6 @@ Emacs Lisp."
   ("C->" . hydra-sexp/lisp/transpose-sexp-down)
   ("C-<" . hydra-sexp/lisp/transpose-sexp-up)
   ("\"" . lispy-quotes)
-  ("C-a" . lispy-move-beginning-of-line)
-  ("C-e" . lispy-move-end-of-line)
   ("C-y" . lispy-yank))
 
 (provide 'init-lisp)

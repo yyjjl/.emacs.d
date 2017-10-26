@@ -5,7 +5,6 @@
 ;; Add `emacs-config-directory' to `load-path'
 (add-to-list 'load-path emacs-config-directory)
 
-(require 'dash)
 ;; All packages required in this section are defined in `init-packages'
 (require 'core-lib)
 ;; Set some important variables
@@ -47,5 +46,6 @@
 (setq-default mode-line-buffer-identification '("%b"))
 (setq-default mode-line-misc-info nil)
 
+(require 'dash)
 
 (provide 'exwm-init)

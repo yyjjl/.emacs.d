@@ -240,6 +240,7 @@
           (if (and (>= k ?A) (<= k ?Z))
               (setf (car x) (+ k 32))
             (if (and (>= k ?a) (<= k ?z))
-                (setf (car x) (- k 32)))))))))
+                (setf (car x) (- k 32))))))))
+  (define-key c-mode-base-map (kbd "` `") #'self-insert-command))
 
 (provide 'init-cpp)

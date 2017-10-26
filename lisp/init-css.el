@@ -47,7 +47,7 @@
 (define-hook! css|setup (css-mode-hook sass-mode-hook)
   (rainbow-mode 1)
   (when (require 'css-eldoc nil t)
-    (turn-on-css-eldoc))
+    (setq eldoc-documentation-function 'css-eldoc-function))
   (unless (buffer-temporary?)
     (setq imenu-create-index-function 'css%imenu-make-index)))
 
