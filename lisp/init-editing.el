@@ -53,7 +53,7 @@ grab matched string and insert them into `kill-ring'"
     items))
 
 ;; @see https://emacs.stackexchange.com/questions/8121/automatically-inserting-an-space-when-inserting-a-character-depending-on-the-pre
-(defvar core-punctuation-chars (string-to-list ",:;?!")
+(defvar core-punctuation-chars (string-to-list ",;?")
   "List of charactesr to insert spaces after")
 
 (defvar core-punctuation-ignore-chars
@@ -107,6 +107,12 @@ other characters."
     (goto-char $start)
     (while (re-search-forward extra-ascii-after-chinese $end t)
       (replace-match "\\1 \\2" nil nil))))
+
+(defun goto-next-char ($arg)
+  (interactive "P")
+  (let ((char (read-char))
+        (func (if $arg 'search-backward 'search-forward)))
+    (funcall func (char-to-string char) nil)))
 
 (defun forward-defun (&optional $N)
   (interactive "p")
@@ -216,7 +222,8 @@ _=_ next    _-_ previous    ___ skip-previous  _+_ skip-next _q_ quit
   ("M-g l" . avy-goto-line)
   ("M-g s" . avy-goto-symbol-1)
   ("M-g w" . avy-goto-word-1)
-  ("M-g y" . avy-copy-line))
+  ("M-g y" . avy-copy-line)
+  ("M-`" . goto-next-char))
 (avy-setup-default)
 
 (provide 'init-editing)

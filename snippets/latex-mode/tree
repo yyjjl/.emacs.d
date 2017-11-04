@@ -1,0 +1,23 @@
+# -*- mode: snippet -*-
+# name: tikz-tree
+# key: tikztree
+# --
+\documentclass{standalone}
+\usepackage{amsmath,amsfonts,amssymb,amsthm,bm,upgreek}
+\usepackage{pgf}
+\usepackage{tikz}
+\usepackage[utf8]{inputenc}
+
+\usetikzlibrary{arrows,calc, shapes, shapes.geometric, fit}
+
+\begin{document}
+\begin{tikzpicture}[shorten <=1pt, shorten >=1pt, ->,>=stealth,
+  level/.style={sibling distance = 6cm/#1, level distance = 2cm}]
+  \tikzstyle{node}=[circle,fill=black!25, minimum size=24pt,inner sep=0pt];
+  \tikzstyle{root}=[node, fill=cyan];
+  \tikzstyle{leaf}=[node, fill=green!50];
+  \tikzstyle{inner node}=[node, fill=red!50];
+  \tikzstyle{annot} = [text width=4em, text centered];
+  $0
+\end{tikzpicture}
+\end{document}

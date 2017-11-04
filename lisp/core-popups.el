@@ -1,7 +1,25 @@
 (defvar core--shackle-popup-window-list nil)
+(defvar core--shackle-popup-buffer-regexp nil)
+
+(defvar core--shackle-comint-modes
+  '(term-mode
+    haskell-interactive-mode))
+
+(defvar core--shackle-help-modes
+  '(help-mode
+    messages-buffer-mode
+    profiler-report-mode))
+
+(defvar core--shackle-help-mode-regexp
+  (eval-when-compile
+    (concat "^"
+            (regexp-opt '("*Compile-Log*"
+                          "*sdcv*"
+                          "*lispy-message*"
+                          "*compilation*"))
+            "$")))
+
 (defvar-local core--shackle-popup-window nil)
-(defvar-local core--shackle-autokill? nil)
-(put 'core--shackle-autokill? 'permanent-local t)
 (put 'core--shackle-popup-window 'permanent-local t)
 
 (defun core/last-popup-window ()
@@ -70,36 +88,37 @@
                    (equal (window-buffer window) buffer))
           (delete-window window)
 
-          (when (buffer-local-value 'core--shackle-autokill? buffer)
-            (kill-buffer buffer))
-
           (pop core--shackle-popup-window-list))))))
 
-(defun core%preapre-to-display ($plist)
+(defun core*shackle-display-buffer-hack ($fn $buffer $alist $plist)
+  (core%clean-window-list)
+
   ;; Set default size
-  (let* ((root (car (window-tree)))
+  (setq shackle-default-alignment
+        (if (> (frame-width)
+               (or split-width-threshold 120))
+            'right
+          'below))
+
+  (let* ((autoclose? (plist-get $plist :autoclose))
+         (align (plist-get $plist :align))
+         (root (car (window-tree)))
          ;; If root window is horizontally splitted
          (num (if (or (atom root) (car root))
                   2
                 (length (cdr root))))
-         (align (plist-get $plist :align)))
-    (unless align
-      (setq shackle-default-alignment
-            (if (> (frame-width)
-                   (or split-width-threshold 120))
-                'right
-              'below)))
+         window)
+    ;; When window is an autoclose window and `:align' is not set,
+    ;; set it to `shackle-default-alignment'
+    (when (and (not align) autoclose?)
+      (setq align shackle-default-alignment)
+      (setq $plist (append $plist `(:align ,align))))
     (setq shackle-default-size
           (min (if (memq align '(left right)) 0.5 0.4)
-               (/ 1.0 num)))))
+               (/ 1.0 num)))
 
-(defun core*shackle-display-buffer-hack ($fn $buffer $alist $plist)
-  (core%preapre-to-display $plist)
+    (setq window (funcall $fn $buffer $alist $plist))
 
-  (core%clean-window-list)
-  (let ((window (funcall $fn $buffer $alist $plist))
-        (autoclose? (plist-get $plist :autoclose))
-        (autokill? (plist-get $plist :autokill)))
     (when autoclose?
       ;; Autoclose window should be dedicated
       (set-window-dedicated-p window t)
@@ -107,10 +126,23 @@
       (push (cons window $buffer) core--shackle-popup-window-list))
     (with-current-buffer $buffer
       ;; Record popup window
-      (when (and autoclose? autokill?)
-        (setq core--shackle-autokill? t))
       (setq core--shackle-popup-window window))
     window))
+
+(defun core--shackle%comint-mode-matcher (buffer)
+  (let ((case-fold-search t)
+        (buffer-name (buffer-name buffer))
+        (mode (buffer-local-value 'major-mode buffer)))
+    (or (derived-mode? 'comint-mode buffer)
+        (memq mode core--shackle-comint-modes)
+        (string-match-p "^\\*.*repl.*\\*$" buffer-name))))
+
+(defun core--shackle%help-mode-matcher (buffer)
+  (let ((case-fold-search t)
+        (buffer-name (buffer-name buffer))
+        (mode (buffer-local-value 'major-mode buffer)))
+    (or (memq mode core--shackle-help-modes)
+        (string-match-p core--shackle-help-mode-regexp buffer-name))))
 
 (with-eval-after-load 'shackle
   (defvar shackle-mode-map (make-sparse-keymap))
@@ -140,30 +172,24 @@
                    (not (minibuffer-window-active-p win)))
           (delete-window win)))))
 
+  (setq core--shackle-popup-buffer-regexp
+        (eval-when-compile
+          (concat "^\\(?:"
+                  (string-join `("\\*Man.*\\*"
+                                 "\\*TeX.*\\*")
+                               "\\|")
+                  "\\)$")))
+
   (setq shackle-default-alignment 'below
         shackle-default-size 0.5
         shackle-default-rule nil
         shackle-rules
-        '(("*sdcv*" :align below :size 15 :autoclose t)
-          ((:custom
-            (lambda (buffer)
-              (or (derived-mode? 'comint-mode buffer)
-                  (memq (buffer-local-value 'major-mode buffer)
-                        '(term-mode haskell-interactive-mode))
-                  (let ((case-fold-search t))
-                    (string-match-p "^\\*.*repl.*\\*$"
-                                    (buffer-name buffer))))))
+        `(((:custom core--shackle%comint-mode-matcher)
            :size 0.4 :align below :select t)
-          (help-mode :align below :select t :autoclose t)
-          (messages-buffer-mode :select t :align below :autoclose t)
-          (ivy-occur-grep-mode :select t)
-          (ivy-occur-mode :select t)
-          (grep-mode :select t)
-          (occur-mode :select t)
-          (ibuffer-mode :select t)
-          ;; Man buffers' major-mode is set after buffer displayed
-          ("^\\*Man.*\\*$" :regexp t :size 0.5 :select t)
-          (poporg-mode :size 0.5 :select t)
-          ("^\\*.*?\\*$" :regexp t :select t :autoclose t :autokill t))))
+          ((:custom core--shackle%help-mode-matcher)
+           :align below :select t :autoclose t)
+          (,core--shackle-popup-buffer-regexp
+           :regexp t :select t :autoclose t)
+          ("^\\*.*\\*$" :regexp t :select t))))
 
 (provide 'core-popups)

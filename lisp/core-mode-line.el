@@ -37,13 +37,14 @@ If buffer file is a remote file, host-address will be showed"
 
 (defun mode-line%buffer-major-mode ()
   "Display buffer major mode in mode-line."
-  (propertize "%m " 'face 'font-lock-builtin-face))
+  (propertize (format-mode-line mode-name)
+              'face 'font-lock-builtin-face))
 
 (defun mode-line%buffer-status ()
   "Display buffer status.
 Whether it is temporary file, whether it is modified, whether is read-only,
 and `buffer-file-coding-system'"
-  (list "("
+  (list " ("
         (when (and (boundp 'text-scale-mode-amount)
                    (/= text-scale-mode-amount 0))
           (propertize (format "%+d " text-scale-mode-amount)
@@ -105,19 +106,19 @@ and `buffer-file-coding-system'"
 (defvar mode-line-active? nil)
 (defvar mode-line-default-format '("%e" (:eval (mode-line%generate))))
 (defvar mode-line-config-alist
-  '((mode-line%use-special? (mode-line%window-number
+  '((mode-line%inactive? (mode-line%window-number
+                          mode-line%buffer-id
+                          mode-line%buffer-major-mode)
+                         (mode-line%process)
+                         nil
+                         :no-center)
+    (mode-line%use-special? (mode-line%window-number
                              mode-line%buffer-id
                              mode-line%buffer-major-mode
                              mode-line%buffer-status)
                             (mode-line%process)
                             :no-tail
                             :no-center)
-    (mode-line%inactive? (mode-line%window-number
-                          mode-line%buffer-id
-                          mode-line%buffer-major-mode)
-                         (mode-line%process)
-                         nil
-                         :no-center)
     (t (mode-line%window-number
         mode-line%buffer-id
         mode-line%buffer-major-mode
@@ -188,7 +189,6 @@ and `buffer-file-coding-system'"
   (setq-default mode-line-buffer-identification '("%b"))
   (setq-default mode-line-misc-info
                 '((global-mode-string ("" global-mode-string " "))
-                  (iedit-mode (:eval (format "Iedit:%d" (iedit-counter))))))
-  (setq-default frame-title-format "Emacs: %b"))
+                  (iedit-mode (:eval (format "Iedit:%d" (iedit-counter)))))))
 
 (provide 'core-mode-line)

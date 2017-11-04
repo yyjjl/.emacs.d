@@ -1,7 +1,5 @@
 ;; Haskell
 (setvar!
- haskell-hare-path (ignore-errors
-                     (find-library-in-directory "hare.el" "~/.cabal/share"))
  haskell-has-stylish-haskell-p (executable-find "stylish-haskell")
  haskell-has-stack-p (executable-find "stack")
  haskell-has-hindent-p (executable-find "hindent")
@@ -50,12 +48,6 @@
    haskell-process-auto-import-loaded-modules t
    haskell-stylish-on-save nil)
 
-  (when haskell-hare-path
-    (add-to-list 'load-path (file-name-directory haskell-hare-path))
-    (autoload 'hare-init haskell-hare-path nil t)
-    (hare-init))
-  (remap! "C-c C-r" "C-c r" haskell-mode-map)
-
   (define-key! :map haskell-mode-map
     ([f5] . haskell-debug)
     ([f10] . haskell-compile)
@@ -70,7 +62,7 @@
     ("C-c C-t" . haskell-process-do-type)
     ("C-c C-\\" . haskell-indent-insert-guard)
     ("C-c \\" . haskell-indent-insert-guard)
-    ("C-c C-l" . haskell-process-load-file)
+    ("C-c L" . haskell-process-load-file)
     ("C-c C-z" . haskell-interactive-switch)
     ("C-c k" . haskell-interactive-mode-clear)
     ("C-c a b" . haskell-process-cabal-build)
@@ -90,18 +82,30 @@
         ("M-n" . flycheck-next-error)
         ("M-p" . flycheck-previous-error))
 
-      (haskell-doc-mode 1)
       (if (and haskell-has-stack-p
                (locate-dominating-file default-directory "stack.yaml"))
-          (progn
-            (intero-mode 1)
-            (setq-local haskell-doc-show-prelude nil))
-        (setq-local haskell-doc-show-prelude t)
+          (intero-mode 1)
+        (haskell-doc-mode 1)
         (flycheck-mode -1)))
 
     (when haskell-has-hindent-p
       (hindent-mode 1))
     (haskell-indentation-mode 1)))
+
+(with-eval-after-load 'haskell-debug
+  (define-key! :map haskell-mode-map :prefix "C-c d"
+    ("b" . haskell-debug/break-on-function)
+    ("n" . haskell-debug/next)
+    ("s" . haskell-debug/step)
+    ("t" . haskell-debug/trace)
+    ("d" . haskell-debug/delete)
+    ("S" . haskell-debug/select)
+    ("a" . haskell-debug/abandon)
+    ("g" . haskell-debug/refresh)
+    ("c" . haskell-debug/continue)
+    ("p" . haskell-debug/previous)
+    ("r" . haskell-debug/start-step)
+    ("N" . haskell-debug/breakpoint-numbers)))
 
 (with-eval-after-load 'haskell-cabal
   (define-key! :map haskell-cabal-mode-map
@@ -114,6 +118,9 @@
 (with-eval-after-load 'haskell-font-lock
   ;; Do not use too much symbols
   (setq haskell-font-lock-symbols-alist nil))
+
+(with-eval-after-load 'idris-mode
+  (add-to-list 'core--shackle-help-modes 'idris-info-mode))
 
 (with-eval-after-load 'align
   (setq align-region-separate 'group)

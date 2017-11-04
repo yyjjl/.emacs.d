@@ -113,6 +113,10 @@ With a prefix BELOW move point to lower block."
   (define-key! :map org-babel-map
     ("/" . org/split-src-block)))
 
+(with-eval-after-load 'poporg
+  (add-to-list 'shackle-rules
+               '(poporg-mode :size 0.5 :select t)))
+
 (with-eval-after-load 'ob-ipython
   ;; Don't prompt me to confirm everytime I want to evaluate a block
   (setq org-confirm-babel-evaluate nil)
@@ -140,7 +144,7 @@ With a prefix BELOW move point to lower block."
 ;; Do not load extra modules
 (setq org-modules '(org-info))
 ;; Do not load extra backends
-(setq org-export-backends '(html latex beamer pandoc))
+(setq org-export-backends '(html latex beamer))
 (setq org-mouse-1-follows-link nil)
 (defvar org-table-extra-map
   (define-key! :map (make-sparse-keymap)
@@ -176,6 +180,9 @@ With a prefix BELOW move point to lower block."
          prepend t)))
    'append)
 
+  (setq org-structure-template-alist
+      (--map (list (car it) (downcase (cadr it)))
+             org-structure-template-alist))
   (setq org-entities
         (append
          '(("rangle" "\\rangle" t "\\rangle" "\\rangle" "\\rangle" "❭")

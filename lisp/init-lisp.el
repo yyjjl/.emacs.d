@@ -41,6 +41,11 @@ Emacs Lisp."
                'try-complete-lisp-symbol-partially
                :append))
 
+(defun lisp|scheme-setup ()
+  (lisp|common-setup)
+  (setq flycheck-check-syntax-automatically
+        '(save mode-enabled)))
+
 (defun lisp|elisp-setup ()
   (lisp|common-setup)
   (flycheck-mode -1)
@@ -60,9 +65,9 @@ Emacs Lisp."
     (checkdoc-minor-mode)))
 
 (add-hook 'emacs-lisp-mode-hook #'lisp|elisp-setup)
+(add-hook 'scheme-mode-hook #'lisp|scheme-setup)
 
 (let ((hooks '(lisp-mode-hook
-               scheme-mode-hook
                lisp-interaction-mode-hook)))
   (dolist (hook hooks)
     (add-hook hook #'lisp|common-setup)))
@@ -73,8 +78,8 @@ Emacs Lisp."
 ;; `hl-sexp-mode' un-highlighting before each command
 (with-eval-after-load 'hl-sexp
   (defadvice hl-sexp-mode (after unflicker (turn-on) activate)
-     (when turn-on
-       (remove-hook 'pre-command-hook #'hl-sexp-unhighlight))))
+    (when turn-on
+      (remove-hook 'pre-command-hook #'hl-sexp-unhighlight))))
 
 (with-eval-after-load 'lisp-mode
   ;; Add keyword `define-hook!'
@@ -94,7 +99,7 @@ Emacs Lisp."
       (1 font-lock-constant-face nil nil)))))
 
 (with-eval-after-load 'geiser
-  (add-to-list 'lispy-elisp-modes 'scheme-mode))
+  (setq geiser-active-implementations '(racket)))
 
 (with-eval-after-load 'elisp-mode
   (define-key emacs-lisp-mode-map (kbd "C-c e") 'macrostep-expand)

@@ -171,6 +171,10 @@ MAP (default `global-map')."
       (define-key $map (kbd $new) (cdr map))
       (define-key $map (kbd $old) nil))))
 
+(defun ignore-errors! ($fn &rest $args)
+  "Use for advice"
+  (ignore-errors (apply $fn $args)))
+
 (defvar core--buffer-useful t)
 (defun buffer-temporary? ()
   "If function `buffer-file-name' return nil or a temp file or

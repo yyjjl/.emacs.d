@@ -38,29 +38,29 @@
 (defun counsel-semantic-or-imenu ()
   "Jump to a semantic tag in the current buffer."
   (interactive)
-  (if (semantic-active-p)
-      (progn
-        (when (semantic-parse-tree-needs-update-p)
-          (semantic-parse-tree-set-needs-update))
-        (ivy-read
-         "tag: " (nreverse (core/semantic--create (semantic-fetch-tags) 0))
-         :preselect (thing-at-point 'symbol)
-         :require-match t
-         :action
-         (lambda (candidate)
-           (let* ((pos (if (string-prefix-p " " candidate)
-                           (next-single-property-change 0
-                                                        'semantic-tag candidate
-                                                        (length candidate))
-                         0))
-                  (tag (get-text-property pos
-                                          'semantic-tag
-                                          candidate)))
-             (semantic-go-to-tag tag)))
-         :caller 'counsel-semantic-or-imenu
-         :keymap (define-key! :map (make-sparse-keymap)
-                   ("C-n" . ivy-next-line-and-call)
-                   ("C-p" . ivy-previous-line-and-call))))
+  (unless (and (semantic-active-p)
+               (ignore-errors
+                 (when (semantic-parse-tree-needs-update-p)
+                   (semantic-parse-tree-set-needs-update))
+                 (ivy-read
+                  "tag: " (nreverse (core/semantic--create (semantic-fetch-tags) 0))
+                  :preselect (thing-at-point 'symbol)
+                  :require-match t
+                  :action
+                  (lambda (candidate)
+                    (let* ((pos (if (string-prefix-p " " candidate)
+                                    (next-single-property-change 0
+                                                                 'semantic-tag candidate
+                                                                 (length candidate))
+                                  0))
+                           (tag (get-text-property pos
+                                                   'semantic-tag
+                                                   candidate)))
+                      (semantic-go-to-tag tag)))
+                  :caller 'counsel-semantic-or-imenu
+                  :keymap (define-key! :map (make-sparse-keymap)
+                            ("C-n" . ivy-next-line-and-call)
+                            ("C-p" . ivy-previous-line-and-call)))))
     (call-interactively #'counsel-imenu)))
 
 (defun counsel-kill-buffer (&optional $arg)

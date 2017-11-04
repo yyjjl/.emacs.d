@@ -60,4 +60,7 @@
               gud-mode rcirc-mode shell-mode
               minibuffer-inactive-mode)))
 
+(with-eval-after-load 'company-capf
+  (advice-add 'company-capf :around #'ignore-errors!))
+
 (provide 'core-company)

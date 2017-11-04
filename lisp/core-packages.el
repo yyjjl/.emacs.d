@@ -170,6 +170,7 @@ Archive with high priority will be used when install a package.")
   (add-to-list 'recentf-exclude (file-truename package-user-dir)))
 
 (define-hook! core|enable-modes-hook (after-init-hook)
+  (shackle-mode 1)
   (recentf-mode 1)
   (session-initialize)
   (winner-mode 1)
@@ -178,7 +179,6 @@ Archive with high priority will be used when install a package.")
   (projectile-mode 1)
   (counsel-projectile-on)
   (yas-global-mode 1)
-  (shackle-mode 1)
   (global-company-mode 1)
 
   ;; global-modes

@@ -38,7 +38,7 @@
     `(progn
        (defun ,name (&optional no-select)
          (interactive "P")
-         (display-buffer (gdb-get-buffer-create ',$type)))
+         (pop-to-buffer (gdb-get-buffer-create ',$type)))
        #',name)))
 
 (defun gud/pop-to-source-buffer ()
@@ -93,10 +93,12 @@
   (if gud-source-mode
       (progn
         (setq gud--source-buffer-status (list buffer-read-only))
-        (add-hook 'global-mode-string "GS")
+        (add-to-list 'mode-line-misc-info
+                     '(gud-source-mode "Debugging"))
         (setq buffer-read-only t))
     (when gud--source-buffer-status
-      (remove-hook 'global-mode-string "GS")
+      (remove-hook 'mode-line-misc-info
+                   '(gud-source-mode "Debugging"))
       (setq buffer-read-only (car gud--source-buffer-status))))
   (force-mode-line-update))
 

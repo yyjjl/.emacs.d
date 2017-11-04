@@ -45,6 +45,7 @@
   (setq graphviz-dot-indent-width 4)
 
   (define-hook! extra|setup-dot (graphviz-dot-mode-hook)
+    (hs-minor-mode 1)
     (add-to-list 'completion-at-point-functions 'extra/dot-complete)))
 
 (with-eval-after-load 'grep

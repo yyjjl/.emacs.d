@@ -99,7 +99,10 @@
 (defhydra hydra-flyspell
   (:color blue :hint nil
           :body-pre
-          (flyspell-dwim current-prefix-arg))
+          (progn
+            (unless (featurep 'flyspell)
+              (require 'flyspell nil :no-error))
+            (flyspell-dwim current-prefix-arg)))
   "
 _p_ previous-error _n_ next-error _q_ quit
 "

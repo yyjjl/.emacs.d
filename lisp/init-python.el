@@ -2,7 +2,7 @@
          python-has-ipython-p (executable-find "ipython3"))
 
 (require-packages!
- elpy 
+ (elpy :archive "melpa-stable")
  py-isort)
 
 
