@@ -15,6 +15,17 @@
 
 
 
+(defun haskell%setup-view-keys (map)
+  (define-key! :map map
+    ("<tab>" . forward-button)
+    ("<backtab>" . backward-button)
+    ("SPC" . scroll-up)
+    ("e" . scroll-up-line)
+    ("y" . scroll-down-line)
+    ("u" . scroll-down)
+    ("n" . next-line)
+    ("p" . previous-line)))
+
 (with-eval-after-load 'hindent
   ;; Rewrite function
   (defun hindent-reformat-decl ()
@@ -120,7 +131,25 @@
   (setq haskell-font-lock-symbols-alist nil))
 
 (with-eval-after-load 'idris-mode
-  (add-to-list 'core--shackle-help-modes 'idris-info-mode))
+  (define-key! :map idris-mode-map
+    ("C-c L" . idris-list-holes)
+    ("C-c ." . idris-print-definition-of-name)
+    ("C-c C-." . idris-print-definition-of-name)
+    ("C-c C-/" . idris-browse-namespace))
+  (add-to-list 'core--shackle-help-modes 'idris-info-mode :append)
+  (add-to-list 'core--shackle-help-modes 'idris-compiler-notes-mode :append))
+
+(with-eval-after-load 'idris-hole-list
+  (haskell%setup-view-keys idris-hole-list-mode-map))
+
+(with-eval-after-load 'idris-info
+  (haskell%setup-view-keys idris-info-mode-map)
+
+  (define-hook! idris|info-mode-setup (idris-info-mode-hook)
+    (setq-local eldoc-documentation-function 'idris-eldoc-lookup)))
+
+(with-eval-after-load 'idris-tree-info
+  (haskell%setup-view-keys idris-tree-info-mode-map))
 
 (with-eval-after-load 'align
   (setq align-region-separate 'group)

@@ -66,7 +66,8 @@
  grep-highlight-matches t
  grep-scroll-output t
  indent-tabs-mode nil
- line-spacing 0.25
+ ;; `line-spacing' make inline-image flickering a lot
+ ;; line-spacing 0.25
  mouse-yank-at-point t
  set-mark-command-repeat-pop t
  echo-keystrokes 0.25
