@@ -131,11 +131,17 @@
   (setq haskell-font-lock-symbols-alist nil))
 
 (with-eval-after-load 'idris-mode
+  (add-hook 'idris-repl-mode-hook
+            #'core|generic-comint-mode-setup)
+
   (define-key! :map idris-mode-map
     ("C-c L" . idris-list-holes)
     ("C-c ." . idris-print-definition-of-name)
     ("C-c C-." . idris-print-definition-of-name)
-    ("C-c C-/" . idris-browse-namespace))
+    ("C-c C-/" . idris-browse-namespace)
+    ("M-q" . (lambda! () (save-mark-and-excursion
+                          (mark-paragraph)
+                          (call-interactively #'align)))))
   (add-to-list 'core--shackle-help-modes 'idris-info-mode :append)
   (add-to-list 'core--shackle-help-modes 'idris-compiler-notes-mode :append))
 
@@ -160,7 +166,9 @@
   (add-to-list 'align-rules-list
                '(haskell-assignment
                  (regexp . "\\(\\s-+\\)=\\(?:\\s-+\\|$\\)")
-                 (modes quote (haskell-mode literate-haskell-mode))))
+                 (modes quote (haskell-mode
+                               literate-haskell-mode
+                               idris-mode))))
   (add-to-list 'align-rules-list
                '(haskell-arrows
                  (regexp . "\\(\\s-+\\)\\(->\\|→\\)\\s-+")
@@ -168,7 +176,13 @@
   (add-to-list 'align-rules-list
                '(haskell-left-arrows
                  (regexp . "\\(\\s-+\\)\\(<-\\|←\\)\\s-+")
-                 (modes quote (haskell-mode literate-haskell-mode)))))
+                 (modes quote (haskell-mode literate-haskell-mode))))
+  (add-to-list 'align-rules-list
+               '(haskell-comments
+                 (regexp . "\\(\\s-+\\)\\(--\\)\\s-+")
+                 (modes quote (haskell-mode
+                               literate-haskell-mode
+                               idris-mode)))))
 
 
 (provide 'init-haskell)

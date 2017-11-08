@@ -1,7 +1,9 @@
 ;; Default prog-mode setup
 (define-hook! core|generic-prog-mode-setup (prog-mode-hook
                                             LaTeX-mode-hook)
-  (hs-minor-mode 1)
+  (condition-case err
+      (hs-minor-mode 1)
+    (error (message "%s" (error-message-string err))))
   (flycheck-mode 1)
   (hl-line-mode 1)
   (when (< (buffer-size) core-large-buffer-size)
@@ -17,7 +19,11 @@
   (setq indicate-empty-lines t))
 
 (define-hook! core|generic-comint-mode-setup (comint-mode-hook)
+  ;; But don't show trailing whitespace in SQLi, inf-ruby etc.
+  (setq show-trailing-whitespace nil)
   (setq-local company-idle-delay nil))
+
+
 
 (setq flycheck-keymap-prefix (kbd "C-c f"))
 (with-eval-after-load 'flycheck

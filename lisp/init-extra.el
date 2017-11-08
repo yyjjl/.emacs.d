@@ -17,6 +17,8 @@
 
 ;; prolog system
 (setq prolog-system 'swi)
+(add-hook 'prolog-mode-hook 'core/space-punctuation-mode)
+
 ;; pulse
 (setq pulse-delay 0.01)
 ;; csv
@@ -49,6 +51,8 @@
     (add-to-list 'completion-at-point-functions 'extra/dot-complete)))
 
 (with-eval-after-load 'grep
+  (setq grep-highlight-matches t
+        grep-scroll-output t)
   (dolist (v core-ignored-directories)
     (add-to-list 'grep-find-ignored-directories v)))
 

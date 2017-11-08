@@ -150,7 +150,6 @@ Archive with high priority will be used when install a package.")
  highlight-indentation
  ;; ^L beautifier
  page-break-lines
- unicode-fonts
  evil-nerd-commenter
  shackle
  easy-kill)

@@ -13,7 +13,8 @@
 
 (custom-theme-set-faces
  'molokai
- '(default ((t (:foreground "#F8F8F2" :background "#1B1D1E"))))
+ '(default ((t (:foreground "#F0F0F0" :background "#1B1D1E"))))
+ '(cursor ((t (:background "#AEB9F5"))))
  '(link ((t (:underline t :weight bold :foreground "#66D9EF"))))
  '(link-visited ((t (:underline t :weight bold :foreground "#AE81EF"))))
 

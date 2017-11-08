@@ -63,11 +63,9 @@
  ediff-split-window-function 'split-window-horizontally
  ediff-window-setup-function 'ediff-setup-windows-plain
  save-interprogram-paste-before-kill t
- grep-highlight-matches t
- grep-scroll-output t
  indent-tabs-mode nil
  ;; `line-spacing' make inline-image flickering a lot
- ;; line-spacing 0.25
+ line-spacing 0.25
  mouse-yank-at-point t
  set-mark-command-repeat-pop t
  echo-keystrokes 0.25
@@ -160,9 +158,6 @@
 
 ;; Don't echo passwords when communicating with interactive programs:
 (add-hook 'comint-output-filter-functions 'comint-watch-for-password-prompt)
-;; But don't show trailing whitespace in SQLi, inf-ruby etc.
-(add-hook 'comint-mode-hook
-          (lambda () (setq show-trailing-whitespace nil)))
 
 ;; Make scratch buffer un-killable
 (define-hook! core|unkillable-buffer (kill-buffer-query-functions)
@@ -205,7 +200,5 @@
   ;; Load private configuration
   (ignore-errors (load-file custom-file))
   (message "Init Time: %s" (emacs-init-time)))
-
-
 
 (provide 'core-defaults)
