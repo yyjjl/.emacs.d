@@ -189,6 +189,9 @@ and `buffer-file-coding-system'"
   (setq-default mode-line-buffer-identification '("%b"))
   (setq-default mode-line-misc-info
                 '((global-mode-string ("" global-mode-string " "))
-                  (iedit-mode (:eval (format "Iedit:%d" (iedit-counter)))))))
+                  (projectile-mode ("" projectile-mode-line " "))
+                  (iedit-mode (:eval (format "Iedit:%d " (iedit-counter))))
+                  (view-mode "View ")
+                  (org-src-mode "OrgSrc "))))
 
 (provide 'core-mode-line)
