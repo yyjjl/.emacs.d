@@ -114,13 +114,13 @@ other characters."
         (func (if $arg 'search-backward 'search-forward)))
     (funcall func (char-to-string char) nil)))
 
-(defun forward-defun (&optional $N)
+(defun forward-defun (&optional $n)
   (interactive "p")
-  (forward-thing 'defun $N))
+  (forward-thing 'defun $n))
 
-(defun backward-defun (&optional $N)
+(defun backward-defun (&optional $n)
   (interactive "p")
-  (forward-thing 'defun (- $N)))
+  (forward-thing 'defun (- $n)))
 
 (define-key!
   ("M-Q" . extra/insert-space-around-chinese)

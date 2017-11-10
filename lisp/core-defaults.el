@@ -130,8 +130,8 @@
     (setq savehist-additional-variables '(ivy-views))
     (savehist-mode 1)))
 
-(defun core%external-file-handler (op &rest args)
-  (let ((file (expand-file-name (car args))))
+(defun core%external-file-handler ($op &rest $args)
+  (let ((file (expand-file-name (car $args))))
     (cond ((eq system-type 'darwin)
            (shell-command (concat "open " (shell-quote-argument file))))
           ((eq system-type 'gnu/linux)

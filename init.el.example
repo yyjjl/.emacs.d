@@ -47,14 +47,18 @@
 
 ;; Some keybindings using when editing
 (require 'init-editing)
-(require 'init-surround)
 (require 'init-dired)
 (require 'init-ibuffer)
 (require 'init-windows)
 (require 'init-gud)
-
-;; (require 'init-linum-mode)
+(require 'init-linum-mode)
 
 ;; Other small tools
-(require 'init-extra)
+(require 'init-surround)
 ;; (require 'init-hydra-extra)
+(require 'init-prettify-symbols)
+
+(when emacs-has-mpv-p
+  (require 'init-emms))
+
+(require 'init-extra)

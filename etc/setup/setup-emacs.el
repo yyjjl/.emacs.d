@@ -15,13 +15,16 @@
 
 ;; Disable some features when load emacs
 (setq core--buffer-useful nil)
-(load-file (expand-file-name "init.el" user-emacs-directory))
-(setq-default prog-mode-hook nil)
-(setq-default auto-mode-alist nil)
-(setq enable-local-variables :all)
+(condition-case err
+    (progn
+      (load-file (expand-file-name "init.el" user-emacs-directory))
+      (setq-default prog-mode-hook nil)
+      (setq-default auto-mode-alist nil)
+      (setq enable-local-variables :all)
 
-;; Compile all configurations
-(core/compile-config :no-message)
+      ;; Compile all configurations
+      (core/compile-config :no-message))
+  (error (message "%s" err)))
 
 (add-to-list 'load-path emacs-setup-directory)
 ;; (dolist (file (directory-files emacs|setup-directory t))

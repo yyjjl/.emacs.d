@@ -3,8 +3,8 @@
 (define-hook! (extra|font-setup frame) (after-make-frame-functions)
   (set-fontset-font t '(57600 . 57711) "Fira Code Symbol"))
 
-(defun extra/make-fix-width-symbol (alist)
-  (loop for (string . char) in alist
+(defun extra/make-fix-width-symbol ($alist)
+  (loop for (string . char) in $alist
         for width = (string-width string)
         collect
         (cons string (if (= width 1)

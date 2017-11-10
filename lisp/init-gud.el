@@ -36,7 +36,7 @@
 (defmacro gud%gdb-display ($type)
   (let ((name (intern (format "gud/display-%s" $type))))
     `(progn
-       (defun ,name (&optional no-select)
+       (defun ,name (&optional $no-select)
          (interactive "P")
          (pop-to-buffer (gdb-get-buffer-create ',$type)))
        #',name)))

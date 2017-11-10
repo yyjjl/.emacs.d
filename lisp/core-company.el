@@ -35,7 +35,8 @@
                    company-etags
                    company-gtags
                    company-keywords)
-                  company-dabbrev))
+                  company-dabbrev
+                  company-yasnippet))
 
   ;; Company should be case sensitive
   (setq company-dabbrev-downcase nil)

@@ -277,22 +277,22 @@ With a prefix BELOW move point to lower block."
       (local-set-key (kbd "C-c h") #'ob-ipython-inspect))
     (flycheck-mode -1))
 
-  (defun org/next-item (&optional $N)
+  (defun org/next-item (&optional $n)
     (interactive "p")
-    (let ((cmd (if (> $N 0) #'org-next-item #'org-previous-item))
+    (let ((cmd (if (> $n 0) #'org-next-item #'org-previous-item))
           (col (current-column))
-          (N (abs $N)))
+          (n (abs $n)))
       (condition-case err
-          (while (>= (decf N) 0)
+          (while (>= (decf n) 0)
             (funcall cmd))
         (error (message "%s" err)))
       (move-to-column col)))
 
-  (defun org/previous-item (&optional $N)
+  (defun org/previous-item (&optional $n)
     (interactive "p")
-    (org/next-item (- $N)))
+    (org/next-item (- $n)))
 
-  (defun org*fill-paragraph-hack (fn &optional arg1 arg2)
+  (defun org*fill-paragraph-hack (&rest _)
     (when (fboundp #'extra/insert-space-around-chinese)
       (let ((element (org-element-at-point)))
         (extra/insert-space-around-chinese

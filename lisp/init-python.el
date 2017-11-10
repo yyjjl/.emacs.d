@@ -17,7 +17,11 @@
     ;; run command `pip install jedi flake8 importmagic` in shell,
     ;; or just check https://github.com/jorgenschaefer/elpy
     (semantic-idle-summary-mode -1)
-    (elpy-mode 1)))
+    (elpy-mode 1)
+    (setq-local company-backends
+                (cons '(elpy-company-backend :with company-dabbrev)
+                      (delq 'elpy-company-backend
+                            company-backends)))))
 
 (with-eval-after-load 'py-isort
   (setq py-isort-options '("--lines=100")))

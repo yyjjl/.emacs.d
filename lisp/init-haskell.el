@@ -15,8 +15,8 @@
 
 
 
-(defun haskell%setup-view-keys (map)
-  (define-key! :map map
+(defun haskell%setup-view-keys ($map)
+  (define-key! :map $map
     ("<tab>" . forward-button)
     ("<backtab>" . backward-button)
     ("SPC" . scroll-up)

@@ -114,13 +114,6 @@
     (delete-file (buffer-file-name))
     (kill-this-buffer)))
 
-(defun core/restore-files ()
-  "Find last opened file"
-  (interactive)
-  (if recentf-mode
-      (find-file (--first (not (get-file-buffer it)) recentf-list))
-    (message "`recentf-mode' must be turned on !!!")))
-
 (defun core/copy-this-file-to-new-file ()
   "Copy current file to a new file without close original file."
   (interactive)
@@ -235,7 +228,6 @@ Does not indent buffer, because it is used for a
   ("C-x C-d" . find-name-dired)
   ("C-x W" . core/copy-this-file-to-new-file)
   ("C-x c" . core/cleanup-buffer-safe)
-  ("C-x ," . core/restore-files)
 
   ("C-c 4" . ispell-word)
   ("C-c q" . auto-fill-mode)

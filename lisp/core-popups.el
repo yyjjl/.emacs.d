@@ -81,7 +81,10 @@
             (when (equal (buffer-local-value 'core--shackle-popup-window
                                              (window-buffer window))
                          window)
-              (and (bound-and-true-p winner-mode) (winner-undo))))
+              (and (bound-and-true-p winner-mode)
+                   (eq winner-last-command
+                       'delete-other-windows)
+                   (winner-undo))))
         (setq window (caar core--shackle-popup-window-list))
         (setq buffer (cdar core--shackle-popup-window-list))
         (when (and (window-live-p window)
@@ -129,18 +132,18 @@
       (setq core--shackle-popup-window window))
     window))
 
-(defun core--shackle%comint-mode-matcher (buffer)
+(defun core--shackle%comint-mode-matcher ($buffer)
   (let ((case-fold-search t)
-        (buffer-name (buffer-name buffer))
-        (mode (buffer-local-value 'major-mode buffer)))
-    (or (derived-mode? 'comint-mode buffer)
+        (buffer-name (buffer-name $buffer))
+        (mode (buffer-local-value 'major-mode $buffer)))
+    (or (derived-mode? 'comint-mode $buffer)
         (memq mode core--shackle-comint-modes)
         (string-match-p "^\\*.*repl.*\\*$" buffer-name))))
 
-(defun core--shackle%help-mode-matcher (buffer)
+(defun core--shackle%help-mode-matcher ($buffer)
   (let ((case-fold-search t)
-        (buffer-name (buffer-name buffer))
-        (mode (buffer-local-value 'major-mode buffer)))
+        (buffer-name (buffer-name $buffer))
+        (mode (buffer-local-value 'major-mode $buffer)))
     (or (memq mode core--shackle-help-modes)
         (string-match-p core--shackle-help-mode-regexp buffer-name))))
 
@@ -169,7 +172,9 @@
         (when (and (equal win core--shackle-popup-window)
                    (window-live-p win)
                    (not (one-window-p))
-                   (not (minibuffer-window-active-p win)))
+                   (not (minibuffer-window-active-p win))
+                   (or (not (boundp 'lv-wnd))
+                       (not (eq (next-window) lv-wnd))))
           (delete-window win)))))
 
   (setq core--shackle-popup-buffer-regexp
