@@ -134,6 +134,10 @@
   (add-hook 'idris-repl-mode-hook
             #'core|generic-comint-mode-setup)
 
+  (add-hook 'idris-mode-hook
+            (lambda ()
+              (setq-local company-idle-delay nil)))
+
   (define-key! :map idris-mode-map
     ("C-c L" . idris-list-holes)
     ("C-c ." . idris-print-definition-of-name)

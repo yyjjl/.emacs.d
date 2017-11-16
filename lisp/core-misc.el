@@ -30,16 +30,17 @@
   ;; Do not check during newline
   (setq-default flycheck-check-syntax-automatically
                 '(idle-change save mode-enabled))
-  (setq flycheck-mode-line-prefix ""))
+  (setq flycheck-mode-line-prefix ""
+        flycheck-idle-change-delay 1.5))
 
 (with-eval-after-load 'hippie-exp
-  (setq hippie-expand-try-functions-list
-        '(try-complete-file-name-partially
-          try-complete-file-name
-          try-expand-all-abbrevs
-          try-expand-dabbrev
-          try-expand-dabbrev-all-buffers
-          try-expand-dabbrev-from-kill)))
+  (setq-default hippie-expand-try-functions-list
+                '(try-complete-file-name-partially
+                  try-complete-file-name
+                  try-expand-all-abbrevs
+                  try-expand-dabbrev
+                  try-expand-dabbrev-all-buffers
+                  try-expand-dabbrev-from-kill)))
 
 (with-eval-after-load 'projectile
   (setq projectile-completion-system 'ivy)
@@ -243,7 +244,8 @@ Does not indent buffer, because it is used for a
   ("RET" . newline-and-indent)
 
   ("C-}" . core/company-yasnippet)
-  ("<backtab>" . company-complete)
+  ("C-c TAB" . company-complete)
+  ("C-c <tab>" . company-complete)
   ([f6] . core/toggle-company-ispell)
   ([f7] . core/create-scratch-buffer)
   ("C-<up>" . text-scale-increase)

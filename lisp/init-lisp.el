@@ -137,8 +137,6 @@ Emacs Lisp."
 
 (define-key!
   ("C->" . hydra-sexp/lisp/transpose-sexp-down)
-  ("C-<" . hydra-sexp/lisp/transpose-sexp-up)
-  ("\"" . lispy-quotes)
-  ("C-y" . lispy-yank))
+  ("C-<" . hydra-sexp/lisp/transpose-sexp-up))
 
 (provide 'init-lisp)

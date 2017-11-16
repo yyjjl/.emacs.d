@@ -1,24 +1,32 @@
+(defun core%semantic--clean-tag ($tag)
+  (let ((def-val (semantic-tag-get-attribute $tag :default-value)))
+    (when (stringp def-val)
+      (when-let ((pos (string-match "\n" def-val)))
+        (setq def-val (concat (substring def-val 0 (min pos 80)) " ... ")))
+      (semantic-tag-put-attribute $tag :default-value def-val))))
+
 (defun core/semantic--create ($tags $depth &optional $class $result)
   "Write the contents of TAGS to the current buffer."
   (let ((class $class)
-        (stylefn #'semantic-format-tag-summarize)
-        cur-type)
+        cur-type
+        formated-tag)
     (dolist (tag $tags)
       (when (listp tag)
+        (core%semantic--clean-tag tag)
+        (setq formated-tag
+              (propertize (semantic-format-tag-summarize tag nil t) 'semantic-tag tag))
         (case (setq cur-type (semantic-tag-class tag))
           ((function variable type)
            (let ((spaces (make-string (* $depth 2) ?\s))
                  (type-p (eq cur-type 'type)))
              (unless (and (> $depth 0) (not type-p))
                (setq class nil))
-             (push (concat
-                    (if (and class (not type-p))
-                        (format "%s%s(%s) "
-                                spaces (if (> $depth 0) "=> " "") class)
-                      spaces)
-                    ;; Save the tag for later
-                    (propertize (funcall stylefn tag nil t)
-                                'semantic-tag tag))
+             ;; Format tag
+             (push (concat (if (and class (not type-p))
+                               (format "%s%s(%s) "
+                                       spaces (if (> $depth 0) "=> " "") class)
+                             spaces)
+                           formated-tag)
                    $result)
              (when type-p
                (setq class (car tag)))
@@ -30,37 +38,33 @@
                                             class
                                             $result)))))
           ;; Catch-all
-          (t
-           (push (propertize (funcall stylefn tag nil t) 'semantic-tag tag)
-                 $result))))))
+          (t (push formated-tag $result))))))
   $result)
 
 (defun counsel-semantic-or-imenu ()
   "Jump to a semantic tag in the current buffer."
   (interactive)
-  (unless (and (semantic-active-p)
-               (ignore-errors
-                 (when (semantic-parse-tree-needs-update-p)
-                   (semantic-parse-tree-set-needs-update))
-                 (ivy-read
-                  "tag: " (nreverse (core/semantic--create (semantic-fetch-tags) 0))
-                  :preselect (thing-at-point 'symbol)
-                  :require-match t
-                  :action
-                  (lambda (candidate)
-                    (let* ((pos (if (string-prefix-p " " candidate)
-                                    (next-single-property-change 0
-                                                                 'semantic-tag candidate
-                                                                 (length candidate))
-                                  0))
-                           (tag (get-text-property pos
-                                                   'semantic-tag
-                                                   candidate)))
-                      (semantic-go-to-tag tag)))
-                  :caller 'counsel-semantic-or-imenu
-                  :keymap (define-key! :map (make-sparse-keymap)
-                            ("C-n" . ivy-next-line-and-call)
-                            ("C-p" . ivy-previous-line-and-call)))))
+  (unless
+      (and (semantic-active-p)
+           (ignore-errors
+             (when (semantic-parse-tree-needs-update-p)
+               (semantic-parse-tree-set-needs-update))
+             (ivy-read
+              "tag: " (nreverse (core/semantic--create (semantic-fetch-tags) 0))
+              :preselect (thing-at-point 'symbol)
+              :require-match t
+              :action
+              (lambda (candidate)
+                (let* ((pos (if (string-prefix-p " " candidate)
+                                (next-single-property-change
+                                 0 'semantic-tag candidate (length candidate))
+                              0))
+                       (tag (get-text-property pos 'semantic-tag candidate)))
+                  (semantic-go-to-tag tag)))
+              :caller 'counsel-semantic-or-imenu
+              :keymap (define-key! :map (make-sparse-keymap)
+                        ("C-n" . ivy-next-line-and-call)
+                        ("C-p" . ivy-previous-line-and-call)))))
     (call-interactively #'counsel-imenu)))
 
 (defun counsel-kill-buffer (&optional $arg)
@@ -171,7 +175,9 @@ for a file to visit if current buffer is not visiting a file."
     ("C-x C-f" . counsel-find-file)
     ("C-x k" . counsel-kill-buffer)
     ("C-x w -" . ivy-pop-view)
-    ("C-x w =" . ivy-push-view))
+    ("C-x w =" . ivy-push-view)
+    ("C-M-i" . counsel-company))
+
   (define-key! :prefix "C-c i"
     ("r" . ivy-resume)
     ("l l" . counsel-load-library)
@@ -200,8 +206,7 @@ for a file to visit if current buffer is not visiting a file."
     ("E" . counsel-colors-emacs)
     ("e" . counsel-sudo-edit)
     ("o" . counsel-outline)
-    ("t" . counsel-tmm)
-    ("<tab>" . counsel-company))
+    ("t" . counsel-tmm))
 
   (add-to-list 'counsel-linux-apps-directories "~/.local/share/applications")
   (setq counsel-yank-pop-separator

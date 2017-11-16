@@ -25,6 +25,8 @@
     ("M-p" . company-previous-page))
 
   (company-statistics-mode 1)
+  (add-to-list 'company-transformers
+               'company-sort-by-backend-importance :append)
   ;; Make company-files a work before capf
   (setq-default company-backends
                 '(company-nxml
@@ -45,7 +47,7 @@
   (setq company-dabbrev-char-regexp "[0-9a-zA-Z-_]")
   (setq company-dabbrev-code-other-buffers t)
   (setq company-show-numbers t)
-  (setq company-idle-delay 0.3)
+  (setq company-idle-delay 0.2)
   (setq company-clang-insert-arguments nil)
   (setq company-require-match nil)
   (setq company-etags-ignore-case t)

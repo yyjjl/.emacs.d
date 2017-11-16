@@ -145,7 +145,7 @@
  '(hl-line ((t (:background "black"))))
  '(org-block ((t (:foreground "#8BC34A" :background "#1E2930"))))
  '(org-block-background ((t (:background "#1C1F26"))))
- '(org-code ((t (:foreground "#8BC34A" :background "#1C1F26"))))
+ '(org-code ((t (:foreground "#8BC34A" :background "#2D2D2D"))))
  '(org-checkbox ((t (:foreground "#8BC34A"))))
  '(org-column ((t (:background "#37474F"))))
  '(org-column-title ((t (:inherit org-column :weight bold :underline t))))

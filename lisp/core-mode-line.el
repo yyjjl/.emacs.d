@@ -13,38 +13,30 @@
     ""))
 
 (defun mode-line%buffer-id ()
-  "Display buffer id in mode-line.
-Default format 'window-number %[%b (host-address) %]'
-If function `window-numbering-mode' enabled window-number will be showed.
-If buffer file is a remote file, host-address will be showed"
-  (let* ((method (file-remote-p default-directory 'method))
-         (sudo? (member method '("su" "sudo")))
-         (host (and default-directory
-                    (let ((dir (file-remote-p default-directory)))
-                      (if (and method (not sudo?))
-                          (cadr (split-string dir ":"))
-                        method))))
-         (real-id (concat
-                   (when host
-                     (propertize (concat "[" host "]")
-                                 'face font-lock-string-face))
-                   (propertize
-                    (format-mode-line  mode-line-buffer-identification)
-                    'face (if sudo?
-                              'font-lock-function-name-face
-                            'font-lock-keyword-face)))))
-    (list " %[" real-id "%] ")))
+  "Display buffer id in mode-line."
+  (let* ((method (file-remote-p default-directory 'method)))
+    (list " %["
+          (when method
+            (propertize (concat "[" method "]") 'face font-lock-string-face))
+          '(:propertize mode-line-buffer-identification
+                        face font-lock-keyword-face)
+          "%] ")))
 
 (defun mode-line%buffer-major-mode ()
   "Display buffer major mode in mode-line."
-  (propertize (format-mode-line mode-name)
-              'face 'font-lock-builtin-face))
+  '(:propertize mode-name face font-lock-builtin-face))
 
 (defun mode-line%buffer-status ()
   "Display buffer status.
 Whether it is temporary file, whether it is modified, whether is read-only,
 and `buffer-file-coding-system'"
   (list " ("
+        (when (bound-and-true-p iedit-mode)
+          (propertize (format "Iedit:%d " (iedit-counter))
+                      'face font-lock-constant-face))
+        (when (bound-and-true-p multiple-cursors-mode)
+          (propertize (format "Mc:%d " (mc/num-cursors))
+                      'face font-lock-constant-face))
         (when (and (boundp 'text-scale-mode-amount)
                    (/= text-scale-mode-amount 0))
           (propertize (format "%+d " text-scale-mode-amount)
@@ -57,7 +49,9 @@ and `buffer-file-coding-system'"
         (when (buffer-modified-p)
           (propertize "Mod " 'face font-lock-negation-char-face))
         (when buffer-read-only
-          (propertize "RO " 'face font-lock-string-face))
+          (propertize (if (bound-and-true-p view-mode) "View " "Ro ")
+                      'face font-lock-string-face))
+
         (when (eq major-mode 'image-mode)
           (cl-destructuring-bind (width . height)
               (image-size (image-get-display-property) :pixels)
@@ -117,7 +111,7 @@ and `buffer-file-coding-system'"
                              mode-line%buffer-major-mode
                              mode-line%buffer-status)
                             (mode-line%process)
-                            :no-tail
+                            nil
                             :no-center)
     (t (mode-line%window-number
         mode-line%buffer-id
@@ -175,7 +169,7 @@ and `buffer-file-coding-system'"
 
 (defvar mode-line--current-window (frame-selected-window))
 (defun mode-line*set-selected-window (&rest _)
-  "Sets `+doom-modeline-current-window' appropriately"
+  "Sets `mode-line--current-window' appropriately"
   (let ((win (frame-selected-window)))
     (unless (minibuffer-window-active-p win)
       (setq mode-line--current-window win))))
@@ -189,9 +183,6 @@ and `buffer-file-coding-system'"
   (setq-default mode-line-buffer-identification '("%b"))
   (setq-default mode-line-misc-info
                 '((global-mode-string ("" global-mode-string " "))
-                  (projectile-mode ("" projectile-mode-line " "))
-                  (iedit-mode (:eval (format "Iedit:%d " (iedit-counter))))
-                  (view-mode "View ")
-                  (org-src-mode "OrgSrc "))))
+                  (projectile-mode ("" projectile-mode-line " ")))))
 
 (provide 'core-mode-line)

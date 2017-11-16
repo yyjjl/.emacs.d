@@ -80,11 +80,7 @@
             (setq window (selected-window))
             (when (equal (buffer-local-value 'core--shackle-popup-window
                                              (window-buffer window))
-                         window)
-              (and (bound-and-true-p winner-mode)
-                   (eq winner-last-command
-                       'delete-other-windows)
-                   (winner-undo))))
+                         window)))
         (setq window (caar core--shackle-popup-window-list))
         (setq buffer (cdar core--shackle-popup-window-list))
         (when (and (window-live-p window)
@@ -181,7 +177,8 @@
         (eval-when-compile
           (concat "^\\(?:"
                   (string-join `("\\*Man.*\\*"
-                                 "\\*TeX.*\\*")
+                                 "\\*TeX.*\\*"
+                                 "\\*Flycheck.*\\*")
                                "\\|")
                   "\\)$")))
 
