@@ -50,7 +50,7 @@
  spelling-has-hunspell-p (executable-find "hunspell")
 
  ;; Tag multiple languages
- tags-has-ggtags-p (executable-find "global")
+ tags-has-gtags-p (executable-find "global")
 
  ;; Whether to use latex packages
  latex-use-latex-p t)

@@ -32,7 +32,7 @@
 (if git-has-git-p
     (require 'init-git))
 
-(if tags-has-ggtags-p
+(if tags-has-gtags-p
     (require 'init-tags))
 
 ;; Programming modes

@@ -57,7 +57,7 @@
     ("d" emms-play-directory-tree)
     ("D" emms-play-directory)
     ("SPC" (emms-play-playlist
-            (ivy-read "Playlist:" emms-playlist-list)))
+            (ivy-read "Playlist: " emms-playlist-list)))
     ("RET" emms-playlist-mode-go :exit t)
     ("t" emms-toggle-repeat-playlist)
     ("T" emms-toggle-repeat-track)

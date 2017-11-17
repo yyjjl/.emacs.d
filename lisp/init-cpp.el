@@ -9,6 +9,7 @@
 ;; C/C++ I need stable version
 (require-packages!
  (cmake-ide :archive "melpa-stable")
+ (ggtags :when tags-has-gtags-p)
  irony
  irony-eldoc
  company-irony
@@ -83,7 +84,7 @@
   (local-set-key (kbd "C-c .") 'rtags-symbol-type)
   (local-set-key (kbd "C-c C-k") 'cpp/remove-project-rtags-cache)
   (when cpp-has-irony-p (irony-eldoc -1))
-  (when tags-has-ggtags-p (ggtags-mode -1)))
+  (when tags-has-gtags-p (ggtags-mode -1)))
 
 (defun cpp/try-misc-setup ()
   (interactive)
@@ -128,6 +129,34 @@
        'cmake-ide-compile
      'compile)))
 
+(defun cpp/load-file-in-root ()
+  (interactive)
+  (cond
+   ((file-remote-p default-directory)
+    (message "Not support in remove sever !"))
+   ((not (executable-find "root"))
+    (message "Executable `root' not found !"))
+   ((not (buffer-file-name))
+    (message "Buffer has no file !"))
+   (t
+    (let* ((file (buffer-file-name))
+           (buffer-name (format "*root:%s*" (buffer-name)))
+           (buffer (get-buffer-create buffer-name))
+           (proc (get-buffer-process buffer)))
+      (if (and proc
+               (process-live-p proc)
+               (eq (buffer-local-value 'major-mode buffer)
+                   'term-mode))
+          (progn
+            (with-current-buffer buffer
+              (term-send-raw-string (format ".X %s\n" file))))
+        (kill-buffer buffer)
+        (setq buffer
+              (term/exec-program "root"
+                                 (list "-l" (or file ""))
+                                 buffer-name)))
+      (pop-to-buffer buffer)))))
+
 (setq hide-ifdef-mode-prefix-key (kbd "C-c h"))
 (defun cpp/c++-setup ()
   "C/C++ only setup"
@@ -136,6 +165,7 @@
   (local-set-key (kbd "C-c C-j") 'semantic-ia-fast-jump)
   (local-set-key (kbd "C-c C-v") 'semantic-decoration-include-visit)
   (local-set-key (kbd "C-c C-c") 'cmake-ide-run-cmake)
+  (local-set-key (kbd "C-c C-l") 'cpp/load-file-in-root)
   (local-set-key [f9] 'cpp/try-misc-setup)
   (local-set-key [f10] 'cpp/compile)
   (local-set-key [f5] 'gdb)
@@ -144,7 +174,7 @@
 
   (modern-c++-font-lock-mode 1)
 
-  (when tags-has-ggtags-p
+  (when tags-has-gtags-p
     (ggtags-mode 1)
     (setq completion-at-point-functions '(t)))
 
@@ -193,6 +223,24 @@
   (setq irony-additional-clang-options
         '("-Wall" "-std=c++14"))
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
+
+(with-eval-after-load 'irony-eldoc
+  (defvar cpp--irony-eldoc-old-overlays nil)
+  (defun cpp%fix-irony-eldoc ()
+    (let ((hook (lambda (ov &rest _)
+                  (if iedit-mode
+                      ;; delay deletion of an overlay
+                      (add-to-list 'cpp--irony-eldoc-old-overlays ov)
+                    (delete-overlay ov)))))
+      (put 'irony-eldoc 'modification-hooks (list hook))
+      (put 'irony-eldoc 'insert-in-front-hooks (list hook))
+      (put 'irony-eldoc 'insert-behind-hooks (list hook)))
+
+    (add-hook 'iedit-mode-end-hook
+              (lambda ()
+                (while cpp--irony-eldoc-old-overlays
+                  (delete-overlay (pop cpp--irony-eldoc-old-overlays))))
+              nil :local)))
 
 (autoload 'cmake-font-lock-activate "cmake-font-lock" nil t)
 (add-hook 'cmake-mode-hook 'cmake-font-lock-activate)

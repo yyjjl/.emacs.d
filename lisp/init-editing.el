@@ -141,13 +141,15 @@ other characters."
   ("P" . mc/mark-pop)
   ("m" . mc/mark-all-like-this-dwim)
   ("l" . mc/edit-lines)
+  ("t" . mc/mark-sgml-tag-pair)
   ("e" . mc/edit-ends-of-lines)
   ("a" . mc/edit-beginnings-of-lines)
   ("i" . mc/insert-numbers)
   ("L" . mc/insert-letters)
   ("s" . mc/sort-regions)
   ("v" . mc/vertical-align)
-  ("r" . mc/reverse-regions))
+  ("r" . mc/reverse-regions)
+  ([C-S-mouse-1] . mc/add-cursor-on-click))
 
 (defhydra hydra-mc (:color blue :hint nil)
   "

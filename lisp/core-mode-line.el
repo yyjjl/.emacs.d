@@ -48,6 +48,7 @@ and `buffer-file-coding-system'"
           (propertize "Tmp " 'face font-lock-comment-face))
         (when (buffer-modified-p)
           (propertize "Mod " 'face font-lock-negation-char-face))
+
         (when buffer-read-only
           (propertize (if (bound-and-true-p view-mode) "View " "Ro ")
                       'face font-lock-string-face))

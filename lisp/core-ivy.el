@@ -71,7 +71,7 @@
   "Kill buffer with ivy backends."
   (interactive "P")
   (let ((ivy-use-virtual-buffers nil))
-    (ivy-read (format "Kill buffer (default %s) :" (buffer-name))
+    (ivy-read (format "Kill buffer (default %s): " (buffer-name))
               'internal-complete-buffer
               :preselect (buffer-name (current-buffer))
               :action (if $arg
@@ -194,7 +194,7 @@ for a file to visit if current buffer is not visiting a file."
     ("g g" . counsel-git-grep)
     ("g q" . counsel-git-grep-query-replace)
     ("g s" . counsel-git-stash)
-    ("h" . counsel-shell-command-history)
+    ("h" . counsel-minibuffer-history)
     ("m" . counsel-mark-ring)
     ("a" . counsel-ag)
     ("/" . counsel-grep)

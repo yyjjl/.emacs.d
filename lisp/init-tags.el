@@ -3,9 +3,11 @@
 
 
 (with-eval-after-load 'ggtags
-  (setq gtags-suggested-key-mapping t)
-  (setq ggtags-mode-prefix-key "\C-cg")
-  (setq ggtags-mode-prefix-map
+  (setq ggtags-mode-prefix-key "\C-cg"
+        ;; Set `ggtags-highlight-tag' to t make iedit fail to update
+        ;; candidates
+        ggtags-highlight-tag nil
+        ggtags-mode-prefix-map
         (define-key! :map (make-sparse-keymap)
           ("D" . ggtags-delete-tags)
           ("p" . ggtags-prev-mark)
