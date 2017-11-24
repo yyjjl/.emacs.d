@@ -52,16 +52,16 @@
 
 (defvar gud--source-mode-map
   (define-key! :map (make-sparse-keymap)
-    ("d i" . (gud%gdb-display gdb-inferior-io))
-    ("d g" . gud/display-comint-buffer)
-    ("d b" . (gud%gdb-display gdb-breakpoints-buffer))
-    ("d t" . (gud%gdb-display gdb-threads-buffer))
-    ("d r" . (gud%gdb-display gdb-registers-buffer))
-    ("d s" . (gud%gdb-display gdb-stack-buffer))
-    ("d d" . (gud%gdb-display gdb-disassembly-buffer))
-    ("d m" . (gud%gdb-display gdb-memory-buffer))
+    ("o" . (gud%gdb-display gdb-inferior-io))
+    ("g" . gud/display-comint-buffer)
+    ("B" . (gud%gdb-display gdb-breakpoints-buffer))
+    ("T" . (gud%gdb-display gdb-threads-buffer))
+    ("R" . (gud%gdb-display gdb-registers-buffer))
+    ("S" . (gud%gdb-display gdb-stack-buffer))
+    ("D" . (gud%gdb-display gdb-disassembly-buffer))
+    ("m" . (gud%gdb-display gdb-memory-buffer))
     ("q" . gud-source-mode)
-    ("=" .  gud-break)
+    ("=" . gud-break)
     ("-" . gud-remove)
     ("t" . gud-tbreak)
     ("s" . gud-step)
@@ -82,6 +82,9 @@
     ("x" . (lambda () (interactive)
              (when (and (yes-or-no-p "Quit process"))
                (gud-call "quit"))))))
+(defvar gud-source-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "`" gud--source-mode-map)))
 
 (defvar-local gud--source-buffer-status nil)
 (defvar-local gud--source-buffer-list nil)
@@ -89,7 +92,7 @@
 (define-minor-mode gud-source-mode "minor mode for source file"
   :init-value nil
   :lighter "GS"
-  :keymap gud--source-mode-map
+  :keymap gud-source-mode-map
   (if gud-source-mode
       (progn
         (setq gud--source-buffer-status (list buffer-read-only))
@@ -103,21 +106,21 @@
   (force-mode-line-update))
 
 (defun gud*find-file-hack ($fn $file)
-  (let ((buf (funcall $fn $file)))
-    (when (and buf gud-comint-buffer)
+  (let ((buffer (funcall $fn $file)))
+    (when (and buffer gud-comint-buffer)
       (with-current-buffer gud-comint-buffer
-        (add-to-list 'gud--source-buffer-list buf))
-      (with-current-buffer buf
+        (add-to-list 'gud--source-buffer-list buffer))
+      (with-current-buffer buffer
         (when (not gud-source-mode)
           (gud-source-mode 1)))
-      buf)))
+      buffer)))
 (advice-add 'gud-find-file :around #'gud*find-file-hack)
 
 (defun gud*sentinel-hack ($proc $msg)
-  (let ((buf (process-buffer $proc)))
-    (when (and (buffer-live-p buf)
+  (let ((buffer (process-buffer $proc)))
+    (when (and (buffer-live-p buffer)
                (memq (process-status $proc) '(signal exit)))
-      (dolist (src-buf (buffer-local-value 'buf gud--source-buffer-list))
+      (dolist (src-buf (buffer-local-value 'gud--source-buffer-list buffer))
         (when (buffer-live-p src-buf)
           (with-current-buffer src-buf
             (when gud-source-mode
@@ -127,12 +130,12 @@
 
 
 (with-eval-after-load 'gud
+  (define-key gud-mode-map "`" gud--source-mode-map)
   (define-hook! gud|setup-hook (gud-mode-hook)
     (add-hook 'kill-buffer-hook #'gud|kill-overlay nil :local)
-    (local-set-key (kbd "C-c C-z") #'gud/pop-to-source-buffer)
     ;; `gud-print' need prompt can be modified
     ;; (setq comint-prompt-read-only t)
-    ))
+    (local-set-key (kbd "C-c C-z") #'gud/pop-to-source-buffer)))
 
 (with-eval-after-load 'gdb-mi
   (setq gdb-show-main t)

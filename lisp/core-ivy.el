@@ -175,8 +175,7 @@ for a file to visit if current buffer is not visiting a file."
     ("C-x C-f" . counsel-find-file)
     ("C-x k" . counsel-kill-buffer)
     ("C-x w -" . ivy-pop-view)
-    ("C-x w =" . ivy-push-view)
-    ("C-M-i" . counsel-company))
+    ("C-x w =" . ivy-push-view))
 
   (define-key! :prefix "C-c i"
     ("r" . ivy-resume)

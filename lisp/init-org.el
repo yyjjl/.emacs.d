@@ -274,7 +274,10 @@ With a prefix BELOW move point to lower block."
 
   (define-hook! org|src-setup (org-src-mode-hook)
     (when (eq major-mode 'python-mode)
-      (local-set-key (kbd "C-c h") #'ob-ipython-inspect))
+      ;; company-ob-ipython is very slow
+      (setq-local company-idle-delay nil)
+      (add-to-list 'company-backends #'company-ob-ipython)
+      (local-set-key (kbd "C-c C-.") #'ob-ipython-inspect))
     (flycheck-mode -1))
 
   (defun org/next-item (&optional $n)
@@ -304,7 +307,7 @@ With a prefix BELOW move point to lower block."
 
   (define-key org-mode-map (kbd "C-c t") org-table-extra-map)
   (define-key! :map org-mode-map
-    ("C-c h" . ob-ipython-inspect)
+    ("C-c C-." . ob-ipython-inspect)
     ("C-c v" . org/open-pdf)
     ("M-," . org-mark-ring-goto)
     ("M-." . org-mark-ring-push)

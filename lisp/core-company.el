@@ -19,6 +19,7 @@
 (make-variable-buffer-local 'company-backends)
 (with-eval-after-load 'company
   (define-key! :map company-active-map
+    ("C-d" . nil)
     ("C-n" . company-select-next)
     ("C-p" . company-select-previous)
     ("M-n" . company-next-page)
@@ -43,7 +44,7 @@
   ;; Company should be case sensitive
   (setq company-dabbrev-downcase nil)
   (setq company-dabbrev-ignore-case t)
-  (setq company-dabbrev-code-ignore-case t)
+  (setq company-dabbrev-code-ignore-case nil)
   (setq company-dabbrev-char-regexp "[0-9a-zA-Z-_]")
   (setq company-dabbrev-code-other-buffers t)
   (setq company-show-numbers t)

@@ -1,6 +1,8 @@
 ;; Default prog-mode setup
 (define-hook! core|generic-prog-mode-setup (prog-mode-hook
                                             LaTeX-mode-hook)
+  (local-set-key [remap completion-at-point] #'counsel-company)
+
   (condition-case err
       (hs-minor-mode 1)
     (error (message "%s" (error-message-string err))))
@@ -9,21 +11,43 @@
   (when (< (buffer-size) core-large-buffer-size)
     ;; (highlight-indentation-current-column-mode 1)
     (highlight-indentation-mode 1))
+
   ;; show trailing spaces in a programming mode
   (setq show-trailing-whitespace t)
   (setq indicate-empty-lines t))
 
 (define-hook! core|generic-text-mode-setup (text-mode-hook)
+  (local-set-key [remap completion-at-point] #'counsel-company)
+
   (hl-line-mode 1)
   (auto-fill-mode 1)
   (setq indicate-empty-lines t))
 
 (define-hook! core|generic-comint-mode-setup (comint-mode-hook)
+  (local-set-key [remap completion-at-point] #'counsel-company)
+
   ;; But don't show trailing whitespace in SQLi, inf-ruby etc.
   (setq show-trailing-whitespace nil)
   (setq-local company-idle-delay nil))
 
 
+
+
+(with-eval-after-load 'bookmark
+  (define-hook! core|setup-buffer-bookmark (find-file-hook)
+    ;; Setup default bookmark
+    (setq bookmark-current-bookmark
+          (ignore-errors
+            (loop for (name . record) in bookmark-alist
+                  when (equal (file-truename (buffer-file-name))
+                              (file-truename (bookmark-get-filename name)))
+                  do (return name)))))
+
+  (bookmark-maybe-load-default-file)
+  ;; Setup for existing buffers
+  (dolist (buffer (buffer-list))
+    (with-current-buffer buffer
+      (core|setup-buffer-bookmark))))
 
 (setq flycheck-keymap-prefix (kbd "C-c f"))
 (with-eval-after-load 'flycheck
@@ -53,7 +77,7 @@
   (setq yas-prompt-functions '(yas-completing-prompt))
   (setq-default yas-indent-line 'fixed))
 
-(with-eval-after-load "isearch"
+(with-eval-after-load 'isearch
   (define-key isearch-mode-map (kbd "C-o") 'isearch-occur))
 
 (with-eval-after-load 'session

@@ -24,7 +24,14 @@
 
 
 
-(defun cpp/fix-cc-indent-offset ($key $val)
+(defun cpp%fix-irony-eldoc ()
+  (add-hook 'iedit-mode-end-hook
+            (lambda ()
+              (while cpp--irony-eldoc-old-overlays
+                (delete-overlay (pop cpp--irony-eldoc-old-overlays))))
+            nil :local))
+
+(defun cpp%fix-cc-indent-offset ($key $val)
   (let ((pair (assoc $key c-offsets-alist)))
     (if pair
         (setcdr pair $val)
@@ -70,10 +77,10 @@
   ;; (c-toggle-auto-newline 1)
   ;; indent
   (highlight-indentation-set-offset 4)
-  (cpp/fix-cc-indent-offset 'innamespace [0])
-  (cpp/fix-cc-indent-offset 'substatement-open 0)
-  (cpp/fix-cc-indent-offset 'func-decl-cont 0)
-  (cpp/fix-cc-indent-offset 'case-label 4))
+  (cpp%fix-cc-indent-offset 'innamespace [0])
+  (cpp%fix-cc-indent-offset 'substatement-open 0)
+  (cpp%fix-cc-indent-offset 'func-decl-cont 0)
+  (cpp%fix-cc-indent-offset 'case-label 4))
 
 (defun cpp/rtags-setup ()
   (setq-local eldoc-documentation-function 'cpp/rtags-eldoc)
@@ -192,7 +199,8 @@
       (add-to-list 'company-backends #'company-irony-c-headers)
       (add-to-list 'company-backends #'company-files)
 
-      (irony-mode 1))
+      (irony-mode 1)
+      (cpp%fix-irony-eldoc))
     ;; Make sure rdm is running
     (when cpp-has-rtags-p
       (rtags-start-process-unless-running))
@@ -226,24 +234,14 @@
 
 (with-eval-after-load 'irony-eldoc
   (defvar cpp--irony-eldoc-old-overlays nil)
-  (defun cpp%fix-irony-eldoc ()
-    (let ((hook (lambda (ov &rest _)
-                  (if iedit-mode
-                      ;; delay deletion of an overlay
-                      (add-to-list 'cpp--irony-eldoc-old-overlays ov)
-                    (delete-overlay ov)))))
-      (put 'irony-eldoc 'modification-hooks (list hook))
-      (put 'irony-eldoc 'insert-in-front-hooks (list hook))
-      (put 'irony-eldoc 'insert-behind-hooks (list hook)))
-
-    (add-hook 'iedit-mode-end-hook
-              (lambda ()
-                (while cpp--irony-eldoc-old-overlays
-                  (delete-overlay (pop cpp--irony-eldoc-old-overlays))))
-              nil :local)))
-
-(autoload 'cmake-font-lock-activate "cmake-font-lock" nil t)
-(add-hook 'cmake-mode-hook 'cmake-font-lock-activate)
+  (let ((hook (lambda (ov &rest _)
+                (if iedit-mode
+                    ;; delay deletion of an overlay
+                    (add-to-list 'cpp--irony-eldoc-old-overlays ov)
+                  (delete-overlay ov)))))
+    (put 'irony-eldoc 'modification-hooks (list hook))
+    (put 'irony-eldoc 'insert-in-front-hooks (list hook))
+    (put 'irony-eldoc 'insert-behind-hooks (list hook))))
 
 (with-eval-after-load 'cmake-ide
   (setq cmake-ide-rdm-buffer-name "*rdm*")
@@ -279,16 +277,16 @@
   ;; Smart tab
   (advice-add 'c-indent-line-or-region :around #'core%indent-for-tab)
 
-  (rtags-enable-standard-keybindings nil "`")
-  ;; ?\` all Upper case to lower-case
-  (let ((m (assoc ?\` c-mode-base-map)))
+  (rtags-enable-standard-keybindings)
+  ;; C-c(3) r(114) make all Upper case to lower-case
+  (let ((m (assoc 114 (assoc 3 c-mode-base-map))))
     (ignore-errors
-      (dolist (x (cddr m))
-        (let ((k (car x)))
-          (if (and (>= k ?A) (<= k ?Z))
-              (setf (car x) (+ k 32))
-            (if (and (>= k ?a) (<= k ?z))
-                (setf (car x) (- k 32))))))))
-  (define-key c-mode-base-map (kbd "` `") #'self-insert-command))
+      (mapcar (lambda (x)
+                (let ((k (car x)))
+                  (if (and (>= k 65) (<= k 90))
+                      (setf (car x) (+ k 32))
+                    (if (and (>= k 97) (<= k 122))
+                        (setf (car x) (- k 32))))))
+              (cddr m)))))
 
 (provide 'init-cpp)

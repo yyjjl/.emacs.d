@@ -111,6 +111,6 @@ _p_ previous-error _n_ next-error _q_ quit
   ("q" nil :exit t)
   ("RET" nil :exit t))
 
-(global-set-key (kbd "C-;") #'hydra-flyspell/body)
+(global-set-key (kbd "C-\"") #'hydra-flyspell/body)
 
 (provide 'init-spelling)

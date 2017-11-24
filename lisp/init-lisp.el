@@ -5,7 +5,9 @@
  lispy
  macrostep
  geiser
- hl-sexp)
+ hl-sexp
+
+ sicp)
 
 
 
@@ -43,8 +45,8 @@ Emacs Lisp."
 
 (defun lisp|scheme-setup ()
   (lisp|common-setup)
-  (setq flycheck-check-syntax-automatically
-        '(save mode-enabled)))
+  (setq-local flycheck-check-syntax-automatically
+              '(save mode-enabled)))
 
 (defun lisp|elisp-setup ()
   (lisp|common-setup)

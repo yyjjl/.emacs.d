@@ -15,6 +15,7 @@
   (require 'ibuffer-vc)
 
   (setq ibuffer-expert t
+        ibuffer-use-other-window t
         ibuffer-show-empty-filter-groups nil
         ibuffer-display-summary nil)
 
