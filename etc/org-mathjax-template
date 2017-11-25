@@ -3,12 +3,16 @@
 <script type="text/javascript">
 <!--/*--><![CDATA[/*><!--*/
     MathJax.Hub.Config({
+        TeX: {
+            Macros: {
+                bm: ["{\\boldsymbol #1}",1]
+            }
+        },
         // Only one of the two following lines, depending on user settings
         // First allows browser-native MathML display, second forces HTML/CSS
         config: ["MMLorHTML.js"], jax: ["input/TeX"],
         jax: ["input/TeX", "output/HTML-CSS"],
-        extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js",
-                     "TeX/noUndefined.js"],
+        extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js", "TeX/noUndefined.js"],
         tex2jax: {
             inlineMath: [ ["\\(","\\)"] ],
             displayMath: [ ['$$','$$'], ["\\[","\\]"], ["\\begin{displaymath}","\\end{displaymath}"] ],

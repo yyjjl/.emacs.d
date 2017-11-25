@@ -265,6 +265,7 @@ With a prefix BELOW move point to lower block."
       (annotation (company-auctex-symbol-annotation $arg))))
 
   (define-hook! org|setup (org-mode-hook)
+    (setq line-spacing nil)
     (auto-fill-mode -1)
 
     (make-local-variable 'completion-at-point-functions)

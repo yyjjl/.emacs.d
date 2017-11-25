@@ -1,44 +1,26 @@
-(defvar gud--current-overlay
-  (let* ((ov (make-overlay (point-min) (point-min))))
-    (overlay-put ov 'face 'secondary-selection)
-    ov)
-  "Overlay variable for GUD highlighting.")
-
-(defun gud*highlight-current-line ($fn $true-file $line)
-  "Highlight current line."
-  (let* ((ov gud--current-overlay)
-         (buf (gud-find-file $true-file))
-         (pos (with-current-buffer buf (point)))
-         (ret (funcall $fn $true-file $line)))
-    (with-current-buffer buf
-      (move-overlay ov
-                    (line-beginning-position)
-                    (line-beginning-position 2)
-                    (current-buffer))
-      (goto-char pos))
-    ret))
-(advice-add 'gud-display-line :around #'gud*highlight-current-line)
-
-(defun gud|kill-overlay ()
-  (if (derived-mode-p 'gud-mode)
-      (delete-overlay gud--current-overlay)))
-
-;; Move the cursor to the end of last line if it's gud-mode {{
-(defun gud*move-to-end (&rest $args)
-  (when (eq major-mode 'gud-mode)
-    (goto-char (point-max))))
-
-(advice-add 'switch-to-buffer :after #'gud*move-to-end)
-(advice-add 'pop-to-buffer :after #'gud*move-to-end)
-(advice-add 'select-window-by-number :after #'gud*move-to-end)
-(advice-add 'windmove-do-window-select :after #'gud*move-to-end)
-
+(defvar gdb--info-window nil)
 (defmacro gud%gdb-display ($type)
   (let ((name (intern (format "gud/display-%s" $type))))
     `(progn
-       (defun ,name (&optional $no-select)
+       (defun ,name (&optional $select)
          (interactive "P")
-         (pop-to-buffer (gdb-get-buffer-create ',$type)))
+         (let ((old-win (selected-window))
+               (buffer (gdb-get-buffer-create ',$type)))
+           (unless (window-live-p gdb--info-window)
+             (when-let ((comint-buffer gud-comint-buffer)
+                        (win (get-buffer-window comint-buffer)))
+               (with-selected-window win
+                 (setq gdb--info-window
+                       (split-window-vertically -15)))))
+           (if (window-live-p gdb--info-window)
+               (progn
+                 (with-selected-window gdb--info-window
+                   (set-window-dedicated-p gdb--info-window nil)
+                   (switch-to-buffer buffer)
+                   (set-window-dedicated-p gdb--info-window t))
+                 (if $select
+                     (select-window gdb--info-window)))
+             (message "Can not display buffer %s" '$type))))
        #',name)))
 
 (defun gud/pop-to-source-buffer ()
@@ -46,22 +28,21 @@
   (when gud-last-last-frame
     (pop-to-buffer (gud-find-file (car gud-last-last-frame)))))
 
-(defun gud/display-comint-buffer ()
+(defun gud/pop-to-comint-buffer ()
   (interactive)
   (pop-to-buffer gud-comint-buffer))
 
 (defvar gud--source-mode-map
   (define-key! :map (make-sparse-keymap)
     ("o" . (gud%gdb-display gdb-inferior-io))
-    ("g" . gud/display-comint-buffer)
+    ("g" . gud/pop-to-comint-buffer)
     ("B" . (gud%gdb-display gdb-breakpoints-buffer))
     ("T" . (gud%gdb-display gdb-threads-buffer))
     ("R" . (gud%gdb-display gdb-registers-buffer))
     ("S" . (gud%gdb-display gdb-stack-buffer))
     ("D" . (gud%gdb-display gdb-disassembly-buffer))
     ("m" . (gud%gdb-display gdb-memory-buffer))
-    ("q" . gud-source-mode)
-    ("=" . gud-break)
+    ("b" . gud-break)
     ("-" . gud-remove)
     ("t" . gud-tbreak)
     ("s" . gud-step)
@@ -79,12 +60,9 @@
     ("p" . gud-print)
     ("*" . gud-pstar)
     ("w" . gud-watch)
-    ("x" . (lambda () (interactive)
+    ("X" . (lambda () (interactive)
              (when (and (yes-or-no-p "Quit process"))
                (gud-call "quit"))))))
-(defvar gud-source-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map "`" gud--source-mode-map)))
 
 (defvar-local gud--source-buffer-status nil)
 (defvar-local gud--source-buffer-list nil)
@@ -92,7 +70,7 @@
 (define-minor-mode gud-source-mode "minor mode for source file"
   :init-value nil
   :lighter "GS"
-  :keymap gud-source-mode-map
+  :keymap gud--source-mode-map
   (if gud-source-mode
       (progn
         (setq gud--source-buffer-status (list buffer-read-only))
@@ -125,20 +103,39 @@
           (with-current-buffer src-buf
             (when gud-source-mode
               (gud-source-mode -1))))))))
-
 (advice-add 'gud-sentinel :after #'gud*sentinel-hack)
-
 
 (with-eval-after-load 'gud
   (define-key gud-mode-map "`" gud--source-mode-map)
+  (define-key gud-mode-map (kbd "C-c C-z") #'gud/pop-to-source-buffer)
   (define-hook! gud|setup-hook (gud-mode-hook)
-    (add-hook 'kill-buffer-hook #'gud|kill-overlay nil :local)
+    (set-window-dedicated-p (selected-window) t)
     ;; `gud-print' need prompt can be modified
     ;; (setq comint-prompt-read-only t)
-    (local-set-key (kbd "C-c C-z") #'gud/pop-to-source-buffer)))
+    (setq-local comint-scroll-to-bottom-on-output t)))
 
 (with-eval-after-load 'gdb-mi
-  (setq gdb-show-main t)
-  (fset 'gdb-display-buffer 'display-buffer))
+  (defun gdb-display-io-buffer-action (buffer alist)
+    (gud/display-gdb-inferior-io :select))
+  (defun gdb-display-io-buffer-condition (buffer action)
+    (with-current-buffer buffer
+      (eq major-mode 'gdb-inferior-io-mode)))
+
+  (add-to-list 'display-buffer-alist
+               '(gdb-display-io-buffer-condition
+                 gdb-display-io-buffer-action))
+
+  (dolist (map (list gdb-inferior-io-mode-map
+                     gdb-breakpoints-mode-map
+                     gdb-frames-mode-map
+                     gdb-memory-mode-map
+                     gdb-registers-mode-map
+                     gdb-disassembly-mode-map
+                     gdb-locals-mode-map
+                     gdb-script-mode-map
+                     gdb-threads-mode-map))
+    (define-key map "`" gud--source-mode-map)
+    (define-key map (kbd "C-c C-z") #'gud/pop-to-source-buffer))
+  (setq gdb-show-main t))
 
 (provide 'init-gud)
