@@ -23,7 +23,7 @@ With a prefix BELOW move point to lower block."
          (language (org-element-property :language el))
          (parameters (org-element-property :parameters el)))
     (beginning-of-line)
-    (insert (format "#+END_SRC\n#+BEGIN_SRC %s %s\n" language parameters))
+    (insert (format "#+end_src\n#+begin_src %s %s\n" language parameters))
     (beginning-of-line)
     (when (not $below)
       (org-babel-previous-src-block))))
@@ -265,7 +265,6 @@ With a prefix BELOW move point to lower block."
       (annotation (company-auctex-symbol-annotation $arg))))
 
   (define-hook! org|setup (org-mode-hook)
-    (setq line-spacing nil)
     (auto-fill-mode -1)
 
     (make-local-variable 'completion-at-point-functions)
@@ -315,6 +314,7 @@ With a prefix BELOW move point to lower block."
     ("M-n" . org/next-item)
     ("M-p" . org/previous-item)
     ("C-c l" . org-store-link)
+    ("C-M-i" . completion-at-point)
     ([f5] . org/open-pdf)
     ([f9] . (lambda () (interactive)
               (save-excursion

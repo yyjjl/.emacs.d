@@ -29,6 +29,7 @@ The app is chosen from your OS's preference."
   (setq dired-recursive-copies 'always)
   (setq dired-recursive-deletes 'always)
   (setq wdired-allow-to-change-permissions t)
+  (setq dired-listing-switches "-alh")
 
   (require 'dired-x)
   (require 'dired+)

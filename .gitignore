@@ -60,3 +60,4 @@ private.el
 /emojis
 /site-lisp/private
 /init.el
+/gnus.el

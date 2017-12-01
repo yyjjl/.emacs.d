@@ -2,7 +2,7 @@
 (defmacro gud%gdb-display ($type)
   (let ((name (intern (format "gud/display-%s" $type))))
     `(progn
-       (defun ,name (&optional $select)
+       (defun ,name (&optional $no-select)
          (interactive "P")
          (let ((old-win (selected-window))
                (buffer (gdb-get-buffer-create ',$type)))
@@ -18,8 +18,8 @@
                    (set-window-dedicated-p gdb--info-window nil)
                    (switch-to-buffer buffer)
                    (set-window-dedicated-p gdb--info-window t))
-                 (if $select
-                     (select-window gdb--info-window)))
+                 (unless $no-select
+                   (select-window gdb--info-window)))
              (message "Can not display buffer %s" '$type))))
        #',name)))
 
@@ -60,9 +60,12 @@
     ("p" . gud-print)
     ("*" . gud-pstar)
     ("w" . gud-watch)
-    ("X" . (lambda () (interactive)
+    ("X" . (lambda!
              (when (and (yes-or-no-p "Quit process"))
-               (gud-call "quit"))))))
+               (gud-call "quit"))))
+    ("C-c C-z" . (lambda!
+                   (when (window-live-p gdb--info-window)
+                     (select-window gdb--info-window))))))
 
 (defvar-local gud--source-buffer-status nil)
 (defvar-local gud--source-buffer-list nil)
@@ -102,7 +105,8 @@
         (when (buffer-live-p src-buf)
           (with-current-buffer src-buf
             (when gud-source-mode
-              (gud-source-mode -1))))))))
+              (gud-source-mode -1)))))
+      (kill-buffer buffer))))
 (advice-add 'gud-sentinel :after #'gud*sentinel-hack)
 
 (with-eval-after-load 'gud
@@ -116,7 +120,7 @@
 
 (with-eval-after-load 'gdb-mi
   (defun gdb-display-io-buffer-action (buffer alist)
-    (gud/display-gdb-inferior-io :select))
+    (gud/display-gdb-inferior-io :no-select))
   (defun gdb-display-io-buffer-condition (buffer action)
     (with-current-buffer buffer
       (eq major-mode 'gdb-inferior-io-mode)))

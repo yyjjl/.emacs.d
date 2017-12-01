@@ -154,6 +154,7 @@ for a file to visit if current buffer is not visiting a file."
   (setq ivy-initial-inputs-alist nil)
   (setq ivy-use-virtual-buffers t)
   (setq ivy-virtual-abbreviate 'full)
+  (setq ivy-use-selectable-prompt t)
 
   (define-key!
     :map ivy-minibuffer-map
@@ -204,7 +205,8 @@ for a file to visit if current buffer is not visiting a file."
     ("W" . counsel-colors-web)
     ("E" . counsel-colors-emacs)
     ("e" . counsel-sudo-edit)
-    ("o" . counsel-outline)
+    ("O" . counsel-outline)
+    ("o" . counsel-org-goto-all)
     ("t" . counsel-tmm))
 
   (add-to-list 'counsel-linux-apps-directories "~/.local/share/applications")

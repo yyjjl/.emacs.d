@@ -26,8 +26,9 @@
     ("M-p" . company-previous-page))
 
   (company-statistics-mode 1)
-  (add-to-list 'company-transformers
-               'company-sort-by-backend-importance :append)
+  ;; (add-to-list 'company-transformers
+  ;;              'company-sort-by-backend-importance :append)
+
   ;; Make company-files a work before capf
   (setq-default company-backends
                 '(company-nxml

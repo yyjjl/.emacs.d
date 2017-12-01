@@ -19,8 +19,7 @@
  rtags
  ivy-rtags
  cmake-mode
- cmake-font-lock
- modern-cpp-font-lock)
+ cmake-font-lock)
 
 
 
@@ -195,7 +194,7 @@
               (bound-and-true-p cpp-setup-literally)
               (> (buffer-size) core-large-buffer-size))
     (when cpp-has-irony-p
-      (add-to-list 'company-backends '(company-irony :with company-dabbrev-code))
+      (add-to-list 'company-backends #'company-irony)
       (add-to-list 'company-backends #'company-irony-c-headers)
       (add-to-list 'company-backends #'company-files)
 
