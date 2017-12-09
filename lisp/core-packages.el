@@ -16,12 +16,16 @@ Archive with high priority will be used when install a package.")
 (defvar package--required-packages (make-hash-table)
   "All packages required.")
 
-;; Use mirror in China
 ;; The index of archive represents its priority
+;; (setq package-archives
+;;       '(("melpa-stable" . "https://elpa.emacs-china.org/melpa-stable/")
+;;         ("melpa" . "https://elpa.emacs-china.org/melpa/")
+;;         ("gnu"   . "https://elpa.emacs-china.org/gnu/")))
 (setq package-archives
-      '(("melpa-stable" . "https://elpa.emacs-china.org/melpa-stable/")
-        ("melpa" . "https://elpa.emacs-china.org/melpa/")
-        ("gnu"   . "https://elpa.emacs-china.org/gnu/")))
+      '(("melpa-stable" . "https://stable.melpa.org/packages/")
+        ("melpa" . "https://melpa.org/packages/")
+        ("gnu"   . "https://elpa.gnu.org/packages/")))
+
 ;; Setup to select right archive
 (setq package--priority-alist (mapcar #'car package-archives))
 
@@ -152,7 +156,7 @@ Archive with high priority will be used when install a package.")
  page-break-lines
  evil-nerd-commenter
  shackle
- easy-kill)
+ expand-region)
 
 (require 'core-ivy)
 (require 'core-company)

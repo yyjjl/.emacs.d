@@ -178,8 +178,6 @@
 
   (hide-ifdef-mode 1)
 
-  (modern-c++-font-lock-mode 1)
-
   (when tags-has-gtags-p
     (ggtags-mode 1)
     (setq completion-at-point-functions '(t)))

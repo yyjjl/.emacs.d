@@ -258,7 +258,7 @@ Does not indent buffer, because it is used for a
   ("C-c q" . auto-fill-mode)
   ("C-x C-b" . ibuffer)
   ("M-/" . hippie-expand)
-  ("M-w" . easy-kill)
+  ("M--" . er/expand-region)
   ([remap mark-sexp] . easy-mark)
 
   ("M-s o" . core/occur-dwim)

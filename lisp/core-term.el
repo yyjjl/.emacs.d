@@ -56,7 +56,10 @@
 (defun term/switch-back ()
   (interactive)
   (if (and term--parent-buffer (buffer-live-p term--parent-buffer))
-      (pop-to-buffer term--parent-buffer)
+      (progn
+        (when (eq term-popup-window (selected-window))
+          (pop-to-buffer term--parent-buffer)
+          (delete-window term-popup-window)))
     (message "No parent buffer or it was killed !!!")))
 
 (defun term/get-ssh-info ($arg)

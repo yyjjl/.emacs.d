@@ -49,8 +49,9 @@
  mark-ring-max 128
  minibuffer-prompt-properties
  '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt)
- ;; History & backup settings (save nothing, that's what git is for)
- auto-save-default nil
+ ;; History & backup settings
+ auto-save-default t
+ auto-save-timeout 3
  create-lockfiles nil
  history-length 500
  history-delete-duplicates t
@@ -179,6 +180,13 @@
 (define-hook! core/colorize-compilation-buffer (compilation-filter-hook)
   (when (eq major-mode 'compilation-mode)
     (ansi-color-apply-on-region compilation-filter-start (point-max))))
+
+(define-hook! core|auto-save-buffer (auto-save-hook)
+  (save-excursion
+    (dolist (buffer (buffer-list))
+      (with-current-buffer buffer
+        (when (and (buffer-file-name) (buffer-modified-p))
+          (basic-save-buffer))))))
 
 (define-hook! core|minibuffer-setup (minibuffer-setup-hook)
   (local-set-key (kbd "C-k") 'kill-line)
