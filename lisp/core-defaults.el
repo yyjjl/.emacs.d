@@ -181,12 +181,12 @@
   (when (eq major-mode 'compilation-mode)
     (ansi-color-apply-on-region compilation-filter-start (point-max))))
 
-(define-hook! core|auto-save-buffer (auto-save-hook)
-  (save-excursion
-    (dolist (buffer (buffer-list))
-      (with-current-buffer buffer
-        (when (and (buffer-file-name) (buffer-modified-p))
-          (basic-save-buffer))))))
+;; (define-hook! core|auto-save-buffer (auto-save-hook)
+;;   (save-excursion
+;;     (dolist (buffer (buffer-list))
+;;       (with-current-buffer buffer
+;;         (when (and (buffer-file-name) (buffer-modified-p))
+;;           (basic-save-buffer))))))
 
 (define-hook! core|minibuffer-setup (minibuffer-setup-hook)
   (local-set-key (kbd "C-k") 'kill-line)

@@ -1,20 +1,19 @@
-(defun core%semantic--clean-tag ($tag)
+(defun counsel%semantic--clean-tag ($tag)
   (let ((def-val (semantic-tag-get-attribute $tag :default-value)))
     (when (stringp def-val)
       (when-let ((pos (string-match "\n" def-val)))
         (setq def-val (concat (substring def-val 0 (min pos 80)) " ... ")))
       (semantic-tag-put-attribute $tag :default-value def-val))))
 
-(defun core/semantic--create ($tags $depth &optional $class $result)
+(defun counsel%semantic--create ($tags $depth &optional $class $result)
   "Write the contents of TAGS to the current buffer."
   (let ((class $class)
         cur-type
         formated-tag)
     (dolist (tag $tags)
       (when (listp tag)
-        (core%semantic--clean-tag tag)
-        (setq formated-tag
-              (propertize (semantic-format-tag-summarize tag nil t) 'semantic-tag tag))
+        (counsel%semantic--clean-tag tag)
+        (setq formated-tag (semantic-format-tag-summarize tag nil t))
         (case (setq cur-type (semantic-tag-class tag))
           ((function variable type)
            (let ((spaces (make-string (* $depth 2) ?\s))
@@ -22,50 +21,100 @@
              (unless (and (> $depth 0) (not type-p))
                (setq class nil))
              ;; Format tag
-             (push (concat (if (and class (not type-p))
-                               (format "%s%s(%s) "
-                                       spaces (if (> $depth 0) "=> " "") class)
-                             spaces)
-                           formated-tag)
+             (push (cons
+                    (concat (if (and class (not type-p))
+                                (format "%s%s(%s) "
+                                        spaces (if (> $depth 0) "=> " "")
+                                        class)
+                              spaces)
+                            formated-tag)
+                    tag)
                    $result)
              (when type-p
                (setq class (car tag)))
              ;; Recurse to children
              (unless (eq cur-type 'function)
                (setq $result
-                     (core/semantic--create (semantic-tag-components tag)
+                     (counsel%semantic--create (semantic-tag-components tag)
                                             (1+ $depth)
                                             class
                                             $result)))))
+          ((code))
           ;; Catch-all
-          (t (push formated-tag $result))))))
+          (t (push (cons formated-tag tag) $result))))))
   $result)
 
-(defun counsel-semantic-or-imenu ()
+(defun counsel%semantic-or-imenu--relative-buffers ($buffer)
+  (let* (projectile-require-project-root
+         (project-buffers (ignore-errors (projectile-project-buffers))))
+    (loop for buffer in (buffer-list)
+          when (or (eq $buffer buffer)
+                   (and (buffer-file-name buffer)
+                        (or (eq (buffer-local-value 'major-mode buffer)
+                                (buffer-local-value 'major-mode $buffer))
+                            (member buffer project-buffers))))
+          collect buffer)))
+
+(defun counsel%semantic-or-imenu--candidates ($buffers)
+  (loop for buffer in $buffers
+        nconc
+        (mapcar
+         (lambda ($candidate)
+           (if (null (cdr-safe $buffers))
+               $candidate
+             (cons (concat (car $candidate) " [" (buffer-name buffer) "]")
+                   (cdr $candidate))))
+         (with-current-buffer buffer
+           ;; Use semantic first
+           (if (semantic-active-p)
+               (progn
+                 (when (semantic-parse-tree-needs-update-p)
+                   (semantic-parse-tree-set-needs-update))
+                 (nreverse (counsel%semantic--create (semantic-fetch-tags) 0)))
+             (let* ((imenu-auto-rescan t)
+                    (imenu-auto-rescan-maxout (if current-prefix-arg
+                                                  (buffer-size)
+                                                imenu-auto-rescan-maxout))
+                    (items (imenu--make-index-alist :noerror))
+                    (items (delete (assoc "*Rescan*" items) items)))
+               (counsel-imenu-get-candidates-from items)))))))
+
+(defun counsel%semantic-or-imenu--goto ($candidate)
+  (let ((place (cdr $candidate))
+        buffer goto-function)
+    (if (semantic-tag-p place)
+        (setq buffer (semantic-tag-buffer place)
+              goto-function 'semantic-go-to-tag)
+      (setq goto-function 'imenu
+            buffer (let ((pos (cdr-safe place)))
+                     (if (overlayp pos)
+                         (overlay-buffer pos)
+                       (marker-buffer pos)))))
+    (switch-to-buffer buffer)
+    (funcall goto-function place)))
+
+
+(defun counsel-semantic-or-imenu ($arg)
   "Jump to a semantic tag in the current buffer."
-  (interactive)
-  (unless
-      (and (semantic-active-p)
-           (ignore-errors
-             (when (semantic-parse-tree-needs-update-p)
-               (semantic-parse-tree-set-needs-update))
-             (ivy-read
-              "tag: " (nreverse (core/semantic--create (semantic-fetch-tags) 0))
+  (interactive "P")
+  (let* ((buffer (current-buffer))
+         (buffers (if $arg
+                      (counsel%semantic-or-imenu--relative-buffers buffer)
+                    (list buffer)))
+         (candidates (counsel%semantic-or-imenu--candidates buffers)))
+    (ivy-read (if $arg "All Imenu Items: " "Imenu Items: ")
+              candidates
               :preselect (thing-at-point 'symbol)
               :require-match t
-              :action
-              (lambda (candidate)
-                (let* ((pos (if (string-prefix-p " " candidate)
-                                (next-single-property-change
-                                 0 'semantic-tag candidate (length candidate))
-                              0))
-                       (tag (get-text-property pos 'semantic-tag candidate)))
-                  (semantic-go-to-tag tag)))
+              :action 'counsel%semantic-or-imenu--goto
               :caller 'counsel-semantic-or-imenu
-              :keymap (define-key! :map (make-sparse-keymap)
-                        ("C-n" . ivy-next-line-and-call)
-                        ("C-p" . ivy-previous-line-and-call)))))
-    (call-interactively #'counsel-imenu)))
+              ;; If search for all buffers, do not jump when selecting
+              ;; candidate
+              :keymap (if $arg
+                          counsel-imenu-map
+                        (define-key! :map (make-sparse-keymap)
+                          ("C-n" . ivy-next-line-and-call)
+                          ("C-p" . ivy-previous-line-and-call))))))
 
 (defun counsel-kill-buffer (&optional $arg)
   "Kill buffer with ivy backends."
