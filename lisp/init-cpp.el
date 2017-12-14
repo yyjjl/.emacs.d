@@ -174,7 +174,9 @@
   (local-set-key (kbd "C-c C-l") 'cpp/load-file-in-root)
   (local-set-key [f9] 'cpp/try-misc-setup)
   (local-set-key [f10] 'cpp/compile)
-  (local-set-key [f5] 'gdb)
+  (local-set-key [f5] (lambda! ()
+                        (setq gud--window-configuration (current-window-configuration))
+                        (call-interactively 'gdb)))
 
   (hide-ifdef-mode 1)
 

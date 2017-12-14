@@ -104,6 +104,36 @@
   (elpy-enable)
   (remove-hook 'python-mode-hook 'elpy-mode)
 
+  (define-key! :map inferior-python-mode-map
+    ("C-c C-t" . python/toggle-pdbtrack)
+    ([f5] . python/toggle-pdbtrack))
+
+  (define-key! :map python-mode-map
+    ([f5] . python/debug-current-file))
+
+  (defun python/debug-current-file ()
+    (interactive)
+    (unless (featurep 'gud)
+      (require 'gud nil :noerror))
+    (setq gud--window-configuration (current-window-configuration))
+    (pdb (read-from-minibuffer "Run pdb: "
+                               (format "pdb3 %s" (buffer-file-name))
+                               gud-minibuffer-local-map
+                               nil
+                               (gud-symbol 'history nil 'pdb))))
+
+  (defun python/toggle-pdbtrack ()
+    (interactive)
+    (if (memq 'python-pdbtrack-comint-output-filter-function
+              comint-output-filter-functions)
+        (progn
+          (remove-hook 'comint-output-filter-functions
+                       #'python-pdbtrack-comint-output-filter-function)
+          (message "pdbtrack disabled"))
+      (add-hook 'comint-output-filter-functions
+                #'python-pdbtrack-comint-output-filter-function)
+      (message "pdbtrack enabled")))
+
   (define-hook! python|python-inferior-setup (inferior-python-mode-hook)
     (remove-hook 'comint-output-filter-functions
                  #'python-pdbtrack-comint-output-filter-function)))

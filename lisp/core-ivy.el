@@ -71,11 +71,12 @@
                  (when (semantic-parse-tree-needs-update-p)
                    (semantic-parse-tree-set-needs-update))
                  (nreverse (counsel%semantic--create (semantic-fetch-tags) 0)))
-             (let* ((imenu-auto-rescan t)
+             (let* ((inhibit-message t)
+                    (imenu-auto-rescan t)
                     (imenu-auto-rescan-maxout (if current-prefix-arg
                                                   (buffer-size)
                                                 imenu-auto-rescan-maxout))
-                    (items (imenu--make-index-alist :noerror))
+                    (items (ignore-errors (imenu--make-index-alist :noerror)))
                     (items (delete (assoc "*Rescan*" items) items)))
                (counsel-imenu-get-candidates-from items)))))))
 
@@ -97,6 +98,8 @@
 (defun counsel-semantic-or-imenu ($arg)
   "Jump to a semantic tag in the current buffer."
   (interactive "P")
+  (unless (featurep 'imenu)
+    (require 'imenu nil t))
   (let* ((buffer (current-buffer))
          (buffers (if $arg
                       (counsel%semantic-or-imenu--relative-buffers buffer)

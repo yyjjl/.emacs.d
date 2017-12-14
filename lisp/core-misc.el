@@ -259,7 +259,6 @@ Does not indent buffer, because it is used for a
   ("C-x C-b" . ibuffer)
   ("M-/" . hippie-expand)
   ("M--" . er/expand-region)
-  ([remap mark-sexp] . easy-mark)
 
   ("M-s o" . core/occur-dwim)
   ("M-i" . iedit-mode)

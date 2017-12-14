@@ -11,14 +11,9 @@
  buffer-move
  zeal-at-point
  skeletor
- slime
- embrace)
+ slime)
 
 
-
-(add-hook 'LaTeX-mode-hook 'embrace-LaTeX-mode-hook)
-(add-hook 'org-mode-hook 'embrace-org-mode-hook)
-(global-set-key (kbd "M-'") #'embrace-commander)
 
 ;; prolog system
 (setq prolog-system 'swi)

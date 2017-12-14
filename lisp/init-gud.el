@@ -1,4 +1,5 @@
 (defvar gdb--info-window nil)
+
 (defmacro gud%gdb-display ($type)
   (let ((name (intern (format "gud/display-%s" $type))))
     `(progn
@@ -106,12 +107,18 @@
           (with-current-buffer src-buf
             (when gud-source-mode
               (gud-source-mode -1)))))
-      (kill-buffer buffer))))
+      (kill-buffer buffer)
+      (when (window-configuration-p gud--window-configuration)
+        (set-window-configuration gud--window-configuration)
+        (setq gud--window-configuration nil)))))
 (advice-add 'gud-sentinel :after #'gud*sentinel-hack)
+
+(defvar gud--window-configuration nil)
 
 (with-eval-after-load 'gud
   (define-key gud-mode-map "`" gud--source-mode-map)
   (define-key gud-mode-map (kbd "C-c C-z") #'gud/pop-to-source-buffer)
+
   (define-hook! gud|setup-hook (gud-mode-hook)
     (set-window-dedicated-p (selected-window) t)
     ;; `gud-print' need prompt can be modified

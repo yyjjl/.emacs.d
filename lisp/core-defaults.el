@@ -51,7 +51,7 @@
  '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt)
  ;; History & backup settings
  auto-save-default t
- auto-save-timeout 3
+ auto-save-timeout 8
  create-lockfiles nil
  history-length 500
  history-delete-duplicates t
