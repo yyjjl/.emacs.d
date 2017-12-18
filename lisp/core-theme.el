@@ -35,9 +35,9 @@
  '(minibuffer-prompt ((t (:foreground "#AE81EF"))))
 
  '(mode-line ((t (:foreground "#F8F8F2" :background "#2D2D2D"
-                              :box (:line-width 5 :color "#2D2D2D")))))
- '(mode-line-inactive ((t (:foreground "#BCBCBC" :background "#1B1D1E"
-                                       :box (:line-width 5 :color "#1B1D1E")))))
+                              :box (:line-width 2 :color "#4D4D4D")))))
+ '(mode-line-inactive ((t (:foreground "#BCBCBC" :background "#2D2D2D"
+                                       :box (:line-width 2 :color "#2D2D2D")))))
  '(mode-line-highlight ((t (:background "black"))))
  '(header-line ((t (:foreground "grey90" :background "#2D2D2D"))))
 

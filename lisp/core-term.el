@@ -121,10 +121,10 @@ none exists, or if the current buffer is already a term."
     (let ((buffer (if (file-remote-p default-directory)
                       (apply #'term/ssh (term/get-ssh-info $arg))
                     (term/local-shell
-                     (or (and (not (equal $arg 1))
+                     (or (and (equal $arg 4)
                               (boundp 'cmake-ide-build-dir)
                               cmake-ide-build-dir)
-                         (and (not (equal $arg 1))
+                         (and (equal $arg 4)
                               (ignore-errors (projectile-project-root)))
                          default-directory)
                      (equal $arg 16))))
@@ -146,8 +146,9 @@ none exists, or if the current buffer is already a term."
 
 (defun term%after-prompt? ()
   (let* ((proc (get-buffer-process (current-buffer)))
-         (mark (and proc (process-mark proc))))
-    (and mark (>= (point) mark))))
+         (mark (and proc (process-mark proc)))
+         (pos (point)))
+    (and mark (>= pos mark))))
 
 (defun term/conditional-send-raw ()
   (interactive)
@@ -157,15 +158,12 @@ none exists, or if the current buffer is already a term."
     (call-interactively (if (and command (term%after-prompt?))
                             #'term-send-raw
                           command))))
-(defun term/define-send-string (string)
-  (interactive)
-  `(lambda!
-     (let ((command (global-key-binding (this-command-keys))))
-       (if (and command (term%after-prompt?))
-           (term-send-raw-string ,string)
-         (call-interactively command)))))
 
 (with-eval-after-load 'multi-term
+  ;; Fix conflict with `core-popups.el'
+  (remove-hook 'kill-buffer-hook 'multi-term-kill-buffer-hook)
+  (add-hook 'kill-buffer-hook 'multi-term-kill-buffer-hook :append)
+
   (defun term*multi-term-switch-internal-hack (&rest _)
     ;; Reset popup window
     (setq core--shackle-popup-window (selected-window)))
@@ -192,8 +190,8 @@ none exists, or if the current buffer is already a term."
   (setq term-bind-key-alist
         '(("C-c C-c" . term-interrupt-subjob)
           ("C-c C-e" . term-send-esc)
-          ("C-p" . previous-line)
-          ("C-n" . next-line)
+          ("C-c C-p" . previous-line)
+          ;; ("C-n" . next-line)
           ("C-r" . isearch-backward)
           ("C-m" . term-send-return)
           ("C-y" . term-paste)

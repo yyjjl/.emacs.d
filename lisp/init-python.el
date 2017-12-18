@@ -33,9 +33,52 @@
         elpy-test-runner 'elpy-test-pytest-runner)
   (define-key! :map elpy-mode-map
     ("C-c C-n" . nil)
-    ("C-c C-p" . nil)))
+    ("C-c C-p" . nil)
+    ("M-i" . python/multiedit-symbol-at-point))
+
+  (defun python*elpy-multiedit-stop-hack ()
+    (when-let ((buffer (get-buffer "*Elpy Edit Usages*"))
+               (window (get-buffer-window buffer)))
+      (kill-buffer buffer)))
+
+  (advice-add 'elpy-multiedit-stop :after #'python*elpy-multiedit-stop-hack))
 
 
+
+(defun python/multiedit-symbol-at-point ()
+  "Edit all usages of the the Python symbol at point."
+  (interactive)
+  (cond
+   ((or current-prefix-arg
+        (use-region-p)
+        (bound-and-true-p iedit-mode))
+    (call-interactively 'iedit-mode))
+   (elpy-multiedit-overlays
+    (elpy-multiedit-stop))
+   (t
+    (save-some-buffers)
+    (let ((usages (condition-case err
+                      (elpy-rpc-get-usages)
+                    ;; This is quite the stunt, but elisp parses JSON
+                    ;; null as nil, which is indistinguishable from
+                    ;; the empty list, we stick to the error.
+                    (error
+                     (if (and (eq (car err) 'error)
+                              (stringp (cadr err))
+                              (string-match "not implemented" (cadr err)))
+                         'not-supported
+                       (error (cadr err)))))))
+      (cond
+       ((eq usages 'not-supported)
+        (call-interactively 'iedit-mode)
+        (message "`get_usages' is not supported"))
+       ((null usages)
+        (call-interactively 'iedit-mode)
+        (message "No usages of the symbol at point found"))
+       (t
+        (save-restriction
+          (widen)
+          (elpy-multiedit--usages usages))))))))
 
 (defun python/generate-doc ($params $indent)
   (setq $indent (concat "\n" $indent))
@@ -70,29 +113,6 @@
               (python/generate-doc params indent)
               "\n" indent
               "\"\"\""))))
-
-(defun python/get-class-defs ()
-  (interactive)
-  (let* ((indent (make-string python-indent-offset
-                              (string-to-char " "))))
-    (save-excursion
-      (forward-line 1)
-      (if (re-search-backward "^\\( *\\)class.+\n")
-          (progn
-            (goto-char (match-end 0))
-            (let* ((extra-indent (match-string 1))
-                   (re (format "^%s%sdef +\\([^(]+\\)" extra-indent indent))
-                   bound defs)
-              (when (re-search-forward
-                     (format "\\(^%s%s\\(.+\\)\\|\n\\)*" extra-indent indent)
-                     nil nil)
-                (setq bound (match-end 0))
-                (goto-char (match-beginning 0))
-                (while (re-search-forward re bound t)
-                  (add-to-list 'defs (match-string 1))))
-              (kill-new (concat (string-join defs " ")))
-              (message "copy => all defs")))
-        (message "Can not find where is the class")))))
 
 (with-eval-after-load 'python
   (when (boundp 'python-shell-completion-native-disabled-interpreters)

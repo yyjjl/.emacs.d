@@ -6,8 +6,7 @@
                        (ignore-errors (window-numbering-get-number-string))
                        (if narrow-p ">" " "))))
         (add-face-text-property 0 (length num-str)
-                                '(:background "black"
-                                              :box (:line-width 5 :color "black"))
+                                '(:background "black")
                                 nil num-str)
         num-str)
     ""))

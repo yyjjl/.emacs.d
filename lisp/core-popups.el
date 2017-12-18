@@ -162,16 +162,15 @@
               :around #'core*shackle-display-buffer-hack)
 
   (define-hook! core%autoclose-popup-window (kill-buffer-hook)
-    "Auto close popup window after buffer killed"
+    "Auto quit popup window after buffer killed"
     (when core--shackle-popup-window
       (let ((win (get-buffer-window (current-buffer))))
         (when (and (equal win core--shackle-popup-window)
-                   (window-live-p win)
                    (not (one-window-p))
                    (not (minibuffer-window-active-p win))
                    (or (not (boundp 'lv-wnd))
                        (not (eq (next-window) lv-wnd))))
-          (delete-window win)))))
+          (quit-window nil win)))))
 
   (setq core--shackle-popup-buffer-regexp
         (eval-when-compile
@@ -192,6 +191,6 @@
            :align below :select t :autoclose t)
           (,core--shackle-popup-buffer-regexp
            :regexp t :select t :autoclose t)
-          ("^\\*.*\\*$" :regexp t :select t))))
+          ("^\\*.*\\*\\(?:<[0-9]+>\\)?$" :regexp t))))
 
 (provide 'core-popups)

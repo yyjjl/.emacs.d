@@ -17,6 +17,7 @@
   (setq ibuffer-expert t
         ibuffer-use-other-window t
         ibuffer-show-empty-filter-groups nil
+        ibuffer-movement-cycle nil
         ibuffer-display-summary nil)
 
   (setq ibuffer-saved-filter-groups

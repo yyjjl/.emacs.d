@@ -106,27 +106,27 @@
 ;; Smart tab
 (defvar core--indent-close-list '(?\} ?\$ ?\] ?\' ?\` ?\"))
 (defun core%indent-for-tab ($fn &rest $arg)
-  (let ((old-point (point))
-        (old-tick (buffer-chars-modified-tick)))
-    (apply $fn $arg)
-    (when (and (eq old-point (point))
-               (eq old-tick (buffer-chars-modified-tick))
-               (called-interactively-p 'interactive))
-      (cond ;; Skip close paren
-       ((memq (char-after) core--indent-close-list)
-        (forward-char 1))
-       ;; Toggle outline
-       ((save-excursion
-          (forward-line 0)
-          (and outline-minor-mode (looking-at-p outline-regexp)))
-        (outline-toggle-children))
-       ;; Trigger completions
-       ((and (looking-back "\\(?:\\s_\\|\\sw\\)\\{2,\\}\\(?:.\\|->\\)?"
-                           (max (point-min) (- (point) 5)))
-             (not (memq (get-text-property (- (point) 1) 'face)
-                        '(font-lock-string-face font-lock-doc-face)))
-             (not (eq tab-always-indent 'complete)))
-        (call-interactively 'hippie-expand))))))
+  (if (save-excursion
+        (forward-line 0)
+        (and outline-minor-mode (looking-at-p outline-regexp)))
+      ;; Toggle outline
+      (outline-toggle-children)
+    (let ((old-point (point))
+          (old-tick (buffer-chars-modified-tick)))
+      (apply $fn $arg)
+      (when (and (eq old-point (point))
+                 (eq old-tick (buffer-chars-modified-tick))
+                 (called-interactively-p 'interactive))
+        (cond ;; Skip close paren
+         ((memq (char-after) core--indent-close-list)
+          (forward-char 1))
+         ;; Trigger completions
+         ((and (looking-back "\\(?:\\s_\\|\\sw\\)\\{2,\\}\\(?:.\\|->\\)?"
+                             (max (point-min) (- (point) 5)))
+               (not (memq (get-text-property (- (point) 1) 'face)
+                          '(font-lock-string-face font-lock-doc-face)))
+               (not (eq tab-always-indent 'complete)))
+          (call-interactively 'hippie-expand)))))))
 (advice-add 'indent-for-tab-command :around #'core%indent-for-tab)
 
 ;; Delete the current file

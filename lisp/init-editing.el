@@ -132,10 +132,7 @@ other characters."
   ("M-e" . forward-defun)
   ("M-a" . backward-defun)
   ("C-M-b" . backward-sentence)
-  ("C-M-f" . forward-sentence)
-
-  ("C-=" . hydra-mc/mc/mark-next-like-this)
-  ("C--" . hydra-mc/mc/mark-previous-like-this))
+  ("C-M-f" . forward-sentence))
 
 (define-key! :prefix "C-c m"
   ("P" . mc/mark-pop)
@@ -149,6 +146,8 @@ other characters."
   ("s" . mc/sort-regions)
   ("v" . mc/vertical-align)
   ("r" . mc/reverse-regions)
+  ("=" . hydra-mc/mc/mark-next-like-this)
+  ("-" . hydra-mc/mc/mark-previous-like-this)
   ([C-S-mouse-1] . mc/add-cursor-on-click))
 
 (defhydra hydra-mc (:color blue :hint nil)
