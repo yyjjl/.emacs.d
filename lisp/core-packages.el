@@ -16,7 +16,7 @@ Archive with high priority will be used when install a package.")
 (defvar package--required-packages (make-hash-table)
   "All packages required.")
 
-The index of archive represents its priority
+;; The index of archive represents its priority
 (setq package-archives
       '(("melpa-stable" . "https://elpa.emacs-china.org/melpa-stable/")
         ("melpa" . "https://elpa.emacs-china.org/melpa/")
