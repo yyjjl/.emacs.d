@@ -180,7 +180,7 @@ Archive with high priority will be used when install a package.")
   (ivy-mode 1)
   (counsel-mode 1)
   (projectile-mode 1)
-  (counsel-projectile-on)
+  (counsel-projectile-mode 1)
   (yas-global-mode 1)
   (global-company-mode 1)
 
