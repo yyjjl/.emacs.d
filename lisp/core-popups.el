@@ -163,14 +163,16 @@
 
   (define-hook! core%autoclose-popup-window (kill-buffer-hook)
     "Auto quit popup window after buffer killed"
-    (when core--shackle-popup-window
-      (let ((win (get-buffer-window (current-buffer))))
-        (when (and (equal win core--shackle-popup-window)
-                   (not (one-window-p))
-                   (not (minibuffer-window-active-p win))
-                   (or (not (boundp 'lv-wnd))
-                       (not (eq (next-window) lv-wnd))))
-          (quit-window nil win)))))
+    (let ((win (get-buffer-window))
+          (buffer-name (buffer-name)))
+      (when (and win
+                 (or (equal win core--shackle-popup-window)
+                     (string-match-p "^\\*.*\\*\\(?:<[0-9]+>\\)?$" buffer-name))
+                 (not (one-window-p))
+                 (not (minibuffer-window-active-p win))
+                 (or (not (boundp 'lv-wnd))
+                     (not (eq (next-window) lv-wnd))))
+        (quit-window nil win))))
 
   (setq core--shackle-popup-buffer-regexp
         (eval-when-compile
@@ -190,7 +192,6 @@
           ((:custom core--shackle%help-mode-matcher)
            :align below :select t :autoclose t)
           (,core--shackle-popup-buffer-regexp
-           :regexp t :select t :autoclose t)
-          ("^\\*.*\\*\\(?:<[0-9]+>\\)?$" :regexp t))))
+           :regexp t :select t :autoclose t))))
 
 (provide 'core-popups)

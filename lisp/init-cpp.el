@@ -163,6 +163,11 @@
                                  buffer-name)))
       (pop-to-buffer buffer)))))
 
+(defun cpp/gdb ()
+  (interactive)
+  (setq gud--window-configuration (current-window-configuration))
+  (gdb (gud-query-cmdline 'gdb)))
+
 (setq hide-ifdef-mode-prefix-key (kbd "C-c h"))
 (defun cpp/c++-setup ()
   "C/C++ only setup"
@@ -174,9 +179,7 @@
   (local-set-key (kbd "C-c C-l") 'cpp/load-file-in-root)
   (local-set-key [f9] 'cpp/try-misc-setup)
   (local-set-key [f10] 'cpp/compile)
-  (local-set-key [f5] (lambda! ()
-                        (setq gud--window-configuration (current-window-configuration))
-                        (call-interactively 'gdb)))
+  (local-set-key [f5] 'cpp/gdb)
 
   (hide-ifdef-mode 1)
 

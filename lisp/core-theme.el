@@ -261,4 +261,5 @@
  '(ivy-highlight-face ((t (:background "#444155")))))
 
 (enable-theme 'molokai)
+
 (provide 'core-theme)

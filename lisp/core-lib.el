@@ -1,13 +1,23 @@
-;;; core-lib.el
-;;; Naming conventions:
+;;; core-lib.el --- Libraries for configuration  -*- lexical-binding: t -*-
+
+;; Copyright (C) 2015-2017 Free Software Foundation, Inc.
+
+;; Author: yyj <yeyajie1229@gmail.com>
+
+;;; Commentary:
+
+;; This module contains some useful macros and functions
+;; Naming conventions:
 ;;
 ;;   <module>-...   public variables
 ;;   <module>--...  private varibales
 ;;   <module>/...   public functions
-;;   <module>%...  private functions
+;;   <module>%...   private functions
 ;;   <module>|...   hook functions
 ;;   <module>*...   advising functions
 ;;   ...!       a macro or function defined in core-lib.el
+
+;;; Code:
 
 (dolist (sym '(when-let if-let string-trim
                          string-join string-blank-p string-lessp
@@ -15,7 +25,9 @@
   (autoload sym "subr-x" nil nil 'macro))
 
 (defmacro lambda! (&rest $body)
-  "A shortcut for inline interactive lambdas."
+  "A shortcut for inline interactive lambdas.
+
+Optional argument $BODY is the lambda body."
   (declare (doc-string 1) (indent defun))
   `(lambda () (interactive) ,@$body))
 
@@ -23,18 +35,20 @@
 (defmacro add-transient-hook! ($hook &rest $forms)
   "Attaches transient forms to a $HOOK.
 
-HOOK can be a quoted hook or a sharp-quoted function (which will be advised).
+Argument $HOOK can be a quoted hook or a sharp-quoted function
+(which will be advised).
 
-These forms will be evaluated once when that function/hook is first invoked,
-then it detaches itself."
+$FORMS will be evaluated once
+when that function/hook is first invoked, then it detaches
+itself."
   (declare (indent 1))
   (let ((append-p (eq (car $forms) :after))
         (fn (intern (cond ((functionp $hook)
-                            (format "core*transient-hook-%s"
-                                    (cl-incf core--transient-index)))
-                           ((symbolp $hook)
-                            (format "core|transient-hook-%s"
-                                    (cl-incf core--transient-index)))))))
+                           (format "core*transient-hook-%s"
+                                   (cl-incf core--transient-index)))
+                          ((symbolp $hook)
+                           (format "core|transient-hook-%s"
+                                   (cl-incf core--transient-index)))))))
     `(when ,$hook
        (fset ',fn
              (lambda (&rest _)
@@ -49,12 +63,18 @@ then it detaches itself."
 
 (defmacro define-hook! ($name $hooks &rest $body)
   "Define a hook function.
-Argument NAME is the name of hook function.  Argument HOOKS are
-hooks to add fucntion to.  Optional argument BODY is the function
-body."
+
+Argument $NAME is the name of hook function. If $NAME is of the
+form (name . args), then args will become the parameter list of
+the lambda function to be added.
+
+Argument $HOOKS are hook list to add fucntion to. Every hook in
+$HOOKS should either be a hook-symbol or the form of (hook-symbol args).
+The args of the second form will be passed to `add-hook'
+
+Optional argument $BODY is the function body."
   (declare (indent defun) (debug t) (doc-string 3))
-  (let ((sym $name)
-        args forms func)
+  (let ((sym $name) args forms func)
     (when (consp $name)
       (setq args (cdr $name))
       (setq sym (car $name)))
@@ -74,7 +94,9 @@ body."
        ,@forms)))
 
 (defmacro define-key! (&rest $args)
-  "Define multiple keys in one expression"
+  "Define multiple keys in one expression.
+
+$ARGS should be the form of (:map map :prefix prefix-key key-definitions ...)"
   (declare (indent defun))
   (let ((sym (gensym))
         (map 'global-map)
@@ -100,9 +122,19 @@ body."
        ,sym)))
 
 (defmacro with-local-minor-mode-map! ($mode &rest $body)
-  "Overrides a minor mode keybinding for the local
-   buffer, by creating or altering keymaps stored in buffer-local
-   `minor-mode-overriding-map-alist'."
+  "Overrides a minor mode keybinding for the local buffer, by
+creating or altering keymaps stored in buffer-local
+`minor-mode-overriding-map-alist'.
+
+$MODE is the minor mode symbol whose map should be overrided.
+
+$BODY is a group of sexps for defining key bindings
+
+Example:
+
+    (with-local-minor-mode-map! 'abc-mode
+      (define-key abc-mode-map ...)
+      ...)"
   (declare (indent 1))
   `(let* ((oldmap (cdr (assoc ,$mode minor-mode-map-alist)))
           (it (or (cdr (assoc ,$mode minor-mode-overriding-map-alist))
@@ -114,6 +146,8 @@ body."
      ,@$body))
 
 (defun keyword-get! ($list $key)
+  "Get values of keyword $KEY from $LIST. This function is used
+for defining functions."
   (let (forms)
     (while (and $list (not (eq $key (pop $list)))))
     (while (and $list (not (keywordp (car $list))))
@@ -121,13 +155,14 @@ body."
     (nreverse forms)))
 
 (defun read-file-content! ($filename)
-  "Read file named FILENAME as string."
+  "Read file named $FILENAME as string."
   (let ((core-recentf-enabled? nil))
     (with-temp-buffer
       (insert-file-contents $filename)
       (buffer-string))))
 
 (defun open! ($file-list)
+  "Open All files in $FILE-LIST in external processes."
   (cond
    ((eq system-type 'darwin)
     (mapc (lambda (path)
@@ -139,30 +174,36 @@ body."
           $file-list))))
 
 (defun add-auto-mode! ($mode &rest $patterns)
-  "Add entries to `auto-mode-alist' to use `MODE' for all given
-file `PATTERNS'."
+  "Add entries to `auto-mode-alist' to use $MODE for all given
+file $PATTERNS."
   (declare (indent 1))
   (dolist (pattern $patterns)
     (add-to-list 'auto-mode-alist (cons pattern $mode))))
 
-(defun derived-mode? ($modes &optional $buf)
-  (unless $buf (setq $buf (current-buffer)))
-  (when (buffer-live-p (get-buffer $buf))
-    (with-current-buffer $buf
+(defun derived-mode? ($modes &optional $buffer)
+  "A wrap for `derived-mode-p'.
+
+$MODES is a mode list. If $BUFFER is nil, it means current
+buffer."
+  (unless $buffer (setq $buffer (current-buffer)))
+  (when (buffer-live-p (get-buffer $buffer))
+    (with-current-buffer $buffer
       (derived-mode-p $modes))))
 
-(defun format-line! ($left-str $right-str)
-  (concat $left-str
+(defun format-line! ($left-string $right-string)
+  "Add space between $LEFT-STRING and $RIGHT-STRING to generate a
+string with the witdh of current frame width."
+  (concat $left-string
           (make-string (max 2 (- (frame-width)
-                                 (+ (string-width $left-str)
-                                    (string-width $right-str)
+                                 (+ (string-width $left-string)
+                                    (string-width $right-string)
                                     (if window-system 0 1))))
                        ?\s)
-          $right-str))
+          $right-string))
 
 (defun remap! ($old $new &optional $map)
-  "Remap keybindings whose prefix is OLD-KEY to NEW-KEY in
-MAP (default `global-map')."
+  "Remap keybindings whose prefix is $OLD-KEY to $NEW-KEY in
+$MAP (default `global-map')."
   (let ((map (or $map global-map))
         (key (string-to-list (kbd $old))))
     (while (and map key)
@@ -172,13 +213,14 @@ MAP (default `global-map')."
       (define-key $map (kbd $old) nil))))
 
 (defun ignore-errors! ($fn &rest $args)
-  "Use for advice"
+  "Use for advice."
   (ignore-errors (apply $fn $args)))
 
-(defvar core--buffer-useful t)
+(defvar core--buffer-useful t
+  "A flag to indicate if the buffer is not a temporary buffer")
 (defun buffer-temporary? ()
   "If function `buffer-file-name' return nil or a temp file or
-HTML file converted from org file."
+HTML file converted from org file, it returns t."
   (let ((filename (buffer-file-name)))
     (or (not core--buffer-useful)
         (not filename)
@@ -208,3 +250,5 @@ HTML file converted from org file."
          (file-truename (concat $d2 "/"))))
 
 (provide 'core-lib)
+
+;;; core-lib.el ends here

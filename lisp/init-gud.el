@@ -26,8 +26,9 @@
 
 (defun gud/pop-to-source-buffer ()
   (interactive)
-  (when gud-last-last-frame
-    (pop-to-buffer (gud-find-file (car gud-last-last-frame)))))
+  (when-let ((file (or (car gud-last-last-frame)
+                       gdb-main-file)))
+    (pop-to-buffer (gud-find-file file))))
 
 (defun gud/pop-to-comint-buffer ()
   (interactive)

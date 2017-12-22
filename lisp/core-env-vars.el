@@ -1,10 +1,10 @@
-(defmacro setvar! (&rest body)
+(defmacro setvar! (&rest $body)
   (let (forms
         (setter (if (bound-and-true-p byte-compile-current-file)
                     'defvar 'setq)))
-    (while (not (null body))
-      (push `(,setter ,(pop body)
-                      (eval-when-compile ,(pop body)))
+    (while (not (null $body))
+      (push `(,setter ,(pop $body)
+                      (eval-when-compile ,(pop $body)))
             forms))
     `(progn ,@(nreverse forms))))
 

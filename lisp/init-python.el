@@ -1,5 +1,6 @@
 (setvar! python-has-pytest-p (executable-find "pytest")
-         python-has-ipython-p (executable-find "ipython3"))
+         python-has-ipython-p (executable-find "ipython3")
+         python-has-pylint-path (executable-find "pylint"))
 
 (require-packages!
  (elpy :archive "melpa-stable")
@@ -25,12 +26,13 @@
 (with-eval-after-load 'elpy
   (remap! "C-c C-r" "C-c r" elpy-mode-map)
   (setcar elpy-test-discover-runner-command "python3")
-  (elpy-use-cpython "python3")
   (setq elpy-rpc-backend "jedi"
         elpy-rpc-python-command "python3"
         elpy-modules (delete 'elpy-module-django
                              (delete 'elpy-module-flymake elpy-modules))
         elpy-test-runner 'elpy-test-pytest-runner)
+
+  (elpy-use-cpython "python3")
   (define-key! :map elpy-mode-map
     ("C-c C-n" . nil)
     ("C-c C-p" . nil)
@@ -120,7 +122,12 @@
                  "jupyter")
     (add-to-list 'python-shell-completion-native-disabled-interpreters
                  "python3"))
+
   (setq python-shell-prompt-detect-failure-warning nil)
+
+  (when python-has-pylint-path
+    (setq python-check-command python-has-pylint-path))
+
   (elpy-enable)
   (remove-hook 'python-mode-hook 'elpy-mode)
 
