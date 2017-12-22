@@ -145,7 +145,7 @@ Archive with high priority will be used when install a package.")
  smex
  ;; Show key bindings when pressing
  which-key
- (fcitx :when emacs-use-fcitx-p)
+ (fcitx :when (and emacs-use-fcitx-p window-system))
  ;; Numbering windows
  window-numbering
  ;; Highlight braces with their depth
@@ -198,7 +198,7 @@ Archive with high priority will be used when install a package.")
   ;;`eldoc', show API doc in minibuffer echo area enabled by default
   ;; (global-eldoc-mode 1)
 
-  (when emacs-use-fcitx-p
+  (when (and emacs-use-fcitx-p window-system)
     (fcitx-aggressive-setup))
 
   (which-key-mode 1)
