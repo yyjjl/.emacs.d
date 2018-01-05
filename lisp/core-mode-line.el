@@ -183,6 +183,7 @@ and `buffer-file-coding-system'"
   (setq-default mode-line-buffer-identification '("%b"))
   (setq-default mode-line-misc-info
                 '((global-mode-string ("" global-mode-string " "))
-                  (projectile-mode ("" projectile-mode-line " ")))))
+                  (projectile-mode (:eval (format "[%s]"
+                                                  (projectile-project-name)))))))
 
 (provide 'core-mode-line)

@@ -12,7 +12,7 @@
                         (win (get-buffer-window comint-buffer)))
                (with-selected-window win
                  (setq gdb--info-window
-                       (split-window-vertically -15)))))
+                       (split-window-vertically -10)))))
            (if (window-live-p gdb--info-window)
                (progn
                  (with-selected-window gdb--info-window

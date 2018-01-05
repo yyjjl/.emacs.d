@@ -181,6 +181,13 @@
   (when (eq major-mode 'compilation-mode)
     (ansi-color-apply-on-region compilation-filter-start (point-max))))
 
+(defun core*desktop-save-unless-loaded ($fn &rest $args)
+  (if (or (called-interactively-p 'interactive)
+          desktop-file-modtime)
+      (apply $fn $args)
+    (message "Current desktop was not loaded from a file. Ignored")))
+(advice-add 'desktop-save :around #'core*desktop-save-unless-loaded)
+
 ;; (define-hook! core|auto-save-buffer (auto-save-hook)
 ;;   (save-excursion
 ;;     (dolist (buffer (buffer-list))

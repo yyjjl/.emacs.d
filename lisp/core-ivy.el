@@ -5,45 +5,6 @@
         (setq def-val (concat (substring def-val 0 (min pos 80)) " ... ")))
       (semantic-tag-put-attribute $tag :default-value def-val))))
 
-(defun counsel%semantic--create ($tags $depth &optional $class $result)
-  "Write the contents of TAGS to the current buffer."
-  (let ((class $class)
-        cur-type
-        formated-tag)
-    (dolist (tag $tags)
-      (when (listp tag)
-        (counsel%semantic--clean-tag tag)
-        (setq formated-tag (semantic-format-tag-summarize tag nil t))
-        (case (setq cur-type (semantic-tag-class tag))
-          ((function variable type)
-           (let ((spaces (make-string (* $depth 2) ?\s))
-                 (type-p (eq cur-type 'type)))
-             (unless (and (> $depth 0) (not type-p))
-               (setq class nil))
-             ;; Format tag
-             (push (cons
-                    (concat (if (and class (not type-p))
-                                (format "%s%s(%s) "
-                                        spaces (if (> $depth 0) "=> " "")
-                                        class)
-                              spaces)
-                            formated-tag)
-                    tag)
-                   $result)
-             (when type-p
-               (setq class (car tag)))
-             ;; Recurse to children
-             (unless (eq cur-type 'function)
-               (setq $result
-                     (counsel%semantic--create (semantic-tag-components tag)
-                                            (1+ $depth)
-                                            class
-                                            $result)))))
-          ((code))
-          ;; Catch-all
-          (t (push (cons formated-tag tag) $result))))))
-  $result)
-
 (defun counsel%semantic-or-imenu--relative-buffers ($buffer)
   (let* (projectile-require-project-root
          (project-buffers (ignore-errors (projectile-project-buffers))))
@@ -62,15 +23,15 @@
          (lambda ($candidate)
            (if (null (cdr-safe $buffers))
                $candidate
-             (cons (concat (car $candidate) " [" (buffer-name buffer) "]")
+             (cons (concat (buffer-name buffer) ": " (car $candidate))
                    (cdr $candidate))))
          (with-current-buffer buffer
            ;; Use semantic first
            (if (semantic-active-p)
-               (progn
-                 (when (semantic-parse-tree-needs-update-p)
-                   (semantic-parse-tree-set-needs-update))
-                 (nreverse (counsel%semantic--create (semantic-fetch-tags) 0)))
+               (mapcar (lambda (x)
+                         (counsel%semantic--clean-tag x)
+                         (cons (counsel-semantic-format-tag x) x))
+                       (counsel-semantic-tags))
              (let* ((inhibit-message t)
                     (imenu-auto-rescan t)
                     (imenu-auto-rescan-maxout (if current-prefix-arg
@@ -95,7 +56,7 @@
     (funcall goto-function place)))
 
 
-(defun counsel-semantic-or-imenu ($arg)
+(defun counsel-semantic-or-imenu* ($arg)
   "Jump to a semantic tag in the current buffer."
   (interactive "P")
   (unless (featurep 'imenu)
@@ -261,7 +222,6 @@ for a file to visit if current buffer is not visiting a file."
     ("o" . counsel-org-goto-all)
     ("t" . counsel-tmm))
 
-  (add-to-list 'counsel-linux-apps-directories "~/.local/share/applications")
   (setq counsel-yank-pop-separator
         "\n------------------------------------------------------------\n")
   (setq counsel-find-file-at-point t)

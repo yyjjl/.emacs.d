@@ -122,17 +122,30 @@ other characters."
   (interactive "p")
   (forward-thing 'defun (- $n)))
 
+(defun forward-sentence-or-sexp (&optional $n)
+  (interactive "p")
+  (if (derived-mode-p 'prog-mode)
+      (forward-sexp $n)
+    (forward-sentence $n)))
+
+(defun backward-sentence-or-sexp (&optional $n)
+  (interactive "p")
+  (forward-sentence-or-sexp (- $n)))
+
 (define-key!
   ("M-Q" . extra/insert-space-around-chinese)
   ("M-;" . evilnc-comment-or-uncomment-lines)
   ("C-x n n" . core/narrow-or-widen-dwim)
   ("C-x K" . core/kill-regexp)
-  ("M-]" . forward-sexp)
-  ("M-[" . backward-sexp)
-  ("M-e" . forward-defun)
-  ("M-a" . backward-defun)
+  ("M-]" . forward-defun)
+  ("M-[" . backward-defun)
+  ("M-e" . forward-sentence-or-sexp)
+  ("M-a" . backward-sentence-or-sexp)
   ("C-M-b" . backward-sentence)
-  ("C-M-f" . forward-sentence))
+  ("C-M-f" . forward-sentence)
+
+  ("C-=" . hydra-mc/mc/mark-next-like-this)
+  ("C--" . hydra-mc/mc/mark-previous-like-this))
 
 (define-key! :prefix "C-c m"
   ("P" . mc/mark-pop)

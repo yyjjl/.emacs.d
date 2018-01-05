@@ -4,12 +4,91 @@
         ("C-x t s" . hs-show-block)
         ("C-x t H" . hs-hide-all)
         ("C-x t S" . hs-show-all)
+        ("C-x t l" . hs-hide-level)
         ("C-t" . hs-toggle-hiding)))
 
 (defvar hs--headline-max-len 30
   "*Maximum length of `hs-headline' to display.")
 (defvar hs--overlay-map (make-sparse-keymap)
   "Keymap for hs minor mode overlay.")
+
+(defvar hs-persistent-file (expand-var! "fold.el"))
+(defvar hs-persistent-table (make-hash-table :test #'equal))
+
+(defun hs%get-overlays ()
+  (loop for overlay in (overlays-in (point-min) (point-max))
+        when (overlay-get overlay 'hs)
+        collect overlay))
+
+(defun hs%load-persistent-table ()
+  (when (file-exists-p hs-persistent-file)
+    (load hs-persistent-file :noerror :nomessage))
+  (let ((table hs-persistent-table))
+    (when hs-persistent-table
+      (dolist (key (hash-table-keys hs-persistent-table))
+        (when (file-exists-p key)
+          (puthash key (gethash key hs-persistent-table) table))))
+    (setq hs-persistent-table table)))
+
+(defun hs%save-persistent-table ()
+  (with-temp-buffer
+    (insert "(setq hs-persistent-table ")
+    (insert (prin1-to-string hs-persistent-table))
+    (insert ")")
+    (write-file hs-persistent-file)))
+
+(defun hs%save-folds (&optional buffer-or-name)
+  "Save folds in BUFFER-OR-NAME, which should have associated file.
+
+BUFFER-OR-NAME defaults to current buffer."
+  (when hs-minor-mode
+    (with-current-buffer (or buffer-or-name (current-buffer))
+      (let ((filename (buffer-file-name))
+            information)
+        (when filename
+          (setq filename (substring-no-properties filename))
+          (dolist (ov (hs%get-overlays))
+            (push (cons (overlay-start ov) (overlay-end ov)) information))
+          (if information
+              (progn
+                (sort information (lambda (x y) (< (cdr x) (cdr y))))
+                (push (file-modification-time! filename) information)
+                (puthash filename information hs-persistent-table))
+            (when (gethash filename hs-persistent-table)
+              (remhash filename hs-persistent-table))))))))
+
+(defun hs%restore-folds (&optional buffer-or-name)
+  "Restore folds in BUFFER-OR-NAME, if they have been saved.
+
+BUFFER-OR-NAME defaults to current buffer."
+  (when hs-minor-mode
+    (with-current-buffer (or buffer-or-name (current-buffer))
+      (let ((filename (buffer-file-name)))
+        (when filename
+          (setq filename (substring-no-properties filename))
+          (when-let ((information (gethash filename hs-persistent-table))
+                     (mtime (car information))
+                     (regions (and mtime
+                                   (equal (file-modification-time! filename)
+                                          mtime)
+                                   (cdr information))))
+            (loop for (beg . end) in regions
+                  do (progn
+                       (goto-char beg)
+                       (hs-hide-block)))))))))
+
+(defun hs|kill-emacs-hook ()
+  "Traverse all buffers and try to save their folds."
+  (mapc #'hs%save-folds (buffer-list))
+  (hs%save-persistent-table))
+
+(define-minor-mode hs-persistent-mode
+  "Toggle `hs-persistent-mode' minor mode."
+  :global nil
+  (let ((fnc (if hs-persistent-mode #'add-hook #'remove-hook)))
+    (funcall fnc 'hs-minor-mode-hook #'hs%restore-folds)
+    (funcall fnc 'kill-buffer-hook #'hs%save-folds)
+    (funcall fnc 'kill-emacs-hook #'hs|kill-emacs-hook)))
 
 (defun hs%display-headline ()
   (let* ((len (length hs-headline))
@@ -30,10 +109,14 @@
     (overlay-put $ov 'keymap hs--overlay-map)))
 
 (with-eval-after-load 'hideshow
-  (setq hs-isearch-open t)
+  (setq hs-isearch-open t
+        hs-allow-nesting t)
   (setq hs-set-up-overlay 'hs%abstract-overlay)
   (defun hs%auto-expand (&rest $args)
     (save-excursion (hs-show-block)))
+
+  (hs-persistent-mode 1)
+  (hs%load-persistent-table)
   (advice-add 'goto-line :after #'hs%auto-expand)
   (advice-add 'find-tag :after #'hs%auto-expand))
 

@@ -111,6 +111,17 @@ If $FORCE is non-nil create a new term buffer directly."
           (multi-term-internal))
         buffer)))
 
+(defvar term-default-directory-function-list
+  '(projectile-project-root))
+
+(defun term%get-default-directory ()
+  (let ((functions term-default-directory-function-list)
+        directory)
+    (while (and functions
+                (not (setq directory
+                           (ignore-errors (funcall (pop functions)))))))
+    directory))
+
 (defun term/pop-shell (&optional $arg)
   "Switch to the term buffer last used, or create a new one if
 none exists, or if the current buffer is already a term."
@@ -122,10 +133,7 @@ none exists, or if the current buffer is already a term."
                       (apply #'term/ssh (term/get-ssh-info $arg))
                     (term/local-shell
                      (or (and (equal $arg 4)
-                              (boundp 'cmake-ide-build-dir)
-                              cmake-ide-build-dir)
-                         (and (equal $arg 4)
-                              (ignore-errors (projectile-project-root)))
+                              (term%get-default-directory))
                          default-directory)
                      (equal $arg 16))))
           (parent-buffer (current-buffer)))
@@ -138,9 +146,9 @@ none exists, or if the current buffer is already a term."
                      (buffer-local-value 'major-mode
                                          (window-buffer term-popup-window))))
             ;; Reuse window
-            (progn
-              (set-window-buffer term-popup-window buffer)
-              (select-window term-popup-window))
+          (progn
+            (select-window term-popup-window)
+            (set-window-buffer term-popup-window buffer))
           (pop-to-buffer buffer)
           (setq term-popup-window (get-buffer-window buffer)))))))
 
@@ -164,12 +172,13 @@ none exists, or if the current buffer is already a term."
   (remove-hook 'kill-buffer-hook 'multi-term-kill-buffer-hook)
   (add-hook 'kill-buffer-hook 'multi-term-kill-buffer-hook :append)
 
-  (defun term*multi-term-switch-internal-hack (&rest _)
+  (defun term*multi-term-switch-internal-hack (&rest $args)
     ;; Reset popup window
-    (setq core--shackle-popup-window (selected-window)))
+    (setq multi-term-buffer-list
+          (cl-remove-if-not #'buffer-live-p multi-term-buffer-list)))
   (add-hook 'term-mode-hook 'multi-term-keystroke-setup)
 
-  (advice-add 'multi-term-switch-internal :after
+  (advice-add 'multi-term-switch-internal :before
               #'term*multi-term-switch-internal-hack)
 
   (setq multi-term-scroll-to-bottom-on-output t)

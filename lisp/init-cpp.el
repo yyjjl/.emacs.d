@@ -21,6 +21,8 @@
  cmake-mode
  cmake-font-lock)
 
+(put 'cmake-ide-build-dir 'safe-local-variable #'stringp)
+
 
 
 (defun cpp%fix-irony-eldoc ()
@@ -39,14 +41,14 @@
 ;; Makefile support for rtags
 (defvar-local cpp-cmake-ide-enabled nil)
 
-(defsubst cpp/locate-makefile (&optional $makefile-name)
+(defsubst cpp%locate-makefile (&optional $makefile-name)
   (locate-dominating-file default-directory (or $makefile-name "Makefile")))
 
 (defun cpp/rtags-indexing-with-makefile (&optional $name)
   (interactive)
   (if (rtags-is-indexed)
       (message "Project indexed already !!")
-    (let ((root (cpp/locate-makefile $name)))
+    (let ((root (cpp%locate-makefile $name)))
       (if root
           (let ((default-directory root) ret)
             (equal (shell-command (format "make -nk|%s -c -"
@@ -65,9 +67,9 @@
         (shell-command (format "%s -W %s"
                                (expand-file-name "rc" rtags-path)
                                default-directory))
-        (cpp/c++-simple-setup)))))
+        (cpp%c++-simple-setup)))))
 
-(defun cpp/common-cc-setup ()
+(defun cpp%common-cc-setup ()
   "Setup shared by all languages (java/groovy/c++ ...)"
   (turn-on-auto-fill)
   (setq c-basic-offset 4)
@@ -81,14 +83,24 @@
   (cpp%fix-cc-indent-offset 'func-decl-cont 0)
   (cpp%fix-cc-indent-offset 'case-label 4))
 
-(defun cpp/rtags-setup ()
+(defun cpp%rtags-setup ()
   (setq-local eldoc-documentation-function 'cpp/rtags-eldoc)
-  (local-set-key (kbd "M-.") 'rtags-find-symbol-at-point)
-  (local-set-key (kbd "M-,") 'rtags-location-stack-back)
-  (local-set-key (kbd "M-n") 'rtags-next-match)
-  (local-set-key (kbd "M-p") 'rtags-previous-match)
-  (local-set-key (kbd "C-c .") 'rtags-symbol-type)
-  (local-set-key (kbd "C-c C-k") 'cpp/remove-project-rtags-cache)
+  (let ((map (copy-keymap (current-local-map))))
+    (define-key! :map map
+      ("M-." . rtags-find-symbol-at-point)
+      ("M-," . rtags-location-stack-back)
+      ("M-?" . rtags-find-references-at-point)
+      ("M-n" . rtags-next-match)
+      ("M-p" . rtags-previous-match)
+      ("C-c ." . rtags-symbol-type)
+      ("C-c C-k" . cpp/remove-project-rtags-cache)
+      ("C-c ;" . rtags-create-doxygen-comment)
+      ("C-c C-;" . rtags-create-doxygen-comment)
+      ("C-c C-c" . cmake-ide-run-cmake)
+      ("C-c T" . cpp/cmake-release-toggle)
+      ("C-c d" . cpp/cmake-define-macro)
+      ("C-c D" . cpp/cmake-delete-macro))
+    (use-local-map map))
   (when cpp-has-irony-p (irony-eldoc -1))
   (when tags-has-gtags-p (ggtags-mode -1)))
 
@@ -98,10 +110,10 @@
       (if cpp-cmake-ide-enabled
           (progn
             (cmake-ide-run-cmake)
-            (cpp/rtags-setup))
+            (cpp%rtags-setup))
         (when (cpp/rtags-indexing-with-makefile)
           (message "Rtags is ready !!")
-          (cpp/rtags-setup)))
+          (cpp%rtags-setup)))
     (message "Rtags not found !!!"))
   (when cpp-has-irony-p
     (unless (featurep 'company-irony-c-headers)
@@ -110,10 +122,10 @@
                 (company-irony-c-headers--resolved-search-paths t))
     (message "Setting CC search directories done !!")))
 
-(defun cpp/c++-simple-setup ()
+(defun cpp%c++-simple-setup ()
   (setq-local compile-command
               '(ignore-errors
-                 (let ((root (cpp/locate-makefile)))
+                 (let ((root (cpp%locate-makefile)))
                    (if root (concat "make -C " root)
                      (let ((filename (buffer-file-name)))
                        (concat "g++ "
@@ -130,10 +142,12 @@
 
 (defun cpp/compile ()
   (interactive)
-  (call-interactively
-   (if cpp-cmake-ide-enabled
-       'cmake-ide-compile
-     'compile)))
+  (if cpp-cmake-ide-enabled
+      (condition-case err
+          (cmake-ide-compile)
+        (error
+         (call-interactively #'compile)))
+    (call-interactively #'compile)))
 
 (defun cpp/load-file-in-root ()
   (interactive)
@@ -163,24 +177,63 @@
                                  buffer-name)))
       (pop-to-buffer buffer)))))
 
-(defun cpp/gdb ()
-  (interactive)
-  (setq gud--window-configuration (current-window-configuration))
-  (gdb (gud-query-cmdline 'gdb)))
+(defun cpp/gdb (&optional directory)
+  (interactive
+   (list (expand-file-name
+          (read-directory-name
+           "Directory: "
+           (and cpp-cmake-ide-enabled
+                (cmake-ide--get-build-dir))
+           ""
+           :must-match))))
+  (unless (featurep 'gud)
+    (require 'gud))
+  (let ((default-directory directory))
+    (setq gud--window-configuration (current-window-configuration))
+    (gdb (gud-query-cmdline 'gdb))))
 
-(setq hide-ifdef-mode-prefix-key (kbd "C-c h"))
+(defun cpp/cmake-release-toggle ()
+  (interactive)
+  (if (not cpp-cmake-ide-enabled)
+      (message "The project is not a CMake project")
+    (setq cmake-ide-cmake-opts
+          (string-join
+           (mapcar (lambda (macro)
+                     (if (null (string-match "-DCMAKE_BUILD_TYPE=\\(.*\\)" macro))
+                         macro
+                       (if (string-suffix-p "Release" macro)
+                           "-DCMAKE_BUILD_TYPE=Debug"
+                         "-DCMAKE_BUILD_TYPE=Release")))
+                   (split-string cmake-ide-cmake-opts))
+           " "))
+    (message "Current: %s" cmake-ide-cmake-opts)))
+
+(defun cpp/cmake-define-macro ()
+  (interactive)
+  (if (not cpp-cmake-ide-enabled)
+      (message "The project is not a CMake project")
+    (let* ((name (read-string "Name: "))
+           (value (read-string "Value: "))
+           (macro (concat "-D" name "=" value))
+           (macros (split-string cmake-ide-cmake-opts)))
+      (unless (member macro macros)
+        (setq cmake-ide-cmake-opts
+              (concat cmake-ide-cmake-opts " " macro)))
+      (message "Flags: %s" cmake-ide-cmake-opts))))
+
+(defun cpp/cmake-delete-macro ()
+  (interactive)
+  (if (not cpp-cmake-ide-enabled)
+      (message "The project is not a CMake project")
+    (let* ((macros (split-string cmake-ide-cmake-opts))
+           (macro-to-delete (completing-read "Macro: " macros nil
+                                             :require-match)))
+      (setq cmake-ide-cmake-opts
+            (string-join (remove macro-to-delete macros) " "))
+      (message "Flags: %s" cmake-ide-cmake-opts))))
+
 (defun cpp/c++-setup ()
   "C/C++ only setup"
-  (local-set-key (kbd "C-c o") 'ff-find-other-file)
-  (local-set-key (kbd "C-c b") 'clang-format-buffer)
-  (local-set-key (kbd "C-c C-j") 'semantic-ia-fast-jump)
-  (local-set-key (kbd "C-c C-v") 'semantic-decoration-include-visit)
-  (local-set-key (kbd "C-c C-c") 'cmake-ide-run-cmake)
-  (local-set-key (kbd "C-c C-l") 'cpp/load-file-in-root)
-  (local-set-key [f9] 'cpp/try-misc-setup)
-  (local-set-key [f10] 'cpp/compile)
-  (local-set-key [f5] 'cpp/gdb)
-
   (hide-ifdef-mode 1)
 
   (when tags-has-gtags-p
@@ -210,9 +263,9 @@
     (if (cmake-ide--locate-cmakelists)
         (progn
           (setq-local cpp-cmake-ide-enabled t)
-          (cpp/rtags-setup))
+          (cpp%rtags-setup))
       (setq cmake-ide-build-dir nil)
-      (cpp/c++-simple-setup))))
+      (cpp%c++-simple-setup))))
 
 ;; Do not use `c-mode-hook' and `c++-mode-hook', there is a bug
 (defvar-local cpp--initialized-p nil)
@@ -222,7 +275,8 @@
     (if (>= (string-to-number c-version) 5.33)
         (run-hooks 'prog-mode-hook))
 
-    (cpp/common-cc-setup)
+    (cpp%common-cc-setup)
+
     (unless (buffer-temporary?)
       (unless (or (derived-mode-p 'java-mode)
                   (derived-mode-p 'groovy-mode))
@@ -232,7 +286,21 @@
   (add-hook 'flycheck-mode-hook 'flycheck-irony-setup)
   (setq irony-additional-clang-options
         '("-Wall" "-std=c++14"))
-  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
+  (add-hook 'irony-mode-hook
+            'irony-cdb-autosetup-compile-options))
+
+(with-eval-after-load 'irony-completion
+  (add-to-list 'irony-completion-availability-filter
+               'not-accessible :append))
+
+(with-eval-after-load 'irony-cdb-json
+  (defun cpp*irony-cdb-json--load-project-alist-hack ()
+    (setq irony-cdb-json--project-alist
+          (cl-remove-if-not (lambda (x)
+                              (ignore-errors (file-exists-p (cdr x))))
+                            irony-cdb-json--project-alist)))
+  (advice-add 'irony-cdb-json--load-project-alist :after
+              #'cpp*irony-cdb-json--load-project-alist-hack))
 
 (with-eval-after-load 'irony-eldoc
   (defvar cpp--irony-eldoc-old-overlays nil)
@@ -273,7 +341,6 @@
   (setq rtags-completions-enabled nil
         rtags-autostart-diagnostics nil))
 
-(put 'cmake-ide-build-dir 'safe-local-variable #'stringp)
 (with-eval-after-load 'cc-mode
   (require 'cmake-ide)
   ;; Smart tab
@@ -289,6 +356,30 @@
                       (setf (car x) (+ k 32))
                     (if (and (>= k 97) (<= k 122))
                         (setf (car x) (- k 32))))))
-              (cddr m)))))
+              (cddr m))))
+
+  (define-key! :map c++-mode-map
+    ("C-c o" . ff-find-other-file)
+    ("C-c b" . clang-format-buffer)
+    ("C-c C-j" . semantic-ia-fast-jump)
+    ("C-c C-v" . semantic-decoration-include-visit)
+    ("C-c C-l" . cpp/load-file-in-root)
+    ([f9] . cpp/try-misc-setup)
+    ([f10] . cpp/compile)
+    ([f5] . cpp/gdb)))
+
+(with-eval-after-load 'cmake-mode
+  (define-key cmake-mode-map [f10] 'compile))
+
+(with-eval-after-load 'hideif
+  (define-key hide-ifdef-mode-map hide-ifdef-mode-prefix-key nil)
+  (define-key hide-ifdef-mode-map (kbd "C-c h")
+    hide-ifdef-mode-submap))
+
+;; Set term default directory
+(when (boundp 'term-default-directory-function-list)
+  (add-to-list 'term-default-directory-function-list
+               (lambda ()
+                 (and cpp-cmake-ide-enabled (cmake-ide--get-build-dir)))))
 
 (provide 'init-cpp)

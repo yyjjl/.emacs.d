@@ -1,1 +1,1 @@
-((nil (cmake-ide-build-dir . __(concat "\"" ( expand-file-name "build" skeletor-project-root) "\"")__)))
+((nil (cmake-ide-build-dir . "build")))

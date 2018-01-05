@@ -7,6 +7,7 @@
 
 (defvar core--shackle-help-modes
   '(help-mode
+    completion-list-mode
     messages-buffer-mode
     profiler-report-mode))
 
@@ -106,6 +107,7 @@
          (num (if (or (atom root) (car root))
                   2
                 (length (cdr root))))
+         (old-window (get-buffer-window $buffer))
          window)
     ;; When window is an autoclose window and `:align' is not set,
     ;; set it to `shackle-default-alignment'
@@ -117,15 +119,15 @@
                (/ 1.0 num)))
 
     (setq window (funcall $fn $buffer $alist $plist))
-
-    (when autoclose?
-      ;; Autoclose window should be dedicated
-      (set-window-dedicated-p window t)
-      ;; Add to autoclose list
-      (push (cons window $buffer) core--shackle-popup-window-list))
-    (with-current-buffer $buffer
-      ;; Record popup window
-      (setq core--shackle-popup-window window))
+    (unless (eq window old-window)
+      (when autoclose?
+        ;; Autoclose window should be dedicated
+        (set-window-dedicated-p window t)
+        ;; Add to autoclose list
+        (push (cons window $buffer) core--shackle-popup-window-list))
+      (with-current-buffer $buffer
+        ;; Record popup window
+        (setq core--shackle-popup-window window)))
     window))
 
 (defun core--shackle%comint-mode-matcher ($buffer)
@@ -163,16 +165,15 @@
 
   (define-hook! core%autoclose-popup-window (kill-buffer-hook)
     "Auto quit popup window after buffer killed"
-    (let ((win (get-buffer-window))
+    (let ((window (get-buffer-window))
           (buffer-name (buffer-name)))
-      (when (and win
-                 (or (equal win core--shackle-popup-window)
-                     (string-match-p "^\\*.*\\*\\(?:<[0-9]+>\\)?$" buffer-name))
+      (when (and window
+                 (equal window core--shackle-popup-window)
                  (not (one-window-p))
-                 (not (minibuffer-window-active-p win))
+                 (not (minibuffer-window-active-p window))
                  (or (not (boundp 'lv-wnd))
                      (not (eq (next-window) lv-wnd))))
-        (quit-window nil win))))
+        (quit-window nil window))))
 
   (setq core--shackle-popup-buffer-regexp
         (eval-when-compile
@@ -192,6 +193,7 @@
           ((:custom core--shackle%help-mode-matcher)
            :align below :select t :autoclose t)
           (,core--shackle-popup-buffer-regexp
-           :regexp t :select t :autoclose t))))
+           :regexp t :select t :autoclose t)
+          ("^ ?\\*.*\\*\\(?:<[0-9]+>\\)?$" :regexp t))))
 
 (provide 'core-popups)

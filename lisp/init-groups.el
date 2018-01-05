@@ -54,6 +54,23 @@
   (groups%clean-groups)
   (groups%display-group $group))
 
+(defun groups/ibuffer-add-files-to-group ($group $files)
+  (interactive
+   (let* ((group-name (ivy-read "Group: " groups-file-groups))
+          (group (assoc group-name groups-file-groups)))
+     (list
+      (or group group-name)
+      (mapcar #'buffer-file-name
+              (--filter (buffer-file-name it)
+                        (ibuffer-get-marked-buffers))))))
+  (if (stringp $group)
+      (progn
+        (setq $group (cons $group $files))
+        (push $group groups-file-groups))
+    (setcdr $group (append $files (cdr $group))))
+  (groups%clean-groups)
+  (groups%display-group $group))
+
 (defun groups/delete-file-from-group ($group $filename)
   "Delete a FILENAME from GROUP"
   (interactive

@@ -49,6 +49,13 @@
     (with-current-buffer buffer
       (core|setup-buffer-bookmark))))
 
+(with-eval-after-load 'xref
+  (define-key! :map xref--xref-buffer-mode-map
+    ("j" . (lambda! () (xref--search-property 'xref-item)))
+    ("k" . (lambda! () (xref--search-property 'xref-item t))))
+  (add-to-list 'xref-prompt-for-identifier
+               'xref-find-references :append))
+
 (setq flycheck-keymap-prefix (kbd "C-c f"))
 (with-eval-after-load 'flycheck
   ;; Do not check during newline
@@ -66,6 +73,8 @@
                   try-expand-dabbrev-all-buffers
                   try-expand-dabbrev-from-kill)))
 
+(put 'projectile-project-run-cmd 'safe-local-variable #'stringp)
+(put 'projectile-project-test-cmd 'safe-local-variable #'stringp)
 (with-eval-after-load 'projectile
   (setq projectile-completion-system 'ivy)
   (setq projectile-enable-caching t)
@@ -275,6 +284,9 @@ Does not indent buffer, because it is used for a
   ("C-<down>" . text-scale-decrease)
 
   ("C-x w [" . winner-undo)
-  ("C-x w ]" . winner-redo))
+  ("C-x w ]" . winner-redo)
+
+  ("M-g n" . flycheck-next-error)
+  ("M-g p" . flycheck-previous-error))
 
 (provide 'core-misc)

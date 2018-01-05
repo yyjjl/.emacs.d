@@ -19,6 +19,9 @@
 
 ;;; Code:
 
+(eval-when-compile
+  (require 'cl))
+
 (dolist (sym '(when-let if-let string-trim
                          string-join string-blank-p string-lessp
                          hash-table-keys))
@@ -158,7 +161,7 @@ for defining functions."
   "Read file named $FILENAME as string."
   (let ((core-recentf-enabled? nil))
     (with-temp-buffer
-      (insert-file-contents $filename)
+      (insert-file-contents-literally $filename)
       (buffer-string))))
 
 (defun open! ($file-list)
@@ -248,6 +251,9 @@ HTML file converted from org file, it returns t."
 (defsubst directory-equal? ($d1 $d2)
   (equal (file-truename (concat $d1 "/"))
          (file-truename (concat $d2 "/"))))
+
+(defsubst file-modification-time! (file)
+  (nth 5 (file-attributes file)))
 
 (provide 'core-lib)
 

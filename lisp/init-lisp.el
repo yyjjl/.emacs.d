@@ -38,9 +38,6 @@ Emacs Lisp."
   (make-local-variable 'hippie-expand-try-functions-list)
   (add-to-list 'hippie-expand-try-functions-list
                'try-complete-lisp-symbol
-               :append)
-  (add-to-list 'hippie-expand-try-functions-list
-               'try-complete-lisp-symbol-partially
                :append))
 
 (defun lisp|racket-setup ()
@@ -133,39 +130,5 @@ Emacs Lisp."
 (with-eval-after-load 'elisp-mode
   (define-key emacs-lisp-mode-map (kbd "C-c e") 'macrostep-expand)
   (define-key lisp-interaction-mode-map (kbd "C-c e") 'macrostep-expand))
-
-(defun lisp/transpose-sexp ($n)
-  (when (/= $n 0)
-    (let ((bounds (bounds-of-thing-at-point 'sexp)))
-      (if bounds
-          (progn
-            (let ((dist (or (and bounds (- (cdr bounds) (point))) 0)))
-              (unless dist
-                (forward-char 1))
-              (transpose-sexps $n)
-              (backward-char dist)))
-        (message "Not in a sexp")))))
-
-(defun lisp/transpose-sexp-down (&optional $n)
-  (interactive "P")
-  (unless $n (setq $n 1))
-  (lisp/transpose-sexp $n))
-
-(defhydra hydra-sexp (:exit nil)
-  "Sexp"
-  ("SPC" (if (region-active-p)
-             (deactivate-mark)
-           (mark-sexp)) "mark")
-  ("." lisp/transpose-sexp-down "->")
-  ("," lisp/transpose-sexp-up "<-"))
-
-(defun lisp/transpose-sexp-up (&optional $n)
-  (interactive "P")
-  (unless $n (setq $n 1))
-  (lisp/transpose-sexp (- 0 $n)))
-
-(define-key!
-  ("C->" . hydra-sexp/lisp/transpose-sexp-down)
-  ("C-<" . hydra-sexp/lisp/transpose-sexp-up))
 
 (provide 'init-lisp)
