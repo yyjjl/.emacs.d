@@ -198,7 +198,7 @@ for a file to visit if current buffer is not visiting a file."
     ("l p" . counsel-list-processes)
     ("l f" . counsel-find-library)
     ("u" . counsel-unicode-char)
-    ("i" . counsel-semantic-or-imenu)
+    ("i" . counsel-semantic-or-imenu*)
     ("x" . counsel-linux-app)
     ("v" . counsel-set-variable)
     ("j" . counsel-file-jump)

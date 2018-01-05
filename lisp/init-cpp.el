@@ -23,6 +23,10 @@
 
 (put 'cmake-ide-build-dir 'safe-local-variable #'stringp)
 
+(require 'init-cmake)
+(defvar cpp--irony-eldoc-old-overlays nil)
+(defvar-local cpp-cmake-ide-enabled nil)
+
 
 
 (defun cpp%fix-irony-eldoc ()
@@ -39,8 +43,6 @@
       (push (cons $key $val) c-offsets-alist))))
 
 ;; Makefile support for rtags
-(defvar-local cpp-cmake-ide-enabled nil)
-
 (defsubst cpp%locate-makefile (&optional $makefile-name)
   (locate-dominating-file default-directory (or $makefile-name "Makefile")))
 
@@ -96,10 +98,9 @@
       ("C-c C-k" . cpp/remove-project-rtags-cache)
       ("C-c ;" . rtags-create-doxygen-comment)
       ("C-c C-;" . rtags-create-doxygen-comment)
-      ("C-c C-c" . cmake-ide-run-cmake)
-      ("C-c T" . cpp/cmake-release-toggle)
-      ("C-c d" . cpp/cmake-define-macro)
-      ("C-c D" . cpp/cmake-delete-macro))
+      ("C-c C-c" . cpp/run-cmake)
+      ("C-c T" . cpp/cmake-toggle-option)
+      ("C-c d" . cpp/cmake-edit-option))
     (use-local-map map))
   (when cpp-has-irony-p (irony-eldoc -1))
   (when tags-has-gtags-p (ggtags-mode -1)))
@@ -109,7 +110,7 @@
   (if cpp-has-rtags-p
       (if cpp-cmake-ide-enabled
           (progn
-            (cmake-ide-run-cmake)
+            (cpp/run-cmake)
             (cpp%rtags-setup))
         (when (cpp/rtags-indexing-with-makefile)
           (message "Rtags is ready !!")
@@ -140,6 +141,23 @@
                                (file-name-base filename)))))))
   (when cpp-has-irony-p (irony-eldoc)))
 
+(defvar cpp--extra-hide-ifdef-env nil)
+(defun cpp%setup-hide-ifdef ()
+  (dolist (name cpp--extra-hide-ifdef-env)
+    (setq hide-ifdef-env (assq-delete-all name hide-ifdef-env)))
+  (setq cpp--extra-hide-ifdef-env nil)
+  (dolist (option (and (boundp 'irony--compile-options)
+                       irony--compile-options))
+    (when (string-prefix-p "-D" option)
+      (let* ((nv (split-string (substring option 2) "="))
+             (name (intern (car nv)))
+             (value (cadr nv)))
+        (push name cpp--extra-hide-ifdef-env)
+        (unless (assq name hide-ifdef-env)
+          (hif-set-var name (or value 1))))))
+  (sit-for 1.0)
+  (hide-ifdefs))
+
 (defun cpp/compile ()
   (interactive)
   (if cpp-cmake-ide-enabled
@@ -148,6 +166,12 @@
         (error
          (call-interactively #'compile)))
     (call-interactively #'compile)))
+
+(defun cpp/run-cmake ()
+  (interactive)
+  (setq cmake-ide-cmake-opts
+        (mapconcat #'cpp%option-to-string cpp-cmake-options " "))
+  (cmake-ide-run-cmake))
 
 (defun cpp/load-file-in-root ()
   (interactive)
@@ -191,46 +215,6 @@
   (let ((default-directory directory))
     (setq gud--window-configuration (current-window-configuration))
     (gdb (gud-query-cmdline 'gdb))))
-
-(defun cpp/cmake-release-toggle ()
-  (interactive)
-  (if (not cpp-cmake-ide-enabled)
-      (message "The project is not a CMake project")
-    (setq cmake-ide-cmake-opts
-          (string-join
-           (mapcar (lambda (macro)
-                     (if (null (string-match "-DCMAKE_BUILD_TYPE=\\(.*\\)" macro))
-                         macro
-                       (if (string-suffix-p "Release" macro)
-                           "-DCMAKE_BUILD_TYPE=Debug"
-                         "-DCMAKE_BUILD_TYPE=Release")))
-                   (split-string cmake-ide-cmake-opts))
-           " "))
-    (message "Current: %s" cmake-ide-cmake-opts)))
-
-(defun cpp/cmake-define-macro ()
-  (interactive)
-  (if (not cpp-cmake-ide-enabled)
-      (message "The project is not a CMake project")
-    (let* ((name (read-string "Name: "))
-           (value (read-string "Value: "))
-           (macro (concat "-D" name "=" value))
-           (macros (split-string cmake-ide-cmake-opts)))
-      (unless (member macro macros)
-        (setq cmake-ide-cmake-opts
-              (concat cmake-ide-cmake-opts " " macro)))
-      (message "Flags: %s" cmake-ide-cmake-opts))))
-
-(defun cpp/cmake-delete-macro ()
-  (interactive)
-  (if (not cpp-cmake-ide-enabled)
-      (message "The project is not a CMake project")
-    (let* ((macros (split-string cmake-ide-cmake-opts))
-           (macro-to-delete (completing-read "Macro: " macros nil
-                                             :require-match)))
-      (setq cmake-ide-cmake-opts
-            (string-join (remove macro-to-delete macros) " "))
-      (message "Flags: %s" cmake-ide-cmake-opts))))
 
 (defun cpp/c++-setup ()
   "C/C++ only setup"
@@ -303,7 +287,6 @@
               #'cpp*irony-cdb-json--load-project-alist-hack))
 
 (with-eval-after-load 'irony-eldoc
-  (defvar cpp--irony-eldoc-old-overlays nil)
   (let ((hook (lambda (ov &rest _)
                 (if iedit-mode
                     ;; delay deletion of an overlay
@@ -318,7 +301,9 @@
   ;; Use `rtags' function instead
   (fset 'cmake-ide-maybe-start-rdm
         'rtags-start-process-unless-running)
-  (setq cmake-ide-build-pool-use-persistent-naming t))
+  (setq cmake-ide-build-pool-use-persistent-naming t)
+
+  (advice-add 'cmake-ide--on-cmake-finished :after #'cpp%setup-hide-ifdef))
 
 (with-eval-after-load 'rtags
   (defun cpp/rtags-eldoc ()
@@ -372,6 +357,7 @@
   (define-key cmake-mode-map [f10] 'compile))
 
 (with-eval-after-load 'hideif
+  (setq-default hide-ifdef-shadow t)
   (define-key hide-ifdef-mode-map hide-ifdef-mode-prefix-key nil)
   (define-key hide-ifdef-mode-map (kbd "C-c h")
     hide-ifdef-mode-submap))

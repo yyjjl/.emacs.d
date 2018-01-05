@@ -195,7 +195,6 @@ With a prefix BELOW move point to lower block."
                                  (emacs-lisp . t)
                                  (dot . t)
                                  (js . t)
-                                 (shell . t)
                                  (perl . t)
                                  (latex . t)
                                  (haskell . t)))
