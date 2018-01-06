@@ -206,15 +206,13 @@
    (list (expand-file-name
           (read-directory-name
            "Directory: "
-           (and cpp-cmake-ide-enabled
-                (cmake-ide--get-build-dir))
+           (and cpp-cmake-ide-enabled (cmake-ide--get-build-dir))
            ""
            :must-match))))
-  (unless (featurep 'gud)
-    (require 'gud))
+  (unless (featurep 'realgud)
+    (require 'realgud nil :noerror))
   (let ((default-directory directory))
-    (setq gud--window-configuration (current-window-configuration))
-    (gdb (gud-query-cmdline 'gdb))))
+    (call-interactively #'realgud:gdb)))
 
 (defun cpp/c++-setup ()
   "C/C++ only setup"

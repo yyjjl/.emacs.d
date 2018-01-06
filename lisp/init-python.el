@@ -140,14 +140,9 @@
 
   (defun python/debug-current-file ()
     (interactive)
-    (unless (featurep 'gud)
-      (require 'gud nil :noerror))
-    (setq gud--window-configuration (current-window-configuration))
-    (pdb (read-from-minibuffer "Run pdb: "
-                               (format "pdb3 %s" (buffer-file-name))
-                               gud-minibuffer-local-map
-                               nil
-                               (gud-symbol 'history nil 'pdb))))
+    (unless (featurep 'realgud)
+      (require 'realgud nil :noerror))
+    (pdb (format "pdb3 %s" (buffer-file-name))))
 
   (defun python/toggle-pdbtrack ()
     (interactive)
