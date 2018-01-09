@@ -101,7 +101,7 @@ Optional argument $BODY is the function body."
 
 $ARGS should be the form of (:map map :prefix prefix-key key-definitions ...)"
   (declare (indent defun))
-  (let ((sym (gensym))
+  (let ((sym (cl-gensym))
         (map 'global-map)
         (prefix "")
         forms)
@@ -235,6 +235,26 @@ HTML file converted from org file, it returns t."
   (let ((pair (memq $val $list)))
     (when pair
       (setcdr pair (cons $ele (cdr pair))))))
+
+(defun get-caller-name! ()
+  "Get the current function' caller function name"
+  (let* ((index 5)
+         (frame (backtrace-frame index))
+         (found 0))
+    (while (not (equal found 2))
+      (setq frame (backtrace-frame (incf index)))
+      (when (equal t (first frame)) (incf found)))
+    (second frame)))
+
+(defun get-call-stack! ()
+  "Return the current call stack frames."
+  (let ((frames)
+        (frame)
+        (index 5))
+    (while (setq frame (backtrace-frame index))
+      (push frame frames)
+      (incf index))
+    (cl-remove-if-not 'car frames)))
 
 (defsubst expand-var! ($name &optional $make-p)
   (let ((val (expand-file-name $name emacs-var-direcotry)))

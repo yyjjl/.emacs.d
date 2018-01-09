@@ -92,7 +92,20 @@
                                        (kill-buffer)))
                         #'kill-buffer)
               :keymap counsel-find-file-map
-              :caller 'counsel-kill-buffer)))
+              :caller 'counsel-kill-buffer
+              :require-match t)))
+
+(defun counsel-projectile-kill-buffer (&optional $arg)
+  "Kill project buffer with ivy backends."
+  (interactive "P")
+  (ivy-read (format "Kill buffer (default %s): " (buffer-name))
+            (counsel-projectile--project-buffers)
+            :preselect (buffer-name (current-buffer))
+            :action (if $arg (lambda () (let ((kill-buffer-hook nil))
+                                          (kill-buffer)))
+                      #'kill-buffer)
+            :keymap counsel-find-file-map
+            :caller 'counsel-projectile-kill-buffer))
 
 (defun counsel-sudo-edit (&optional $arg)
   "Edit currently visited file as root.
@@ -146,7 +159,9 @@ for a file to visit if current buffer is not visiting a file."
 (with-eval-after-load 'ivy
   (dolist (caller '(ivy-switch-buffer
                     counsel-kill-buffer
-                    internal-complete-buffer))
+                    internal-complete-buffer
+                    counsel-projectile-switch-to-buffer
+                    counsel-projectile))
     (ivy-set-display-transformer caller
                                  #'core%ivy-switch-buffer-transformer))
 
@@ -238,5 +253,12 @@ for a file to visit if current buffer is not visiting a file."
       (lambda (x) (delete-file (expand-file-name x ivy--directory)))
       ,(propertize "delete" 'face 'font-lock-warning-face))))
   (define-key read-expression-map (kbd "C-r") 'counsel-expression-history))
+
+(with-eval-after-load 'counsel-projectile
+  (define-key! :map projectile-command-map
+    ("p" . counsel-projectile)
+    ("k" . counsel-projectile-kill-buffer)
+    ("K" . projectile-kill-buffers)
+    ("w" . projectile-switch-project)))
 
 (provide 'core-ivy)

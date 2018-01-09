@@ -75,11 +75,13 @@
 
 (put 'projectile-project-run-cmd 'safe-local-variable #'stringp)
 (put 'projectile-project-test-cmd 'safe-local-variable #'stringp)
+(setq projectile-keymap-prefix (kbd "C-x p"))
 (with-eval-after-load 'projectile
+  (setq projectile-mode-line
+        '(:eval (format "[%s]" (projectile-project-name))))
   (setq projectile-completion-system 'ivy)
   (setq projectile-enable-caching t)
-  (add-hook 'kill-emacs-hook
-            #'projectile-cleanup-known-projects))
+  (add-hook 'kill-emacs-hook #'projectile-cleanup-known-projects))
 
 (with-eval-after-load 'yasnippet
   (add-to-list 'auto-mode-alist '("\\.yasnippet\\'" . snippet-mode))

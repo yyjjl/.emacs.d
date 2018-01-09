@@ -148,30 +148,35 @@
    (list (expand-file-name
           (read-directory-name
            "Directory: "
-           (and cpp-cmakelists-directory
-                cpp-build-directory
-                (file-name-as-directory cpp-build-directory))
+           (and cpp-cmake-ide-enabled (cmake-ide--get-build-dir))
            ""
            :must-match))))
   (unless (featurep 'gud)
-    (require 'gud))
+    (require 'gud nil :noerror))
   (let ((default-directory directory))
-    (setq gud--window-configuration (current-window-configuration))
-    (gdb (gud-query-cmdline 'gdb))))
+    (call-interactively #'gdb)))
 
-(defun cpp/lsp-restart ()
-  (interactive)
-  (lsp-mode 0)
-  (condition-case-unless-debug nil
-      (lsp--shutdown-cur-workspace)
-    (error
-     (lsp--unset-variables)
-     (setq lsp--cur-workspace nil)))
-  (lsp-cquery-enable))
+(defun cpp/lsp-restart (&optional $force)
+  (interactive "P")
+  (let (buffers)
+    (when (and lsp--cur-workspace
+               (process-live-p (lsp--workspace-proc lsp--cur-workspace))
+               (or $force
+                   (y-or-n-p "LSP server is already running kill it? ")))
+      (setq buffers (lsp--workspace-buffers lsp--cur-workspace))
+      (condition-case-unless-debug nil
+          (lsp--shutdown-cur-workspace)
+        (error
+         (lsp--unset-variables)
+         (setq lsp--cur-workspace nil))))
+    (add-to-list 'buffers (buffer-name))
+    (dolist (buffer buffers)
+      (lsp-mode 0)
+      (lsp-cquery-enable))))
 
 (defun cpp%c++-setup ()
   "C/C++ only setup"
-  (hide-ifdef-mode 1)
+  ;; (hide-ifdef-mode 1)
 
   ;; Make a #define be left-aligned
   (setq c-electric-pound-behavior '(alignleft))
@@ -233,16 +238,12 @@
 (with-eval-after-load 'cmake-mode
   (define-key cmake-mode-map [f10] 'compile))
 
-(with-eval-after-load 'hideif
-  (define-key hide-ifdef-mode-map hide-ifdef-mode-prefix-key nil)
-  (define-key hide-ifdef-mode-map (kbd "C-c h")
-    hide-ifdef-mode-submap))
-
 (with-eval-after-load 'cquery
   (push 'c++-mode (get 'lsp 'flycheck-modes))
   (push 'c-mode (get 'lsp 'flycheck-modes))
   (setq cquery-executable cpp-cquery-path)
-  (setq-default cquery-enable-sem-highlight nil))
+  ;; (setq cquery-sem-highlight-method 'font-lock)
+  (setq-default cquery-enable-sem-highlight t))
 
 ;; Set term default directory
 (when (boundp 'term-default-directory-function-list)

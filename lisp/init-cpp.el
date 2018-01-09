@@ -209,10 +209,10 @@
            (and cpp-cmake-ide-enabled (cmake-ide--get-build-dir))
            ""
            :must-match))))
-  (unless (featurep 'realgud)
-    (require 'realgud nil :noerror))
+  (unless (featurep 'gud)
+    (require 'gud nil :noerror))
   (let ((default-directory directory))
-    (call-interactively #'realgud:gdb)))
+    (call-interactively #'gdb)))
 
 (defun cpp/c++-setup ()
   "C/C++ only setup"
