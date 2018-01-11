@@ -69,7 +69,6 @@
     ("C-c ." . haskell-indent-align-guards-and-rhs)
     ("C-c C-o" . haskell-indent-insert-otherwise)
     ("C-c C-|")
-    ("C-c <tab>" . haskell-process-do-info)
     ("C-c C-t" . haskell-process-do-type)
     ("C-c C-\\" . haskell-indent-insert-guard)
     ("C-c \\" . haskell-indent-insert-guard)
@@ -148,6 +147,9 @@
                           (call-interactively #'align)))))
   (add-to-list 'core--shackle-help-modes 'idris-info-mode :append)
   (add-to-list 'core--shackle-help-modes 'idris-compiler-notes-mode :append))
+
+(with-eval-after-load 'intero
+  (define-key intero-mode-map (kbd "C-c C-d") 'intero-info))
 
 (with-eval-after-load 'idris-hole-list
   (haskell%setup-view-keys idris-hole-list-mode-map))

@@ -174,6 +174,9 @@ _=_ next    _-_ previous    ___ skip-previous  _+_ skip-next _q_ quit
   ("RET" nil)
   ("q" nil))
 
+(with-eval-after-load 'multiple-cursors-core
+  (require 'mc-hide-unmatched-lines-mode))
+
 (with-eval-after-load 'picture
   (define-key! :map picture-mode-map
     ("C-c C-a" . artist-mode)))

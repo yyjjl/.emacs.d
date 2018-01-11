@@ -73,7 +73,8 @@ Emacs Lisp."
 (add-hook 'racket-mode-hook #'lisp|racket-setup)
 
 (let ((hooks '(lisp-mode-hook
-               lisp-interaction-mode-hook)))
+               lisp-interaction-mode-hook
+               scheme-mode-hook)))
   (dolist (hook hooks)
     (add-hook hook #'lisp|common-setup)))
 
@@ -87,6 +88,7 @@ Emacs Lisp."
       (remove-hook 'pre-command-hook #'hl-sexp-unhighlight))))
 
 (with-eval-after-load 'lisp-mode
+  (require 'hippie-exp)
   ;; Add keyword `define-hook!'
   (font-lock-add-keywords
    'emacs-lisp-mode

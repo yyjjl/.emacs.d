@@ -81,6 +81,7 @@
         '(:eval (format "[%s]" (projectile-project-name))))
   (setq projectile-completion-system 'ivy)
   (setq projectile-enable-caching t)
+
   (add-hook 'kill-emacs-hook #'projectile-cleanup-known-projects))
 
 (with-eval-after-load 'yasnippet

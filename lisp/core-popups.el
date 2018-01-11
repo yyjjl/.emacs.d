@@ -18,6 +18,7 @@
                           "*sdcv*"
                           "*lispy-message*"
                           "*compilation*"))
+            "\\|\\*.*?Help.*?\\*"
             "$")))
 
 (defvar-local core--shackle-popup-window nil)
@@ -179,8 +180,7 @@
         (eval-when-compile
           (concat "^\\(?:"
                   (string-join `("\\*Man.*\\*"
-                                 "\\*TeX.*\\*"
-                                 "\\*Flycheck.*\\*")
+                                 "\\*TeX.*\\*")
                                "\\|")
                   "\\)$")))
 
@@ -192,6 +192,8 @@
            :size 0.4 :align below :select t)
           ((:custom core--shackle%help-mode-matcher)
            :align below :select t :autoclose t)
+          ("\\*Flycheck.*\\*"
+           :regexp t :align below :noselect t :autoclose t)
           (,core--shackle-popup-buffer-regexp
            :regexp t :select t :autoclose t)
           ("^ ?\\*.*\\*\\(?:<[0-9]+>\\)?$" :regexp t))))

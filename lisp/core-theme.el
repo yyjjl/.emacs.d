@@ -170,12 +170,8 @@
  '(org-block-begin-line ((t (:foreground "#B3E5FC" :background "#1E2930"))))
  '(org-block-end-line ((t (:foreground "#B3E5FC" :background "#1E2930"))))
 
- '(org-level-1 ((t (:inherit outline-1 :weight bold :overline t
-                             ;; :background "grey20"
-                             ))))
- '(org-level-2 ((t (:inherit outline-2
-                             ;; :background "grey20"
-                             ))))
+ '(org-level-1 ((t (:inherit outline-1 :weight bold :overline t))))
+ '(org-level-2 ((t (:inherit outline-2))))
  '(org-level-3 ((t (:inherit outline-3))))
  '(org-level-4 ((t (:inherit outline-4))))
  '(org-level-5 ((t (:inherit outline-5))))
@@ -197,6 +193,17 @@
  '(popup-tip-face
    ((t (:background "#5E5079" :foreground "#B2B2B2"
                     :bold nil :italic nil :underline nil))))
+
+ ;; auctex (latex-mode)
+ '(font-latex-sectioning-0-face ((t (:inherit org-level-1))))
+ '(font-latex-sectioning-1-face ((t (:inherit org-level-2))))
+ '(font-latex-sectioning-2-face ((t (:inherit org-level-3))))
+ '(font-latex-sectioning-3-face ((t (:inherit font-latex-sectioning-2-face))))
+ '(font-latex-sectioning-4-face ((t (:inherit font-latex-sectioning-2-face))))
+ '(font-latex-sectioning-5-face ((t (:inherit font-latex-sectioning-2-face))))
+ '(font-latex-script-char-face ((t (:inherit font-lock-constant-face))))
+ '(font-latex-string-face ((t (:inherit font-lock-string-face))))
+ '(font-latex-warning-face ((t (:inherit font-lock-warning-face))))
 
  '(web-mode-builtin-face ((t (:inherit font-lock-builtin-face))))
  '(web-mode-comment-face ((t (:inherit font-lock-comment-face))))

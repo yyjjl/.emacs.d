@@ -199,10 +199,11 @@ Archive with high priority will be used when install a package.")
   ;;`eldoc', show API doc in minibuffer echo area enabled by default
   ;; (global-eldoc-mode 1)
 
-  (run-with-idle-timer 1 nil
-                       #'(lambda ()
-                           (when (and window-system emacs-use-fcitx-p)
-                             (fcitx-aggressive-setup))))
+  (run-with-idle-timer
+   1 nil
+   #'(lambda ()
+       (when (and (display-graphic-p) emacs-use-fcitx-p)
+         (fcitx-aggressive-setup))))
 
   (which-key-mode 1)
   (core/enable-semantic))
