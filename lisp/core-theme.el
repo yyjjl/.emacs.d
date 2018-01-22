@@ -1,3 +1,5 @@
+(require-packages! doom-themes)
+
 (require 'doom-themes)
 
 (defface mode-line-window-number
