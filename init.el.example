@@ -36,7 +36,8 @@
     (require 'init-tags))
 
 ;; Programming modes
-(require 'init-cpp)
+;; (require 'init-lsp)
+;; (require 'init-cquery)
 (require 'init-haskell)
 (require 'init-python)
 (require 'init-lisp)

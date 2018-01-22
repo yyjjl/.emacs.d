@@ -29,7 +29,8 @@ Optional argument ARG is used to toggle narrow functions."
 
 (defun core/grab-regexp ($regexp)
   "Grab strings matching REGEXP to list."
-  (let ((s (buffer-string))
+  (let ((case-fold-search nil)
+        (s (buffer-string))
         (pos 0)
         item
         items)

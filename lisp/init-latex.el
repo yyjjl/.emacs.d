@@ -16,6 +16,8 @@
                                          (insert-char ?\`)))
   (orgtbl-mode 1)
 
+  (setq TeX-master 'dwim)
+
   (unless (buffer-temporary?)
     (turn-on-reftex)
     (TeX-source-correlate-mode 1)

@@ -111,8 +111,8 @@
     :default-license "^gpl"
     :after-creation (lambda (dir)
                       (skeletor-async-shell-command "mkdir build"))))
-(global-set-key (kbd "C-c p n") 'skeletor-create-project)
-(global-set-key (kbd "C-c p N") 'skeletor-create-project-at)
+(global-set-key (kbd "C-x p n") 'skeletor-create-project)
+(global-set-key (kbd "C-x p N") 'skeletor-create-project-at)
 
 ;; `calc' setup
 (with-eval-after-load 'calc

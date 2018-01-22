@@ -5,8 +5,8 @@
 which means on every .el and .elc file loaded during start up, it
 hasn't to runs those regexps against the filename.")
 
-(defvar emacs-site-packages-directory
-  (expand-file-name "site-lisp" user-emacs-directory)
+(defvar emacs-private-directory
+  (expand-file-name "private" user-emacs-directory)
   "Local packages in this directory")
 
 (defvar emacs-etc-direcotry

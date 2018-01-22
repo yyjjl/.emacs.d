@@ -107,7 +107,7 @@ Archive with high priority will be used when install a package.")
   (message "Compile configuration files ...")
   (dolist (file (append
                  (directory-files emacs-config-directory :full "\\.el$")
-                 (directory-files-recursively emacs-site-packages-directory
+                 (directory-files-recursively emacs-private-directory
                                               "\\.el$")
                  (list user-init-file
                        custom-file)))

@@ -1,9 +1,10 @@
 ;; Add site-package's path to `load-path'
-(if (fboundp 'normal-top-level-add-to-load-path)
-    (dolist (-dir (directory-files emacs-site-packages-directory))
-      (unless (string-match "^\\." -dir)
-        (push (expand-file-name -dir emacs-site-packages-directory)
-              load-path))))
+(when (fboundp 'normal-top-level-add-to-load-path)
+  (dolist (dir (directory-files emacs-private-directory))
+    (unless (string-match "^\\." dir)
+      (push (expand-file-name dir emacs-private-directory)
+            load-path)))
+  (push emacs-private-directory load-path))
 
 (setq file-name-handler-alist nil)
 ;; Don't GC during startup to save time
@@ -186,7 +187,11 @@
           desktop-file-modtime)
       (apply $fn $args)
     (message "Current desktop was not loaded from a file. Ignored")))
-(advice-add 'desktop-save :around #'core*desktop-save-unless-loaded)
+
+(with-eval-after-load 'desktop
+  (advice-add 'desktop-save :around #'core*desktop-save-unless-loaded)
+  (add-to-list 'desktop-minor-mode-handlers '(orgtbl-mode . ignore))
+  (add-to-list 'desktop-minor-mode-handlers '(hs-minor-mode . ignore)))
 
 ;; (define-hook! core|auto-save-buffer (auto-save-hook)
 ;;   (save-excursion

@@ -56,8 +56,8 @@ projectile.cache
 .unpacked
 /irony
 private.el
-/lisp.old
 /emojis
-/site-lisp/private
+/private/*
+!/private/sdcv/
 /init.el
 /gnus.el

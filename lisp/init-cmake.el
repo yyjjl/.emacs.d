@@ -75,11 +75,13 @@
     (bury-buffer))
   (dolist (buffer (projectile-project-buffers))
     (with-current-buffer buffer
-      (hack-dir-local-variables-non-file-buffer)))
-  (message "%s" (cpp%options-to-string options)))
+      (hack-dir-local-variables-non-file-buffer))))
 
 (defsubst cpp%option-to-string (option)
   (concat "-D" (car option) "=" (cdr option)))
+
+(defsubst cpp%options-to-string ()
+  (mapconcat #'cpp%option-to-string cpp-cmake-options " "))
 
 (defun cpp/cmake-toggle-option ()
   (interactive)
@@ -99,7 +101,8 @@
                   ((equal "Debug" option-value) "Release")
                   ((equal "ON" option-value) "OFF")
                   ((equal "OFF" option-value) "ON")))
-    (cpp%cmake-save-options cpp-cmake-options)))
+    (cpp%cmake-save-options cpp-cmake-options)
+    (cpp/run-cmake)))
 
 (defun cpp/cmake-edit-option ()
   (interactive)
@@ -114,7 +117,8 @@
           (nv (setcdr nv option-value))
           (t
            (push (cons option-name option-value) cpp-cmake-options)))
-    (cpp%cmake-save-options cpp-cmake-options)))
+    (cpp%cmake-save-options cpp-cmake-options)
+    (cpp/run-cmake)))
 
 (defun cpp%run-cmake-internal (callback)
   (let ((default-directory (or cpp-build-directory default-directory)))
@@ -126,7 +130,7 @@
     (lexical-let ((func callback))
       (set-process-sentinel cpp--cmake-process
                             (lambda ($process $event)
-                              (funcall func)
-                              (message "Finished running CMake"))))))
+                              (message "Finished running CMake")
+                              (funcall func))))))
 
 (provide 'init-cmake)

@@ -180,7 +180,8 @@
         (eval-when-compile
           (concat "^\\(?:"
                   (string-join `("\\*Man.*\\*"
-                                 "\\*TeX.*\\*")
+                                 "\\*TeX.*\\*"
+                                 "\\*Warnings\\*")
                                "\\|")
                   "\\)$")))
 

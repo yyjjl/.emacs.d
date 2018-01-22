@@ -8,7 +8,7 @@
 
 ;; C/C++ I need stable version
 (require-packages!
- (cmake-ide :archive "melpa-stable")
+ cmake-ide
  (ggtags :when tags-has-gtags-p)
  irony
  irony-eldoc
@@ -25,7 +25,6 @@
 
 (require 'init-cmake)
 (defvar cpp--irony-eldoc-old-overlays nil)
-(defvar-local cpp-cmake-ide-enabled nil)
 
 
 
@@ -108,7 +107,7 @@
 (defun cpp/try-misc-setup ()
   (interactive)
   (if cpp-has-rtags-p
-      (if cpp-cmake-ide-enabled
+      (if cmake-ide-project-dir
           (progn
             (cpp/run-cmake)
             (cpp%rtags-setup))
@@ -141,26 +140,9 @@
                                (file-name-base filename)))))))
   (when cpp-has-irony-p (irony-eldoc)))
 
-(defvar cpp--extra-hide-ifdef-env nil)
-(defun cpp%setup-hide-ifdef ()
-  (dolist (name cpp--extra-hide-ifdef-env)
-    (setq hide-ifdef-env (assq-delete-all name hide-ifdef-env)))
-  (setq cpp--extra-hide-ifdef-env nil)
-  (dolist (option (and (boundp 'irony--compile-options)
-                       irony--compile-options))
-    (when (string-prefix-p "-D" option)
-      (let* ((nv (split-string (substring option 2) "="))
-             (name (intern (car nv)))
-             (value (cadr nv)))
-        (push name cpp--extra-hide-ifdef-env)
-        (unless (assq name hide-ifdef-env)
-          (hif-set-var name (or value 1))))))
-  (sit-for 1.0)
-  (hide-ifdefs))
-
 (defun cpp/compile ()
   (interactive)
-  (if cpp-cmake-ide-enabled
+  (if cmake-ide-project-dir
       (condition-case err
           (cmake-ide-compile)
         (error
@@ -169,8 +151,7 @@
 
 (defun cpp/run-cmake ()
   (interactive)
-  (setq cmake-ide-cmake-opts
-        (mapconcat #'cpp%option-to-string cpp-cmake-options " "))
+  (setq cmake-ide-cmake-opts (cpp%options-to-string))
   (cmake-ide-run-cmake))
 
 (defun cpp/load-file-in-root ()
@@ -206,7 +187,7 @@
    (list (expand-file-name
           (read-directory-name
            "Directory: "
-           (and cpp-cmake-ide-enabled (cmake-ide--get-build-dir))
+           (and cmake-ide-project-dir (cmake-ide--get-build-dir))
            ""
            :must-match))))
   (unless (featurep 'gud)
@@ -216,7 +197,7 @@
 
 (defun cpp/c++-setup ()
   "C/C++ only setup"
-  (hide-ifdef-mode 1)
+  ;; (hide-ifdef-mode 1)
 
   (when tags-has-gtags-p
     (ggtags-mode 1)
@@ -235,16 +216,17 @@
       (add-to-list 'company-backends #'company-irony)
       (add-to-list 'company-backends #'company-irony-c-headers)
       (add-to-list 'company-backends #'company-files)
-
       (irony-mode 1)
+      (irony-cdb-autosetup-compile-options)
       (cpp%fix-irony-eldoc))
     ;; Make sure rdm is running
     (when cpp-has-rtags-p
       (rtags-start-process-unless-running))
 
-    (if (cmake-ide--locate-cmakelists)
+    (if-let ((project-dir (cmake-ide--locate-project-dir)))
         (progn
-          (setq-local cpp-cmake-ide-enabled t)
+          (setq-local cmake-ide-project-dir project-dir)
+          (cmake-ide--add-file-to-buffer-list)
           (cpp%rtags-setup))
       (setq cmake-ide-build-dir nil)
       (cpp%c++-simple-setup))))
@@ -254,8 +236,8 @@
 (define-hook! cpp|common-setup (c-mode-common-hook)
   (unless cpp--initialized-p
     (setq cpp--initialized-p t)
-    (if (>= (string-to-number c-version) 5.33)
-        (run-hooks 'prog-mode-hook))
+    (when (>= (string-to-number c-version) 5.33)
+      (run-hooks 'prog-mode-hook))
 
     (cpp%common-cc-setup)
 
@@ -300,8 +282,20 @@
   (fset 'cmake-ide-maybe-start-rdm
         'rtags-start-process-unless-running)
   (setq cmake-ide-build-pool-use-persistent-naming t)
-
-  (advice-add 'cmake-ide--on-cmake-finished :after #'cpp%setup-hide-ifdef))
+  (defun cmake-ide--register-callback ()
+    "Register callback for when CMake finishes running."
+    (set-process-sentinel (get-process "cmake")
+                          (lambda (_process _event)
+                            (cmake-ide--message "Finished running CMake")
+                            (cmake-ide--on-cmake-finished)
+                            (when cpp-has-irony-p
+                              (dolist (buffer (append cmake-ide--src-buffers
+                                                      cmake-ide--hdr-buffers))
+                                (when (buffer-live-p buffer)
+                                  (with-current-buffer buffer
+                                    (when irony-mode
+                                      (irony-cdb-autosetup-compile-options))))))
+                            (cmake-ide--message "%s" cmake-ide-cmake-opts)))))
 
 (with-eval-after-load 'rtags
   (defun cpp/rtags-eldoc ()
@@ -329,6 +323,10 @@
   ;; Smart tab
   (advice-add 'c-indent-line-or-region :around #'core%indent-for-tab)
 
+  (put 'c++-mode 'derived-mode-parent 'prog-mode)
+  (put 'c-mode 'derived-mode-parent 'prog-mode)
+  (put 'java-mode 'derived-mode-parent 'prog-mode)
+
   (rtags-enable-standard-keybindings)
   ;; C-c(3) r(114) make all Upper case to lower-case
   (let ((m (assoc 114 (assoc 3 c-mode-base-map))))
@@ -354,16 +352,15 @@
 (with-eval-after-load 'cmake-mode
   (define-key cmake-mode-map [f10] 'compile))
 
-(with-eval-after-load 'hideif
-  (setq-default hide-ifdef-shadow t)
-  (define-key hide-ifdef-mode-map hide-ifdef-mode-prefix-key nil)
-  (define-key hide-ifdef-mode-map (kbd "C-c h")
-    hide-ifdef-mode-submap))
+;; (with-eval-after-load 'hideif
+;;   (setq-default hide-ifdef-shadow t)
+;;   (define-key hide-ifdef-mode-map hide-ifdef-mode-prefix-key nil)
+;;   (define-key hide-ifdef-mode-map (kbd "C-c h") hide-ifdef-mode-submap))
 
 ;; Set term default directory
 (when (boundp 'term-default-directory-function-list)
   (add-to-list 'term-default-directory-function-list
                (lambda ()
-                 (and cpp-cmake-ide-enabled (cmake-ide--get-build-dir)))))
+                 (and cmake-ide-project-dir (cmake-ide--get-build-dir)))))
 
 (provide 'init-cpp)

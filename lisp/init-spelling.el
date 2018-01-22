@@ -45,7 +45,7 @@
 (with-eval-after-load 'flyspell
   (setq flyspell-large-region 1)
   ;; Better performance
-  ;; (setq flyspell-issue-message-flag nil)
+  (setq flyspell-issue-message-flag nil)
 
   (advice-add 'flyspell-auto-correct-word :around #'spelling*set-extra-args)
 
@@ -99,13 +99,13 @@
 (defhydra hydra-flyspell
   (:color blue :hint nil
           :body-pre
-          (progn
-            (unless (featurep 'flyspell)
-              (require 'flyspell nil :no-error))
-            (flyspell-dwim current-prefix-arg)))
+          (unless (featurep 'flyspell)
+            (require 'flyspell nil :no-error)))
   "
-_p_ previous-error _n_ next-error _q_ quit
+_SPC_ line-or-region _b_ buffer  _p_ previous-error _n_ next-error _q_ quit
 "
+  ("b" (flyspell-dwim :whole-buffer) :exit nil)
+  ("SPC" (flyspell-dwim) :exit nil)
   ("p" flyspell-goto-previous-error :exit nil)
   ("n" flyspell-goto-next-error :exit nil)
   ("q" nil :exit t)
