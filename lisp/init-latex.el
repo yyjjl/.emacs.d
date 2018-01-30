@@ -14,7 +14,7 @@
   ;; Fix conflit with `orgtbl-mode'
   (define-key LaTeX-math-mode-map "``" (lambda () (interactive)
                                          (insert-char ?\`)))
-  (orgtbl-mode 1)
+  ;; (orgtbl-mode 1)
 
   (setq TeX-master 'dwim)
 

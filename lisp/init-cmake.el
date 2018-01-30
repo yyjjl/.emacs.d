@@ -133,4 +133,10 @@
                               (message "Finished running CMake")
                               (funcall func))))))
 
+(with-eval-after-load 'cmake-mode
+  (add-hook 'cmake-mode-hook
+            (lambda ()
+              (font-lock-mode 1)
+              (cmake-font-lock-activate))))
+
 (provide 'init-cmake)

@@ -287,14 +287,19 @@
     (set-process-sentinel (get-process "cmake")
                           (lambda (_process _event)
                             (cmake-ide--message "Finished running CMake")
-                            (cmake-ide--on-cmake-finished)
+                            (setq cmake-ide--src-buffers
+                                  (--filter (buffer-live-p it)
+                                            cmake-ide--src-buffers)
+                                  cmake-ide--hdr-buffers
+                                  (--filter (buffer-live-p it)
+                                            cmake-ide--hdr-buffers))
                             (when cpp-has-irony-p
                               (dolist (buffer (append cmake-ide--src-buffers
                                                       cmake-ide--hdr-buffers))
-                                (when (buffer-live-p buffer)
-                                  (with-current-buffer buffer
-                                    (when irony-mode
-                                      (irony-cdb-autosetup-compile-options))))))
+                                (with-current-buffer buffer
+                                  (when irony-mode
+                                    (irony-cdb-autosetup-compile-options)))))
+                            (cmake-ide--on-cmake-finished)
                             (cmake-ide--message "%s" cmake-ide-cmake-opts)))))
 
 (with-eval-after-load 'rtags

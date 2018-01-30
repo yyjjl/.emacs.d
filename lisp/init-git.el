@@ -11,7 +11,10 @@
 
 
 (with-eval-after-load 'magit
-  (setq magit-completing-read-function 'ivy-completing-read))
+  (setq magit-completing-read-function 'ivy-completing-read)
+  (setq vc-handled-backends nil)
+
+  (require 'magit-autorevert))
 
 ;; @see
 ;; http://blog.binchen.org/posts/enhance-emacs-git-gutter-with-ivy-mode.html

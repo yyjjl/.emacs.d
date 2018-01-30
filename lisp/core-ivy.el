@@ -184,6 +184,9 @@ for a file to visit if current buffer is not visiting a file."
   (setq ivy-virtual-abbreviate 'full)
   (setq ivy-use-selectable-prompt t)
 
+  (define-hook! ivy|occur-mode-setup (ivy-occur-mode-hook)
+    (toggle-truncate-lines 1))
+
   (define-key!
     :map ivy-minibuffer-map
     ("C-j" . ivy-immediate-done)

@@ -9,8 +9,10 @@
   (flycheck-mode 1)
   (hl-line-mode 1)
   (when (< (buffer-size) core-large-buffer-size)
-    ;; (highlight-indentation-current-column-mode 1)
-    (highlight-indentation-mode 1))
+    ;; (unless (buffer-temporary?)
+    ;;   (highlight-indentation-current-column-mode 1))
+    (highlight-indentation-mode 1)
+    (auto-revert-mode 1))
 
   ;; show trailing spaces in a programming mode
   (setq show-trailing-whitespace t)
@@ -21,6 +23,8 @@
 
   (hl-line-mode 1)
   (auto-fill-mode 1)
+  (when (< (buffer-size) core-large-buffer-size)
+    (auto-revert-mode 1))
   (setq indicate-empty-lines t))
 
 (define-hook! core|generic-comint-mode-setup (comint-mode-hook)

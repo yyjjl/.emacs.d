@@ -20,10 +20,12 @@ Archive with high priority will be used when install a package.")
 (setq package-archives
       '(("melpa-stable" . "https://elpa.emacs-china.org/melpa-stable/")
         ("melpa" . "https://elpa.emacs-china.org/melpa/")
+        ("org" . "https://orgmode.org/elpa/")
         ("gnu"   . "https://elpa.emacs-china.org/gnu/")))
 ;; (setq package-archives
 ;;       '(("melpa-stable" . "https://stable.melpa.org/packages/")
 ;;         ("melpa" . "https://melpa.org/packages/")
+;;         ("org" . "https://orgmode.org/elpa/")
 ;;         ("gnu"   . "https://elpa.gnu.org/packages/")))
 
 ;; Setup to select right archive
@@ -187,7 +189,6 @@ Archive with high priority will be used when install a package.")
 
   ;; global-modes
   (global-subword-mode 1)
-  (global-auto-revert-mode 1)
   (global-page-break-lines-mode 1)
 
   (column-number-mode 1)
@@ -201,9 +202,9 @@ Archive with high priority will be used when install a package.")
 
   (run-with-idle-timer
    1 nil
-   #'(lambda ()
-       (when (and (display-graphic-p) emacs-use-fcitx-p)
-         (fcitx-aggressive-setup))))
+   (lambda ()
+     (when (and (display-graphic-p) emacs-use-fcitx-p)
+       (fcitx-aggressive-setup))))
 
   (which-key-mode 1)
   (core/enable-semantic))

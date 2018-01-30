@@ -29,22 +29,24 @@
 
  '(font-lock-builtin-face ((t (:foreground "#749e20"))))
  '(font-lock-constant-face ((t (:foreground "#AE81FF"))))
+ '(font-lock-warning-face
+   ((t (:background "black" :weight bold :underline t))))
 
  '(eldoc-highlight-function-argument
    ((t (:foreground "#86DC2F" :weight bold))))
  '(hl-sexp-face ((t (:background "gray7"))))
- '(hl-line ((t (:background "gray7"))))
+ '(hl-line ((t (:background "gray17"))))
 
  '(window-numbering-face ((t (:foreground "DeepPink" :weight bold))))
 
  '(haskell-keyword-face ((t (:inherit font-lock-builtin-face))))
  '(haskell-type-face ((t (:inherit font-lock-constant-face))))
- '(haskell-constructor-face  ((t (:inherit font-lock-type-face))))
+ '(haskell-constructor-face ((t (:inherit font-lock-type-face))))
 
  '(js2-external-variable ((t (:inherit font-lock-negation-char-face))))
  '(js2-function-call ((t (:inherit font-lock-regexp-grouping-backslash))))
 
- '(easy-kill-selection ((t (:inverse-video t :inherit warning ))))
+ '(easy-kill-selection ((t (:inverse-video t :inherit warning))))
  '(nlinum-current-line ((t (:inherit font-lock-builtin-face))))
  '(semantic-highlight-func-current-tag-face ((t (:background "gray5"))))
  '(shm-current-face ((t (:inherit hl-line))))

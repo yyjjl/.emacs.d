@@ -31,8 +31,9 @@
         elpy-modules (delete 'elpy-module-django
                              (delete 'elpy-module-flymake elpy-modules))
         elpy-test-runner 'elpy-test-pytest-runner)
+  (setq python-shell-interpreter "python3"
+        python-shell-interpreter-args "-i")
 
-  (elpy-use-cpython "python3")
   (define-key! :map elpy-mode-map
     ("C-c C-n" . nil)
     ("C-c C-p" . nil)
@@ -136,7 +137,9 @@
     ([f5] . python/toggle-pdbtrack))
 
   (define-key! :map python-mode-map
-    ([f5] . python/debug-current-file))
+    ([f5] . python/debug-current-file)
+    ("M-p" . flycheck-previous-error)
+    ("M-n" . flycheck-next-error))
 
   (defun python/debug-current-file ()
     (interactive)

@@ -59,9 +59,6 @@ Emacs Lisp."
   (add-to-list 'company-backends 'company-elisp)
 
   (unless (buffer-temporary?)
-    (when (require 'eldoc nil t)
-      (setq eldoc-idle-delay 0.2)
-      (setq eldoc-echo-area-use-multiline-p t))
     (require 'semantic/bovine/el nil t)
     (auto-compile-on-save-mode)
 
