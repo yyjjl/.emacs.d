@@ -8,7 +8,8 @@
 (require-packages!
  ;; (ggtags :when tags-has-gtags-p)
  cquery
- clang-format)
+ clang-format
+ google-c-style)
 
 (require 'init-cmake)
 
@@ -17,6 +18,28 @@
   :group 'cmake
   :type 'directory
   :safe #'atom)
+
+(defconst cpp--font-lock-keywords
+  (eval-when-compile
+    `((,(concat "\\<"
+                (regexp-opt
+                 '("alignas" "alignof" "and" "and_eq" "asm" "auto" "bitand" "bitor" "break" "case"
+                   "catch" "class" "compl" "concept" "const" "constexpr" "const_cast" "continue" "decltype"
+                   "default" "delete" "do" "double" "dynamic_cast" "else" "enum" "explicit" "export" "extern"
+                   "for" "friend" "goto" "if" "import" "inline" "module" "mutable" "namespace" "new"
+                   "noexcept" "not" "not_eq" "operator" "or" "or_eq" "private" "protected" "public" "register"
+                   "reinterpret_cast" "requires" "return" "short" "signed" "sizeof" "static" "static_assert"
+                   "static_cast" "struct" "switch" "template" "this" "thread_local" "throw" "try" "typedef" "typeid"
+                   "typename" "union" "using" "virtual" "void" "volatile" "while" "xor" "xor_eq"))
+                "\\>")
+       . font-lock-keyword-face)
+      (,(concat "\\<"
+                (regexp-opt '("bool" "float" "double" "int" "long"
+                              "char" "char16_t" "char32_t" "wchar_t" "unsigned"))
+                "\\>")
+       . font-lock-type-face)
+      (,(concat "\\<" (regexp-opt '("NULL" "nullptr" "false" "true")) "\\>")
+       . font-lock-constant-face))))
 
 (custom-theme-set-faces
  'doom-molokai
@@ -81,25 +104,15 @@
       (error (message "%s" (error-message-string err))))
     (add-to-list 'company-backends 'company-lsp)))
 
-(defun cpp%fix-cc-indent-offset ($key $val)
-  (let ((pair (assoc $key c-offsets-alist)))
-    (if pair
-        (setcdr pair $val)
-      (push (cons $key $val) c-offsets-alist))))
-
 (defun cpp%common-cc-setup ()
   "Setup shared by all languages (java/groovy/c++ ...)"
   (turn-on-auto-fill)
+  (google-set-c-style)
   (setq c-basic-offset 4)
   ;; make DEL take all previous whitespace with it
-  (c-toggle-hungry-state 1)
   ;; (c-toggle-auto-newline 1)
-  ;; indent
-  (highlight-indentation-set-offset 4)
-  (cpp%fix-cc-indent-offset 'innamespace [0])
-  (cpp%fix-cc-indent-offset 'substatement-open 0)
-  (cpp%fix-cc-indent-offset 'func-decl-cont 0)
-  (cpp%fix-cc-indent-offset 'case-label 4))
+  (highlight-indentation-set-offset c-basic-offset)
+  (c-toggle-hungry-state 1))
 
 (defun cpp%simple-setup ()
   (setq-local
@@ -195,18 +208,7 @@
                  (eq (cdr (assoc major-mode
                                  font-lock-maximum-decoration))
                      1)))
-    (font-lock-add-keywords
-     nil
-     `((,(concat "\\<\\("
-                 (c-make-keywords-re nil (c-lang-const c-constant-kwds))
-                 "\\)\\>")
-        1 font-lock-constant-face)
-       (,(concat "\\<" (c-lang-const c-regular-keywords-regexp))
-        1 font-lock-keyword-face)
-       (,(concat "\\<" (regexp-opt '("int" "float" "double" "long"
-                                     "bool" "unsigned"))
-                 "\\>")
-        . font-lock-type-face)))))
+    (font-lock-add-keywords nil cpp--font-lock-keywords)))
 
 (defun cpp%setup ()
   "C/C++ only setup"
@@ -242,6 +244,16 @@
                   (derived-mode-p 'groovy-mode))
         (cpp%setup)))))
 
+(defun cpp/electric-star ($arg)
+  (interactive "*P")
+  (if (eq (char-before) ?\/)
+      (progn
+        (self-insert-command (prefix-numeric-value $arg))
+        (insert "*/")
+        (backward-char 2)
+        (indent-according-to-mode))
+    (call-interactively 'c-electric-star)))
+
 (defmacro cpp%cquery-define-find (symbol command)
   `(defun ,(intern (format "cpp/xref-find-%s" symbol)) ()
      (interactive)
@@ -270,19 +282,23 @@
     (put 'c-mode 'derived-mode-parent 'prog-mode)
     (put 'java-mode 'derived-mode-parent 'prog-mode))
 
-  (define-key! :map c++-mode-map
+  (define-key! :map c-mode-base-map
+    ("*" . cpp/electric-star)
     ("C-c o" . ff-find-other-file)
-    ("C-c b" . clang-format-buffer)
     ("C-c C-j" . semantic-ia-fast-jump)
     ("C-c C-v" . semantic-decoration-include-visit)
+    ("M-n" . flycheck-next-error)
+    ("M-p" . flycheck-previous-error))
+
+  (define-key! :map c++-mode-map
+    ("C-c b" . clang-format-buffer)
+    ("C-c C-b" . clang-format-buffer)
     ("C-c C-l" . cpp/load-file-in-root)
     ("C-c C-SPC" . cquery-select-codeaction)
     ("C-c T" . cpp/cmake-toggle-option)
     ("C-c d" . cpp/cmake-edit-option)
     ("C-c C-c" . cpp/run-cmake)
     ("M-s l" . cquery-code-lens-mode)
-    ("M-n" . flycheck-next-error)
-    ("M-p" . flycheck-previous-error)
     ([f9] . cpp/run-cmake)
     ([f10] . cpp/compile)
     ([f5] . cpp/gdb))

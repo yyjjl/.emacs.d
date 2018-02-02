@@ -47,7 +47,7 @@
    ((file-exists-p (expand-file-name "build.ninja" $dir))
     (concat "ninja -C " $dir))
    ((file-exists-p (expand-file-name "Makefile" $dir))
-    (concat "make -C " $dir))
+    (concat "make -C --no-print-directory" $dir))
    (t nil)))
 
 (defun cpp%maybe-create-build-directory ()
