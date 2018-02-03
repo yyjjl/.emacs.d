@@ -52,7 +52,6 @@
 (require 'init-ibuffer)
 (require 'init-windows)
 (require 'init-gud)
-(require 'init-linum-mode)
 
 ;; Other small tools
 (require 'init-surround)

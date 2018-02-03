@@ -10,12 +10,6 @@
 
 
 
-(with-eval-after-load 'magit
-  (setq magit-completing-read-function 'ivy-completing-read)
-  (setq vc-handled-backends nil)
-
-  (require 'magit-autorevert))
-
 ;; @see
 ;; http://blog.binchen.org/posts/enhance-emacs-git-gutter-with-ivy-mode.html
 ;; {{ git gutter with ivy
@@ -57,7 +51,7 @@
                   :action (lambda (linenum)
                             (forward-line (- (cdr linenum)
                                              (line-number-at-pos))))))
-    (message "NO git-gutters!")))
+    (message "No git-gutters!")))
 ;; }}
 
 ;; @see
@@ -134,6 +128,10 @@
 
 (with-eval-after-load 'git-messenger
   (setq git-messenger:show-detail t))
+
+(with-eval-after-load 'magit
+  (setq magit-completing-read-function 'ivy-completing-read)
+  (require 'magit-autorevert))
 
 
 (define-hook! (git|message-kill-commit-id msg)

@@ -6,9 +6,13 @@
 
 
 
-(defvar term-popup-window nil)
 (defvar-local term--ssh-info nil)
 (defvar-local term--parent-buffer nil)
+
+(defsubst term%get-popup-window ()
+  (frame-parameter nil 'term-popup-window))
+(defsubst term%set-popup-window (popup-window)
+  (set-frame-parameter nil 'term-popup-window popup-window))
 
 ;; Add below code to .zshrc to make term-mode track directory changes
 ;;   if [ -n "$INSIDE_EMACS" ];then
@@ -57,9 +61,9 @@
   (interactive)
   (if (and term--parent-buffer (buffer-live-p term--parent-buffer))
       (progn
-        (when (eq term-popup-window (selected-window))
+        (when (eq (term%get-popup-window) (selected-window))
           (pop-to-buffer term--parent-buffer)
-          (delete-window term-popup-window)))
+          (delete-window (term%get-popup-window))))
     (message "No parent buffer or it was killed !!!")))
 
 (defun term/get-ssh-info ($arg)
@@ -141,16 +145,17 @@ none exists, or if the current buffer is already a term."
         (with-current-buffer buffer
           (local-set-key [f8] #'term/switch-back)
           (setq term--parent-buffer parent-buffer))
-        (if (and (window-live-p term-popup-window)
-                 (eq 'term-mode
-                     (buffer-local-value 'major-mode
-                                         (window-buffer term-popup-window))))
-            ;; Reuse window
-          (progn
-            (select-window term-popup-window)
-            (set-window-buffer term-popup-window buffer))
-          (pop-to-buffer buffer)
-          (setq term-popup-window (get-buffer-window buffer)))))))
+        (let ((popup-window (term%get-popup-window)))
+          (if (and (window-live-p popup-window)
+                   (eq 'term-mode
+                       (buffer-local-value 'major-mode
+                                           (window-buffer popup-window))))
+              ;; Reuse window
+              (progn
+                (select-window popup-window)
+                (set-window-buffer popup-window buffer))
+            (pop-to-buffer buffer)
+            (term%set-popup-window (get-buffer-window buffer))))))))
 
 (defun term%after-prompt? ()
   (let* ((proc (get-buffer-process (current-buffer)))

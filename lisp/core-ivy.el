@@ -1,12 +1,12 @@
 (defun counsel%semantic--clean-tag ($tag)
   (let ((def-val (semantic-tag-get-attribute $tag :default-value)))
     (when (stringp def-val)
-      (when-let ((pos (string-match "\n" def-val)))
+      (when-let* ((pos (string-match "\n" def-val)))
         (setq def-val (concat (substring def-val 0 (min pos 80)) " ... ")))
       (semantic-tag-put-attribute $tag :default-value def-val))))
 
 (defun counsel%semantic-or-imenu--relative-buffers ($buffer)
-  (let* (projectile-require-project-root
+  (let* ((projectile-require-project-root nil)
          (project-buffers (ignore-errors (projectile-project-buffers))))
     (loop for buffer in (buffer-list)
           when (or (eq $buffer buffer)
@@ -80,32 +80,42 @@
                           ("C-n" . ivy-next-line-and-call)
                           ("C-p" . ivy-previous-line-and-call))))))
 
-(defun counsel-kill-buffer (&optional $arg)
+(defvar counsel--kill-buffers nil)
+(defun counsel%kill-buffer-action (x)
+  (if (member x counsel--kill-buffers)
+      (unless (memq this-command '(ivy-done
+                                   ivy-alt-done
+                                   ivy-immediate-done))
+        (setq counsel--kill-buffers (delete x counsel--kill-buffers)))
+    (unless (equal x "")
+      (setq counsel--kill-buffers (append counsel--kill-buffers (list x)))))
+  (let ((prompt (counsel%kill-buffer-prompt)))
+    (setf (ivy-state-prompt ivy-last) prompt)
+    (setq ivy--prompt (concat ivy-count-format prompt))))
+
+(defun counsel%kill-buffers (&optional $hard)
+  (dolist (buffer counsel--kill-buffers)
+    (let ((kill-buffer-hook (and (not $hard) kill-buffer-hook)))
+      (kill-buffer buffer))))
+
+(defun counsel%kill-buffer-prompt ()
+  (format "%sKill buffers (%s): "
+          (if current-prefix-arg "[hard] " "")
+          (string-join counsel--kill-buffers ", ")))
+
+(defun counsel-kill-buffer ($hard)
   "Kill buffer with ivy backends."
   (interactive "P")
+  (setq counsel--kill-buffers nil)
   (let ((ivy-use-virtual-buffers nil))
-    (ivy-read (format "Kill buffer (default %s): " (buffer-name))
+    (ivy-read (counsel%kill-buffer-prompt)
               'internal-complete-buffer
               :preselect (buffer-name (current-buffer))
-              :action (if $arg
-                          (lambda () (let ((kill-buffer-hook nil))
-                                       (kill-buffer)))
-                        #'kill-buffer)
+              :action #'counsel%kill-buffer-action
               :keymap counsel-find-file-map
               :caller 'counsel-kill-buffer
-              :require-match t)))
-
-(defun counsel-projectile-kill-buffer (&optional $arg)
-  "Kill project buffer with ivy backends."
-  (interactive "P")
-  (ivy-read (format "Kill buffer (default %s): " (buffer-name))
-            (counsel-projectile--project-buffers)
-            :preselect (buffer-name (current-buffer))
-            :action (if $arg (lambda () (let ((kill-buffer-hook nil))
-                                          (kill-buffer)))
-                      #'kill-buffer)
-            :keymap counsel-find-file-map
-            :caller 'counsel-projectile-kill-buffer))
+              :require-match t))
+  (counsel%kill-buffers $hard))
 
 (defun counsel-sudo-edit (&optional $arg)
   "Edit currently visited file as root.

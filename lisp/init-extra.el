@@ -7,6 +7,7 @@
  gnuplot-mode
  csharp-mode
  graphviz-dot-mode
+ yaml-mode
  ;; Move buffers between windows
  buffer-move
  zeal-at-point

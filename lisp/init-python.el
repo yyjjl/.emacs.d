@@ -48,6 +48,32 @@
 
 
 
+(defun python/create-venv-in-workon-home ($name $python-exe &optional $args)
+  (interactive
+   (list (read-from-minibuffer "Name: ")
+         (read-shell-command "Python executable: ")
+         (when current-prefix-arg
+           (read-from-minibuffer "Arguments: "))))
+  (when (and $name $python-exe (> (length $name) 0))
+    (let* ((dir (expand-file-name $name (pyvenv-workon-home)))
+           (command (format "virtualenv --python=%s %s %s\n"
+                            $python-exe dir (or $args ""))))
+      (compile command))))
+
+(defun python/create-virtualenv ($dir $python-exe &optional $args)
+  (interactive
+   (list (read-directory-name "Directory: "
+                              (ignore-errors (projectile-project-root))
+                              nil :mustmatch)
+         (read-shell-command "Python executable: ")
+         (when current-prefix-arg
+           (read-from-minibuffer "Arguments: "))))
+  (when (and $dir $python-exe)
+    (let* ((dir (expand-file-name ".venv" $dir))
+           (command (format "virtualenv --python=%s %s %s\n"
+                            $python-exe dir (or $args ""))))
+      (compile command))))
+
 (defun python/multiedit-symbol-at-point ()
   "Edit all usages of the the Python symbol at point."
   (interactive)
@@ -116,6 +142,11 @@
               (python/generate-doc params indent)
               "\n" indent
               "\"\"\""))))
+
+(with-eval-after-load 'pyvenv
+  (setq pyvenv-mode-line-indicator
+        '(pyvenv-virtual-env-name
+          ("Py:" pyvenv-virtual-env-name " "))))
 
 (with-eval-after-load 'python
   (when (boundp 'python-shell-completion-native-disabled-interpreters)

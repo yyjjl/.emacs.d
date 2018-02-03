@@ -2,12 +2,6 @@
 
 (require 'doom-themes)
 
-(defface mode-line-window-number
-  '((t (:background "black"
-                    :box (:line-width 5 :color "black"))))
-  "Window number in mode-line"
-  :group 'mode-line)
-
 (defface empty-line-face
   '((t (:foreground "grey50")))
   "Window number in mode-line"
@@ -37,7 +31,12 @@
  '(hl-sexp-face ((t (:background "gray7"))))
  '(hl-line ((t (:background "gray17"))))
 
- '(window-numbering-face ((t (:foreground "DeepPink" :weight bold))))
+ '(flycheck-error ((t (:underline (:style wave :color "#e74c3c")))))
+ '(flycheck-info ((t (:underline (:style wave :color "#b6e63e")))))
+ '(flycheck-warning ((t (:underline (:style wave :color "#e2c770")))))
+
+ ;; '(window-numbering-face
+ ;;   ((t (:foreground "DeepPink" :weight bold :underline t))))
 
  '(haskell-keyword-face ((t (:inherit font-lock-builtin-face))))
  '(haskell-type-face ((t (:inherit font-lock-constant-face))))

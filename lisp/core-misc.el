@@ -82,7 +82,10 @@
 (setq projectile-keymap-prefix (kbd "C-x p"))
 (with-eval-after-load 'projectile
   (setq projectile-mode-line
-        '(:eval (format "[%s]" (projectile-project-name))))
+        '(:eval (format "[%s]" (or projectile-project-name
+                                   projectile-cached-project-name
+                                   "-"))))
+  (setq projectile-require-project-root t)
   (setq projectile-completion-system 'ivy)
   (setq projectile-enable-caching t)
 

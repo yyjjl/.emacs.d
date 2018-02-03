@@ -82,16 +82,11 @@ and `buffer-file-coding-system'"
                                           'face 'flycheck-fringe-warning)))))
        " ")))
 
-(defun mode-line%vc ()
-  "Display `version-control' status."
-  (and (buffer-file-name (current-buffer))
-       (concat vc-mode " ")))
-
 (defun mode-line%process ()
   "Display buffer process status."
-  (let ((proc (get-buffer-process (current-buffer))))
-    (if proc (list "{" mode-line-process "} ")
-      "")))
+  (if (get-buffer-process (current-buffer))
+      (list "{" mode-line-process "} ")
+    ""))
 
 (defun mode-line%tail ()
   (if (buffer-file-name) "[L%l C%c %p %I]" "[L%l C%c %p]"))
@@ -118,8 +113,7 @@ and `buffer-file-coding-system'"
         mode-line%buffer-major-mode
         mode-line%buffer-status)
        (mode-line%flycheck
-        mode-line%process
-        mode-line%vc))))
+        mode-line%process))))
 (defun mode-line%inactive? ($bn)
   (not mode-line-active?))
 
@@ -130,9 +124,7 @@ and `buffer-file-coding-system'"
 
 (defun mode-line%create ($left $right &optional $no-tail? $no-center?)
   (let* ((lhs (format-mode-line (mapcar #'funcall $left)))
-         (chs (if $no-center? ""
-                (propertize (format-mode-line mode-line-misc-info)
-                            'face font-lock-string-face)))
+         (chs (if $no-center? "" (format-mode-line mode-line-misc-info)))
          (rhs (format-mode-line (mapcar #'funcall $right)))
          (tail (if $no-tail? ""
                  (propertize (mode-line%tail) 'face 'font-lock-constant-face)))
@@ -182,7 +174,8 @@ and `buffer-file-coding-system'"
   (setq-default mode-line-format mode-line-default-format)
   (setq-default mode-line-buffer-identification '("%b"))
   (setq-default mode-line-misc-info
-                '((global-mode-string ("" global-mode-string " "))
+                '((vc-mode ("" vc-mode " "))
                   (projectile-mode ("" projectile-mode-line " ")))))
 
 (provide 'core-mode-line)
+
