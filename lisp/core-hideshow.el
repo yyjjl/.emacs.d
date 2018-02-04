@@ -72,10 +72,11 @@ BUFFER-OR-NAME defaults to current buffer."
                                    (equal (file-modification-time! filename)
                                           mtime)
                                    (cdr information))))
-            (loop for (beg . end) in regions
-                  do (progn
-                       (goto-char beg)
-                       (hs-hide-block)))))))))
+            (save-excursion
+              (loop for (beg . end) in regions
+                    do (progn
+                         (goto-char beg)
+                         (hs-hide-block))))))))))
 
 (defun hs|kill-emacs-hook ()
   "Traverse all buffers and try to save their folds."

@@ -9,8 +9,9 @@
   (flycheck-mode 1)
   (hl-line-mode 1)
   (when (< (buffer-size) core-large-buffer-size)
-    ;; (unless (buffer-temporary?)
-    ;;   (highlight-indentation-current-column-mode 1))
+    ;; (highlight-indentation-current-column-mode 1)
+    ;; (when (fboundp 'display-line-numbers-mode)
+    ;;   (display-line-numbers-mode 1))
     (highlight-indentation-mode 1)
     (auto-revert-mode 1))
 
@@ -24,6 +25,8 @@
   (hl-line-mode 1)
   (auto-fill-mode 1)
   (when (< (buffer-size) core-large-buffer-size)
+    ;; (when (fboundp 'display-line-numbers-mode)
+    ;;   (display-line-numbers-mode 1))
     (auto-revert-mode 1))
   (setq indicate-empty-lines t))
 
@@ -52,6 +55,10 @@
   (dolist (buffer (buffer-list))
     (with-current-buffer buffer
       (core|setup-buffer-bookmark))))
+
+(with-eval-after-load 'display-line-numbers
+  (setq display-line-numbers-type t)
+  (setq display-line-numbers-widen t))
 
 (with-eval-after-load 'xref
   (define-key! :map xref--xref-buffer-mode-map

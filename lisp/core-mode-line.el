@@ -89,7 +89,7 @@ and `buffer-file-coding-system'"
     ""))
 
 (defun mode-line%tail ()
-  (if (buffer-file-name) "[L%l C%c %p %I]" "[L%l C%c %p]"))
+  (if (buffer-file-name) "[L%l C%C %p %I]" "[L%l C%C %p]"))
 
 (defvar mode-line--center-margin 1)
 (defvar mode-line-active? nil)

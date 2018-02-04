@@ -117,6 +117,19 @@
               :require-match t))
   (counsel%kill-buffers $hard))
 
+(defun counsel-projectile-kill-buffer ($hard)
+  "Kill buffer with ivy backends."
+  (interactive "P")
+  (setq counsel--kill-buffers nil)
+  (ivy-read (counsel%kill-buffer-prompt)
+            (mapcar #'buffer-name (projectile-project-buffers))
+            :preselect (buffer-name (current-buffer))
+            :action #'counsel%kill-buffer-action
+            :keymap counsel-find-file-map
+            :caller 'counsel-projectile-kill-buffer
+            :require-match t)
+  (counsel%kill-buffers $hard))
+
 (defun counsel-sudo-edit (&optional $arg)
   "Edit currently visited file as root.
 With a prefix ARG prompt for a file to visit.  Will also prompt

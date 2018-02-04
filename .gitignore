@@ -59,5 +59,6 @@ private.el
 /emojis
 /private/*
 !/private/sdcv/
+!/private/dired-plus/
 /init.el
 /gnus.el

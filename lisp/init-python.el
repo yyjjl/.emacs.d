@@ -146,7 +146,7 @@
 (with-eval-after-load 'pyvenv
   (setq pyvenv-mode-line-indicator
         '(pyvenv-virtual-env-name
-          ("Py:" pyvenv-virtual-env-name " "))))
+          ("[" pyvenv-virtual-env-name "] "))))
 
 (with-eval-after-load 'python
   (when (boundp 'python-shell-completion-native-disabled-interpreters)
