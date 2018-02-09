@@ -9,9 +9,6 @@
 
 
 (define-hook! python|setup (python-mode-hook)
-  (local-set-key (kbd "C-c b") 'elpy-autopep8-fix-code)
-  (local-set-key (kbd "C-c B") 'py-isort-buffer)
-  (local-set-key (kbd "C-c M-d") 'python/generate-doc-at-point)
   ;; emacs 24.4 only
   (setq electric-indent-chars (delq ?: electric-indent-chars))
   (unless (buffer-temporary?)
@@ -37,6 +34,9 @@
   (define-key! :map elpy-mode-map
     ("C-c C-n" . nil)
     ("C-c C-p" . nil)
+    ("C-c b" . elpy-autopep8-fix-code)
+    ("C-c B" . py-isort-buffer)
+    ("C-c M-d" . python/generate-doc-at-point)
     ("M-i" . python/multiedit-symbol-at-point))
 
   (defun python*elpy-multiedit-stop-hack ()

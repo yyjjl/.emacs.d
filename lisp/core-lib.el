@@ -34,7 +34,6 @@ Optional argument $BODY is the lambda body."
   (declare (doc-string 1) (indent defun))
   `(lambda () (interactive) ,@$body))
 
-(defvar core--transient-index 0)
 (defmacro add-transient-hook! ($hook &rest $forms)
   "Attaches transient forms to a $HOOK.
 
@@ -45,24 +44,26 @@ $FORMS will be evaluated once
 when that function/hook is first invoked, then it detaches
 itself."
   (declare (indent 1))
-  (let ((append-p (eq (car $forms) :after))
-        (fn (intern (cond ((functionp $hook)
-                           (format "core*transient-hook-%s"
-                                   (cl-incf core--transient-index)))
-                          ((symbolp $hook)
-                           (format "core|transient-hook-%s"
-                                   (cl-incf core--transient-index)))))))
-    `(when ,$hook
+  (let* ((hook (if (consp $hook) (car $hook) $hook))
+         (args (and (consp $hook) (cdr $hook)))
+         (append-p (plist-get args :after))
+         (local-p (plist-get args :local))
+         (fn (or (plist-get args :name)
+                 (cond ((functionp hook)
+                        (cl-gensym "core*transient-hook-"))
+                       ((symbolp hook)
+                        (cl-gensym "core|transient-hook-"))))))
+    `(progn
        (fset ',fn
              (lambda (&rest _)
                ,@$forms
-               (cond ((functionp ,$hook) (advice-remove ,$hook #',fn))
-                     ((symbolp ,$hook) (remove-hook ,$hook #',fn)))
+               ,(cond ((functionp hook) `(advice-remove ',hook ',fn))
+                      ((symbolp hook) `(remove-hook ',hook ',fn)))
                (unintern ',fn nil)))
-       (cond ((functionp ,$hook)
-              (advice-add ,$hook ,(if append-p :after :before) #',fn))
-             ((symbolp ,$hook)
-              (add-hook ,$hook #',fn ,append-p))))))
+       ,(cond ((functionp hook)
+               `(advice-add ',hook ,(if append-p :after :before) ',fn))
+              ((symbolp hook)
+               `(add-hook ',hook ',fn ,append-p ,local-p))))))
 
 (defmacro define-hook! ($name $hooks &rest $body)
   "Define a hook function.
@@ -274,6 +275,9 @@ HTML file converted from org file, it returns t."
 
 (defsubst file-modification-time! (file)
   (nth 5 (file-attributes file)))
+
+(unless (fboundp 'when-let*)
+  (defalias 'when-let* 'when-let))
 
 (provide 'core-lib)
 

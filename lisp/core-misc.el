@@ -88,10 +88,10 @@
 (put 'projectile-project-test-cmd 'safe-local-variable #'stringp)
 (setq projectile-keymap-prefix (kbd "C-x p"))
 (with-eval-after-load 'projectile
-  (setq projectile-mode-line
-        '(:eval (format "[%s]" (or projectile-project-name
-                                   projectile-cached-project-name
-                                   "-"))))
+  ;; (setq projectile-mode-line
+  ;;       '(:eval (format "[%s]" (or projectile-project-name
+  ;;                                  projectile-cached-project-name
+  ;;                                  "-"))))
   (setq projectile-require-project-root t)
   (setq projectile-completion-system 'ivy)
   (setq projectile-enable-caching t)
@@ -131,7 +131,7 @@
 
 ;; Smart tab
 (defvar core--indent-close-list '(?\} ?\$ ?\] ?\' ?\` ?\"))
-(defun core%indent-for-tab ($fn &rest $arg)
+(defun core*indent-for-tab ($fn &rest $arg)
   (if (save-excursion
         (forward-line 0)
         (and outline-minor-mode (looking-at-p outline-regexp)))
@@ -153,7 +153,16 @@
                           '(font-lock-string-face font-lock-doc-face)))
                (not (eq tab-always-indent 'complete)))
           (call-interactively 'hippie-expand)))))))
-(advice-add 'indent-for-tab-command :around #'core%indent-for-tab)
+(advice-add 'indent-for-tab-command :around #'core*indent-for-tab)
+
+(defun core*desktop-read ($fn &rest $args)
+  "Temporarily disable semantic mode when load desktop"
+  (let ((semantic-enable-p semantic-mode))
+    (semantic-mode -1)
+    (apply $fn $args)
+    (when semantic-enable-p
+      (core/enable-semantic))))
+(advice-add 'desktop-read :around #'core*desktop-read)
 
 ;; Delete the current file
 (defun core/delete-this-file ()
@@ -260,6 +269,43 @@ Does not indent buffer, because it is used for a
       (activate-mark 1)
       (goto-char $start))))
 
+(defvar core-search-engine-alist
+  '(("g" "google" "http://www.google.com/search?q=%s")
+    ("q" "stackoverflow" "http://www.google.com/search?q=%s+site:stackoverflow.com")
+    ("w" "wikipedia" "http://en.wikipedia.org/wiki/Special:Search?search=%s")
+    ("d" "dictionary" "http://dictionary.reference.com/search?q=%s")
+    ("cpp" "cpp" "https://www.google.com/search?q=cpp+%s")))
+
+(defun core%read-search-engine ()
+  (assoc-string
+   (car (split-string-and-unquote
+         (ivy-read "Engine: "
+                   (mapcar (lambda (x)
+                             (format "%-6s %s"
+                                     (nth 0 x)
+                                     (propertize (nth 2 x)
+                                                 'face font-lock-comment-face)))
+                           core-search-engine-alist)
+                   :preselect "g"
+                   :matcher (lambda (re candidates)
+                              (when (and (stringp re)
+                                         (not (string-prefix-p "^" re)))
+                                (setq re (concat "^" re)))
+                              (ivy--re-filter re candidates))
+                   :require-match t)))
+   core-search-engine-alist))
+
+(defun core/search-in-chrome ($engine $keyword)
+  (interactive
+   (let ((engine (core%read-search-engine)))
+     (list (nth 2 engine)
+           (read-from-minibuffer (concat (nth 1 engine) ": ")
+                                 nil nil 'core-search-history))))
+  (unless (featurep 'browse-url)
+    (require 'browse-url))
+  (browse-url-chrome (format $engine $keyword))
+  (run-hooks 'core-after-search-hook))
+
 (defvar socks-server '("Default server" "127.0.0.1" 1080 5))
 (defun core/toggle-socket-proxy ()
   (interactive)
@@ -283,6 +329,7 @@ Does not indent buffer, because it is used for a
   ("C-c 4" . ispell-word)
   ("C-c q" . auto-fill-mode)
   ("C-x C-b" . ibuffer)
+  ("C-x ," . core/search-in-chrome)
   ("M-/" . hippie-expand)
   ("M--" . er/expand-region)
 

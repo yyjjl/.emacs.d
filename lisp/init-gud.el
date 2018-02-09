@@ -37,6 +37,7 @@
       (with-selected-window window
         (when (save-excursion
                 (goto-char gud-overlay-arrow-position)
+                (swiper--ensure-visible)
                 (forward-line 2)
                 (not (pos-visible-in-window-p)))
           (recenter))))))

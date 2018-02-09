@@ -13,11 +13,14 @@
           global-semantic-stickyfunc-mode
           ;; Error occurs a lot
           ;; global-semantic-decoration-mode
-          global-semantic-highlight-func-mode
-          ;; global-semantic-mru-bookmark-mode
-          ))
+          ;; global-semantic-highlight-func-mode
+          global-semantic-mru-bookmark-mode))
   (add-to-list 'semantic-inhibit-functions
-               (lambda () (file-remote-p default-directory))))
+               (lambda () (file-remote-p default-directory)))
+
+  (when tags-has-gtags-p
+    (dolist (mode '(c++-mode c-mode java-mode))
+      (semanticdb-enable-gnu-global-databases mode))))
 
 (defun core/semanticdb-parse-directory ($dir &optional $regex $recursive?)
   (let ((dir (file-name-as-directory $dir)))

@@ -25,6 +25,7 @@
  '(font-lock-constant-face ((t (:foreground "#AE81FF"))))
  '(font-lock-warning-face
    ((t (:background "black" :weight bold :underline t))))
+ '(font-lock-doc-face ((t (:foreground "#777777" :weight bold))))
 
  '(eldoc-highlight-function-argument
    ((t (:foreground "#86DC2F" :weight bold))))

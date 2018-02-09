@@ -326,7 +326,7 @@
 (with-eval-after-load 'cc-mode
   (require 'cmake-ide)
   ;; Smart tab
-  (advice-add 'c-indent-line-or-region :around #'core%indent-for-tab)
+  (advice-add 'c-indent-line-or-region :around #'core*indent-for-tab)
 
   (put 'c++-mode 'derived-mode-parent 'prog-mode)
   (put 'c-mode 'derived-mode-parent 'prog-mode)

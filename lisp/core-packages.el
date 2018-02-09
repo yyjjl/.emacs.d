@@ -204,7 +204,9 @@ Archive with high priority will be used when install a package.")
    1 nil
    (lambda ()
      (when (and (display-graphic-p) emacs-use-fcitx-p)
-       (fcitx-aggressive-setup))))
+       (fcitx-aggressive-setup))
+     (find-file-noselect (expand-var! "org/*note*"))
+     (desktop-save-mode 1)))
 
   (which-key-mode 1)
   (core/enable-semantic))

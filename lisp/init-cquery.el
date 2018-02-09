@@ -6,7 +6,9 @@
 
 ;; C/C++ I need stable version
 (require-packages!
- ;; (ggtags :when tags-has-gtags-p)
+ (ggtags :when tags-has-gtags-p)
+ lsp-mode
+ company-lsp
  cquery
  clang-format
  google-c-style)
@@ -128,6 +130,51 @@
                     (file-name-nondirectory filename) " -o "
                     (file-name-base filename))))))))
 
+(defun cpp%font-lock-setup ()
+  (when (or (eq font-lock-maximum-decoration 1)
+            (and (listp font-lock-maximum-decoration)
+                 (eq (cdr (assoc major-mode
+                                 font-lock-maximum-decoration))
+                     1)))
+    (font-lock-add-keywords nil cpp--font-lock-keywords)))
+
+(defun cpp%setup ()
+  (if (or (file-remote-p default-directory)
+          (bound-and-true-p cpp-setup-literally)
+          (> (buffer-size) core-large-buffer-size))
+      (progn
+        (ggtags-mode 1)
+        (setq completion-at-point-functions nil)
+        (setq flycheck-clang-language-standard "c++14"))
+    (when (setq cpp-cmakelists-directory (cpp%locate-cmakelists))
+      (cpp%maybe-create-build-directory))
+    (if (file-exists-p (cpp%get-cquery-file))
+        (cpp%cquery-setup)
+      (cpp%maybe-create-cdb-file))))
+
+;; Do not use `c-mode-hook' and `c++-mode-hook', there is a bug
+(defvar-local cpp--initialized-p nil)
+(define-hook! cpp|common-setup (c-mode-common-hook)
+  (unless cpp--initialized-p
+    (setq cpp--initialized-p t)
+    (if (>= (string-to-number c-version) 5.33)
+        (run-hooks 'prog-mode-hook))
+
+    (cpp%common-cc-setup)
+
+    (unless (or (derived-mode-p 'java-mode)
+                (derived-mode-p 'groovy-mode))
+      ;; (hide-ifdef-mode 1)
+      ;; Make a #define be left-aligned
+      (setq c-electric-pound-behavior '(alignleft))
+      (cpp%font-lock-setup)
+      (cpp%simple-setup)
+
+      (unless (buffer-temporary?)
+        (add-transient-hook!
+            (hack-local-variables-hook :local t :name cpp%setup-interal)
+          (cpp%setup))))))
+
 (defun cpp/load-file-in-root ()
   (interactive)
   (cond
@@ -202,48 +249,6 @@
         (lsp-mode -1)
         (lsp-cquery-enable)))))
 
-(defun cpp%font-lock-setup ()
-  (when (or (eq font-lock-maximum-decoration 1)
-            (and (listp font-lock-maximum-decoration)
-                 (eq (cdr (assoc major-mode
-                                 font-lock-maximum-decoration))
-                     1)))
-    (font-lock-add-keywords nil cpp--font-lock-keywords)))
-
-(defun cpp%setup ()
-  "C/C++ only setup"
-  ;; (hide-ifdef-mode 1)
-
-  ;; Make a #define be left-aligned
-  (setq c-electric-pound-behavior '(alignleft))
-
-  (cpp%font-lock-setup)
-  (cpp%simple-setup)
-
-  (unless (or (file-remote-p default-directory)
-              (bound-and-true-p cpp-setup-literally)
-              (> (buffer-size) core-large-buffer-size))
-    (when (setq cpp-cmakelists-directory (cpp%locate-cmakelists))
-      (cpp%maybe-create-build-directory))
-    (if (file-exists-p (cpp%get-cquery-file))
-        (cpp%cquery-setup)
-      (cpp%maybe-create-cdb-file))))
-
-;; Do not use `c-mode-hook' and `c++-mode-hook', there is a bug
-(defvar-local cpp--initialized-p nil)
-(define-hook! cpp|common-setup (c-mode-common-hook)
-  (unless cpp--initialized-p
-    (setq cpp--initialized-p t)
-    (if (>= (string-to-number c-version) 5.33)
-        (run-hooks 'prog-mode-hook))
-
-    (cpp%common-cc-setup)
-
-    (unless (buffer-temporary?)
-      (unless (or (derived-mode-p 'java-mode)
-                  (derived-mode-p 'groovy-mode))
-        (cpp%setup)))))
-
 (defun cpp/electric-star ($arg)
   (interactive "*P")
   (if (eq (char-before) ?\/)
@@ -275,7 +280,7 @@
   (require 'cquery)
 
   ;; Smart tab
-  (advice-add 'c-indent-line-or-region :around #'core%indent-for-tab)
+  (advice-add 'c-indent-line-or-region :around #'core*indent-for-tab)
 
   (when (>= (string-to-number c-version) 5.33)
     (put 'c++-mode 'derived-mode-parent 'prog-mode)
@@ -294,11 +299,11 @@
     ("C-c b" . clang-format-buffer)
     ("C-c C-b" . clang-format-buffer)
     ("C-c C-l" . cpp/load-file-in-root)
-    ("C-c C-SPC" . cquery-select-codeaction)
     ("C-c T" . cpp/cmake-toggle-option)
     ("C-c d" . cpp/cmake-edit-option)
     ("C-c C-c" . cpp/run-cmake)
     ("M-s l" . cquery-code-lens-mode)
+    ("M-s c" . cquery-call-tree)
     ([f9] . cpp/run-cmake)
     ([f10] . cpp/compile)
     ([f5] . cpp/gdb))
@@ -317,7 +322,20 @@
   (setq cquery-executable cpp-cquery-path
         cquery-extra-init-params '(:index (:comments 2 :builtinTypes t)
                                           :cacheFormat "msgpack"))
-  (setq cquery-sem-highlight-method 'font-lock))
+  (setq cquery-sem-highlight-method nil))
+
+(with-eval-after-load 'cquery-tree
+  (defun cpp*call-tree-open-hack (&rest args)
+    (setq mode-line-format mode-line-default-format))
+  (advice-add 'cquery-call-tree--open :after #'cpp*call-tree-open-hack)
+
+  (define-key! :map cquery-call-tree-mode-map
+    ("v" . cquery-call-tree-look)
+    ("o" . cquery-call-tree-look)
+    ("." . cquery-call-tree-expand-or-set-root)
+    ("^" . cquery-call-tree-collapse-or-select-parent)
+    ("j" . next-line)
+    ("k" . previous-line)))
 
 ;; Set term default directory
 (when (boundp 'term-default-directory-function-list)

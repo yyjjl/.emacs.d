@@ -1,6 +1,6 @@
 ;; Improve `dired-mode'
 (require-packages! 
- dired+
+ ;; dired+
  dired-narrow)
 
 

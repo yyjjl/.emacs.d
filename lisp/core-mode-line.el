@@ -1,4 +1,4 @@
-(defun mode-line%window-number ()
+(defsubst mode-line%window-number ()
   (if (bound-and-true-p window-numbering-mode)
       (let* ((narrow-p (buffer-narrowed-p))
              (num-str (concat
@@ -11,7 +11,7 @@
         num-str)
     ""))
 
-(defun mode-line%buffer-id ()
+(defsubst mode-line%buffer-id ()
   "Display buffer id in mode-line."
   (let* ((method (file-remote-p default-directory 'method)))
     (list " %["
@@ -21,11 +21,11 @@
                         face font-lock-keyword-face)
           "%] ")))
 
-(defun mode-line%buffer-major-mode ()
+(defsubst mode-line%buffer-major-mode ()
   "Display buffer major mode in mode-line."
   '(:propertize mode-name face font-lock-builtin-face))
 
-(defun mode-line%buffer-status ()
+(defsubst mode-line%buffer-status ()
   "Display buffer status.
 Whether it is temporary file, whether it is modified, whether is read-only,
 and `buffer-file-coding-system'"
@@ -62,7 +62,7 @@ and `buffer-file-coding-system'"
                         buf-coding)))
         ")"))
 
-(defun mode-line%flycheck ()
+(defsubst mode-line%flycheck ()
   "Display flycheck status in mode-line."
   (if (bound-and-true-p flycheck-mode)
       (list
@@ -82,82 +82,85 @@ and `buffer-file-coding-system'"
                                           'face 'flycheck-fringe-warning)))))
        " ")))
 
-(defun mode-line%process ()
+(defsubst mode-line%process ()
   "Display buffer process status."
   (if (get-buffer-process (current-buffer))
       (list "{" mode-line-process "} ")
     ""))
 
-(defun mode-line%tail ()
-  (if (buffer-file-name) "[L%l C%C %p %I]" "[L%l C%C %p]"))
+(defsubst mode-line%tail ()
+  (propertize
+   (if (buffer-file-name)
+       "[L%l C%c %p %I]"
+     "[L%l C%c %p]")
+   'face 'font-lock-constant-face))
 
 (defvar mode-line--center-margin 1)
 (defvar mode-line-active? nil)
 (defvar mode-line-default-format '("%e" (:eval (mode-line%generate))))
 (defvar mode-line-config-alist
-  '((mode-line%inactive? (mode-line%window-number
-                          mode-line%buffer-id
-                          mode-line%buffer-major-mode)
-                         (mode-line%process)
-                         nil
-                         :no-center)
-    (mode-line%use-special? (mode-line%window-number
-                             mode-line%buffer-id
-                             mode-line%buffer-major-mode
-                             mode-line%buffer-status)
-                            (mode-line%process)
-                            nil
-                            :no-center)
+  '(((not mode-line-active?)
+     (mode-line%window-number
+      mode-line%buffer-id
+      mode-line%buffer-major-mode)
+     (mode-line%process)
+     :no-center)
+    ((or (memq major-mode '(dired-mode))
+         (and (not (derived-mode-p 'text-mode 'prog-mode))
+              (string-match-p "^\\*" (buffer-name))))
+     (mode-line%window-number
+      mode-line%buffer-id
+      mode-line%buffer-major-mode
+      mode-line%buffer-status)
+     (mode-line%process)
+     :no-center)
     (t (mode-line%window-number
         mode-line%buffer-id
         mode-line%buffer-major-mode
         mode-line%buffer-status)
        (mode-line%flycheck
         mode-line%process))))
-(defun mode-line%inactive? ($bn)
-  (not mode-line-active?))
 
-(defun mode-line%use-special? ($bn)
-  (or (memq major-mode '(dired-mode))
-      (and (not (derived-mode-p 'text-mode 'prog-mode))
-           (string-match-p "^\\*" $bn))))
-
-(defun mode-line%create ($left $right &optional $no-tail? $no-center?)
-  (let* ((lhs (format-mode-line (mapcar #'funcall $left)))
-         (chs (if $no-center? "" (format-mode-line mode-line-misc-info)))
-         (rhs (format-mode-line (mapcar #'funcall $right)))
-         (tail (if $no-tail? ""
-                 (propertize (mode-line%tail) 'face 'font-lock-constant-face)))
-         (lw (string-width lhs))
-         (cw (string-width chs))
-         (rw (+ (string-width rhs) (length (format-mode-line tail))))
+(defun mode-line%format-line ($lhs $chs $rhs $tail)
+  (let* ((lw (string-width $lhs))
+         (cw (string-width $chs))
+         (rw (+ (string-width $rhs) (length (format-mode-line $tail))))
          (tw (window-total-width))
          (margin (/ (- tw (+ lw rw cw)) 2)))
-    (setq chs
+    (setq $chs
           (if (>= margin mode-line--center-margin)
               (list (make-string margin ?\s)
-                    chs
+                    $chs
                     (make-string (max 0 (- tw (+ lw cw rw margin))) ?\s))
             (make-string (max mode-line--center-margin
                               (- tw (+ lw rw)))
                          ?\s)))
-    (list lhs chs rhs tail)))
+    (list $lhs $chs $rhs $tail)))
 
-(defun mode-line%generate ()
-  "Generate mode-line."
-  (setq mode-line-active?
-        (equal (selected-window) mode-line--current-window))
-  (unless (bound-and-true-p eldoc-mode-line-string)
-    (let ((config-alist mode-line-config-alist)
-          config
-          mode-line)
-      (while (and config-alist
-                  (setq config (pop config-alist)))
-        (when (or (eq (car config) t)
-                  (funcall (car config) (buffer-name)))
-          (setq config-alist nil)
-          (setq mode-line (apply #'mode-line%create (cdr config)))))
-      mode-line)))
+(defun mode-line%generate-body ($body)
+  (let ((lhs (car $body))
+        (rhs (cadr $body))
+        (no-tail? (memq :no-tail $body))
+        (no-center? (memq :no-center $body)))
+    `(mode-line%format-line
+      (format-mode-line (list ,@(mapcar #'list lhs)))
+      ,(if no-center? "" '(format-mode-line mode-line-misc-info))
+      (format-mode-line (list ,@(mapcar #'list rhs)))
+      ,(if no-tail? "" '(format-mode-line (mode-line%tail))))))
+
+(defmacro mode-line%compile ()
+  `(byte-compile
+    (defun mode-line%generate ()
+      "Generate mode-line."
+      (setq mode-line-active? (equal (selected-window)
+                                     mode-line--current-window))
+      (unless (bound-and-true-p eldoc-mode-line-string)
+        (cond ,@(mapcar (lambda (config)
+                          (list (car config)
+                                (mode-line%generate-body (cdr config))))
+                        mode-line-config-alist))))))
+
+(mode-line%compile)
 
 (defvar mode-line--current-window (frame-selected-window))
 (defun mode-line*set-selected-window (&rest _)
@@ -167,15 +170,14 @@ and `buffer-file-coding-system'"
       (setq mode-line--current-window win))))
 (advice-add #'select-window :after #'mode-line*set-selected-window)
 
-
 ;; Setup `mode-line-format'
 (define-hook! mode-line|after-init-hook (after-init-hook)
   (window-numbering-mode 1)
   (setq-default mode-line-format mode-line-default-format)
   (setq-default mode-line-buffer-identification '("%b"))
   (setq-default mode-line-misc-info
-                '((vc-mode ("" vc-mode " "))
-                  (projectile-mode ("" projectile-mode-line " ")))))
+                '((vc-mode vc-mode)
+                  (company-mode company-lighter))))
 
 (provide 'core-mode-line)
 

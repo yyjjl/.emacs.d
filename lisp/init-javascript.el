@@ -1,11 +1,7 @@
-(setvar! js2-has-tern-p (executable-find "tern"))
-
 (require-packages!
+ lsp-javascript-typescript
  js-doc
- js2-mode
- js2-refactor
- (tern :when js2-has-tern-p)
- (company-tern :when js2-has-tern-p))
+ js2-mode)
 
 
 
@@ -50,9 +46,10 @@ replaced with it."
     result))
 
 (with-eval-after-load 'js2-mode
+  (require 'lsp-javascript-typescript)
   (setq-default js2-use-font-lock-faces t
                 js2-mode-must-byte-compile nil
-                js2-idle-timer-delay 0.5
+                js2-idle-timer-delay 2
                 js2-auto-indent-p nil
                 js2-indent-on-enter-key nil
                 js2-skip-preprocessor-directives t
@@ -69,14 +66,9 @@ replaced with it."
 
 (define-hook! js2|setup (js2-mode-hook)
   (js2-imenu-extras-mode)
-  (setq mode-name "Js2")
-  (unless (or (buffer-temporary?)
-              (> (buffer-size) core-large-buffer-size))
-    (js2-refactor-mode 1)
-    (js2r-add-keybindings-with-prefix "`"))
 
-  (unless (and (buffer-temporary?) js2-has-tern-p)
-    (tern-mode 1)
-    (add-to-list 'company-backends 'company-tern)))
+  (unless (buffer-temporary?)
+    (lsp-javascript-typescript-enable)
+    (add-to-list 'company-backends 'company-lsp)))
 
 (provide 'init-javascript)

@@ -153,11 +153,9 @@ for a file to visit if current buffer is not visiting a file."
   (let ((buffer (get-buffer $left-str))
         (right-str ""))
     (cond
-     (buffer (setq right-str
-                   (propertize (format "%s"
-                                       (buffer-local-value 'major-mode
-                                                           buffer))
-                               'face 'warning)))
+     (buffer
+      (setq right-str (abbreviate-file-name
+                       (buffer-local-value 'default-directory buffer))))
      ((and (eq ivy-virtual-abbreviate 'full)
            (file-name-directory $left-str))
       (setq right-str (abbreviate-file-name
@@ -216,11 +214,13 @@ for a file to visit if current buffer is not visiting a file."
     ("C-M-j" . ivy-done)))
 
 (defun swiper/dispatch (&optional $arg)
-  (interactive "p")
+  (interactive "P")
   (call-interactively
    (cond
-    ((eq $arg 4) #'swiper-multi)
-    ((eq $arg 16) #'swiper-all)
+    ((equal $arg 0) #'isearch-forward-regexp)
+    ((equal $arg 9) #'isearch-backward-regexp)
+    ((equal $arg '(4)) #'swiper-multi)
+    ((equal $arg '(16)) #'swiper-all)
     (t #'counsel-grep-or-swiper))))
 
 (with-eval-after-load 'counsel
