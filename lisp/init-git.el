@@ -152,7 +152,8 @@
   ("l" . git-link)
   ("c" . git-link-commit)
   ("m" . git-messenger:popup-message)
-  ("g" . magit-status))
+  ("g" . magit-status)
+  ("b" . magit-checkout))
 
 
 (provide 'init-git)

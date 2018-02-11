@@ -2,7 +2,8 @@
  cpp-cquery-base-path "~/program/cquery"
  cpp-cquery-path (expand-file-name "build/release/bin/cquery"
                                    cpp-cquery-base-path)
- cpp-has-cmake-p (executable-find "cmake"))
+ cpp-has-cmake-p (executable-find "cmake")
+ cpp-has-cquery-p (file-exists-p cpp-cquery-base-path))
 
 ;; C/C++ I need stable version
 (require-packages!
@@ -13,7 +14,8 @@
  clang-format
  google-c-style)
 
-(require 'init-cmake)
+(when cpp-has-cmake-p
+  (require 'init-cmake))
 
 (defcustom cpp-setup-literally nil
   "Whether to setup project literally"
@@ -100,11 +102,12 @@
         (message ".cquery created")))))
 
 (defun cpp%cquery-setup ()
-  (unless lsp-mode
-    (condition-case err
-        (lsp-cquery-enable)
-      (error (message "%s" (error-message-string err))))
-    (add-to-list 'company-backends 'company-lsp)))
+  (when cpp-has-cquery-p
+    (unless lsp-mode
+      (condition-case err
+          (lsp-cquery-enable)
+        (error (message "%s" (error-message-string err))))
+      (add-to-list 'company-backends 'company-lsp))))
 
 (defun cpp%common-cc-setup ()
   "Setup shared by all languages (java/groovy/c++ ...)"
@@ -140,12 +143,14 @@
 
 (defun cpp%setup ()
   (if (or (file-remote-p default-directory)
+          (not cpp-has-cmake-p)
+          (not cpp-has-cquery-p)
           (bound-and-true-p cpp-setup-literally)
           (> (buffer-size) core-large-buffer-size))
       (progn
         (ggtags-mode 1)
-        (setq completion-at-point-functions nil)
-        (setq flycheck-clang-language-standard "c++14"))
+        (flycheck-mode -1)
+        (setq completion-at-point-functions nil))
     (when (setq cpp-cmakelists-directory (cpp%locate-cmakelists))
       (cpp%maybe-create-build-directory))
     (if (file-exists-p (cpp%get-cquery-file))

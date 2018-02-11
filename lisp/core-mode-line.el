@@ -149,16 +149,15 @@ and `buffer-file-coding-system'"
       ,(if no-tail? "" '(format-mode-line (mode-line%tail))))))
 
 (defmacro mode-line%compile ()
-  `(byte-compile
-    (defun mode-line%generate ()
-      "Generate mode-line."
-      (setq mode-line-active? (equal (selected-window)
-                                     mode-line--current-window))
-      (unless (bound-and-true-p eldoc-mode-line-string)
-        (cond ,@(mapcar (lambda (config)
-                          (list (car config)
-                                (mode-line%generate-body (cdr config))))
-                        mode-line-config-alist))))))
+  `(defun mode-line%generate ()
+     "Generate mode-line."
+     (setq mode-line-active? (equal (selected-window)
+                                    mode-line--current-window))
+     (unless (bound-and-true-p eldoc-mode-line-string)
+       (cond ,@(mapcar (lambda (config)
+                         (list (car config)
+                               (mode-line%generate-body (cdr config))))
+                       mode-line-config-alist)))))
 
 (mode-line%compile)
 
@@ -176,8 +175,7 @@ and `buffer-file-coding-system'"
   (setq-default mode-line-format mode-line-default-format)
   (setq-default mode-line-buffer-identification '("%b"))
   (setq-default mode-line-misc-info
-                '((vc-mode vc-mode)
-                  (company-mode company-lighter))))
+                '((company-mode company-lighter))))
 
 (provide 'core-mode-line)
 

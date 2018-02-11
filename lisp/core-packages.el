@@ -89,20 +89,25 @@ Archive with high priority will be used when install a package.")
 
 (defmacro require-packages! (&rest pkg-list)
   (declare (indent nil))
-  (let (forms)
+  (let (forms compile-forms)
     (dolist (pkg pkg-list)
-      (push (if (atom pkg)
-                `(require! ',pkg)
-              (let ((when-form (plist-get (cdr pkg) :when))
-                    (form `(require! ',(car pkg)
-                                     ,(plist-get (cdr pkg) :archive)
-                                     ,(plist-get (cdr pkg) :location))))
-                (if when-form
-                    `(if ,when-form ,form)
-                  form)))
-            forms))
+      (if (atom pkg)
+          (progn (push `(require! ',pkg) forms)
+                 (push `(require ',pkg) compile-forms))
+        (let ((when-form (plist-get (cdr pkg) :when))
+              (form `(require! ',(car pkg)
+                               ,(plist-get (cdr pkg) :archive)
+                               ,(plist-get (cdr pkg) :location))))
+          (if when-form
+              (progn
+                (push `(when ,when-form ,form) forms)
+                (push `(when ,when-form (require ',(car pkg))) compile-forms))
+            (push form forms)
+            (push `(require ',(car pkg)) compile-forms)))))
     `(progn
-       ,@(nreverse forms))))
+       ,@(nreverse forms)
+       (eval-when-compile
+         ,@(nreverse compile-forms)))))
 
 (defun core/compile-config (&optional $no-message?)
   (interactive "P")
