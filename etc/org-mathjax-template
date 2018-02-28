@@ -1,46 +1,42 @@
-
 <script type="text/javascript" src="%PATH"></script>
 <script type="text/javascript">
- MathJax.Hub.Config({
-     "HTML-CSS": {
-         scale: %SCALE,
-         linebreaks: { automatic: "%LINEBREAKS" },
-         webFont: "%FONT"
-     },
-     SVG: {
-         scale: %SCALE,
-         linebreaks: { automatic: "%LINEBREAKS" },
-         font: "%FONT"
-     },
-     NativeMML: {scale: %SCALE},
-     TeX: {
-         Macros: {
-             bm: ["{\\boldsymbol #1}",1]
-         },
-         equationNumbers: { autoNumber: "%AUTONUMBER" },
-         MultLineWidth: "%MULTLINEWIDTH",
-         TagSide: "%TAGSIDE",
-         TagIndent: "%TAGINDENT"
-     },
-     // Only one of the two following lines, depending on user settings
-     // First allows browser-native MathML display, second forces HTML/CSS
-     config: ["MMLorHTML.js"], jax: ["input/TeX"],
-     jax: ["input/TeX", "output/HTML-CSS"],
-     extensions: ["tex2jax.js","TeX/AMSmath.js",
-                  "TeX/AMSsymbols.js", "TeX/noUndefined.js"],
-     tex2jax: {
-         inlineMath: [ ["\\(","\\)"] ],
-         displayMath: [ ['$$','$$'], ["\\[","\\]"],
-                        ["\\begin{displaymath}","\\end{displaymath}"] ],
-         skipTags: ["script","noscript","style","textarea"],
-         ignoreClass: "tex2jax_ignore",
-         processEscapes: false,
-         processEnvironments: true,
-         preview: "TeX"
-     },
-     // showProcessingMessages: true,
-     messageStyle: "none",
-     displayAlign: "%ALIGN",
-     displayIndent: "%INDENT"
- });
+<!--/*--><![CDATA[/*><!--*/
+    MathJax.Hub.Config({
+        // Only one of the two following lines, depending on user settings
+        // First allows browser-native MathML display, second forces HTML/CSS
+        :MMLYES: config: ["MMLorHTML.js"], jax: ["input/TeX"],
+        :MMLNO: jax: ["input/TeX", "output/HTML-CSS"],
+        extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js",
+                     "TeX/noUndefined.js"],
+        tex2jax: {
+            inlineMath: [ ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"], ["\\begin{displaymath}","\\end{displaymath}"] ],
+            skipTags: ["script","noscript","style","textarea"],
+            ignoreClass: "tex2jax_ignore",
+            processEscapes: false,
+            processEnvironments: true,
+            preview: "TeX"
+        },
+        showProcessingMessages: false,
+        displayAlign: "%ALIGN",
+        displayIndent: "%INDENT",
+
+        "HTML-CSS": {
+             scale: "%SCALE",
+             availableFonts: ["STIX","TeX"],
+             preferredFont: "TeX",
+             webFont: "TeX",
+             imageFont: "TeX",
+             showMathMenu: true,
+        },
+        MMLorHTML: {
+             prefer: {
+                 MSIE:    "MML",
+                 Firefox: "MML",
+                 Opera:   "HTML",
+                 other:   "HTML"
+             }
+        }
+    });
+/*]]>*///-->
 </script>

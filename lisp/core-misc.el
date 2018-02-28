@@ -1,3 +1,7 @@
+(declare-function browse-url-chrome "browse-url")
+
+
+
 ;; Default prog-mode setup
 (define-hook! core|generic-prog-mode-setup (prog-mode-hook
                                             LaTeX-mode-hook)
@@ -56,14 +60,16 @@
     (with-current-buffer buffer
       (core|setup-buffer-bookmark))))
 
-(with-eval-after-load 'display-line-numbers
-  (setq display-line-numbers-type t)
-  (setq display-line-numbers-widen t))
+;; (with-eval-after-load 'display-line-numbers
+;;   (setq display-line-numbers-type t)
+;;   (setq display-line-numbers-widen t))
 
 (with-eval-after-load 'xref
   (define-key! :map xref--xref-buffer-mode-map
     ("j" . (lambda! () (xref--search-property 'xref-item)))
     ("k" . (lambda! () (xref--search-property 'xref-item t))))
+  (define-hook! xref*xref-buffer-setup (xref--xref-buffer-mode-hook)
+    (toggle-truncate-lines 1))
   (add-to-list 'xref-prompt-for-identifier
                'xref-find-references :append))
 

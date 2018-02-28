@@ -51,6 +51,7 @@
     (when (/= exit-code 0)
       (message "[Warning] Execution failed !!!")
       (with-current-buffer (get-log-buffer)
+        (goto-char (point-max))
         (insert output "\n")
         (basic-save-buffer)))))
 
@@ -77,6 +78,10 @@
         (message "(%s) External tools won't be installed automatically"
                  system-type))
 
+      (message "Remove *.elc in %s ..." (abbreviate-file-name emacs-config-directory))
+      (dolist (elc-file (directory-files-recursively emacs-config-directory
+                                                     "\\.elc$"))
+        (delete-file elc-file))
       ;; Compile all configurations
       (core/compile-config :no-message))
   (error (message "Error: %s" err)))

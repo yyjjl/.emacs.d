@@ -250,7 +250,7 @@ for a file to visit if current buffer is not visiting a file."
     ("g s" . counsel-git-stash)
     ("h" . counsel-minibuffer-history)
     ("m" . counsel-mark-ring)
-    ("a" . counsel-ag)
+    ("a" . counsel-rg)
     ("/" . counsel-grep)
     ("L" . counsel-locate)
     ("f" . counsel-describe-face)
@@ -273,6 +273,9 @@ for a file to visit if current buffer is not visiting a file."
          ;; file names ending with # or ~
          "\\|\\(?:[#~]\\'\\)"))
 
+  (when emacs-has-ripgrep-p
+    (setq counsel-grep-base-command
+          "rg -M 1000 --no-heading --line-number --color never '%s' %s"))
   (ivy-set-actions
    'counsel-find-file
    `(("x"
@@ -282,6 +285,8 @@ for a file to visit if current buffer is not visiting a file."
 
 (with-eval-after-load 'counsel-projectile
   (define-key! :map projectile-command-map
+    ("s s" . counsel-projectile-rg)
+    ("s a" . counsel-projectile-ag)
     ("p" . counsel-projectile)
     ("k" . counsel-projectile-kill-buffer)
     ("K" . projectile-kill-buffers)

@@ -9,6 +9,7 @@
   '(help-mode
     completion-list-mode
     messages-buffer-mode
+    compilation-mode
     profiler-report-mode))
 
 (defvar core--shackle-help-mode-regexp
@@ -16,8 +17,7 @@
     (concat "^"
             (regexp-opt '("*Compile-Log*"
                           "*sdcv*"
-                          "*lispy-message*"
-                          "*compilation*"))
+                          "*lispy-message*"))
             "\\|\\*.*?Help.*?\\*"
             "$")))
 
@@ -143,8 +143,10 @@
   (let ((case-fold-search t)
         (buffer-name (buffer-name $buffer))
         (mode (buffer-local-value 'major-mode $buffer)))
-    (or (memq mode core--shackle-help-modes)
-        (string-match-p core--shackle-help-mode-regexp buffer-name))))
+    (or (with-current-buffer $buffer
+          (and (not (string-prefix-p "ivy-occur" (symbol-name major-mode)))
+               (apply #'derived-mode-p core--shackle-help-modes)))
+     (string-match-p core--shackle-help-mode-regexp buffer-name))))
 
 (with-eval-after-load 'shackle
   (defvar shackle-mode-map (make-sparse-keymap))

@@ -18,7 +18,7 @@
 (defvar cpp--cmake-process nil)
 
 (defconst cpp--cquery-default-template
-  "# Driver\ng++\n\n# Language\n-std=c++14\n\n# Includes")
+  "%gcc\n%c -std=gnu11\n%cpp -std=c++14\n\n# Includes")
 
 
 
@@ -134,6 +134,7 @@
                               (funcall func))))))
 
 (with-eval-after-load 'cmake-mode
+  (define-key cmake-mode-map [f10] 'compile)
   (add-hook 'cmake-mode-hook
             (lambda ()
               (font-lock-mode 1)

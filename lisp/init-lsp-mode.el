@@ -19,15 +19,9 @@
   (define-key!
     ("M-s h h" . lsp-symbol-highlight)
     ("C-c r" . lsp-rename)
+    ("C-c C-d" . lsp/show-doc-at-point)
     ("C-c ." . lsp-info-under-point)
     ("C-c C-SPC" . lsp-execute-code-action))
-
-  (define-hook! lsp|after-initialize (lsp-after-initialize-hook)
-    (when lsp--cur-workspace
-      (when-let* ((client (lsp--workspace-client lsp--cur-workspace))
-                  (stderr (lsp--client-stderr client))
-                  (proc (get-buffer-process stderr)))
-        (set-process-query-on-exit-flag proc nil))))
 
   (defun lsp%flycheck-check ()
     (when (and flycheck-mode
@@ -68,7 +62,63 @@
           (-when-let (bounds (bounds-of-thing-at-point 'symbol))
             (lsp--move-code-action-overlay (car bounds)
                                            (cdr bounds)
-                                           buf)))))))
+                                           buf))))))
+
+  (defun lsp%get-hover-string (hover
+                               renderers
+                               &optional full-content-p)
+    (when-let* ((contents (gethash "contents" hover)))
+      ;; contents: MarkedString | MarkedString[] | MarkupContent
+      (if (lsp--markup-content-p contents)
+          (when full-content-p
+            (lsp--render-markup-content hover))
+        (let ((content-list (if (listp contents) contents (list contents))))
+          (unless full-content-p
+            (setq content-list (--filter (hash-table-p it) content-list)))
+          (mapconcat (lambda (e)
+                       (let (renderer)
+                         (if (hash-table-p e)
+                             (if (setq renderer
+                                       (cdr (assoc-string
+                                             (gethash "language" e)
+                                             renderers)))
+                                 (when (gethash "value" e nil)
+                                   (funcall renderer (gethash "value" e)))
+                               (gethash "value" e))
+                           e)))
+                     content-list
+                     (if full-content-p "\n\n" "\n"))))))
+
+  (defun lsp/show-doc-at-point ()
+    (interactive)
+    (lsp--cur-workspace-check)
+    (let* ((client (lsp--workspace-client lsp--cur-workspace))
+           (renderers (lsp--client-string-renderers client)))
+      (when-let* ((bounds (bounds-of-thing-at-point 'symbol))
+                  (hover (lsp--send-request
+                          (lsp--make-request
+                           "textDocument/hover"
+                           (lsp--text-document-position-params))))
+                  (contents (gethash "contents" hover))
+                  (buffer (get-buffer-create "*lsp-doc*"))
+                  (msg (lsp%get-hover-string hover renderers :full-content)))
+        (with-current-buffer buffer
+          (setq buffer-read-only nil)
+          (erase-buffer)
+          (insert msg)
+          (help-mode))
+        (pop-to-buffer buffer))))
+
+  (defun lsp--make-hover-callback (renderers start end buffer)
+    (lambda (hover)
+      (with-current-buffer buffer
+        (setq lsp--cur-hover-request-id nil))
+      (when (and hover
+                 (lsp--point-is-within-bounds-p start end)
+                 (eq (current-buffer) buffer) (eldoc-display-message-p))
+        (when-let* ((contents (gethash "contents" hover))
+                    (msg (lsp%get-hover-string hover renderers)))
+          (eldoc-message msg))))))
 
 (with-eval-after-load 'company-lsp
   (setq company-lsp-async t))

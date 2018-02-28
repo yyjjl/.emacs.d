@@ -1,11 +1,10 @@
 (setvar!
- cpp-cquery-base-path "~/program/cquery"
+ cpp-cquery-base-path (expand-var! "cquery")
  cpp-cquery-path (expand-file-name "build/release/bin/cquery"
                                    cpp-cquery-base-path)
  cpp-has-cmake-p (executable-find "cmake")
  cpp-has-cquery-p (file-exists-p cpp-cquery-base-path))
 
-;; C/C++ I need stable version
 (require-packages!
  (ggtags :when tags-has-gtags-p)
  lsp-mode
@@ -107,6 +106,8 @@
       (condition-case err
           (lsp-cquery-enable)
         (error (message "%s" (error-message-string err))))
+      (setq-local company-transformers nil)
+      (setq-local company-lsp-cache-candidates nil)
       (add-to-list 'company-backends 'company-lsp))))
 
 (defun cpp%common-cc-setup ()
@@ -142,9 +143,9 @@
     (font-lock-add-keywords nil cpp--font-lock-keywords)))
 
 (defun cpp%setup ()
-  (if (or (file-remote-p default-directory)
-          (not cpp-has-cmake-p)
+  (if (or (not cpp-has-cmake-p)
           (not cpp-has-cquery-p)
+          (file-remote-p default-directory)
           (bound-and-true-p cpp-setup-literally)
           (> (buffer-size) core-large-buffer-size))
       (progn
@@ -308,37 +309,34 @@
     ("C-c d" . cpp/cmake-edit-option)
     ("C-c C-c" . cpp/run-cmake)
     ("M-s l" . cquery-code-lens-mode)
-    ("M-s c" . cquery-call-tree)
+    ("M-s c" . cquery-call-hierarchy)
+    ("M-s m" . cquery-member-hierarchy)
+    ("M-s i" . cquery-inheritance-hierarchy)
     ([f9] . cpp/run-cmake)
     ([f10] . cpp/compile)
     ([f5] . cpp/gdb))
   (define-key c++-mode-map (kbd "C-c j") cpp-cquery-jump-map))
 
-(with-eval-after-load 'cmake-mode
-  (define-key cmake-mode-map [f10] 'compile))
-
-(setq cquery-extra-args '("--language-server"))
 (with-eval-after-load 'cquery
-  ;; need to register snippet capability
+  ;; Need to register snippet capability
   (require 'company-lsp)
 
   (push 'c++-mode (get 'lsp 'flycheck-modes))
   (push 'c-mode (get 'lsp 'flycheck-modes))
-  (setq cquery-executable cpp-cquery-path
-        cquery-extra-init-params '(:index (:comments 2 :builtinTypes t)
-                                          :cacheFormat "msgpack"))
+  (setq cquery-executable cpp-cquery-path)
+  (setq cquery-extra-init-params
+        '(:index (:comments 2) :cacheFormat "msgpack" :completion (:detailedLabel t)))
   (setq cquery-sem-highlight-method nil))
 
 (with-eval-after-load 'cquery-tree
-  (defun cpp*call-tree-open-hack (&rest args)
-    (setq mode-line-format mode-line-default-format))
-  (advice-add 'cquery-call-tree--open :after #'cpp*call-tree-open-hack)
-
-  (define-key! :map cquery-call-tree-mode-map
-    ("v" . cquery-call-tree-look)
-    ("o" . cquery-call-tree-look)
-    ("." . cquery-call-tree-expand-or-set-root)
-    ("^" . cquery-call-tree-collapse-or-select-parent)
+  (add-hook 'cquery-tree-mode-hook
+            (lambda ()
+              (toggle-truncate-lines 1)))
+  (define-key! :map cquery-tree-mode-map
+    ("v" . cquery-tree-look)
+    ("o" . cquery-tree-look)
+    ("." . cquery-tree-expand-or-set-root)
+    ("^" . cquery-tree-collapse-or-select-parent)
     ("j" . next-line)
     ("k" . previous-line)))
 

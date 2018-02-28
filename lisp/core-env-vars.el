@@ -41,6 +41,8 @@
  ;; In order to use `emms' package, you need a music player
  emacs-has-mpv-p (executable-find "mplayer")
 
+ emacs-has-ripgrep-p (executable-find "rg")
+
  ;; Whether has `git'
  git-has-git-p (executable-find "git")
 
