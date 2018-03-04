@@ -55,6 +55,6 @@
  tags-has-gtags-p (executable-find "global")
 
  ;; Whether to use latex packages
- latex-use-latex-p t)
+ latex-use-latex-p (executable-find "xelatex"))
 
 (provide 'core-env-vars)

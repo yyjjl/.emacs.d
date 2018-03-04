@@ -1,4 +1,7 @@
 (require-packages!
+ calc
+ whitespace
+
  restclient
  company-restclient
  markdown-mode
@@ -23,7 +26,7 @@
 ;; pulse
 (setq pulse-delay 0.01)
 ;; csv
-(setq csv-separators '(", " ";" "|" " "))
+(setq csv-separators '("," ";" "|" " "))
 
 (defalias 'perl-mode 'cperl-mode)
 

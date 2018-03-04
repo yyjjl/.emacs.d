@@ -77,14 +77,6 @@
                           (call-interactively (cdr command)))
                 :history 'rust-cargo-history))))
 
-(defun rust%term-sentinel (proc msg)
-  (term-sentinel proc msg)
-  (when (eq (process-status proc) 'exit)
-    (with-current-buffer (process-buffer proc)
-      (insert "Press Ctrl-d kill buffer ")
-      (setq buffer-read-only t)
-      (local-set-key (kbd "C-d") (lambda! (kill-buffer))))))
-
 (defun rust/cargo-run ()
   (interactive)
   (let* ((project-root (or (cargo-process--project-root)
@@ -98,8 +90,7 @@
                      'term-mode))
       (set-rust-backtrace "cargo run")
       (kill-buffer buffer)
-      (setq buffer (term/exec-program "cargo" '("run") buffer-name
-                                      #'rust%term-sentinel)))
+      (setq buffer (term/exec-program "cargo" '("run") buffer-name)))
     (pop-to-buffer buffer)))
 
 (with-eval-after-load 'rust-mode

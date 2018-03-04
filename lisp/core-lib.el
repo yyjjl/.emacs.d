@@ -114,11 +114,14 @@ $ARGS should be the form of (:map map :prefix prefix-key key-definitions ...)"
       (let ((key (car arg))
             (func (cdr arg)))
         (push (list 'define-key sym
-                    (if (vectorp key)
-                        key
-                      (kbd (concat prefix " " key)))
+                    (if (stringp key)
+                        (kbd (concat prefix " " key))
+                      key)
                     (cond ((eq func nil) nil)
                           ((symbolp func) `(function ,func))
+                          ((and (listp func)
+                                (eq (car func) :map))
+                           (cadr func))
                           (t func)))
               forms)))
     `(let ((,sym ,map))

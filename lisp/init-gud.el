@@ -1,3 +1,5 @@
+(require-packages! gud gdb-mi)
+
 (defvar gdb--info-window nil)
 (defvar gud--window-configuration nil)
 (defvar-local gud--source-buffer-status nil)

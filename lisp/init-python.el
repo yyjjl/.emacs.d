@@ -4,6 +4,7 @@
 
 (require-packages!
  (elpy :archive "melpa-stable")
+ gud
  py-isort)
 
 

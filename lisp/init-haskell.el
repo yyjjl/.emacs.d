@@ -44,6 +44,7 @@
 
 (with-eval-after-load 'haskell-mode
   (require 'haskell-indent)
+  (require 'haskell-debug)
 
   (setq
    ;; Use notify.el (if you have it installed) at the end of running

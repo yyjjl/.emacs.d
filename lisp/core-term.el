@@ -28,11 +28,21 @@
           (let ((buffer (process-buffer $proc)))
             (kill-buffer buffer))))))
 
+(defun term%default-sentinel (proc msg)
+  (term-sentinel proc msg)
+  (when (eq (process-status proc) 'exit)
+    (with-current-buffer (process-buffer proc)
+      (insert (propertize "Press `Ctrl-D' or `q' to kill this buffer. "
+                          'font-lock-face 'font-lock-comment-face))
+      (setq buffer-read-only t)
+      (local-set-key (kbd "C-d") (lambda! (kill-buffer)))
+      (local-set-key (kbd "q") (lambda! (kill-buffer))))))
+
 (defun term/exec-program ($program $args &optional $name $sentinel)
   (unless (featurep 'term)
     (require 'term))
   (unless $sentinel
-    (setq $sentinel (term/wrap-sentinel #'term-sentinel)))
+    (setq $sentinel 'term%default-sentinel))
   (unless $name
     (setq $name (term/get-buffer-name
                  (concat "*" (file-name-nondirectory $program) "<%s>*"))))

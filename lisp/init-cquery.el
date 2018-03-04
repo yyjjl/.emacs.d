@@ -7,6 +7,7 @@
 
 (require-packages!
  (ggtags :when tags-has-gtags-p)
+ ht
  lsp-mode
  company-lsp
  cquery
@@ -15,6 +16,11 @@
 
 (when cpp-has-cmake-p
   (require 'init-cmake))
+
+(defface cpp-variable-face
+  `((t :foreground ,(face-attribute 'default :foreground)))
+  "Face for variables"
+  :group 'cquery-sem)
 
 (defcustom cpp-setup-literally nil
   "Whether to setup project literally"
@@ -43,12 +49,6 @@
        . font-lock-type-face)
       (,(concat "\\<" (regexp-opt '("NULL" "nullptr" "false" "true")) "\\>")
        . font-lock-constant-face))))
-
-(custom-theme-set-faces
- 'doom-molokai
- '(cquery-sem-free-var-face ((t (:inherit default))))
- '(cquery-sem-member-var-face
-   ((t (:weight bold :inherit default)))))
 
 
 
@@ -302,6 +302,7 @@
     ("M-p" . flycheck-previous-error))
 
   (define-key! :map c++-mode-map
+    ("C-c C-d")
     ("C-c b" . clang-format-buffer)
     ("C-c C-b" . clang-format-buffer)
     ("C-c C-l" . cpp/load-file-in-root)
@@ -312,29 +313,33 @@
     ("M-s c" . cquery-call-hierarchy)
     ("M-s m" . cquery-member-hierarchy)
     ("M-s i" . cquery-inheritance-hierarchy)
+    ("C-c j" :map cpp-cquery-jump-map)
     ([f9] . cpp/run-cmake)
     ([f10] . cpp/compile)
-    ([f5] . cpp/gdb))
-  (define-key c++-mode-map (kbd "C-c j") cpp-cquery-jump-map))
+    ([f5] . cpp/gdb)))
 
 (with-eval-after-load 'cquery
   ;; Need to register snippet capability
   (require 'company-lsp)
+  (require 'cquery-semantic-highlighting)
+
+  (aset cquery-sem-macro-faces 0 'font-lock-builtin-face)
+  (aset cquery-sem-variable-faces 0 'cpp-variable-face)
 
   (push 'c++-mode (get 'lsp 'flycheck-modes))
   (push 'c-mode (get 'lsp 'flycheck-modes))
   (setq cquery-executable cpp-cquery-path)
   (setq cquery-extra-init-params
-        '(:index (:comments 2) :cacheFormat "msgpack" :completion (:detailedLabel t)))
-  (setq cquery-sem-highlight-method nil))
+        '(:index (:comments 2)
+                 :cacheFormat "msgpack" :completion (:detailedLabel t)))
+  (setq cquery-sem-highlight-method 'font-lock))
 
 (with-eval-after-load 'cquery-tree
   (add-hook 'cquery-tree-mode-hook
             (lambda ()
               (toggle-truncate-lines 1)))
   (define-key! :map cquery-tree-mode-map
-    ("v" . cquery-tree-look)
-    ("o" . cquery-tree-look)
+    ("o" . cquery-tree-press)
     ("." . cquery-tree-expand-or-set-root)
     ("^" . cquery-tree-collapse-or-select-parent)
     ("j" . next-line)

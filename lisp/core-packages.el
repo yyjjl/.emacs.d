@@ -94,22 +94,33 @@ Archive with high priority will be used when install a package.")
       (if (atom pkg)
           (progn (push `(require! ',pkg) forms)
                  (push `(require ',pkg) compile-forms))
-        (let ((when-form (plist-get (cdr pkg) :when))
-              (form `(require! ',(car pkg)
-                               ,(plist-get (cdr pkg) :archive)
-                               ,(plist-get (cdr pkg) :location))))
+        (let* ((when-form (plist-get (cdr pkg) :when))
+               (form `(require! ',(car pkg)
+                                ,(plist-get (cdr pkg) :archive)
+                                ,(plist-get (cdr pkg) :location)))
+               (pkgs-required-when-compile (or (plist-get (cdr pkg) :compile)
+                                               (list (car pkg))))
+               (compile-form (mapcar (lambda (x)
+                                       `(require ',x))
+                                     pkgs-required-when-compile)))
           (if when-form
               (progn
                 (push `(when ,when-form ,form) forms)
-                (push `(when ,when-form (require ',(car pkg))) compile-forms))
+                (push `(when ,when-form ,@compile-form) compile-forms))
             (push form forms)
-            (push `(require ',(car pkg)) compile-forms)))))
+            (setq compile-forms
+                  (nconc (nreverse compile-form) compile-forms))))))
     `(progn
        ,@(nreverse forms)
        (eval-when-compile
          ,@(nreverse compile-forms)))))
 
-(defun core/compile-config (&optional $no-message?)
+(defun package/compile-elpa-packages (&optional $no-message?)
+  (interactive)
+  (let ((inhibit-message $no-message?))
+    (byte-recompile-directory package-user-dir nil :force)))
+
+(defun package/compile-config (&optional $no-message?)
   (interactive "P")
   (message "Compile configuration files ...")
   (dolist (file (append

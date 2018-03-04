@@ -1,3 +1,9 @@
+(require-packages!
+ ispell
+ flyspell)
+
+
+
 (cond
  (spelling-has-aspell-p
   (setq ispell-program-name "aspell"))

@@ -1,6 +1,6 @@
 
 (require-packages!
- auctex
+ (auctex :compile (latex tex preview reftex))
  company-auctex)
 
 
@@ -113,8 +113,9 @@
     ("d" . TeX-fold-dwim) ("C-o")
     ("P" . TeX-fold-paragraph) ("C-p")
     ("R" . TeX-fold-region) ("C-r"))
-  (define-key LaTeX-mode-map (kbd "C-c t") org-table-extra-map)
+
   (define-key! :map LaTeX-mode-map
+    ("C-c t" :map org-table-extra-map)
     ("}" . latex/skip-close-pair)
     (")" . latex/skip-close-pair)
     ("]" . latex/skip-close-pair)
@@ -130,8 +131,8 @@
     ("C-c x i" . latex/font-italic)
     ("C-c x c" . latex/font-clear)
     ("C-c x C" . latex/font-calligraphic)
-    ("C-c x s m" . latex/font-small)
-    ("C-c x s a" . latex/font-sans)
+    ("C-c x s m" . latex/font-small-caps)
+    ("C-c x s a" . latex/font-sans-serif)
     ("C-c x n" . latex/font-normal)
     ("C-c x s e" . latex/font-serif)
     ("C-c x o" . latex/font-oblique)
@@ -148,25 +149,23 @@
   (set-face-background 'preview-reference-face
                        (face-attribute 'default :background))
   (setq preview-map
-        (let ((map (make-sparse-keymap)))
-          (define-key! :map map
-            ("p" . preview-at-point)
-            ("M-p" . preview-at-point)
-            ("r" . preview-region)
-            ("b" . preview-buffer)
-            ("d" . preview-document)
-            ("f" . preview-cache-preamble)
-            ("i" . preview-goto-info-page)
-            ("e" . preview-environment)
-            ("s" . preview-section)
-            ("w" . preview-copy-region-as-mml)
-            ("F" . preview-cache-preamble-off)
-            ("P" . preview-clearout-at-point)
-            ("R" . preview-clearout)
-            ("S" . preview-clearout-section)
-            ("B" . preview-clearout-buffer)
-            ("D" . preview-clearout-document))
-          map))
+        (define-key! :map (make-sparse-keymap)
+          ("p" . preview-at-point)
+          ("M-p" . preview-at-point)
+          ("r" . preview-region)
+          ("b" . preview-buffer)
+          ("d" . preview-document)
+          ("f" . preview-cache-preamble)
+          ("i" . preview-goto-info-page)
+          ("e" . preview-environment)
+          ("s" . preview-section)
+          ("w" . preview-copy-region-as-mml)
+          ("F" . preview-cache-preamble-off)
+          ("P" . preview-clearout-at-point)
+          ("R" . preview-clearout)
+          ("S" . preview-clearout-section)
+          ("B" . preview-clearout-buffer)
+          ("D" . preview-clearout-document)))
   (define-key LaTeX-mode-map (kbd "M-p") preview-map))
 
 (with-eval-after-load 'reftex

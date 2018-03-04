@@ -3,11 +3,11 @@
 
 
 (with-eval-after-load 'ggtags
-  (setq ggtags-mode-prefix-key "\C-cg"
-        ;; Set `ggtags-highlight-tag' to t make iedit fail to update
-        ;; candidates
-        ggtags-highlight-tag nil
-        ggtags-mode-prefix-map
+  (setq ggtags-mode-prefix-key "\C-cg")
+  ;; Set `ggtags-highlight-tag' to t make iedit fail to update
+   ;; candidates
+  (setq ggtags-highlight-tag nil)
+  (setq ggtags-mode-prefix-map
         (define-key! :map (make-sparse-keymap)
           ("D" . ggtags-delete-tags)
           ("p" . ggtags-prev-mark)
@@ -23,8 +23,11 @@
           ("/" . ggtags-view-search-history)
           ("SPC" . ggtags-save-to-register)
           ("%" . ggtags-query-replace)))
-  (define-key ggtags-mode-map "\C-c" nil)
-  (define-key ggtags-mode-map (kbd "M-]") nil)
-  (define-key ggtags-mode-map ggtags-mode-prefix-key ggtags-mode-prefix-map))
+  (define-key! :map ggtags-mode-map
+    ("C-c")
+    ("M-]")
+    ("M-?" . ggtags-find-reference)
+    ("C-M-." . ggtags-find-tag-regexp)
+    (ggtags-mode-prefix-key :map ggtags-mode-prefix-map)))
 
 (provide 'init-tags)

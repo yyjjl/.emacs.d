@@ -1,5 +1,5 @@
 (require-packages!
- org
+ (org :compile (org ob ox-html org-table))
  ;; IPython notebook feature in `org-mode'
  ob-ipython
  ;; Export colorful src block in `org-mode'

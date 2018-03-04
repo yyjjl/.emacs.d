@@ -49,11 +49,28 @@
 
 (defun core/enable-semantic ()
   (semantic-mode 1)
-  (remove-hook 'completion-at-point-functions
-               'semantic-analyze-completion-at-point-function)
-  (remove-hook 'completion-at-point-functions
-               'semantic-analyze-notc-completion-at-point-function)
-  (remove-hook 'completion-at-point-functions
-               'semantic-analyze-nolongprefix-completion-at-point-function))
+  (core/toggle-semantic-completion :no-message))
+
+(defun core/toggle-semantic-completion (&optional $no-message-p)
+  (interactive)
+  (if (--some (string-prefix-p "semantic-" (symbol-name it))
+              (default-value 'completion-at-point-functions))
+      (progn
+        (unless $no-message-p
+          (message "Remove semantic-* from `completion-at-point-functions'"))
+        (remove-hook 'completion-at-point-functions
+                     'semantic-analyze-completion-at-point-function)
+        (remove-hook 'completion-at-point-functions
+                     'semantic-analyze-notc-completion-at-point-function)
+        (remove-hook 'completion-at-point-functions
+                     'semantic-analyze-nolongprefix-completion-at-point-function))
+    (unless $no-message-p
+      (message "Add semantic-* to `completion-at-point-functions'"))
+    (add-hook 'completion-at-point-functions
+              'semantic-analyze-nolongprefix-completion-at-point-function)
+    (add-hook 'completion-at-point-functions
+              'semantic-analyze-notc-completion-at-point-function)
+    (add-hook 'completion-at-point-functions
+              'semantic-analyze-completion-at-point-function)))
 
 (provide 'core-semantic)
