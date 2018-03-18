@@ -51,9 +51,9 @@
    (t nil)))
 
 (defun cpp%maybe-create-build-directory ()
-  (setq cpp-build-directory
-        (expand-file-name (or cpp-build-directory "build")
-                          cpp-cmakelists-directory))
+  (setq-local cpp-build-directory
+              (expand-file-name (or cpp-build-directory "build")
+                                cpp-cmakelists-directory))
   (or (file-exists-p cpp-build-directory)
       (make-directory cpp-build-directory)))
 

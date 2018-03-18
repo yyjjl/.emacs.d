@@ -137,7 +137,8 @@
         (mode (buffer-local-value 'major-mode $buffer)))
     (or (derived-mode? 'comint-mode $buffer)
         (memq mode core--shackle-comint-modes)
-        (string-match-p "^\\*.*repl.*\\*$" buffer-name))))
+        (string-match-p "^\\*.*repl.*\\*$" buffer-name)
+        (string-match-p "^\\*shell\\*" buffer-name))))
 
 (defun core--shackle%help-mode-matcher ($buffer)
   (let ((case-fold-search t)

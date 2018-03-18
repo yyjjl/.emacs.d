@@ -181,13 +181,14 @@ With a prefix BELOW move point to lower block."
    'append)
 
   (setq org-structure-template-alist
-      (--map (list (car it) (downcase (cadr it)))
-             org-structure-template-alist))
-  (setq org-entities
-        (append
-         '(("rangle" "\\rangle" t "\\rangle" "\\rangle" "\\rangle" "❭")
-           ("langle" "\\langle" t "\\langle" "\\langle" "\\langle" "❬"))
-         org-entities))
+        (--map (list (car it) (downcase (cadr it)))
+               org-structure-template-alist))
+  (setq org-entities-user
+        '(("rangle" "\\rangle" t "&rangle;" "rangle" "rangle" "❭")
+          ("langle" "\\langle" t "&langle;" "langle" "langle" "❬")
+          ("doteq" "\\doteq" t "&doteq;" "doteq" "doteq" "≐")
+          ("lessdot" "\\lessdot" t "&lessdot;" "lessdot" "lessdot" "⋖")
+          ("gtrdot" "\\gtrdot" t "&gtrdot;" "gtrdot" "gtrdot" "⋗")))
 
   (org-babel-do-load-languages 'org-babel-load-languages
                                '((ipython . t)
@@ -323,8 +324,6 @@ With a prefix BELOW move point to lower block."
     ("C-c C-t" . org-todo)))
 
 (with-eval-after-load 'ox-html
-  ;; Org-mode 9.1
-  (setq org-html-keep-old-src t)
   (defun org*html-export-with-line-number ($fn &rest $rest)
     (when (= (length $rest) 5)
       (let ((num-start (nth 4 $rest)))
@@ -335,7 +334,11 @@ With a prefix BELOW move point to lower block."
 
   ;; (advice-add 'org-html-do-format-code
   ;;             :around #'org*html-export-with-line-number)
-  )
+  (setq org-html-mathjax-template (eval-when-compile
+                                    (read-file-content!
+                                     (expand-etc! "org-mathjax-template"))))
+  (setcdr (assoc 'scale org-html-mathjax-options) '("90"))
+  (setcdr (assoc 'align org-html-mathjax-options) '("center")))
 
 (with-eval-after-load 'ox-latex
   (add-to-list 'org-latex-minted-langs '(ipython "python"))
@@ -354,9 +357,10 @@ With a prefix BELOW move point to lower block."
           ("" "graphicx,psfrag,epsfig" t)
           ("" "minted" nil)
           ("" "mdframed" nil)
-          ("" "amsmath,amsfonts,amssymb,amsthm,bm,upgreek" t)
+          ("" "amsmath, amsfonts, amssymb, amsthm, bm, upgreek" t)
           ("mathscr" "eucal" t)
-          ("" "geometry" t)))
+          ("" "geometry" t)
+          ("" "tcolorbox" t)))
   (let ((common (read-file-content!
                  (expand-file-name "common" org-template-directory))))
     (add-to-list 'org-latex-classes

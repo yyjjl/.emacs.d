@@ -35,7 +35,7 @@
   (define-key! :map elpy-mode-map
     ("C-c C-n" . nil)
     ("C-c C-p" . nil)
-    ("C-c b" . elpy-autopep8-fix-code)
+    ("C-c b" . elpy-yapf-fix-code)
     ("C-c B" . py-isort-buffer)
     ("C-c M-d" . python/generate-doc-at-point)
     ("M-i" . python/multiedit-symbol-at-point))

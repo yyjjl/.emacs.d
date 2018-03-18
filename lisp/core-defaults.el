@@ -178,9 +178,15 @@
 ;; ANSI-escape coloring in compilation-mode
 (setq compilation-environment '("TERM=xterm-256color"))
 (require 'ansi-color)
-(define-hook! core/colorize-compilation-buffer (compilation-filter-hook)
+(define-hook! core|colorize-compilation-buffer (compilation-filter-hook)
   (when (eq major-mode 'compilation-mode)
     (ansi-color-apply-on-region compilation-filter-start (point-max))))
+
+(define-hook! (core|compilation-finish-hook buffer msg)
+  (compilation-finish-functions)
+  (with-current-buffer buffer
+    (unless (eq major-mode 'compilation-mode)
+      (compilation-mode))))
 
 (defun core*desktop-save-unless-loaded ($fn &rest $args)
   (if (or (called-interactively-p 'interactive)

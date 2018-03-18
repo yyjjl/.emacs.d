@@ -43,7 +43,8 @@ Use `scan-lists', otherwise use simple algorithm."
 
 (defun core%surround-mark ()
   (setq core--suround-origin-pos nil)
-  (let ((from-pair (core%surround-get-pair (read-char))))
+  (let ((from-pair (and (not (region-active-p))
+                        (core%surround-get-pair (read-char)))))
     (when-let ((pos (and (not (region-active-p))
                          (core%surround-get-bounds (car from-pair)
                                                    (cdr from-pair)))))

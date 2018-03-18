@@ -32,6 +32,9 @@
  '(hl-sexp-face ((t (:background "gray7"))))
  '(hl-line ((t (:background "gray17"))))
 
+ '(org-meta-line ((t :inherit font-lock-doc-face)))
+ '(org-document-info-keyword ((t :inherit font-lock-builtin-face)))
+
  '(flycheck-error ((t (:underline (:style wave :color "#e74c3c")))))
  '(flycheck-info ((t (:underline (:style wave :color "#b6e63e")))))
  '(flycheck-warning ((t (:underline (:style wave :color "#e2c770")))))

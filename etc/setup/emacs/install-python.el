@@ -10,4 +10,4 @@
     "flake8"
     "jupyter-console"))
 
-(apply #'run-command "pip3" "install" "--user" python-extrenal-packages)
+(apply #'run-program "pip3" "install" "--user" python-extrenal-packages)

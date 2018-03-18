@@ -7,7 +7,6 @@
 
 (require-packages!
  (ggtags :when tags-has-gtags-p)
- ht
  lsp-mode
  company-lsp
  cquery
@@ -234,27 +233,6 @@
   (let ((default-directory directory))
     (call-interactively #'gdb)))
 
-(defun cpp/lsp-restart ()
-  (interactive)
-  (-when-let* ((buffers (and lsp-mode
-                             lsp--cur-workspace
-                             (lsp--workspace-buffers lsp--cur-workspace)))
-               (proc (lsp--workspace-proc lsp--cur-workspace)))
-    (when (and (process-live-p proc)
-               (or (y-or-n-p "LSP server is already running kill it? ")
-                   (error "LSP server must be killed !!!")))
-      (ignore-errors (lsp--shutdown-cur-workspace))
-      (sit-for 1))
-    (dolist (buffer buffers)
-      (with-current-buffer buffer
-        (when (and lsp--cur-workspace
-                   (not (process-live-p
-                         (lsp--workspace-proc lsp--cur-workspace))))
-          (setq lsp--cur-workspace nil)
-          (lsp--unset-variables))
-        (lsp-mode -1)
-        (lsp-cquery-enable)))))
-
 (defun cpp/electric-star ($arg)
   (interactive "*P")
   (if (eq (char-before) ?\/)
@@ -299,7 +277,8 @@
     ("C-c C-j" . semantic-ia-fast-jump)
     ("C-c C-v" . semantic-decoration-include-visit)
     ("M-n" . flycheck-next-error)
-    ("M-p" . flycheck-previous-error))
+    ("M-p" . flycheck-previous-error)
+    ("C-M-i" . counsel-company))
 
   (define-key! :map c++-mode-map
     ("C-c C-d")

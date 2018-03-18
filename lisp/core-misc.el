@@ -92,6 +92,8 @@
 
 (put 'projectile-project-run-cmd 'safe-local-variable #'stringp)
 (put 'projectile-project-test-cmd 'safe-local-variable #'stringp)
+(put 'projectile-project-compilation-cmd 'safe-local-variable #'stringp)
+(put 'projectile-project-configure-cmd 'safe-local-variable #'stringp)
 (setq projectile-keymap-prefix (kbd "C-x p"))
 (with-eval-after-load 'projectile
   ;; (setq projectile-mode-line
@@ -350,6 +352,7 @@ Does not indent buffer, because it is used for a
   ("C-c <tab>" . company-complete)
   ([f6] . core/toggle-company-ispell)
   ([f7] . core/create-scratch-buffer)
+  ([f10] . compile)
   ("C-<up>" . text-scale-increase)
   ("C-<down>" . text-scale-decrease)
 
