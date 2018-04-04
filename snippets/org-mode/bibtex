@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: bib
+# key: bib
+# --
+#+BIBLIOGRAPHY: ${1:references} \string~/.emacs.d/etc/acl_natbib.bst
+$0

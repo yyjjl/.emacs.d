@@ -59,9 +59,11 @@
                                    "\n" :omit-nulls " \t"))
             option)
         (while (setq option (pop content))
-          (if (string-prefix-p "# " option)
-              (when (string-match-p "^#\s+Driver" option)
-                (setq driver (pop content)))
+          (if (string-prefix-p "%" option)
+              (if (or (string-match "^%cpp +\\(.+\\)" option)
+                      (string-match "^%c +\\(.+\\)" option))
+                  (push (match-string 1 option) options)
+                (setq driver (s-trim (substring option 1))))
             (push option options)))))
     (cons (or driver "g++") options)))
 
@@ -107,7 +109,8 @@
         (error (message "%s" (error-message-string err))))
       (setq-local company-transformers nil)
       (setq-local company-lsp-cache-candidates nil)
-      (add-to-list 'company-backends 'company-lsp))))
+      (add-to-list 'company-backends 'company-lsp)
+      (add-to-list 'company-backends 'company-files))))
 
 (defun cpp%common-cc-setup ()
   "Setup shared by all languages (java/groovy/c++ ...)"
@@ -198,15 +201,13 @@
                (process-live-p proc)
                (eq (buffer-local-value 'major-mode buffer)
                    'term-mode))
-          (progn
-            (with-current-buffer buffer
-              (term-send-raw-string (format ".X %s\n" file))))
+          (with-current-buffer buffer
+            (term-send-raw-string (format ".X %s\n" file)))
         (kill-buffer buffer)
-        (setq buffer
-              (term/exec-program "root"
-                                 (list "-l" (or file ""))
-                                 buffer-name)))
-      (pop-to-buffer buffer)))))
+        (setq buffer (term/exec-program "root"
+                                        (list "-l" (or file ""))
+                                        buffer-name)))
+      (term%pop-to-buffer buffer)))))
 
 (defun cpp/compile ()
   (interactive)
@@ -311,7 +312,8 @@
   (setq cquery-extra-init-params
         '(:index (:comments 2)
                  :cacheFormat "msgpack" :completion (:detailedLabel t)))
-  (setq cquery-sem-highlight-method 'font-lock))
+  ;; (setq cquery-sem-highlight-method 'font-lock)
+  (setq cquery-sem-highlight-method nil))
 
 (with-eval-after-load 'cquery-tree
   (add-hook 'cquery-tree-mode-hook

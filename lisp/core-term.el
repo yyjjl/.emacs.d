@@ -30,7 +30,7 @@
 
 (defun term%default-sentinel (proc msg)
   (term-sentinel proc msg)
-  (when (eq (process-status proc) 'exit)
+  (when (memq (process-status proc) '(signal exit))
     (with-current-buffer (process-buffer proc)
       (insert (propertize "Press `Ctrl-D' or `q' to kill this buffer. "
                           'font-lock-face 'font-lock-comment-face))
@@ -136,6 +136,20 @@ If $FORCE is non-nil create a new term buffer directly."
                            (ignore-errors (funcall (pop functions)))))))
     directory))
 
+
+(defun term%pop-to-buffer (buffer)
+  (let ((popup-window (term%get-popup-window)))
+    (if (and (window-live-p popup-window)
+             (eq 'term-mode
+                 (buffer-local-value 'major-mode
+                                     (window-buffer popup-window))))
+        ;; Reuse window
+        (progn
+          (select-window popup-window)
+          (set-window-buffer popup-window buffer))
+      (pop-to-buffer buffer)
+      (term%set-popup-window (get-buffer-window buffer)))))
+
 (defun term/pop-shell (&optional $arg)
   "Switch to the term buffer last used, or create a new one if
 none exists, or if the current buffer is already a term."
@@ -155,17 +169,7 @@ none exists, or if the current buffer is already a term."
         (with-current-buffer buffer
           (local-set-key [f8] #'term/switch-back)
           (setq term--parent-buffer parent-buffer))
-        (let ((popup-window (term%get-popup-window)))
-          (if (and (window-live-p popup-window)
-                   (eq 'term-mode
-                       (buffer-local-value 'major-mode
-                                           (window-buffer popup-window))))
-              ;; Reuse window
-              (progn
-                (select-window popup-window)
-                (set-window-buffer popup-window buffer))
-            (pop-to-buffer buffer)
-            (term%set-popup-window (get-buffer-window buffer))))))))
+        (term%pop-to-buffer buffer)))))
 
 (defun term%after-prompt? ()
   (let* ((proc (get-buffer-process (current-buffer)))
@@ -227,6 +231,9 @@ none exists, or if the current buffer is already a term."
           ("M-M" . term-send-forward-kill-word)
           ("M-N" . term-send-backward-kill-word)
           ("<C-backspace>" . term-send-backward-kill-word)
+          ("<M-backspace>" . term-send-backward-kill-word)
+          ("C-DEL" . term-send-backward-kill-word)
+          ("M-DEL" . term-send-backward-kill-word)
           ("M-r" . term-send-reverse-search-history)
           ("M-d" . term-send-delete-word)
           ("M-," . term-send-raw)

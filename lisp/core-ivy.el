@@ -146,7 +146,9 @@ for a file to visit if current buffer is not visiting a file."
                                        (expand-file-name x ivy--directory)))))
                 :keymap counsel-find-file-map
                 :caller 'counsel-sudo-edit)
-    (find-file (concat "/sudo:root@localhost:" buffer-file-name))))
+    (let ((old-point (point)))
+      (find-file (concat "/sudo:root@localhost:" buffer-file-name))
+      (goto-char old-point))))
 
 (defun core%ivy-switch-buffer-transformer ($left-str)
   "Transform STR to more readable format."
@@ -181,6 +183,7 @@ for a file to visit if current buffer is not visiting a file."
   (dolist (caller '(ivy-switch-buffer
                     counsel-kill-buffer
                     internal-complete-buffer
+                    ivy-switch-buffer-other-window
                     counsel-projectile-switch-to-buffer
                     counsel-projectile))
     (ivy-set-display-transformer caller
@@ -239,6 +242,7 @@ for a file to visit if current buffer is not visiting a file."
     ("l p" . counsel-list-processes)
     ("l f" . counsel-find-library)
     ("u" . counsel-unicode-char)
+    ("d" . counsel-dired-jump)
     ("i" . counsel-semantic-or-imenu*)
     ("x" . counsel-linux-app)
     ("v" . counsel-set-variable)
@@ -284,6 +288,11 @@ for a file to visit if current buffer is not visiting a file."
   (define-key read-expression-map (kbd "C-r") 'counsel-expression-history))
 
 (with-eval-after-load 'counsel-projectile
+  (defun counsel-projectile*hack (&optional $arg)
+    (when (eq $arg '(16))
+      (setq projectile-cached-project-root nil)))
+  (advice-add 'counsel-projectile :before #'counsel-projectile*hack)
+
   (define-key! :map projectile-command-map
     ("s s" . counsel-projectile-rg)
     ("s a" . counsel-projectile-ag)

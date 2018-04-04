@@ -100,12 +100,7 @@
 
 ;; `whitespace-space' setup
 (with-eval-after-load 'whitespace
-  (setq whitespace-style '(face spaces tabs newline
-                                space-mark tab-mark newline-mark))
-  (setcdr (assoc 'newline-mark whitespace-display-mappings)
-          '(10 [182 10]))
-  (setcdr (assoc 'tab-mark whitespace-display-mappings)
-          '(9 [8594 9])))
+  (setq whitespace-style '(face tabs tab-mark)))
 
 (with-eval-after-load 'skeletor
   (setq skeletor-completing-read-function 'ivy-completing-read)
@@ -121,6 +116,35 @@
 ;; `calc' setup
 (with-eval-after-load 'calc
   (add-to-list 'calc-language-alist '(org-mode . latex)))
+
+(defvar extra-translate-shell-path
+  (eval-when-compile (expand-var! "translate-shell/build/trans")))
+(defvar extra-translate-shell-args
+  (eval-when-compile (split-string "-I -b -s en -t zh -e google" " ")))
+(defun extra/translate-shell ()
+  (interactive)
+  (cond
+   ((not (file-exists-p extra-translate-shell-path))
+    (message "Executable `%s' not found !" extra-translate-shell-path))
+   ((not (file-executable-p extra-translate-shell-path))
+    (message "`%s' can't be executed" extra-translate-shell-path))
+   (t
+    (let* ((bname "*translate-shell*")
+           (buffer (get-buffer-create bname))
+           (proc (get-buffer-process buffer)))
+      (when (not (and proc
+                      (process-live-p proc)
+                      (eq (buffer-local-value 'major-mode buffer)
+                          'term-mode)))
+        (kill-buffer buffer)
+        (setq buffer (term/exec-program extra-translate-shell-path
+                                        extra-translate-shell-args
+                                        bname)))
+      (term%pop-to-buffer buffer)))))
+
+(with-eval-after-load 'shackle
+  (define-key! :map shackle-mode-map
+    ("i" . extra/translate-shell)))
 
 (define-key!
   ;; buffer-mode

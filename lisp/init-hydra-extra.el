@@ -2,7 +2,7 @@
   (require 'hydra))
 
 (defvar comma-hydra-timer nil)
-(defvar comma-hydra-delay 0.5)
+(defvar comma-hydra-delay 0.3)
 (defvar comma-hydra-char ",")
 (defvar-local comma-hydra-last-buffer-undo-list nil)
 (defun comma-hydra-quit (&optional $no-hydra-quit)
@@ -73,7 +73,7 @@
   ("x" "C-c C-x")
   ("4" "C-x 4")
   ("5" "C-x 5")
-  ("p" "C-c p")
+  ("p" "C-x p")
   ("b" "C-c b")
   ("," switch-to-buffer))
 

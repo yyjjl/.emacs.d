@@ -52,3 +52,5 @@ breaksymbolsepright=0pt
 \paragraphfont{\large}
 
 \setmonofont{Ubuntu Mono}
+\let\OldTexttt\texttt
+\renewcommand{\texttt}[1]{\colorbox{codeblockbg}{\OldTexttt{{#1}}}}

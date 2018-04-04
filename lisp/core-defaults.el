@@ -121,6 +121,8 @@
       recentf-exclude (list "/tmp/" "/ssh:" "/sudo:" "\\.elc$"
                             emacs-var-direcotry))
 
+;; Keep mouse at upper-right corner when typing
+(mouse-avoidance-mode 'banish)
 ;; Purges buffers which haven't been displayed in 3 days
 (midnight-mode 1)
 ;; (display-time-mode 1)
@@ -165,6 +167,7 @@
 (define-hook! core|unkillable-buffer (kill-buffer-query-functions)
   (let ((bn (buffer-name)))
     (cond ((equal bn "*note*") nil)
+          ((equal bn "*task*") nil)
           ((equal bn "*scratch*") (delete-region (point-min) (point-max)) nil)
           (t t))))
 

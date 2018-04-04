@@ -17,16 +17,16 @@ Archive with high priority will be used when install a package.")
   "All packages required.")
 
 ;; The index of archive represents its priority
-(setq package-archives
-      '(("melpa-stable" . "https://elpa.emacs-china.org/melpa-stable/")
-        ("melpa" . "https://elpa.emacs-china.org/melpa/")
-        ("org" . "https://orgmode.org/elpa/")
-        ("gnu"   . "https://elpa.emacs-china.org/gnu/")))
 ;; (setq package-archives
-;;       '(("melpa-stable" . "https://stable.melpa.org/packages/")
-;;         ("melpa" . "https://melpa.org/packages/")
+;;       '(("melpa-stable" . "https://elpa.emacs-china.org/melpa-stable/")
+;;         ("melpa" . "https://elpa.emacs-china.org/melpa/")
 ;;         ("org" . "https://orgmode.org/elpa/")
-;;         ("gnu"   . "https://elpa.gnu.org/packages/")))
+;;         ("gnu"   . "https://elpa.emacs-china.org/gnu/")))
+(setq package-archives
+      '(("melpa-stable" . "https://stable.melpa.org/packages/")
+        ("melpa" . "https://melpa.org/packages/")
+        ("org" . "https://orgmode.org/elpa/")
+        ("gnu"   . "https://elpa.gnu.org/packages/")))
 
 ;; Setup to select right archive
 (setq package--priority-alist (mapcar #'car package-archives))
@@ -222,6 +222,7 @@ Archive with high priority will be used when install a package.")
      (when (and (display-graphic-p) emacs-use-fcitx-p)
        (fcitx-aggressive-setup))
      (find-file-noselect (expand-var! "org/*note*"))
+     (find-file-noselect (expand-var! "org/*task*"))
      (desktop-save-mode 1)))
 
   (which-key-mode 1)

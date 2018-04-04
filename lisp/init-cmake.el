@@ -18,7 +18,7 @@
 (defvar cpp--cmake-process nil)
 
 (defconst cpp--cquery-default-template
-  "%gcc\n%c -std=gnu11\n%cpp -std=c++14\n\n# Includes")
+  "%gcc\n%c -std=gnu11\n%cpp -std=c++14\n\n")
 
 
 

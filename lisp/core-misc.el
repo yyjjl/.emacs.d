@@ -100,6 +100,7 @@
   ;;       '(:eval (format "[%s]" (or projectile-project-name
   ;;                                  projectile-cached-project-name
   ;;                                  "-"))))
+  (setq projectile-globally-ignored-file-suffixes '(".pyc" ".elc"))
   (setq projectile-require-project-root t)
   (setq projectile-completion-system 'ivy)
   (setq projectile-enable-caching t)
