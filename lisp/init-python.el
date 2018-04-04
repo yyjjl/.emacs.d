@@ -9,6 +9,9 @@
 
 
 
+(require 'lsp-mode)
+(require 'lsp-common)
+
 (define-hook! python|setup (python-mode-hook)
   ;; emacs 24.4 only
   (setq electric-indent-chars (delq ?: electric-indent-chars))
@@ -19,9 +22,11 @@
     (elpy-mode 1)))
 
 (with-eval-after-load 'py-isort
-  (setq py-isort-options '("--lines=100")))
+  (setq py-isort-options '("--lines=75"
+                           "--multi-line=1")))
 
 (with-eval-after-load 'elpy
+  (put 'elpy-shell-use-project-root 'safe-local-variable #'booleanp)
   (remap! "C-c C-r" "C-c r" elpy-mode-map)
   (setcar elpy-test-discover-runner-command "python3")
   (setq elpy-rpc-backend "jedi"
@@ -29,13 +34,11 @@
         elpy-modules (delete 'elpy-module-django
                              (delete 'elpy-module-flymake elpy-modules))
         elpy-test-runner 'elpy-test-pytest-runner)
-  (setq python-shell-interpreter "python3"
-        python-shell-interpreter-args "-i")
 
   (define-key! :map elpy-mode-map
     ("C-c C-n" . nil)
     ("C-c C-p" . nil)
-    ("C-c b" . elpy-yapf-fix-code)
+    ("C-c b" . elpy-autopep8-fix-code)
     ("C-c B" . py-isort-buffer)
     ("C-c M-d" . python/generate-doc-at-point)
     ("M-i" . python/multiedit-symbol-at-point))
@@ -157,6 +160,9 @@
                  "python3"))
 
   (setq python-shell-prompt-detect-failure-warning nil)
+
+  (setq python-shell-interpreter "python3"
+        python-shell-interpreter-args "-i")
 
   (when python-has-pylint-path
     (setq python-check-command python-has-pylint-path))

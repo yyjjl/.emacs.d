@@ -77,10 +77,14 @@ See https://github.com/emacs-lsp/lsp-mode."
   (setq lsp-enable-completion-at-point nil
         lsp-highlight-symbol-at-point nil)
 
+  (setq lsp--show-doc-key "C-c C-d")
+  (setq lsp--show-doc-extra-message
+        (propertize (format " (`%s' to see more ...)" lsp--show-doc-key)
+                    'face font-lock-comment-face))
   (define-key!
     ("M-s h h" . lsp-symbol-highlight)
     ("C-c r" . lsp-rename)
-    ("C-c C-d" . lsp/show-doc-at-point)
+    ((kbd lsp--show-doc-key) . lsp/show-doc-at-point)
     ("C-c ." . lsp-info-under-point)
     ("C-c C-SPC" . lsp-execute-code-action))
 
@@ -131,22 +135,28 @@ See https://github.com/emacs-lsp/lsp-mode."
       (if (lsp--markup-content-p contents)
           (when full-content-p
             (lsp--render-markup-content hover))
-        (let ((content-list (if (listp contents) contents (list contents))))
+        (let ((content-list (if (listp contents) contents (list contents)))
+              extra-message)
           (unless full-content-p
-            (setq content-list (--filter (hash-table-p it) content-list)))
-          (mapconcat (lambda (e)
-                       (let (renderer)
-                         (if (hash-table-p e)
-                             (if (setq renderer
-                                       (cdr (assoc-string
-                                             (gethash "language" e)
-                                             renderers)))
-                                 (when (gethash "value" e nil)
-                                   (funcall renderer (gethash "value" e)))
-                               (gethash "value" e))
-                           e)))
-                     content-list
-                     (if full-content-p "\n\n" "\n"))))))
+            (let ((result (--separate (hash-table-p it) content-list)))
+              (setq content-list (car result)
+                    extra-message (and (cadr result)
+                                       lsp--show-doc-extra-message))))
+          (concat
+           (mapconcat (lambda (e)
+                        (let (renderer)
+                          (if (hash-table-p e)
+                              (if (setq renderer
+                                        (cdr (assoc-string
+                                              (gethash "language" e)
+                                              renderers)))
+                                  (when (gethash "value" e nil)
+                                    (funcall renderer (gethash "value" e)))
+                                (gethash "value" e))
+                            e)))
+                      content-list
+                      (if full-content-p "\n\n" "\n"))
+           extra-message)))))
 
   (defun lsp/show-doc-at-point ()
     (interactive)

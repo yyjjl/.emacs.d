@@ -19,7 +19,7 @@
   (setq TeX-master 'dwim)
 
   (unless (buffer-temporary?)
-    (turn-on-reftex)
+    (reftex-mode 1)
     (TeX-source-correlate-mode 1)
     (TeX-PDF-mode 1)
     (TeX-fold-mode 1)
@@ -169,7 +169,7 @@
   (define-key LaTeX-mode-map (kbd "M-p") preview-map))
 
 (with-eval-after-load 'reftex
-  (setq reftex-plug-into-AUCTeX '(nil nil t t t)
+  (setq reftex-plug-into-AUCTeX '(t t t t t)
         reftex-use-fonts t))
 
 (provide 'init-latex)

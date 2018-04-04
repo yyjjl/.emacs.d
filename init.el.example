@@ -38,13 +38,14 @@
 ;; Programming modes
 ;; (require 'init-lsp)
 ;; (require 'init-cquery)
-(require 'init-haskell)
+;; (require 'init-haskell)
 (require 'init-python)
 (require 'init-lisp)
 (require 'init-web-mode)
 (require 'init-sh)
-(require 'init-javascript)
-(require 'init-css)
+;; (require 'init-javascript)
+;; (require 'init-css)
+;; (require 'init-rust)
 
 ;; Some keybindings using when editing
 (require 'init-editing)
@@ -54,11 +55,11 @@
 (require 'init-gud)
 
 ;; Other small tools
-(require 'init-surround)
 ;; (require 'init-hydra-extra)
-(require 'init-prettify-symbols)
+;; (require 'init-prettify-symbols)
 
 (when emacs-has-mpv-p
   (require 'init-emms))
 
 (require 'init-extra)
+(require 'init-surround)

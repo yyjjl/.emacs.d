@@ -56,4 +56,8 @@
  '(ivy-highlight-face ((t (:background "#444155"))))
  '(ivy-current-match ((t (:background "black")))))
 
+(with-eval-after-load 'org
+  (dolist (face org-level-faces)
+    (set-face-attribute face nil :height 1.0)))
+
 (provide 'core-theme)

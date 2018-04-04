@@ -1,5 +1,6 @@
 (require-packages!
- (org :compile (org ob ox-html org-table))
+ ;; (org :compile (org ob ox-html org-table))
+ (org-plus-contrib :compile (org ob ox-html org-table))
  ;; IPython notebook feature in `org-mode'
  ob-ipython
  ;; Export colorful src block in `org-mode'
@@ -241,7 +242,7 @@ With a prefix BELOW move point to lower block."
   (setq org-refile-targets '((nil :maxlevel . 5)
                              (org-agenda-files :maxlevel . 5)))
   ;; Targets start with the file name - allows creating level 1 tasks
-  (setq org-refile-use-outline-path (quote file))
+  (setq org-refile-use-outline-path 'file)
   ;; Targets complete in steps so we start with filename, TAB shows
   ;; the next level of targets etc
   (setq org-outline-path-complete-in-steps t)
@@ -250,6 +251,50 @@ With a prefix BELOW move point to lower block."
                 (sequence "WAITING(w@/!)" "SOMEDAY(S)"
                           "PROJECT(P@)" "|" "CANCELLED(c@/!)"))))
   (setq org-imenu-depth 9)
+
+  (setq org-capture-templates
+        `(("t" "Main task" entry
+           (file+headline ,(expand-var! "org/*task*") "Task")
+           "
+* TODO %^{Task}
+  Captured: %t
+  %?")
+          ("i" "Idea" entry
+           (file+headline ,(expand-var! "org/*note*") "Idea")
+           "
+* %^{Idea}
+  Captured: %U
+  %?")
+          ("l" "Link" entry
+           (file+headline ,(expand-var! "org/*note*") "Link")
+           "
+* %^{Link}
+  Captured: %U
+  %?")
+          ("L" "Long term tasks" checkitem
+           (file+function
+            ,(expand-var! "org/*task*")
+            (lambda ()
+              (goto-char (point-min))
+              (unless (re-search-forward "^\\* Long-term Task")
+                (error "Can not find heading `Long-term Task'"))
+              (unwind-protect
+                  (progn
+                    (org-narrow-to-subtree)
+                    (let* ((headings (cdr (counsel-outline-candidates)))
+                           (result (assoc
+                                    (completing-read
+                                     "Select subsection: "
+                                     headings
+                                     nil
+                                     :require-match
+                                     nil
+                                     'org-capture-long-term-task-history)
+                                    headings)))
+                      (goto-char (cdr result))
+                      (end-of-line 1)))
+                (widen))))
+           "   - [ ] %^{Task} %?")))
 
   (unless (featurep 'company-auctex)
     (require 'company-auctex))
@@ -308,6 +353,9 @@ With a prefix BELOW move point to lower block."
   (define-key org-mode-map (kbd "C-c t") org-table-extra-map)
   (define-key! :map org-mode-map
     ("C-c C-." . ob-ipython-inspect)
+    ("C-c [" . org-reftex-citation)
+    ("C-c {" . org-reftex-citation)
+    ("C-c C-x [" . org-agenda-file-to-front)
     ("C-c v" . org/open-pdf)
     ("M-," . org-mark-ring-goto)
     ("M-." . org-mark-ring-push)
@@ -341,13 +389,39 @@ With a prefix BELOW move point to lower block."
   (setcdr (assoc 'align org-html-mathjax-options) '("center")))
 
 (with-eval-after-load 'ox-latex
+  (ignore-errors
+    (require 'ox-bibtex))
+
+  (defun org*latex-link-hack ($fn $link $desc $info)
+    (let* ((type (org-element-property :type $link))
+           (raw-path (org-element-property :path $link))
+           (search-option (org-element-property :search-option $link))
+           (project (ignore-errors
+                      (org-publish-get-project-from-filename
+                       (buffer-file-name)))))
+      (if (and project
+               (string= type "file")
+               (string= (file-name-extension raw-path) "org")
+               (equal (car (org-publish-get-project-from-filename
+                            (file-truename raw-path)))
+                      (car project)))
+          (format "\\href{%s.pdf%s}{%s}"
+                  (org-latex--protect-text
+                   (org-export-file-uri
+                    (file-name-sans-extension raw-path)))
+                  search-option
+                  (or $desc ""))
+        (funcall $fn $link $desc $info))))
+  (advice-add 'org-latex-link :around #'org*latex-link-hack)
+
   (add-to-list 'org-latex-minted-langs '(ipython "python"))
+  (setq org-latex-compiler "xelatex")
   (setq org-latex-pdf-process
-        '("xelatex -shell-escape -interaction nonstopmode %f"
-          "xelatex -shell-escape -interaction nonstopmode %f"))
+        '("latexmk -g -pdf -dvi- -ps- -pdflatex=\"xelatex -shell-escape %%O %%S\" -outdir=%o %f"))
 
   ;; Use minted
   (setq org-latex-listings 'minted)
+  (setq org-latex-prefer-user-labels t)
   (setq org-latex-default-class "cn-article")
   (setq org-latex-packages-alist
         '(("" "ctex" nil)
@@ -395,6 +469,8 @@ With a prefix BELOW move point to lower block."
                  ("\\paragraph{%s}" . "\\paragraph*{%s}")
                  ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
 
-(global-set-key (kbd "C-c '") #'poporg-dwim)
+(define-key!
+  ("C-c '" . poporg-dwim)
+  ([C-f12] . org-capture))
 
 (provide 'init-org)
