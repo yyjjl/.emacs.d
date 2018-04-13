@@ -1,16 +1,13 @@
 (defvar core--shackle-popup-window-list nil)
-(defvar core--shackle-popup-buffer-regexp nil)
 
-(defvar core--shackle-comint-modes
-  '(term-mode
-    haskell-interactive-mode))
-
-(defvar core--shackle-help-modes
-  '(help-mode
-    completion-list-mode
-    messages-buffer-mode
-    compilation-mode
-    profiler-report-mode))
+(defvar core--shackle-popup-buffer-regexp
+  (eval-when-compile
+    (concat "^\\(?:"
+            (string-join `("\\*Man.*\\*"
+                           "\\*TeX.*\\*"
+                           "\\*Warnings\\*")
+                         "\\|")
+            "\\)$")))
 
 (defvar core--shackle-help-mode-regexp
   (eval-when-compile
@@ -24,12 +21,23 @@
 (defvar-local core--shackle-popup-window nil)
 (put 'core--shackle-popup-window 'permanent-local t)
 
+(defvar core--shackle-comint-modes
+  '(term-mode
+    haskell-interactive-mode))
+
+(defvar core--shackle-help-modes
+  '(help-mode
+    completion-list-mode
+    messages-buffer-mode
+    compilation-mode
+    profiler-report-mode))
+
 (defun core/last-popup-window ()
   "Display last popup window"
   (interactive)
   (if (buffer-live-p shackle-last-buffer)
       (display-buffer shackle-last-buffer)
-    (message "Last buffer killed !!")
+    (message "Last buffer killed !!!")
     (core/display-buffer)))
 
 (defun core/display-buffer ()
@@ -65,10 +73,10 @@
 (defun core%clean-window-list ()
   ;; Remove inactive window
   (setq core--shackle-popup-window-list
-        (loop for (window . buffer) in core--shackle-popup-window-list
+        (loop for (window buffer action) in core--shackle-popup-window-list
               if (and (window-live-p window)
                       (equal (window-buffer window) buffer))
-              collect (cons window buffer))))
+              collect (list window buffer action))))
 
 (defun core*close-popup-window (&rest _)
   "When `C-g' pressed, close latest opened popup window"
@@ -76,25 +84,29 @@
   ;; `C-g' can deactivate region
   (when (and (called-interactively-p 'interactive)
              (not (region-active-p)))
-    (let (window buffer)
+    (let (window buffer action)
       (if (one-window-p)
           (progn
             (setq window (selected-window))
             (when (equal (buffer-local-value 'core--shackle-popup-window
                                              (window-buffer window))
-                         window)))
-        (setq window (caar core--shackle-popup-window-list))
-        (setq buffer (cdar core--shackle-popup-window-list))
+                         window)
+              (winner-undo)))
+        (setq window (nth 0 (car core--shackle-popup-window-list)))
+        (setq buffer (nth 1 (car core--shackle-popup-window-list)))
+        (setq action (nth 2 (car core--shackle-popup-window-list)))
         (when (and (window-live-p window)
                    (equal (window-buffer window) buffer))
-          (delete-window window)
+          (if (eq action :quit)
+              (quit-window nil window)
+            (delete-window window))
 
           (pop core--shackle-popup-window-list))))))
 
 (defun core*shackle-display-buffer-hack ($fn $buffer $alist $plist)
   (core%clean-window-list)
 
-  ;; Set default size
+  ;; Set default alignment
   (setq shackle-default-alignment
         (if (> (frame-width)
                (or split-width-threshold 120))
@@ -102,34 +114,48 @@
           'below))
 
   (let* ((autoclose? (plist-get $plist :autoclose))
-         (align (plist-get $plist :align))
-         (root (car (window-tree)))
-         ;; If root window is horizontally splitted
-         (num (if (or (atom root) (car root))
-                  2
-                (length (cdr root))))
          (old-window (get-buffer-window $buffer))
-         window)
-    ;; When window is an autoclose window and `:align' is not set,
-    ;; set it to `shackle-default-alignment'
-    (when (and (not align) autoclose?)
-      (setq align shackle-default-alignment)
-      (setq $plist (append $plist `(:align ,align))))
-    (setq shackle-default-size
-          (min (if (memq align '(left right)) 0.5 0.4)
-               (/ 1.0 num)))
-
-    (setq window (funcall $fn $buffer $alist $plist))
+         (action :delete)
+         (window (or (funcall $fn $buffer $alist $plist)
+                     (and
+                      (setq action :quit)
+                      (funcall $fn $buffer $alist (list* :other t $plist))))))
     (unless (eq window old-window)
       (when autoclose?
         ;; Autoclose window should be dedicated
         (set-window-dedicated-p window t)
         ;; Add to autoclose list
-        (push (cons window $buffer) core--shackle-popup-window-list))
+        (push (list window $buffer action) core--shackle-popup-window-list))
       (with-current-buffer $buffer
         ;; Record popup window
         (setq core--shackle-popup-window window)))
     window))
+
+(defun core*shackle--display-buffer-popup-window-hack ($buffer $alist $plist)
+  "Fix a bug when :other is t"
+  (let ((frame (shackle--splittable-frame))
+        (other-window-p (and (plist-get $plist :other) (not (one-window-p)))))
+    (when frame
+      (let ((window (if other-window-p
+                        (next-window nil 'nominibuf)
+                      (shackle--split-some-window frame $alist))))
+        (prog1 (window--display-buffer
+                $buffer window
+                (if other-window-p 'reuse 'window)
+                $alist
+                display-buffer-mark-dedicated)
+          (when window
+            (setq shackle-last-window window
+                  shackle-last-buffer $buffer))
+          (unless (cdr (assq 'inhibit-switch-frame $alist))
+            (window--maybe-raise-frame (window-frame window))))))))
+
+(defun core*window--try-to-split-window-hack ($fn $window &optional $alist)
+  (let ((buffer (and (window-live-p $window)
+                     (window-buffer $window))))
+    (unless (and buffer (buffer-local-value 'core--shackle-popup-window buffer))
+      (funcall $fn $window $alist))))
+
 
 (defun core--shackle%comint-mode-matcher ($buffer)
   (let ((case-fold-search t)
@@ -147,7 +173,7 @@
     (or (with-current-buffer $buffer
           (and (not (string-prefix-p "ivy-occur" (symbol-name major-mode)))
                (apply #'derived-mode-p core--shackle-help-modes)))
-     (string-match-p core--shackle-help-mode-regexp buffer-name))))
+        (string-match-p core--shackle-help-mode-regexp buffer-name))))
 
 (with-eval-after-load 'shackle
   (defvar shackle-mode-map (make-sparse-keymap))
@@ -163,11 +189,14 @@
   ;; Can not be advised `:after', keyboard-quit signal `quit'
   (advice-add 'keyboard-quit :before #'core*close-popup-window)
   (advice-add 'other-window :before #'core*close-popup-window)
-
   (advice-add 'shackle-display-buffer
               :around #'core*shackle-display-buffer-hack)
+  (advice-add 'shackle--display-buffer-popup-window
+              :override #'core*shackle--display-buffer-popup-window-hack)
+  (advice-add 'window--try-to-split-window
+            :around #'core*window--try-to-split-window-hack)
 
-  (define-hook! core%autoclose-popup-window (kill-buffer-hook)
+  (define-hook! core|autoclose-popup-window (kill-buffer-hook)
     "Auto quit popup window after buffer killed"
     (let ((window (get-buffer-window))
           (buffer-name (buffer-name)))
@@ -179,21 +208,12 @@
                      (not (eq (next-window) lv-wnd))))
         (quit-window nil window))))
 
-  (setq core--shackle-popup-buffer-regexp
-        (eval-when-compile
-          (concat "^\\(?:"
-                  (string-join `("\\*Man.*\\*"
-                                 "\\*TeX.*\\*"
-                                 "\\*Warnings\\*")
-                               "\\|")
-                  "\\)$")))
-
   (setq shackle-default-alignment 'below
-        shackle-default-size 0.5
+        shackle-default-size 0.40
         shackle-default-rule nil
         shackle-rules
         `(((:custom core--shackle%comint-mode-matcher)
-           :size 0.4 :align below :select t)
+           :align below :select t)
           ((:custom core--shackle%help-mode-matcher)
            :align below :select t :autoclose t)
           ("\\*Flycheck.*\\*"

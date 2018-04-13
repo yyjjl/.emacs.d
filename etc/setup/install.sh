@@ -58,42 +58,70 @@ export -f critical
 export -f exists
 export -f apt-package-installed
 
-# Get command line arguments
-while [[ $# -gt 0 ]]; do
-    key="$1"
-    shift # past key
-    case $key in
-        -l|--list)
-            echo "Sub-scripts:"
-            for script in emacs/*.sh; do
-                script=${script#emacs/install-}
-                echo "  ${script%.*}"
-            done
-            exit 0
-            ;;
-        -h|--help)
-            echo >&2  "usage: $0 <sub-scripts> ..."
-            exit 0
-            ;;
-        *)
-            POSITIONAL+=("${key}")
-            ;;
-    esac
-done
-# restore positional parameters
-set -- "${POSITIONAL[@]}"
+xargs sudo apt install -y < packages/apt-packages
+xargs cabal install < packages/cabal-packages
+xargs pip3 install < packages/python-packages
 
-if [ "x$*" = "x" ]; then
-    critical "No script to run"
-    exit 1
+sudo apt install nodejs -y
+sudo npm install -g n
+sudo n latest
+sudo apt remove --purge nodejs -y
+
+xargs sudo npm install -g < packages/npm-packages
+xargs sudo cpan install < packages/cpan-packages
+
+# zsh
+sudo chsh -s "$(which zsh)"
+if [ -d "${HOME}/.oh-my-zsh" ]; then
+    echo "oh-my-zsh is installed"
+else
+    git clone https://github.com/robbyrussell/oh-my-zsh ~/.oh-my-zsh
+    sh ~/.oh-my-zsh/tools/install.sh
 fi
 
-for script in "$@"; do
-    script=${base_dir}/emacs/install-${script}.sh
-    info "Run ${script}"
-    if bash "${script}"; then
-        info "Run ${script} success"
-    else
-        warn "Run ${script} failed !!!"
+# stack
+if which stack; then
+    echo "stack is installed"
+else
+    curl -sSL https://get.haskellstack.org/ | sh
+    echo -n "
+templates:
+  params: null
+system-ghc: true
+package-indices:
+- name: Tsinghua
+  http: http://mirrors.tuna.tsinghua.edu.cn/hackage/00-index.tar.gz
+  download-prefix: http://mirrors.tuna.tsinghua.edu.cn/hackage/package/
+" > ~/.stack/config.yaml
+    stack update
+    # stack install idris --resolver=lts-6.35
+fi
+
+# GNU Global
+
+# cquery
+mkdir -p ~/.emacs.d/var
+if [ -d "${HOME}/.emacs.d//var/cquery" ]; then
+    echo "cquery is installed"
+else
+    if cd ~/.emacs.d/var; then
+        git clone https://github.com/cquery-project/cquery cquery
+        if cd cquery && mkdir -p build && cd build; then
+            cmake .. && make
+        fi
     fi
-done
+fi
+if  [ -d "${HOME}/.emacs.d/var/translate-shell" ]; then
+    echo "translate-shell is installed"
+else
+    if cd ~/.emacs.d/var ; then
+        git clone https://github.com/soimort/translate-shell  translate-shell
+        make -C translate-shell
+    fi
+fi
+
+# rust
+curl https://sh.rustup.rs -sSf | sh
+rustup update
+xargs rustup component add < packages/rust-packages
+cargo install ripgrep

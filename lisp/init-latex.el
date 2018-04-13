@@ -16,6 +16,11 @@
                                          (insert-char ?\`)))
   ;; (orgtbl-mode 1)
 
+  (setq-local prettify-symbols-alist tex--prettify-symbols-alist)
+  (add-function :override (local 'prettify-symbols-compose-predicate)
+                #'tex--prettify-symbols-compose-p)
+  (prettify-symbols-mode 1)
+
   (setq TeX-master 'dwim)
 
   (unless (buffer-temporary?)
@@ -67,9 +72,10 @@
         TeX-electric-math '("$" . "$")
         LaTeX-electric-left-right-brace t
         TeX-complete-expert-commands t
-        TeX-electric-sub-and-superscript nil
+        TeX-electric-sub-and-superscript t
         ;; Synctex support
         TeX-source-correlate-start-server nil
+        font-latex-fontify-script nil
         ;; Don't insert line-break at inline math
         LaTeX-fill-break-at-separators nil))
 
@@ -125,18 +131,29 @@
     ("C-c s" . LaTeX-section)
     ("C-c e" . LaTeX-environment)
     ("C-c x b" . latex/font-bold)
+    ("C-c C-x b" . latex/font-bold)
     ("C-c x m" . latex/font-medium)
+    ("C-c C-x m" . latex/font-medium)
     ("C-c x c" . latex/font-code)
+    ("C-c C-x c" . latex/font-code)
     ("C-c x e" . latex/font-emphasis)
+    ("C-c C-x e" . latex/font-emphasis)
     ("C-c x i" . latex/font-italic)
-    ("C-c x c" . latex/font-clear)
+    ("C-c C-x i" . latex/font-italic)
     ("C-c x C" . latex/font-calligraphic)
+    ("C-c C-x C" . latex/font-calligraphic)
     ("C-c x s m" . latex/font-small-caps)
+    ("C-c C-x s m" . latex/font-small-caps)
     ("C-c x s a" . latex/font-sans-serif)
+    ("C-c C-x s a" . latex/font-sans-serif)
     ("C-c x n" . latex/font-normal)
+    ("C-c C-x n" . latex/font-normal)
     ("C-c x s e" . latex/font-serif)
+    ("C-c C-x s e" . latex/font-serif)
     ("C-c x o" . latex/font-oblique)
-    ("C-c x u" . latex/font-upright)))
+    ("C-c C-x o" . latex/font-oblique)
+    ("C-c x u" . latex/font-upright)
+    ("C-c C-x u" . latex/font-upright)))
 
 (with-eval-after-load 'preview
   (setq preview-auto-cache-preamble t

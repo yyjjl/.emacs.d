@@ -175,7 +175,7 @@ Archive with high priority will be used when install a package.")
  page-break-lines
  evil-nerd-commenter
  shackle
- expand-region)
+ easy-kill)
 
 (require 'core-ivy)
 (require 'core-company)

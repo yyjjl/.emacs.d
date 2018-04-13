@@ -13,10 +13,6 @@ hasn't to runs those regexps against the filename.")
   (expand-file-name "etc" user-emacs-directory)
   "Some configuration file in this directory")
 
-(defvar emacs-var-direcotry
-  (expand-file-name "var" user-emacs-directory)
-  "All data and external executable file in this direcotry")
-
 (defvar core-ignored-directories '("auto" "target" "node_modules"
                                    "bower_components" ".sass_cache" ".cache"
                                    ".git" ".cvs" ".svn" ".hg" "elpa"))
@@ -52,6 +48,7 @@ will close some features to speed up emacs performance")
   (setq org-preview-latex-image-directory (expand-var! "ltxpng/"))
   (setq org-publish-timestamp-directory (expand-var! "org-timestamps/"))
   (setq org-default-notes-file (expand-var! "org/*note*"))
+  (setq org-export-async-init-file (expand-etc! "org-async-init.el"))
   (setq org-template-directory (expand-etc! "org-template"))
   (setq projectile-cache-file (expand-var! "projectile-cache.el"))
   (setq projectile-known-projects-file (expand-var! "projectile-bookmarks.el"))

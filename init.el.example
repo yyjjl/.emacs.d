@@ -2,6 +2,10 @@
   (expand-file-name "lisp" user-emacs-directory)
   "All configuration in this directory")
 
+(defvar emacs-var-direcotry
+  (expand-file-name "var" user-emacs-directory)
+  "All data and external executable file in this direcotry")
+
 ;; Add `emacs-config-directory' to `load-path'
 (add-to-list 'load-path emacs-config-directory)
 

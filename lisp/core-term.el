@@ -76,6 +76,12 @@
           (delete-window (term%get-popup-window))))
     (message "No parent buffer or it was killed !!!")))
 
+(defun term/switch-back-no-quit ()
+  (interactive)
+  (if (and term--parent-buffer (buffer-live-p term--parent-buffer))
+      (pop-to-buffer term--parent-buffer)
+    (message "No parent buffer or it was killed !!!")))
+
 (defun term/get-ssh-info ($arg)
   (let ((user (file-remote-p default-directory 'user))
         (host (file-remote-p default-directory 'host))
@@ -168,6 +174,7 @@ none exists, or if the current buffer is already a term."
       (when buffer
         (with-current-buffer buffer
           (local-set-key [f8] #'term/switch-back)
+          (local-set-key (kbd "C-c C-z") #'term/switch-back-no-quit)
           (setq term--parent-buffer parent-buffer))
         (term%pop-to-buffer buffer)))))
 

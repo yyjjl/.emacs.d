@@ -122,7 +122,7 @@
                             emacs-var-direcotry))
 
 ;; Keep mouse at upper-right corner when typing
-(mouse-avoidance-mode 'banish)
+;; (mouse-avoidance-mode 'banish)
 ;; Purges buffers which haven't been displayed in 3 days
 (midnight-mode 1)
 ;; (display-time-mode 1)
@@ -189,7 +189,10 @@
   (compilation-finish-functions)
   (with-current-buffer buffer
     (unless (eq major-mode 'compilation-mode)
-      (compilation-mode))))
+      ;; Sometime will open a comint buffer
+      (compilation-mode)
+      (push (list (get-buffer-window buffer) buffer :delete)
+            core--shackle-popup-window-list))))
 
 (defun core*desktop-save-unless-loaded ($fn &rest $args)
   (if (or (called-interactively-p 'interactive)

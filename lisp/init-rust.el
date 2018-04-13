@@ -88,8 +88,8 @@
                  (process-live-p proc)
                  (eq (buffer-local-value 'major-mode buffer)
                      'term-mode))
-      (set-rust-backtrace "cargo run")
       (kill-buffer buffer)
+      (set-rust-backtrace "cargo run")
       (setq buffer (term/exec-program "cargo" '("run") buffer-name)))
     (pop-to-buffer buffer)))
 

@@ -1,9 +1,20 @@
+(defun counsel%truncate-string (string width)
+  (when (> (length string) width)
+    (setq string
+          (concat (substring
+                   (replace-regexp-in-string "\n" "\\\\n" string)
+                   0 width)
+                  " ... ")))
+  string)
+
 (defun counsel%semantic--clean-tag ($tag)
-  (let ((def-val (semantic-tag-get-attribute $tag :default-value)))
-    (when (stringp def-val)
-      (when-let* ((pos (string-match "\n" def-val)))
-        (setq def-val (concat (substring def-val 0 (min pos 80)) " ... ")))
-      (semantic-tag-put-attribute $tag :default-value def-val))))
+  (let ((default-value (semantic-tag-get-attribute $tag :default-value))
+        (name (semantic-tag-name $tag)))
+    (when (stringp default-value)
+      (semantic-tag-put-attribute $tag :default-value
+                                  (counsel%truncate-string default-value 75)))
+    (when (stringp name)
+      (semantic-tag-set-name $tag (counsel%truncate-string name 75)))))
 
 (defun counsel%semantic-or-imenu--relative-buffers ($buffer)
   (let* ((projectile-require-project-root nil)

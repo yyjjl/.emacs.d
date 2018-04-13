@@ -7,8 +7,8 @@
  elisp-def
  macrostep
  hl-sexp
- (racket-mode :when lisp-has-racket-p)
- sicp)
+ easy-escape
+ (racket-mode :when lisp-has-racket-p))
 
 
 
@@ -61,7 +61,7 @@ Emacs Lisp."
     (auto-compile-on-save-mode)
 
     (lisp%hippie-expand-setup)
-
+    (easy-escape-minor-mode 1)
     (checkdoc-minor-mode)))
 
 (add-hook 'emacs-lisp-mode-hook #'lisp|elisp-setup)

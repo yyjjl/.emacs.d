@@ -8,4 +8,4 @@
     (if (stringp args) "&rest args"
       (string-join (mapcar (lambda (x) (format "%s" x)) args) " "))))})
    $0)
-(advice-add \'${2:find-file} ${3::around$$(yas-choose-value '(":around" ":after" ":before"))} #\'$1)
+(advice-add \'${2:find-file} ${3::around$$(yas-choose-value '(":around" ":after" ":before" ":override"))} #\'$1)

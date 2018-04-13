@@ -4,6 +4,7 @@ anaconda-mode/
 .wg-file.el
 /url/cache
 /auto-save-list
+/old
 /data
 /var
 /session.*
@@ -42,7 +43,6 @@ GPATH
 GRTAGS
 .emacs.d/emms/
 tutorial/
-/var
 org-clock-save.el
 .\#*
 emms/

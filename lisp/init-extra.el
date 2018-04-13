@@ -1,7 +1,6 @@
 (require-packages!
  calc
  whitespace
-
  restclient
  company-restclient
  markdown-mode
@@ -28,8 +27,6 @@
 ;; csv
 (setq csv-separators '("," ";" "|" " "))
 
-(defalias 'perl-mode 'cperl-mode)
-
 (setq inferior-lisp-program "ccl")
 
 (with-eval-after-load 'slime
@@ -52,6 +49,7 @@
 
   (define-hook! extra|setup-dot (graphviz-dot-mode-hook)
     (hs-minor-mode 1)
+    (make-local-variable 'completion-at-point-functions)
     (add-to-list 'completion-at-point-functions 'extra/dot-complete)))
 
 (with-eval-after-load 'grep

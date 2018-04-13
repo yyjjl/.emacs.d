@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Devel::REPL;
+
+my $repl = Devel::REPL->new;
+
+for (
+    qw(History
+    LexEnv
+    MultiLine::PPI
+    Completion
+    Colors
+    Packages
+    CompletionDriver::Keywords
+    CompletionDriver::INC
+    CompletionDriver::Methods
+    CompletionDriver::LexEnv)
+  )
+{
+    $repl->load_plugin($_);
+}
+
+$repl->run;

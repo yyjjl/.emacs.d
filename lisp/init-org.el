@@ -343,11 +343,12 @@ With a prefix BELOW move point to lower block."
   (defun org*fill-paragraph-hack (&rest _)
     (when (fboundp #'extra/insert-space-around-chinese)
       (let ((element (org-element-at-point)))
-        (extra/insert-space-around-chinese
-         (min (point-max)
-              (org-element-property :contents-end element))
-         (max (point-min)
-              (org-element-property :contents-begin element))))))
+        (ignore-errors
+          (extra/insert-space-around-chinese
+           (min (point-max)
+                (org-element-property :contents-end element))
+           (max (point-min)
+                (org-element-property :contents-begin element)))))))
   (advice-add 'org-fill-paragraph :after #'org*fill-paragraph-hack)
 
   (define-key org-mode-map (kbd "C-c t") org-table-extra-map)

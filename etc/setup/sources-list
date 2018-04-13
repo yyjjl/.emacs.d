@@ -1,0 +1,12 @@
+deb http://ppa.launchpad.net/alessandro-strada/ppa/ubuntu xenial main
+deb http://www.geogebra.net/linux/ stable main
+deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main
+deb http://ppa.launchpad.net/graphics-drivers/ppa/ubuntu xenial main
+deb http://ppa.launchpad.net/nilarimogard/webupd8/ubuntu xenial main
+deb http://ppa.launchpad.net/noobslab/icons/ubuntu xenial main
+deb http://ppa.launchpad.net/noobslab/themes/ubuntu xenial main
+deb http://ppa.launchpad.net/plt/racket/ubuntu xenial main
+deb http://debian.sur5r.net/i3/ xenial universe
+deb http://ppa.launchpad.net/ubuntu-elisp/ppa/ubuntu xenial main
+deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main
+deb http://ppa.launchpad.net/zeal-developers/ppa/ubuntu xenial main

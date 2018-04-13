@@ -65,9 +65,10 @@
  split-width-threshold 120
  visible-cursor nil
  x-stretch-cursor nil
+ widget-image-enable nil
  ;; Defer jit font locking slightly to [try to] improve Emacs performance
  jit-lock-defer-time nil
- jit-lock-stealth-nice 0.1
+ jit-lock-stealth-nice 0.5
  jit-lock-stealth-time 0.2
  jit-lock-stealth-verbose nil
  ;; No beeping or blinking please

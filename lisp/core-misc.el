@@ -327,8 +327,6 @@ Does not indent buffer, because it is used for a
     (message "Use socket proxy %s" socks-server)))
 
 (define-key!
-  ("C-r" . isearch-backward-regexp)
-  ("C-M-r" . isearch-backward)
   ("C-x R" . core/rename-this-file-and-buffer)
   ("C-x D" . core/delete-this-file)
   ("C-x C-d" . find-name-dired)
@@ -340,10 +338,13 @@ Does not indent buffer, because it is used for a
   ("C-x C-b" . ibuffer)
   ("C-x ," . core/search-in-chrome)
   ("M-/" . hippie-expand)
-  ("M--" . er/expand-region)
 
-  ("M-s o" . core/occur-dwim)
+  ("M-w" . easy-kill)
+  ([remap mark-sexp] . easy-mark)
+  ("M--" . easy-mark)
+
   ("M-i" . iedit-mode)
+  ("M-s o" . core/occur-dwim)
   ("M-s e" . core/eval-and-replace)
 
   ("RET" . newline-and-indent)

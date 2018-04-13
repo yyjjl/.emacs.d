@@ -39,6 +39,8 @@
  '(flycheck-info ((t (:underline (:style wave :color "#b6e63e")))))
  '(flycheck-warning ((t (:underline (:style wave :color "#e2c770")))))
 
+ '(widget-field ((t (:inherit hl-line :underline t))))
+
  ;; '(window-numbering-face
  ;;   ((t (:foreground "DeepPink" :weight bold :underline t))))
 

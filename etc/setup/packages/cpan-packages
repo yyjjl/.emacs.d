@@ -1,0 +1,11 @@
+Cache::FileCache
+Class::Std::Storable
+Devel::REPL
+Graph::Easy
+List::AllUtils
+Log::Handler
+Module::Install
+Module::Pluggable
+PPI
+Perl::Tidy
+Term::ReadLine::Gnu

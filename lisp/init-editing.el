@@ -81,7 +81,7 @@ other characters."
   :init-value nil
   :lighter "._a"
   :keymap nil
-  (make-variable-buffer-local 'post-self-insert-hook)
+  (make-local-variable 'post-self-insert-hook)
   (if core/space-punctuation-mode
       (add-hook 'post-self-insert-hook 'core|insert-space-after-punc)
     (remove-hook 'post-self-insert-hook 'core|insert-space-after-punc)))
@@ -126,7 +126,7 @@ other characters."
 
 (defun forward-sentence-or-sexp (&optional $n)
   (interactive "p")
-  (if (derived-mode-p 'prog-mode)
+  (if (or (derived-mode-p 'prog-mode 'latex-mode 'org-mode))
       (forward-sexp $n)
     (forward-sentence $n)))
 
