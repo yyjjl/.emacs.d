@@ -187,12 +187,13 @@
 
 (define-hook! (core|compilation-finish-hook buffer msg)
   (compilation-finish-functions)
-  (with-current-buffer buffer
-    (unless (eq major-mode 'compilation-mode)
-      ;; Sometime will open a comint buffer
-      (compilation-mode)
-      (push (list (get-buffer-window buffer) buffer :delete)
-            core--shackle-popup-window-list))))
+  (when (buffer-live-p buffer)
+    (with-current-buffer buffer
+      (unless (eq major-mode 'compilation-mode)
+        ;; Sometime will open a comint buffer
+        (compilation-mode)
+        (push (list (get-buffer-window buffer) buffer :delete)
+              core--shackle-popup-window-list)))))
 
 (defun core*desktop-save-unless-loaded ($fn &rest $args)
   (if (or (called-interactively-p 'interactive)

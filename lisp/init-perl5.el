@@ -1,5 +1,3 @@
-(require-packages! company-plsense)
-
 (defalias 'perl-mode 'cperl-mode)
 
 
@@ -71,9 +69,8 @@ If region is active, operate on it, else operate on line."
     (pop-to-buffer buffer)))
 
 (define-hook! perl|mode-setup (cperl-mode-hook)
-  (add-to-list 'company-backends '(company-plsense
-                                   :with company-dabbrev-code))
-  (setq-local completion-at-point-functions nil))
+  (ggtags-mode 1)
+  (setq ggtags-local-libpath (expand-var! "perl-modules")))
 
 (with-eval-after-load 'cperl-mode
   (font-lock-add-keywords 'cperl-mode

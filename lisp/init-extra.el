@@ -118,7 +118,7 @@
 (defvar extra-translate-shell-path
   (eval-when-compile (expand-var! "translate-shell/build/trans")))
 (defvar extra-translate-shell-args
-  (eval-when-compile (split-string "-I -b -s en -t zh -e google" " ")))
+  (eval-when-compile (split-string "-I -s en -t zh -e google" " ")))
 (defun extra/translate-shell ()
   (interactive)
   (cond
@@ -133,12 +133,17 @@
       (when (not (and proc
                       (process-live-p proc)
                       (eq (buffer-local-value 'major-mode buffer)
-                          'term-mode)))
-        (kill-buffer buffer)
-        (setq buffer (term/exec-program extra-translate-shell-path
-                                        extra-translate-shell-args
-                                        bname)))
-      (term%pop-to-buffer buffer)))))
+                          'comint-mode)))
+        (with-current-buffer buffer
+          (let ((buffer-read-only nil))
+            (erase-buffer))
+          (comint-exec buffer
+                       "trans"
+                       extra-translate-shell-path
+                       nil
+                       extra-translate-shell-args)
+          (comint-mode)))
+      (pop-to-buffer buffer)))))
 
 (with-eval-after-load 'shackle
   (define-key! :map shackle-mode-map

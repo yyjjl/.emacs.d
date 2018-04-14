@@ -182,21 +182,22 @@
   (let ((command (and cpp-cmake-project-root
                       (cpp%compile-command (cpp-cmake%config-build)))))
     (if command
-        (cpp-cmake%with-env
-         (compile command))
+        (with-temp-env! (cpp-cmake%config-env)
+          (compile command))
       (setq command
-            (or (-when-let (info (ignore-errors (cquery-file-info)))
+            (or (-when-let (dir (cpp-cmake%locate-cmakelists
+                                 nil nil "Makefile"))
+                  (cpp%compile-command dir))
+                (-when-let (info (ignore-errors (cquery-file-info)))
                   (concat (string-join (mapcar #'shell-quote-argument
                                                (gethash "args" info))
                                        " ")
                           " -o "
                           (ignore-errors
-                            (file-name-base (buffer-file-name)))))
-                (-when-let (dir (cpp-cmake%locate-cmakelists
-                                 nil nil "Makefile"))
-                  (cpp%compile-command dir))))
+                            (file-name-base (buffer-file-name)))))))
       (let ((compile-command (or command compile-command)))
-        (call-interactively 'compile)))))
+        (with-temp-env! (cpp-cmake%config-env)
+          (call-interactively 'compile))))))
 
 (defun cpp/gdb (&optional directory)
   (interactive

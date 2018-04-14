@@ -102,11 +102,6 @@
                                $filename)
       $last-found)))
 
-(defmacro cpp-cmake%with-env (&rest body)
-  `(let ((process-environment (append (cpp-cmake%config-env)
-                                      process-environment)))
-     ,@body))
-
 (defun cpp-cmake%run-cmake-internal (&optional $callback)
   (cl-assert cpp-cmake-project-root nil "Not in a project")
   (let* ((build-directory (cpp-cmake%config-build))
@@ -122,7 +117,8 @@
       (if (yes-or-no-p (format "`%s' doesn't exist, create?" build-directory))
           (make-directory build-directory)
         (error "Can not cd to build directory")))
-    (with-current-buffer (cpp-cmake%with-env (compilation-start command))
+    (with-current-buffer (with-temp-env! (cpp-cmake%config-env)
+                           (compilation-start command))
       (when $callback
         (add-hook 'compilation-finish-functions
                   (lambda (&rest _) (funcall $callback buffer))
@@ -148,8 +144,8 @@
          (buffer (current-buffer))
          (default-directory (or build-directory default-directory)))
     (set-process-sentinel
-     (cpp-cmake%with-env
-      (start-process "cmake" " *cmake*" "cmake" "-L" build-directory))
+     (with-temp-env! (cpp-cmake%config-env)
+       (start-process "cmake" " *cmake*" "cmake" "-L" build-directory))
      (lambda ($proc _)
        (let* ((cmake-buffer (process-buffer $proc))
               (result (cpp-cmake%parse-available-options cmake-buffer)))

@@ -152,6 +152,11 @@ Example:
                     map))))
      ,@$body))
 
+(defmacro with-temp-env! (env &rest body)
+  (declare (indent 1))
+  `(let ((process-environment (append ,env process-environment)))
+     ,@body))
+
 (defun keyword-get! ($list $key)
   "Get values of keyword $KEY from $LIST. This function is used
 for defining functions."

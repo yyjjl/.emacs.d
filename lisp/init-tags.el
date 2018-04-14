@@ -2,10 +2,20 @@
 
 
 
+(defvar-local ggtags-local-libpath nil)
+
+(defun tags*with-local-libpath ($fn &rest $args)
+  (if (stringp ggtags-local-libpath)
+      (with-temp-env! (list (concat "GTAGSLIBPATH=" ggtags-local-libpath))
+        (apply $fn $args))
+    (apply $fn $args)))
+
 (with-eval-after-load 'ggtags
+  (advice-add 'ggtags-process-string :around #'tags*with-local-libpath)
+
   (setq ggtags-mode-prefix-key "\C-cg")
   ;; Set `ggtags-highlight-tag' to t make iedit fail to update
-   ;; candidates
+  ;; candidates
   (setq ggtags-highlight-tag nil)
   (setq ggtags-mode-prefix-map
         (define-key! :map (make-sparse-keymap)

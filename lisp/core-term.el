@@ -32,8 +32,9 @@
   (term-sentinel proc msg)
   (when (memq (process-status proc) '(signal exit))
     (with-current-buffer (process-buffer proc)
-      (insert (propertize "Press `Ctrl-D' or `q' to kill this buffer. "
-                          'font-lock-face 'font-lock-comment-face))
+      (let ((buffer-read-only nil))
+        (insert (propertize "Press `Ctrl-D' or `q' to kill this buffer. "
+                            'font-lock-face 'font-lock-comment-face)))
       (setq buffer-read-only t)
       (local-set-key (kbd "C-d") (lambda! (kill-buffer)))
       (local-set-key (kbd "q") (lambda! (kill-buffer))))))
@@ -222,10 +223,16 @@ none exists, or if the current buffer is already a term."
         (term-send-raw-string "\ef")
       (call-interactively #'forward-word)))
 
+  (defun term/previous-line ()
+    (interactive)
+    ;; Fix for Emacs 26
+    (setq term-goto-process-mark nil)
+    (forward-line -1))
+
   (setq term-bind-key-alist
         '(("C-c C-c" . term-interrupt-subjob)
           ("C-c C-e" . term-send-esc)
-          ("C-c C-p" . previous-line)
+          ("C-c C-p" . term/previous-line)
           ;; ("C-n" . next-line)
           ("C-r" . isearch-backward)
           ("C-m" . term-send-return)

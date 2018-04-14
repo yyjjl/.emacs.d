@@ -100,6 +100,7 @@
   ;;       '(:eval (format "[%s]" (or projectile-project-name
   ;;                                  projectile-cached-project-name
   ;;                                  "-"))))
+  (setq projectile-require-project-root nil)
   (setq projectile-globally-ignored-file-suffixes '(".pyc" ".elc"))
   (setq projectile-require-project-root t)
   (setq projectile-completion-system 'ivy)
@@ -339,9 +340,7 @@ Does not indent buffer, because it is used for a
   ("C-x ," . core/search-in-chrome)
   ("M-/" . hippie-expand)
 
-  ("M-w" . easy-kill)
-  ([remap mark-sexp] . easy-mark)
-  ("M--" . easy-mark)
+  ("M--" . er/expand-region)
 
   ("M-i" . iedit-mode)
   ("M-s o" . core/occur-dwim)
