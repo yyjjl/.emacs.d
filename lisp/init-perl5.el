@@ -10,7 +10,7 @@
 (defvar perl-shell-path (expand-etc! "perli"))
 
 
-(defun perl%format-region (beg end)
+(defun perl//format-region (beg end)
   (unless (char-equal ?\n (char-before end))
     (setq end (min (save-excursion ;; must including terminating newline
                      (goto-char end)
@@ -30,15 +30,15 @@
 If region is active, operate on it, else operate on line."
   (interactive "p")
   (if (use-region-p)
-      (perl%format-region (region-beginning) (region-end))
+      (perl//format-region (region-beginning) (region-end))
     (cond
      ((eq $arg 1)
-      (perl%format-region (save-excursion (beginning-of-defun)
+      (perl//format-region (save-excursion (beginning-of-defun)
                                           (point))
                           (save-excursion (end-of-defun)
                                           (point))))
      ((eq $arg 4)
-      (perl%format-region (point-min) (point-max))))))
+      (perl//format-region (point-min) (point-max))))))
 
 
 (setq

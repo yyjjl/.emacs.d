@@ -82,7 +82,7 @@
   (interactive "r")
   (if (display-graphic-p)
       (kill-new (buffer-substring-no-properties $beg $end))
-    (if emacs-has-xsel-p
+    (if env-has-xsel-p
         (if (= 0 (shell-command-on-region $beg $end "xsel -ib"))
             (message "Copy finished")
           (message "Error occured !!!"))
@@ -92,13 +92,13 @@
   (interactive)
   (if (display-graphic-p)
       (yank 1)
-    (if emacs-has-xsel-p
+    (if env-has-xsel-p
         (shell-command "xsel -ob" t)
       (message "Executable `xsel' not found !!!"))))
 
 ;; `whitespace-space' setup
 (with-eval-after-load 'whitespace
-  (setq whitespace-style '(face tabs tab-mark)))
+  (setq whitespace-style '(face tabs tab-mark spaces space-mark)))
 
 (with-eval-after-load 'skeletor
   (setq skeletor-completing-read-function 'ivy-completing-read)
@@ -118,7 +118,7 @@
 (defvar extra-translate-shell-path
   (eval-when-compile (expand-var! "translate-shell/build/trans")))
 (defvar extra-translate-shell-args
-  (eval-when-compile (split-string "-I -s en -t zh -e google" " ")))
+  (eval-when-compile (split-string "-I -s zh -t en -e google" " ")))
 (defun extra/translate-shell ()
   (interactive)
   (cond

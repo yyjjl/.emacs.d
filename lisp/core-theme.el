@@ -56,7 +56,8 @@
  '(semantic-highlight-func-current-tag-face ((t (:background "gray5"))))
  '(shm-current-face ((t (:inherit hl-line))))
  '(ivy-highlight-face ((t (:background "#444155"))))
- '(ivy-current-match ((t (:background "black")))))
+ '(ivy-current-match ((t (:background "black"))))
+ '(window-numbering-face ((t (:background "black")))))
 
 (with-eval-after-load 'org
   (dolist (face org-level-faces)

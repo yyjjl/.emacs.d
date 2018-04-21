@@ -15,12 +15,12 @@
 (defvar hs-persistent-file (expand-var! "fold.el"))
 (defvar hs-persistent-table (make-hash-table :test #'equal))
 
-(defun hs%get-overlays ()
+(defun hs//get-overlays ()
   (loop for overlay in (overlays-in (point-min) (point-max))
         when (overlay-get overlay 'hs)
         collect overlay))
 
-(defun hs%load-persistent-table ()
+(defun hs//load-persistent-table ()
   (when (file-exists-p hs-persistent-file)
     (load hs-persistent-file :noerror :nomessage))
   (let ((table hs-persistent-table))
@@ -30,14 +30,14 @@
           (puthash key (gethash key hs-persistent-table) table))))
     (setq hs-persistent-table table)))
 
-(defun hs%save-persistent-table ()
+(defun hs//save-persistent-table ()
   (with-temp-buffer
     (insert "(setq hs-persistent-table ")
     (insert (prin1-to-string hs-persistent-table))
     (insert ")")
     (write-file hs-persistent-file)))
 
-(defun hs%save-folds (&optional buffer-or-name)
+(defun hs//save-folds (&optional buffer-or-name)
   "Save folds in BUFFER-OR-NAME, which should have associated file.
 
 BUFFER-OR-NAME defaults to current buffer."
@@ -47,7 +47,7 @@ BUFFER-OR-NAME defaults to current buffer."
             information)
         (when filename
           (setq filename (substring-no-properties filename))
-          (dolist (ov (hs%get-overlays))
+          (dolist (ov (hs//get-overlays))
             (push (cons (overlay-start ov) (overlay-end ov)) information))
           (if information
               (progn
@@ -57,7 +57,7 @@ BUFFER-OR-NAME defaults to current buffer."
             (when (gethash filename hs-persistent-table)
               (remhash filename hs-persistent-table))))))))
 
-(defun hs%restore-folds (&optional buffer-or-name)
+(defun hs//restore-folds (&optional buffer-or-name)
   "Restore folds in BUFFER-OR-NAME, if they have been saved.
 
 BUFFER-OR-NAME defaults to current buffer."
@@ -80,18 +80,18 @@ BUFFER-OR-NAME defaults to current buffer."
 
 (defun hs|kill-emacs-hook ()
   "Traverse all buffers and try to save their folds."
-  (mapc #'hs%save-folds (buffer-list))
-  (hs%save-persistent-table))
+  (mapc #'hs//save-folds (buffer-list))
+  (hs//save-persistent-table))
 
 (define-minor-mode hs-persistent-mode
   "Toggle `hs-persistent-mode' minor mode."
   :global nil
   (let ((fnc (if hs-persistent-mode #'add-hook #'remove-hook)))
-    (funcall fnc 'hs-minor-mode-hook #'hs%restore-folds)
-    (funcall fnc 'kill-buffer-hook #'hs%save-folds)
+    (funcall fnc 'hs-minor-mode-hook #'hs//restore-folds)
+    (funcall fnc 'kill-buffer-hook #'hs//save-folds)
     (funcall fnc 'kill-emacs-hook #'hs|kill-emacs-hook)))
 
-(defun hs%display-headline ()
+(defun hs//display-headline ()
   (let* ((len (length hs-headline))
          (headline hs-headline)
          (postfix ""))
@@ -100,7 +100,7 @@ BUFFER-OR-NAME defaults to current buffer."
       (setq headline (substring hs-headline 0 hs--headline-max-len)))
     (if hs-headline (concat headline postfix " ") "")))
 
-(defun hs%abstract-overlay ($ov)
+(defun hs//abstract-overlay ($ov)
   (let* ((start (overlay-start $ov))
          (end (overlay-end $ov))
          (str (format " ...%d... " (count-lines start end))) text)
@@ -109,17 +109,18 @@ BUFFER-OR-NAME defaults to current buffer."
     (overlay-put $ov 'pointer 'hand)
     (overlay-put $ov 'keymap hs--overlay-map)))
 
+(defun hs//auto-expand (&rest $args)
+  (save-excursion (hs-show-block)))
+
 (with-eval-after-load 'hideshow
   (setq hs-isearch-open t
         hs-allow-nesting t)
-  (setq hs-set-up-overlay 'hs%abstract-overlay)
-  (defun hs%auto-expand (&rest $args)
-    (save-excursion (hs-show-block)))
+  (setq hs-set-up-overlay 'hs//abstract-overlay)
 
   (hs-persistent-mode 1)
-  (hs%load-persistent-table)
-  (advice-add 'goto-line :after #'hs%auto-expand)
-  (advice-add 'find-tag :after #'hs%auto-expand))
+  (hs//load-persistent-table)
+  (advice-add 'goto-line :after #'hs//auto-expand)
+  (advice-add 'find-tag :after #'hs//auto-expand))
 
 
 (provide 'core-hideshow)

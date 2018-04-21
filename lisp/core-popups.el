@@ -70,7 +70,7 @@
                 nil nil word))
     (sdcv-search-word word)))
 
-(defun core%clean-window-list ()
+(defun core//clean-window-list ()
   ;; Remove inactive window
   (setq core--shackle-popup-window-list
         (loop for (window buffer action) in core--shackle-popup-window-list
@@ -80,7 +80,7 @@
 
 (defun core*close-popup-window (&rest _)
   "When `C-g' pressed, close latest opened popup window"
-  (core%clean-window-list)
+  (core//clean-window-list)
   ;; `C-g' can deactivate region
   (when (and (called-interactively-p 'interactive)
              (not (region-active-p)))
@@ -103,8 +103,19 @@
 
           (pop core--shackle-popup-window-list))))))
 
+(defun core//record-popup-window ($window $buffer &optional $autoclose? $action)
+  (when $autoclose?
+    ;; Autoclose window should be dedicated
+    (set-window-dedicated-p $window t)
+    ;; Add to autoclose list
+    (push (list $window $buffer (or $action :delete))
+          core--shackle-popup-window-list))
+  (with-current-buffer $buffer
+    ;; Record popup window
+    (setq core--shackle-popup-window $window)))
+
 (defun core*shackle-display-buffer-hack ($fn $buffer $alist $plist)
-  (core%clean-window-list)
+  (core//clean-window-list)
 
   ;; Set default alignment
   (setq shackle-default-alignment
@@ -121,14 +132,7 @@
                       (setq action :quit)
                       (funcall $fn $buffer $alist (list* :other t $plist))))))
     (unless (eq window old-window)
-      (when autoclose?
-        ;; Autoclose window should be dedicated
-        (set-window-dedicated-p window t)
-        ;; Add to autoclose list
-        (push (list window $buffer action) core--shackle-popup-window-list))
-      (with-current-buffer $buffer
-        ;; Record popup window
-        (setq core--shackle-popup-window window)))
+      (core//record-popup-window window $buffer autoclose? action))
     window))
 
 (defun core*shackle--display-buffer-popup-window-hack ($buffer $alist $plist)
@@ -157,16 +161,16 @@
       (funcall $fn $window $alist))))
 
 
-(defun core--shackle%comint-mode-matcher ($buffer)
+(defun core//shackle-comint-mode-matcher ($buffer)
   (let ((case-fold-search t)
         (buffer-name (buffer-name $buffer))
         (mode (buffer-local-value 'major-mode $buffer)))
-    (or (derived-mode? 'comint-mode $buffer)
+    (or (derived-mode? 'comint-mode)
         (memq mode core--shackle-comint-modes)
         (string-match-p "^\\*.*repl.*\\*$" buffer-name)
         (string-match-p "^\\*shell\\*" buffer-name))))
 
-(defun core--shackle%help-mode-matcher ($buffer)
+(defun core//shackle-help-mode-matcher ($buffer)
   (let ((case-fold-search t)
         (buffer-name (buffer-name $buffer))
         (mode (buffer-local-value 'major-mode $buffer)))
@@ -194,7 +198,7 @@
   (advice-add 'shackle--display-buffer-popup-window
               :override #'core*shackle--display-buffer-popup-window-hack)
   (advice-add 'window--try-to-split-window
-            :around #'core*window--try-to-split-window-hack)
+              :around #'core*window--try-to-split-window-hack)
 
   (define-hook! core|autoclose-popup-window (kill-buffer-hook)
     "Auto quit popup window after buffer killed"
@@ -212,9 +216,9 @@
         shackle-default-size 0.40
         shackle-default-rule nil
         shackle-rules
-        `(((:custom core--shackle%comint-mode-matcher)
+        `(((:custom core//shackle-comint-mode-matcher)
            :align below :select t)
-          ((:custom core--shackle%help-mode-matcher)
+          ((:custom core//shackle-help-mode-matcher)
            :align below :select t :autoclose t)
           ("\\*Flycheck.*\\*"
            :regexp t :align below :noselect t :autoclose t)

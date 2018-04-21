@@ -18,12 +18,12 @@
 
 
 
-(defsubst cpp-cquery%dot-cquery-path (&optional $dir)
+(defsubst cpp-cquery//dot-cquery-path (&optional $dir)
   (expand-file-name ".cquery"
                     (locate-dominating-file (or $dir default-directory)
                                             ".cquery")))
 
-(defun cpp-cquery%setup ()
+(defun cpp-cquery//setup ()
   (when cpp-has-cquery-p
     (unless lsp-mode
       (condition-case err
@@ -49,15 +49,15 @@
         (message ".cquery created")))))
 
 
-(defmacro cpp-cquery%define-find (symbol command)
+(defmacro cpp-cquery//define-find (symbol command)
   `(defun ,(intern (format "cpp/xref-find-%s" symbol)) ()
      (interactive)
      (cquery-xref-find-custom ,command)))
 
-(cpp-cquery%define-find base "$cquery/base")
-(cpp-cquery%define-find callers "$cquery/callers")
-(cpp-cquery%define-find derived "$cquery/derived")
-(cpp-cquery%define-find vars "$cquery/vars")
+(cpp-cquery//define-find base "$cquery/base")
+(cpp-cquery//define-find callers "$cquery/callers")
+(cpp-cquery//define-find derived "$cquery/derived")
+(cpp-cquery//define-find vars "$cquery/vars")
 
 
 
@@ -82,8 +82,24 @@
   (setq cquery-extra-init-params
         '(:index (:comments 2)
                  :cacheFormat "msgpack" :completion (:detailedLabel t)))
-  ;; (setq cquery-sem-highlight-method 'font-lock)
-  (setq cquery-sem-highlight-method nil))
+  (setq cquery-sem-highlight-method 'font-lock)
+
+  (defvar cpp-cquery--semantic-highlight-timer nil)
+  (defvar cpp-cquery--semantic-highlight-interval 1)
+  (defvar cpp-cquery--semantic-highlight-params nil)
+  (defun cpp-cquery*semantic-highlight ($fn _ $params)
+    (setq cpp-cquery--semantic-highlight-params $params)
+    (unless cpp-cquery--semantic-highlight-timer
+      (setq cpp-cquery--semantic-highlight-timer
+            (run-with-idle-timer
+             cpp-cquery--semantic-highlight-interval nil
+             (lambda ()
+               (unwind-protect
+                   (funcall $fn nil cpp-cquery--semantic-highlight-params)
+                 (setq cpp-cquery--semantic-highlight-timer nil)))))))
+
+  (advice-add 'cquery--publish-semantic-highlighting
+              :around #'cpp-cquery*semantic-highlight))
 
 (with-eval-after-load 'cquery-tree
   (add-hook 'cquery-tree-mode-hook

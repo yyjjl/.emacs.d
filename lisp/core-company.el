@@ -59,7 +59,7 @@
   ;; `M-x describe-variable company-auto-complete-chars` for details
   ;; That's BAD idea.
   (setq company-auto-complete nil)
-  ;; NOT to load company-mode for certain major modes.
+  ;; Not to load company-mode for certain major modes.
   (setq company-global-modes
         '(not eshell-mode comint-mode erc-mode
               gud-mode rcirc-mode shell-mode

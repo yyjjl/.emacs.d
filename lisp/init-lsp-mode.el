@@ -9,68 +9,68 @@
  'doom-molokai
  '(lsp-face-highlight-textual ((t :background "#444155"))))
 
-(with-eval-after-load 'flycheck
-  ;; flycheck support
-  (defvar lsp--flycheck-global-idle-timer nil)
+;; flycheck support
+(defvar lsp--flycheck-global-idle-timer nil)
 
-  (defun lsp%flycheck--start (checker callback)
-    "Start an LSP syntax check with CHECKER.
+(defun lsp//flycheck--start (checker callback)
+  "Start an LSP syntax check with CHECKER.
 
 CALLBACK is the status callback passed by Flycheck."
-    ;; Turn all errors from lsp--diagnostics into flycheck-error objects and pass
-    ;; them immediately to the callback
-    (let ((errors))
-      (maphash (lambda (file diagnostics)
-                 (dolist (diag diagnostics)
-                   (push (flycheck-error-new
-                          :buffer (current-buffer)
-                          :checker checker
-                          :filename file
-                          :line (1+ (lsp-diagnostic-line diag))
-                          :column (1+ (lsp-diagnostic-column diag))
-                          :message (lsp-diagnostic-message diag)
-                          :level (pcase (lsp-diagnostic-severity diag)
-                                   (1 'error)
-                                   (2 'warning)
-                                   (_ 'info))
-                          :id (lsp-diagnostic-code diag))
-                         errors)))
-               lsp--diagnostics)
-      (funcall callback 'finished errors)))
+  ;; Turn all errors from lsp--diagnostics into flycheck-error objects and pass
+  ;; them immediately to the callback
+  (let ((errors))
+    (maphash (lambda (file diagnostics)
+               (dolist (diag diagnostics)
+                 (push (flycheck-error-new
+                        :buffer (current-buffer)
+                        :checker checker
+                        :filename file
+                        :line (1+ (lsp-diagnostic-line diag))
+                        :column (1+ (lsp-diagnostic-column diag))
+                        :message (lsp-diagnostic-message diag)
+                        :level (pcase (lsp-diagnostic-severity diag)
+                                 (1 'error)
+                                 (2 'warning)
+                                 (_ 'info))
+                        :id (lsp-diagnostic-code diag))
+                       errors)))
+             lsp--diagnostics)
+    (funcall callback 'finished errors)))
 
-  (defun lsp%flycheck-check ()
-    (when (and flycheck-mode
-               (not lsp--flycheck-global-idle-timer))
-      (setq lsp--flycheck-global-idle-timer
-            (run-with-idle-timer 0.2 nil
-                                 (lambda ()
-                                   (setq lsp--flycheck-global-idle-timer nil)
-                                   (ignore-errors
-                                     (when flycheck-mode
-                                       (flycheck-buffer))))))))
+(defun lsp//flycheck-check ()
+  (when (and flycheck-mode
+             (not lsp--flycheck-global-idle-timer))
+    (setq lsp--flycheck-global-idle-timer
+          (run-with-idle-timer 0.2 nil
+                               (lambda ()
+                                 (setq lsp--flycheck-global-idle-timer nil)
+                                 (ignore-errors
+                                   (when flycheck-mode
+                                     (flycheck-buffer))))))))
 
+(defun lsp//flycheck-add-mode (mode)
+  "Add MODE as a valid major mode for the lsp checker."
+  (unless (flycheck-checker-supports-major-mode-p 'lsp-mine mode)
+    (flycheck-add-mode 'lsp-mine mode)))
+
+(defun lsp//flycheck-enable (_)
+  "Enable flycheck integration for the current buffer."
+  (setq-local flycheck-check-syntax-automatically nil)
+  (setq-local flycheck-checker 'lsp-mine)
+  (lsp//flycheck-add-mode major-mode)
+  (add-to-list 'flycheck-checkers 'lsp-mine)
+  (add-hook 'lsp-after-diagnostics-hook #'lsp//flycheck-check))
+
+(with-eval-after-load 'flycheck
   (flycheck-define-generic-checker 'lsp-mine
     "A syntax checker using the Language Server Protocol (RLS)
 provided by lsp-mode.
 
 See https://github.com/emacs-lsp/lsp-mode."
-    :start #'lsp%flycheck--start
+    :start #'lsp//flycheck--start
     :modes '(python-mode c++-mode rust-mode) ; Need a default mode
     :predicate (lambda () lsp-mode)
-    :error-explainer (lambda (e) (flycheck-error-message e)))
-
-  (defun lsp%flycheck-add-mode (mode)
-    "Add MODE as a valid major mode for the lsp checker."
-    (unless (flycheck-checker-supports-major-mode-p 'lsp-mine mode)
-      (flycheck-add-mode 'lsp-mine mode)))
-
-  (defun lsp%flycheck-enable (_)
-    "Enable flycheck integration for the current buffer."
-    (setq-local flycheck-check-syntax-automatically nil)
-    (setq-local flycheck-checker 'lsp-mine)
-    (lsp%flycheck-add-mode major-mode)
-    (add-to-list 'flycheck-checkers 'lsp-mine)
-    (add-hook 'lsp-after-diagnostics-hook #'lsp%flycheck-check)))
+    :error-explainer (lambda (e) (flycheck-error-message e))))
 
 (with-eval-after-load 'lsp-mode
   (require 'lsp-imenu)
@@ -90,7 +90,7 @@ See https://github.com/emacs-lsp/lsp-mode."
 
   (define-hook! lsp|after-open (lsp-after-open-hook)
     (lsp-enable-imenu)
-    (lsp%flycheck-enable 1))
+    (lsp//flycheck-enable 1))
 
   (defun lsp-execute-code-action (action)
     "Execute code action ACTION."

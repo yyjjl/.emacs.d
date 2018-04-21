@@ -8,7 +8,7 @@
  cpp-has-cquery-p (file-exists-p cpp-cquery-base-path))
 
 (require-packages!
- (ggtags :when tags-has-gtags-p)
+ (ggtags :when env-has-gtags-p)
  (lsp-mode :when cpp-has-cquery-p)
  (company-lsp :when cpp-has-cquery-p)
  (cquery :when cpp-has-cquery-p)
@@ -57,7 +57,7 @@
 
 
 
-(defun cpp%compile-command ($dir)
+(defun cpp//compile-command ($dir)
   "Return suitable compile command for current project"
   (cond
    ((bound-and-true-p projectile-project-compilation-cmd)
@@ -72,8 +72,9 @@
 
 ;; Setup
 
-(defun cpp%common-cc-setup ()
+(defun cpp//common-cc-setup ()
   "Setup shared by all languages (java/groovy/c++ ...)"
+  (highlight-indentation-mode 1)
   (turn-on-auto-fill)
   (google-set-c-style)
   (setq c-basic-offset 4)
@@ -82,7 +83,7 @@
   (highlight-indentation-set-offset c-basic-offset)
   (c-toggle-hungry-state 1))
 
-(defun cpp%font-lock-setup ()
+(defun cpp//font-lock-setup ()
   (when (or (eq font-lock-maximum-decoration 1)
             (and (listp font-lock-maximum-decoration)
                  (eq (cdr (assoc major-mode
@@ -90,7 +91,7 @@
                      1)))
     (font-lock-add-keywords nil cpp--font-lock-keywords)))
 
-(defun cpp%setup ()
+(defun cpp//setup ()
   (if (or (not cpp-has-cmake-p)
           (not cpp-has-cquery-p)
           (file-remote-p default-directory)
@@ -100,10 +101,10 @@
         (ggtags-mode 1)
         ;; (setq completion-at-point-functions nil)
         (flycheck-mode -1))
-    (setq cpp-cmake-project-root (cpp-cmake%locate-cmakelists))
-    (if (or (file-exists-p (cpp-cquery%dot-cquery-path))
-            (and cpp-cmake-project-root (file-exists-p (cpp-cmake%cdb-path))))
-        (cpp-cquery%setup)
+    (setq cpp-cmake-project-root (cpp-cmake//locate-cmakelists))
+    (if (or (file-exists-p (cpp-cquery//dot-cquery-path))
+            (and cpp-cmake-project-root (file-exists-p (cpp-cmake//cdb-path))))
+        (cpp-cquery//setup)
       (when cpp-cmake-project-root
         (message "Need run `cpp/run-cmake' to setup cquery server")))))
 
@@ -115,19 +116,19 @@
     (if (>= (string-to-number c-version) 5.33)
         (run-hooks 'prog-mode-hook))
 
-    (cpp%common-cc-setup)
+    (cpp//common-cc-setup)
 
     (unless (or (derived-mode-p 'java-mode)
                 (derived-mode-p 'groovy-mode))
       ;; (hide-ifdef-mode 1)
       ;; Make a #define be left-aligned
       (setq c-electric-pound-behavior '(alignleft))
-      (cpp%font-lock-setup)
+      (cpp//font-lock-setup)
 
       (unless (buffer-temporary?)
         (add-transient-hook!
-            (hack-local-variables-hook :local t :name cpp%setup-interal)
-          (cpp%setup))))))
+            (hack-local-variables-hook :local t :name cpp//setup-interal)
+          (cpp//setup))))))
 
 
 
@@ -135,19 +136,19 @@
   (interactive "P")
   (if (not cpp-cmake-project-root)
       (message "CMakeLists.txt hasn't been found.")
-    (cpp-cmake%run-cmake-internal
+    (cpp-cmake//run-cmake-internal
      (lambda (buffer)
        (with-current-buffer buffer
          (unless cpp-setup-literally
-           (let ((cdb-path (cpp-cmake%cdb-path)))
+           (let ((cdb-path (cpp-cmake//cdb-path)))
              (when (not (file-exists-p cdb-path))
                (error "Can not find compile_commands.json"))
              (let ((default-directory cpp-cmake-project-root))
                (make-symbolic-link cdb-path "compile_commands.json"
                                    :ok-if-already-exists)))
-           (cpp-cquery%setup)))))
+           (cpp-cquery//setup)))))
     (when $set-options
-      (cpp-cmake%set-cmake-options
+      (cpp-cmake//set-cmake-options
        (lambda (_)
          (message "Finish setting cmake options"))))))
 
@@ -175,19 +176,19 @@
         (setq buffer (term/exec-program "root"
                                         (list "-l" (or file ""))
                                         buffer-name)))
-      (term%pop-to-buffer buffer)))))
+      (term//pop-to-buffer buffer)))))
 
 (defun cpp/compile ()
   (interactive)
   (let ((command (and cpp-cmake-project-root
-                      (cpp%compile-command (cpp-cmake%config-build)))))
+                      (cpp//compile-command (cpp-cmake//config-build)))))
     (if command
-        (with-temp-env! (cpp-cmake%config-env)
+        (with-temp-env! (cpp-cmake//config-env)
           (compile command))
       (setq command
-            (or (-when-let (dir (cpp-cmake%locate-cmakelists
+            (or (-when-let (dir (cpp-cmake//locate-cmakelists
                                  nil nil "Makefile"))
-                  (cpp%compile-command dir))
+                  (cpp//compile-command dir))
                 (-when-let (info (ignore-errors (cquery-file-info)))
                   (concat (string-join (mapcar #'shell-quote-argument
                                                (gethash "args" info))
@@ -196,7 +197,7 @@
                           (ignore-errors
                             (file-name-base (buffer-file-name)))))))
       (let ((compile-command (or command compile-command)))
-        (with-temp-env! (cpp-cmake%config-env)
+        (with-temp-env! (cpp-cmake//config-env)
           (call-interactively 'compile))))))
 
 (defun cpp/gdb (&optional directory)
@@ -205,7 +206,7 @@
           (read-directory-name
            "Directory: "
            (file-name-as-directory (or (and cpp-cmake-project-root
-                                            (cpp-cmake%config-build))
+                                            (cpp-cmake//config-build))
                                        default-directory))
            ""
            :must-match))))
@@ -266,8 +267,15 @@
 ;; Set term default directory
 (when (boundp 'term-default-directory-function-list)
   (add-to-list 'term-default-directory-function-list
-               (lambda ()
-                 (and cpp-cmake-project-root (cpp-cmake%config-build)))))
+               (byte-compile
+                (lambda ()
+                  (and cpp-cmake-project-root (cpp-cmake//config-build))))))
+
+(when (boundp 'term-default-environment-function-list)
+  (add-to-list 'term-default-environment-function-list
+               (byte-compile
+                (lambda ()
+                  (and cpp-cmake-project-root (cpp-cmake//config-env))))))
 
 (cond ((eq font-lock-maximum-decoration t)
        (setq font-lock-maximum-decoration
@@ -281,4 +289,3 @@
 
 
 (provide 'init-cpp)
-

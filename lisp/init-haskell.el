@@ -15,7 +15,7 @@
 
 
 
-(defun haskell%setup-view-keys ($map)
+(defun haskell//setup-view-keys ($map)
   (define-key! :map $map
     ("<tab>" . forward-button)
     ("<backtab>" . backward-button)
@@ -153,16 +153,16 @@
   (define-key intero-mode-map (kbd "C-c C-d") 'intero-info))
 
 (with-eval-after-load 'idris-hole-list
-  (haskell%setup-view-keys idris-hole-list-mode-map))
+  (haskell//setup-view-keys idris-hole-list-mode-map))
 
 (with-eval-after-load 'idris-info
-  (haskell%setup-view-keys idris-info-mode-map)
+  (haskell//setup-view-keys idris-info-mode-map)
 
   (define-hook! idris|info-mode-setup (idris-info-mode-hook)
     (setq-local eldoc-documentation-function 'idris-eldoc-lookup)))
 
 (with-eval-after-load 'idris-tree-info
-  (haskell%setup-view-keys idris-tree-info-mode-map))
+  (haskell//setup-view-keys idris-tree-info-mode-map))
 
 (with-eval-after-load 'align
   (setq align-region-separate 'group)

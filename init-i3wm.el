@@ -59,8 +59,9 @@
 (setq-default mode-line-format nil)
 (setq-default window-min-height 1)
 (setq-default default-frame-alist
-              `((name . "Minibuffer")
-                (width . 80)
+              `((name . "Minibuffer-i3wm")
+                (font . "MonacoB-11")
+                (width . 100)
                 (height . ,(+ 4 ivy-height))
                 (menu-bar-lines . 0)
                 (tool-bar-lines . 0)
@@ -150,15 +151,15 @@
     (dolist (directory i3-document-directories)
       (dolist (file (directory-files-recursively directory
                                                  i3-document-regexp))
-        (recentf-push file))))
+        (let ((m (recentf-string-member file recentf-list)))
+          (unless m
+            (push file recentf-list))))))
   (recentf-save-list)
   (message "Indexing done"))
 
-(define-hook! i3%do-index-files (midnight-hook)
-  (i3%index-document-files))
+(add-hook 'midnight-hook 'i3%index-document-files)
 
-
-(i3%do-index-files)
+(i3%index-document-files)
 
 
 
@@ -191,5 +192,10 @@
 
 (ivy-set-display-transformer 'i3/open-document
                              #'i3%open-document-transformer)
+
+(run-with-idle-timer 10 t
+                     (lambda ()
+                       (recentf-save-list)
+                       (session-save-session)))
 
 (provide 'init-i3)

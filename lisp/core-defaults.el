@@ -11,7 +11,7 @@
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 0.6)
 
-;; NO tool bar or scroll bar
+;; No tool bar or scroll bar
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
 (when (fboundp 'set-scroll-bar-mode)
@@ -33,69 +33,65 @@
 (setq locale-coding-system 'utf-8)
 (setq-default buffer-file-coding-system 'utf-8)
 
-(setq-default
- ;; silence advised function warnings
- ad-redefinition-action 'accept
- ;; make `apropos' more useful
- apropos-do-all t
+ ;; Silence advised function warnings
+(setq-default ad-redefinition-action 'accept)
+ ;; Make `apropos' more useful
+(setq-default apropos-do-all t)
  ;; kill compilation process before starting another
- compilation-always-kill t
- compilation-scroll-output t
- confirm-nonexistent-file-or-buffer t
- delete-by-moving-to-trash t
- enable-recursive-minibuffers nil
- ;; update ui less often
- idle-update-delay 2
+(setq-default compilation-always-kill t)
+(setq-default compilation-scroll-output t)
+(setq-default confirm-nonexistent-file-or-buffer t)
+(setq-default delete-by-moving-to-trash t)
+(setq-default enable-recursive-minibuffers nil)
+;; Update ui less often
+(setq-default idle-update-delay 2)
  ;; keep the point out of the minibuffer
- mark-ring-max 128
- minibuffer-prompt-properties
- '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt)
+(setq-default mark-ring-max 128)
+(setq-default minibuffer-prompt-properties
+              '(read-only t point-entered minibuffer-avoid-prompt
+                          face minibuffer-prompt))
  ;; History & backup settings
- auto-save-default t
- auto-save-timeout 8
- create-lockfiles nil
- history-length 500
- history-delete-duplicates t
- make-backup-files nil
+(setq-default auto-save-default t)
+(setq-default auto-save-timeout 8)
+(setq-default create-lockfiles nil)
+(setq-default history-length 500)
+(setq-default history-delete-duplicates t)
+(setq-default make-backup-files nil)
  ;; No automatic new line when scrolling down at buffer bottom
- next-line-add-newlines nil
- buffers-menu-max-size 30
- case-fold-search t
- compilation-scroll-output t
- ediff-split-window-function 'split-window-horizontally
- ediff-window-setup-function 'ediff-setup-windows-plain
- save-interprogram-paste-before-kill t
- indent-tabs-mode nil
+(setq-default next-line-add-newlines nil)
+(setq-default buffers-menu-max-size 30)
+(setq-default case-fold-search t)
+(setq-default compilation-scroll-output t)
+(setq-default ediff-split-window-function 'split-window-horizontally)
+(setq-default ediff-window-setup-function 'ediff-setup-windows-plain)
+(setq-default save-interprogram-paste-before-kill t)
+(setq-default indent-tabs-mode nil)
  ;; `line-spacing' make inline-image flickering a lot
- line-spacing 0.25
- mouse-yank-at-point t
- set-mark-command-repeat-pop t
- echo-keystrokes 0.25
- tooltip-delay 1
- ;; Bad idea, could accidentally edit others' code
- ;; require-final-newline t
- truncate-lines nil
- truncate-partial-width-windows nil
- speedbar-use-images nil
- large-file-warning-threshold (* 512 1024 1024)
-
- system-time-locale "C"
- imenu-max-item-length 1024
-
- global-auto-revert-non-file-buffers t
- auto-revert-verbose nil
-
- backup-by-coping t
- delete-old-versions t
- ;; Use versioned backups
- version-control t
- kept-new-versions 6
- kept-old-versions 2
-
- select-enable-clipboard t
- select-enable-primary t
-
- vc-make-backup-files nil)
+(setq-default line-spacing 0.25)
+(setq-default mouse-yank-at-point t)
+(setq-default set-mark-command-repeat-pop t)
+(setq-default echo-keystrokes 0.25)
+;; Bad idea, could accidentally edit others' code
+;; (setq-default                require-final-newline t)
+(setq-default tooltip-delay 1)
+(setq-default truncate-lines nil)
+(setq-default truncate-partial-width-windows nil)
+(setq-default speedbar-use-images nil)
+(setq-default large-file-warning-threshold (* 512 1024 1024))
+(setq-default line-number-display-limit core-large-buffer-size)
+(setq-default system-time-locale "C")
+(setq-default imenu-max-item-length 1024)
+(setq-default global-auto-revert-non-file-buffers t)
+(setq-default auto-revert-verbose nil)
+(setq-default backup-by-coping t)
+(setq-default delete-old-versions t)
+;; Use versioned backups
+(setq-default version-control t)
+(setq-default kept-new-versions 6)
+(setq-default kept-old-versions 2)
+(setq-default select-enable-clipboard t)
+(setq-default select-enable-primary t)
+(setq-default vc-make-backup-files nil)
 
 ;; be quiet at startup; don't load or display anything unnecessary
 (advice-add #'display-startup-echo-area-message :override #'ignore)
@@ -104,22 +100,20 @@
 (setq use-dialog-box nil)
 (setq inhibit-startup-screen t)
 (setq inhibit-startup-echo-area-message t)
-(setq display-time-24hr-format t
-      display-time-day-and-date t)
+(setq display-time-24hr-format t)
+(setq display-time-day-and-date t)
 (setq initial-scratch-message
       (concat ";; Welcome to Emacs " (or user-login-name "") " !!!"))
 
-(defvar core-recentf-enabled? t)
-(defun core%recentf-keep? ($fn)
-  (and core-recentf-enabled?
+(defun core//recentf-keep? ($fn)
+  (and core--recentf-enabled-p
        ;; The order must be kept
        (or (file-remote-p $fn)
            (and (file-readable-p $fn)
                 (file-writable-p $fn)))))
-(setq recentf-keep '(core%recentf-keep?))
+(setq recentf-keep '(core//recentf-keep?))
 (setq recentf-max-saved-items 2048
-      recentf-exclude (list "/tmp/" "/ssh:" "/sudo:" "\\.elc$"
-                            emacs-var-direcotry))
+      recentf-exclude (list "/tmp/" "/ssh:" "/sudo:" "\\.elc$" emacs-var-direcotry))
 
 ;; Keep mouse at upper-right corner when typing
 ;; (mouse-avoidance-mode 'banish)
@@ -128,13 +122,11 @@
 ;; (display-time-mode 1)
 (transient-mark-mode 1)
 
-(ignore-errors
-  (progn
-    (setq history-length 1000)
-    (setq savehist-additional-variables '(ivy-views))
-    (savehist-mode 1)))
+(setq history-length 1000)
+(setq savehist-additional-variables '(ivy-views))
+(ignore-errors (savehist-mode 1))
 
-(defun core%external-file-handler ($op &rest $args)
+(defun core//external-file-handler ($op &rest $args)
   (let ((file (expand-file-name (car $args))))
     (cond ((eq system-type 'darwin)
            (shell-command (concat "open " (shell-quote-argument file))))
@@ -146,72 +138,20 @@
     (let (debug-on-error)
       (error "Opened %s in external program" (file-name-nondirectory file)))))
 
-(put 'core%external-file-handler 'safe-magic t)
-(put 'core%external-file-handler 'operations '(insert-file-contents))
+(put 'core//external-file-handler 'safe-magic t)
+(put 'core//external-file-handler 'operations '(insert-file-contents))
 
-(defvar core-external-file-extensions
+(defvar core--external-file-extensions
   '("pdf" "djvu" "dvi" "od[fgpst]" "docx?" "xlsx?"
     "pptx?" "mkv" "avi" "mp4" "rmvb"))
-(defvar core-external-file-regexp
+(defvar core--external-file-regexp
   (eval-when-compile
     (concat "\\.\\(?:"
-            (string-join (append (mapcar #'upcase
-                                         core-external-file-extensions)
-                                 core-external-file-extensions) "\\|")
+            (string-join
+             (append (mapcar #'upcase core--external-file-extensions)
+                     core--external-file-extensions)
+             "\\|")
             "\\)\\'")))
-
-;; Don't echo passwords when communicating with interactive programs:
-(add-hook 'comint-output-filter-functions 'comint-watch-for-password-prompt)
-
-;; Make scratch buffer un-killable
-(define-hook! core|unkillable-buffer (kill-buffer-query-functions)
-  (let ((bn (buffer-name)))
-    (cond ((equal bn "*note*") nil)
-          ((equal bn "*task*") nil)
-          ((equal bn "*scratch*") (delete-region (point-min) (point-max)) nil)
-          (t t))))
-
-;; Display long lines in truncated style (end line with $)
-(define-hook! core|truncate-lines-setup (grep-mode-hook)
-  (toggle-truncate-lines 1))
-
-;; Turns on `auto-fill-mode', don't use `text-mode-hook'
-(add-hook 'change-log-mode-hook 'turn-on-auto-fill)
-
-;; ANSI-escape coloring in compilation-mode
-(setq compilation-environment '("TERM=xterm-256color"))
-(require 'ansi-color)
-(define-hook! core|colorize-compilation-buffer (compilation-filter-hook)
-  (when (eq major-mode 'compilation-mode)
-    (ansi-color-apply-on-region compilation-filter-start (point-max))))
-
-(define-hook! (core|compilation-finish-hook buffer msg)
-  (compilation-finish-functions)
-  (when (buffer-live-p buffer)
-    (with-current-buffer buffer
-      (unless (eq major-mode 'compilation-mode)
-        ;; Sometime will open a comint buffer
-        (compilation-mode)
-        (push (list (get-buffer-window buffer) buffer :delete)
-              core--shackle-popup-window-list)))))
-
-(defun core*desktop-save-unless-loaded ($fn &rest $args)
-  (if (or (called-interactively-p 'interactive)
-          desktop-file-modtime)
-      (apply $fn $args)
-    (message "Current desktop was not loaded from a file. Ignored")))
-
-(with-eval-after-load 'desktop
-  (advice-add 'desktop-save :around #'core*desktop-save-unless-loaded)
-  (add-to-list 'desktop-minor-mode-handlers '(orgtbl-mode . ignore))
-  (add-to-list 'desktop-minor-mode-handlers '(hs-minor-mode . ignore)))
-
-;; (define-hook! core|auto-save-buffer (auto-save-hook)
-;;   (save-excursion
-;;     (dolist (buffer (buffer-list))
-;;       (with-current-buffer buffer
-;;         (when (and (buffer-file-name) (buffer-modified-p))
-;;           (basic-save-buffer))))))
 
 (define-hook! core|minibuffer-setup (minibuffer-setup-hook)
   (local-set-key (kbd "C-k") 'kill-line)
@@ -227,8 +167,8 @@
         gc-cons-percentage 0.1)
 
   (add-to-list 'file-name-handler-alist
-               (cons core-external-file-regexp
-                     #'core%external-file-handler))
+               (cons core--external-file-regexp
+                     #'core//external-file-handler))
 
   ;; Load private configuration
   (ignore-errors (load-file custom-file))

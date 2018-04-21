@@ -188,6 +188,19 @@ Hydra move [%s(current-forward-thing)]
       (hydra-move-other-window/body)
     (hydra-move/body)))
 
+(defhydra hydra-next-error (:color pink :hint nil)
+  "
+Compilation errors:
+_n_: next error        _<_: first error
+_p_: previous error    _`_: next error
+_q_uit
+"
+  ("`" next-error)
+  ("n" next-error)
+  ("p" previous-error)
+  ("<" first-error)
+  ("q" nil :color blue))
+
 (define-key!
   ("C-x {" . hydra-resize-window/shrink-window-horizontally)
   ("C-x }" . hydra-resize-window/enlarge-window-horizontally)
@@ -199,6 +212,6 @@ Hydra move [%s(current-forward-thing)]
   ("C-c O" . hydra-outline/body)
   ("C-x SPC" . hydra-rectangle/body)
 
-  ("C-x `" . next-error))
+  ("C-x `" . hydra-next-error/body))
 
 (provide 'core-hydra)

@@ -12,7 +12,7 @@
 ;;   <module>-...   public variables
 ;;   <module>--...  private varibales
 ;;   <module>/...   public functions
-;;   <module>%...   private functions
+;;   <module>//...   private functions
 ;;   <module>|...   hook functions
 ;;   <module>*...   advising functions
 ;;   ...!       a macro or function defined in core-lib.el
@@ -22,10 +22,43 @@
 (eval-when-compile
   (require 'cl))
 
-(dolist (sym '(when-let if-let string-trim
-                         string-join string-blank-p string-lessp
-                         hash-table-keys))
-  (autoload sym "subr-x" nil nil 'macro))
+(defvar core--recentf-enabled-p t)
+(defvar core--buffer-useful-p t
+  "A flag to indicate if the buffer is not a temporary buffer")
+
+(defun keyword-get! ($list $key)
+  "Get values of keyword $KEY from $LIST. This function is used
+for defining functions."
+  (let (forms)
+    (while (and $list (not (eq $key (pop $list)))))
+    (while (and $list (not (keywordp (car $list))))
+      (push (pop $list) forms))
+    (nreverse forms)))
+
+(defun plist-delete! ($plist &rest $properties)
+  "Delete PROPERTIES from PLIST."
+  (let ((result $plist))
+    (dolist (property $properties)
+      (let (($plist result) last-pos)
+        (while $plist
+          (if (not (eq property (car $plist)))
+              (setq last-pos (cdr $plist)
+                    $plist (cddr $plist))
+            (if (null last-pos)
+                (setq result (cddr $plist))
+              (setcdr last-pos (cddr $plist)))
+            (setq $plist nil)))))
+    result))
+
+(defmacro setvar! (&rest $body)
+  (let (forms
+        (setter (if (bound-and-true-p byte-compile-current-file)
+                    'defvar 'setq)))
+    (while (not (null $body))
+      (push `(,setter ,(pop $body)
+                      (eval-when-compile ,(pop $body)))
+            forms))
+    `(progn ,@(nreverse forms))))
 
 (defmacro lambda! (&rest $body)
   "A shortcut for inline interactive lambdas.
@@ -40,9 +73,8 @@ Optional argument $BODY is the lambda body."
 Argument $HOOK can be a quoted hook or a sharp-quoted function
 (which will be advised).
 
-$FORMS will be evaluated once
-when that function/hook is first invoked, then it detaches
-itself."
+$FORMS will be evaluated once when that function/hook is first
+invoked, then it detaches itself."
   (declare (indent 1))
   (let* ((hook (if (consp $hook) (car $hook) $hook))
          (args (and (consp $hook) (cdr $hook)))
@@ -54,48 +86,48 @@ itself."
                        ((symbolp hook)
                         (cl-gensym "core|transient-hook-"))))))
     `(progn
-       (fset ',fn
-             (lambda (&rest _)
-               ,@$forms
-               ,(cond ((functionp hook) `(advice-remove ',hook ',fn))
-                      ((symbolp hook) `(remove-hook ',hook ',fn)))
-               (unintern ',fn nil)))
+       (defun ,fn (&rest _)
+         ,@$forms
+         ,(cond ((functionp hook) `(advice-remove ',hook ',fn))
+                ((symbolp hook) `(remove-hook ',hook ',fn))))
        ,(cond ((functionp hook)
                `(advice-add ',hook ,(if append-p :after :before) ',fn))
               ((symbolp hook)
                `(add-hook ',hook ',fn ,append-p ,local-p))))))
 
 (defmacro define-hook! ($name $hooks &rest $body)
-  "Define a hook function.
+  "Add or define a hook function.
 
 Argument $NAME is the name of hook function. If $NAME is of the
 form (name . args), then args will become the parameter list of
-the lambda function to be added.
+the lambda function to be added. Else if $NAME is :anonymous,
+a lambda function will be add to $hooks
 
 Argument $HOOKS are hook list to add fucntion to. Every hook in
-$HOOKS should either be a hook-symbol or the form of (hook-symbol args).
+$HOOKS should either be a hook-symbol or the form of (hook-symbol . args).
 The args of the second form will be passed to `add-hook'
 
 Optional argument $BODY is the function body."
   (declare (indent defun) (debug t) (doc-string 3))
-  (let ((sym $name) args forms func)
-    (when (consp $name)
-      (setq args (cdr $name))
-      (setq sym (car $name)))
-    (setq func `(lambda ,args ,@$body))
-    (dolist (hook $hooks)
-      (let (append-p local-p extra)
-        (when (consp hook)
-          (setq extra (cdr hook))
-          (setq hook (car hook))
-          (while extra
-            (pcase (pop extra)
-              (:append (setq append-p t))
-              (:local (setq local-p t)))))
-        (push `(add-hook ',hook #',sym ,append-p ,local-p) forms)))
-    `(progn
-       (defalias ',sym (function ,func))
-       ,@forms)))
+  (let* ((anonymous-p (eq $name :anonymous))
+         (symbol (cond (anonymous-p (cl-gensym "g"))
+                       ((consp $name) `',(car $name))
+                       ((symbolp $name) `',$name)
+                       (t (error "Invalid hook name: %s" $name))))
+         (args (when (consp $name) (cdr $name)))
+         (hooks (if (listp $hooks) $hooks (list $hooks)))
+         (forms (cl-loop for hook in hooks
+                         for hook-name = (if (consp hook) (car hook) hook)
+                         for append-p = (plist-get (cdr-safe hook) :append)
+                         for local-p = (plist-get (cdr-safe hook) :local)
+                         collect `(add-hook ',hook-name
+                                            ,symbol ,append-p ,local-p))))
+    (if anonymous-p
+        `(let ((,symbol (lambda ,args ,@$body)))
+           ,@forms)
+      `(progn
+         (defun ,(cadr symbol) ,args ,@$body)
+         ,@forms))))
 
 (defmacro define-key! (&rest $args)
   "Define multiple keys in one expression.
@@ -157,21 +189,19 @@ Example:
   `(let ((process-environment (append ,env process-environment)))
      ,@body))
 
-(defun keyword-get! ($list $key)
-  "Get values of keyword $KEY from $LIST. This function is used
-for defining functions."
-  (let (forms)
-    (while (and $list (not (eq $key (pop $list)))))
-    (while (and $list (not (keywordp (car $list))))
-      (push (pop $list) forms))
-    (nreverse forms)))
-
 (defun read-file-content! ($filename)
   "Read file named $FILENAME as string."
-  (let ((core-recentf-enabled? nil))
-    (with-temp-buffer
-      (insert-file-contents-literally $filename)
-      (buffer-string))))
+  (let ((recentf-enabled-p core--recentf-enabled-p)
+        (buffer-useful-p core--buffer-useful-p))
+    (unwind-protect
+        (progn
+          (setq core--recentf-enabled-p nil
+                core--buffer-useful-p nil)
+          (with-temp-buffer
+            (insert-file-contents-literally $filename)
+            (buffer-string))
+          (setq core--recentf-enabled-p recentf-enabled-p
+                core--buffer-useful-p buffer-useful-p)))))
 
 (defun open! ($file-list)
   "Open All files in $FILE-LIST in external processes."
@@ -228,13 +258,11 @@ $MAP (default `global-map')."
   "Use for advice."
   (ignore-errors (apply $fn $args)))
 
-(defvar core--buffer-useful t
-  "A flag to indicate if the buffer is not a temporary buffer")
 (defun buffer-temporary? ()
   "If function `buffer-file-name' return nil or a temp file or
 HTML file converted from org file, it returns t."
   (let ((filename (buffer-file-name)))
-    (or (not core--buffer-useful)
+    (or (not core--buffer-useful-p)
         (not filename)
         (string-match (concat "^" temporary-file-directory)
                       filename))))
@@ -283,6 +311,22 @@ HTML file converted from org file, it returns t."
 
 (defsubst file-modification-time! (file)
   (nth 5 (file-attributes file)))
+
+(defun find-library-in-directory! ($name $dir)
+  (setq $dir (expand-file-name $dir))
+  (let ((files (directory-files $dir))
+        (default-directory $dir)
+        file
+        lib-path)
+    (while (and (not lib-path) files)
+      (setq file (pop files))
+      (unless (member file '("." ".."))
+        (setq lib-path
+              (if (file-directory-p file)
+                  (ignore-errors (find-library-in-directory! $name file))
+                (and (string= file $name)
+                     (expand-file-name file $dir))))))
+    lib-path))
 
 (unless (fboundp 'when-let*)
   (defalias 'when-let* 'when-let))

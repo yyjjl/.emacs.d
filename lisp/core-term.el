@@ -6,21 +6,23 @@
 
 
 
+(defvar term-goto-process-mark nil)
 (defvar-local term--ssh-info nil)
 (defvar-local term--parent-buffer nil)
 
-(defsubst term%get-popup-window ()
+(defsubst term//get-popup-window ()
   (frame-parameter nil 'term-popup-window))
-(defsubst term%set-popup-window (popup-window)
+(defsubst term//set-popup-window (popup-window)
+  (set-window-dedicated-p popup-window t)
   (set-frame-parameter nil 'term-popup-window popup-window))
 
-;; Add below code to .zshrc to make term-mode track directory changes
+;; Add below code to .zshrc to make term-mode track value changes
 ;;   if [ -n "$INSIDE_EMACS" ];then
 ;;       chpwd() {print -P "\033AnSiTc %d"}
 ;;   fi
 
 ;; Kill the buffer when terminal is exited
-(defun term/wrap-sentinel (&optional _fn)
+(defun term//wrap-sentinel (&optional _fn)
   (lexical-let ((fn _fn))
     (lambda ($proc $msg)
       (and fn (funcall fn $proc $msg))
@@ -28,7 +30,7 @@
           (let ((buffer (process-buffer $proc)))
             (kill-buffer buffer))))))
 
-(defun term%default-sentinel (proc msg)
+(defun term//default-sentinel (proc msg)
   (term-sentinel proc msg)
   (when (memq (process-status proc) '(signal exit))
     (with-current-buffer (process-buffer proc)
@@ -43,7 +45,7 @@
   (unless (featurep 'term)
     (require 'term))
   (unless $sentinel
-    (setq $sentinel 'term%default-sentinel))
+    (setq $sentinel 'term//default-sentinel))
   (unless $name
     (setq $name (term/get-buffer-name
                  (concat "*" (file-name-nondirectory $program) "<%s>*"))))
@@ -72,9 +74,9 @@
   (interactive)
   (if (and term--parent-buffer (buffer-live-p term--parent-buffer))
       (progn
-        (when (eq (term%get-popup-window) (selected-window))
+        (when (eq (term//get-popup-window) (selected-window))
           (pop-to-buffer term--parent-buffer)
-          (delete-window (term%get-popup-window))))
+          (delete-window (term//get-popup-window))))
     (message "No parent buffer or it was killed !!!")))
 
 (defun term/switch-back-no-quit ()
@@ -124,7 +126,9 @@ If $FORCE is non-nil create a new term buffer directly."
                                                    default-directory)))
                           (buffer-list))))
       (let* ((default-directory $directory)
-             (buffer (multi-term-get-buffer)))
+             (buffer (with-temp-env! (term//eval-function-list
+                                      'term-default-environment-function-list)
+                       (multi-term-get-buffer))))
         (setq multi-term-buffer-list
               (nconc multi-term-buffer-list (list buffer)))
         (with-current-buffer buffer
@@ -132,20 +136,20 @@ If $FORCE is non-nil create a new term buffer directly."
           (multi-term-internal))
         buffer)))
 
-(defvar term-default-directory-function-list
-  '(projectile-project-root))
+(defvar term-default-directory-function-list '(projectile-project-root))
 
-(defun term%get-default-directory ()
-  (let ((functions term-default-directory-function-list)
-        directory)
+(defvar term-default-environment-function-list nil)
+
+(defun term//eval-function-list (variable)
+  (let ((functions (symbol-value variable))
+        value)
     (while (and functions
-                (not (setq directory
-                           (ignore-errors (funcall (pop functions)))))))
-    directory))
+                (not (setq value (ignore-errors
+                                   (funcall (pop functions)))))))
+    value))
 
-
-(defun term%pop-to-buffer (buffer)
-  (let ((popup-window (term%get-popup-window)))
+(defun term//pop-to-buffer (buffer)
+  (let ((popup-window (term//get-popup-window)))
     (if (and (window-live-p popup-window)
              (eq 'term-mode
                  (buffer-local-value 'major-mode
@@ -153,9 +157,10 @@ If $FORCE is non-nil create a new term buffer directly."
         ;; Reuse window
         (progn
           (select-window popup-window)
+          (set-window-dedicated-p popup-window nil)
           (set-window-buffer popup-window buffer))
       (pop-to-buffer buffer)
-      (term%set-popup-window (get-buffer-window buffer)))))
+      (term//set-popup-window (get-buffer-window buffer)))))
 
 (defun term/pop-shell (&optional $arg)
   "Switch to the term buffer last used, or create a new one if
@@ -168,7 +173,8 @@ none exists, or if the current buffer is already a term."
                       (apply #'term/ssh (term/get-ssh-info $arg))
                     (term/local-shell
                      (or (and (equal $arg 4)
-                              (term%get-default-directory))
+                              (term//eval-function-list
+                               'term-default-directory-function-list))
                          default-directory)
                      (equal $arg 16))))
           (parent-buffer (current-buffer)))
@@ -177,9 +183,9 @@ none exists, or if the current buffer is already a term."
           (local-set-key [f8] #'term/switch-back)
           (local-set-key (kbd "C-c C-z") #'term/switch-back-no-quit)
           (setq term--parent-buffer parent-buffer))
-        (term%pop-to-buffer buffer)))))
+        (term//pop-to-buffer buffer)))))
 
-(defun term%after-prompt? ()
+(defun term//after-prompt? ()
   (let* ((proc (get-buffer-process (current-buffer)))
          (mark (and proc (process-mark proc)))
          (pos (point)))
@@ -190,7 +196,7 @@ none exists, or if the current buffer is already a term."
   (let ((command (global-key-binding (this-command-keys))))
     ;; When `point' is after last output mark, send raw string
     ;; Otherwise call global binding
-    (call-interactively (if (and command (term%after-prompt?))
+    (call-interactively (if (and command (term//after-prompt?))
                             #'term-send-raw
                           command))))
 
@@ -213,13 +219,13 @@ none exists, or if the current buffer is already a term."
 
   (defun term-send-backward-word ()
     (interactive)
-    (if (term%after-prompt?)
+    (if (term//after-prompt?)
         (term-send-raw-string "\eb")
       (call-interactively #'backward-word)))
 
   (defun term-send-forward-word ()
     (interactive)
-    (if (term%after-prompt?)
+    (if (term//after-prompt?)
         (term-send-raw-string "\ef")
       (call-interactively #'forward-word)))
 
@@ -267,7 +273,7 @@ none exists, or if the current buffer is already a term."
   (let ((proc (get-buffer-process (current-buffer))))
     (when proc
       (set-process-sentinel proc
-                            (term/wrap-sentinel (process-sentinel proc))))))
+                            (term//wrap-sentinel (process-sentinel proc))))))
 
 (global-set-key [f8] 'term/pop-shell)
 

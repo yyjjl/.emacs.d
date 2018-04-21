@@ -8,13 +8,13 @@
                (cons (concat "<" tag ">")
                      (concat "</" tag ">")))))
     (?\\ . (lambda (_)
-             (let ((pair (core%surround-get-pair (read-char))))
+             (let ((pair (core//surround-get-pair (read-char))))
                (when pair
                  (cons (concat "\\" (car pair))
                        (concat "\\" (cdr pair)))))))))
 (defvar core--suround-origin-pos nil)
 
-(defun core%surround-get-pair ($char)
+(defun core//surround-get-pair ($char)
   "Get pair from $CHAR"
   (let ((pair (cdr (assoc $char core-surround-pair-alist))))
     (cond ((functionp pair) (funcall pair $char)) ; function
@@ -23,7 +23,7 @@
           (t (cons (char-to-string $char)
                    (char-to-string $char))))))
 
-(defun core%surround-get-bounds ($left $right)
+(defun core//surround-get-bounds ($left $right)
   "Get bounds of pair. If $LEFT and $RIGHT is a open/close delimeter.
 Use `scan-lists', otherwise use simple algorithm."
   (if (and (string-match-p "^\\s($" $left)
@@ -41,12 +41,12 @@ Use `scan-lists', otherwise use simple algorithm."
                         (eq ?\\ (char-before (- (point) (length $right))))))
             (point)))))
 
-(defun core%surround-mark ()
+(defun core//surround-mark ()
   (setq core--suround-origin-pos nil)
   (let ((from-pair (and (not (region-active-p))
-                        (core%surround-get-pair (read-char)))))
+                        (core//surround-get-pair (read-char)))))
     (when-let ((pos (and (not (region-active-p))
-                         (core%surround-get-bounds (car from-pair)
+                         (core//surround-get-bounds (car from-pair)
                                                    (cdr from-pair)))))
       (setq core--suround-origin-pos (point))
       (set-mark (car pos))
@@ -55,10 +55,10 @@ Use `scan-lists', otherwise use simple algorithm."
     (list (region-beginning)
           (region-end)
           from-pair
-          (core%surround-get-pair (read-char)))))
+          (core//surround-get-pair (read-char)))))
 
 (defun core/change-surround ($beg $end $from-pair $to-pair)
-  (interactive (core%surround-mark))
+  (interactive (core//surround-mark))
   (if (equal $beg $end)
       (message "Empty region")
     (let ((from-left (car $from-pair))

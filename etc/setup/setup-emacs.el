@@ -13,7 +13,7 @@
          (abbreviate-file-name emacs-setup-directory))
 
 ;; Disable some features when load emacs
-(setq core--buffer-useful nil)
+(setq core--buffer-useful-p nil)
 (condition-case err
     (progn
       (load (expand-file-name "init.el" user-emacs-directory)

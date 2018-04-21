@@ -5,7 +5,7 @@
 (defvar-local gud--source-buffer-status nil)
 (defvar-local gud--source-buffer-list nil)
 
-(defmacro gud%gdb-display ($type)
+(defmacro gud//gdb-display ($type)
   (let ((name (intern (format "gud/display-%s" $type))))
     `(progn
        (defun ,name (&optional $no-select)
@@ -56,14 +56,14 @@
 
 (defvar gud--source-mode-map
   (define-key! :map (make-sparse-keymap)
-    ("o" . (gud%gdb-display gdb-inferior-io))
+    ("o" . (gud//gdb-display gdb-inferior-io))
     ("g" . gud/pop-to-comint-buffer)
-    ("B" . (gud%gdb-display gdb-breakpoints-buffer))
-    ("T" . (gud%gdb-display gdb-threads-buffer))
-    ("R" . (gud%gdb-display gdb-registers-buffer))
-    ("S" . (gud%gdb-display gdb-stack-buffer))
-    ("D" . (gud%gdb-display gdb-disassembly-buffer))
-    ("m" . (gud%gdb-display gdb-memory-buffer))
+    ("B" . (gud//gdb-display gdb-breakpoints-buffer))
+    ("T" . (gud//gdb-display gdb-threads-buffer))
+    ("R" . (gud//gdb-display gdb-registers-buffer))
+    ("S" . (gud//gdb-display gdb-stack-buffer))
+    ("D" . (gud//gdb-display gdb-disassembly-buffer))
+    ("m" . (gud//gdb-display gdb-memory-buffer))
     ("b" . gud-break)
     ("-" . gud-remove)
     ("t" . gud-tbreak)

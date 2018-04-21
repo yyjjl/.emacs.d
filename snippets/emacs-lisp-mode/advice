@@ -2,10 +2,17 @@
 # name: (defadvice ...)
 # key: ada
 # --
-(defun ${1:name} (${3:$(if (equal yas-text ":around") "fn " "")}${2:$(let ((sym (intern yas-text)) args)
-  (if (not (fboundp sym)) "&rest args"
+(defun ${1:name} (${3:$(if (equal yas-text ":around") "$fn " "")}${2:$(let ((sym (intern yas-text)) args)
+  (if (not (fboundp sym))
+      "&rest $args"
     (setq args (help-function-arglist sym))
-    (if (stringp args) "&rest args"
-      (string-join (mapcar (lambda (x) (format "%s" x)) args) " "))))})
+    (if (stringp args)
+        "&rest $args"
+      (mapconcat (lambda (x)
+                    (setq x (format "%s" x))
+                    (if (string-prefix-p "&" x) x (concat "$" x)))
+                  args
+                  " "))))})
    $0)
-(advice-add \'${2:find-file} ${3::around$$(yas-choose-value '(":around" ":after" ":before" ":override"))} #\'$1)
+(advice-add \'${2:find-file}
+             ${3::around$$(yas-choose-value '(":around" ":after" ":before" ":override"))} #\'$1)

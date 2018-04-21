@@ -21,7 +21,8 @@
                 #'tex--prettify-symbols-compose-p)
   (prettify-symbols-mode 1)
 
-  (setq TeX-master 'dwim)
+  (unless TeX-master
+    (setq TeX-master 'dwim))
 
   (unless (buffer-temporary?)
     (reftex-mode 1)
@@ -53,7 +54,7 @@
     (interactive)
     (let* ((fn (file-name-base (buffer-file-name)))
            (output-file (concat fn ".svg"))
-           (core-recentf-enabled? nil))
+           (core--recentf-enabled-p nil))
       (message (shell-command-to-string
                 (format "pdf2svg %s.pdf %s.svg" fn fn)))
       (if (file-exists-p output-file)

@@ -68,9 +68,6 @@ will close some features to speed up emacs performance")
   (setq tramp-persistency-file-name (expand-var! "tramp.el"))
   (setq url-configuration-directory (expand-var! "url/")))
 
-;; Set envrionment variables
-(require 'core-env-vars)
-
 (add-auto-mode! 'conf-mode
                "\\.[^b][^a][a-zA-Z]*rc$"
                "\\.aspell\\.en\\.pws\\'"

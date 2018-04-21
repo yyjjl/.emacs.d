@@ -2,13 +2,14 @@
  rust-has-rls-p (executable-find "rls"))
 
 (require-packages!
- (ggtags :when tags-has-gtags-p)
+ (ggtags :when env-has-gtags-p)
  (lsp-mode :when rust-has-rls-p)
  (lsp-rust :when rust-has-rls-p)
  (company-lsp :when rust-has-rls-p)
  cargo
- rust-mode
- toml-mode)
+ ;; Emacs 26 has conf-toml-mode
+ (toml-mode :when (<= emacs-major-version 25))
+ rust-mode)
 
 (defcustom rust-config-build-lib :unset
   "Enable(t)/Disable(nil) building the lib target."

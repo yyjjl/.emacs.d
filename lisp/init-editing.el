@@ -91,6 +91,9 @@ other characters."
 (defconst extra-ascii-before-chinese
   (rx (group-n 1 (in "a-zA-Z0-9!@#$%^&\\-+|)\\]}\\:;?><.,/"))
       (group-n 2 (category chinese-two-byte))))
+(defconst extra-non-space-after-punc
+  (rx (group-n 1 (in ",?"))
+      (group-n 2 (not blank))))
 (defconst extra-ascii-after-chinese
   (rx (group-n 1 (category chinese-two-byte))
       (group-n 2 (in "a-zA-Z0-9@#$%^&\\-+|(\\[{\\></"))))
@@ -108,6 +111,9 @@ other characters."
       (replace-match "\\1 \\2" nil nil))
     (goto-char $start)
     (while (re-search-forward extra-ascii-after-chinese $end t)
+      (replace-match "\\1 \\2" nil nil))
+    (goto-char $start)
+    (while (re-search-forward extra-non-space-after-punc $end t)
       (replace-match "\\1 \\2" nil nil))))
 
 (defun goto-next-char ($arg)
@@ -135,7 +141,7 @@ other characters."
   (forward-sentence-or-sexp (- $n)))
 
 (define-key!
-  ("M-Q" . extra/insert-space-around-chinese)
+  ("C-x , SPC" . extra/insert-space-around-chinese)
   ("M-;" . evilnc-comment-or-uncomment-lines)
   ("C-x n n" . core/narrow-or-widen-dwim)
   ("C-x K" . core/kill-regexp)

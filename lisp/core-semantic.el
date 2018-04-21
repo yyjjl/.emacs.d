@@ -15,10 +15,11 @@
           ;; global-semantic-decoration-mode
           ;; global-semantic-highlight-func-mode
           global-semantic-mru-bookmark-mode))
+  (setq semantic-idle-scheduler-idle-time 4)
   (add-to-list 'semantic-inhibit-functions
                (lambda () (file-remote-p default-directory)))
 
-  (when tags-has-gtags-p
+  (when env-has-gtags-p
     (dolist (mode '(c++-mode c-mode java-mode))
       (semanticdb-enable-gnu-global-databases mode))))
 
@@ -55,5 +56,7 @@
                'semantic-analyze-notc-completion-at-point-function)
   (remove-hook 'completion-at-point-functions
                'semantic-analyze-nolongprefix-completion-at-point-function))
+
+(add-hook 'after-init-hook 'core/enable-semantic)
 
 (provide 'core-semantic)

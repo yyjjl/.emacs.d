@@ -14,10 +14,13 @@
 ;; Set some important variables
 (require 'core-vars)
 (require 'core-defaults)
-(require 'core-ui)
 ;; (package-initialize)
 ;; Load core packages
+(require 'core-packages-lib)
+(require 'core-ui)
 (require 'core-packages)
+(require 'core-semantic)
+(require 'core-hideshow)
 
 ;; ----------------------------------------
 ;; Optional packages
@@ -40,16 +43,19 @@
     (require 'init-tags))
 
 ;; Programming modes
-;; (require 'init-lsp)
-;; (require 'init-cquery)
-;; (require 'init-haskell)
+(require 'init-lsp-mode)
+(require 'init-cpp)
+(require 'init-cpp-cmake)
+(require 'init-cpp-cquery)
+(require 'init-haskell)
 (require 'init-python)
 (require 'init-lisp)
 (require 'init-web-mode)
 (require 'init-sh)
-;; (require 'init-javascript)
-;; (require 'init-css)
-;; (require 'init-rust)
+(require 'init-javascript)
+(require 'init-css)
+(require 'init-rust)
+(require 'init-perl5)
 
 ;; Some keybindings using when editing
 (require 'init-editing)
@@ -59,8 +65,8 @@
 (require 'init-gud)
 
 ;; Other small tools
-;; (require 'init-hydra-extra)
-;; (require 'init-prettify-symbols)
+(require 'init-hydra-extra)
+(require 'init-prettify-symbols)
 
 (when emacs-has-mpv-p
   (require 'init-emms))

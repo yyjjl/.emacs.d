@@ -1,6 +1,44 @@
-(declare-function browse-url-chrome "browse-url")
+;; Don't echo passwords when communicating with interactive programs:
+(add-hook 'comint-output-filter-functions 'comint-watch-for-password-prompt)
 
-
+;; Make scratch buffer un-killable
+(define-hook! core|unkillable-buffer (kill-buffer-query-functions)
+  (let ((bn (buffer-name)))
+    (cond ((equal bn "*note*") nil)
+          ((equal bn "*task*") nil)
+          ((equal bn "*scratch*") (delete-region (point-min) (point-max)) nil)
+          (t t))))
+
+;; Display long lines in truncated style (end line with $)
+(define-hook! core|truncate-lines-setup (grep-mode-hook)
+  (toggle-truncate-lines 1))
+
+;; Turns on `auto-fill-mode', don't use `text-mode-hook'
+(add-hook 'change-log-mode-hook 'turn-on-auto-fill)
+
+;; ANSI-escape coloring in compilation-mode
+(setq compilation-environment '("TERM=xterm-256color"))
+(require 'ansi-color)
+(define-hook! core|colorize-compilation-buffer (compilation-filter-hook)
+  (when (eq major-mode 'compilation-mode)
+    (ansi-color-apply-on-region compilation-filter-start (point-max))))
+
+(define-hook! (core|compilation-finish-hook $buffer $message)
+  (compilation-finish-functions)
+  (when (buffer-live-p $buffer)
+    (with-current-buffer $buffer
+      (unless (eq major-mode 'compilation-mode)
+        ;; Sometime it will open a comint $buffer
+        (compilation-mode)
+        (core//record-popup-window (get-buffer-window $buffer) $buffer
+                                   :autoclose :delete)))))
+
+;; (define-hook! core|auto-save-buffer (auto-save-hook)
+;;   (save-excursion
+;;     (dolist (buffer (buffer-list))
+;;       (with-current-buffer buffer
+;;         (when (and (buffer-file-name) (buffer-modified-p))
+;;           (basic-save-buffer))))))
 
 ;; Default prog-mode setup
 (define-hook! core|generic-prog-mode-setup (prog-mode-hook
@@ -28,6 +66,7 @@
 
   (hl-line-mode 1)
   (auto-fill-mode 1)
+  ;; (whitespace-mode 1)
   (when (< (buffer-size) core-large-buffer-size)
     ;; (when (fboundp 'display-line-numbers-mode)
     ;;   (display-line-numbers-mode 1))
@@ -41,7 +80,20 @@
   (setq show-trailing-whitespace nil)
   (setq-local company-idle-delay nil))
 
+
 
+
+
+(defun core*desktop-save-unless-loaded ($fn &rest $args)
+  (if (or (called-interactively-p 'interactive)
+          desktop-file-modtime)
+      (apply $fn $args)
+    (message "Current desktop was not loaded from a file. Ignored")))
+
+(with-eval-after-load 'desktop
+  (advice-add 'desktop-save :around #'core*desktop-save-unless-loaded)
+  (add-to-list 'desktop-minor-mode-handlers '(orgtbl-mode . ignore))
+  (add-to-list 'desktop-minor-mode-handlers '(hs-minor-mode . ignore)))
 
 
 (with-eval-after-load 'bookmark
@@ -96,13 +148,12 @@
 (put 'projectile-project-configure-cmd 'safe-local-variable #'stringp)
 (setq projectile-keymap-prefix (kbd "C-x p"))
 (with-eval-after-load 'projectile
-  ;; (setq projectile-mode-line
-  ;;       '(:eval (format "[%s]" (or projectile-project-name
-  ;;                                  projectile-cached-project-name
-  ;;                                  "-"))))
+  (setq projectile-mode-line
+        '(:eval (format " [%s]" (or projectile-project-name
+                                    projectile-cached-project-name
+                                    "-"))))
   (setq projectile-require-project-root nil)
   (setq projectile-globally-ignored-file-suffixes '(".pyc" ".elc"))
-  (setq projectile-require-project-root t)
   (setq projectile-completion-system 'ivy)
   (setq projectile-enable-caching t)
 
@@ -279,6 +330,7 @@ Does not indent buffer, because it is used for a
       (activate-mark 1)
       (goto-char $start))))
 
+(declare-function browse-url-chrome "browse-url")
 (defvar core-search-engine-alist
   '(("g" "google" "http://www.google.com/search?q=%s")
     ("q" "stackoverflow" "http://www.google.com/search?q=%s+site:stackoverflow.com")
@@ -286,7 +338,7 @@ Does not indent buffer, because it is used for a
     ("d" "dictionary" "http://dictionary.reference.com/search?q=%s")
     ("cpp" "cpp" "https://www.google.com/search?q=cpp+%s")))
 
-(defun core%read-search-engine ()
+(defun core//read-search-engine ()
   (assoc-string
    (car (split-string-and-unquote
          (ivy-read "Engine: "
@@ -307,7 +359,7 @@ Does not indent buffer, because it is used for a
 
 (defun core/search-in-chrome ($engine $keyword)
   (interactive
-   (let ((engine (core%read-search-engine)))
+   (let ((engine (core//read-search-engine)))
      (list (nth 2 engine)
            (read-from-minibuffer (concat (nth 1 engine) ": ")
                                  nil nil 'core-search-history))))
@@ -328,39 +380,40 @@ Does not indent buffer, because it is used for a
     (message "Use socket proxy %s" socks-server)))
 
 (define-key!
-  ("C-x R" . core/rename-this-file-and-buffer)
-  ("C-x D" . core/delete-this-file)
-  ("C-x C-d" . find-name-dired)
-  ("C-x W" . core/copy-this-file-to-new-file)
-  ("C-x c" . core/cleanup-buffer-safe)
+  ("C-<down>" . text-scale-decrease)
+  ("C-<up>" . text-scale-increase)
 
   ("C-c 4" . ispell-word)
-  ("C-c q" . auto-fill-mode)
-  ("C-x C-b" . ibuffer)
-  ("C-x ," . core/search-in-chrome)
-  ("M-/" . hippie-expand)
-
-  ("M--" . er/expand-region)
-
-  ("M-i" . iedit-mode)
-  ("M-s o" . core/occur-dwim)
-  ("M-s e" . core/eval-and-replace)
-
-  ("RET" . newline-and-indent)
-
-  ("C-}" . core/company-yasnippet)
-  ("C-c TAB" . company-complete)
   ("C-c <tab>" . company-complete)
-  ([f6] . core/toggle-company-ispell)
-  ([f7] . core/create-scratch-buffer)
-  ([f10] . compile)
-  ("C-<up>" . text-scale-increase)
-  ("C-<down>" . text-scale-decrease)
+  ("C-c TAB" . company-complete)
+  ("C-c q" . auto-fill-mode)
+  ("C-x , ," . core/search-in-chrome)
+  ("C-x C-b" . ibuffer)
+  ("C-x C-d" . find-name-dired)
+
+  ("C-x D" . core/delete-this-file)
+  ("C-x R" . core/rename-this-file-and-buffer)
+  ("C-x W" . core/copy-this-file-to-new-file)
+  ("C-x c" . core/cleanup-buffer-safe)
 
   ("C-x w [" . winner-undo)
   ("C-x w ]" . winner-redo)
 
+  ("C-}" . core/company-yasnippet)
+
+  ("M--" . er/expand-region)
+  ("M-/" . hippie-expand)
+
   ("M-g n" . flycheck-next-error)
-  ("M-g p" . flycheck-previous-error))
+  ("M-g p" . flycheck-previous-error)
+
+  ("M-i" . iedit-mode)
+  ("M-s e" . core/eval-and-replace)
+  ("M-s o" . core/occur-dwim)
+  ("RET" . newline-and-indent)
+
+  ([f10] . compile)
+  ([f6] . core/toggle-company-ispell)
+  ([f7] . core/create-scratch-buffer))
 
 (provide 'core-misc)

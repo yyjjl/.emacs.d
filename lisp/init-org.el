@@ -33,7 +33,7 @@ With a prefix BELOW move point to lower block."
 (defvar org--ipython-src-block nil)
 (defvar-local org--ipython-error-line 0)
 
-(defun org%ipython-trace-move ($n)
+(defun org//ipython-trace-move ($n)
   (let ((search-func (if (> $n 0)
                          #'re-search-forward
                        (setq $n (- 0 $n))
@@ -47,12 +47,12 @@ With a prefix BELOW move point to lower block."
 
 (defun org/ipython-trace-prev (&optional $n)
   (interactive "P")
-  (unless (org%ipython-trace-move (or (and $n (- 0 $n)) -1))
+  (unless (org//ipython-trace-move (or (and $n (- 0 $n)) -1))
     (message "No previous frame")))
 
 (defun org/ipython-trace-next (&optional $n)
   (interactive "P")
-  (unless (org%ipython-trace-move (or $n 1))
+  (unless (org//ipython-trace-move (or $n 1))
     (message "No next frame")))
 
 (defun org/ipython-jump ($lineno &optional $do-jump)
@@ -185,11 +185,22 @@ With a prefix BELOW move point to lower block."
         (--map (list (car it) (downcase (cadr it)))
                org-structure-template-alist))
   (setq org-entities-user
-        '(("rangle" "\\rangle" t "&rangle;" "rangle" "rangle" "❭")
-          ("langle" "\\langle" t "&langle;" "langle" "langle" "❬")
-          ("doteq" "\\doteq" t "&doteq;" "doteq" "doteq" "≐")
-          ("lessdot" "\\lessdot" t "&lessdot;" "lessdot" "lessdot" "⋖")
-          ("gtrdot" "\\gtrdot" t "&gtrdot;" "gtrdot" "gtrdot" "⋗")))
+        (eval-when-compile
+          (when (require 'tex-mode nil :noerror)
+            (let ((entities (make-hash-table)) result)
+              (dolist (e org-entities)
+                (when (consp e)
+                  (puthash (car e) t entities)))
+              (cl-loop for (latex-name . char) in tex--prettify-symbols-alist
+                       for name = (substring latex-name 1)
+                       unless (gethash name entities)
+                       collect (list name
+                                     (concat "\\" name)
+                                     t
+                                     (concat "&#" (number-to-string char) ";")
+                                     name
+                                     name
+                                     (char-to-string char)))))))
 
   (org-babel-do-load-languages 'org-babel-load-languages
                                '((ipython . t)
@@ -225,6 +236,7 @@ With a prefix BELOW move point to lower block."
         org-hide-leading-stars t
         org-hide-block-startup t
         ;; org-startup-indented t
+        ;; org-adapt-indentation nil
         org-startup-folded 'content
         org-pretty-entities t
         org-pretty-entities-include-sub-superscripts nil
@@ -299,8 +311,7 @@ With a prefix BELOW move point to lower block."
   (unless (featurep 'company-auctex)
     (require 'company-auctex))
   (defun company-org-symbols ($command &optional $arg &rest $ignored)
-    "Complete math symbol in LaTeX fragments, better than
-`pcomplete'"
+    "Complete math symbol in LaTeX fragments, better than `pcomplete'"
     (interactive (list 'interactive))
     (cl-case $command
       (interactive (company-begin-backend 'company-org-symbols))
@@ -312,14 +323,16 @@ With a prefix BELOW move point to lower block."
   (define-hook! org|setup (org-mode-hook)
     (auto-fill-mode -1)
 
+    ;; Add context-sensitive completion for meta options
     (make-local-variable 'completion-at-point-functions)
     (add-to-list 'completion-at-point-functions
-                 '(lambda () (ignore-errors pcomplete-completions-at-point)))
+                 (lambda ()
+                   (ignore-errors (pcomplete-completions-at-point))))
     (add-to-list 'company-backends 'company-org-symbols))
 
   (define-hook! org|src-setup (org-src-mode-hook)
     (when (eq major-mode 'python-mode)
-      ;; company-ob-ipython is very slow
+      ;; `company-ob-ipython' is very slow
       (setq-local company-idle-delay nil)
       (add-to-list 'company-backends #'company-ob-ipython)
       (local-set-key (kbd "C-c C-.") #'ob-ipython-inspect))
@@ -367,7 +380,7 @@ With a prefix BELOW move point to lower block."
     ([f5] . org/open-pdf)
     ([f9] . (lambda () (interactive)
               (save-excursion
-                (let ((core--buffer-useful nil))
+                (let ((core--buffer-useful-p nil))
                   (org-publish-current-file)))))
     ([f10] . org-publish)
     ("C-c C-t" . org-todo)))
@@ -430,6 +443,7 @@ With a prefix BELOW move point to lower block."
           ("" "subfig" nil)
           ("" "hyperref" t)
           ("" "graphicx,psfrag,epsfig" t)
+          ("OT1" "fontenc" nil)
           ("" "minted" nil)
           ("" "mdframed" nil)
           ("" "amsmath, amsfonts, amssymb, amsthm, bm, upgreek" t)

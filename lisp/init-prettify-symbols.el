@@ -3,17 +3,16 @@
 (define-hook! (extra|font-setup frame) (after-make-frame-functions)
   (set-fontset-font t '(57600 . 57711) "Fira Code Symbol"))
 
-(defun extra/make-fix-width-symbol ($alist)
-  (loop for (string . char) in $alist
-        for width = (string-width string)
-        collect
-        (cons string (if (= width 1)
-                         char
-                       (concat "\t" (list char) "\t")))))
-
 (defvar fira-code-font-lock-keywords-alist
   (eval-and-compile
-    (extra/make-fix-width-symbol
+    (defun extra//make-fix-width-symbol ($alist)
+      (loop for (string . char) in $alist
+            for width = (string-width string)
+            collect
+            (cons string (if (= width 1)
+                             char
+                           (concat "\t" (list char) "\t")))))
+    (extra//make-fix-width-symbol
      '(("!=" . 57614)
        ("-->" . 57619)
        ("->" . 57620)
@@ -62,6 +61,6 @@
   (setq prettify-symbols-alist fira-code-font-lock-keywords-alist)
   (prettify-symbols-mode 1))
 
-(setq prettify-symbols-unprettify-at-point 'right-edge)
+;; (setq prettify-symbols-unprettify-at-point 'right-edge)
 
 (provide 'init-prettify-symbols)

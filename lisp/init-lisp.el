@@ -4,10 +4,8 @@
  auto-compile
  ;; pair edit
  lispy
- elisp-def
  macrostep
  hl-sexp
- easy-escape
  (racket-mode :when lisp-has-racket-p))
 
 
@@ -33,7 +31,7 @@
   (local-set-key (kbd "M-,") 'xref-pop-marker-stack))
 
 ;; Hippie-expand
-(defun lisp%hippie-expand-setup ()
+(defun lisp//hippie-expand-setup ()
   "Locally set `hippie-expand' completion functions for use with
 Emacs Lisp."
   (make-local-variable 'hippie-expand-try-functions-list)
@@ -60,8 +58,7 @@ Emacs Lisp."
     (require 'semantic/bovine/el nil t)
     (auto-compile-on-save-mode)
 
-    (lisp%hippie-expand-setup)
-    (easy-escape-minor-mode 1)
+    (lisp//hippie-expand-setup)
     (checkdoc-minor-mode)))
 
 (add-hook 'emacs-lisp-mode-hook #'lisp|elisp-setup)
@@ -127,14 +124,5 @@ Emacs Lisp."
 (with-eval-after-load 'elisp-mode
   (define-key emacs-lisp-mode-map (kbd "C-c e") 'macrostep-expand)
   (define-key lisp-interaction-mode-map (kbd "C-c e") 'macrostep-expand))
-
-(with-eval-after-load 'lispy
-  (defun lisp*goto-symbol-hack ($fn $symbol)
-    (if (memq major-mode lispy-elisp-modes)
-        (condition-case nil
-            (elisp-def)
-          (error (lispy-goto-symbol-elisp $symbol)))
-      (funcall $fn $symbol)))
-  (advice-add 'lispy-goto-symbol :around #'lisp*goto-symbol-hack))
 
 (provide 'init-lisp)

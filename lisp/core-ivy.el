@@ -1,4 +1,4 @@
-(defun counsel%truncate-string (string width)
+(defun counsel//truncate-string (string width)
   (when (> (length string) width)
     (setq string
           (concat (substring
@@ -7,16 +7,16 @@
                   " ... ")))
   string)
 
-(defun counsel%semantic--clean-tag ($tag)
+(defun counsel//semantic--clean-tag ($tag)
   (let ((default-value (semantic-tag-get-attribute $tag :default-value))
         (name (semantic-tag-name $tag)))
     (when (stringp default-value)
       (semantic-tag-put-attribute $tag :default-value
-                                  (counsel%truncate-string default-value 75)))
+                                  (counsel//truncate-string default-value 75)))
     (when (stringp name)
-      (semantic-tag-set-name $tag (counsel%truncate-string name 75)))))
+      (semantic-tag-set-name $tag (counsel//truncate-string name 75)))))
 
-(defun counsel%semantic-or-imenu--relative-buffers ($buffer)
+(defun counsel//semantic-or-imenu--relative-buffers ($buffer)
   (let* ((projectile-require-project-root nil)
          (project-buffers (ignore-errors (projectile-project-buffers))))
     (loop for buffer in (buffer-list)
@@ -27,7 +27,7 @@
                             (member buffer project-buffers))))
           collect buffer)))
 
-(defun counsel%semantic-or-imenu--candidates ($buffers)
+(defun counsel//semantic-or-imenu--candidates ($buffers)
   (loop for buffer in $buffers
         nconc
         (mapcar
@@ -40,7 +40,7 @@
            ;; Use semantic first
            (if (semantic-active-p)
                (mapcar (lambda (x)
-                         (counsel%semantic--clean-tag x)
+                         (counsel//semantic--clean-tag x)
                          (cons (counsel-semantic-format-tag x) x))
                        (counsel-semantic-tags))
              (let* ((inhibit-message t)
@@ -52,7 +52,7 @@
                     (items (delete (assoc "*Rescan*" items) items)))
                (counsel-imenu-get-candidates-from items)))))))
 
-(defun counsel%semantic-or-imenu--goto ($candidate)
+(defun counsel//semantic-or-imenu--goto ($candidate)
   (let ((place (cdr $candidate))
         buffer goto-function)
     (if (semantic-tag-p place)
@@ -67,21 +67,21 @@
     (funcall goto-function place)))
 
 
-(defun counsel-semantic-or-imenu* ($arg)
+(defun counsel/semantic-or-imenu* ($arg)
   "Jump to a semantic tag in the current buffer."
   (interactive "P")
   (unless (featurep 'imenu)
     (require 'imenu nil t))
   (let* ((buffer (current-buffer))
          (buffers (if $arg
-                      (counsel%semantic-or-imenu--relative-buffers buffer)
+                      (counsel//semantic-or-imenu--relative-buffers buffer)
                     (list buffer)))
-         (candidates (counsel%semantic-or-imenu--candidates buffers)))
+         (candidates (counsel//semantic-or-imenu--candidates buffers)))
     (ivy-read (if $arg "All Imenu Items: " "Imenu Items: ")
               candidates
               :preselect (thing-at-point 'symbol)
               :require-match t
-              :action 'counsel%semantic-or-imenu--goto
+              :action 'counsel//semantic-or-imenu--goto
               :caller 'counsel-semantic-or-imenu
               ;; If search for all buffers, do not jump when selecting
               ;; candidate
@@ -92,7 +92,7 @@
                           ("C-p" . ivy-previous-line-and-call))))))
 
 (defvar counsel--kill-buffers nil)
-(defun counsel%kill-buffer-action (x)
+(defun counsel//kill-buffer-action (x)
   (if (member x counsel--kill-buffers)
       (unless (memq this-command '(ivy-done
                                    ivy-alt-done
@@ -100,48 +100,37 @@
         (setq counsel--kill-buffers (delete x counsel--kill-buffers)))
     (unless (equal x "")
       (setq counsel--kill-buffers (append counsel--kill-buffers (list x)))))
-  (let ((prompt (counsel%kill-buffer-prompt)))
+  (let ((prompt (counsel//kill-buffer-prompt)))
     (setf (ivy-state-prompt ivy-last) prompt)
     (setq ivy--prompt (concat ivy-count-format prompt))))
 
-(defun counsel%kill-buffers (&optional $hard)
-  (dolist (buffer counsel--kill-buffers)
-    (let ((kill-buffer-hook (and (not $hard) kill-buffer-hook)))
-      (kill-buffer buffer))))
-
-(defun counsel%kill-buffer-prompt ()
+(defun counsel//kill-buffer-prompt (&optional $hard)
   (format "%sKill buffers (%s): "
-          (if current-prefix-arg "[hard] " "")
+          (if $hard "[hard] " "")
           (string-join counsel--kill-buffers ", ")))
 
-(defun counsel-kill-buffer ($hard)
+(defun counsel/kill-buffer ($arg)
   "Kill buffer with ivy backends."
   (interactive "P")
   (setq counsel--kill-buffers nil)
   (let ((ivy-use-virtual-buffers nil))
-    (ivy-read (counsel%kill-buffer-prompt)
-              'internal-complete-buffer
+    (ivy-read (format "%s%sKill buffers (%s): "
+                      (if (eq $arg '(16)) "<hard> " "")
+                      (if $arg (concat "[" (projectile-project-name) "] ") "")
+                      (string-join counsel--kill-buffers ", "))
+              (if $arg
+                  (mapcar #'buffer-name (projectile-project-buffers))
+                'internal-complete-buffer)
               :preselect (buffer-name (current-buffer))
-              :action #'counsel%kill-buffer-action
+              :action #'counsel//kill-buffer-action
               :keymap counsel-find-file-map
-              :caller 'counsel-kill-buffer
+              :caller 'counsel/kill-buffer
               :require-match t))
-  (counsel%kill-buffers $hard))
+  (dolist (buffer counsel--kill-buffers)
+    (let ((kill-buffer-hook (and (eq $arg '(16)) kill-buffer-hook)))
+      (kill-buffer buffer))))
 
-(defun counsel-projectile-kill-buffer ($hard)
-  "Kill buffer with ivy backends."
-  (interactive "P")
-  (setq counsel--kill-buffers nil)
-  (ivy-read (counsel%kill-buffer-prompt)
-            (mapcar #'buffer-name (projectile-project-buffers))
-            :preselect (buffer-name (current-buffer))
-            :action #'counsel%kill-buffer-action
-            :keymap counsel-find-file-map
-            :caller 'counsel-projectile-kill-buffer
-            :require-match t)
-  (counsel%kill-buffers $hard))
-
-(defun counsel-sudo-edit (&optional $arg)
+(defun counsel/sudo-edit (&optional $arg)
   "Edit currently visited file as root.
 With a prefix ARG prompt for a file to visit.  Will also prompt
 for a file to visit if current buffer is not visiting a file."
@@ -156,12 +145,12 @@ for a file to visit if current buffer is not visiting a file."
                     (find-file (concat "/sudo:root@localhost:"
                                        (expand-file-name x ivy--directory)))))
                 :keymap counsel-find-file-map
-                :caller 'counsel-sudo-edit)
+                :caller 'counsel/sudo-edit)
     (let ((old-point (point)))
       (find-file (concat "/sudo:root@localhost:" buffer-file-name))
       (goto-char old-point))))
 
-(defun core%ivy-switch-buffer-transformer ($left-str)
+(defun core//ivy-switch-buffer-transformer ($left-str)
   "Transform STR to more readable format."
   (let ((buffer (get-buffer $left-str))
         (right-str ""))
@@ -177,7 +166,7 @@ for a file to visit if current buffer is not visiting a file."
                                   'face 'ivy-virtual))))
     (format-line! $left-str right-str)))
 
-(defun core%counsel-bookmark-transformer ($left-str)
+(defun core//counsel-bookmark-transformer ($left-str)
   "Transform STR to more readable format."
   (let ((right-str "")
         (bm (bookmark-get-bookmark-record $left-str)))
@@ -190,18 +179,28 @@ for a file to visit if current buffer is not visiting a file."
     (format-line! (propertize $left-str 'face 'font-lock-string-face)
                   right-str)))
 
+(defun swiper/dispatch (&optional $arg)
+  (interactive "P")
+  (call-interactively
+   (cond
+    ((equal $arg 0) #'isearch-forward-regexp)
+    ((equal $arg 9) #'isearch-backward-regexp)
+    ((equal $arg '(4)) #'swiper-multi)
+    ((equal $arg '(16)) #'swiper-all)
+    (t #'counsel-grep-or-swiper))))
+
 (with-eval-after-load 'ivy
   (dolist (caller '(ivy-switch-buffer
-                    counsel-kill-buffer
+                    counsel/kill-buffer
                     internal-complete-buffer
                     ivy-switch-buffer-other-window
                     counsel-projectile-switch-to-buffer
                     counsel-projectile))
     (ivy-set-display-transformer caller
-                                 #'core%ivy-switch-buffer-transformer))
+                                 #'core//ivy-switch-buffer-transformer))
 
   (ivy-set-display-transformer 'counsel-bookmark
-                               #'core%counsel-bookmark-transformer)
+                               #'core//counsel-bookmark-transformer)
 
   (require 'ivy-hydra)
 
@@ -227,22 +226,12 @@ for a file to visit if current buffer is not visiting a file."
     ("C-j" . ivy-immediate-done)
     ("C-M-j" . ivy-done)))
 
-(defun swiper/dispatch (&optional $arg)
-  (interactive "P")
-  (call-interactively
-   (cond
-    ((equal $arg 0) #'isearch-forward-regexp)
-    ((equal $arg 9) #'isearch-backward-regexp)
-    ((equal $arg '(4)) #'swiper-multi)
-    ((equal $arg '(16)) #'swiper-all)
-    (t #'counsel-grep-or-swiper))))
-
 (with-eval-after-load 'counsel
   (define-key!
     ("C-x j j" . counsel-bookmark)
     ("C-s" . swiper/dispatch)
     ("C-x C-f" . counsel-find-file)
-    ("C-x k" . counsel-kill-buffer)
+    ("C-x k" . counsel/kill-buffer)
     ("C-x w -" . ivy-pop-view)
     ("C-x w =" . ivy-push-view))
 
@@ -254,7 +243,7 @@ for a file to visit if current buffer is not visiting a file."
     ("l f" . counsel-find-library)
     ("u" . counsel-unicode-char)
     ("d" . counsel-dired-jump)
-    ("i" . counsel-semantic-or-imenu*)
+    ("i" . counsel/semantic-or-imenu*)
     ("x" . counsel-linux-app)
     ("v" . counsel-set-variable)
     ("j" . counsel-file-jump)
@@ -273,7 +262,7 @@ for a file to visit if current buffer is not visiting a file."
     ("F" . counsel-faces)
     ("W" . counsel-colors-web)
     ("E" . counsel-colors-emacs)
-    ("e" . counsel-sudo-edit)
+    ("e" . counsel/sudo-edit)
     ("O" . counsel-outline)
     ("o" . counsel-org-goto-all)
     ("t" . counsel-tmm))
@@ -288,7 +277,7 @@ for a file to visit if current buffer is not visiting a file."
          ;; file names ending with # or ~
          "\\|\\(?:[#~]\\'\\)"))
 
-  (when emacs-has-ripgrep-p
+  (when env-has-ripgrep-p
     (setq counsel-grep-base-command
           "rg -M 1000 --no-heading --line-number --color never '%s' %s"))
   (ivy-set-actions
@@ -308,7 +297,6 @@ for a file to visit if current buffer is not visiting a file."
     ("s s" . counsel-projectile-rg)
     ("s a" . counsel-projectile-ag)
     ("p" . counsel-projectile)
-    ("k" . counsel-projectile-kill-buffer)
     ("K" . projectile-kill-buffers)
     ("w" . projectile-switch-project)))
 

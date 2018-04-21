@@ -1,7 +1,7 @@
 ;; When splitting window, show (other-buffer) in the new window
 
 (defvar window-size-list '("0.25" "0.382" "0.5" "0.618" "0.7"))
-(defun window%split-with-size ($size &optional $vertical?)
+(defun window//split-with-size ($size &optional $vertical?)
   "Set new window size to $SIZE"
   (let ((window-size (if $vertical?
                          (window-body-height)
@@ -21,14 +21,14 @@
 
 (defun window/split-vertically (&optional $arg)
   (interactive "P")
-  (window%split-with-size (when $arg (string-to-number
+  (window//split-with-size (when $arg (string-to-number
                                       (completing-read "Float or Integer: "
                                                        window-size-list)))
                           :vertial))
 
 (defun window/split-horizontally (&optional $arg)
   (interactive "P")
-  (window%split-with-size (when $arg (string-to-number
+  (window//split-with-size (when $arg (string-to-number
                                       (completing-read "Float or Integer: "
                                                        window-size-list)))))
 
@@ -45,7 +45,7 @@
     (delete-other-windows)
     (window/split-vertically $arg)))
 
-(defun window%split-n ($window $n $align)
+(defun window//split-n ($window $n $align)
   (when (> $n 1)
     (let ((split-function (if (eq $align :vertical)
                               #'split-window-vertically
@@ -81,8 +81,8 @@
      (t
       (message "Nothing to do !!!")))
     (when align
-      (window%split-n orig-window $num1 align)
-      (window%split-n new-window $num2 align))))
+      (window//split-n orig-window $num1 align)
+      (window//split-n new-window $num2 align))))
 
 (define-key! :prefix "C-x"
   ("2" . window/split-vertically)

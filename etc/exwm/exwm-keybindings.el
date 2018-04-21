@@ -1,6 +1,8 @@
+(eval-when-compile
+  (require 'dash))
+
 ;; (setq exwm-input-prefix-keys '(?\M-x ?\M-` ?\M-& ?\M-: ?\C-g ?\C-x ?\C-z))
-(setq exwm-input-prefix-keys
-      '(?\M-x ?\M-` ?\M-& ?\M-: ?\C-g ?\C-x ?\C-z ?\C-u))
+(setq exwm-input-prefix-keys '(?\M-: ?\C-x ?\C-u))
 
 (defvar exwm--command-history nil)
 (defun exwm%run-command (command)
@@ -36,9 +38,8 @@
                           map)))))
 
 
-(defmacro define-exwm-command! (cmd)
-  `(lambda!
-     (message "%s" (shell-command-to-string ,cmd))))
+(defmacro define-exwm-command! (name command)
+  `(lambda! (start-process-shell-command ,name nil ,command)))
 
 (defvar exwm-input-prefix-keys-extra nil)
 (defun exwm/define-key (key def)
@@ -48,22 +49,21 @@
   (add-to-list 'exwm-input-prefix-keys-extra (elt key 0)))
 
 (exwm-input-set-key [XF86KbdBrightnessDown]
-                    (define-exwm-command! "kbdbacklight.sh down"))
+                    (define-exwm-command! "kbd" "bash ~/.config/i3/kbdbacklight.sh down"))
 (exwm-input-set-key [XF86KbdBrightnessUp]
-                    (define-exwm-command! "kbdbacklight.sh up"))
+                    (define-exwm-command! "kbd" "bash ~/.config/i3/kbdbacklight.sh up"))
 (exwm-input-set-key [XF86AudioMute]
-                    (define-exwm-command!
-                      "amixer -D pulse set Master 1+ toggle"))
+                    (define-exwm-command! "vol" "amixer -D pulse set Master 1+ toggle"))
 (exwm-input-set-key [XF86AudioLowerVolume]
-                    (define-exwm-command!
-                      "amixer -D pulse set Master 5%-"))
+                    (define-exwm-command! "vol" "bash ~/.config/i3/volume.sh down"))
 (exwm-input-set-key [XF86AudioRaiseVolume]
-                    (define-exwm-command!
-                      "amixer -D pulse set Master 5%+"))
+                    (define-exwm-command! "vol" "bash ~/.config/i3/volume.sh up"))
+(exwm-input-set-key [XF86MonBrightnessDown]
+                    (define-exwm-command! "light" "bash ~/.config/i3/backlight.sh down"))
+(exwm-input-set-key [XF86MonBrightnessUp]
+                    (define-exwm-command! "light" "bash ~/.config/i3/backlight.sh up"))
 (exwm-input-set-key [print]
-                    (lambda!
-                      (start-process-shell-command "gnome-screenshot"
-                                                   nil "gnome-screenshot  --interactive")))
+                    (define-exwm-command! "screenshot" "gnome-screenshot --interactive"))
 
 (exwm/define-key  "s-r" #'exwm-reset)
 (exwm/define-key  "s-w" #'exwm-workspace-switch)
@@ -88,10 +88,24 @@
 (exwm/define-key "s-2" (lambda! (exwm-workspace-switch 1)))
 (exwm/define-key "s-3" (lambda! (exwm-workspace-switch 2)))
 (exwm/define-key "s-4" (lambda! (exwm-workspace-switch 3)))
+(exwm/define-key "s-5" (lambda! (exwm-workspace-switch 4)))
+(exwm/define-key "s-6" (lambda! (exwm-workspace-switch 5)))
+(exwm/define-key "s-7" (lambda! (exwm-workspace-switch 6)))
+(exwm/define-key "s-8" (lambda! (exwm-workspace-switch 7)))
+(exwm/define-key "s-9" (lambda! (exwm-workspace-switch 8)))
 
-(exwm-input-set-simulation-keys
- '(([?\s-x] . ?\C-x)
-   ([?\s-g] . ?\C-g)
-   ([?\s-z] . ?\C-z)))
+(define-key exwm-mode-map (kbd "C-c") nil)
+
+;; (setq exwm-input-simulation-keys
+;;       '(([?\C-b] . [left])
+;;         ([?\C-f] . [right])
+;;         ([?\C-p] . [up])
+;;         ([?\C-n] . [down])
+;;         ([?\C-a] . [home])
+;;         ([?\C-e] . [end])
+;;         ([?\M-v] . [prior])
+;;         ([?\C-v] . [next])
+;;         ([?\C-d] . [delete])
+;;         ([?\C-k] . [S-end delete])))
 
 (provide 'exwm-keybindings)
