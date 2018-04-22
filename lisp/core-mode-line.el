@@ -28,21 +28,21 @@ Whether it is temporary file, whether it is modified, whether is
 read-only, and `buffer-file-coding-system'"
   (list " ("
         (when (bound-and-true-p iedit-mode)
-          (propertize (format "iedit:%d " (iedit-counter))
+          (propertize (format "IE:%d " (iedit-counter))
                       'face font-lock-constant-face))
         (when (bound-and-true-p multiple-cursors-mode)
-          (propertize (format "mc:%d " (mc/num-cursors))
+          (propertize (format "MC:%d " (mc/num-cursors))
                       'face font-lock-constant-face))
         (when (and (boundp 'text-scale-mode-amount)
                    (/= text-scale-mode-amount 0))
           (propertize (format "%+d " text-scale-mode-amount)
                       'face font-lock-doc-face))
         (when (or defining-kbd-macro executing-kbd-macro)
-          (propertize "macro " 'face font-lock-variable-name-face))
+          (propertize "Macro " 'face font-lock-variable-name-face))
         (when (buffer-temporary?)
-          (propertize "tmp " 'face font-lock-comment-face))
+          (propertize "Tmp " 'face font-lock-comment-face))
         (when (buffer-modified-p)
-          (propertize "mod " 'face font-lock-negation-char-face))
+          (propertize "Mod " 'face font-lock-negation-char-face))
         (when (buffer-base-buffer) "I ")
         (when buffer-read-only
           (propertize (if (bound-and-true-p view-mode) "view " "ro ")
@@ -52,37 +52,37 @@ read-only, and `buffer-file-coding-system'"
               (image-size (image-get-display-property) :pixels)
             (format "%dx%d " width height)))
         (let ((buffer-encoding (format "%s" buffer-file-coding-system)))
-          (if (string-match "\\(dos\\|unix\\|mac\\)" buffer-encoding)
-              (match-string 1 buffer-encoding)
-            buffer-encoding))
-        ") "))
+          (capitalize (if (string-match "\\(dos\\|unix\\|mac\\)" buffer-encoding)
+                          (match-string 1 buffer-encoding)
+                        buffer-encoding)))
+        ")"))
 
 (autoload 'image-get-display-property "image-mode" nil)
 (defsubst mode-line//flycheck ()
   "Display flycheck status in mode-line."
-  (if (bound-and-true-p flycheck-mode)
-      (list
-       (pcase flycheck-last-status-change
-         (`not-checked (propertize "Waiting" 'face 'font-lock-comment-face))
-         (`no-checker (propertize "No" 'face 'font-lock-comment-face))
-         (`running (propertize "Running" 'face 'font-lock-doc-face))
-         (`errored (propertize "Error" 'face 'flycheck-fringe-error))
-         (`interrupted (propertize "Interrupted" 'face 'flycheck-fringe-warning))
-         (`suspicious (propertize "???" 'face 'flycheck-fringe-error))
-         (`finished (let-alist (flycheck-count-errors flycheck-current-errors)
-                      (concat (propertize (format "E%s" (or .error 0))
-                                          'face 'flycheck-fringe-error)
-                              " "
-                              (propertize (format "W%s" (or .warning 0))
-                                          'face 'flycheck-fringe-warning)))))
-       " ")))
+  (and (bound-and-true-p flycheck-mode)
+       (concat
+        " "
+        (pcase flycheck-last-status-change
+          (`not-checked (propertize "Waiting" 'face 'font-lock-comment-face))
+          (`no-checker (propertize "No" 'face 'font-lock-comment-face))
+          (`running (propertize "Running" 'face 'font-lock-doc-face))
+          (`errored (propertize "Error" 'face 'flycheck-fringe-error))
+          (`interrupted (propertize "Interrupted" 'face 'flycheck-fringe-warning))
+          (`suspicious (propertize "???" 'face 'flycheck-fringe-error))
+          (`finished (let-alist (flycheck-count-errors flycheck-current-errors)
+                       (concat (propertize (format "E%s" (or .error 0))
+                                           'face 'flycheck-fringe-error)
+                               " "
+                               (propertize (format "W%s" (or .warning 0))
+                                           'face 'flycheck-fringe-warning))))))))
 
 (defsubst mode-line//process ()
   "Display buffer process status."
-  (and mode-line-process (list "{" mode-line-process "} ")))
+  (and mode-line-process (list " {" mode-line-process "}")))
 
 (defsubst mode-line//position ()
-  (propertize "L%l C%c %p %I" 'face 'font-lock-constant-face))
+  (propertize " L%l C%c %p %I" 'face 'font-lock-constant-face))
 
 (defvar mode-line--center-margin 1)
 (defvar mode-line-default-format '("%e" (:eval (mode-line//generate))))
@@ -91,7 +91,8 @@ read-only, and `buffer-file-coding-system'"
      :segments (mode-line//window-number
                 mode-line//buffer-id
                 mode-line//buffer-major-mode
-                mode-line//process)
+                mode-line//process
+                mode-line//position)
      :center nil)
     ((or (memq major-mode '(dired-mode))
          (and (not (derived-mode-p 'text-mode 'prog-mode))

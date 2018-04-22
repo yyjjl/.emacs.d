@@ -166,17 +166,17 @@
            (buffer-name (format "*root:%s*" (buffer-name)))
            (buffer (get-buffer-create buffer-name))
            (proc (get-buffer-process buffer)))
-      (if (and proc
-               (process-live-p proc)
-               (eq (buffer-local-value 'major-mode buffer)
-                   'term-mode))
-          (with-current-buffer buffer
-            (term-send-raw-string (format ".X %s\n" file)))
+      (unless (and proc
+                   (process-live-p proc)
+                   (eq (buffer-local-value 'major-mode buffer)
+                       'term-mode))
         (kill-buffer buffer)
-        (setq buffer (term/exec-program "root"
-                                        (list "-l" (or file ""))
-                                        buffer-name)))
-      (term//pop-to-buffer buffer)))))
+        (setq buffer
+              (term/exec-program "root" (list "-l" (or file "")) buffer-name)))
+      (when buffer
+        (with-current-buffer buffer
+          (term-send-raw-string (format ".X %s\n" file)))
+        (term//pop-to-buffer buffer))))))
 
 (defun cpp/compile ()
   (interactive)

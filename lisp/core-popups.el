@@ -18,6 +18,9 @@
             "\\|\\*.*?Help.*?\\*"
             "$")))
 
+(defvar core--shackle-comint-mode-regexp
+  "^\\(?:\\*shell\\*\\|\\*.*repl.*\\*\\|\\*prolog\\*\\)$")
+
 (defvar-local core--shackle-popup-window nil)
 (put 'core--shackle-popup-window 'permanent-local t)
 
@@ -165,10 +168,9 @@
   (let ((case-fold-search t)
         (buffer-name (buffer-name $buffer))
         (mode (buffer-local-value 'major-mode $buffer)))
-    (or (derived-mode? 'comint-mode)
+    (or (derived-mode? 'comint-mode $buffer)
         (memq mode core--shackle-comint-modes)
-        (string-match-p "^\\*.*repl.*\\*$" buffer-name)
-        (string-match-p "^\\*shell\\*" buffer-name))))
+        (string-match-p core--shackle-comint-mode-regexp buffer-name))))
 
 (defun core//shackle-help-mode-matcher ($buffer)
   (let ((case-fold-search t)

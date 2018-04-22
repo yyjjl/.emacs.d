@@ -94,9 +94,8 @@
             (run-with-idle-timer
              cpp-cquery--semantic-highlight-interval nil
              (lambda ()
-               (unwind-protect
-                   (funcall $fn nil cpp-cquery--semantic-highlight-params)
-                 (setq cpp-cquery--semantic-highlight-timer nil)))))))
+               (setq cpp-cquery--semantic-highlight-timer nil)
+               (funcall $fn nil cpp-cquery--semantic-highlight-params))))))
 
   (advice-add 'cquery--publish-semantic-highlighting
               :around #'cpp-cquery*semantic-highlight))
