@@ -55,7 +55,7 @@ grab matched string and insert them into `kill-ring'"
     items))
 
 ;; @see https://emacs.stackexchange.com/questions/8121/automatically-inserting-an-space-when-inserting-a-character-depending-on-the-pre
-(defvar core-punctuation-chars (string-to-list ",;?")
+(defvar core-punctuation-chars (string-to-list ",;")
   "List of charactesr to insert spaces after")
 
 (defvar core-punctuation-ignore-chars
@@ -78,15 +78,13 @@ space between the two characters."
 (define-minor-mode core/space-punctuation-mode
   "Automatically inserts spaces between some punctuation and
 other characters."
-  :init-value nil
-  :lighter "._a"
-  :keymap nil
-  (make-local-variable 'post-self-insert-hook)
+  :global t
+  :initialize 'custom-initialize-delay
   (if core/space-punctuation-mode
       (add-hook 'post-self-insert-hook 'core|insert-space-after-punc)
     (remove-hook 'post-self-insert-hook 'core|insert-space-after-punc)))
 
-(add-hook 'text-mode-hook 'core/space-punctuation-mode)
+(core/space-punctuation-mode)
 
 (defconst extra-ascii-before-chinese
   (rx (group-n 1 (in "a-zA-Z0-9!@#$%^&\\-+|)\\]}\\:;?><.,/"))
@@ -140,13 +138,23 @@ other characters."
   (interactive "p")
   (forward-sentence-or-sexp (- $n)))
 
+(defun forward-defun-or-paragraph (&optional $n)
+  (interactive "p")
+  (if (or (derived-mode-p 'prog-mode))
+      (forward-defun $n)
+    (forward-paragraph $n)))
+
+(defun backward-defun-or-paragraph (&optional $n)
+  (interactive "p")
+  (forward-defun-or-paragraph (- $n)))
+
 (define-key!
   ("C-x , SPC" . extra/insert-space-around-chinese)
   ("M-;" . evilnc-comment-or-uncomment-lines)
   ("C-x n n" . core/narrow-or-widen-dwim)
   ("C-x K" . core/kill-regexp)
-  ("M-]" . forward-defun)
-  ("M-[" . backward-defun)
+  ("M-]" . forward-defun-or-paragraph)
+  ("M-[" . backward-defun-or-paragraph)
   ("M-e" . forward-sentence-or-sexp)
   ("M-a" . backward-sentence-or-sexp)
   ("C-M-b" . backward-sentence)

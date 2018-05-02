@@ -1,3 +1,4 @@
+;;* Load Path
 ;; Add site-package's path to `load-path'
 (when (fboundp 'normal-top-level-add-to-load-path)
   (dolist (dir (directory-files emacs-private-directory))
@@ -11,6 +12,7 @@
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 0.6)
 
+;;* Default Values
 ;; No tool bar or scroll bar
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
@@ -50,7 +52,7 @@
 (setq-default minibuffer-prompt-properties
               '(read-only t point-entered minibuffer-avoid-prompt
                           face minibuffer-prompt))
- ;; History & backup settings
+;; History & backup settings
 (setq-default auto-save-default t)
 (setq-default auto-save-timeout 8)
 (setq-default create-lockfiles nil)
@@ -75,7 +77,7 @@
 ;; (setq-default                require-final-newline t)
 (setq-default tooltip-delay 1)
 (setq-default truncate-lines nil)
-(setq-default truncate-partial-width-windows nil)
+(setq-default truncate-partial-width-windows 50)
 (setq-default speedbar-use-images nil)
 (setq-default large-file-warning-threshold (* 512 1024 1024))
 (setq-default line-number-display-limit core-large-buffer-size)
@@ -91,6 +93,12 @@
 (setq-default kept-old-versions 2)
 (setq-default select-enable-clipboard t)
 (setq-default select-enable-primary t)
+
+;; Scrolling
+(setq-default auto-window-vscroll nil)
+(setq-default scroll-conservatively 0)
+(setq-default scroll-preserve-screen-position t)
+
 (setq-default vc-make-backup-files nil)
 
 ;; be quiet at startup; don't load or display anything unnecessary
@@ -105,6 +113,7 @@
 (setq initial-scratch-message
       (concat ";; Welcome to Emacs " (or user-login-name "") " !!!"))
 
+;;* Recentf
 (defun core//recentf-keep? ($fn)
   (and core--recentf-enabled-p
        ;; The order must be kept
@@ -113,19 +122,16 @@
                 (file-writable-p $fn)))))
 (setq recentf-keep '(core//recentf-keep?))
 (setq recentf-max-saved-items 2048
-      recentf-exclude (list "/tmp/" "/ssh:" "/sudo:" "\\.elc$" emacs-var-direcotry))
+      recentf-exclude (list "/tmp/" "^/ssh:" "/sudo:" "\\.elc$"
+                            "\\.\\(gz\\|gif\\|svg\\|png\\|jpe?g\\)$" "/TAGS$"
+                            emacs-var-direcotry))
 
-;; Keep mouse at upper-right corner when typing
-;; (mouse-avoidance-mode 'banish)
-;; Purges buffers which haven't been displayed in 3 days
-(midnight-mode 1)
-;; (display-time-mode 1)
-(transient-mark-mode 1)
-
+;;* Savehist
 (setq history-length 1000)
 (setq savehist-additional-variables '(ivy-views))
 (ignore-errors (savehist-mode 1))
 
+;;* Handle External Files
 (defun core//external-file-handler ($op &rest $args)
   (let ((file (expand-file-name (car $args))))
     (cond ((eq system-type 'darwin)
@@ -153,6 +159,7 @@
              "\\|")
             "\\)\\'")))
 
+;;* Generic hooks
 (define-hook! core|minibuffer-setup (minibuffer-setup-hook)
   (local-set-key (kbd "C-k") 'kill-line)
   (setq gc-cons-threshold most-positive-fixnum))
@@ -160,7 +167,103 @@
 (define-hook! core|minibuffer-exit (minibuffer-exit-hook)
   (setq gc-cons-threshold emacs-gc-cons-threshold))
 
+;; Don't echo passwords when communicating with interactive programs:
+(add-hook 'comint-output-filter-functions 'comint-watch-for-password-prompt)
+
+(add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
+
+;; Make scratch buffer un-killable
+(define-hook! core|unkillable-buffer (kill-buffer-query-functions)
+  (let ((bn (buffer-name)))
+    (cond ((equal bn "*note*") nil)
+          ((equal bn "*task*") nil)
+          ((equal bn "*scratch*") (delete-region (point-min) (point-max)) nil)
+          (t t))))
+
+;; Display long lines in truncated style (end line with $)
+(define-hook! core|truncate-lines-setup (grep-mode-hook)
+  (toggle-truncate-lines 1))
+
+;; Turns on `auto-fill-mode', don't use `text-mode-hook'
+(add-hook 'change-log-mode-hook 'turn-on-auto-fill)
+
+;; ANSI-escape coloring in compilation-mode
+(setq compilation-environment '("TERM=xterm-256color"))
+(autoload 'ansi-color-apply-on-region "ansi-color")
+(define-hook! core|colorize-compilation-buffer (compilation-filter-hook)
+  (when (eq major-mode 'compilation-mode)
+    (ansi-color-apply-on-region compilation-filter-start (point-max))))
+
+(define-hook! (core|compilation-finish-hook $buffer _)
+  (compilation-finish-functions)
+  (when (buffer-live-p $buffer)
+    (with-current-buffer $buffer
+      (unless (eq major-mode 'compilation-mode)
+        ;; Sometime it will open a comint $buffer
+        (compilation-mode)
+        (core//record-popup-window
+         (get-buffer-window $buffer) $buffer :autoclose :delete)))))
+
+;; Default prog-mode setup
+(define-hook! core|generic-prog-mode-setup (prog-mode-hook
+                                            LaTeX-mode-hook)
+  (local-set-key [remap completion-at-point] #'counsel-company)
+
+  (condition-case err
+      (hs-minor-mode 1)
+    (error (message "%s" (error-message-string err))))
+
+  (flycheck-mode 1)
+  (hl-line-mode 1)
+
+  (unless (buffer-too-large?)
+    ;; (highlight-indentation-current-column-mode 1)
+    ;; (when (fboundp 'display-line-numbers-mode)
+    ;;   (display-line-numbers-mode 1))
+    (highlight-indentation-mode 1))
+
+  ;; show trailing spaces in a programming mode
+  (setq show-trailing-whitespace t)
+  (setq indicate-empty-lines t))
+
+(define-hook! core|generic-text-mode-setup (text-mode-hook)
+  (local-set-key [remap completion-at-point] #'counsel-company)
+
+  (hl-line-mode 1)
+  (auto-fill-mode 1)
+  ;; (whitespace-mode 1)
+  ;; (unless (buffer-too-large?)
+  ;;   (when (fboundp 'display-line-numbers-mode)
+  ;;     (display-line-numbers-mode 1)))
+  (setq indicate-empty-lines t))
+
+(define-hook! core|generic-comint-mode-setup (comint-mode-hook)
+  (local-set-key [remap completion-at-point] #'counsel-company)
+
+  ;; But don't show trailing whitespace in SQLi, inf-ruby etc.
+  (setq show-trailing-whitespace nil)
+  (setq-local company-idle-delay nil))
+
 (define-hook! core|after-init-hook (after-init-hook)
+  ;; global-modes
+  (global-subword-mode 1)
+  (global-page-break-lines-mode 1)
+  (global-auto-revert-mode 1)
+
+  (column-number-mode 1)
+  (show-paren-mode 1)
+  ;; Auto insert closing pair
+  (electric-pair-mode 1)
+  (electric-layout-mode 1)
+  (electric-indent-mode -1)
+
+  ;; Keep mouse at upper-right corner when typing
+  ;; (mouse-avoidance-mode 'banish)
+  ;; Purges buffers which haven't been displayed in 3 days
+  (midnight-mode 1)
+  ;; (display-time-mode 1)
+  (transient-mark-mode 1)
+
   ;; Restore `file-name-handler-alist'
   (setq file-name-handler-alist emacs-file-name-handler-alist
         gc-cons-threshold emacs-gc-cons-threshold

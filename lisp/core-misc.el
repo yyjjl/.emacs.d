@@ -1,88 +1,4 @@
-;; Don't echo passwords when communicating with interactive programs:
-(add-hook 'comint-output-filter-functions 'comint-watch-for-password-prompt)
-
-;; Make scratch buffer un-killable
-(define-hook! core|unkillable-buffer (kill-buffer-query-functions)
-  (let ((bn (buffer-name)))
-    (cond ((equal bn "*note*") nil)
-          ((equal bn "*task*") nil)
-          ((equal bn "*scratch*") (delete-region (point-min) (point-max)) nil)
-          (t t))))
-
-;; Display long lines in truncated style (end line with $)
-(define-hook! core|truncate-lines-setup (grep-mode-hook)
-  (toggle-truncate-lines 1))
-
-;; Turns on `auto-fill-mode', don't use `text-mode-hook'
-(add-hook 'change-log-mode-hook 'turn-on-auto-fill)
-
-;; ANSI-escape coloring in compilation-mode
-(setq compilation-environment '("TERM=xterm-256color"))
-(require 'ansi-color)
-(define-hook! core|colorize-compilation-buffer (compilation-filter-hook)
-  (when (eq major-mode 'compilation-mode)
-    (ansi-color-apply-on-region compilation-filter-start (point-max))))
-
-(define-hook! (core|compilation-finish-hook $buffer $message)
-  (compilation-finish-functions)
-  (when (buffer-live-p $buffer)
-    (with-current-buffer $buffer
-      (unless (eq major-mode 'compilation-mode)
-        ;; Sometime it will open a comint $buffer
-        (compilation-mode)
-        (core//record-popup-window (get-buffer-window $buffer) $buffer
-                                   :autoclose :delete)))))
-
-;; (define-hook! core|auto-save-buffer (auto-save-hook)
-;;   (save-excursion
-;;     (dolist (buffer (buffer-list))
-;;       (with-current-buffer buffer
-;;         (when (and (buffer-file-name) (buffer-modified-p))
-;;           (basic-save-buffer))))))
-
-;; Default prog-mode setup
-(define-hook! core|generic-prog-mode-setup (prog-mode-hook
-                                            LaTeX-mode-hook)
-  (local-set-key [remap completion-at-point] #'counsel-company)
-
-  (condition-case err
-      (hs-minor-mode 1)
-    (error (message "%s" (error-message-string err))))
-  (flycheck-mode 1)
-  (hl-line-mode 1)
-  (when (< (buffer-size) core-large-buffer-size)
-    ;; (highlight-indentation-current-column-mode 1)
-    ;; (when (fboundp 'display-line-numbers-mode)
-    ;;   (display-line-numbers-mode 1))
-    (highlight-indentation-mode 1)
-    (auto-revert-mode 1))
-
-  ;; show trailing spaces in a programming mode
-  (setq show-trailing-whitespace t)
-  (setq indicate-empty-lines t))
-
-(define-hook! core|generic-text-mode-setup (text-mode-hook)
-  (local-set-key [remap completion-at-point] #'counsel-company)
-
-  (hl-line-mode 1)
-  (auto-fill-mode 1)
-  ;; (whitespace-mode 1)
-  (when (< (buffer-size) core-large-buffer-size)
-    ;; (when (fboundp 'display-line-numbers-mode)
-    ;;   (display-line-numbers-mode 1))
-    (auto-revert-mode 1))
-  (setq indicate-empty-lines t))
-
-(define-hook! core|generic-comint-mode-setup (comint-mode-hook)
-  (local-set-key [remap completion-at-point] #'counsel-company)
-
-  ;; But don't show trailing whitespace in SQLi, inf-ruby etc.
-  (setq show-trailing-whitespace nil)
-  (setq-local company-idle-delay nil))
-
-
-
-
+;; -*- lexical-binding: t -*-
 
 (defun core*desktop-save-unless-loaded ($fn &rest $args)
   (if (or (called-interactively-p 'interactive)
@@ -93,8 +9,8 @@
 (with-eval-after-load 'desktop
   (advice-add 'desktop-save :around #'core*desktop-save-unless-loaded)
   (add-to-list 'desktop-minor-mode-handlers '(orgtbl-mode . ignore))
-  (add-to-list 'desktop-minor-mode-handlers '(hs-minor-mode . ignore)))
-
+  (add-to-list 'desktop-minor-mode-handlers '(hs-minor-mode . ignore))
+  (add-to-list 'desktop-minor-mode-handlers '(auto-revert-mode . ignore)))
 
 (with-eval-after-load 'bookmark
   (define-hook! core|setup-buffer-bookmark (find-file-hook)
@@ -112,9 +28,9 @@
     (with-current-buffer buffer
       (core|setup-buffer-bookmark))))
 
-;; (with-eval-after-load 'display-line-numbers
-;;   (setq display-line-numbers-type t)
-;;   (setq display-line-numbers-widen t))
+(with-eval-after-load 'display-line-numbers
+  (setq display-line-numbers-type 'relative)
+  (setq-default display-line-numbers-width 2))
 
 (with-eval-after-load 'xref
   (define-key! :map xref--xref-buffer-mode-map
@@ -131,16 +47,20 @@
   (setq-default flycheck-check-syntax-automatically
                 '(idle-change save mode-enabled))
   (setq flycheck-mode-line-prefix ""
-        flycheck-idle-change-delay 1.5))
+        flycheck-idle-change-delay 1))
 
 (with-eval-after-load 'hippie-exp
+  (require 'hippie-exp-ext)
   (setq-default hippie-expand-try-functions-list
                 '(try-complete-file-name-partially
                   try-complete-file-name
-                  try-expand-all-abbrevs
                   try-expand-dabbrev
+                  try-expand-all-abbrevs
                   try-expand-dabbrev-all-buffers
-                  try-expand-dabbrev-from-kill)))
+                  try-expand-dabbrev-from-kill
+                  try-expand-dabbrev-limited-chars
+                  try-expand-dabbrev-limited-chars
+                  try-expand-dabbrev-limited-chars-all-buffers)))
 
 (put 'projectile-project-run-cmd 'safe-local-variable #'stringp)
 (put 'projectile-project-test-cmd 'safe-local-variable #'stringp)
@@ -149,9 +69,7 @@
 (setq projectile-keymap-prefix (kbd "C-x p"))
 (with-eval-after-load 'projectile
   (setq projectile-mode-line
-        '(:eval (format " [%s]" (or projectile-project-name
-                                    projectile-cached-project-name
-                                    "-"))))
+        '(:eval (format " [%s]" (projectile-project-name))))
   (setq projectile-require-project-root nil)
   (setq projectile-globally-ignored-file-suffixes '(".pyc" ".elc"))
   (setq projectile-completion-system 'ivy)
@@ -187,8 +105,7 @@
 (with-eval-after-load 'fcitx
   ;; Init fcitx prefix keys
   (setq fcitx-use-dbus nil)
-  (fcitx-prefix-keys-add "C-h" "M-g" "M-s"
-                         "M-o" "C-x" "C-c" "C-z"))
+  (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c" "C-z"))
 
 ;; Smart tab
 (defvar core--indent-close-list '(?\} ?\$ ?\] ?\' ?\` ?\"))
@@ -208,12 +125,14 @@
          ((memq (char-after) core--indent-close-list)
           (forward-char 1))
          ;; Trigger completions
-         ((and (looking-back "\\(?:\\s_\\|\\sw\\)\\{2,\\}\\(?:.\\|->\\)?"
+         ((and (looking-back "\\(?:\\s_\\|\\sw\\)\\{2,\\}\\(?:\\.\\|->\\|::?\\)?"
                              (max (point-min) (- (point) 5)))
                (not (memq (get-text-property (- (point) 1) 'face)
                           '(font-lock-string-face font-lock-doc-face)))
                (not (eq tab-always-indent 'complete)))
-          (call-interactively 'hippie-expand)))))))
+          (if (bound-and-true-p company-idle-delay)
+              (call-interactively 'hippie-expand)
+            (call-interactively 'company-complete))))))))
 (advice-add 'indent-for-tab-command :around #'core*indent-for-tab)
 
 (defun core*desktop-read ($fn &rest $args)
@@ -225,169 +144,15 @@
       (core/enable-semantic))))
 (advice-add 'desktop-read :around #'core*desktop-read)
 
-;; Delete the current file
-(defun core/delete-this-file ()
-  "Delete the current file, and kill the buffer."
-  (interactive)
-  (or (buffer-file-name) (error "No file is currently being edited"))
-  (when (yes-or-no-p (format "Really delete '%s'?"
-                             (file-name-nondirectory buffer-file-name)))
-    (delete-file (buffer-file-name))
-    (kill-this-buffer)))
-
-(defun core/copy-this-file-to-new-file ()
-  "Copy current file to a new file without close original file."
-  (interactive)
-  (let* ((this (current-buffer))
-         (this-name (buffer-file-name))
-         (name (completing-read "New file name: "
-                                #'read-file-name-internal)))
-    (if (and name this-name
-            (string= name this-name)
-            (not (get-buffer name)))
-        (message "Copy failed !!!")
-      (let ((buf (get-buffer-create name)))
-        (with-current-buffer buf
-          (insert-buffer-substring this)
-          (write-file (expand-file-name name
-                                        (file-name-directory this-name))))
-        (switch-to-buffer buf)))))
-
-;; Rename the current file
-(defun core/rename-this-file-and-buffer ($new-name)
-  "Renames both current buffer and file it's visiting to NEW-NAME."
-  (interactive (list (completing-read "New file name: "
-                                      #'read-file-name-internal)))
-  (let ((name (buffer-name))
-        (filename (buffer-file-name)))
-    (unless filename
-      (error "Buffer '%s' is not visiting a file!" name))
-    (if (get-buffer $new-name)
-        (message "A buffer named '%s' already exists!" $new-name)
-      (progn
-        (rename-file filename $new-name :ok-if-already-exists)
-        (rename-buffer $new-name)
-        (set-visited-file-name $new-name)
-        (set-buffer-modified-p nil)))))
-
-(defun core/create-scratch-buffer ()
-  "Create a new scratch buffer to work in. (could be *scratch* - *scratchX*)."
-  (interactive)
-  (let ((n 0)
-        (mode major-mode)
-        bufname)
-    (while (progn
-             (setq bufname (concat "*scratch"
-                                   (if (= n 0) "" (int-to-string n))
-                                   "*"))
-             (setq n (1+ n))
-             (get-buffer bufname)))
-    (pop-to-buffer (get-buffer-create bufname))
-    (funcall mode)))
-
-(defun core/cleanup-buffer-safe ()
-  "Perform a bunch of safe operations on the whitespace content of a buffer.
-Does not indent buffer, because it is used for a
-`before-save-hook', and that might be bad."
-  (interactive)
-  (untabify (point-min) (point-max))
-  (delete-trailing-whitespace)
-  (set-buffer-file-coding-system 'utf-8))
-
-(defun core/current-font-face ()
-  "Get the font face under cursor."
-  (interactive)
-  (let ((rlt (format "%S" (get-text-property (point) 'face))))
-    (kill-new rlt)
-    (message "%s => yank ring" rlt)))
-
-(defun core/occur-dwim ()
-  (interactive)
-  (if (region-active-p)
-      (push (buffer-substring-no-properties
-             (region-beginning)
-             (region-end))
-            regexp-history)
-    (let ((sym (thing-at-point 'symbol)))
-      (when (stringp sym)
-        (push (concat "\\_<" (regexp-quote sym) "\\_>") regexp-history))))
-  (call-interactively 'occur))
-
-(defun core/eval-and-replace ($start $end)
-  (interactive "r")
-  (let ((value (eval
-                `(let ((it (buffer-substring $start $end)))
-                   ,(if (bound-and-true-p
-                         mc--executing-command-for-fake-cursor)
-                        (read (car read-expression-history))
-                      (read--expression "Expression(it): "
-                                        "(eval (read it))")))
-                lexical-binding)))
-    (delete-region $start $end)
-    (save-excursion
-      (goto-char $start)
-      (prin1 value (current-buffer))
-      (activate-mark 1)
-      (goto-char $start))))
-
-(declare-function browse-url-chrome "browse-url")
-(defvar core-search-engine-alist
-  '(("g" "google" "http://www.google.com/search?q=%s")
-    ("q" "stackoverflow" "http://www.google.com/search?q=%s+site:stackoverflow.com")
-    ("w" "wikipedia" "http://en.wikipedia.org/wiki/Special:Search?search=%s")
-    ("d" "dictionary" "http://dictionary.reference.com/search?q=%s")
-    ("cpp" "cpp" "https://www.google.com/search?q=cpp+%s")))
-
-(defun core//read-search-engine ()
-  (assoc-string
-   (car (split-string-and-unquote
-         (ivy-read "Engine: "
-                   (mapcar (lambda (x)
-                             (format "%-6s %s"
-                                     (nth 0 x)
-                                     (propertize (nth 2 x)
-                                                 'face font-lock-comment-face)))
-                           core-search-engine-alist)
-                   :preselect "g"
-                   :matcher (lambda (re candidates)
-                              (when (and (stringp re)
-                                         (not (string-prefix-p "^" re)))
-                                (setq re (concat "^" re)))
-                              (ivy--re-filter re candidates))
-                   :require-match t)))
-   core-search-engine-alist))
-
-(defun core/search-in-chrome ($engine $keyword)
-  (interactive
-   (let ((engine (core//read-search-engine)))
-     (list (nth 2 engine)
-           (read-from-minibuffer (concat (nth 1 engine) ": ")
-                                 nil nil 'core-search-history))))
-  (unless (featurep 'browse-url)
-    (require 'browse-url))
-  (browse-url-chrome (format $engine $keyword))
-  (run-hooks 'core-after-search-hook))
-
-(defvar socks-server '("Default server" "127.0.0.1" 1080 5))
-(defun core/toggle-socket-proxy ()
-  (interactive)
-  (if (eq url-gateway-method 'socks)
-      (let ((method (function-get #'core/toggle-socket-proxy 'method)))
-        (setq url-gateway-method (or method 'native))
-        (message "Use method '%s" url-gateway-method))
-    (function-put #'core/toggle-socket-proxy 'method url-gateway-method)
-    (setq url-gateway-method 'socks)
-    (message "Use socket proxy %s" socks-server)))
-
 (define-key!
   ("C-<down>" . text-scale-decrease)
   ("C-<up>" . text-scale-increase)
 
   ("C-c 4" . ispell-word)
-  ("C-c <tab>" . company-complete)
-  ("C-c TAB" . company-complete)
   ("C-c q" . auto-fill-mode)
   ("C-x , ," . core/search-in-chrome)
+  ("C-x , l" . display-line-numbers-mode)
+  ("C-x , -" . core/copy-file-name)
   ("C-x C-b" . ibuffer)
   ("C-x C-d" . find-name-dired)
 
@@ -398,8 +163,6 @@ Does not indent buffer, because it is used for a
 
   ("C-x w [" . winner-undo)
   ("C-x w ]" . winner-redo)
-
-  ("C-}" . core/company-yasnippet)
 
   ("M--" . er/expand-region)
   ("M-/" . hippie-expand)
@@ -413,7 +176,6 @@ Does not indent buffer, because it is used for a
   ("RET" . newline-and-indent)
 
   ([f10] . compile)
-  ([f6] . core/toggle-company-ispell)
   ([f7] . core/create-scratch-buffer))
 
 (provide 'core-misc)

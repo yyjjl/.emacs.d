@@ -7,12 +7,29 @@
                       (if narrow-p ">" " "))
                      'face 'window-numbering-face))))
 
+(defvar-local mode-line--cached-relative-directory nil)
+(defsubst mode-line//relative-directory ()
+  (or (and projectile-cached-buffer-file-name
+           (equal projectile-cached-buffer-file-name (or buffer-file-name 'none))
+           mode-line--cached-relative-directory)
+      (setq mode-line--cached-relative-directory
+            (let ((root (file-truename (projectile-project-root)))
+                  (directory (file-truename default-directory)))
+              (if (and (string-prefix-p root directory) (buffer-file-name))
+                  (mapconcat
+                   (lambda (x) (if (equal x "") "" (substring x 0 1)))
+                   (split-string (substring directory (length root)) "/")
+                   "/")
+                "")))))
+
 (defsubst mode-line//buffer-id ()
   "Display buffer id in mode-line."
   (let ((method (file-remote-p default-directory 'method)))
     (list " %["
-          (when method
-            (propertize method (concat "[" method "]") 'face 'font-lock-string-face))
+          (propertize (if method
+                          (concat "[" method "]")
+                        (mode-line//relative-directory))
+                      'face 'font-lock-string-face)
           '(:propertize mode-line-buffer-identification
                         face font-lock-keyword-face)
           "%] ")))
@@ -128,19 +145,18 @@ read-only, and `buffer-file-coding-system'"
 
 
 (defmacro mode-line//compile (&rest $segments)
-  `(byte-compile
-    (defun mode-line//generate ()
-      "Generate mode-line."
-      (unless (bound-and-true-p eldoc-mode-line-string)
-        (cond
-         ,@(mapcar
-            (lambda (config)
-              (list (car config)
-                    (let ((segments (plist-get (cdr config) :segments))
-                          (show-center-p (plist-get (cdr config) :center)))
-                      `(list ,@(mapcar #'list segments)
-                             ,(and show-center-p 'mode-line-misc-info)))))
-            (or $segments mode-line-config-alist)))))))
+  `(defun mode-line//generate ()
+     "Generate mode-line."
+     (unless (bound-and-true-p eldoc-mode-line-string)
+       (cond
+        ,@(mapcar
+           (lambda (config)
+             (list (car config)
+                   (let ((segments (plist-get (cdr config) :segments))
+                         (show-center-p (plist-get (cdr config) :center)))
+                     `(list ,@(mapcar #'list segments)
+                            ,(and show-center-p 'mode-line-misc-info)))))
+           (or $segments mode-line-config-alist))))))
 
 (mode-line//compile)
 

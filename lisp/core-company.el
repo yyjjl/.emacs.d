@@ -1,21 +1,3 @@
-(defun core/toggle-company-ispell ()
-  "Toggle `company-ispell'"
-  (interactive)
-  (cond
-   ((memq 'company-ispell company-backends)
-    (setq company-backends (delete 'company-ispell company-backends))
-    (message "company-ispell disabled"))
-   (t
-    ;; Company-ispell it will stop other completions
-    (add-to-list 'company-backends 'company-ispell)
-    (message "company-ispell enabled!"))))
-
-(defun core/company-yasnippet ()
-  "Call `company-yasnippet'"
-  (interactive)
-  (company-abort)
-  (call-interactively 'company-yasnippet))
-
 (make-variable-buffer-local 'company-backends)
 (with-eval-after-load 'company
   (define-key! :map company-active-map
@@ -67,5 +49,12 @@
 
 (with-eval-after-load 'company-capf
   (advice-add 'company-capf :around #'ignore-errors!))
+
+(define-key!
+  ("C-c <tab>" . company-complete)
+  ("C-c TAB" . company-complete)
+
+  ("C-}" . core/company-yasnippet)
+  ([f6] . core/toggle-company-ispell))
 
 (provide 'core-company)

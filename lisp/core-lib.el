@@ -197,11 +197,12 @@ Example:
         (progn
           (setq core--recentf-enabled-p nil
                 core--buffer-useful-p nil)
-          (with-temp-buffer
-            (insert-file-contents-literally $filename)
-            (buffer-string))
-          (setq core--recentf-enabled-p recentf-enabled-p
-                core--buffer-useful-p buffer-useful-p)))))
+          (unwind-protect
+              (with-temp-buffer
+                (insert-file-contents-literally $filename)
+                (buffer-string))
+            (setq core--recentf-enabled-p recentf-enabled-p
+                  core--buffer-useful-p buffer-useful-p))))))
 
 (defun open! ($file-list)
   "Open All files in $FILE-LIST in external processes."
@@ -258,7 +259,7 @@ $MAP (default `global-map')."
   "Use for advice."
   (ignore-errors (apply $fn $args)))
 
-(defun buffer-temporary? ()
+(defsubst buffer-temporary? ()
   "If function `buffer-file-name' return nil or a temp file or
 HTML file converted from org file, it returns t."
   (let ((filename (buffer-file-name)))
@@ -266,6 +267,11 @@ HTML file converted from org file, it returns t."
         (not filename)
         (string-match (concat "^" temporary-file-directory)
                       filename))))
+
+(defsubst buffer-too-large? ()
+  (let ((filename (buffer-file-name)))
+    (and filename
+         (> (nth 7 (file-attributes filename)) core-large-buffer-size))))
 
 (defun insert-after! ($val $ele $list)
   "Find $VAL and Add $ELE to $LIST after it."

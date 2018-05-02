@@ -1,8 +1,6 @@
 (require-packages!
  ;; (org :compile (org ob ox-html org-table))
  (org-plus-contrib :compile (org ob ox-html org-table))
- ;; IPython notebook feature in `org-mode'
- ob-ipython
  ;; Export colorful src block in `org-mode'
  htmlize
  poporg
@@ -29,108 +27,9 @@ With a prefix BELOW move point to lower block."
     (when (not $below)
       (org-babel-previous-src-block))))
 
-(defvar org--ipython-parent-buffer nil)
-(defvar org--ipython-src-block nil)
-(defvar-local org--ipython-error-line 0)
-
-(defun org//ipython-trace-move ($n)
-  (let ((search-func (if (> $n 0)
-                         #'re-search-forward
-                       (setq $n (- 0 $n))
-                       #'re-search-backward))
-        found)
-    (while (and (> $n 0)
-                (setq found
-                      (apply search-func '("^-+> \\([0-9]+\\)" nil t))))
-      (setq $n (1- $n)))
-    found))
-
-(defun org/ipython-trace-prev (&optional $n)
-  (interactive "P")
-  (unless (org//ipython-trace-move (or (and $n (- 0 $n)) -1))
-    (message "No previous frame")))
-
-(defun org/ipython-trace-next (&optional $n)
-  (interactive "P")
-  (unless (org//ipython-trace-move (or $n 1))
-    (message "No next frame")))
-
-(defun org/ipython-jump ($lineno &optional $do-jump)
-  (interactive (list (or org--ipython-error-line 0) t))
-  (if (and (buffer-live-p org--ipython-parent-buffer)
-           org--ipython-src-block)
-      (let ((p (org-babel-where-is-src-block-head org--ipython-src-block))
-            (window (if $do-jump
-                        (progn (pop-to-buffer org--ipython-parent-buffer)
-                               (selected-window))
-                      (display-buffer org--ipython-parent-buffer))))
-        (with-selected-window window
-          (goto-char p)
-          (forward-line $lineno)
-          (recenter)
-          (point)))
-    (message "Parent buffer killed or Can not find src block !!!")))
-
-(defun org/ipython-trace-bury-buffer ()
-  (interactive)
-  (org/ipython-jump org--ipython-error-line)
-  (call-interactively 'quit-window))
-
-(defun org*ipython-before-execute (&rest $args)
-  (setq org--ipython-parent-buffer (current-buffer))
-  (setq org--ipython-src-block (org-element-context)))
-
-(advice-add 'org-babel-execute:ipython
-            :before #'org*ipython-before-execute)
-
-(defun org*ipython-trace-setup ($fn &rest $args)
-  (with-current-buffer (apply $fn $args)
-    (use-local-map (copy-keymap special-mode-map))
-    (define-key! :map (current-local-map)
-      ("q" . org/ipython-trace-bury-buffer)
-      ("p" . org/ipython-trace-prev)
-      ("n" . org/ipython-trace-next)
-      ("j" . org/ipython-jump))
-
-    (goto-char (point-min))
-    (if (re-search-forward "-+> \\([0-9]+\\)" nil t)
-        (setq org--ipython-error-line (string-to-number (match-string 1)))
-      (goto-char (point-min))
-      (when (re-search-forward "SyntaxError:" nil t)
-        (goto-char (point-min))
-        ;; Get the line number
-        (when (re-search-forward "File.*, line \\([0-9]+\\)" nil t)
-          (goto-char (match-end 0))
-          (setq org--ipython-error-line (string-to-number (match-string 1))))))
-    (goto-char (point-min))
-    (setq header-line-format
-          (format "Error at line: %d, press `j' to jump to location"
-                  org--ipython-error-line))))
-
-(advice-add 'ob-ipython--create-traceback-buffer
-            :around #'org*ipython-trace-setup)
-
 (with-eval-after-load 'ob
   (define-key! :map org-babel-map
     ("/" . org/split-src-block)))
-
-(with-eval-after-load 'poporg
-  (add-to-list 'shackle-rules
-               '(poporg-mode :size 0.5 :select t)))
-
-(with-eval-after-load 'ob-ipython
-  ;; Don't prompt me to confirm everytime I want to evaluate a block
-  (setq org-confirm-babel-evaluate nil)
-
-  (define-hook! org|babel-after-execute
-    ((org-babel-after-execute-hook :append))
-    (dolist (buf (buffer-list))
-      (when (and (string-prefix-p " *http " (buffer-name buf))
-                 (let ((proc (get-buffer-process buf)))
-                   (not (and proc (process-live-p proc)))))
-        (kill-buffer buf)))
-    ;; Display/update images in the buffer after I evaluate
-    (org-display-inline-images t)))
 
 (defun org/open-pdf (&optional $arg)
   (interactive "P")
@@ -142,8 +41,6 @@ With a prefix BELOW move point to lower block."
         (find-file fn)
       (counsel-find-file (file-name-base -fn)))))
 
-;; Do not load extra modules
-(setq org-modules '(org-info))
 ;; Do not load extra backends
 (setq org-export-backends '(html latex beamer))
 (setq org-mouse-1-follows-link nil)
@@ -156,6 +53,7 @@ With a prefix BELOW move point to lower block."
     ("d" . org-table-delete-column)
     ("i" . org-table-insert-column)
     ("r" . org-table-show-reference)))
+
 (with-eval-after-load 'org
   ;; Highlight `{{{color(<color>, <text>}}}' form
   (font-lock-add-keywords
@@ -187,13 +85,13 @@ With a prefix BELOW move point to lower block."
   (setq org-entities-user
         (eval-when-compile
           (when (require 'tex-mode nil :noerror)
-            (let ((entities (make-hash-table)) result)
+            (let ((entities (make-hash-table :test #'equal)) result)
               (dolist (e org-entities)
                 (when (consp e)
                   (puthash (car e) t entities)))
               (cl-loop for (latex-name . char) in tex--prettify-symbols-alist
                        for name = (substring latex-name 1)
-                       unless (gethash name entities)
+                       unless (or (not (numberp char)) (gethash name entities))
                        collect (list name
                                      (concat "\\" name)
                                      t
@@ -315,13 +213,20 @@ With a prefix BELOW move point to lower block."
     (interactive (list 'interactive))
     (cl-case $command
       (interactive (company-begin-backend 'company-org-symbols))
-      (prefix (ignore-errors (and (org-inside-LaTeX-fragment-p)
-                                  (company-grab-word))))
+      (prefix (ignore-errors (let ((symbol (company-grab-symbol)))
+                               (and (string-prefix-p "\\" symbol)
+                                    (substring symbol 1)))))
       (candidates (company-auctex-symbol-candidates $arg))
       (annotation (company-auctex-symbol-annotation $arg))))
 
   (define-hook! org|setup (org-mode-hook)
     (auto-fill-mode -1)
+
+    (setq org-element-paragraph-separate
+          (concat (substring org-element-paragraph-separate 0
+                             (- (length org-element-paragraph-separate)
+                                (length "\\)\\)")))
+                  "\\|\\\\\\[\\)\\)"))
 
     ;; Add context-sensitive completion for meta options
     (make-local-variable 'completion-at-point-functions)
@@ -353,16 +258,29 @@ With a prefix BELOW move point to lower block."
     (interactive "p")
     (org/next-item (- $n)))
 
-  (defun org*fill-paragraph-hack (&rest _)
-    (when (fboundp #'extra/insert-space-around-chinese)
-      (let ((element (org-element-at-point)))
+  (defun org*fill-paragraph-hack ($fn &rest $args)
+    (let* ((element (org-element-context))
+           (end (org-element-property :end element))
+           (begin (org-element-property :begin element)))
+      (when (fboundp #'extra/insert-space-around-chinese)
         (ignore-errors
           (extra/insert-space-around-chinese
-           (min (point-max)
-                (org-element-property :contents-end element))
-           (max (point-min)
-                (org-element-property :contents-begin element)))))))
-  (advice-add 'org-fill-paragraph :after #'org*fill-paragraph-hack)
+           (min (point-max) end)
+           (max (point-min) begin))))
+      (if (and (memq (org-element-type element)
+                     '(latex-fragment latex-environment))
+               (not (region-active-p)))
+          (save-excursion
+            (goto-char begin)
+            (query-replace-regexp
+             (rx (group (not (any ?\{ ?\( ?\[ blank)))
+                 (group (or (any ?= ?- ?+ ?/ ?| ?> ?<)
+                            (and "\\" (or "ne" "neq" "le" "ge" "cdot" "circ"))))
+                 (group (not (any ?\} ?\( ?\] blank))))
+             "\\1 \\2 \\3"
+             nil begin end))
+        (apply $fn $args))))
+  (advice-add 'org-fill-paragraph :around #'org*fill-paragraph-hack)
 
   (define-key org-mode-map (kbd "C-c t") org-table-extra-map)
   (define-key! :map org-mode-map
@@ -377,6 +295,8 @@ With a prefix BELOW move point to lower block."
     ("M-p" . org/previous-item)
     ("C-c l" . org-store-link)
     ("C-M-i" . completion-at-point)
+    ("C-c n" . org-next-block)
+    ("C-c p" . org-previous-block)
     ([f5] . org/open-pdf)
     ([f9] . (lambda () (interactive)
               (save-excursion

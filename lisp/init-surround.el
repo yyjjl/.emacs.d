@@ -4,14 +4,19 @@
     (?\[ . ("[" . "]"))
     (?\` . ("`" . "'"))
     (?\< . (lambda (_)
-             (let ((tag (read-string "Tag: " nil)))
+             (let ((tag (read-string "Tag: ")))
                (cons (concat "<" tag ">")
                      (concat "</" tag ">")))))
     (?\\ . (lambda (_)
              (let ((pair (core//surround-get-pair (read-char))))
                (when pair
                  (cons (concat "\\" (car pair))
-                       (concat "\\" (cdr pair)))))))))
+                       (concat "\\" (cdr pair)))))))
+    (?b . (lambda (_)
+            (let ((env (read-string "environment: ")))
+              (when env
+                (cons (concat "\\begin{" env "}")
+                      (concat "\\end{" env "}"))))))))
 (defvar core--suround-origin-pos nil)
 
 (defun core//surround-get-pair ($char)

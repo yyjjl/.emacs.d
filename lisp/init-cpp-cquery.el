@@ -82,23 +82,24 @@
   (setq cquery-extra-init-params
         '(:index (:comments 2)
                  :cacheFormat "msgpack" :completion (:detailedLabel t)))
-  (setq cquery-sem-highlight-method 'font-lock)
+  (setq cquery-sem-highlight-method 'overlay)
 
-  (defvar cpp-cquery--semantic-highlight-timer nil)
-  (defvar cpp-cquery--semantic-highlight-interval 1)
-  (defvar cpp-cquery--semantic-highlight-params nil)
-  (defun cpp-cquery*semantic-highlight ($fn _ $params)
-    (setq cpp-cquery--semantic-highlight-params $params)
-    (unless cpp-cquery--semantic-highlight-timer
-      (setq cpp-cquery--semantic-highlight-timer
-            (run-with-idle-timer
-             cpp-cquery--semantic-highlight-interval nil
-             (lambda ()
-               (setq cpp-cquery--semantic-highlight-timer nil)
-               (funcall $fn nil cpp-cquery--semantic-highlight-params))))))
+  ;; (defvar cpp-cquery--semantic-highlight-timer nil)
+  ;; (defvar cpp-cquery--semantic-highlight-interval 1)
+  ;; (defvar cpp-cquery--semantic-highlight-params nil)
+  ;; (defun cpp-cquery*semantic-highlight ($fn _ $params)
+  ;;   (setq cpp-cquery--semantic-highlight-params $params)
+  ;;   (unless cpp-cquery--semantic-highlight-timer
+  ;;     (setq cpp-cquery--semantic-highlight-timer
+  ;;           (run-with-idle-timer
+  ;;            cpp-cquery--semantic-highlight-interval nil
+  ;;            (lambda ()
+  ;;              (setq cpp-cquery--semantic-highlight-timer nil)
+  ;;              (funcall $fn nil cpp-cquery--semantic-highlight-params))))))
 
-  (advice-add 'cquery--publish-semantic-highlighting
-              :around #'cpp-cquery*semantic-highlight))
+  ;; (advice-add 'cquery--publish-semantic-highlighting
+  ;;             :around #'cpp-cquery*semantic-highlight)
+  )
 
 (with-eval-after-load 'cquery-tree
   (add-hook 'cquery-tree-mode-hook

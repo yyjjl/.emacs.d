@@ -4,6 +4,13 @@
 (blink-cursor-mode -1)
 (tooltip-mode -1)
 
+(setq-default window-divider-default-places t)
+(setq-default window-divider-default-bottom-width 1)
+(setq-default window-divider-default-right-width 1)
+(window-divider-mode 1)
+
+(setq show-paren-when-point-inside-paren t)
+
 (require 'uniquify)
 
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets)

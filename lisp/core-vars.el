@@ -13,6 +13,12 @@ hasn't to runs those regexps against the filename.")
   (expand-file-name "etc" user-emacs-directory)
   "Some configuration file in this directory")
 
+(defvar emacs-autoloads-directory
+  (expand-file-name "autoloads" emacs-config-directory)
+  "Autoloads files in this directory")
+(defvar emacs-autoloads-file (expand-var! "autoloads")
+  "Autoloads file")
+
 (defvar core-ignored-directories '("auto" "target" "node_modules"
                                    "bower_components" ".sass_cache" ".cache"
                                    ".git" ".cvs" ".svn" ".hg" "elpa"))
@@ -95,7 +101,7 @@ will close some features to speed up emacs performance")
                "\\.emacs-project\\'"
                "archive-contents\\'")
 
-(add-auto-mode! 'js-mode "\\.json\\'" "\\.jason\\'" "\\.jshintrc\\'")
+(add-auto-mode! 'js-mode "\\.jason\\'" "\\.jshintrc\\'")
 (add-auto-mode! 'js2-mode "\\.js\\(\\.erb\\)?\\'")
 (add-auto-mode! 'js2-jsx-mode "\\.jsx?\\'")
 

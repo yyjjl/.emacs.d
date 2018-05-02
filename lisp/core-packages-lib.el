@@ -114,6 +114,22 @@ Archive with high priority will be used when install a package.")
        (eval-when-compile
          ,@(nreverse compile-forms)))))
 
+(defun package/generate-autoloads ()
+  (interactive)
+  (let ((files (directory-files emacs-autoloads-directory :full "\\.el\\'"))
+        (failed-count 0))
+    (with-current-buffer (find-file-noselect emacs-autoloads-file)
+      (erase-buffer)
+      (dolist (file files)
+        (condition-case nil
+            (generate-file-autoloads file)
+          (error (message "Generating for %s failed" file)
+                 (incf failed-count))))
+      (save-buffer))
+    (message "%d generated, %d failed"
+             (- (length files) failed-count)
+             failed-count)))
+
 (defun package/compile-elpa-packages (&optional $no-message?)
   (interactive)
   (let ((inhibit-message $no-message?))
@@ -136,5 +152,9 @@ Archive with high priority will be used when install a package.")
   (message "Compile finished"))
 
 (package-initialize)
+
+(unless (file-exists-p emacs-autoloads-file)
+  (package/generate-autoloads))
+(load emacs-autoloads-file)
 
 (provide 'core-packages-lib)

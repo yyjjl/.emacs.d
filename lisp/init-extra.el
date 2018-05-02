@@ -20,7 +20,6 @@
 
 ;; prolog system
 (setq prolog-system 'swi)
-(add-hook 'prolog-mode-hook 'core/space-punctuation-mode)
 
 ;; pulse
 (setq pulse-delay 0.01)

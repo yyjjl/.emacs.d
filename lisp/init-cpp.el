@@ -180,24 +180,17 @@
 
 (defun cpp/compile ()
   (interactive)
-  (let ((command (and cpp-cmake-project-root
-                      (cpp//compile-command (cpp-cmake//config-build)))))
-    (if command
-        (with-temp-env! (cpp-cmake//config-env)
-          (compile command))
-      (setq command
-            (or (-when-let (dir (cpp-cmake//locate-cmakelists
-                                 nil nil "Makefile"))
-                  (cpp//compile-command dir))
-                (-when-let (info (ignore-errors (cquery-file-info)))
-                  (concat (string-join (mapcar #'shell-quote-argument
-                                               (gethash "args" info))
-                                       " ")
-                          " -o "
-                          (ignore-errors
-                            (file-name-base (buffer-file-name)))))))
-      (let ((compile-command (or command compile-command)))
-        (with-temp-env! (cpp-cmake//config-env)
+  (with-temp-env! (cpp-cmake//config-env)
+    (let ((command (and cpp-cmake-project-root
+                        (cpp//compile-command (cpp-cmake//config-build)))))
+      (if command
+          (compile command)
+        (setq command (-when-let (dir (cpp-cmake//locate-cmakelists
+                                       nil nil "Makefile"))
+                        (cpp//compile-command dir)))
+        (if command
+            (let ((compile-command command))
+              (call-interactively 'compile))
           (call-interactively 'compile))))))
 
 (defun cpp/gdb (&optional directory)
@@ -272,10 +265,7 @@
                   (and cpp-cmake-project-root (cpp-cmake//config-build))))))
 
 (when (boundp 'term-default-environment-function-list)
-  (add-to-list 'term-default-environment-function-list
-               (byte-compile
-                (lambda ()
-                  (and cpp-cmake-project-root (cpp-cmake//config-env))))))
+  (add-to-list 'term-default-environment-function-list 'cpp-cmake//config-env))
 
 (cond ((eq font-lock-maximum-decoration t)
        (setq font-lock-maximum-decoration

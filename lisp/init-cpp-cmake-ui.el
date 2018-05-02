@@ -139,24 +139,29 @@
     (push widget cpp-cmake--widgets)
 
     (widget-insert "\n")
-    (apply
-     #'widget-create 'list
-     :tag "Available Options (Click to add)"
-     (mapcar
-      (lambda (ap)
-        (let* ((name (nth 0 ap))
-               (type (nth 1 ap))
-               (value (nth 2 ap)))
-          `(push-button
-            :format ,(concat "%[%v%]\n(" type ")=" value "\n")
-            :notify
-            ,(lambda (&rest _)
-               (widget-put widget :args
-                           `((editable-field :value
-                                             ,(concat name "=" value))))
-               (widget-editable-list-insert-before widget nil))
-            :value ,name)))
-      (buffer-local-value 'cpp-cmake-available-options $buffer)))))
+    (let ((available-options (buffer-local-value 'cpp-cmake-available-options
+                                                 $buffer)))
+      (if (not available-options)
+          (widget-insert "No Available Options "
+                         "(run `C-u M-x cpp/run-cmake' to get available options")
+        (apply
+         #'widget-create 'list
+         :tag "Available Options (Click to add)"
+         (mapcar
+          (lambda (ap)
+            (let* ((name (nth 0 ap))
+                   (type (nth 1 ap))
+                   (value (nth 2 ap)))
+              `(push-button
+                :format ,(concat "%[%v%]\n(" type ")=" value "\n")
+                :notify
+                ,(lambda (&rest _)
+                   (widget-put widget :args
+                               `((editable-field :value
+                                                 ,(concat name "=" value))))
+                   (widget-editable-list-insert-before widget nil))
+                :value ,name)))
+          available-options))))))
 
 (defun cpp-cmake//render-config-buffer ($buffer)
   (kill-all-local-variables)
@@ -188,7 +193,6 @@
     (widget-setup)
     (local-set-key (kbd "C-x C-s")
                    (lambda! (widget-apply cpp-cmake--save-button :notify)))
-    (goto-char (min old-point (point-max))))
-  (special-mode))
+    (goto-char (min old-point (point-max)))))
 
 (provide 'init-cpp-cmake-ui)

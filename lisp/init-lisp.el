@@ -4,6 +4,7 @@
  auto-compile
  ;; pair edit
  lispy
+ elisp-def
  macrostep
  hl-sexp
  (racket-mode :when lisp-has-racket-p))
@@ -124,5 +125,18 @@ Emacs Lisp."
 (with-eval-after-load 'elisp-mode
   (define-key emacs-lisp-mode-map (kbd "C-c e") 'macrostep-expand)
   (define-key lisp-interaction-mode-map (kbd "C-c e") 'macrostep-expand))
+
+(with-eval-after-load 'lispy
+  (defun lisp*goto-symbol-hack ($fn $symbol)
+    (if (memq major-mode lispy-elisp-modes)
+        (condition-case nil
+            (elisp-def)
+          (error (lispy-goto-symbol-elisp $symbol)))
+      (funcall $fn $symbol)))
+  (advice-add 'lispy-goto-symbol :around #'lisp*goto-symbol-hack))
+
+(define-key!
+  ([remap move-beginning-of-line] . lispy-move-beginning-of-line)
+  ([remap back-to-indentation] . mark-sexp))
 
 (provide 'init-lisp)

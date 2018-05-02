@@ -19,7 +19,7 @@
             "$")))
 
 (defvar core--shackle-comint-mode-regexp
-  "^\\(?:\\*shell\\*\\|\\*.*repl.*\\*\\|\\*prolog\\*\\)$")
+  "^\\*\\(?:\\*shell\\|.*repl.*\\|prolog\\|Sage*\\)\\*$")
 
 (defvar-local core--shackle-popup-window nil)
 (put 'core--shackle-popup-window 'permanent-local t)
@@ -33,45 +33,8 @@
     completion-list-mode
     messages-buffer-mode
     compilation-mode
+    flycheck-error-list-mode
     profiler-report-mode))
-
-(defun core/last-popup-window ()
-  "Display last popup window"
-  (interactive)
-  (if (buffer-live-p shackle-last-buffer)
-      (display-buffer shackle-last-buffer)
-    (message "Last buffer killed !!!")
-    (core/display-buffer)))
-
-(defun core/display-buffer ()
-  (interactive)
-  (let ((ivy-use-virtual-buffers nil))
-    (display-buffer
-     (completing-read "Buffer:"
-                      #'internal-complete-buffer
-                      nil
-                      :require-match))))
-
-(defun core/fix-popup-window ()
-  "Make a popup window not to close when `C-g' pressed"
-  (interactive)
-  (let ((window (selected-window)))
-    (setq core--shackle-popup-window-list
-          (--filter (not (equal (car it) window))
-                    core--shackle-popup-window-list))))
-
-(defun core/popup-sdcv ()
-  "Display *sdcv* buffer"
-  (interactive)
-  (let ((word (if (and transient-mark-mode mark-active)
-                  (buffer-substring-no-properties (region-beginning)
-                                                  (region-end))
-                (sdcv-current-word))))
-    (sdcv-goto-sdcv)
-    (setq word (read-string
-                (format "Word (default %s): " word)
-                nil nil word))
-    (sdcv-search-word word)))
 
 (defun core//clean-window-list ()
   ;; Remove inactive window
@@ -163,7 +126,6 @@
     (unless (and buffer (buffer-local-value 'core--shackle-popup-window buffer))
       (funcall $fn $window $alist))))
 
-
 (defun core//shackle-comint-mode-matcher ($buffer)
   (let ((case-fold-search t)
         (buffer-name (buffer-name $buffer))
@@ -182,12 +144,12 @@
         (string-match-p core--shackle-help-mode-regexp buffer-name))))
 
 (with-eval-after-load 'shackle
-  (defvar shackle-mode-map (make-sparse-keymap))
-  (define-key! :map shackle-mode-map
-    ("l" . core/last-popup-window)
-    ("d" . core/popup-sdcv)
-    ("b" . core/display-buffer)
-    ("RET" . core/fix-popup-window))
+  (defvar shackle-mode-map
+    (define-key! :map (make-sparse-keymap)
+      ("l" . core/last-popup-window)
+      ("d" . core/popup-sdcv)
+      ("b" . core/display-buffer)
+      ("RET" . core/fix-popup-window)))
 
   (global-set-key (kbd "C-z") shackle-mode-map)
   (global-set-key (kbd "C-x m") #'view-echo-area-messages)
@@ -215,15 +177,13 @@
         (quit-window nil window))))
 
   (setq shackle-default-alignment 'below
-        shackle-default-size 0.40
+        shackle-default-size 0.4
         shackle-default-rule nil
         shackle-rules
         `(((:custom core//shackle-comint-mode-matcher)
            :align below :select t)
           ((:custom core//shackle-help-mode-matcher)
            :align below :select t :autoclose t)
-          ("\\*Flycheck.*\\*"
-           :regexp t :align below :noselect t :autoclose t)
           (,core--shackle-popup-buffer-regexp
            :regexp t :select t :autoclose t)
           ("^ ?\\*.*\\*\\(?:<[0-9]+>\\)?$" :regexp t))))

@@ -10,7 +10,7 @@
  '(lsp-face-highlight-textual ((t :background "#444155"))))
 
 ;; flycheck support
-(defvar lsp--flycheck-global-idle-timer nil)
+(defvar lsp--flycheck-diagnostic nil)
 
 (defun lsp//flycheck--start (checker callback)
   "Start an LSP syntax check with CHECKER.
@@ -19,34 +19,30 @@ CALLBACK is the status callback passed by Flycheck."
   ;; Turn all errors from lsp--diagnostics into flycheck-error objects and pass
   ;; them immediately to the callback
   (let ((errors))
-    (maphash (lambda (file diagnostics)
-               (dolist (diag diagnostics)
-                 (push (flycheck-error-new
-                        :buffer (current-buffer)
-                        :checker checker
-                        :filename file
-                        :line (1+ (lsp-diagnostic-line diag))
-                        :column (1+ (lsp-diagnostic-column diag))
-                        :message (lsp-diagnostic-message diag)
-                        :level (pcase (lsp-diagnostic-severity diag)
-                                 (1 'error)
-                                 (2 'warning)
-                                 (_ 'info))
-                        :id (lsp-diagnostic-code diag))
-                       errors)))
-             lsp--diagnostics)
+    (when lsp--flycheck-diagnostic
+      (maphash (lambda (file diagnostics)
+                 (dolist (diag diagnostics)
+                   (push (flycheck-error-new
+                          :buffer (current-buffer)
+                          :checker checker
+                          :filename file
+                          :line (1+ (lsp-diagnostic-line diag))
+                          :column (1+ (lsp-diagnostic-column diag))
+                          :message (lsp-diagnostic-message diag)
+                          :level (pcase (lsp-diagnostic-severity diag)
+                                   (1 'error)
+                                   (2 'warning)
+                                   (_ 'info))
+                          :id (lsp-diagnostic-code diag))
+                         errors)))
+               lsp--flycheck-diagnostic)
+      (setq lsp--flycheck-diagnostic nil))
     (funcall callback 'finished errors)))
 
 (defun lsp//flycheck-check ()
-  (when (and flycheck-mode
-             (not lsp--flycheck-global-idle-timer))
-    (setq lsp--flycheck-global-idle-timer
-          (run-with-idle-timer 0.2 nil
-                               (lambda ()
-                                 (setq lsp--flycheck-global-idle-timer nil)
-                                 (ignore-errors
-                                   (when flycheck-mode
-                                     (flycheck-buffer))))))))
+  (and lsp-mode
+       flycheck-mode
+       (setq lsp--flycheck-diagnostic lsp--diagnostics)))
 
 (defun lsp//flycheck-add-mode (mode)
   "Add MODE as a valid major mode for the lsp checker."
@@ -55,7 +51,6 @@ CALLBACK is the status callback passed by Flycheck."
 
 (defun lsp//flycheck-enable (_)
   "Enable flycheck integration for the current buffer."
-  (setq-local flycheck-check-syntax-automatically nil)
   (setq-local flycheck-checker 'lsp-mine)
   (lsp//flycheck-add-mode major-mode)
   (add-to-list 'flycheck-checkers 'lsp-mine)
@@ -81,6 +76,7 @@ See https://github.com/emacs-lsp/lsp-mode."
   (setq lsp--show-doc-extra-message
         (propertize (format " (`%s' to see more ...)" lsp--show-doc-key)
                     'face font-lock-comment-face))
+
   (define-key!
     ("M-s h h" . lsp-symbol-highlight)
     ("C-c r" . lsp-rename)
@@ -127,9 +123,9 @@ See https://github.com/emacs-lsp/lsp-mode."
                                            (cdr bounds)
                                            buf))))))
 
-  (defun lsp%get-hover-string (hover
-                               renderers
-                               &optional full-content-p)
+  (defun lsp//get-hover-string (hover
+                                renderers
+                                &optional full-content-p)
     (when-let* ((contents (gethash "contents" hover)))
       ;; contents: MarkedString | MarkedString[] | MarkupContent
       (if (lsp--markup-content-p contents)
@@ -170,7 +166,7 @@ See https://github.com/emacs-lsp/lsp-mode."
                            (lsp--text-document-position-params))))
                   (contents (gethash "contents" hover))
                   (buffer (get-buffer-create "*lsp-doc*"))
-                  (msg (lsp%get-hover-string hover renderers :full-content)))
+                  (msg (lsp//get-hover-string hover renderers :full-content)))
         (with-current-buffer buffer
           (setq buffer-read-only nil)
           (erase-buffer)
@@ -186,7 +182,7 @@ See https://github.com/emacs-lsp/lsp-mode."
                  (lsp--point-is-within-bounds-p start end)
                  (eq (current-buffer) buffer) (eldoc-display-message-p))
         (when-let* ((contents (gethash "contents" hover))
-                    (msg (lsp%get-hover-string hover renderers)))
+                    (msg (lsp//get-hover-string hover renderers)))
           (eldoc-message msg))))))
 
 (with-eval-after-load 'company-lsp

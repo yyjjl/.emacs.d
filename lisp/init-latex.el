@@ -1,13 +1,38 @@
 
 (require-packages!
  (auctex :compile (latex tex preview reftex))
+ company-reftex
  company-auctex)
 
 
 
+(defun latex/fill-one-sentence-per-line ()
+  "Split the current paragraph into one sentence per line."
+  (interactive)
+  (save-excursion
+    (let ((fill-column 1000000)) ;; relies on dynamic binding
+      (fill-paragraph)
+      (let ((end (save-excursion
+                   (forward-paragraph 1)
+                   (backward-sentence)
+                   (point-marker)))) ;; remember where to stop
+        (beginning-of-line)
+        (while (progn (forward-sentence)
+                      (<= (point) (marker-position end)))
+          ;; leaves only one space, point is after it
+          (just-one-space)
+          ;; delete the space
+          (delete-char -1)
+          ;; and insert a newline
+          (newline)
+          ;; I only use this in combination with late, so this makes sense
+          (LaTeX-indent-line))))))
+
 (autoload 'LaTeX-math-mode "latex" nil t)
 (define-hook! latex|setup (LaTeX-mode-hook)
   (company-auctex-init)
+  (add-to-list 'company-backends 'company-reftex-labels)
+  (add-to-list 'company-backends 'company-reftex-citations)
   (turn-off-auto-fill)
   ;; (setq company-backends (delete 'company-dabbrev company-backends))
   (LaTeX-math-mode 1)
@@ -123,6 +148,7 @@
 
   (define-key! :map LaTeX-mode-map
     ("C-c t" :map org-table-extra-map)
+    ("M-Q" . latex/fill-one-sentence-per-line)
     ("}" . latex/skip-close-pair)
     (")" . latex/skip-close-pair)
     ("]" . latex/skip-close-pair)

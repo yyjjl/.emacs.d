@@ -49,7 +49,7 @@ replaced with it."
   (require 'lsp-javascript-typescript)
   (setq-default js2-use-font-lock-faces t
                 js2-mode-must-byte-compile nil
-                js2-idle-timer-delay 2
+                js2-idle-timer-delay 1
                 js2-auto-indent-p nil
                 js2-indent-on-enter-key nil
                 js2-skip-preprocessor-directives t

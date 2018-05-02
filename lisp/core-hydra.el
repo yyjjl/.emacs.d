@@ -27,6 +27,7 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
     ("I" (org/hot-expand "<I"))
     ("H" (org/hot-expand "<H"))
     ("A" (org/hot-expand "<A"))
+    ("'" (yas-expand-snippet "#+begin_${1:src}\n$0\n#+end_$1"))
     ("<" self-insert-command "ins")
     ("o" nil "quit"))
 
