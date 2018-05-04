@@ -62,8 +62,9 @@ read-only, and `buffer-file-coding-system'"
           (propertize "Mod " 'face font-lock-negation-char-face))
         (when (buffer-base-buffer) "I ")
         (when buffer-read-only
-          (propertize (if (bound-and-true-p view-mode) "view " "ro ")
-                      'face font-lock-string-face))
+          (propertize "RO " 'face font-lock-string-face))
+        (when visual-line-mode
+          (propertize "V " 'face font-lock-type-face))
         (when (eq major-mode 'image-mode)
           (cl-destructuring-bind (width . height)
               (image-size (image-get-display-property) :pixels)

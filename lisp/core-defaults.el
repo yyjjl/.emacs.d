@@ -75,7 +75,7 @@
 (setq-default echo-keystrokes 0.25)
 ;; Bad idea, could accidentally edit others' code
 ;; (setq-default                require-final-newline t)
-(setq-default tooltip-delay 1)
+(setq-default tooltip-delay 0.5)
 (setq-default truncate-lines nil)
 (setq-default truncate-partial-width-windows 50)
 (setq-default speedbar-use-images nil)
@@ -181,9 +181,8 @@
           (t t))))
 
 ;; Display long lines in truncated style (end line with $)
-(define-hook! core|truncate-lines-setup (grep-mode-hook)
-  (toggle-truncate-lines 1))
-
+(add-hook 'grep-mode-hook 'toggle-truncate-lines)
+(add-hook 'compilation-mode-hook 'toggle-truncate-lines)
 ;; Turns on `auto-fill-mode', don't use `text-mode-hook'
 (add-hook 'change-log-mode-hook 'turn-on-auto-fill)
 
@@ -263,6 +262,7 @@
   (midnight-mode 1)
   ;; (display-time-mode 1)
   (transient-mark-mode 1)
+  (delete-selection-mode 1)
 
   ;; Restore `file-name-handler-alist'
   (setq file-name-handler-alist emacs-file-name-handler-alist

@@ -79,6 +79,7 @@ invoked, then it detaches itself."
   (let* ((hook (if (consp $hook) (car $hook) $hook))
          (args (and (consp $hook) (cdr $hook)))
          (append-p (plist-get args :after))
+         (override-p (plist-get args :override))
          (local-p (plist-get args :local))
          (fn (or (plist-get args :name)
                  (cond ((functionp hook)
@@ -91,7 +92,10 @@ invoked, then it detaches itself."
          ,(cond ((functionp hook) `(advice-remove ',hook ',fn))
                 ((symbolp hook) `(remove-hook ',hook ',fn))))
        ,(cond ((functionp hook)
-               `(advice-add ',hook ,(if append-p :after :before) ',fn))
+               `(advice-add ',hook ,(if override-p
+                                        :override
+                                      (if append-p :after :before))
+                            ',fn))
               ((symbolp hook)
                `(add-hook ',hook ',fn ,append-p ,local-p))))))
 
@@ -271,7 +275,8 @@ HTML file converted from org file, it returns t."
 (defsubst buffer-too-large? ()
   (let ((filename (buffer-file-name)))
     (and filename
-         (> (nth 7 (file-attributes filename)) core-large-buffer-size))))
+         (> (or (nth 7 (file-attributes filename)) 0)
+            core-large-buffer-size))))
 
 (defun insert-after! ($val $ele $list)
   "Find $VAL and Add $ELE to $LIST after it."

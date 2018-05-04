@@ -27,6 +27,7 @@
 
 (defun lisp|common-setup ()
   "Enable features useful in any Lisp mode."
+  (highlight-indentation-mode -1)
   (rainbow-delimiters-mode 1)
   (lispy-mode 1)
   (local-set-key (kbd "M-,") 'xref-pop-marker-stack))
@@ -63,13 +64,11 @@ Emacs Lisp."
     (checkdoc-minor-mode)))
 
 (add-hook 'emacs-lisp-mode-hook #'lisp|elisp-setup)
+(add-hook 'lisp-interaction-mode-hook #'lisp|elisp-setup)
 (add-hook 'racket-mode-hook #'lisp|racket-setup)
 
-(let ((hooks '(lisp-mode-hook
-               lisp-interaction-mode-hook
-               scheme-mode-hook)))
-  (dolist (hook hooks)
-    (add-hook hook #'lisp|common-setup)))
+(dolist (hook '(lisp-mode-hook scheme-mode-hook))
+  (add-hook hook #'lisp|common-setup))
 
 
 

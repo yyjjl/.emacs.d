@@ -1,9 +1,13 @@
+;;; -*- lexical-binding: t; -*-
+
 (setvar!
- org-has-ipython-p (executable-find "ipython3"))
+ org-has-ipython-p (executable-find "ipython3")
+ org-has-sage-p (executable-find "sage"))
 
 (require-packages!
  ;; IPython notebook feature in `org-mode'
- (ob-ipython :when org-has-ipython-p))
+ (ob-ipython :when org-has-ipython-p)
+ (sage-shell-mode :when org-has-sage-p))
 
 
 
@@ -54,7 +58,7 @@
   (org/ipython-jump org--ipython-error-line)
   (call-interactively 'quit-window))
 
-(defun org*ipython-before-execute (&rest $args)
+(defun org*ipython-before-execute (&rest _)
   (setq org--ipython-parent-buffer (current-buffer))
   (setq org--ipython-src-block (org-element-context)))
 
@@ -100,5 +104,59 @@
     ;; Display/update images in the buffer after I evaluate
     (org-display-inline-images t)))
 
+(with-eval-after-load 'sage-shell-mode
+  (fset 'sage-shell:-process-sentinel-generator 'identity)
+  (advice-add 'sage-shell-view-process-overlay
+              :after 'sage*after-ceare-overlay-hack)
+
+  (define-key! :map sage-shell-mode-map
+    ("C-c M-o" . sage/clea-current-buffer))
+
+  (defun sage/clea-current-buffer ()
+    (interactive)
+    (sage-shell:-delete-output (point-min))
+    (sage-shell-edit:delete-temp-dir))
+
+  (defun sage*after-ceare-overlay-hack ($ov)
+    (unless (overlay-get $ov 'extra-map)
+      (let ((map (overlay-get $ov 'keymap)))
+        (define-key! :map map
+          ;; Regenerate
+          ("R" . (lambda! (sage-shell-view-regenerate $ov)))
+          ;; Show text
+          ("T" . (lambda! (overlay-put $ov 'display nil)))
+          ("w" . (lambda!
+                   (sage-shell-view-copy-text $ov)
+                   (message "Text copied")))
+          ("W" . (lambda!
+                   (sage-shell-view-copy-latex $ov)
+                   (message "LaTeX copied")))
+          ("=" . (lambda! (sage-shell-view--when-overlay-active $ov
+                            (sage-shell-view-zoom-in $ov))))
+          ("-" . (lambda! (sage-shell-view--when-overlay-active $ov
+                            (sage-shell-view-zoom-out $ov)))))
+        (overlay-put $ov 'extra-map t))))
+
+  (defun sage-shell-edit:delete-temp-dir ()
+    (when (and (stringp sage-shell-edit:temp-directory)
+               (string= (file-name-as-directory temporary-file-directory)
+                        (file-name-directory sage-shell-edit:temp-directory))
+               (file-exists-p sage-shell-edit:temp-directory))
+      (message "Delete directory %s" sage-shell-edit:temp-directory)
+      (delete-directory sage-shell-edit:temp-directory t)))
+
+  (setq sage-shell-view-scale 1.5)
+
+  (define-hook! sage|setup (sage-shell-after-prompt-hook)
+    (when (display-graphic-p)
+      (sage-shell-view-mode 1))
+    (remove-hook 'sage-shell:process-exit-hook
+                 'sage-shell-edit:delete-temp-dir)
+    (add-hook 'term-or-comint-process-exit-hook
+              (lambda () (run-hooks 'sage-shell:process-exit-hook))
+              nil :local)
+    (add-hook 'term-or-comint-process-exit-hook
+              'sage-shell-edit:delete-temp-dir
+              nil :local)))
 
 (provide 'init-org-ipython)

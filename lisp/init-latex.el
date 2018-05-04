@@ -34,6 +34,7 @@
   (add-to-list 'company-backends 'company-reftex-labels)
   (add-to-list 'company-backends 'company-reftex-citations)
   (turn-off-auto-fill)
+  (visual-line-mode 1)
   ;; (setq company-backends (delete 'company-dabbrev company-backends))
   (LaTeX-math-mode 1)
   ;; Fix conflit with `orgtbl-mode'
@@ -213,6 +214,15 @@
   (define-key LaTeX-mode-map (kbd "M-p") preview-map))
 
 (with-eval-after-load 'reftex
+  (setq reftex-cite-format
+        '((?t . "\\textcite[]{%l}")
+          (?a . "\\autocite[]{%l}")
+          (?c . "\\cite[]{%l}")
+          (?s . "\\smartcite[]{%l}")
+          (?f . "\\footcite[]{%l}")
+          (?n . "\\nocite{%l}")
+          (?b . "\\blockcquote[]{%l}{}")))
+
   (setq reftex-plug-into-AUCTeX '(t t t t t)
         reftex-use-fonts t))
 

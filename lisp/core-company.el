@@ -31,7 +31,8 @@
   (setq company-dabbrev-char-regexp "[0-9a-zA-Z-_]")
   (setq company-dabbrev-code-other-buffers t)
   (setq company-show-numbers t)
-  (setq company-idle-delay 0.3)
+  ;; Don't auto auto complete
+  (setq company-idle-delay 0.5)
   (setq company-clang-insert-arguments nil)
   (setq company-require-match nil)
   (setq company-etags-ignore-case t)

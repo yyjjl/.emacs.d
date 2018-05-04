@@ -97,11 +97,11 @@
       (progn
         (setq gud--source-buffer-status (list buffer-read-only))
         (add-to-list 'mode-line-misc-info
-                     '(gud-source-mode "Debugging"))
+                     '(gud-source-mode " Debugging"))
         (setq buffer-read-only t))
     (when gud--source-buffer-status
       (remove-hook 'mode-line-misc-info
-                   '(gud-source-mode "Debugging"))
+                   '(gud-source-mode " Debugging"))
       (setq buffer-read-only (car gud--source-buffer-status))))
   (force-mode-line-update))
 
@@ -128,6 +128,7 @@
             (when gud-source-mode
               (gud-source-mode -1)))))
       (kill-buffer buffer)
+      (gud-tooltip-mode -1)
       (when (window-configuration-p gud--window-configuration)
         (set-window-configuration gud--window-configuration)
         (setq gud--window-configuration nil)))))
@@ -137,6 +138,7 @@
   (define-key gud-mode-map (kbd "C-c C-z") #'gud/pop-to-source-buffer)
 
   (define-hook! gud|setup-hook (gud-mode-hook)
+    (gud-tooltip-mode 1)
     (set-window-dedicated-p (selected-window) t)
     ;; `gud-print' need prompt can be modified
     ;; (setq comint-prompt-read-only t)

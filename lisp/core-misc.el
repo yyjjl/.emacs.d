@@ -69,7 +69,8 @@
 (setq projectile-keymap-prefix (kbd "C-x p"))
 (with-eval-after-load 'projectile
   (setq projectile-mode-line
-        '(:eval (format " [%s]" (projectile-project-name))))
+        '(:eval (and buffer-file-name
+                     (format " [%s]" (projectile-project-name)))))
   (setq projectile-require-project-root nil)
   (setq projectile-globally-ignored-file-suffixes '(".pyc" ".elc"))
   (setq projectile-completion-system 'ivy)
@@ -130,9 +131,11 @@
                (not (memq (get-text-property (- (point) 1) 'face)
                           '(font-lock-string-face font-lock-doc-face)))
                (not (eq tab-always-indent 'complete)))
-          (if (bound-and-true-p company-idle-delay)
-              (call-interactively 'hippie-expand)
-            (call-interactively 'company-complete))))))))
+          ;; If company-idle-delay is nil (which means company is not
+          ;; trigger automatically, <tab> will trigger it
+          (or (and (bound-and-true-p company-idle-delay)
+                   (call-interactively 'company-complete))
+              (call-interactively 'hippie-expand))))))))
 (advice-add 'indent-for-tab-command :around #'core*indent-for-tab)
 
 (defun core*desktop-read ($fn &rest $args)
@@ -177,5 +180,10 @@
 
   ([f10] . compile)
   ([f7] . core/create-scratch-buffer))
+
+(define-key! :map special-mode-map
+  ("u" . scroll-down-command)
+  ("y" . scroll-down-line)
+  ("e" . scroll-up-line))
 
 (provide 'core-misc)

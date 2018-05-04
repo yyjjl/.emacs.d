@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t; -*-
+
 (setvar! term-zsh-path (executable-find "zsh")
          term-bash-path (executable-find "bash"))
 
@@ -10,26 +12,28 @@
 (defvar-local term--ssh-info nil)
 (defvar-local term--parent-buffer nil)
 
+(defvar term-or-comint-process-exit-hook nil)
+
 (defsubst term//get-popup-window ()
   (frame-parameter nil 'term-popup-window))
 (defsubst term//set-popup-window (popup-window)
   (set-window-dedicated-p popup-window t)
   (set-frame-parameter nil 'term-popup-window popup-window))
 
-(defsubst term//wrap-sentinel (&optional _fn)
-  (lexical-let ((fn _fn))
-    (lambda ($proc $msg)
-      (and fn (funcall fn $proc $msg))
-      (when (memq (process-status $proc) '(signal exit))
-        (let ((buffer (process-buffer $proc)))
-          (kill-buffer buffer))))))
+(defsubst term//wrap-sentinel (&optional sentinel)
+  (lambda ($proc $msg)
+    (and sentinel (funcall sentinel $proc $msg))
+    (run-hooks 'term-or-comint-process-exit-hook)
+    (when (memq (process-status $proc) '(signal exit))
+      (let ((buffer (process-buffer $proc)))
+        (kill-buffer buffer)))))
 
 ;; Add below code to .zshrc to make term-mode track value changes
 ;;   if [ -n "$INSIDE_EMACS" ];then
 ;;       chpwd() {print -P "\033AnSiTc %d"}
 ;;   fi
 
-(defun term*multi-term-switch-internal-hack (&rest $args)
+(defun term*multi-term-switch-internal-hack (&rest _)
   ;; Reset popup window
   (setq multi-term-buffer-list
         (cl-remove-if-not #'buffer-live-p multi-term-buffer-list)))

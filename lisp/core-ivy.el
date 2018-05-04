@@ -42,13 +42,17 @@
 
   (require 'ivy-hydra)
 
+  (add-to-list 'ivy-display-functions-alist
+               '(counsel-company . ivy-display-function-overlay))
+
   (setq ivy-dispatching-done-columns 3)
   (setq ivy-count-format "(%d/%d) ")
+  (setq ivy-initial-inputs-alist nil)
+  (setq ivy-action-wrap t)
 
   (setq ivy-re-builders-alist
-        '( ;; Use regex as default
+        '(;; Use regex as default
           (t . ivy--regex-plus)))
-  (setq ivy-initial-inputs-alist nil)
   (setq ivy-use-virtual-buffers t)
   (setq ivy-virtual-abbreviate 'full)
   (setq ivy-use-selectable-prompt t)

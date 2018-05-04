@@ -82,7 +82,7 @@
   (setq cquery-extra-init-params
         '(:index (:comments 2)
                  :cacheFormat "msgpack" :completion (:detailedLabel t)))
-  (setq cquery-sem-highlight-method 'overlay)
+  (setq cquery-sem-highlight-method nil)
 
   ;; (defvar cpp-cquery--semantic-highlight-timer nil)
   ;; (defvar cpp-cquery--semantic-highlight-interval 1)

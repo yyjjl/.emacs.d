@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t; -*-
+
 (require-packages!
  ;; (org :compile (org ob ox-html org-table))
  (org-plus-contrib :compile (org ob ox-html org-table))
@@ -30,6 +32,21 @@ With a prefix BELOW move point to lower block."
 (with-eval-after-load 'ob
   (define-key! :map org-babel-map
     ("/" . org/split-src-block)))
+
+(defun org/latexmk-start-watching ()
+  (interactive)
+  (let* ((base-name (file-name-base (buffer-file-name)))
+         (out-dir (or (file-name-directory (buffer-file-name)) "./")))
+    (save-window-excursion
+      (let ((proc (get-process "latexmk")))
+        (unless (and proc (process-live-p proc))
+          (start-process
+           "latexmk" (get-buffer-create "LaTeXMK")
+           "latexmk" "-quiet" "-pvc" "-g" "-pdf" "-dvi-" "-ps-"
+           "-pdflatex=xelatex -shell-escape -interaction=nonstopmode %O %S"
+           (concat "-outdir=" out-dir)
+           (concat base-name ".tex"))
+          (message "latexmk started ..."))))))
 
 (defun org/open-pdf (&optional $arg)
   (interactive "P")
@@ -85,7 +102,7 @@ With a prefix BELOW move point to lower block."
   (setq org-entities-user
         (eval-when-compile
           (when (require 'tex-mode nil :noerror)
-            (let ((entities (make-hash-table :test #'equal)) result)
+            (let ((entities (make-hash-table :test #'equal)))
               (dolist (e org-entities)
                 (when (consp e)
                   (puthash (car e) t entities)))
@@ -208,25 +225,19 @@ With a prefix BELOW move point to lower block."
 
   (unless (featurep 'company-auctex)
     (require 'company-auctex))
-  (defun company-org-symbols ($command &optional $arg &rest $ignored)
+  (defun company-org-symbols ($command &optional $arg &rest _)
     "Complete math symbol in LaTeX fragments, better than `pcomplete'"
     (interactive (list 'interactive))
     (cl-case $command
       (interactive (company-begin-backend 'company-org-symbols))
-      (prefix (ignore-errors (let ((symbol (company-grab-symbol)))
-                               (and (string-prefix-p "\\" symbol)
-                                    (substring symbol 1)))))
+      (prefix (ignore-errors (let ((word (company-grab-word)))
+                               (and (= ?\\ (char-before (- (point) (length word))))
+                                    word))))
       (candidates (company-auctex-symbol-candidates $arg))
       (annotation (company-auctex-symbol-annotation $arg))))
 
   (define-hook! org|setup (org-mode-hook)
     (auto-fill-mode -1)
-
-    (setq org-element-paragraph-separate
-          (concat (substring org-element-paragraph-separate 0
-                             (- (length org-element-paragraph-separate)
-                                (length "\\)\\)")))
-                  "\\|\\\\\\[\\)\\)"))
 
     ;; Add context-sensitive completion for meta options
     (make-local-variable 'completion-at-point-functions)
@@ -258,28 +269,27 @@ With a prefix BELOW move point to lower block."
     (interactive "p")
     (org/next-item (- $n)))
 
-  (defun org*fill-paragraph-hack ($fn &rest $args)
+  (defun org*fill-paragraph-hack ($fn &optional $justify $region)
     (let* ((element (org-element-context))
            (end (org-element-property :end element))
-           (begin (org-element-property :begin element)))
+           (begin (org-element-property :begin element))
+           (latex-p (memq (org-element-type element)
+                          '(latex-fragment latex-environment))))
       (when (fboundp #'extra/insert-space-around-chinese)
-        (ignore-errors
-          (extra/insert-space-around-chinese
-           (min (point-max) end)
-           (max (point-min) begin))))
-      (if (and (memq (org-element-type element)
-                     '(latex-fragment latex-environment))
-               (not (region-active-p)))
+        (ignore-errors (extra/insert-space-around-chinese end begin)))
+      (if (and latex-p
+               (not (region-active-p))
+               $justify)
           (save-excursion
             (goto-char begin)
             (query-replace-regexp
-             (rx (group (not (any ?\{ ?\( ?\[ blank)))
-                 (group (or (any ?= ?- ?+ ?/ ?| ?> ?<)
+             (rx (group (not (any "{([" blank)))
+                 (group (or (any ?= ?- ?+ ?/ ?> ?<)
                             (and "\\" (or "ne" "neq" "le" "ge" "cdot" "circ"))))
-                 (group (not (any ?\} ?\( ?\] blank))))
+                 (group (not (any ")}]" blank))))
              "\\1 \\2 \\3"
              nil begin end))
-        (apply $fn $args))))
+        (funcall $fn $justify $region))))
   (advice-add 'org-fill-paragraph :around #'org*fill-paragraph-hack)
 
   (define-key org-mode-map (kbd "C-c t") org-table-extra-map)
@@ -305,7 +315,18 @@ With a prefix BELOW move point to lower block."
     ([f10] . org-publish)
     ("C-c C-t" . org-todo)))
 
+(with-eval-after-load 'org-element
+  (setq org-element-paragraph-separate
+        (concat org-element-paragraph-separate
+                "\\|^[\t ]*\\\\\\[")))
+
 (with-eval-after-load 'ox-html
+  (defun org*beginning-of-line ($fn &optional $n)
+    (if (bolp)
+        (back-to-indentation)
+      (funcall $fn $n)))
+  (advice-add 'org-beginning-of-line :around  #'org*beginning-of-line)
+
   (defun org*html-export-with-line-number ($fn &rest $rest)
     (when (= (length $rest) 5)
       (let ((num-start (nth 4 $rest)))
@@ -351,7 +372,7 @@ With a prefix BELOW move point to lower block."
   (add-to-list 'org-latex-minted-langs '(ipython "python"))
   (setq org-latex-compiler "xelatex")
   (setq org-latex-pdf-process
-        '("latexmk -g -pdf -dvi- -ps- -pdflatex=\"xelatex -shell-escape %%O %%S\" -outdir=%o %f"))
+        '("latexmk -g -pdf -dvi- -ps- -pdflatex=\"xelatex -shell-escape -interaction=nonstopmode %%O %%S\" -outdir=%o %f"))
 
   ;; Use minted
   (setq org-latex-listings 'minted)
@@ -365,7 +386,7 @@ With a prefix BELOW move point to lower block."
           ("" "graphicx,psfrag,epsfig" t)
           ("OT1" "fontenc" nil)
           ("" "minted" nil)
-          ("" "mdframed" nil)
+          ("" "mdframed" t)
           ("" "amsmath, amsfonts, amssymb, amsthm, bm, upgreek" t)
           ("mathscr" "eucal" t)
           ("" "geometry" t)
