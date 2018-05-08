@@ -16,47 +16,9 @@
              'babel)
      ,@body))
 
-(defun org/split-src-block (&optional $below)
-  "Split the current src block.
-With a prefix BELOW move point to lower block."
-  (interactive "P")
-  (let* ((el (org-element-context))
-         (language (org-element-property :language el))
-         (parameters (org-element-property :parameters el)))
-    (beginning-of-line)
-    (insert (format "#+end_src\n#+begin_src %s %s\n" language parameters))
-    (beginning-of-line)
-    (when (not $below)
-      (org-babel-previous-src-block))))
-
 (with-eval-after-load 'ob
   (define-key! :map org-babel-map
     ("/" . org/split-src-block)))
-
-(defun org/latexmk-start-watching ()
-  (interactive)
-  (let* ((base-name (file-name-base (buffer-file-name)))
-         (out-dir (or (file-name-directory (buffer-file-name)) "./")))
-    (save-window-excursion
-      (let ((proc (get-process "latexmk")))
-        (unless (and proc (process-live-p proc))
-          (start-process
-           "latexmk" (get-buffer-create "LaTeXMK")
-           "latexmk" "-quiet" "-pvc" "-g" "-pdf" "-dvi-" "-ps-"
-           "-pdflatex=xelatex -shell-escape -interaction=nonstopmode %O %S"
-           (concat "-outdir=" out-dir)
-           (concat base-name ".tex"))
-          (message "latexmk started ..."))))))
-
-(defun org/open-pdf (&optional $arg)
-  (interactive "P")
-  (let* ((-fn (buffer-file-name))
-         (fn (and -fn
-                  (concat (file-name-sans-extension -fn)
-                          ".pdf"))))
-    (if (and fn (not $arg) (file-exists-p fn))
-        (find-file fn)
-      (counsel-find-file (file-name-base -fn)))))
 
 ;; Do not load extra backends
 (setq org-export-backends '(html latex beamer))
@@ -72,6 +34,31 @@ With a prefix BELOW move point to lower block."
     ("r" . org-table-show-reference)))
 
 (with-eval-after-load 'org
+  (require 'company-auctex)
+
+  (defvar org-block-key-bindings
+    '(("p" . org-previous-block)
+      ("\C-p" . org-previous-block)
+      ("n" . org-next-block)
+      ("\C-n" . org-next-block)))
+  (defun org-block-speed-command-activate (keys)
+    "Hook for activating single-letter block commands."
+    (when (and (bolp)
+               (looking-at
+                (eval-when-compile
+                  (concat
+                   "^[\t ]*#\\+begin_?\\([^ \n]+\\)\\(\\([^\n]+\\)\\)?"
+                   "\\|"
+                   "^[\t ]*#\\+end_?\\([^ \n]+\\)$"))))
+      (cdr (assoc keys org-block-key-bindings))))
+  (add-hook 'org-speed-command-hook 'org-block-speed-command-activate :append)
+
+  (defun org*beginning-of-line ($fn &optional $n)
+    (if (bolp)
+        (back-to-indentation)
+      (funcall $fn $n)))
+  (advice-add 'org-beginning-of-line :around  #'org*beginning-of-line)
+
   ;; Highlight `{{{color(<color>, <text>}}}' form
   (font-lock-add-keywords
    'org-mode
@@ -223,21 +210,17 @@ With a prefix BELOW move point to lower block."
                 (widen))))
            "   - [ ] %^{Task} %?")))
 
-  (unless (featurep 'company-auctex)
-    (require 'company-auctex))
-  (defun company-org-symbols ($command &optional $arg &rest _)
-    "Complete math symbol in LaTeX fragments, better than `pcomplete'"
-    (interactive (list 'interactive))
-    (cl-case $command
-      (interactive (company-begin-backend 'company-org-symbols))
-      (prefix (ignore-errors (let ((word (company-grab-word)))
-                               (and (= ?\\ (char-before (- (point) (length word))))
-                                    word))))
-      (candidates (company-auctex-symbol-candidates $arg))
-      (annotation (company-auctex-symbol-annotation $arg))))
-
   (define-hook! org|setup (org-mode-hook)
+    (when buffer-file-name
+      (setq-local org-preview-latex-image-directory
+                  (concat "auto/" (file-name-base buffer-file-name) "/")))
     (auto-fill-mode -1)
+    (eldoc-mode -1)
+
+    (unless (string-suffix-p "[" org-element-paragraph-separate)
+      (setq org-element-paragraph-separate
+            (concat org-element-paragraph-separate
+                    "\\|^[\t ]*\\\\\\[")))
 
     ;; Add context-sensitive completion for meta options
     (make-local-variable 'completion-at-point-functions)
@@ -254,29 +237,12 @@ With a prefix BELOW move point to lower block."
       (local-set-key (kbd "C-c C-.") #'ob-ipython-inspect))
     (flycheck-mode -1))
 
-  (defun org/next-item (&optional $n)
-    (interactive "p")
-    (let ((cmd (if (> $n 0) #'org-next-item #'org-previous-item))
-          (col (current-column))
-          (n (abs $n)))
-      (condition-case err
-          (while (>= (decf n) 0)
-            (funcall cmd))
-        (error (message "%s" err)))
-      (move-to-column col)))
-
-  (defun org/previous-item (&optional $n)
-    (interactive "p")
-    (org/next-item (- $n)))
-
-  (defun org*fill-paragraph-hack ($fn &optional $justify $region)
+  (defun org*fill-paragraph-hack ($fn &optional $justify region)
     (let* ((element (org-element-context))
            (end (org-element-property :end element))
            (begin (org-element-property :begin element))
            (latex-p (memq (org-element-type element)
                           '(latex-fragment latex-environment))))
-      (when (fboundp #'extra/insert-space-around-chinese)
-        (ignore-errors (extra/insert-space-around-chinese end begin)))
       (if (and latex-p
                (not (region-active-p))
                $justify)
@@ -289,7 +255,9 @@ With a prefix BELOW move point to lower block."
                  (group (not (any ")}]" blank))))
              "\\1 \\2 \\3"
              nil begin end))
-        (funcall $fn $justify $region))))
+        (funcall $fn $justify region))
+      (when (fboundp #'extra/insert-space-around-chinese)
+        (ignore-errors (extra/insert-space-around-chinese end begin)))))
   (advice-add 'org-fill-paragraph :around #'org*fill-paragraph-hack)
 
   (define-key org-mode-map (kbd "C-c t") org-table-extra-map)
@@ -315,17 +283,7 @@ With a prefix BELOW move point to lower block."
     ([f10] . org-publish)
     ("C-c C-t" . org-todo)))
 
-(with-eval-after-load 'org-element
-  (setq org-element-paragraph-separate
-        (concat org-element-paragraph-separate
-                "\\|^[\t ]*\\\\\\[")))
-
 (with-eval-after-load 'ox-html
-  (defun org*beginning-of-line ($fn &optional $n)
-    (if (bolp)
-        (back-to-indentation)
-      (funcall $fn $n)))
-  (advice-add 'org-beginning-of-line :around  #'org*beginning-of-line)
 
   (defun org*html-export-with-line-number ($fn &rest $rest)
     (when (= (length $rest) 5)
@@ -391,8 +349,9 @@ With a prefix BELOW move point to lower block."
           ("mathscr" "eucal" t)
           ("" "geometry" t)
           ("" "tcolorbox" t)))
-  (let ((common (read-file-content!
-                 (expand-file-name "common" org-template-directory))))
+  (let ((common (eval-when-compile
+                  (read-file-content!
+                   (expand-file-name "common" org-template-directory)))))
     (add-to-list 'org-latex-classes
                  `("cn-article"
                    ,(concat "\\documentclass[11pt,a4paper]{article}\n"
@@ -402,15 +361,15 @@ With a prefix BELOW move point to lower block."
                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-    (add-to-list  'org-latex-classes
-                  `("cn-book"
-                    ,(concat "\\documentclass[11pt,openany]{book}\n"
-                             common)
-                    ("\\chapter{%s}" . "\\chapter*{%s}")
-                    ("\\section{%s}" . "\\section*{%s}")
-                    ("\\subsection{%s}" . "\\subsection*{%s}")
-                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                    ("\\paragraph{%s}" . "\\paragraph*{%s}")))))
+    (add-to-list 'org-latex-classes
+                 `("cn-book"
+                   ,(concat "\\documentclass[11pt,openany]{book}\n"
+                            common)
+                   ("\\chapter{%s}" . "\\chapter*{%s}")
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\paragraph{%s}" . "\\paragraph*{%s}")))))
 
 (with-eval-after-load 'ox-beamer
   (add-to-list 'org-latex-classes

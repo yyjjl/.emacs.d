@@ -23,7 +23,7 @@
          (setq cpp-cmake-config-list
                (delq (cpp-cmake//current-config) cpp-cmake-config-list))
          (setq cpp-cmake-current-config-name "Release")
-         (cpp-cmake//save-variables 'cpp-cmake-current-config-name
+         (save-dir-local-variables! 'cpp-cmake-current-config-name
                                    'cpp-cmake-config-list))
        (cpp-cmake//render-config-buffer $buffer)
        (message "You may need run cmake manually.")))
@@ -43,7 +43,7 @@
            (dolist (widget cpp-cmake--widgets)
              (widget-apply widget :apply-change))
            (with-current-buffer $buffer
-             (cpp-cmake//save-variables 'cpp-cmake-current-config-name
+             (save-dir-local-variables! 'cpp-cmake-current-config-name
                                        'cpp-cmake-config-list))
            (message "Changes Applied"))
          "Apply")))

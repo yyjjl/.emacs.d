@@ -16,7 +16,7 @@ hasn't to runs those regexps against the filename.")
 (defvar emacs-autoloads-directory
   (expand-file-name "autoloads" emacs-config-directory)
   "Autoloads files in this directory")
-(defvar emacs-autoloads-file (expand-var! "autoloads")
+(defvar emacs-autoloads-file (expand-var! "autoloads.el")
   "Autoloads file")
 
 (defvar core-ignored-directories '("auto" "target" "node_modules"
@@ -51,7 +51,7 @@ will close some features to speed up emacs performance")
   (setq irony-user-dir (expand-var! "irony/"))
   (setq ispell-personal-dictionary (expand-var! "aspell.pws"))
   (setq mc/list-file (expand-var! "mc-lists.el"))
-  (setq org-preview-latex-image-directory (expand-var! "ltxpng/"))
+  (setq org-preview-latex-image-directory (expand-var! "ltximg/"))
   (setq org-publish-timestamp-directory (expand-var! "org-timestamps/"))
   (setq org-default-notes-file (expand-var! "org/*note*"))
   (setq org-export-async-init-file (expand-etc! "org-async-init.el"))

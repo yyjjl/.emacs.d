@@ -94,8 +94,8 @@
 (define-hook! python|setup (python-mode-hook)
   ;; emacs 24.4 only
   (setq electric-indent-chars (delq ?: electric-indent-chars))
-  (unless (and (buffer-temporary?)
-               (not (eq major-mode 'python-mode)))
+  (unless (or (buffer-temporary?)
+              (not (eq major-mode 'python-mode)))
     ;; run command `pip install jedi flake8 importmagic` in shell,
     ;; or just check https://github.com/jorgenschaefer/elpy
     (semantic-idle-summary-mode -1)
@@ -148,7 +148,6 @@
   (setq py-isort-options '("--lines=75" "--multi-line=1")))
 
 (with-eval-after-load 'elpy
-  (put 'elpy-shell-use-project-root 'safe-local-variable #'booleanp)
   (remap! "C-c C-r" "C-c r" elpy-mode-map)
   (setcar elpy-test-discover-runner-command "python3")
   (setq elpy-rpc-backend "jedi"

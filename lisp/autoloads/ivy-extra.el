@@ -125,7 +125,7 @@
                 'internal-complete-buffer)
               :preselect (buffer-name (current-buffer))
               :action #'counsel//kill-buffer-action
-              :keymap counsel-find-file-map
+              :keymap ivy-switch-buffer-map
               :caller 'counsel/kill-buffer
               :require-match t))
   (dolist (buffer counsel--kill-buffers)

@@ -93,6 +93,7 @@
 (setq-default kept-old-versions 2)
 (setq-default select-enable-clipboard t)
 (setq-default select-enable-primary t)
+(setq-default fill-column 79)
 
 ;; Scrolling
 (setq-default auto-window-vscroll nil)
@@ -181,8 +182,8 @@
           (t t))))
 
 ;; Display long lines in truncated style (end line with $)
-(add-hook 'grep-mode-hook 'toggle-truncate-lines)
-(add-hook 'compilation-mode-hook 'toggle-truncate-lines)
+(add-hook 'grep-mode-hook (lambda () (setq truncate-lines t)))
+(add-hook 'compilation-mode-hook (lambda () (setq truncate-lines t)))
 ;; Turns on `auto-fill-mode', don't use `text-mode-hook'
 (add-hook 'change-log-mode-hook 'turn-on-auto-fill)
 
@@ -262,7 +263,7 @@
   (midnight-mode 1)
   ;; (display-time-mode 1)
   (transient-mark-mode 1)
-  (delete-selection-mode 1)
+  ;; (delete-selection-mode 1)
 
   ;; Restore `file-name-handler-alist'
   (setq file-name-handler-alist emacs-file-name-handler-alist

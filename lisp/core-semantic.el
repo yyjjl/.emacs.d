@@ -15,7 +15,7 @@
           ;; global-semantic-decoration-mode
           ;; global-semantic-highlight-func-mode
           global-semantic-mru-bookmark-mode))
-  (setq semantic-idle-scheduler-idle-time 4)
+  (setq semantic-idle-scheduler-idle-time 1)
   (add-to-list 'semantic-inhibit-functions
                (lambda () (file-remote-p default-directory)))
 
@@ -50,6 +50,8 @@
 
 (defun core/enable-semantic ()
   (semantic-mode 1)
+  ;; (global-semantic-show-parser-state-mode 1)
+  ;; (global-semantic-highlight-edits-mode 1)
   (remove-hook 'completion-at-point-functions
                'semantic-analyze-completion-at-point-function)
   (remove-hook 'completion-at-point-functions

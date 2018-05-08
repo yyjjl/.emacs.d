@@ -186,3 +186,57 @@ directory and extension."
      ("=" . (lambda! (core/copy-file-name (max 1 (1- $level)) t)))
      ("-" . (lambda! (core/copy-file-name (min 5 (1+ $level)) t)))
      ("0" . (lambda! (core/copy-file-name 5 t))))))
+
+;;;###autoload
+(defvar core--local-snippets-list nil)
+;;;###autoload
+(defun core/add-local-snippet ()
+  (interactive)
+  (let ((key (read-string "Snippet key: "))
+        (template (read-string "Snippet template: "))
+        (local-snippets-list (copy-alist core--local-snippets-list)))
+    (-if-let (item (assoc-string key local-snippets-list))
+        (when (yes-or-no-p (format "Key is used for %s, overwrite it" (cdr item)))
+          (setcdr item template))
+      (push (cons (substring-no-properties key) template) local-snippets-list)
+      (message "Snippet %s => %s" key template))
+    (setq-local core--local-snippets-list local-snippets-list)
+    (save-dir-local-variables! 'core--local-snippets-list)))
+
+;;;###autoload
+(defun core//try-expand-local-snippets ()
+  (when-let*
+      ((bounds (bounds-of-thing-at-point 'word))
+       (template (cdr-safe (assoc-string
+                            (buffer-substring-no-properties (car bounds)
+                                                            (cdr bounds))
+                            core--local-snippets-list))))
+    (yas-expand-snippet template (car bounds) (cdr bounds))))
+
+;;;###autoload
+(defun core/delete-local-snippet ()
+  (interactive)
+  (if (not core--local-snippets-list)
+      (message "No local snippets")
+    (let* ((key (completing-read "Snippet key: "
+                                 core--local-snippets-list nil :require-match))
+           (local-snippets-list (copy-alist core--local-snippets-list))
+           (item (assoc-string key local-snippets-list)))
+      (when (yes-or-no-p (format "Delete %s => %s? " (car item) (cdr item)))
+        (setq-local core--local-snippets-list (delete item local-snippets-list))
+        (save-dir-local-variables! 'core--local-snippets-list)))))
+
+;;;###autoload
+(defun core/delete-http-buffers ($force)
+  (interactive "P")
+  (let ((buffers (--filter (and (string-prefix-p " *http " (buffer-name it))
+                                (not (process-live-p (get-buffer-process it))))
+                           (buffer-list))))
+    (when (and buffers
+               (or (not $force)
+                   (not (called-interactively-p 'interactive)))
+               (yes-or-no-p (format "Delete following buffers? \n %s"
+                                    (string-join (mapcar #'buffer-name buffers)
+                                                 "\n"))))
+      (dolist (buffer buffers)
+        (kill-buffer buffer)))))

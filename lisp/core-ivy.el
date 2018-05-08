@@ -47,7 +47,8 @@
 
   (setq ivy-dispatching-done-columns 3)
   (setq ivy-count-format "(%d/%d) ")
-  (setq ivy-initial-inputs-alist nil)
+  ;; (setq ivy-initial-inputs-alist nil)
+  (setq ivy-extra-directories '("./"))
   (setq ivy-action-wrap t)
 
   (setq ivy-re-builders-alist

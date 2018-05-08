@@ -1,8 +1,6 @@
 # -*- mode: snippet; require-final-newline: nil -*-
 # name: block-latex
-# key: bl
+# key: b
 # binding: direct-keybinding
 # --
-\\[
-${1:latex}
-\\]
+\\[ ${1:latex} \\]

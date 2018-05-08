@@ -116,6 +116,7 @@ Archive with high priority will be used when install a package.")
 
 (defun package/generate-autoloads ()
   (interactive)
+  (require 'autoload)
   (let ((files (directory-files emacs-autoloads-directory :full "\\.el\\'"))
         (failed-count 0))
     (with-current-buffer (find-file-noselect emacs-autoloads-file)

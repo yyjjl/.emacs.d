@@ -62,26 +62,36 @@
                   try-expand-dabbrev-limited-chars
                   try-expand-dabbrev-limited-chars-all-buffers)))
 
-(put 'projectile-project-run-cmd 'safe-local-variable #'stringp)
-(put 'projectile-project-test-cmd 'safe-local-variable #'stringp)
-(put 'projectile-project-compilation-cmd 'safe-local-variable #'stringp)
-(put 'projectile-project-configure-cmd 'safe-local-variable #'stringp)
 (setq projectile-keymap-prefix (kbd "C-x p"))
 (with-eval-after-load 'projectile
   (setq projectile-mode-line
         '(:eval (and buffer-file-name
                      (format " [%s]" (projectile-project-name)))))
   (setq projectile-require-project-root nil)
-  (setq projectile-globally-ignored-file-suffixes '(".pyc" ".elc"))
+  (setq projectile-globally-ignored-file-suffixes
+        '(".pyc" ".elc" ".jpg" ".png" ".svg"
+          ".jpeg" ".pyg" ".pygtex" ".pygstyle"))
   (setq projectile-completion-system 'ivy)
-  (setq projectile-enable-caching t)
+  (setq projectile-ignored-projects '("~/" "/tmp"))
+  (setq projectile-enable-caching (not noninteractive))
 
   (add-hook 'kill-emacs-hook #'projectile-cleanup-known-projects))
 
 (with-eval-after-load 'yasnippet
+  (defun core*expand-local-snippets ($fn &rest $args)
+    (or (core//try-expand-local-snippets)
+        (apply $fn $args)))
+
+  (advice-add 'yas-next-field-or-maybe-expand
+              :around #'core*expand-local-snippets)
+  (with-eval-after-load 'org
+    (advice-add 'org-cycle
+                :around #'core*expand-local-snippets))
+
   (add-to-list 'auto-mode-alist '("\\.yasnippet\\'" . snippet-mode))
   (setq yas-prompt-functions '(yas-completing-prompt))
-  (setq-default yas-indent-line 'fixed))
+  (setq-default yas-indent-line 'fixed)
+  (setq yas-triggers-in-field t))
 
 (with-eval-after-load 'isearch
   (define-key isearch-mode-map (kbd "C-o") 'isearch-occur))
@@ -126,14 +136,15 @@
          ((memq (char-after) core--indent-close-list)
           (forward-char 1))
          ;; Trigger completions
-         ((and (looking-back "\\(?:\\s_\\|\\sw\\)\\{2,\\}\\(?:\\.\\|->\\|::?\\)?"
-                             (max (point-min) (- (point) 5)))
+         ((and (not (eq tab-always-indent 'complete))
                (not (memq (get-text-property (- (point) 1) 'face)
                           '(font-lock-string-face font-lock-doc-face)))
-               (not (eq tab-always-indent 'complete)))
-          ;; If company-idle-delay is nil (which means company is not
-          ;; trigger automatically, <tab> will trigger it
-          (or (and (bound-and-true-p company-idle-delay)
+               (looking-back "\\(?:\\s_\\|\\sw\\)\\{2,\\}\\(?:\\.\\|->\\|::?\\)?"
+                             (max (point-min) (- (point) 5))))
+          ;; If company-idle-delay is nil (which means company is not trigger
+          ;; automatically, <tab> will trigger it
+          (or (core//try-expand-local-snippets)
+              (and (bound-and-true-p company-idle-delay)
                    (call-interactively 'company-complete))
               (call-interactively 'hippie-expand))))))))
 (advice-add 'indent-for-tab-command :around #'core*indent-for-tab)

@@ -7,9 +7,24 @@
 (require-packages!
  ;; IPython notebook feature in `org-mode'
  (ob-ipython :when org-has-ipython-p)
- (sage-shell-mode :when org-has-sage-p))
+ (sage-shell-mode :when org-has-sage-p
+                  :compile (sage-shell-mode sage-shell-view)))
 
 
+
+(defconst org--sage-overlay-help-template
+  "--------------------
+Text:
+%s
+LaTeX:
+%s
+--------------------
+R\tRegenerate
+T\tShow text
+w\tCopy text
+W\tCopy LaTeX
+=\tZoom in
+-\tZoom out")
 
 (defvar org--ipython-parent-buffer nil)
 (defvar org--ipython-src-block nil)
@@ -96,31 +111,47 @@
 
   (define-hook! org|babel-after-execute
     ((org-babel-after-execute-hook :append))
-    (dolist (buf (buffer-list))
-      (when (and (string-prefix-p " *http " (buffer-name buf))
-                 (let ((proc (get-buffer-process buf)))
-                   (not (and proc (process-live-p proc)))))
-        (kill-buffer buf)))
+    (core/delete-http-buffers :force)
     ;; Display/update images in the buffer after I evaluate
     (org-display-inline-images t)))
 
+(defvar sage-shell:source-buffer nil)
 (with-eval-after-load 'sage-shell-mode
   (fset 'sage-shell:-process-sentinel-generator 'identity)
   (advice-add 'sage-shell-view-process-overlay
               :after 'sage*after-ceare-overlay-hack)
 
   (define-key! :map sage-shell-mode-map
-    ("C-c M-o" . sage/clea-current-buffer))
+    ("C-c M-o" . sage/clea-current-buffer)
+    ("C-c C-z" . sage/pop-to-source-buffer))
 
   (defun sage/clea-current-buffer ()
     (interactive)
     (sage-shell:-delete-output (point-min))
     (sage-shell-edit:delete-temp-dir))
 
+  (defun sage/pop-to-source-buffer ()
+    (interactive)
+    (unless sage-shell:source-buffer
+      (setq sage-shell:source-buffer
+            (completing-read "Buffer:"
+                             (mapcar
+                              #'buffer-name
+                              (--filter (eq 'sage-shell:sage-mode
+                                            (buffer-local-value 'major-mode it))
+                                        (buffer-list)))
+                             nil :require-match)))
+    (when sage-shell:source-buffer
+      (pop-to-buffer sage-shell:source-buffer)))
+
   (defun sage*after-ceare-overlay-hack ($ov)
     (unless (overlay-get $ov 'extra-map)
       (let ((map (overlay-get $ov 'keymap)))
         (define-key! :map map
+          ("?" . (lambda! (display-message-or-buffer
+                           (format org--sage-overlay-help-template
+                                   (overlay-get $ov 'text)
+                                   (overlay-get $ov 'math)))))
           ;; Regenerate
           ("R" . (lambda! (sage-shell-view-regenerate $ov)))
           ;; Show text
@@ -131,10 +162,10 @@
           ("W" . (lambda!
                    (sage-shell-view-copy-latex $ov)
                    (message "LaTeX copied")))
-          ("=" . (lambda! (sage-shell-view--when-overlay-active $ov
-                            (sage-shell-view-zoom-in $ov))))
-          ("-" . (lambda! (sage-shell-view--when-overlay-active $ov
-                            (sage-shell-view-zoom-out $ov)))))
+          ("=" . (lambda! (sage-shell-view--when-overlay-active
+                              $ov (sage-shell-view-zoom-in $ov))))
+          ("-" . (lambda! (sage-shell-view--when-overlay-active
+                              $ov (sage-shell-view-zoom-out $ov)))))
         (overlay-put $ov 'extra-map t))))
 
   (defun sage-shell-edit:delete-temp-dir ()

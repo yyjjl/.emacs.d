@@ -78,19 +78,6 @@
 
 
 
-
-(defun cpp-cmake//save-variables (&rest $variables)
-  (save-window-excursion
-    (dolist (var $variables)
-      (add-dir-local-variable nil var
-                              (buffer-local-value var (current-buffer))))
-    (save-buffer)
-    (dolist (buffer (or (ignore-errors (projectile-project-buffers))
-                        (list (current-buffer))))
-      (with-current-buffer buffer
-        (hack-dir-local-variables-non-file-buffer)))))
-
-
 (defun cpp-cmake//locate-cmakelists (&optional $dir $last-found $filename)
   "Find the topmost CMakeLists.txt."
   (let ((new-dir (locate-dominating-file (or $dir default-directory)
@@ -151,7 +138,7 @@
               (result (cpp-cmake//parse-available-options cmake-buffer)))
          (with-current-buffer buffer
            (setq cpp-cmake-available-options result)
-           (cpp-cmake//save-variables 'cpp-cmake-available-options))
+           (save-dir-local-variables! 'cpp-cmake-available-options))
          (kill-buffer cmake-buffer))
        (funcall callback buffer)))))
 
@@ -174,7 +161,7 @@
                                :require-match)))
     (unless (string= name cpp-cmake-current-config-name)
       (setq cpp-cmake-current-config-name name)
-      (cpp-cmake//save-variables 'cpp-cmake-current-config-name)
+      (save-dir-local-variables! 'cpp-cmake-current-config-name)
       (cpp-cmake//run-cmake-internal))))
 
 (defun cpp-cmake/toggle-option ()
@@ -197,7 +184,7 @@
                   ((equal "Debug" option-value) "Release")
                   ((equal "ON" option-value) "OFF")
                   ((equal "OFF" option-value) "ON")))
-    (cpp-cmake//save-variables 'cpp-cmake-config-list)
+    (save-dir-local-variables! 'cpp-cmake-config-list)
     (cpp-cmake//run-cmake-internal)))
 
 (with-eval-after-load 'cmake-mode

@@ -70,7 +70,7 @@ See https://github.com/emacs-lsp/lsp-mode."
 (with-eval-after-load 'lsp-mode
   (require 'lsp-imenu)
   (setq lsp-enable-completion-at-point nil
-        lsp-highlight-symbol-at-point nil)
+        lsp-highlight-symbol-at-point t)
 
   (setq lsp--show-doc-key "C-c C-d")
   (setq lsp--show-doc-extra-message
@@ -86,7 +86,12 @@ See https://github.com/emacs-lsp/lsp-mode."
 
   (define-hook! lsp|after-open (lsp-after-open-hook)
     (lsp-enable-imenu)
-    (lsp//flycheck-enable 1))
+    (lsp//flycheck-enable 1)
+    (when (and lsp-highlight-symbol-at-point lsp-mode)
+      (ignore-errors (semantic-idle-local-symbol-highlight-mode -1))
+      (setq-local semantic-init-hook
+                  (delete 'semantic-idle-local-symbol-highlight-mode
+                          semantic-init-hook))))
 
   (defun lsp-execute-code-action (action)
     "Execute code action ACTION."

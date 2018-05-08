@@ -188,25 +188,22 @@ Example:
                     map))))
      ,@$body))
 
-(defmacro with-temp-env! (env &rest body)
+(defmacro with-temp-env! ($env &rest $body)
   (declare (indent 1))
-  `(let ((process-environment (append ,env process-environment)))
-     ,@body))
+  `(let ((process-environment (append ,$env process-environment)))
+     ,@$body))
+
+(defmacro without-user-record! (&rest $body)
+  `(let ((core--buffer-useful-p nil)
+         (core--recentf-enabled-p nil))
+     ,@$body))
 
 (defun read-file-content! ($filename)
   "Read file named $FILENAME as string."
-  (let ((recentf-enabled-p core--recentf-enabled-p)
-        (buffer-useful-p core--buffer-useful-p))
-    (unwind-protect
-        (progn
-          (setq core--recentf-enabled-p nil
-                core--buffer-useful-p nil)
-          (unwind-protect
-              (with-temp-buffer
-                (insert-file-contents-literally $filename)
-                (buffer-string))
-            (setq core--recentf-enabled-p recentf-enabled-p
-                  core--buffer-useful-p buffer-useful-p))))))
+  (without-user-record!
+   (with-temp-buffer
+     (insert-file-contents-literally $filename)
+     (buffer-string))))
 
 (defun open! ($file-list)
   "Open All files in $FILE-LIST in external processes."
@@ -338,6 +335,16 @@ HTML file converted from org file, it returns t."
                 (and (string= file $name)
                      (expand-file-name file $dir))))))
     lib-path))
+
+(defun save-dir-local-variables! (&rest $variables)
+  (save-window-excursion
+    (dolist (var $variables)
+      (add-dir-local-variable nil var (buffer-local-value var (current-buffer))))
+    (save-buffer)
+    (dolist (buffer (or (ignore-errors (projectile-project-buffers))
+                        (list (current-buffer))))
+      (with-current-buffer buffer
+        (hack-dir-local-variables-non-file-buffer)))))
 
 (unless (fboundp 'when-let*)
   (defalias 'when-let* 'when-let))

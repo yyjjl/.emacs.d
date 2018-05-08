@@ -99,7 +99,7 @@
         TeX-electric-math '("$" . "$")
         LaTeX-electric-left-right-brace t
         TeX-complete-expert-commands t
-        TeX-electric-sub-and-superscript t
+        TeX-electric-sub-and-superscript nil
         ;; Synctex support
         TeX-source-correlate-start-server nil
         font-latex-fontify-script nil
