@@ -39,10 +39,9 @@
 (defun core//clean-window-list ()
   ;; Remove inactive window
   (setq core--shackle-popup-window-list
-        (loop for (window buffer action) in core--shackle-popup-window-list
-              if (and (window-live-p window)
-                      (equal (window-buffer window) buffer))
-              collect (list window buffer action))))
+        (loop for (window action) in core--shackle-popup-window-list
+              if (window-live-p window)
+              collect (list window action))))
 
 (defun core*close-popup-window (&rest _)
   "When `C-g' pressed, close latest opened popup window"
@@ -50,7 +49,7 @@
   ;; `C-g' can deactivate region
   (when (and (called-interactively-p 'interactive)
              (not (region-active-p)))
-    (let (window buffer action)
+    (let (window action)
       (if (one-window-p)
           (progn
             (setq window (selected-window))
@@ -59,10 +58,8 @@
                          window)
               (winner-undo)))
         (setq window (nth 0 (car core--shackle-popup-window-list)))
-        (setq buffer (nth 1 (car core--shackle-popup-window-list)))
         (setq action (nth 2 (car core--shackle-popup-window-list)))
-        (when (and (window-live-p window)
-                   (equal (window-buffer window) buffer))
+        (when (window-live-p window)
           (if (eq action :quit)
               (quit-window nil window)
             (delete-window window))
@@ -74,7 +71,7 @@
     ;; Autoclose window should be dedicated
     (set-window-dedicated-p $window t)
     ;; Add to autoclose list
-    (push (list $window $buffer (or $action :delete))
+    (push (list $window (or $action :delete))
           core--shackle-popup-window-list))
   (with-current-buffer $buffer
     ;; Record popup window
@@ -166,8 +163,7 @@
 
   (define-hook! core|autoclose-popup-window (kill-buffer-hook)
     "Auto quit popup window after buffer killed"
-    (let ((window (get-buffer-window))
-          (buffer-name (buffer-name)))
+    (let ((window (get-buffer-window)))
       (when (and window
                  (equal window core--shackle-popup-window)
                  (not (one-window-p))

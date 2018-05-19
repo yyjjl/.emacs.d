@@ -9,40 +9,28 @@
  'doom-molokai
  '(lsp-face-highlight-textual ((t :background "#444155"))))
 
-;; flycheck support
-(defvar lsp--flycheck-diagnostic nil)
-
 (defun lsp//flycheck--start (checker callback)
   "Start an LSP syntax check with CHECKER.
 
 CALLBACK is the status callback passed by Flycheck."
   ;; Turn all errors from lsp--diagnostics into flycheck-error objects and pass
   ;; them immediately to the callback
-  (let ((errors))
-    (when lsp--flycheck-diagnostic
-      (maphash (lambda (file diagnostics)
-                 (dolist (diag diagnostics)
-                   (push (flycheck-error-new
-                          :buffer (current-buffer)
-                          :checker checker
-                          :filename file
-                          :line (1+ (lsp-diagnostic-line diag))
-                          :column (1+ (lsp-diagnostic-column diag))
-                          :message (lsp-diagnostic-message diag)
-                          :level (pcase (lsp-diagnostic-severity diag)
-                                   (1 'error)
-                                   (2 'warning)
-                                   (_ 'info))
-                          :id (lsp-diagnostic-code diag))
-                         errors)))
-               lsp--flycheck-diagnostic)
-      (setq lsp--flycheck-diagnostic nil))
+  (let (errors)
+    (dolist (diag (gethash (buffer-file-name) lsp--diagnostics))
+      (push (flycheck-error-new
+             :buffer (current-buffer)
+             :checker checker
+             :filename (buffer-file-name)
+             :line (1+ (lsp-diagnostic-line diag))
+             :column (1+ (lsp-diagnostic-column diag))
+             :message (lsp-diagnostic-message diag)
+             :level (pcase (lsp-diagnostic-severity diag)
+                      (1 'error)
+                      (2 'warning)
+                      (_ 'info))
+             :id (lsp-diagnostic-code diag))
+            errors))
     (funcall callback 'finished errors)))
-
-(defun lsp//flycheck-check ()
-  (and lsp-mode
-       flycheck-mode
-       (setq lsp--flycheck-diagnostic lsp--diagnostics)))
 
 (defun lsp//flycheck-add-mode (mode)
   "Add MODE as a valid major mode for the lsp checker."
@@ -53,8 +41,7 @@ CALLBACK is the status callback passed by Flycheck."
   "Enable flycheck integration for the current buffer."
   (setq-local flycheck-checker 'lsp-mine)
   (lsp//flycheck-add-mode major-mode)
-  (add-to-list 'flycheck-checkers 'lsp-mine)
-  (add-hook 'lsp-after-diagnostics-hook #'lsp//flycheck-check))
+  (add-to-list 'flycheck-checkers 'lsp-mine))
 
 (with-eval-after-load 'flycheck
   (flycheck-define-generic-checker 'lsp-mine
@@ -69,10 +56,10 @@ See https://github.com/emacs-lsp/lsp-mode."
 
 (with-eval-after-load 'lsp-mode
   (require 'lsp-imenu)
-  (setq lsp-enable-completion-at-point nil
-        lsp-highlight-symbol-at-point t)
-
+  (setq lsp-enable-completion-at-point nil)
+  (setq lsp-highlight-symbol-at-point t)
   (setq lsp--show-doc-key "C-c C-d")
+  (setq lsp-hover-text-function 'lsp--text-document-hover-string)
   (setq lsp--show-doc-extra-message
         (propertize (format " (`%s' to see more ...)" lsp--show-doc-key)
                     'face font-lock-comment-face))
@@ -86,12 +73,7 @@ See https://github.com/emacs-lsp/lsp-mode."
 
   (define-hook! lsp|after-open (lsp-after-open-hook)
     (lsp-enable-imenu)
-    (lsp//flycheck-enable 1)
-    (when (and lsp-highlight-symbol-at-point lsp-mode)
-      (ignore-errors (semantic-idle-local-symbol-highlight-mode -1))
-      (setq-local semantic-init-hook
-                  (delete 'semantic-idle-local-symbol-highlight-mode
-                          semantic-init-hook))))
+    (lsp//flycheck-enable 1))
 
   (defun lsp-execute-code-action (action)
     "Execute code action ACTION."
@@ -104,7 +86,7 @@ See https://github.com/emacs-lsp/lsp-mode."
     (lsp--execute-command action))
 
   (defvar lsp--code-action-overlay nil)
-  (defun lsp--move-code-action-overlay ($beg $end &optional $buffer)
+  (defun lsp//move-code-action-overlay ($beg $end &optional $buffer)
     (unless (overlayp lsp--code-action-overlay)
       (setq lsp--code-action-overlay (make-overlay $beg $end $buffer))
       (overlay-put lsp--code-action-overlay
@@ -124,9 +106,7 @@ See https://github.com/emacs-lsp/lsp-mode."
           (delete-overlay lsp--code-action-overlay))
         (when actions
           (-when-let (bounds (bounds-of-thing-at-point 'symbol))
-            (lsp--move-code-action-overlay (car bounds)
-                                           (cdr bounds)
-                                           buf))))))
+            (lsp//move-code-action-overlay (car bounds) (cdr bounds) buf))))))
 
   (defun lsp//get-hover-string (hover
                                 renderers

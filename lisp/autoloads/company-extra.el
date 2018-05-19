@@ -16,4 +16,5 @@
   "Call `company-yasnippet'"
   (interactive)
   (company-abort)
-  (call-interactively 'company-yasnippet))
+  (or (ignore-errors (call-interactively 'company-yasnippet))
+      (call-interactively 'company-abbrev)))

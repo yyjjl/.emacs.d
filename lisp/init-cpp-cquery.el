@@ -13,7 +13,7 @@
   :group 'cquery-sem)
 
 (defconst cpp-cquery--default-template
-  "%gcc\n%c -std=gnu11\n%cpp -std=c++14\n\n")
+  "%clang \n%c -std=gnu11\n%cpp -std=c++14\n\n")
 
 
 
@@ -59,6 +59,24 @@
 (cpp-cquery//define-find derived "$cquery/derived")
 (cpp-cquery//define-find vars "$cquery/vars")
 
+
+(defun cpp-cquery//buffer-compile-command ()
+  (-when-let (args (gethash "args" (cquery-file-info)))
+    (concat (car args) " "
+            (string-join
+             (--filter (or (not (string-prefix-p "-" it))
+                           (and (not (string-prefix-p "-working-directory" it))
+                                (not (string-prefix-p "-resource-dir" it))
+                                (not (string-prefix-p "-fparse-all-comments" it))))
+                       (cdr args))
+             " "))))
+
+(defun cpp-cquery//system-headers ()
+  (or cpp-cquery--system-headers-cache
+      (ignore-errors (cpp-cquery//set-header-directories))
+      '("/usr/local/include/" "/usr/include")))
+
+
 
 
 (defvar cpp-cquery-jump-map
@@ -82,8 +100,6 @@
   (setq cquery-extra-init-params
         '(:index (:comments 2)
                  :cacheFormat "msgpack" :completion (:detailedLabel t)))
-  (setq cquery-sem-highlight-method nil)
-
   ;; (defvar cpp-cquery--semantic-highlight-timer nil)
   ;; (defvar cpp-cquery--semantic-highlight-interval 1)
   ;; (defvar cpp-cquery--semantic-highlight-params nil)
@@ -99,7 +115,8 @@
 
   ;; (advice-add 'cquery--publish-semantic-highlighting
   ;;             :around #'cpp-cquery*semantic-highlight)
-  )
+
+  (setq cquery-sem-highlight-method nil))
 
 (with-eval-after-load 'cquery-tree
   (add-hook 'cquery-tree-mode-hook

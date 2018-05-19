@@ -210,6 +210,34 @@
                 (widen))))
            "   - [ ] %^{Task} %?")))
 
+  (defun org//ltximg-directory-local-p (filename &optional directory)
+    (and (eq major-mode 'org-mode)
+         (equal org-preview-latex-image-directory
+                (concat "auto/" (file-name-base filename) "/"))
+         (file-exists-p
+          (expand-file-name org-preview-latex-image-directory
+                            (or directory default-directory)))))
+
+  (define-hook! (org|after-rename-this-file $old-name $new-name)
+    (core-after-rename-this-file-hook)
+    (let ((new-dir (file-name-directory $new-name))
+          (old-dir (file-name-directory $old-name))
+          (old-cache-dir org-preview-latex-image-directory)
+          (new-cache-dir (concat "auto/" (file-name-base $new-name) "/")))
+      (when (org//ltximg-directory-local-p $old-name old-dir)
+        (let ((dir (expand-file-name "auto" new-dir)))
+          (when (not (file-exists-p dir))
+            (make-directory dir t)))
+        (rename-file (expand-file-name (directory-file-name old-cache-dir) old-dir)
+                     (expand-file-name (directory-file-name new-cache-dir) new-dir))
+        (setq-local org-preview-latex-image-directory new-cache-dir))))
+
+  (define-hook! org|after-delete-this-file (core-after-delete-this-file-hook)
+    (when (and (org//ltximg-directory-local-p buffer-file-name)
+               (yes-or-no-p (format "Delete org preview cache '%s'? "
+                                    org-preview-latex-image-directory)))
+      (delete-directory org-preview-latex-image-directory :recursive)))
+
   (define-hook! org|setup (org-mode-hook)
     (when buffer-file-name
       (setq-local org-preview-latex-image-directory
@@ -276,10 +304,10 @@
     ("C-c n" . org-next-block)
     ("C-c p" . org-previous-block)
     ([f5] . org/open-pdf)
-    ([f9] . (lambda () (interactive)
+    ([f9] . (lambda!
               (save-excursion
-                (let ((core--buffer-useful-p nil))
-                  (org-publish-current-file)))))
+                (without-user-record!
+                 (org-publish-current-file)))))
     ([f10] . org-publish)
     ("C-c C-t" . org-todo)))
 

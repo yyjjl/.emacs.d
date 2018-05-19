@@ -63,7 +63,7 @@ If region is active, operate on it, else operate on line."
                  (eq (buffer-local-value 'major-mode buffer)
                      'term-mode))
       (when buffer (kill-buffer buffer))
-      (setq buffer (term/exec-program perl-shell-path nil buffer-name))
+      (setq buffer (term//exec-program perl-shell-path nil buffer-name))
       (with-current-buffer buffer
         (local-set-key (kbd "C-c C-z") 'term/switch-back-no-quit)))
     (pop-to-buffer buffer)))

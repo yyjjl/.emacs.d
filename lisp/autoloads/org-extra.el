@@ -79,12 +79,20 @@ With a prefix BELOW move point to lower block."
       (org-babel-previous-src-block))))
 
 ;;;###autoload
-(defun org/create-latex-fragemnt-cache ($directory)
-  (interactive "D")
+(defun org/create-latex-fragemnt-cache ($files)
+  (interactive
+   (list
+    (or (and (not current-prefix-arg)
+             (string-suffix-p ".org" (buffer-file-name))
+             (list (buffer-file-name)))
+        (let ((file-or-dir-name (read-file-name "File or Directory: ")))
+          (if (file-directory-p file-or-dir-name)
+              (directory-files-recursively file-or-dir-name "\\.org\\'")
+            (list file-or-dir-name))))))
   (let ((ltximg-dirs (make-hash-table :test 'equal))
         directory-conflict-p
-        files)
-    (dolist (file (directory-files-recursively $directory "\\.org\\'"))
+        invalid-files)
+    (dolist (file $files)
       (without-user-record!
        (with-current-buffer (find-file-noselect file)
          (let* ((prefix (concat org-preview-latex-image-directory "org-ltximg"))
@@ -118,10 +126,11 @@ With a prefix BELOW move point to lower block."
                           (directory-files absolute-dir
                                            :full "\\.\\(png\\|jpe?g\\|svg\\)\\'"))
                    (unless (gethash image-file image-files)
-                     (push image-file files))))))))))
-    (when (and files
-               (yes-or-no-p (format "Delete %d invalid cache? " (length files))))
-      (dolist (file files)
+                     (push image-file invalid-files))))))))))
+    (when (and invalid-files
+               (yes-or-no-p (format "Delete %d invalid cache? "
+                                    (length invalid-files))))
+      (dolist (file invalid-files)
         (delete-file file))
       (and directory-conflict-p
            (message "Directories for caching have confict !!")))))

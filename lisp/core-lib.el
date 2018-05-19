@@ -80,6 +80,7 @@ invoked, then it detaches itself."
          (args (and (consp $hook) (cdr $hook)))
          (append-p (plist-get args :after))
          (override-p (plist-get args :override))
+         (args-list (or (plist-get args :arguments) '(&rest _)))
          (local-p (plist-get args :local))
          (fn (or (plist-get args :name)
                  (cond ((functionp hook)
@@ -87,10 +88,10 @@ invoked, then it detaches itself."
                        ((symbolp hook)
                         (cl-gensym "core|transient-hook-"))))))
     `(progn
-       (defun ,fn (&rest _)
+       (defun ,fn ,args-list
          ,@$forms
          ,(cond ((functionp hook) `(advice-remove ',hook ',fn))
-                ((symbolp hook) `(remove-hook ',hook ',fn))))
+                ((symbolp hook) `(remove-hook ',hook ',fn ,local-p))))
        ,(cond ((functionp hook)
                `(advice-add ',hook ,(if override-p
                                         :override
@@ -194,8 +195,8 @@ Example:
      ,@$body))
 
 (defmacro without-user-record! (&rest $body)
-  `(let ((core--buffer-useful-p nil)
-         (core--recentf-enabled-p nil))
+  `(let (core--buffer-useful-p
+         core--recentf-enabled-p)
      ,@$body))
 
 (defun read-file-content! ($filename)

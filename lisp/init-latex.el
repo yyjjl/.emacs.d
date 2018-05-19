@@ -6,33 +6,36 @@
 
 
 
-(defun latex/fill-one-sentence-per-line ()
-  "Split the current paragraph into one sentence per line."
+(defun latex/count-words ()
   (interactive)
-  (save-excursion
-    (let ((fill-column 1000000)) ;; relies on dynamic binding
-      (fill-paragraph)
-      (let ((end (save-excursion
-                   (forward-paragraph 1)
-                   (backward-sentence)
-                   (point-marker)))) ;; remember where to stop
-        (beginning-of-line)
-        (while (progn (forward-sentence)
-                      (<= (point) (marker-position end)))
-          ;; leaves only one space, point is after it
-          (just-one-space)
-          ;; delete the space
-          (delete-char -1)
-          ;; and insert a newline
-          (newline)
-          ;; I only use this in combination with late, so this makes sense
-          (LaTeX-indent-line))))))
+  (if (region-active-p)
+      (call-interactively 'tex-count-words)
+    (let* ((options (or (and (eq current-prefix-arg '(16))
+                             (read-string "Options: "))
+                        "-inc -ch -total"))
+           (file (or (cond ((not current-prefix-arg)
+                            (expand-file-name (TeX-master-file "tex")))
+                           ((equal current-prefix-arg '(4))
+                            (buffer-file-name)))
+                     (read-file-name "TeX file: "))))
+      (let ((default-directory (TeX-master-directory)))
+        (with-current-buffer (compile (concat "texcount " options " "
+                                              (shell-quote-argument file)))
+          (add-transient-hook! (compilation-finish-functions
+                                :local t
+                                :name latex|after-count-words
+                                :arguments (buffer _))
+            (with-current-buffer buffer
+              (goto-char (point-min))
+              (re-search-forward "^texcount" nil :noerror)
+              (forward-line 0))))))))
 
 (autoload 'LaTeX-math-mode "latex" nil t)
 (define-hook! latex|setup (LaTeX-mode-hook)
   (company-auctex-init)
   (add-to-list 'company-backends 'company-reftex-labels)
   (add-to-list 'company-backends 'company-reftex-citations)
+  (add-to-list 'company-backends 'company-files)
   (turn-off-auto-fill)
   (visual-line-mode 1)
   ;; (setq company-backends (delete 'company-dabbrev company-backends))
@@ -79,8 +82,7 @@
   (defun latex/convert-to-svg ()
     (interactive)
     (let* ((fn (file-name-base (buffer-file-name)))
-           (output-file (concat fn ".svg"))
-           (core--recentf-enabled-p nil))
+           (output-file (concat fn ".svg")))
       (message (shell-command-to-string
                 (format "pdf2svg %s.pdf %s.svg" fn fn)))
       (if (file-exists-p output-file)
@@ -90,7 +92,7 @@
 
   (add-to-list
    'TeX-command-list
-   '("XeLaTeX" "%`xelatex -interaction nonstopmode -shell-escape%(mode)%' %t"
+   '("XeLaTeX" "%`xelatex -interaction nonstopmode -shell-escape %(mode)%' %t"
      TeX-run-TeX nil t))
 
   (setq TeX-auto-save t
@@ -148,8 +150,8 @@
     ("R" . TeX-fold-region) ("C-r"))
 
   (define-key! :map LaTeX-mode-map
+    ("M-=" . latex/count-words)
     ("C-c t" :map org-table-extra-map)
-    ("M-Q" . latex/fill-one-sentence-per-line)
     ("}" . latex/skip-close-pair)
     (")" . latex/skip-close-pair)
     ("]" . latex/skip-close-pair)

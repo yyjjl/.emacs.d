@@ -40,7 +40,7 @@
  '(flycheck-info ((t (:underline (:style wave :color "#b6e63e")))))
  '(flycheck-warning ((t (:underline (:style wave :color "#e2c770")))))
 
- '(widget-field ((t (:inherit hl-line :underline t))))
+ ;; '(widget-field ((t (:inherit hl-line :underline t))))
 
  ;; '(window-numbering-face
  ;;   ((t (:foreground "DeepPink" :weight bold :underline t))))
@@ -54,7 +54,7 @@
  '(js2-function-call ((t (:inherit font-lock-regexp-grouping-backslash))))
 
  '(easy-kill-selection ((t (:inverse-video t :inherit warning))))
- '(nlinum-current-line ((t (:inherit font-lock-builtin-face))))
+ ;; '(nlinum-current-line ((t (:inherit font-lock-builtin-face))))
  '(semantic-highlight-func-current-tag-face ((t (:background "gray5"))))
  '(shm-current-face ((t (:inherit hl-line))))
  '(ivy-highlight-face ((t (:background "#444155"))))

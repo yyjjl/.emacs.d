@@ -64,7 +64,8 @@
   (define-key!
     :map ivy-minibuffer-map
     ("C-j" . ivy-immediate-done)
-    ("C-M-j" . ivy-done)))
+    ("C-M-j" . ivy-done)
+    ("M-." . ignore)))
 
 (with-eval-after-load 'counsel
   (define-key!
@@ -120,13 +121,13 @@
 
   (when env-has-ripgrep-p
     (setq counsel-grep-base-command
-          "rg -M 1000 --no-heading --line-number --color never '%s' %s"))
+          "rg -M 1000 -S --no-heading --line-number --color never %s %s"))
   (ivy-set-actions
    'counsel-find-file
    `(("x"
       (lambda (x) (delete-file (expand-file-name x ivy--directory)))
       ,(propertize "delete" 'face 'font-lock-warning-face))))
-  (define-key read-expression-map (kbd "C-r") 'counsel-expression-history))
+  (define-key read-expression-map (kbd "C-r") 'counsel-minibuffer-history))
 
 (with-eval-after-load 'counsel-projectile
   (defun counsel-projectile*hack (&optional $arg)

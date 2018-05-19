@@ -55,9 +55,9 @@ Emacs Lisp."
 (defun lisp|elisp-setup ()
   (lisp|common-setup)
   (flycheck-mode -1)
+  (semantic-default-elisp-setup)
 
   (unless (buffer-temporary?)
-    (require 'semantic/bovine/el nil t)
     (auto-compile-on-save-mode)
 
     (lisp//hippie-expand-setup)

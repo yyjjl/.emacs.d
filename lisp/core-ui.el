@@ -48,7 +48,8 @@
      #b11111111
      #b11111111])
   (set-fringe-bitmap-face 'right-curly-arrow 'warning)
-  (set-fringe-bitmap-face 'left-curly-arrow 'warning))
+  (set-fringe-bitmap-face 'left-curly-arrow 'warning)
+  (set-fringe-bitmap-face 'right-triangle 'error))
 
  ;; Disable bidirectional text for tiny performance boost
 (setq-default bidi-display-reordering nil)
@@ -72,6 +73,7 @@
 (setq-default visible-cursor nil)
 (setq-default x-stretch-cursor nil)
 (setq-default widget-image-enable nil)
+(setq-default use-default-font-for-symbols nil)
 ;; Defer jit font locking slightly to [try to] improve Emacs performance
 (setq-default jit-lock-defer-time 0.3)
 (setq-default jit-lock-stealth-nice 0.1)

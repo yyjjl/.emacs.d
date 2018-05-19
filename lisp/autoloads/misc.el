@@ -8,6 +8,7 @@
   (when (yes-or-no-p (format "Really delete '%s'?"
                              (file-name-nondirectory buffer-file-name)))
     (delete-file (buffer-file-name))
+    (run-hooks 'core-after-delete-this-file-hook)
     (kill-this-buffer)))
 
 ;;;###autoload
@@ -32,19 +33,26 @@
 ;;;###autoload
 (defun core/rename-this-file-and-buffer ($new-name)
   "Renames both current buffer and file it's visiting to NEW-NAME."
-  (interactive (list (completing-read "New file name: "
-                                      #'read-file-name-internal)))
-  (let ((name (buffer-name))
-        (filename (buffer-file-name)))
-    (unless filename
-      (error "Buffer '%s' is not visiting a file!" name))
-    (if (get-buffer $new-name)
-        (message "A buffer named '%s' already exists!" $new-name)
-      (progn
-        (rename-file filename $new-name :ok-if-already-exists)
-        (rename-buffer $new-name)
-        (set-visited-file-name $new-name)
-        (set-buffer-modified-p nil)))))
+  (interactive
+   (list (let (confirm-nonexistent-file-or-buffer)
+           (unless buffer-file-name
+             (error "Current buffer is not visiting a file!"))
+           (let ((new-name (completing-read "New file name: "
+                                            #'read-file-name-internal)))
+             (if (file-directory-p new-name)
+                 (expand-file-name (file-name-nondirectory buffer-file-name)
+                                   new-name)
+               new-name)))))
+  (let ((filename (buffer-file-name)))
+    (when (or (not (file-exists-p $new-name))
+              (not (equal filename $new-name))
+              (yes-or-no-p (format "'%s' exists, overwrite it? " $new-name)))
+      (set-visited-file-name $new-name)
+      (rename-file filename $new-name)
+      (let ((inhibit-message t))
+        (recentf-cleanup))
+      (run-hook-with-args 'core-after-rename-this-file-hook filename $new-name)
+      (message "Rename to %s" $new-name))))
 
 ;;;###autoload
 (defun core/create-scratch-buffer ()
@@ -235,8 +243,7 @@ directory and extension."
     (when (and buffers
                (or (not $force)
                    (not (called-interactively-p 'interactive)))
-               (yes-or-no-p (format "Delete following buffers? \n %s"
-                                    (string-join (mapcar #'buffer-name buffers)
-                                                 "\n"))))
+               (yes-or-no-p (concat "Delete following buffers? \n"
+                                    (string-join (mapcar #'buffer-name buffers) "\n"))))
       (dolist (buffer buffers)
         (kill-buffer buffer)))))

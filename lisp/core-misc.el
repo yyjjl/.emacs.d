@@ -63,7 +63,16 @@
                   try-expand-dabbrev-limited-chars-all-buffers)))
 
 (setq projectile-keymap-prefix (kbd "C-x p"))
+
 (with-eval-after-load 'projectile
+  ;; Projectile root-searching functions can cause an infinite loop on TRAMP
+  ;; connections, so disable them.
+  (defun doom*projectile-locate-dominating-file ($fn &rest $args)
+    "Don't traverse the file system if on a remote connection."
+    (unless (file-remote-p default-directory)
+      (apply $fn $args)))
+  (advice-add #'projectile-locate-dominating-file
+              :around #'doom*projectile-locate-dominating-file)
   (setq projectile-mode-line
         '(:eval (and buffer-file-name
                      (format " [%s]" (projectile-project-name)))))
@@ -120,6 +129,7 @@
 
 ;; Smart tab
 (defvar core--indent-close-list '(?\} ?\$ ?\] ?\' ?\` ?\"))
+(defvar core--indent-compelte-functions '(hippie-expand))
 (defun core*indent-for-tab ($fn &rest $arg)
   (if (save-excursion
         (forward-line 0)
@@ -137,16 +147,19 @@
           (forward-char 1))
          ;; Trigger completions
          ((and (not (eq tab-always-indent 'complete))
-               (not (memq (get-text-property (- (point) 1) 'face)
+               (not (memq (get-text-property (max (point-min) (1- (point))) 'face)
                           '(font-lock-string-face font-lock-doc-face)))
-               (looking-back "\\(?:\\s_\\|\\sw\\)\\{2,\\}\\(?:\\.\\|->\\|::?\\)?"
+               (looking-back "\\(?:\\s_\\|\\sw\\)\\(?:\\.\\|->\\|::?\\)?"
                              (max (point-min) (- (point) 5))))
           ;; If company-idle-delay is nil (which means company is not trigger
           ;; automatically, <tab> will trigger it
           (or (core//try-expand-local-snippets)
-              (and (bound-and-true-p company-idle-delay)
+              (and (eq company-idle-delay nil)
                    (call-interactively 'company-complete))
-              (call-interactively 'hippie-expand))))))))
+              (catch 'done
+                (dolist (func core--indent-compelte-functions)
+                  (when (ignore-errors (call-interactively func))
+                    (throw 'done nil)))))))))))
 (advice-add 'indent-for-tab-command :around #'core*indent-for-tab)
 
 (defun core*desktop-read ($fn &rest $args)

@@ -1,7 +1,8 @@
 (with-eval-after-load 'semantic
-  (semantic-add-system-include "/usr/include/c++/5/" 'c++-mode)
   (semantic-add-system-include "/usr/include/" 'c++-mode)
   (semantic-add-system-include "/usr/include/" 'c-mode)
+
+  (advice-add 'semantic-new-buffer-fcn :around 'ignore-errors!)
 
   ;; It's too slow, when file is large
   ;; (require 'stickyfunc-enhance)

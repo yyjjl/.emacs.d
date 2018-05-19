@@ -8,8 +8,6 @@
  company-statistics
  ;; Save session to disk
  session
- ;; Improve `term-mode'
- multi-term
  hydra
  ivy
  counsel

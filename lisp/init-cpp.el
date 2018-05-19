@@ -75,13 +75,14 @@
 (defun cpp//common-cc-setup ()
   "Setup shared by all languages (java/groovy/c++ ...)"
   (highlight-indentation-mode 1)
-  (turn-on-auto-fill)
+  ;; (turn-on-auto-fill)
   (google-set-c-style)
   (setq c-basic-offset 4)
   ;; make DEL take all previous whitespace with it
   ;; (c-toggle-auto-newline 1)
   (highlight-indentation-set-offset c-basic-offset)
-  (c-toggle-hungry-state 1))
+  (c-toggle-hungry-state 1)
+  (c-toggle-electric-state -1))
 
 (defun cpp//font-lock-setup ()
   (when (or (eq font-lock-maximum-decoration 1)
@@ -92,6 +93,11 @@
     (font-lock-add-keywords nil cpp--font-lock-keywords)))
 
 (defun cpp//setup ()
+  (advice-add 'projectile--run-project-cmd
+              :around
+              (lambda ($fn &rest $args)
+                (with-temp-env! (cpp-cmake//config-env)
+                  (apply $fn $args))))
   (if (or (not cpp-has-cmake-p)
           (not cpp-has-cquery-p)
           (file-remote-p default-directory)
@@ -172,7 +178,7 @@
                        'term-mode))
         (kill-buffer buffer)
         (setq buffer
-              (term/exec-program "root" (list "-l" (or file "")) buffer-name)))
+              (term//exec-program "root" (list "-l" (or file "")) buffer-name)))
       (when buffer
         (with-current-buffer buffer
           (term-send-raw-string (format ".X %s\n" file)))
@@ -185,12 +191,11 @@
                         (cpp//compile-command (cpp-cmake//config-build)))))
       (if command
           (compile command)
-        (setq command (-when-let (dir (cpp-cmake//locate-cmakelists
-                                       nil nil "Makefile"))
-                        (cpp//compile-command dir)))
-        (if command
-            (let ((compile-command command))
-              (call-interactively 'compile))
+        (let ((compile-command
+               (or (-when-let (dir (cpp-cmake//locate-cmakelists nil nil "Makefile"))
+                     (cpp//compile-command dir))
+                   (ignore-errors (cpp-cquery//buffer-compile-command))
+                   compile-command)))
           (call-interactively 'compile))))))
 
 (defun cpp/gdb (&optional directory)
@@ -216,12 +221,31 @@
         (insert "*/")
         (backward-char 2)
         (indent-according-to-mode))
-    (call-interactively 'c-electric-star)))
+    (call-interactively 'self-insert-command)))
+
+(defun cpp/begining-of-statment ()
+  (interactive)
+  (if (and (not current-prefix-arg)
+           (or (= (char-before) ?\})
+               (= (char-after) ?\})))
+      (backward-sexp)
+    (call-interactively 'c-beginning-of-statement)))
+
+(defun cpp/end-of-statment ()
+  (interactive)
+  (if (and (not current-prefix-arg)
+           (or (= (char-before) ?\{)
+               (= (char-after) ?\{)))
+      (forward-sexp)
+    (call-interactively 'c-end-of-statement)))
 
 
 
 (with-eval-after-load 'cc-mode
   (require 'cquery)
+
+  (dolist (key '("#" "}" "/" ";" "," ":" "(" ")" "{"))
+    (define-key c-mode-base-map key nil))
 
   ;; Smart tab
   (advice-add 'c-indent-line-or-region :around #'core*indent-for-tab)
@@ -233,14 +257,18 @@
 
   (define-key! :map c-mode-base-map
     ("*" . cpp/electric-star)
+    ("M-a" . cpp/begining-of-statment)
+    ("M-e" . cpp/end-of-statment)
     ("C-c o" . ff-find-other-file)
     ("C-c C-j" . semantic-ia-fast-jump)
-    ("C-c C-v" . semantic-decoration-include-visit)
+    ("C-c C-v" . semantic-ia-show-variants)
     ("M-n" . flycheck-next-error)
     ("M-p" . flycheck-previous-error)
     ("C-M-i" . counsel-company))
 
   (define-key! :map c++-mode-map
+    ("<")
+    (">")
     ("C-c C-d")
     ("C-c b" . clang-format-buffer)
     ("C-c C-b" . clang-format-buffer)

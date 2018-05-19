@@ -91,7 +91,7 @@
                      'term-mode))
       (kill-buffer buffer)
       (set-rust-backtrace "cargo run")
-      (setq buffer (term/exec-program "cargo" '("run") buffer-name)))
+      (setq buffer (term//exec-program "cargo" '("run") buffer-name)))
     (pop-to-buffer buffer)))
 
 (with-eval-after-load 'rust-mode
