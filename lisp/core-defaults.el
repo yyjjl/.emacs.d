@@ -201,8 +201,7 @@
       (unless (eq major-mode 'compilation-mode)
         ;; Sometime it will open a comint $buffer
         (compilation-mode)
-        (core//record-popup-window
-         (get-buffer-window $buffer) $buffer :autoclose :delete)))))
+        (core-popups//push-popup-window (get-buffer-window $buffer) $buffer t)))))
 
 ;; Default prog-mode setup
 (define-hook! core|generic-prog-mode-setup (prog-mode-hook
@@ -271,11 +270,13 @@
         gc-cons-percentage 0.1)
 
   (add-to-list 'file-name-handler-alist
-               (cons core--external-file-regexp
-                     #'core//external-file-handler))
+               (cons core--external-file-regexp #'core//external-file-handler))
 
   ;; Load private configuration
-  (ignore-errors (load-file custom-file))
+  (load (file-name-sans-extension custom-file))
+
+  (run-with-timer 1 nil #'run-hooks 'after-init-idle-hook)
+
   (message "Init Time: %s" (emacs-init-time)))
 
 (provide 'core-defaults)

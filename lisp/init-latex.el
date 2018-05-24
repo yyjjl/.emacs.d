@@ -6,21 +6,27 @@
 
 
 
+(defun latex/narrow-to-section (&optional $no-subsections)
+  (interactive "P")
+  (save-mark-and-excursion
+    (LaTeX-mark-section $no-subsections)
+    (call-interactively 'narrow-to-region)))
+
 (defun latex/count-words ()
   (interactive)
   (if (region-active-p)
       (call-interactively 'tex-count-words)
     (let* ((options (or (and (eq current-prefix-arg '(16))
-                             (read-string "Options: "))
-                        "-inc -ch -total"))
+                             (read-string "Options: " "-inc -ch -brief"))
+                        "-inc -ch -brief"))
            (file (or (cond ((not current-prefix-arg)
                             (expand-file-name (TeX-master-file "tex")))
                            ((equal current-prefix-arg '(4))
                             (buffer-file-name)))
                      (read-file-name "TeX file: "))))
       (let ((default-directory (TeX-master-directory)))
-        (with-current-buffer (compile (concat "texcount " options " "
-                                              (shell-quote-argument file)))
+        (with-current-buffer (compilation-start (concat "texcount " options " "
+                                                        (shell-quote-argument file)))
           (add-transient-hook! (compilation-finish-functions
                                 :local t
                                 :name latex|after-count-words
@@ -37,7 +43,7 @@
   (add-to-list 'company-backends 'company-reftex-citations)
   (add-to-list 'company-backends 'company-files)
   (turn-off-auto-fill)
-  (visual-line-mode 1)
+  ;; (visual-line-mode 1)
   ;; (setq company-backends (delete 'company-dabbrev company-backends))
   (LaTeX-math-mode 1)
   ;; Fix conflit with `orgtbl-mode'
@@ -109,8 +115,7 @@
         LaTeX-fill-break-at-separators nil))
 
 (with-eval-after-load 'latex
-  (setq TeX-outline-extra
-        '(("^\\\\begin{[a-zA-Z]+}" 7)))
+  (setq TeX-outline-extra nil)
   (setq TeX-fold-command-prefix (kbd "C-c C-o"))
 
   (require 'tex-fold)

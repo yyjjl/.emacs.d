@@ -13,7 +13,7 @@ If this is nil, setup to environment variable of `SHELL'.")
 (defvar term-buffer-name "terminal"
   "The buffer name of term buffer.")
 
-(defvar term-unbind-key-list '("C-z" "C-x" "C-c" "C-h" "C-y" "<ESC>")
+(defvar term-unbind-key-list '("C-z" "C-x" "C-c" "C-h" "C-y" "<ESC>" "C-u")
   "The key list that will need to be unbind.")
 
 (defvar term-bind-key-alist
@@ -117,24 +117,28 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
                                  term--buffer-list))
         (set-window-dedicated-p window t)))))
 
-(defun term/switch-next ($n)
-  (interactive "p")
-  (term//switch-internal $n))
+(defun term/switch-next ($create-new)
+  (interactive "P")
+  (if $create-new
+      (term//pop-to-buffer (term//create-buffer))
+    (term//switch-internal 1)))
 
-(defun term/switch-prev ($n)
-  (interactive "p")
-  (term//switch-internal (- $n)))
+(defun term/switch-prev ($create-new)
+  (interactive "P")
+  (if $create-new
+      (term//pop-to-buffer (term//create-buffer))
+    (term//switch-internal -1)))
 
 (defun term//terminal-exit-hook ()
-  (setq term--buffer-list (--filter (buffer-live-p it) term--buffer-list))
-  (let ((buffer (current-buffer)))
-    (unwind-protect
-        (term//switch-internal 1)
-      (setq term--buffer-list (delq buffer term--buffer-list))
-      (unless term--buffer-list
-        (-when-let (window (get-buffer-window buffer))
-          (when (window-live-p window)
-            (set-window-dedicated-p window nil)))))))
+  (setq term--buffer-list
+        (delq (current-buffer)
+              (--filter (buffer-live-p it) term--buffer-list)))
+  (if term--buffer-list
+      (term//switch-internal 0)
+    (-when-let (window (get-buffer-window (current-buffer)))
+      (when (and (window-live-p window)
+                 (equal window (term//get-popup-window)))
+        (quit-window nil window)))))
 
 (defun term//create-buffer (&optional $shell-program)
   "Get term buffer.

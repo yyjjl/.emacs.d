@@ -20,7 +20,8 @@
 
 ;; prolog system
 (setq prolog-system 'swi)
-
+;; erc
+(setq erc-track-enable-keybindings nil)
 ;; pulse
 (setq pulse-delay 0.01)
 ;; csv

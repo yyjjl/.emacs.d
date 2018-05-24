@@ -8,9 +8,11 @@
 
 (with-eval-after-load 'desktop
   (advice-add 'desktop-save :around #'core*desktop-save-unless-loaded)
-  (add-to-list 'desktop-minor-mode-handlers '(orgtbl-mode . ignore))
-  (add-to-list 'desktop-minor-mode-handlers '(hs-minor-mode . ignore))
-  (add-to-list 'desktop-minor-mode-handlers '(auto-revert-mode . ignore)))
+  (dolist (mode '(company-childframe-mode
+                  orgtbl-mode
+                  hs-minor-mode
+                  auto-revert-mode))
+    (add-to-list 'desktop-minor-mode-handlers (cons mode 'ignore))))
 
 (with-eval-after-load 'bookmark
   (define-hook! core|setup-buffer-bookmark (find-file-hook)
@@ -51,6 +53,7 @@
 
 (with-eval-after-load 'hippie-exp
   (require 'hippie-exp-ext)
+  (setq he-dabbrev-chars "0-9a-zA-Z\\?!_")
   (setq-default hippie-expand-try-functions-list
                 '(try-complete-file-name-partially
                   try-complete-file-name
@@ -58,8 +61,9 @@
                   try-expand-all-abbrevs
                   try-expand-dabbrev-all-buffers
                   try-expand-dabbrev-from-kill
+                  try-expand-dabbrev-substring
                   try-expand-dabbrev-limited-chars
-                  try-expand-dabbrev-limited-chars
+                  try-expand-dabbrev-limited-chars-visible
                   try-expand-dabbrev-limited-chars-all-buffers)))
 
 (setq projectile-keymap-prefix (kbd "C-x p"))

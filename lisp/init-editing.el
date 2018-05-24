@@ -6,13 +6,14 @@
  wgrep
  picture
  ;; provide tree style search jump
+ electric-operator
  avy)
 
 
 
 (defvar core-narrow-dwim-alist
   '((org-mode org-narrow-to-subtree org-narrow-to-element)
-    (latex-mode LaTeX-narrow-to-environment TeX-narrow-to-group)))
+    (latex-mode LaTeX-narrow-to-environment latex/narrow-to-section)))
 (defun core/narrow-or-widen-dwim (&optional $arg)
   "If the buffer is narrowed, it widens.
 Otherwise,it narrows to region, or Org subtree.
@@ -160,6 +161,14 @@ _=_ next    _-_ previous    ___ skip-previous  _+_ skip-next _q_ quit
   ("+" mc/skip-to-next-like-this :exit nil)
   ("RET" nil)
   ("q" nil))
+
+(with-eval-after-load 'electric-operator
+  (setq electric-operator-prose-rules '(("," . ", ")))
+  (define-hook! core|electric-operator-setup (prog-mode-hook text-mode-hook)
+    (unless (derived-mode-p 'emacs-lisp-mode
+                            'lisp-mode
+                            'scheme-mode)
+      (electric-operator-mode 1))))
 
 (with-eval-after-load 'multiple-cursors-core
   (require 'mc-hide-unmatched-lines-mode))

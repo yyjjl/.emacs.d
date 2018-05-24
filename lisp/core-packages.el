@@ -5,13 +5,14 @@
  (flycheck :archive "melpa-stable")
  ;; Code completion framework
  company
+ (company-childframe :when (>= emacs-major-version 26))
  company-statistics
  ;; Save session to disk
  session
  hydra
  ivy
- counsel
  ivy-hydra
+ counsel
  swiper
  projectile
  counsel-projectile
@@ -40,11 +41,8 @@
 (require 'core-misc)
 (require 'core-hydra)
 
-(defvar after-init-idle-hook '(package|idle-init-emacs))
-
-(defun package|idle-init-emacs ()
-  (when (and (display-graphic-p)
-             env-has-fcitx-p)
+(define-hook! package|idle-init-emacs (after-init-idle-hook)
+  (when (and env-has-fcitx-p (display-graphic-p))
     (fcitx-aggressive-setup))
   (find-file-noselect (expand-var! "org/*note*"))
   (find-file-noselect (expand-var! "org/*task*"))
@@ -64,6 +62,9 @@
   (yas-global-mode 1)
   (global-company-mode 1)
 
+  (when (>= emacs-major-version 26)
+    (company-childframe-mode 1))
+
   (which-key-mode 1)
 
   ;;`eldoc', show API doc in minibuffer echo area enabled by default
@@ -71,10 +72,7 @@
 
   (setq package-selected-packages
         (hash-table-keys package--required-packages))
-  (add-to-list 'recentf-exclude (file-truename package-user-dir))
 
-  (run-hooks 'after-init-idle-hook)
-
-  (run-with-timer 1 nil 'run-hooks 'after-init-idle-hook))
+  (add-to-list 'recentf-exclude (file-truename package-user-dir)))
 
 (provide 'core-packages)

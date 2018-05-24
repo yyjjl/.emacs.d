@@ -146,8 +146,8 @@
     ("M-q" . (lambda! () (save-mark-and-excursion
                           (mark-paragraph)
                           (call-interactively #'align)))))
-  (add-to-list 'core--shackle-help-modes 'idris-info-mode :append)
-  (add-to-list 'core--shackle-help-modes 'idris-compiler-notes-mode :append))
+  (add-to-list 'core-popups-help-modes 'idris-info-mode :append)
+  (add-to-list 'core-popups-help-modes 'idris-compiler-notes-mode :append))
 
 (with-eval-after-load 'intero
   (define-key intero-mode-map (kbd "C-c C-d") 'intero-info))

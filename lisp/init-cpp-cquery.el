@@ -59,22 +59,45 @@
 (cpp-cquery//define-find derived "$cquery/derived")
 (cpp-cquery//define-find vars "$cquery/vars")
 
+(defun cpp-cquery//filter-arguments ($args &optional $no-filename)
+  (--filter
+   (not (or (string-prefix-p "-working-directory" it)
+            (string-prefix-p "-resource-dir" it)
+            (string-prefix-p "-fparse-all-comments" it)
+            (and $no-filename
+                 (not (string-prefix-p "-" it)))))
+   $args))
+
+(defun cpp-cquery//include-directories ()
+  (let ((args (or (ignore-errors (gethash "args" (cquery-file-info)))
+                  '("cpp" "-v" "-E"))))
+    (with-temp-buffer
+      (erase-buffer)
+      (apply #'call-process (car args) nil t nil
+             "-v" "-E" "-"
+             (cpp-cquery//filter-arguments (cdr args) :no-filename))
+      (goto-char (point-min))
+      (let ((bounds
+             (cons
+              (when (re-search-forward "^#include \"\\.\\.\\.\"" nil :noerror)
+                (forward-line 1)
+                (point))
+              (when (re-search-forward "^End of search list\\." nil :noerror)
+                (forward-line 0)
+                (point)))))
+        (when (and (car bounds) (cdr bounds))
+          (--map (expand-file-name (s-trim it))
+                 (--filter
+                  (string-prefix-p " " it)
+                  (split-string (buffer-substring-no-properties (car bounds)
+                                                                (cdr bounds))
+                                "\n"
+                                :omit-nulls))))))))
 
 (defun cpp-cquery//buffer-compile-command ()
   (-when-let (args (gethash "args" (cquery-file-info)))
     (concat (car args) " "
-            (string-join
-             (--filter (or (not (string-prefix-p "-" it))
-                           (and (not (string-prefix-p "-working-directory" it))
-                                (not (string-prefix-p "-resource-dir" it))
-                                (not (string-prefix-p "-fparse-all-comments" it))))
-                       (cdr args))
-             " "))))
-
-(defun cpp-cquery//system-headers ()
-  (or cpp-cquery--system-headers-cache
-      (ignore-errors (cpp-cquery//set-header-directories))
-      '("/usr/local/include/" "/usr/include")))
+            (string-join (cpp-cquery//filter-arguments (cdr args)) " "))))
 
 
 

@@ -5,6 +5,7 @@
 (require-packages!
  (elpy :archive "melpa-stable")
  gud
+ py-autopep8
  py-isort)
 
 
@@ -156,15 +157,15 @@
         elpy-rpc-python-command "python3"
         elpy-modules (delete 'elpy-module-django
                              (delete 'elpy-module-flymake elpy-modules))
-        elpy-test-runner 'elpy-test-pytest-runner)
+        elpy-test-runner 'elpy-test-pytest-runner
+        elpy-shell-echo-input nil)
 
   (define-key! :map elpy-mode-map
     ("C-c C-n" . nil)
     ("C-c C-p" . nil)
-    ("C-c b" . elpy-autopep8-fix-code)
+    ("C-c b" . py-autopep8)
     ("C-c B" . py-isort-buffer)
     ("C-c M-d" . python/generate-doc-at-point)
-    ;; ("M-i" . python/multiedit-symbol-at-point)
     ("M-i" . elpy-multiedit-python-symbol-at-point))
 
   (defvar python--elpy-mutiedit-overlay-map

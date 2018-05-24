@@ -27,6 +27,8 @@ hasn't to runs those regexps against the filename.")
   "When buffer's size bigger than `core-large-buffer-size', it
 will close some features to speed up emacs performance")
 
+(defvar after-init-idle-hook nil)
+
 (unless (file-exists-p emacs-var-direcotry)
   (make-directory emacs-var-direcotry))
 

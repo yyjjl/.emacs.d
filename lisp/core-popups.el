@@ -1,34 +1,42 @@
-(defvar core--shackle-popup-window-list nil)
+;;  -*- lexical-binding: t -*-
+(defvar core-popups-default-regexp
+  (rx line-start
+      (? " ") "*" (*\? not-newline) "*" (? "<" (+ digit) ">")
+      line-end))
 
-(defvar core--shackle-popup-buffer-regexp
-  (eval-when-compile
-    (concat "^\\(?:"
-            (string-join `("\\*Man.*\\*"
-                           "\\*TeX.*\\*"
-                           "\\*Warnings\\*")
-                         "\\|")
-            "\\)$")))
+(defvar core-popups-other-window-regexp
+  (rx line-start
+      "*" (or "Man" "TeX" "Warnings") (*\? not-newline) "*"
+      line-end))
 
-(defvar core--shackle-help-mode-regexp
-  (eval-when-compile
-    (concat "^"
-            (regexp-opt '("*Compile-Log*"
-                          "*sdcv*"
-                          "*lispy-message*"))
-            "\\|\\*.*?Help.*?\\*"
-            "$")))
+(defvar core-popups-help-buffer-regexp
+  (rx line-start
+      "*"
+      (or "Compile-Log"
+          "sdcv"
+          "lispy-message"
+          (and (*\? not-newline) (in "Hh") "elp" (*\? not-newline)))
+      "*"
+      line-end))
 
-(defvar core--shackle-comint-mode-regexp
-  "^\\*\\(?:\\*shell\\|.*repl.*\\|prolog\\|Sage*\\)\\*$")
+(defvar core-popups-comint-buffer-regexp
+  (rx line-start
+      "*"
+      (or "shell"
+          "prolog"
+          "Sage"
+          (and (*\? not-newline) (in "Rr") "epl" (*\? not-newline)))
+      "*"
+      (?  "<" (+ digit) ">")
+      line-end))
 
-(defvar-local core--shackle-popup-window nil)
-(put 'core--shackle-popup-window 'permanent-local t)
-
-(defvar core--shackle-comint-modes
+(defvar core-popups--window-list nil)
+(defvar-local core-popups-current-window nil)
+(put 'core-popups-current-window 'permanent-local t)
+(defvar core-popups-comint-modes
   '(term-mode
     haskell-interactive-mode))
-
-(defvar core--shackle-help-modes
+(defvar core-popups-help-modes
   '(help-mode
     completion-list-mode
     messages-buffer-mode
@@ -36,16 +44,16 @@
     flycheck-error-list-mode
     profiler-report-mode))
 
-(defun core//clean-window-list ()
-  ;; Remove inactive window
-  (setq core--shackle-popup-window-list
-        (loop for (window action) in core--shackle-popup-window-list
-              if (window-live-p window)
-              collect (list window action))))
+
 
-(defun core*close-popup-window (&rest _)
+(defsubst core-popups//clean-window-list ()
+  ;; Remove inactive window
+  (setq core-popups--window-list
+        (--filter (window-live-p (car it)) core-popups--window-list)))
+
+(defun core-popups*keyboard-quit-hack (&rest _)
   "When `C-g' pressed, close latest opened popup window"
-  (core//clean-window-list)
+  (core-popups//clean-window-list)
   ;; `C-g' can deactivate region
   (when (and (called-interactively-p 'interactive)
              (not (region-active-p)))
@@ -53,92 +61,86 @@
       (if (one-window-p)
           (progn
             (setq window (selected-window))
-            (when (equal (buffer-local-value 'core--shackle-popup-window
+            (when (equal (buffer-local-value 'core-popups-current-window
                                              (window-buffer window))
                          window)
               (winner-undo)))
-        (setq window (nth 0 (car core--shackle-popup-window-list)))
-        (setq action (nth 2 (car core--shackle-popup-window-list)))
+        (setq window (car (car core-popups--window-list)))
+        (setq action (cdr (car core-popups--window-list)))
         (when (window-live-p window)
-          (if (eq action :quit)
+          (if (eq action 'quit)
               (quit-window nil window)
             (delete-window window))
 
-          (pop core--shackle-popup-window-list))))))
+          (pop core-popups--window-list))))))
 
-(defun core//record-popup-window ($window $buffer &optional $autoclose? $action)
-  (when $autoclose?
+(defun core-popups//push-popup-window ($window $buffer &optional $autoclose-p $action)
+  (when $autoclose-p
     ;; Autoclose window should be dedicated
     (set-window-dedicated-p $window t)
     ;; Add to autoclose list
-    (push (list $window (or $action :delete))
-          core--shackle-popup-window-list))
+    (push (cons $window (or $action 'delete)) core-popups--window-list))
   (with-current-buffer $buffer
     ;; Record popup window
-    (setq core--shackle-popup-window $window)))
+    (setq core-popups-current-window $window)))
 
-(defun core*shackle-display-buffer-hack ($fn $buffer $alist $plist)
-  (core//clean-window-list)
-
+(defun core-popups*shackle-display-buffer-hack ($fn $buffer $alist $plist)
+  (core-popups//clean-window-list)
   ;; Set default alignment
   (setq shackle-default-alignment
         (if (> (frame-width)
                (or split-width-threshold 120))
             'right
           'below))
-
-  (let* ((autoclose? (plist-get $plist :autoclose))
+  (let* ((autoclose-p (plist-get $plist :autoclose))
          (old-window (get-buffer-window $buffer))
-         (action :delete)
+         (action 'delete)
          (window (or (funcall $fn $buffer $alist $plist)
-                     (and
-                      (setq action :quit)
-                      (funcall $fn $buffer $alist (list* :other t $plist))))))
+                     (progn (setq action 'quit)
+                            (funcall $fn $buffer $alist (list* :other t $plist))))))
     (unless (eq window old-window)
-      (core//record-popup-window window $buffer autoclose? action))
+      (core-popups//push-popup-window window $buffer autoclose-p action))
     window))
 
-(defun core*shackle--display-buffer-popup-window-hack ($buffer $alist $plist)
-  "Fix a bug when :other is t"
+(defun core-popups//display-buffer-popup-window ($buffer $alist $plist)
   (let ((frame (shackle--splittable-frame))
         (other-window-p (and (plist-get $plist :other) (not (one-window-p)))))
     (when frame
       (let ((window (if other-window-p
                         (next-window nil 'nominibuf)
                       (shackle--split-some-window frame $alist))))
-        (prog1 (window--display-buffer
-                $buffer window
-                (if other-window-p 'reuse 'window)
-                $alist
-                display-buffer-mark-dedicated)
+        (prog1 (window--display-buffer $buffer
+                                       window
+                                       (if other-window-p 'reuse 'window)
+                                       $alist
+                                       display-buffer-mark-dedicated)
           (when window
             (setq shackle-last-window window
                   shackle-last-buffer $buffer))
           (unless (cdr (assq 'inhibit-switch-frame $alist))
             (window--maybe-raise-frame (window-frame window))))))))
 
-(defun core*window--try-to-split-window-hack ($fn $window &optional $alist)
+(defun core-popups*window--try-to-split-window-hack ($fn $window &optional $alist)
   (let ((buffer (and (window-live-p $window)
                      (window-buffer $window))))
-    (unless (and buffer (buffer-local-value 'core--shackle-popup-window buffer))
+    (unless (and buffer
+                 (window-live-p
+                  (buffer-local-value 'core-popups-current-window buffer)))
       (funcall $fn $window $alist))))
 
-(defun core//shackle-comint-mode-matcher ($buffer)
-  (let ((case-fold-search t)
-        (buffer-name (buffer-name $buffer))
-        (mode (buffer-local-value 'major-mode $buffer)))
-    (or (derived-mode? 'comint-mode $buffer)
-        (memq mode core--shackle-comint-modes)
-        (string-match-p core--shackle-comint-mode-regexp buffer-name))))
+(defun core-popups//comint-buffer-matcher ($buffer)
+  (let ((case-fold-search t))
+    (with-current-buffer $buffer
+      (or (memq major-mode core-popups-comint-modes)
+          (derived-mode-p 'comint-mode)
+          (string-match-p core-popups-comint-buffer-regexp (buffer-name))))))
 
-(defun core//shackle-help-mode-matcher ($buffer)
-  (let ((case-fold-search t)
-        (buffer-name (buffer-name $buffer))
-        (mode (buffer-local-value 'major-mode $buffer)))
-    (or (with-current-buffer $buffer
-          (and (not (string-prefix-p "ivy-occur" (symbol-name major-mode)))
-               (apply #'derived-mode-p core--shackle-help-modes)))
-        (string-match-p core--shackle-help-mode-regexp buffer-name))))
+(defun core-popups//help-buffer-matcher ($buffer)
+  (let ((case-fold-search t))
+    (with-current-buffer $buffer
+      (or (and (not (string-prefix-p "ivy-occur" (symbol-name major-mode)))
+               (apply #'derived-mode-p core-popups-help-modes))
+          (string-match-p core-popups-help-buffer-regexp (buffer-name))))))
 
 (with-eval-after-load 'shackle
   (defvar shackle-mode-map
@@ -152,20 +154,20 @@
   (global-set-key (kbd "C-x m") #'view-echo-area-messages)
 
   ;; Can not be advised `:after', keyboard-quit signal `quit'
-  (advice-add 'keyboard-quit :before #'core*close-popup-window)
-  (advice-add 'other-window :before #'core*close-popup-window)
+  (advice-add 'keyboard-quit :before #'core-popups*keyboard-quit-hack)
+  (advice-add 'other-window :before #'core-popups*keyboard-quit-hack)
   (advice-add 'shackle-display-buffer
-              :around #'core*shackle-display-buffer-hack)
+              :around #'core-popups*shackle-display-buffer-hack)
   (advice-add 'shackle--display-buffer-popup-window
-              :override #'core*shackle--display-buffer-popup-window-hack)
+              :override #'core-popups//display-buffer-popup-window)
   (advice-add 'window--try-to-split-window
-              :around #'core*window--try-to-split-window-hack)
+              :around #'core-popups*window--try-to-split-window-hack)
 
-  (define-hook! core|autoclose-popup-window (kill-buffer-hook)
+  (define-hook! core-popups|autoclose-popup-window (kill-buffer-hook)
     "Auto quit popup window after buffer killed"
     (let ((window (get-buffer-window)))
       (when (and window
-                 (equal window core--shackle-popup-window)
+                 (equal window core-popups-current-window)
                  (not (one-window-p))
                  (not (minibuffer-window-active-p window))
                  (or (not (boundp 'lv-wnd))
@@ -176,12 +178,12 @@
         shackle-default-size 0.4
         shackle-default-rule nil
         shackle-rules
-        `(((:custom core//shackle-comint-mode-matcher)
+        `(((:custom core-popups//comint-buffer-matcher)
            :align below :select t)
-          ((:custom core//shackle-help-mode-matcher)
+          ((:custom core-popups//help-buffer-matcher)
            :align below :select t :autoclose t)
-          (,core--shackle-popup-buffer-regexp
-           :regexp t :select t :autoclose t)
-          ("^ ?\\*.*\\*\\(?:<[0-9]+>\\)?$" :regexp t))))
+          (,core-popups-other-window-regexp :regexp t :select t :autoclose t)
+          (occur-mode :select t)
+          (,core-popups-default-regexp :regexp t))))
 
 (provide 'core-popups)
