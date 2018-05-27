@@ -175,8 +175,14 @@ read-only, and `buffer-file-coding-system'"
   (setq-default mode-line-format mode-line-default-format)
   (setq-default mode-line-buffer-identification '("%b"))
   (setq-default mode-line-misc-info
-                '((projectile-mode projectile-mode-line)
-                  (company-mode company-lighter)
+                '((projectile-mode
+                   (""
+                    " ["
+                    projectile-mode-line
+                    (:propertize "|" face font-lock-comment-face)
+                    core-current-desktop-name
+                    "]"))
+                  ;; (company-mode company-lighter)
                   (global-mode-string ("" global-mode-string " ")))))
 
 (provide 'core-mode-line)

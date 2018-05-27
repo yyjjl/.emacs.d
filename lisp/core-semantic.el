@@ -3,6 +3,8 @@
   (semantic-add-system-include "/usr/include/" 'c-mode)
 
   (advice-add 'semantic-new-buffer-fcn :around 'ignore-errors!)
+  (advice-add 'semantic-idle-scheduler-function
+              :around (lambda (fn &rest args) (with-local-quit (apply fn args))))
 
   ;; It's too slow, when file is large
   ;; (require 'stickyfunc-enhance)

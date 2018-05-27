@@ -12,7 +12,7 @@
   (interactive)
   (let ((ivy-use-virtual-buffers nil))
     (display-buffer
-     (completing-read "Buffer:"
+     (completing-read "Buffer: "
                       #'internal-complete-buffer
                       nil
                       :require-match))))

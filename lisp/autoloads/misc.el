@@ -84,9 +84,11 @@ Does not indent buffer, because it is used for a
 (defun core/current-font-face ()
   "Get the font face under cursor."
   (interactive)
-  (let ((rlt (format "%S" (get-text-property (point) 'face))))
-    (kill-new rlt)
-    (message "%s => yank ring" rlt)))
+  (let* ((pos (point))
+         (text (buffer-substring pos (1+ pos)))
+         (faces (-flatten (list (get-char-property pos 'face)
+                                (get-char-property 0 'face text)))))
+    (message "%s" faces)))
 
 ;;;###autoload
 (defun core/occur-dwim ()
@@ -247,3 +249,47 @@ directory and extension."
                                     (string-join (mapcar #'buffer-name buffers) "\n"))))
       (dolist (buffer buffers)
         (kill-buffer buffer)))))
+
+(defsubst core//desktop-files ()
+  (--remove (member it '("." ".."))
+            (--map (file-name-nondirectory it)
+                   (--filter (file-exists-p (file-name-as-directory it))
+                             (directory-files (expand-var! "desktop") :full)))))
+;;;###autoload
+(defun core/change-or-new-desktop ($name)
+  (interactive (list (completing-read "Change to: "
+                                      (list* "Default"
+                                             (core//desktop-files)))))
+  (let ((new-dir (expand-file-name (if (equal $name "Default")
+                                       ""
+                                     $name)
+                                   (expand-var! "desktop"))))
+    (if (file-exists-p new-dir)
+        (if (not (and desktop-dirname
+                      (equal (file-name-as-directory new-dir)
+                             (file-name-as-directory desktop-dirname))
+                      (file-exists-p (desktop-full-lock-name))))
+            (desktop-change-dir new-dir)
+          (error "Desktop file is in use !!"))
+      (make-directory new-dir t)
+      (desktop-kill)
+      (desktop-save new-dir))
+    (setq core-current-desktop-name $name)))
+
+;;;###autoload
+(defun core/delete-desktop ($name)
+  (interactive (list (completing-read "Delete: "
+                                      (core//desktop-files)
+                                      nil
+                                      :require-match)))
+  (let* ((default (expand-var! "desktop"))
+         (dir (expand-file-name $name default)))
+    (when (and (file-exists-p dir)
+               (not (equal default dir))
+               (y-or-n-p (format "Delete desktop `%s'?" $name)))
+      (when (equal (file-name-as-directory dir)
+                   (file-name-as-directory desktop-dirname))
+        (progn (desktop-change-dir default)
+               (setq core-current-desktop-name "Default")
+               (message "Change to default desktop.")))
+      (delete-directory dir t))))

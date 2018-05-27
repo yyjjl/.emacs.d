@@ -187,6 +187,10 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
                                    (funcall (pop functions)))))))
     value))
 
+;;;###autoload
+(defsubst term//extra-env ()
+  (term//eval-function-list 'term-default-environment-function-list))
+
 (defun term//default-sentinel (proc msg)
   (term-sentinel proc msg)
   (when (memq (process-status proc) '(signal exit))
@@ -277,8 +281,7 @@ If $FORCE is non-nil create a new term buffer directly."
                                                    default-directory)))
                           (buffer-list))))
       (let ((default-directory $directory))
-        (with-temp-env! (term//eval-function-list
-                         'term-default-environment-function-list)
+        (with-temp-env! (term//extra-env)
           (term//create-buffer)))))
 
 ;;;###autoload

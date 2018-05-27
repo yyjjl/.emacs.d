@@ -74,6 +74,7 @@
 (with-eval-after-load 'tex
   (defun latex/build ()
     (interactive)
+    (reftex-parse-all)
     (let ((TeX-save-query nil))
       (TeX-save-document (TeX-master-file)))
     (let ((command (if (save-excursion

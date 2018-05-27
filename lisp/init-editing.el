@@ -162,13 +162,16 @@ _=_ next    _-_ previous    ___ skip-previous  _+_ skip-next _q_ quit
   ("RET" nil)
   ("q" nil))
 
+(define-hook! core|electric-operator-setup (prog-mode-hook text-mode-hook)
+  (unless (derived-mode-p 'emacs-lisp-mode
+                          'sh-mode
+                          'org-mode
+                          'lisp-mode
+                          'scheme-mode)
+    (electric-operator-mode 1)))
+
 (with-eval-after-load 'electric-operator
-  (setq electric-operator-prose-rules '(("," . ", ")))
-  (define-hook! core|electric-operator-setup (prog-mode-hook text-mode-hook)
-    (unless (derived-mode-p 'emacs-lisp-mode
-                            'lisp-mode
-                            'scheme-mode)
-      (electric-operator-mode 1))))
+  (setq electric-operator-prose-rules '(("," . ", "))))
 
 (with-eval-after-load 'multiple-cursors-core
   (require 'mc-hide-unmatched-lines-mode))

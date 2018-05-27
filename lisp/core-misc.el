@@ -1,5 +1,9 @@
 ;; -*- lexical-binding: t -*-
 
+;;; -*- lexical-binding: t; -*-
+
+(defvar core-current-desktop-name nil)
+
 (defun core*desktop-save-unless-loaded ($fn &rest $args)
   (if (or (called-interactively-p 'interactive)
           desktop-file-modtime)
@@ -78,8 +82,7 @@
   (advice-add #'projectile-locate-dominating-file
               :around #'doom*projectile-locate-dominating-file)
   (setq projectile-mode-line
-        '(:eval (and buffer-file-name
-                     (format " [%s]" (projectile-project-name)))))
+        '(:eval (and buffer-file-name (projectile-project-name))))
   (setq projectile-require-project-root nil)
   (setq projectile-globally-ignored-file-suffixes
         '(".pyc" ".elc" ".jpg" ".png" ".svg"
@@ -184,6 +187,8 @@
   ("C-x , ," . core/search-in-chrome)
   ("C-x , l" . display-line-numbers-mode)
   ("C-x , -" . core/copy-file-name)
+  ("C-x , c" . core/change-or-new-desktop)
+  ("C-x , d" . core/delete-desktop)
   ("C-x C-b" . ibuffer)
   ("C-x C-d" . find-name-dired)
 

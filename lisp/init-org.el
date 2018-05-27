@@ -285,7 +285,7 @@
              nil begin end))
         (funcall $fn $justify region))
       (when (fboundp #'extra/insert-space-around-chinese)
-        (ignore-errors (extra/insert-space-around-chinese end begin)))))
+        (ignore-errors (extra/insert-space-around-chinese begin end)))))
   (advice-add 'org-fill-paragraph :around #'org*fill-paragraph-hack)
 
   (define-key org-mode-map (kbd "C-c t") org-table-extra-map)

@@ -145,10 +145,10 @@
 (with-eval-after-load 'shackle
   (defvar shackle-mode-map
     (define-key! :map (make-sparse-keymap)
-      ("l" . core/last-popup-window)
-      ("d" . core/popup-sdcv)
-      ("b" . core/display-buffer)
-      ("RET" . core/fix-popup-window)))
+      ("l" . core-popups/last-popup-window)
+      ("d" . core-popups/popup-sdcv)
+      ("b" . core-popups/display-buffer)
+      ("RET" . core-popups/fix-popup-window)))
 
   (global-set-key (kbd "C-z") shackle-mode-map)
   (global-set-key (kbd "C-x m") #'view-echo-area-messages)
