@@ -1,6 +1,37 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;;;###autoload
+(defun core/display-latex-fragment-at-point ()
+  (interactive)
+  (let ((latex-fragment
+         (when-let ((bounds (if (region-active-p)
+                                (cons (region-beginning) (region-end))
+                              (when-let (element (org-element-at-point))
+                                (cons (org-element-property :begin element)
+                                      (org-element-property :end element))))))
+           (buffer-substring-no-properties (car bounds) (cdr bounds))))
+        (buffer (get-buffer-create "*latex-preview*")))
+    (shackle-display-buffer buffer nil '(:align below :size 0.4 :autoclose t))
+    (with-current-buffer buffer
+      (erase-buffer)
+      (setq-local mode-line-format nil)
+      (insert (or (string-trim latex-fragment
+                               (rx (* (any blank "\n,.!?;:")))
+                               (rx (* (any blank "\n,.!?;:"))))
+                  ""))
+      (unless (eq major-mode 'org-mode)
+        (org-mode))
+      (org-remove-latex-fragment-image-overlays)
+      (org-toggle-latex-fragment '(16))
+      (when-let (window (get-buffer-window buffer))
+        (fit-window-to-buffer window 15)))
+    (set-transient-map
+     (define-key! :map (make-sparse-keymap)
+       ("C-g" . (lambda!
+                  (kill-buffer buffer)
+                  (keyboard-quit)))))))
+
+;;;###autoload
 (defun core/delete-this-file ()
   "Delete the current file, and kill the buffer."
   (interactive)
@@ -183,19 +214,21 @@ name without directory. If ARG < 0 copy the file name without
 directory and extension."
   (interactive "p")
   (let ((path (or (buffer-file-name) default-directory)))
-    (message "(-, +, 0) Copy => %s"
+    (message "(-, +, 0) Level %d => %s"
+             $level
              (kill-new (case $level
-                         (1 path)
-                         (2 (abbreviate-file-name path))
-                         (3 default-directory)
-                         (4 (file-name-nondirectory path))
-                         (5 (file-name-base path)))
+                         (1 (buffer-name))
+                         (2 path)
+                         (3 (abbreviate-file-name path))
+                         (4 default-directory)
+                         (5 (file-name-nondirectory path))
+                         (6 (file-name-base path)))
                        $replace)))
   (set-transient-map
    (define-key! :map (make-sparse-keymap)
-     ("=" . (lambda! (core/copy-file-name (max 1 (1- $level)) t)))
-     ("-" . (lambda! (core/copy-file-name (min 5 (1+ $level)) t)))
-     ("0" . (lambda! (core/copy-file-name 5 t))))))
+     ("=" . (lambda! (core/copy-file-name (min 6 (1+ $level)) t)))
+     ("-" . (lambda! (core/copy-file-name (max 1 (1- $level)) t)))
+     ("0" . (lambda! (core/copy-file-name 1 t))))))
 
 ;;;###autoload
 (defvar core--local-snippets-list nil)
@@ -250,6 +283,9 @@ directory and extension."
       (dolist (buffer buffers)
         (kill-buffer buffer)))))
 
+(autoload 'desktop-full-lock-name "desktop")
+(autoload 'desktop-kill "desktop")
+
 (defsubst core//desktop-files ()
   (--remove (member it '("." ".."))
             (--map (file-name-nondirectory it)
@@ -258,9 +294,9 @@ directory and extension."
 ;;;###autoload
 (defun core/change-or-new-desktop ($name)
   (interactive (list (completing-read "Change to: "
-                                      (list* "Default"
+                                      (list* "default"
                                              (core//desktop-files)))))
-  (let ((new-dir (expand-file-name (if (equal $name "Default")
+  (let ((new-dir (expand-file-name (if (equal $name "default")
                                        ""
                                      $name)
                                    (expand-var! "desktop"))))
@@ -290,6 +326,6 @@ directory and extension."
       (when (equal (file-name-as-directory dir)
                    (file-name-as-directory desktop-dirname))
         (progn (desktop-change-dir default)
-               (setq core-current-desktop-name "Default")
+               (setq core-current-desktop-name "default")
                (message "Change to default desktop.")))
       (delete-directory dir t))))

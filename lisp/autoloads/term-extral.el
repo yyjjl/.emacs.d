@@ -179,6 +179,7 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
          (pos (point)))
     (and mark (>= pos mark))))
 
+;;;###autoload
 (defun term//eval-function-list (variable)
   (let ((functions (symbol-value variable))
         value)

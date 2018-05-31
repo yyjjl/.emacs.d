@@ -211,6 +211,8 @@
   ("M-s o" . core/occur-dwim)
   ("RET" . newline-and-indent)
 
+  ([C-f6] . core/display-latex-fragment-at-point)
+
   ([f10] . compile)
   ([f7] . core/create-scratch-buffer))
 

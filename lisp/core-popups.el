@@ -6,7 +6,7 @@
 
 (defvar core-popups-other-window-regexp
   (rx line-start
-      "*" (or "Man" "TeX" "Warnings") (*\? not-newline) "*"
+      "*" (or "Man" "TeX" "Shell Command Output" "Warnings") (*\? not-newline) "*"
       line-end))
 
 (defvar core-popups-help-buffer-regexp
@@ -37,9 +37,8 @@
   '(term-mode
     haskell-interactive-mode))
 (defvar core-popups-help-modes
-  '(help-mode
+  '(special-mode
     completion-list-mode
-    messages-buffer-mode
     compilation-mode
     flycheck-error-list-mode
     profiler-report-mode))

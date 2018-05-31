@@ -42,8 +42,8 @@
 
   (require 'ivy-hydra)
 
-  (add-to-list 'ivy-display-functions-alist
-               '(counsel-company . ivy-display-function-overlay))
+  ;; (add-to-list 'ivy-display-functions-alist
+  ;;              '(counsel-company . ivy-display-function-overlay))
 
   (setq ivy-dispatching-done-columns 3)
   (setq ivy-count-format "(%d/%d) ")

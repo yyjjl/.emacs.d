@@ -263,6 +263,8 @@
   ;; (display-time-mode 1)
   (transient-mark-mode 1)
   ;; (delete-selection-mode 1)
+  ;; Auto save to files
+  ;; (auto-save-visited-mode 1)
 
   ;; Restore `file-name-handler-alist'
   (setq file-name-handler-alist emacs-file-name-handler-alist

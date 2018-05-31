@@ -158,7 +158,7 @@
         elpy-modules (delete 'elpy-module-django
                              (delete 'elpy-module-flymake elpy-modules))
         elpy-test-runner 'elpy-test-pytest-runner
-        elpy-shell-echo-input nil)
+        elpy-shell-echo-input t)
 
   (define-key! :map elpy-mode-map
     ("C-c C-n" . nil)
