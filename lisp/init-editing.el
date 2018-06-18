@@ -102,7 +102,10 @@ grab matched string and insert them into `kill-ring'"
 (defun forward-sentence-or-sexp (&optional $n)
   (interactive "p")
   (if (or (derived-mode-p 'prog-mode 'latex-mode 'org-mode))
-      (forward-sexp $n)
+      (condition-case err
+          (forward-sexp $n)
+        (scan-error
+         (forward-char $n)))
     (forward-sentence $n)))
 
 (defun backward-sentence-or-sexp (&optional $n)
@@ -162,11 +165,12 @@ _=_ next    _-_ previous    ___ skip-previous  _+_ skip-next _q_ quit
   ("RET" nil)
   ("q" nil))
 
-(define-hook! core|electric-operator-setup (prog-mode-hook text-mode-hook)
+(define-hook! core|electric-operator-setup (prog-mode-hook)
   (unless (derived-mode-p 'emacs-lisp-mode
+                          'prolog-mode
                           'sh-mode
-                          'org-mode
                           'lisp-mode
+                          'racket-mode
                           'scheme-mode)
     (electric-operator-mode 1)))
 

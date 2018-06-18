@@ -62,7 +62,7 @@
     ("T" . (gud//gdb-display gdb-threads-buffer))
     ("R" . (gud//gdb-display gdb-registers-buffer))
     ("S" . (gud//gdb-display gdb-stack-buffer))
-    ("D" . (gud//gdb-display gdb-disassembly-buffer))
+    ("A" . (gud//gdb-display gdb-disassembly-buffer))
     ("m" . (gud//gdb-display gdb-memory-buffer))
     ("b" . gud-break)
     ("-" . gud-remove)
@@ -80,6 +80,8 @@
     ("r" . gud-run)
     ("C" . gud-call)
     ("p" . gud-print)
+    ("d" . gud-display)
+    ("D" . gud-display-all)
     ("*" . gud-pstar)
     ("w" . gud-watch)
     ("X" . (lambda!
@@ -138,6 +140,8 @@
   (define-key gud-mode-map (kbd "C-c C-z") #'gud/pop-to-source-buffer)
 
   (define-hook! gud|setup-hook (gud-mode-hook)
+    (gud-def gud-display "display %e" " " "Display expression")
+    (gud-def gud-display-all "display" "\C- " "Display all")
     (gud-tooltip-mode 1)
     (set-window-dedicated-p (selected-window) t)
     ;; `gud-print' need prompt can be modified

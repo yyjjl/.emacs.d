@@ -11,7 +11,7 @@
 (defvar term-goto-process-mark nil)
 (defvar-local term--ssh-info nil)
 (defvar-local term--parent-buffer nil)
-
+(defvar-local term--directly-kill-buffer-p nil)
 (defvar term-or-comint-process-exit-hook nil)
 
 (defsubst term//get-popup-window ()
@@ -25,8 +25,16 @@
     (and sentinel (funcall sentinel $proc $msg))
     (ignore-errors (run-hooks 'term-or-comint-process-exit-hook))
     (when (memq (process-status $proc) '(signal exit))
-      (let ((buffer (process-buffer $proc)))
-        (kill-buffer buffer)))))
+      (with-current-buffer (process-buffer $proc)
+        (if term--directly-kill-buffer-p
+            (kill-buffer)
+          (let ((buffer-read-only nil))
+            (insert (propertize "Press `Ctrl-D' or `q' to kill this buffer. "
+                                'font-lock-face 'font-lock-comment-face)))
+          (setq buffer-read-only t)
+          (use-local-map (copy-keymap (current-local-map)))
+          (local-set-key (kbd "C-d") (lambda! (kill-buffer)))
+          (local-set-key (kbd "q") (lambda! (kill-buffer))))))))
 
 ;; Add below code to .zshrc to make term-mode track value changes
 ;;   if [ -n "$INSIDE_EMACS" ];then
@@ -44,6 +52,11 @@
 
 (define-hook! term|utf8-setup (term-exec-hook)
   (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
+
+(defun term*eof-hack (_)
+  (setq term--directly-kill-buffer-p t))
+(advice-add 'comint-delchar-or-maybe-eof :after #'term*eof-hack)
+
 
 (define-hook! term|autoclose-buffer (comint-exec-hook)
   (let ((proc (get-buffer-process (current-buffer))))

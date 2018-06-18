@@ -100,7 +100,7 @@ read-only, and `buffer-file-coding-system'"
   (and mode-line-process (list " {" mode-line-process "}")))
 
 (defsubst mode-line//position ()
-  (propertize " L%l C%c %p %I" 'face 'font-lock-constant-face))
+  (propertize " L%l C%c %p %I " 'face 'font-lock-constant-face))
 
 (defvar mode-line--center-margin 1)
 (defvar mode-line-default-format '("%e" (:eval (mode-line//generate))))
@@ -176,8 +176,7 @@ read-only, and `buffer-file-coding-system'"
   (setq-default mode-line-buffer-identification '("%b"))
   (setq-default mode-line-misc-info
                 '((projectile-mode
-                   (""
-                    " ["
+                   ("["
                     projectile-mode-line
                     (:propertize "|" face font-lock-comment-face)
                     core-current-desktop-name

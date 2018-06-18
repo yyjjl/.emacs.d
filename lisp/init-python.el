@@ -95,6 +95,7 @@
 (define-hook! python|setup (python-mode-hook)
   ;; emacs 24.4 only
   (setq electric-indent-chars (delq ?: electric-indent-chars))
+  (electric-indent-local-mode 1)
   (unless (or (buffer-temporary?)
               (not (eq major-mode 'python-mode)))
     ;; run command `pip install jedi flake8 importmagic` in shell,
@@ -120,8 +121,11 @@
 
   (setq python-shell-prompt-detect-failure-warning nil)
 
-  (setq python-shell-interpreter "python3"
-        python-shell-interpreter-args "-i")
+  (setq python-shell-interpreter "ipython3"
+        python-shell-interpreter-args "--simple-prompt")
+
+  ;; (setq python-shell-interpreter "python3"
+  ;;       python-shell-interpreter-args "-i")
 
   (with-eval-after-load 'flycheck
     ;; (setq flycheck-python-pylint-executable "python3")
@@ -158,7 +162,7 @@
         elpy-modules (delete 'elpy-module-django
                              (delete 'elpy-module-flymake elpy-modules))
         elpy-test-runner 'elpy-test-pytest-runner
-        elpy-shell-echo-input t)
+        elpy-shell-echo-input nil)
 
   (define-key! :map elpy-mode-map
     ("C-c C-n" . nil)
@@ -212,7 +216,7 @@
   (defun python*elpy-multiedit-hack ($fn &optional $arg)
     (setq python--elpy-multiedit-buffers nil)
     (if (and (not elpy-multiedit-overlays)
-             (or $arg iedit-mode))
+             (or $arg (bound-and-true-p iedit-mode)))
         (call-interactively 'iedit-mode)
       (funcall $fn $arg)
       (dolist (ov elpy-multiedit-overlays)

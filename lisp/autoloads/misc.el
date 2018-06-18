@@ -14,7 +14,6 @@
     (shackle-display-buffer buffer nil '(:align below :size 0.4 :autoclose t))
     (with-current-buffer buffer
       (erase-buffer)
-      (setq-local mode-line-format nil)
       (insert (or (string-trim latex-fragment
                                (rx (* (any blank "\n,.!?;:")))
                                (rx (* (any blank "\n,.!?;:"))))
@@ -22,14 +21,18 @@
       (unless (eq major-mode 'org-mode)
         (org-mode))
       (org-remove-latex-fragment-image-overlays)
-      (org-toggle-latex-fragment '(16))
+      (let ((org-format-latex-options
+             (plist-put (copy-sequence org-format-latex-options) :scale 2)))
+        (org-toggle-latex-fragment '(16)))
       (when-let (window (get-buffer-window buffer))
-        (fit-window-to-buffer window 15)))
-    (set-transient-map
-     (define-key! :map (make-sparse-keymap)
-       ("C-g" . (lambda!
-                  (kill-buffer buffer)
-                  (keyboard-quit)))))))
+        (fit-window-to-buffer window 15)
+        (special-mode))
+      (setq-local mode-line-format nil))
+    (add-transient-hook! (window-configuration-change-hook
+                          :name core|display-latex-fragment-at-point-hook)
+      (when-let (window (get-buffer-window buffer))
+        (delete-window window))
+      (kill-buffer buffer))))
 
 ;;;###autoload
 (defun core/delete-this-file ()
@@ -329,3 +332,32 @@ directory and extension."
                (setq core-current-desktop-name "default")
                (message "Change to default desktop.")))
       (delete-directory dir t))))
+
+(defun rainbow-delimiters--number-to-subscript ($char $n)
+  (cond ((< $n 0))
+        ((< $n 10)
+         (list $char '(bc . tc) (+ ?₀ $n)))
+        ((< $n 100)
+         (list $char '(bc . tc) (+ ?₀ (/ $n 10)) '(bc . tc) (+ ?₀ (mod $n 10))))))
+
+(defun rainbow-delimiters--add-depth-number ($loc $depth _match)
+  (when rainbow-delimiters-count-mode
+    (let* (($char (char-after $loc)))
+      (when-let (components (rainbow-delimiters--number-to-subscript $char $depth))
+        (compose-region $loc (1+ $loc) components)))))
+
+(with-eval-after-load 'rainbow-delimiters
+  (advice-add 'rainbow-delimiters--apply-color
+              :after #'rainbow-delimiters--add-depth-number))
+
+;;;###autoload
+(define-minor-mode rainbow-delimiters-count-mode
+  "Add count below parentheses."
+  :init-value nil
+  (unless (or (bound-and-true-p rainbow-delimiters-mode)
+              (display-graphic-p))
+    (setq rainbow-delimiters-count-mode nil)
+    (error "rainbow-delimiters-mode is not enabled"))
+  (if rainbow-delimiters-count-mode
+      (setq line-spacing 0.1)
+    (setq line-spacing (default-value 'line-spacing))))

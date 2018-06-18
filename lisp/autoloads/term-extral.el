@@ -46,6 +46,7 @@ If this is nil, setup to environment variable of `SHELL'.")
     ("C-s" . swiper/dispatch)
     ("M-]" . term/switch-next)
     ("M-[" . term/switch-prev)
+    ("C-S-t" . term/pop-shell-current-directory)
     ("C-g" . keyboard-quit))
   "The key alist that will need to be bind.
 If you do not like default setup, modify it, with (KEY . COMMAND) format.")
@@ -120,13 +121,13 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
 (defun term/switch-next ($create-new)
   (interactive "P")
   (if $create-new
-      (term//pop-to-buffer (term//create-buffer))
+      (term/pop-shell-current-directory)
     (term//switch-internal 1)))
 
 (defun term/switch-prev ($create-new)
   (interactive "P")
   (if $create-new
-      (term//pop-to-buffer (term//create-buffer))
+      (term/pop-shell-current-directory)
     (term//switch-internal -1)))
 
 (defun term//terminal-exit-hook ()
@@ -298,6 +299,17 @@ If $FORCE is non-nil create a new term buffer directly."
           (set-window-buffer popup-window buffer))
       (pop-to-buffer buffer)
       (term//set-popup-window (get-buffer-window buffer)))))
+
+;;;###autoload
+(defun term/pop-shell-current-directory ()
+  (interactive)
+  (when-let ((parent-buffer (or term--parent-buffer (current-buffer)))
+             (buffer (term//create-buffer)))
+    (with-current-buffer buffer
+      (local-set-key [f8] #'term/switch-back)
+      (local-set-key (kbd "C-c C-z") #'term/switch-back-no-quit)
+      (setq term--parent-buffer parent-buffer))
+    (term//pop-to-buffer buffer)))
 
 ;;;###autoload
 (defun term/pop-shell (&optional $arg)

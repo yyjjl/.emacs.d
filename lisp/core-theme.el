@@ -48,6 +48,7 @@
 
  '(haskell-keyword-face ((t (:inherit font-lock-builtin-face))))
  '(haskell-type-face ((t (:inherit font-lock-constant-face))))
+ '(show-paren-match ((t (:background "#000000"))))
  '(haskell-constructor-face ((t (:inherit font-lock-type-face))))
 
  '(js2-external-variable ((t (:inherit font-lock-negation-char-face))))

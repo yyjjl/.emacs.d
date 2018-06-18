@@ -28,5 +28,6 @@
                                                      "\\.elc$"))
         (delete-file elc-file))
       ;; Compile all configurations
+      (package/generate-autoloads)
       (package/compile-config :nomessage))
   (error (message "Error: %s" err)))

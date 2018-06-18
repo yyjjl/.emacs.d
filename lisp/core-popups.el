@@ -6,7 +6,7 @@
 
 (defvar core-popups-other-window-regexp
   (rx line-start
-      "*" (or "Man" "TeX" "Shell Command Output" "Warnings") (*\? not-newline) "*"
+      "*" (or "Man" "TeX" "Shell Command Output") (*\? not-newline) "*"
       line-end))
 
 (defvar core-popups-help-buffer-regexp
@@ -15,7 +15,8 @@
       (or "Compile-Log"
           "sdcv"
           "lispy-message"
-          (and (*\? not-newline) (in "Hh") "elp" (*\? not-newline)))
+          (and (*\? not-newline) (in "Hh") "elp" (*\? not-newline))
+          (and (*\? not-newline) (in "Dd") "escribe" (*\? not-newline)))
       "*"
       line-end))
 
@@ -37,7 +38,8 @@
   '(term-mode
     haskell-interactive-mode))
 (defvar core-popups-help-modes
-  '(special-mode
+  '(help-mode
+    messages-buffer-mode
     completion-list-mode
     compilation-mode
     flycheck-error-list-mode
@@ -183,6 +185,7 @@
            :align below :select t :autoclose t)
           (,core-popups-other-window-regexp :regexp t :select t :autoclose t)
           (occur-mode :select t)
+          ("*Warnings*" :align below :autoclose t)
           (,core-popups-default-regexp :regexp t))))
 
 (provide 'core-popups)

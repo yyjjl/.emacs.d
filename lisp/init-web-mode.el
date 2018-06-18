@@ -9,6 +9,7 @@
 
 
 (define-hook! web|setup (web-mode-hook)
+  (highlight-indentation-mode -1)
   (add-to-list 'company-backends 'company-web-html)
   ;;     (add-to-list 'company-backends 'company-web-jade)
   ;;     (add-to-list 'company-backends 'company-web-slim)

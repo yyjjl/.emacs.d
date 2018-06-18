@@ -20,6 +20,7 @@
 ;;; Code:
 
 (eval-when-compile
+  (require 'subr-x)
   (require 'cl))
 
 (defvar core--recentf-enabled-p t)

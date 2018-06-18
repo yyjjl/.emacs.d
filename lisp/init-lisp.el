@@ -29,6 +29,7 @@
   "Enable features useful in any Lisp mode."
   (highlight-indentation-mode -1)
   (rainbow-delimiters-mode 1)
+  ;; (rainbow-delimiters-count-mode 1)
   (lispy-mode 1)
   (local-set-key (kbd "M-,") 'xref-pop-marker-stack))
 

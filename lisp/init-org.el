@@ -116,7 +116,6 @@
   ;; Various preferences
   (setq org-log-done t
         org-use-speed-commands t
-        org-completion-use-ido t
         org-edit-src-content-indentation 0
         org-edit-timestamp-down-means-later t
         org-catch-invisible-edits 'smart
@@ -136,7 +135,7 @@
         org-ellipsis "  "
         org-hide-emphasis-markers nil
         org-hide-leading-stars t
-        org-hide-block-startup t
+        org-hide-block-startup nil
         ;; org-startup-indented t
         ;; org-adapt-indentation nil
         org-startup-folded 'content
@@ -244,11 +243,6 @@
                   (concat "auto/" (file-name-base buffer-file-name) "/")))
     (auto-fill-mode -1)
     (eldoc-mode -1)
-
-    (unless (string-suffix-p "[" org-element-paragraph-separate)
-      (setq org-element-paragraph-separate
-            (concat org-element-paragraph-separate
-                    "\\|^[\t ]*\\\\\\[")))
 
     ;; Add context-sensitive completion for meta options
     (make-local-variable 'completion-at-point-functions)
@@ -369,7 +363,7 @@
           ("" "setspace,dcolumn" t)
           ("" "subfig" nil)
           ("" "hyperref" t)
-          ("" "graphicx,psfrag,epsfig" t)
+          ("" "graphicx, psfrag, epsfig" t)
           ("OT1" "fontenc" nil)
           ("" "minted" nil)
           ("" "mdframed" t)
