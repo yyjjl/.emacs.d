@@ -51,7 +51,8 @@ BUFFER-OR-NAME defaults to current buffer."
             (push (cons (overlay-start ov) (overlay-end ov)) information))
           (if information
               (progn
-                (sort information (lambda (x y) (< (cdr x) (cdr y))))
+                (setq information
+                      (sort information (lambda (x y) (< (cdr x) (cdr y)))))
                 (push (file-modification-time! filename) information)
                 (puthash filename information hs-persistent-table))
             (when (gethash filename hs-persistent-table)

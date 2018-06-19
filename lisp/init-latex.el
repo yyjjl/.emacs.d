@@ -36,6 +36,57 @@
               (re-search-forward "^texcount" nil :noerror)
               (forward-line 0))))))))
 
+(defun latex/convert-to-svg ()
+  (interactive)
+  (let* ((fn (file-name-base (buffer-file-name)))
+         (output-file (concat fn ".svg")))
+    (message (shell-command-to-string
+              (format "pdf2svg %s.pdf %s.svg" fn fn)))
+    (if (file-exists-p output-file)
+        (pop-to-buffer
+         (find-file-noselect output-file))
+      (message "Something wrong !!!"))))
+
+(defun latex/build ()
+  (interactive)
+  (reftex-parse-all)
+  (let ((TeX-save-query nil))
+    (TeX-save-document (TeX-master-file)))
+  (let ((command (if (save-excursion
+                       (goto-char 1)
+                       (search-forward-regexp
+                        "\\\\usepackage\\s-*{\\s-*minted"
+                        nil t))
+                     "XeLaTeX"
+                   TeX-command-default)))
+    (TeX-command command  'TeX-master-file -1)))
+
+(defun latex/skip-close-pair ()
+  (interactive)
+  (let ((char (char-after)))
+    (if (and (equal char (string-to-char (this-command-keys)))
+             (member char '(?\) ?\} ?\])))
+        (forward-char)
+      (self-insert-command 1))))
+
+(defun latex/force-update-style ()
+  (interactive)
+  (TeX-update-style t))
+
+(defun latex/font-bold () (interactive) (TeX-font nil ?\C-b))
+(defun latex/font-medium () (interactive) (TeX-font nil ?\C-m))
+(defun latex/font-code () (interactive) (TeX-font nil ?\C-t))
+(defun latex/font-emphasis () (interactive) (TeX-font nil ?\C-e))
+(defun latex/font-italic () (interactive) (TeX-font nil ?\C-i))
+(defun latex/font-clear () (interactive) (TeX-font nil ?\C-d))
+(defun latex/font-calligraphic () (interactive) (TeX-font nil ?\C-a))
+(defun latex/font-small-caps () (interactive) (TeX-font nil ?\C-c))
+(defun latex/font-sans-serif () (interactive) (TeX-font nil ?\C-f))
+(defun latex/font-normal () (interactive) (TeX-font nil ?\C-n))
+(defun latex/font-serif () (interactive) (TeX-font nil ?\C-r))
+(defun latex/font-oblique () (interactive) (TeX-font nil ?\C-s))
+(defun latex/font-upright () (interactive) (TeX-font nil ?\C-u))
+
 (autoload 'LaTeX-math-mode "latex" nil t)
 (define-hook! latex|setup (LaTeX-mode-hook)
   (company-auctex-init)
@@ -72,31 +123,6 @@
     (outline-minor-mode 1)))
 
 (with-eval-after-load 'tex
-  (defun latex/build ()
-    (interactive)
-    (reftex-parse-all)
-    (let ((TeX-save-query nil))
-      (TeX-save-document (TeX-master-file)))
-    (let ((command (if (save-excursion
-                         (goto-char 1)
-                         (search-forward-regexp
-                          "\\\\usepackage\\s-*{\\s-*minted"
-                          nil t))
-                       "XeLaTeX"
-                     TeX-command-default)))
-      (TeX-command command  'TeX-master-file -1)))
-
-  (defun latex/convert-to-svg ()
-    (interactive)
-    (let* ((fn (file-name-base (buffer-file-name)))
-           (output-file (concat fn ".svg")))
-      (message (shell-command-to-string
-                (format "pdf2svg %s.pdf %s.svg" fn fn)))
-      (if (file-exists-p output-file)
-          (pop-to-buffer
-           (find-file-noselect output-file))
-        (message "Something wrong !!!"))))
-
   (add-to-list
    'TeX-command-list
    '("XeLaTeX" "%`xelatex -interaction nonstopmode -shell-escape %(mode)%' %t"
@@ -115,37 +141,17 @@
         ;; Don't insert line-break at inline math
         LaTeX-fill-break-at-separators nil))
 
-(with-eval-after-load 'latex
-  (setq TeX-outline-extra nil)
-  (setq TeX-fold-command-prefix (kbd "C-c C-o"))
+(with-eval-after-load 'tex-mode
+  (dolist (key '("--" "---"))
+    (setq tex--prettify-symbols-alist
+          (delq (assoc key tex--prettify-symbols-alist)
+                tex--prettify-symbols-alist))))
 
+(with-eval-after-load 'latex
   (require 'tex-fold)
 
-  (defun latex/skip-close-pair ()
-    (interactive)
-    (let ((char (char-after)))
-      (if (and (equal char (string-to-char (this-command-keys)))
-               (member char '(?\) ?\} ?\])))
-          (forward-char)
-        (self-insert-command 1))))
-
-  (defun latex/force-update-style ()
-    (interactive)
-    (TeX-update-style t))
-
-  (defun latex/font-bold () (interactive) (TeX-font nil ?\C-b))
-  (defun latex/font-medium () (interactive) (TeX-font nil ?\C-m))
-  (defun latex/font-code () (interactive) (TeX-font nil ?\C-t))
-  (defun latex/font-emphasis () (interactive) (TeX-font nil ?\C-e))
-  (defun latex/font-italic () (interactive) (TeX-font nil ?\C-i))
-  (defun latex/font-clear () (interactive) (TeX-font nil ?\C-d))
-  (defun latex/font-calligraphic () (interactive) (TeX-font nil ?\C-a))
-  (defun latex/font-small-caps () (interactive) (TeX-font nil ?\C-c))
-  (defun latex/font-sans-serif () (interactive) (TeX-font nil ?\C-f))
-  (defun latex/font-normal () (interactive) (TeX-font nil ?\C-n))
-  (defun latex/font-serif () (interactive) (TeX-font nil ?\C-r))
-  (defun latex/font-oblique () (interactive) (TeX-font nil ?\C-s))
-  (defun latex/font-upright () (interactive) (TeX-font nil ?\C-u))
+  (setq TeX-outline-extra nil)
+  (setq TeX-fold-command-prefix (kbd "C-c C-o"))
 
   (define-key! :map TeX-fold-keymap
     ("B" . TeX-fold-buffer) ("C-b")
