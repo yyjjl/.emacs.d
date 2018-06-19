@@ -62,7 +62,8 @@
   (yas-global-mode 1)
   (global-company-mode 1)
 
-  (when (>= emacs-major-version 26)
+  (when (and (>= emacs-major-version 26)
+             (display-graphic-p))
     (company-childframe-mode 1))
 
   (which-key-mode 1)

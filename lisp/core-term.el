@@ -32,7 +32,8 @@
             (insert (propertize "Press `Ctrl-D' or `q' to kill this buffer. "
                                 'font-lock-face 'font-lock-comment-face)))
           (setq buffer-read-only t)
-          (use-local-map (copy-keymap (current-local-map)))
+          (when-let (map (current-local-map))
+            (use-local-map (copy-keymap (current-local-map))))
           (local-set-key (kbd "C-d") (lambda! (kill-buffer)))
           (local-set-key (kbd "q") (lambda! (kill-buffer))))))))
 
