@@ -6,7 +6,6 @@
  lispy
  elisp-def
  macrostep
- hl-sexp
  (racket-mode :when lisp-has-racket-p))
 
 
@@ -56,7 +55,6 @@ Emacs Lisp."
 (defun lisp|elisp-setup ()
   (lisp|common-setup)
   (flycheck-mode -1)
-  (semantic-default-elisp-setup)
 
   (unless (buffer-temporary?)
     (auto-compile-on-save-mode)
@@ -72,13 +70,6 @@ Emacs Lisp."
   (add-hook hook #'lisp|common-setup))
 
 
-
-;; Highlight current sexp. Prevent flickery behaviour due to
-;; `hl-sexp-mode' un-highlighting before each command
-(with-eval-after-load 'hl-sexp
-  (defadvice hl-sexp-mode (after unflicker (turn-on) activate)
-    (when turn-on
-      (remove-hook 'pre-command-hook #'hl-sexp-unhighlight))))
 
 (with-eval-after-load 'lisp-mode
   (require 'hippie-exp)
@@ -123,6 +114,7 @@ Emacs Lisp."
               :preselect $default)))
 
 (with-eval-after-load 'elisp-mode
+  (require 'semantic/bovine/el)
   (define-key emacs-lisp-mode-map (kbd "C-c e") 'macrostep-expand)
   (define-key lisp-interaction-mode-map (kbd "C-c e") 'macrostep-expand))
 

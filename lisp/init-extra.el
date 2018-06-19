@@ -12,7 +12,7 @@
  yaml-mode
  ;; Move buffers between windows
  buffer-move
- zeal-at-point
+ (zeal-at-point :when (display-graphic-p))
  skeletor
  slime)
 

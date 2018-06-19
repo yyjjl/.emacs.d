@@ -16,21 +16,26 @@ Archive with high priority will be used when install a package.")
   "All packages required.")
 
 ;; The index of archive represents its priority
-;; (setq package-archives
-;;       '(("melpa-stable" . "https://elpa.emacs-china.org/melpa-stable/")
-;;         ("melpa" . "https://elpa.emacs-china.org/melpa/")
-;;         ("org" . "https://orgmode.org/elpa/")
-;;         ("gnu"   . "https://elpa.emacs-china.org/gnu/")))
 (setq package-archives
       (if (gnutls-available-p)
-          '(("melpa-stable" . "https://stable.melpa.org/packages/")
-            ("melpa" . "https://melpa.org/packages/")
+          '(("melpa-stable" . "https://elpa.emacs-china.org/melpa-stable/")
+            ("melpa" . "https://elpa.emacs-china.org/melpa/")
             ("org" . "https://orgmode.org/elpa/")
-            ("gnu" . "https://elpa.gnu.org/packages/"))
-        '(("melpa-stable" . "http://stable.melpa.org/packages/")
-          ("melpa" . "http://melpa.org/packages/")
+            ("gnu" . "https://elpa.emacs-china.org/gnu/"))
+        '(("melpa-stable" . "http://elpa.emacs-china.org/melpa-stable/")
+          ("melpa" . "http://elpa.emacs-china.org/melpa/")
           ("org" . "http://orgmode.org/elpa/")
-          ("gnu" . "http://elpa.gnu.org/packages/"))))
+          ("gnu" . "http://elpa.emacs-china.org/gnu/"))))
+;; (setq package-archives
+;;       (if (gnutls-available-p)
+;;           '(("melpa-stable" . "https://stable.melpa.org/packages/")
+;;             ("melpa" . "https://melpa.org/packages/")
+;;             ("org" . "https://orgmode.org/elpa/")
+;;             ("gnu" . "https://elpa.gnu.org/packages/"))
+;;         '(("melpa-stable" . "http://stable.melpa.org/packages/")
+;;           ("melpa" . "http://melpa.org/packages/")
+;;           ("org" . "http://orgmode.org/elpa/")
+;;           ("gnu" . "http://elpa.gnu.org/packages/"))))
 
 ;; Setup to select right archive
 (setq package--priority-alist (mapcar #'car package-archives))
