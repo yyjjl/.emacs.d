@@ -314,27 +314,32 @@ If $FORCE is non-nil create a new term buffer directly."
       (setq term--parent-buffer parent-buffer))
     (term//pop-to-buffer buffer)))
 
+(defun term//pop-shell-get-buffer (&optional $arg)
+  (unless (memq major-mode '(eshell-mode term-mode shell-mode))
+    (if (file-remote-p default-directory)
+        (apply #'term/ssh (term//get-ssh-info $arg))
+      (term//local-shell (or (and (= $arg 4)
+                                  (term//eval-function-list
+                                   'term-default-directory-function-list))
+                             default-directory)
+                         (= $arg 16)))))
+
 ;;;###autoload
 (defun term/pop-shell (&optional $arg)
   "Switch to the term buffer last used, or create a new one if
 none exists, or if the current buffer is already a term."
   (interactive "p")
-  (unless (memq major-mode '(eshell-mode term-mode shell-mode))
-    (let ((buffer (if (file-remote-p default-directory)
-                      (apply #'term/ssh (term//get-ssh-info $arg))
-                    (term//local-shell
-                     (or (and (equal $arg 4)
-                              (term//eval-function-list
-                               'term-default-directory-function-list))
-                         default-directory)
-                     (equal $arg 16))))
-          (parent-buffer (current-buffer)))
-      (when buffer
-        (with-current-buffer buffer
-          (local-set-key [f8] #'term/switch-back)
-          (local-set-key (kbd "C-c C-z") #'term/switch-back-no-quit)
-          (setq term--parent-buffer parent-buffer))
-        (term//pop-to-buffer buffer)))))
+  (when-let* ((buffer (term//pop-shell-get-buffer $arg))
+              (parent-buffer (current-buffer)))
+    (with-current-buffer buffer
+      (setq term--directly-kill-buffer-p t))
+    (if (= $arg 0)
+        (switch-to-buffer buffer)
+      (with-current-buffer buffer
+        (local-set-key [f8] #'term/switch-back)
+        (local-set-key (kbd "C-c C-z") #'term/switch-back-no-quit)
+        (setq term--parent-buffer parent-buffer))
+      (term//pop-to-buffer buffer))))
 
 ;;;###autoload
 (defun term/conditional-send-raw ()

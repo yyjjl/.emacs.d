@@ -121,11 +121,11 @@
 
   (setq python-shell-prompt-detect-failure-warning nil)
 
-  (setq python-shell-interpreter "ipython3"
-        python-shell-interpreter-args "--simple-prompt")
-
-  ;; (setq python-shell-interpreter "python3"
-  ;;       python-shell-interpreter-args "-i")
+  (if python-has-ipython-p
+      (setq python-shell-interpreter "ipython3"
+            python-shell-interpreter-args "--simple-prompt")
+    (setq python-shell-interpreter "python3"
+          python-shell-interpreter-args "-i"))
 
   (with-eval-after-load 'flycheck
     ;; (setq flycheck-python-pylint-executable "python3")

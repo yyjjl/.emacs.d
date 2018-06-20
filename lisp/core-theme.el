@@ -29,7 +29,6 @@
 
  '(eldoc-highlight-function-argument
    ((t (:foreground "#86DC2F" :weight bold))))
- '(hl-sexp-face ((t (:background "gray7"))))
  '(hl-line ((t (:background "gray17"))))
 
  '(org-meta-line ((t :inherit font-lock-doc-face)))
