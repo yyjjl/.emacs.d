@@ -96,7 +96,6 @@
     ("g s" . counsel-git-stash)
     ("h" . counsel-minibuffer-history)
     ("m" . counsel-mark-ring)
-    ("a" . counsel-rg)
     ("/" . counsel-grep)
     ("L" . counsel-locate)
     ("f" . counsel-describe-face)
@@ -119,9 +118,6 @@
          ;; file names ending with # or ~
          "\\|\\(?:[#~]\\'\\)"))
 
-  (when env-has-ripgrep-p
-    (setq counsel-grep-base-command
-          "rg -M 1000 -S --no-heading --line-number --color never %s %s"))
   (ivy-set-actions
    'counsel-find-file
    `(("x"
@@ -135,8 +131,16 @@
       (setq projectile-cached-project-root nil)))
   (advice-add 'counsel-projectile :before #'counsel-projectile*hack)
 
+  (if env-has-ripgrep-p
+      (progn
+        (setq counsel-grep-base-command
+              "rg -M 1000 -S --no-heading --line-number --color never %s %s")
+        (define-key projectile-command-map "ss" 'counsel-projectile-rg)
+        (global-set-key (kbd "C-c i a") 'counsel-rg))
+    (define-key projectile-command-map "ss" 'counsel-projectile-grep)
+    (global-set-key (kbd "C-c i a") 'counsel-grep))
+
   (define-key! :map projectile-command-map
-    ("s s" . counsel-projectile-rg)
     ("s a" . counsel-projectile-ag)
     ("p" . counsel-projectile)
     ("K" . projectile-kill-buffers)
