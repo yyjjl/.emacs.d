@@ -32,6 +32,7 @@
  evil-nerd-commenter
  shackle
  hippie-exp-ext
+ electric-operator
  expand-region)
 
 (require 'core-popups)

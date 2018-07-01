@@ -32,12 +32,6 @@ The app is chosen from your OS's preference."
   (setq wdired-allow-to-change-permissions t)
   (setq dired-listing-switches "-alh")
 
-  (require 'dired-x)
-  (require 'dired+)
-  (setq dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$\\|^\\..*$"))
-
-(with-eval-after-load 'dired+
-  (diredp-toggle-find-file-reuse-dir 1)
   (define-key! :map dired-mode-map
     (")" . dired-omit-mode)
     ("E" . dired/open-externally)
@@ -45,7 +39,16 @@ The app is chosen from your OS's preference."
     ("\\" . dired-narrow)
     ("M-p" . dired-prev-subdir)
     ("M-n" . dired-next-subdir)
-    (";" . dired-kill-subdir)))
+    (";" . dired-kill-subdir))
+
+  (require 'dired-x)
+  (require 'dired+)
+  (setq dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$\\|^\\..*$"))
+
+(with-eval-after-load 'dired+
+  (remove-hook 'dired-mode-hook 'diredp-nb-marked-in-mode-name)
+  (remove-hook 'dired-readin 'diredp-nb-marked-in-mode-name)
+  (diredp-toggle-find-file-reuse-dir 1))
 
 
 (provide 'init-dired)

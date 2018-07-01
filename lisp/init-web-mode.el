@@ -10,14 +10,9 @@
 
 (define-hook! web|setup (web-mode-hook)
   (highlight-indentation-mode -1)
-  (add-to-list 'company-backends 'company-web-html)
   ;;     (add-to-list 'company-backends 'company-web-jade)
   ;;     (add-to-list 'company-backends 'company-web-slim)
-
-  (remove-hook 'yas-after-exit-snippet-hook
-               'web-mode-yasnippet-exit-hook t)
-  (remove-hook 'yas/after-exit-snippet-hook
-               'web-mode-yasnippet-exit-hook t))
+  (add-to-list 'company-backends 'company-web-html))
 
 (with-eval-after-load 'web-mode
   (setq web-mode-enable-auto-closing t) ;; Enable auto close tag in `web-mode'

@@ -47,6 +47,7 @@
 
 (define-hook! rust|setup (rust-mode-hook)
   (cargo-minor-mode 1)
+  (electric-operator-mode 1)
   (unless (or (not rust-has-rls-p)
               (buffer-temporary?)
               (file-remote-p default-directory)
@@ -92,7 +93,7 @@
       (kill-buffer buffer)
       (set-rust-backtrace "cargo run")
       (setq buffer (term//exec-program "cargo" '("run") buffer-name)))
-    (pop-to-buffer buffer)))
+    (term//pop-to-buffer buffer)))
 
 (with-eval-after-load 'rust-mode
   (require 'lsp-rust)

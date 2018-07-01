@@ -6,7 +6,6 @@
  wgrep
  picture
  ;; provide tree style search jump
- electric-operator
  avy)
 
 
@@ -122,14 +121,20 @@ grab matched string and insert them into `kill-ring'"
   (interactive "p")
   (forward-defun-or-paragraph (- $n)))
 
+(if (display-graphic-p)
+    (define-key!
+      ("M-[" . forward-defun-or-paragraph)
+      ("M-]" . backward-defun-or-paragraph))
+  (define-key!
+    ("M-{" . forward-defun-or-paragraph)
+    ("M-]" . backward-defun-or-paragraph)))
+
 (define-key!
   ("C-x , SPC" . extra/insert-space-around-chinese)
   ("M-Q" . extra/insert-space-around-chinese)
   ("M-;" . evilnc-comment-or-uncomment-lines)
   ("C-x n n" . core/narrow-or-widen-dwim)
   ("C-x K" . core/kill-regexp)
-  ("M-]" . forward-defun-or-paragraph)
-  ("M-[" . backward-defun-or-paragraph)
   ("M-e" . forward-sentence-or-sexp)
   ("M-a" . backward-sentence-or-sexp)
   ("C-M-b" . backward-sentence)
@@ -165,18 +170,6 @@ _=_ next    _-_ previous    ___ skip-previous  _+_ skip-next _q_ quit
   ("RET" nil)
   ("q" nil))
 
-(define-hook! core|electric-operator-setup (prog-mode-hook)
-  (unless (derived-mode-p 'emacs-lisp-mode
-                          'prolog-mode
-                          'sh-mode
-                          'lisp-mode
-                          'racket-mode
-                          'scheme-mode)
-    (electric-operator-mode 1)))
-
-(with-eval-after-load 'electric-operator
-  (setq electric-operator-prose-rules '(("," . ", "))))
-
 (with-eval-after-load 'multiple-cursors-core
   (require 'mc-hide-unmatched-lines-mode))
 
@@ -193,7 +186,7 @@ _=_ next    _-_ previous    ___ skip-previous  _+_ skip-next _q_ quit
   ("M-g s" . avy-goto-symbol-1)
   ("M-g w" . avy-goto-word-1)
   ("M-g y" . avy-copy-line)
-  ("M-`" . goto-next-char))
+  ("M-g `" . goto-next-char))
 (avy-setup-default)
 
 (provide 'init-editing)

@@ -125,6 +125,7 @@
         '(:index (:comments 2)
           :diagnostics (:frequencyMs 2000)
           :cacheFormat "msgpack" :completion (:detailedLabel t)))
+
   ;; (defvar cpp-cquery--semantic-highlight-timer nil)
   ;; (defvar cpp-cquery--semantic-highlight-interval 1)
   ;; (defvar cpp-cquery--semantic-highlight-params nil)

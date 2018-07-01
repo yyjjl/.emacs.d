@@ -1,25 +1,21 @@
 \documentclass[xcolor=svgnames,bigger,presentation]{beamer}
-[NO-DEFAULT-PACKAGES]
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+% default packages
+[DEFAULT-PACKAGES]
+%
+% \usepackage[utf8]{inputenc}
+% \usepackage[T1]{fontenc}
 \usepackage{fixltx2e}
-\usepackage{graphicx}
-\usepackage{longtable}
-\usepackage{rotating}
-\usepackage[normalem]{ulem}
-\usepackage{textcomp}
-\usepackage{marvosym}
-\usepackage{wasysym}
 \usepackage{booktabs}
 \usepackage{fancyvrb}
 \tolerance=1000
+%
+[PACKAGES]
 % 
 \setbeamercovered{transparent}
 \setbeamertemplate{caption}[numbered]
 \setbeamertemplate{blocks}[rounded][shadow=true]
 \usepackage{[ORG-TEMPLATE-DIR]/beamer-theme/beamerthememetropolis} %{Darmstadt}
 %
-[PACKAGES]
 \usepackage{verbatim}
 \definecolor{codeblockbg}{rgb}{0.95,0.95,0.95}
 \definecolor{linkcolor}{rgb}{0.1,0.3,0.5}

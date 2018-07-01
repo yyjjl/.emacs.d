@@ -1,5 +1,5 @@
 \usepackage{sectsty}
-[NO-DEFAULT-PACKAGES]
+[DEFAULT-PACKAGES]
 [PACKAGES]
 
 \definecolor{codeblockbg}{rgb}{0.95,0.95,0.95}

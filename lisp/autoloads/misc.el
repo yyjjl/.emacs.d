@@ -297,8 +297,7 @@ directory and extension."
 ;;;###autoload
 (defun core/change-or-new-desktop ($name)
   (interactive (list (completing-read "Change to: "
-                                      (list* "default"
-                                             (core//desktop-files)))))
+                                      (list* "default" (core//desktop-files)))))
   (let ((new-dir (expand-file-name (if (equal $name "default")
                                        ""
                                      $name)

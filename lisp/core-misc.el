@@ -134,6 +134,9 @@
   (setq fcitx-use-dbus nil)
   (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c" "C-z"))
 
+(with-eval-after-load 'electric-operator
+  (setq electric-operator-prose-rules '(("," . ", "))))
+
 ;; Smart tab
 (defvar core--indent-close-list '(?\} ?\$ ?\] ?\' ?\` ?\"))
 (defvar core--indent-compelte-functions '(hippie-expand))
@@ -206,6 +209,7 @@
   ("M-g n" . flycheck-next-error)
   ("M-g p" . flycheck-previous-error)
 
+  ("M-`" . other-frame)
   ("M-i" . iedit-mode)
   ("M-s e" . core/eval-and-replace)
   ("M-s o" . core/occur-dwim)

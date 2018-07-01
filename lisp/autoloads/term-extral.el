@@ -223,26 +223,10 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
     (list user host port (>= $arg 16))))
 
 ;;;###autoload
-(defun term//exec-program ($program $args &optional $name $sentinel)
-  (unless (featurep 'term)
-    (require 'term))
-  (unless $sentinel
-    (setq $sentinel 'term//default-sentinel))
-  (unless $name
-    (setq $name (term//get-buffer-name
-                 (concat "*" (file-name-nondirectory $program) "<%s>*"))))
-  (let ((buf (generate-new-buffer $name))
-        (parent-buf (current-buffer)))
-    (with-current-buffer buf
-      (term-mode)
-      (setq term--parent-buffer parent-buf)
-      (term-exec buf $name $program nil $args)
-      (let ((proc (get-buffer-process buf)))
-        (if (and proc (eq 'run (process-status proc)))
-            (set-process-sentinel proc $sentinel)
-          (error "Failed to invoke command")))
-      (term-char-mode))
-    buf))
+(defun term//exec-program ($program $args &optional $name)
+  (let ((term-program-switches $args)
+        (term-buffer-name $name))
+    (term//create-buffer $program)))
 
 (defun term/switch-back ()
   (interactive)

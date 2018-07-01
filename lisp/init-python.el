@@ -96,6 +96,7 @@
   ;; emacs 24.4 only
   (setq electric-indent-chars (delq ?: electric-indent-chars))
   (electric-indent-local-mode 1)
+  (electric-operator-mode 1)
   (unless (or (buffer-temporary?)
               (not (eq major-mode 'python-mode)))
     ;; run command `pip install jedi flake8 importmagic` in shell,
@@ -235,5 +236,12 @@
       (kill-buffer buffer)))
 
   (advice-add 'elpy-multiedit-stop :after #'python*elpy-multiedit-stop-hack))
+
+(with-eval-after-load 'py-autopep8
+  (defun py-autopep8 ()
+    (interactive)
+    (save-restriction
+      (widen)
+      (py-autopep8-buffer))))
 
 (provide 'init-python)

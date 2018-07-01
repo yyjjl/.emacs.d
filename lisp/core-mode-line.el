@@ -8,18 +8,21 @@
                      'face 'window-numbering-face))))
 
 (defvar-local mode-line--cached-relative-directory nil)
+(defvar-local mode-line--cached-root nil)
 (defsubst mode-line//relative-directory ()
   (or (and projectile-cached-buffer-file-name
            (equal projectile-cached-buffer-file-name (or buffer-file-name 'none))
            mode-line--cached-relative-directory)
-      (setq mode-line--cached-relative-directory
-            (let ((root (file-truename (projectile-project-root)))
-                  (directory (file-truename default-directory)))
+      (let ((root (file-truename (projectile-project-root)))
+            (directory (file-truename default-directory)))
+        (setq mode-line--cached-root (abbreviate-file-name root))
+        (setq mode-line--cached-relative-directory
               (if (and (string-prefix-p root directory) (buffer-file-name))
-                  (mapconcat
-                   (lambda (x) (if (equal x "") "" (substring x 0 1)))
-                   (split-string (substring directory (length root)) "/")
-                   "/")
+                  ;; (mapconcat
+                  ;;  (lambda (x) (if (equal x "") "" (substring x 0 1)))
+                  ;;  (split-string (substring directory (length root)) "/")
+                  ;;  "/")
+                  (substring directory (length root))
                 "")))))
 
 (defsubst mode-line//buffer-id ()
@@ -175,12 +178,12 @@ read-only, and `buffer-file-coding-system'"
   (setq-default mode-line-format mode-line-default-format)
   (setq-default mode-line-buffer-identification '("%b"))
   (setq-default mode-line-misc-info
-                '((projectile-mode
+                '((core-current-desktop-name
                    ("["
-                    projectile-mode-line
-                    (:propertize "|" face font-lock-comment-face)
-                    core-current-desktop-name
-                    "]"))
+                    (:propertize core-current-desktop-name
+                                 face font-lock-comment-face)
+                    "] "))
+                  (projectile-mode ("" mode-line--cached-root " "))
                   ;; (company-mode company-lighter)
                   (global-mode-string ("" global-mode-string " ")))))
 

@@ -4,8 +4,9 @@
         ("C-x t s" . hs-show-block)
         ("C-x t H" . hs-hide-all)
         ("C-x t S" . hs-show-all)
-        ("C-x t l" . hs-hide-level)
-        ("C-t" . hs-toggle-hiding)))
+        ("C-x t l" . hs-hide-level)))
+
+(global-set-key (kbd "C-t") 'hs-toggle-hiding)
 
 (defvar hs--headline-max-len 30
   "*Maximum length of `hs-headline' to display.")

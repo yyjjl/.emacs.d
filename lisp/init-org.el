@@ -270,13 +270,20 @@
                $justify)
           (save-excursion
             (goto-char begin)
-            (query-replace-regexp
-             (rx (group (not (any "{([" blank)))
-                 (group (or (any ?= ?- ?+ ?/ ?> ?<)
-                            (and "\\" (or "ne" "neq" "le" "ge" "cdot" "circ"))))
-                 (group (not (any ")}]" blank))))
-             "\\1 \\2 \\3"
-             nil begin end))
+            (let ((g1 '(group (not (any "{([" blank))))
+                  (g2 '(group (or (any ?= ?- ?+ ?/ ?> ?<)
+                                  (and "\\" (or "ne" "neq" "le" "ge"
+                                                "cdot" "circ" "cap" "cup"
+                                                "subset" "subsetqe" "lor"
+                                                "land" "in" "to" "rightarrow"
+                                                "Rightarrow")))))
+                  (g3 '(group (not (any ")}]" blank)))))
+              (query-replace-regexp (rx-to-string `(and ,g1 ,g2 ,g3) t)
+                                    "\\1 \\2 \\3" nil begin end)
+              (query-replace-regexp (rx-to-string `(and ,g1 ,g2 (group " ")) t)
+                                    "\\1 \\2 " nil begin end)
+              (query-replace-regexp (rx-to-string `(and (group " ") ,g2 ,g3) t)
+                                    " \\1 \\2" nil begin end)))
         (funcall $fn $justify region))
       (when (fboundp #'extra/insert-space-around-chinese)
         (ignore-errors (extra/insert-space-around-chinese begin end)))))
@@ -359,18 +366,19 @@
   (setq org-latex-prefer-user-labels t)
   (setq org-latex-default-class "cn-article")
   (setq org-latex-packages-alist
-        '(("" "ctex" nil)
-          ("" "setspace,dcolumn" t)
+        '(("" "xeCJK" t)
+          ("" "setspace, dcolumn" t)
+          ("" "booktabs, wasysym, marvosym" nil)
           ("" "subfig" nil)
-          ("" "hyperref" t)
-          ("" "graphicx, psfrag, epsfig" t)
-          ("OT1" "fontenc" nil)
+          ("" "psfrag, epsfig" t)
+          ;; ("OT1" "fontenc" nil)
           ("" "minted" nil)
           ("" "mdframed" t)
-          ("" "amsmath, amsfonts, amssymb, amsthm, bm, upgreek" t)
+          ("" "amsfonts, amsthm, bm, upgreek" t)
           ("mathscr" "eucal" t)
           ("" "geometry" t)
-          ("" "tcolorbox" t)))
+          ("" "tcolorbox" t)
+          ("" "verbatim" nil)))
   (let ((common (eval-when-compile
                   (read-file-content!
                    (expand-file-name "common" org-template-directory)))))
