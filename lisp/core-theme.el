@@ -59,6 +59,7 @@
  '(shm-current-face ((t (:inherit hl-line))))
  '(ivy-highlight-face ((t (:background "#444155"))))
  '(ivy-current-match ((t (:background "black"))))
+ '(ivy-virtual ((t (:inherit font-lock-doc-face))))
  '(window-numbering-face ((t (:background "black")))))
 
 (with-eval-after-load 'org

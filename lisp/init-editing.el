@@ -121,18 +121,18 @@ grab matched string and insert them into `kill-ring'"
   (interactive "p")
   (forward-defun-or-paragraph (- $n)))
 
-(if (display-graphic-p)
+(define-hook! core|init-keybingdings (after-init-idle-hook)
+  (when (display-graphic-p)
     (define-key!
       ("M-[" . forward-defun-or-paragraph)
-      ("M-]" . backward-defun-or-paragraph))
-  (define-key!
-    ("M-{" . forward-defun-or-paragraph)
-    ("M-]" . backward-defun-or-paragraph)))
+      ("M-]" . backward-defun-or-paragraph))))
 
 (define-key!
   ("C-x , SPC" . extra/insert-space-around-chinese)
   ("M-Q" . extra/insert-space-around-chinese)
   ("M-;" . evilnc-comment-or-uncomment-lines)
+  ("M-{" . forward-defun-or-paragraph)
+  ("M-}" . backward-defun-or-paragraph)
   ("C-x n n" . core/narrow-or-widen-dwim)
   ("C-x K" . core/kill-regexp)
   ("M-e" . forward-sentence-or-sexp)

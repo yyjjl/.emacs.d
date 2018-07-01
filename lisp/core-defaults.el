@@ -123,7 +123,7 @@
                 (file-writable-p $fn)))))
 (setq recentf-keep '(core//recentf-keep?))
 (setq recentf-max-saved-items 2048
-      recentf-exclude (list "/tmp/" "^/ssh:" "/sudo:" "\\.elc$"
+      recentf-exclude (list "/tmp/" "^/sshx?:" "/sudo:" "\\.elc$"
                             "\\.\\(gz\\|gif\\|svg\\|png\\|jpe?g\\)$" "/TAGS$"
                             (expand-file-name "~/downloads")
                             emacs-var-direcotry))

@@ -31,8 +31,7 @@
         (error (message "%s" (error-message-string err))))
       (setq-local company-transformers nil)
       (setq-local company-lsp-cache-candidates nil)
-      (add-to-list 'company-backends '(company-lsp
-                                       :with company-dabbrev-code company-dabbrev))
+      (add-to-list 'company-backends '(company-lsp :with company-dabbrev-code))
       (add-to-list 'company-backends 'company-files))))
 
 (defun cpp-cquery/create-dot-cquery ($dir)

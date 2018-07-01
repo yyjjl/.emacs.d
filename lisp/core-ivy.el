@@ -1,31 +1,29 @@
-(defun core//ivy-switch-buffer-transformer ($left-str)
+(defun core//ivy-switch-buffer-transformer ($string)
   "Transform STR to more readable format."
-  (let ((buffer (get-buffer $left-str))
-        (right-str ""))
+  (let ((buffer (get-buffer $string)))
     (cond
      (buffer
-      (setq right-str (abbreviate-file-name
-                       (buffer-local-value 'default-directory buffer))))
+      (format-line! $string
+                    (format "%s %10s"
+                            (buffer-local-value 'default-directory buffer)
+                            (propertize (format-mode-line
+                                         (buffer-local-value 'mode-name buffer))
+                                        'face font-lock-variable-name-face))))
      ((and (eq ivy-virtual-abbreviate 'full)
-           (file-name-directory $left-str))
-      (setq right-str (abbreviate-file-name
-                       (file-name-directory $left-str)))
-      (setq $left-str (propertize (file-name-nondirectory $left-str)
-                                  'face 'ivy-virtual))))
-    (format-line! $left-str right-str)))
+           (file-name-directory $string))
+      (format-line! (propertize (file-name-nondirectory $string)
+                                'face 'ivy-virtual)
+                    (file-name-directory $string)))
+     (t $string))))
 
-(defun core//counsel-bookmark-transformer ($left-str)
+(defun core//counsel-bookmark-transformer ($string)
   "Transform STR to more readable format."
-  (let ((right-str "")
-        (bm (bookmark-get-bookmark-record $left-str)))
-    (when bm
-      (setq right-str
-            (concat (file-name-nondirectory (cdr (assoc 'filename bm)))
-                    (propertize (format " [%d]"
-                                        (cdr (assoc 'position bm)))
-                                'face 'warning))))
-    (format-line! (propertize $left-str 'face 'font-lock-string-face)
-                  right-str)))
+  (format-line! (propertize $string 'face 'font-lock-string-face)
+                (when-let (bm (bookmark-get-bookmark-record $string))
+                  (concat (file-name-nondirectory (cdr (assoc 'filename bm)))
+                          (propertize (format " %10d"
+                                              (cdr (assoc 'position bm)))
+                                      'face 'warning)))))
 
 (with-eval-after-load 'ivy
   (dolist (caller '(ivy-switch-buffer

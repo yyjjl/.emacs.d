@@ -59,13 +59,13 @@
   (require 'hippie-exp-ext)
   (setq he-dabbrev-chars "0-9a-zA-Z\\?!_")
   (setq-default hippie-expand-try-functions-list
-                '(try-complete-file-name-partially
-                  try-complete-file-name
-                  try-expand-dabbrev
+                '(try-expand-dabbrev
                   try-expand-all-abbrevs
                   try-expand-dabbrev-all-buffers
                   try-expand-dabbrev-from-kill
                   try-expand-dabbrev-substring
+                  try-complete-file-name-partially
+                  try-complete-file-name
                   try-expand-dabbrev-limited-chars
                   try-expand-dabbrev-limited-chars-visible
                   try-expand-dabbrev-limited-chars-all-buffers)))
@@ -75,12 +75,12 @@
 (with-eval-after-load 'projectile
   ;; Projectile root-searching functions can cause an infinite loop on TRAMP
   ;; connections, so disable them.
-  (defun doom*projectile-locate-dominating-file ($fn &rest $args)
+  (defun core*projectile-locate-dominating-file ($fn &rest $args)
     "Don't traverse the file system if on a remote connection."
     (unless (file-remote-p default-directory)
       (apply $fn $args)))
   (advice-add #'projectile-locate-dominating-file
-              :around #'doom*projectile-locate-dominating-file)
+              :around #'core*projectile-locate-dominating-file)
   (setq projectile-mode-line
         '(:eval (and buffer-file-name (projectile-project-name))))
   (setq projectile-require-project-root nil)
@@ -117,6 +117,7 @@
 
 ;; `tramp' setup
 (with-eval-after-load 'tramp
+  (setq tramp-terminal-type "tramp")
   (setq tramp-default-method "ssh")
   (setq backup-enable-predicate
         (lambda (name)

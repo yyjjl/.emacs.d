@@ -18,11 +18,11 @@
         (setq mode-line--cached-root (abbreviate-file-name root))
         (setq mode-line--cached-relative-directory
               (if (and (string-prefix-p root directory) (buffer-file-name))
-                  ;; (mapconcat
-                  ;;  (lambda (x) (if (equal x "") "" (substring x 0 1)))
-                  ;;  (split-string (substring directory (length root)) "/")
-                  ;;  "/")
-                  (substring directory (length root))
+                  (mapconcat
+                   (lambda (x) (if (equal x "") "" (substring x 0 1)))
+                   (split-string (substring directory (length root)) "/")
+                   "/")
+                ;; (substring directory (length root))
                 "")))))
 
 (defsubst mode-line//buffer-id ()
