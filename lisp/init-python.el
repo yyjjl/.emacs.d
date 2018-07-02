@@ -97,6 +97,11 @@
   (setq electric-indent-chars (delq ?: electric-indent-chars))
   (electric-indent-local-mode 1)
   (electric-operator-mode 1)
+
+  (when (file-remote-p default-directory)
+    (setq-local python-shell-interpreter "python3")
+    (setq-local python-shell-interpreter-args "-i"))
+
   (unless (or (buffer-temporary?)
               (not (eq major-mode 'python-mode)))
     ;; run command `pip install jedi flake8 importmagic` in shell,

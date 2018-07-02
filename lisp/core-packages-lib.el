@@ -121,8 +121,9 @@ Archive with high priority will be used when install a package.")
                   (nconc (nreverse compile-form) compile-forms))))))
     `(progn
        ,@(nreverse forms)
-       (eval-when-compile
-         ,@(nreverse compile-forms)))))
+       (ignore-errors
+         (eval-when-compile
+           ,@(nreverse compile-forms))))))
 
 (defun package/generate-autoloads ()
   (interactive)

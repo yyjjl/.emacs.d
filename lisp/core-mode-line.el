@@ -178,11 +178,7 @@ read-only, and `buffer-file-coding-system'"
   (setq-default mode-line-format mode-line-default-format)
   (setq-default mode-line-buffer-identification '("%b"))
   (setq-default mode-line-misc-info
-                '((core-current-desktop-name
-                   ("["
-                    (:propertize core-current-desktop-name
-                                 face font-lock-comment-face)
-                    "] "))
+                '((core-current-desktop-name ("[" core-current-desktop-name "] "))
                   (projectile-mode ("" mode-line--cached-root " "))
                   ;; (company-mode company-lighter)
                   (global-mode-string ("" global-mode-string " ")))))
