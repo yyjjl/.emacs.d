@@ -29,6 +29,25 @@ will close some features to speed up emacs performance")
 
 (defvar after-init-idle-hook nil)
 
+(setvar!
+ ;; Use `xsel' to copy/paste in terminal thoungh system clipboard
+ env-has-xsel-p (executable-find "xsel")
+ ;; Whether to use X input method `fcitx'
+ env-has-fcitx-p (executable-find "fcitx")
+ ;; In order to use `emms' package, you need a music player
+ env-has-mpv-p (executable-find "mplayer")
+ env-has-ripgrep-p (executable-find "rg")
+ ;; Whether has `git'
+ env-has-git-p (executable-find "git")
+ ;; Only one of `aspell' and `hunspell' is needed Use for spellcheck
+ env-has-aspell-p (executable-find "aspell")
+ ;; Use for spellcheck
+ env-has-hunspell-p (executable-find "hunspell")
+ ;; Tag multiple languages
+ env-has-gtags-p (executable-find "global")
+ ;; Whether to use latex packages
+ env-has-latex-p (executable-find "xelatex"))
+
 (unless (file-exists-p emacs-var-direcotry)
   (make-directory emacs-var-direcotry))
 
@@ -77,61 +96,61 @@ will close some features to speed up emacs performance")
   (setq url-configuration-directory (expand-var! "url/")))
 
 (add-auto-mode! 'conf-mode
-               "\\.[^b][^a][a-zA-Z]*rc$"
-               "\\.aspell\\.en\\.pws\\'"
-               "\\.meta\\'"
-               "\\.?muttrc\\'"
-               "\\.ctags\\'"
-               "\\.mailcap\\'")
+  "\\.[^b][^a][a-zA-Z]*rc$"
+  "\\.aspell\\.en\\.pws\\'"
+  "\\.meta\\'"
+  "\\.?muttrc\\'"
+  "\\.ctags\\'"
+  "\\.mailcap\\'")
 
 (add-auto-mode! 'groovy-mode
-               "\\.groovy\\'"
-               "\\.gradle\\'")
+  "\\.groovy\\'"
+  "\\.gradle\\'")
 
 (add-auto-mode! 'crontab-mode
-               "\\.?cron\\(tab\\)?\\'")
+  "\\.?cron\\(tab\\)?\\'")
 
 ;; cmake
 (add-auto-mode! 'cmake-mode
-               "CMakeLists\\.txt\\'"
-               "\\.cmake\\'")
+  "CMakeLists\\.txt\\'"
+  "\\.cmake\\'")
 ;; markdown
 (add-auto-mode! 'markdown-mode
-               "\\.\\(md\\|markdown\\)\\'")
+  "\\.\\(md\\|markdown\\)\\'")
 
 (add-auto-mode! 'emacs-lisp-mode
-               "\\.emacs-project\\'"
-               "archive-contents\\'")
+  "\\.emacs-project\\'"
+  "archive-contents\\'")
 
-(add-auto-mode! 'js-mode "\\.jason\\'" "\\.jshintrc\\'")
-(add-auto-mode! 'js2-mode "\\.js\\(\\.erb\\)?\\'")
-(add-auto-mode! 'js2-jsx-mode "\\.jsx?\\'")
+;; (add-auto-mode! 'js2-mode "\\.jason\\'" "\\.jshintrc\\'")
+;; (add-auto-mode! 'js2-mode "\\.js\\(\\.erb\\)?\\'")
+;; (add-auto-mode! 'js2-jsx-mode "\\.jsx?\\'")
 
 (add-auto-mode! 'sh-mode
-               "\\.basj_profile\\'" "\\.bash_history\\'"
-               "\\.sh\\'" "\\.bash\\'" "\\.bashrc.local\\'"
-               "\\.zsh\\'" "\\.bashrc\\'" "\\.zshrc\\'")
+  "\\.basj_profile\\'" "\\.bash_history\\'"
+  "\\.sh\\'" "\\.bash\\'" "\\.bashrc.local\\'"
+  "\\.zsh\\'" "\\.bashrc\\'" "\\.zshrc\\'")
 
 (add-auto-mode! 'web-mode
-               "\\.phtml\\'" "\\.cmp\\'" "\\.app\\'"
-               "\\.page\\'" "\\.component\\'"
-               "\\.wp\\'" "\\.tmpl\\'" "\\.php\\'"
-               "\\.module\\'" "\\.inc\\'" "\\.hbs\\'"
-               "\\.tpl\\'" "\\.[gj]sp\\'" "\\.as[cp]x\\'"
-               "\\.erb\\'" "\\.mustache\\'"
-               "\\.djhtml\\'" "\\.ftl\\'"
-               "\\.html?\\'" "\\.xul?\\'" "\\.eex?\\'"
-               "\\.xml?\\'")
+  "\\.phtml\\'" "\\.cmp\\'" "\\.app\\'"
+  "\\.page\\'" "\\.component\\'"
+  "\\.wp\\'" "\\.tmpl\\'" "\\.php\\'"
+  "\\.module\\'" "\\.inc\\'" "\\.hbs\\'"
+  "\\.tpl\\'" "\\.[gj]sp\\'" "\\.as[cp]x\\'"
+  "\\.erb\\'" "\\.mustache\\'"
+  "\\.djhtml\\'" "\\.ftl\\'"
+  "\\.html?\\'" "\\.xul?\\'" "\\.eex?\\'"
+  "\\.xml?\\'")
 
 (add-auto-mode! 'glsl-mode
-               "\\.glsl\\'" "\\.vert\\'"
-               "\\.frag\\'" "\\.geom\\'")
+  "\\.glsl\\'" "\\.vert\\'"
+  "\\.frag\\'" "\\.geom\\'")
 
 (add-auto-mode! 'latex-mode "\\.tikz\\'")
 
 (setcdr (assoc-string "\\.[tT]e[xX]\\'" auto-mode-alist) 'latex-mode)
 
-(add-to-list 'interpreter-mode-alist '("node" . js2-mode))
-(add-to-list 'interpreter-mode-alist '("python" .   python-mode))
+(add-to-list 'interpreter-mode-alist '("node" . js-mode))
+(add-to-list 'interpreter-mode-alist '("python" . python-mode))
 
 (provide 'core-vars)

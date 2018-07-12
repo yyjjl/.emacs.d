@@ -19,7 +19,7 @@
 (defun counsel//semantic-or-imenu--relative-buffers ($buffer)
   (let* ((projectile-require-project-root nil)
          (project-buffers (ignore-errors (projectile-project-buffers))))
-    (loop for buffer in (buffer-list)
+    (cl-loop for buffer in (buffer-list)
           when (or (eq $buffer buffer)
                    (and (buffer-file-name buffer)
                         (or (eq (buffer-local-value 'major-mode buffer)
@@ -28,7 +28,7 @@
           collect buffer)))
 
 (defun counsel//semantic-or-imenu--candidates ($buffers)
-  (loop for buffer in $buffers
+  (cl-loop for buffer in $buffers
         nconc
         (mapcar
          (lambda ($candidate)

@@ -3,7 +3,7 @@
          python-has-pylint-path (executable-find "pylint"))
 
 (require-packages!
- (elpy :archive "melpa-stable")
+ elpy
  gud
  py-autopep8
  py-isort)
@@ -95,7 +95,6 @@
 (define-hook! python|setup (python-mode-hook)
   ;; emacs 24.4 only
   (setq electric-indent-chars (delq ?: electric-indent-chars))
-  (electric-indent-local-mode 1)
   (electric-operator-mode 1)
 
   (when (file-remote-p default-directory)

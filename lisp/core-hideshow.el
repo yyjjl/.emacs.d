@@ -17,7 +17,7 @@
 (defvar hs-persistent-table (make-hash-table :test #'equal))
 
 (defun hs//get-overlays ()
-  (loop for overlay in (overlays-in (point-min) (point-max))
+  (cl-loop for overlay in (overlays-in (point-min) (point-max))
         when (overlay-get overlay 'hs)
         collect overlay))
 
@@ -75,7 +75,7 @@ BUFFER-OR-NAME defaults to current buffer."
                                           mtime)
                                    (cdr information))))
             (save-excursion
-              (loop for (beg . end) in regions
+              (cl-loop for (beg . end) in regions
                     do (progn
                          (goto-char beg)
                          (hs-hide-block))))))))))

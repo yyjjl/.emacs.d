@@ -3,12 +3,7 @@
   (let ((buffer (get-buffer $string)))
     (cond
      (buffer
-      (format-line! $string
-                    (format "%s %10s"
-                            (buffer-local-value 'default-directory buffer)
-                            (propertize (format-mode-line
-                                         (buffer-local-value 'mode-name buffer))
-                                        'face font-lock-variable-name-face))))
+      (format-line! $string (buffer-local-value 'default-directory buffer)))
      ((and (eq ivy-virtual-abbreviate 'full)
            (file-name-directory $string))
       (format-line! (propertize (file-name-nondirectory $string)

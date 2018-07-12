@@ -255,7 +255,7 @@
   ;; Auto insert closing pair
   (electric-pair-mode 1)
   (electric-layout-mode 1)
-  (electric-indent-mode -1)
+  (electric-indent-mode 1)
 
   ;; Keep mouse at upper-right corner when typing
   ;; (mouse-avoidance-mode 'banish)

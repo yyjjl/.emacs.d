@@ -5,7 +5,7 @@
  (flycheck :archive "melpa-stable")
  ;; Code completion framework
  company
- ;; (company-childframe :when (>= emacs-major-version 26))
+ (company-posframe :when (>= emacs-major-version 26))
  company-statistics
  ;; Save session to disk
  session
@@ -63,9 +63,9 @@
   (yas-global-mode 1)
   (global-company-mode 1)
 
-  ;; (when (and (>= emacs-major-version 26)
-  ;;            (display-graphic-p))
-  ;;   (company-childframe-mode 1))
+  (when (and (>= emacs-major-version 26)
+             (display-graphic-p))
+    (company-posframe-mode 1))
 
   (which-key-mode 1)
 

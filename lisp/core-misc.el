@@ -12,7 +12,7 @@
 
 (with-eval-after-load 'desktop
   (advice-add 'desktop-save :around #'core*desktop-save-unless-loaded)
-  (dolist (mode '(company-childframe-mode
+  (dolist (mode '(company-posframe-mode
                   orgtbl-mode
                   hs-minor-mode
                   auto-revert-mode))
@@ -23,7 +23,7 @@
     ;; Setup default bookmark
     (setq bookmark-current-bookmark
           (ignore-errors
-            (loop for (name . record) in bookmark-alist
+            (cl-loop for (name . record) in bookmark-alist
                   when (equal (file-truename (buffer-file-name))
                               (file-truename (bookmark-get-filename name)))
                   do (return name)))))
@@ -73,7 +73,7 @@
 (setq projectile-keymap-prefix (kbd "C-x p"))
 
 (with-eval-after-load 'projectile
-  ;; Projectile root-searching functions can cause an infinite loop on TRAMP
+  ;; Projectile root-searching functions can cause an infinite cl-loop on TRAMP
   ;; connections, so disable them.
   (defun core*projectile-locate-dominating-file ($fn &rest $args)
     "Don't traverse the file system if on a remote connection."

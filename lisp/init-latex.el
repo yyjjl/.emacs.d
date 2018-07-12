@@ -156,7 +156,7 @@
     ("]" . latex/skip-close-pair)
     ("C-c b" . latex/build)
     ("C-c h" . TeX-doc)
-    ("C-c C-." . latex/force-update-style)
+    ("C-c C-u" . latex/force-update-style)
     ("C-c s" . LaTeX-section)
     ("C-c e" . LaTeX-environment)
     ("C-c x" . TeX-font)

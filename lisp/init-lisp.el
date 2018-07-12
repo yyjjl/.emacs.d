@@ -127,8 +127,4 @@ Emacs Lisp."
       (funcall $fn $symbol)))
   (advice-add 'lispy-goto-symbol :around #'lisp*goto-symbol-hack))
 
-(define-key!
-  ([remap move-beginning-of-line] . lispy-move-beginning-of-line)
-  ([remap back-to-indentation] . mark-sexp))
-
 (provide 'init-lisp)

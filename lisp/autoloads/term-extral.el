@@ -1,11 +1,21 @@
+;;; -*- lexical-binding: t; -*-
+
 ;; Kill the buffer when terminal is exited
 ;;;###autoload
 (defvar term-default-directory-function-list '(projectile-project-root))
 ;;;###autoload
 (defvar term-default-environment-function-list nil)
 
-(defvar term-program-switches nil)
 (defvar term--buffer-list nil)
+(defvar-local term--ssh-info nil)
+(defvar-local term--parent-buffer nil)
+
+;;;###autoload
+(defvar-local term-directly-kill-buffer nil)
+;;;###autoload
+(defvar term-or-comint-process-exit-hook nil)
+
+(defvar term-program-switches nil)
 (defvar term-default-directory "~/")
 (defvar term-shell-name (or term-zsh-path term-bash-path)
   "The program of term.
@@ -17,7 +27,7 @@ If this is nil, setup to environment variable of `SHELL'.")
   "The key list that will need to be unbind.")
 
 (defvar term-bind-key-alist
-  '(("C-c C-c" . term-interrupt-subjob)
+  `(("C-c C-c" . term-interrupt-subjob)
     ("C-c C-e" . term/send-esc)
     ("C-c C-p" . term/previous-line)
     ;; ("C-n" . next-line)
@@ -44,8 +54,13 @@ If this is nil, setup to environment variable of `SHELL'.")
     ("M-d" . term/send-delete-word)
     ("M-," . term-send-raw)
     ("C-s" . swiper/dispatch)
-    ("M-]" . term/switch-next)
-    ("M-[" . term/switch-prev)
+    ,@(if (display-graphic-p)
+          '(("M-]" . term/switch-next)
+            ("M-[" . term/switch-prev)
+            ("M-}" . term/switch-next)
+            ("M-{" . term/switch-prev))
+        '(("M-}" . term/switch-next)
+          ("M-{" . term/switch-prev)))
     ("C-S-t" . term/pop-shell-current-directory)
     ("C-g" . keyboard-quit))
   "The key alist that will need to be bind.
@@ -83,6 +98,24 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
       (setq name (format $fmt index))
       (setq index (1+ index)))
     name))
+
+;;;###autoload
+(defsubst term//wrap-sentinel (&optional sentinel)
+  (lambda ($proc $msg)
+    (and sentinel (funcall sentinel $proc $msg))
+    (ignore-errors (run-hooks 'term-or-comint-process-exit-hook))
+    (when (memq (process-status $proc) '(signal exit))
+      (with-current-buffer (process-buffer $proc)
+        (if term-directly-kill-buffer
+            (kill-buffer)
+          (let ((buffer-read-only nil))
+            (insert (propertize "Press `Ctrl-D' or `q' to kill this buffer. "
+                                'font-lock-face 'font-lock-comment-face)))
+          (setq buffer-read-only t)
+          (when-let (map (current-local-map))
+            (use-local-map (copy-keymap (current-local-map))))
+          (local-set-key (kbd "C-d") (lambda! (kill-buffer)))
+          (local-set-key (kbd "q") (lambda! (kill-buffer))))))))
 
 (defun term//setup-keybindings ()
   (let (bind-key bind-command)
@@ -193,16 +226,16 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
 (defsubst term//extra-env ()
   (term//eval-function-list 'term-default-environment-function-list))
 
-(defun term//default-sentinel (proc msg)
-  (term-sentinel proc msg)
-  (when (memq (process-status proc) '(signal exit))
-    (with-current-buffer (process-buffer proc)
-      (let ((buffer-read-only nil))
-        (insert (propertize "Press `Ctrl-D' or `q' to kill this buffer. "
-                            'font-lock-face 'font-lock-comment-face)))
-      (setq buffer-read-only t)
-      (local-set-key (kbd "C-d") (lambda! (kill-buffer)))
-      (local-set-key (kbd "q") (lambda! (kill-buffer))))))
+;; (defun term//default-sentinel (proc msg)
+;;   (term-sentinel proc msg)
+;;   (when (memq (process-status proc) '(signal exit))
+;;     (with-current-buffer (process-buffer proc)
+;;       (let ((buffer-read-only nil))
+;;         (insert (propertize "Press `Ctrl-D' or `q' to kill this buffer. "
+;;                             'font-lock-face 'font-lock-comment-face)))
+;;       (setq buffer-read-only t)
+;;       (local-set-key (kbd "C-d") (lambda! (kill-buffer)))
+;;       (local-set-key (kbd "q") (lambda! (kill-buffer))))))
 
 (defun term//get-ssh-info ($arg)
   (let* ((user (file-remote-p default-directory 'user))
@@ -273,6 +306,13 @@ If $FORCE is non-nil create a new term buffer directly."
         (with-temp-env! (term//extra-env)
           (term//create-buffer)))))
 
+(defsubst term//get-popup-window ()
+  (frame-parameter nil 'term-popup-window))
+
+(defsubst term//set-popup-window (popup-window)
+  (set-window-dedicated-p popup-window t)
+  (set-frame-parameter nil 'term-popup-window popup-window))
+
 ;;;###autoload
 (defun term//pop-to-buffer (buffer)
   (let ((popup-window (term//get-popup-window)))
@@ -293,6 +333,7 @@ If $FORCE is non-nil create a new term buffer directly."
   (when-let ((parent-buffer (or term--parent-buffer (current-buffer)))
              (buffer (term//create-buffer)))
     (with-current-buffer buffer
+      (setq term-directly-kill-buffer t)
       (local-set-key [f8] #'term/switch-back)
       (local-set-key (kbd "C-c C-z") #'term/switch-back-no-quit)
       (setq term--parent-buffer parent-buffer))
@@ -316,7 +357,7 @@ none exists, or if the current buffer is already a term."
   (when-let* ((buffer (term//pop-shell-get-buffer $arg))
               (parent-buffer (current-buffer)))
     (with-current-buffer buffer
-      (setq term--directly-kill-buffer-p t))
+      (setq term-directly-kill-buffer t))
     (if (= $arg 0)
         (switch-to-buffer buffer)
       (with-current-buffer buffer

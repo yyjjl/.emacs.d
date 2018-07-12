@@ -124,8 +124,8 @@ grab matched string and insert them into `kill-ring'"
 (define-hook! core|init-keybingdings (after-init-idle-hook)
   (when (display-graphic-p)
     (define-key!
-      ("M-[" . forward-defun-or-paragraph)
-      ("M-]" . backward-defun-or-paragraph))))
+      ("M-]" . forward-defun-or-paragraph)
+      ("M-[" . backward-defun-or-paragraph))))
 
 (define-key!
   ("C-x , SPC" . extra/insert-space-around-chinese)

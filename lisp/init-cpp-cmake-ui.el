@@ -193,6 +193,8 @@
     (widget-setup)
     (local-set-key (kbd "C-x C-s")
                    (lambda! (widget-apply cpp-cmake--save-button :notify)))
+    (local-set-key (kbd "q")
+                   (lambda! (kill-this-buffer)))
     (goto-char (min old-point (point-max)))))
 
 (provide 'init-cpp-cmake-ui)
