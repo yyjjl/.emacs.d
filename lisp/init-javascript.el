@@ -66,14 +66,15 @@
 (with-eval-after-load 'js-mode
   (require 'lsp-javascript-typescript))
 
-(define-hook! js|setup (js-mode-hook)
+(define-hook! js|setup (js-mode-hook
+                        typescript-mode-hook)
   ;; (js2-imenu-extras-mode)
 
   ;; (js2-mode-toggle-warnings-and-errors)
   ;; (electric-operator-mode 1)
-  ;; (unless (buffer-temporary?)
-  ;;   (lsp-javascript-typescript-enable)
-  ;;   (add-to-list 'company-backends 'company-lsp))
+  (unless (buffer-temporary?)
+    (lsp-javascript-typescript-enable)
+    (add-to-list 'company-backends 'company-lsp))
 
   (setq-local electric-layout-rules
               (delq (assoc ?\; electric-layout-rules)

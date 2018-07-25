@@ -133,6 +133,11 @@
   (setq magit-completing-read-function 'ivy-completing-read)
   (require 'magit-autorevert))
 
+(with-eval-after-load 'magit-files
+  (define-key! :map magit-file-mode-map
+    ("C-x g g" . magit-status)
+    ("C-x g")))
+
 
 (define-hook! (git|message-kill-commit-id msg)
   (git-messenger:after-popup-hook)
@@ -152,7 +157,6 @@
   ("l" . git-link)
   ("c" . git-link-commit)
   ("m" . git-messenger:popup-message)
-  ("g" . magit-status)
   ("b" . magit-checkout))
 
 

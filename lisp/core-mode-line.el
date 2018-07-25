@@ -41,44 +41,48 @@
   "Display buffer major mode in mode-line."
   '(:propertize mode-name face font-lock-builtin-face))
 
+(autoload 'image-get-display-property "image-mode" nil)
+
+(defvar mode-line-multi-edit-alist
+  '((iedit-mode . (iedit-counter))
+    (multiple-cursors-mode . (mc/num-cursors))
+    (elpy-multiedit-overlays . (length elpy-multiedit-overlays))))
+
 (defsubst mode-line//buffer-status ()
   "Display buffer status.
 
 Whether it is temporary file, whether it is modified, whether is
 read-only, and `buffer-file-coding-system'"
   (list " ("
-        (when (bound-and-true-p iedit-mode)
-          (propertize (format "IE:%d " (iedit-counter))
-                      'face font-lock-constant-face))
-        (when (bound-and-true-p multiple-cursors-mode)
-          (propertize (format "MC:%d " (mc/num-cursors))
-                      'face font-lock-constant-face))
-        (when (and (boundp 'text-scale-mode-amount)
-                   (/= text-scale-mode-amount 0))
+        (cl-loop for (symbol . expr) in mode-line-multi-edit-alist
+                 when (and (boundp symbol) (symbol-value symbol))
+                 do (when-let (count (eval expr))
+                      (return (propertize (format ":%d " count)
+                                          'face font-lock-constant-face))))
+        (when (and (boundp 'text-scale-mode-amount) (/= text-scale-mode-amount 0))
           (propertize (format "%+d " text-scale-mode-amount)
                       'face font-lock-doc-face))
         (when (or defining-kbd-macro executing-kbd-macro)
-          (propertize "Macro " 'face font-lock-variable-name-face))
+          (propertize "macro " 'face font-lock-variable-name-face))
         (when (buffer-temporary?)
-          (propertize "Tmp " 'face font-lock-comment-face))
+          (propertize "tmp " 'face font-lock-comment-face))
         (when (buffer-modified-p)
-          (propertize "Mod " 'face font-lock-negation-char-face))
-        (when (buffer-base-buffer) "I ")
+          (propertize "mod " 'face font-lock-negation-char-face))
         (when buffer-read-only
-          (propertize "RO " 'face font-lock-string-face))
+          (propertize "ro " 'face font-lock-string-face))
         (when visual-line-mode
-          (propertize "V " 'face font-lock-type-face))
+          (propertize "v " 'face font-lock-type-face))
+        (when (buffer-base-buffer) "I ")
         (when (eq major-mode 'image-mode)
           (cl-destructuring-bind (width . height)
               (image-size (image-get-display-property) :pixels)
             (format "%dx%d " width height)))
         (let ((buffer-encoding (format "%s" buffer-file-coding-system)))
-          (capitalize (if (string-match "\\(dos\\|unix\\|mac\\)" buffer-encoding)
-                          (match-string 1 buffer-encoding)
-                        buffer-encoding)))
+          (if (string-match "\\(dos\\|unix\\|mac\\)" buffer-encoding)
+              (match-string 1 buffer-encoding)
+            buffer-encoding))
         ")"))
 
-(autoload 'image-get-display-property "image-mode" nil)
 (defsubst mode-line//flycheck ()
   "Display flycheck status in mode-line."
   (and (bound-and-true-p flycheck-mode)
@@ -92,10 +96,10 @@ read-only, and `buffer-file-coding-system'"
           (`interrupted (propertize "Interrupted" 'face 'flycheck-fringe-warning))
           (`suspicious (propertize "???" 'face 'flycheck-fringe-error))
           (`finished (let-alist (flycheck-count-errors flycheck-current-errors)
-                       (concat (propertize (format "E%s" (or .error 0))
+                       (concat (propertize (format "%s" (or .error 0))
                                            'face 'flycheck-fringe-error)
-                               " "
-                               (propertize (format "W%s" (or .warning 0))
+                               ":"
+                               (propertize (format "%s" (or .warning 0))
                                            'face 'flycheck-fringe-warning))))))))
 
 (defsubst mode-line//process ()
@@ -103,7 +107,7 @@ read-only, and `buffer-file-coding-system'"
   (and mode-line-process (list " {" mode-line-process "}")))
 
 (defsubst mode-line//position ()
-  (propertize " L%l C%c %p %I " 'face 'font-lock-constant-face))
+  (propertize " %l:%c %p %I " 'face 'font-lock-constant-face))
 
 (defvar mode-line--center-margin 1)
 (defvar mode-line-default-format '("%e" (:eval (mode-line//generate))))

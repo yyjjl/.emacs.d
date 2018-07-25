@@ -174,7 +174,7 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
                  (equal window (term//get-popup-window)))
         (quit-window nil window)))))
 
-(defun term//create-buffer (&optional $shell-program)
+(defun term//create-buffer (&optional $shell-program $shell-buffer-p)
   "Get term buffer.
 If option SPECIAL-SHELL is `non-nil', will use shell from user input."
   (let ((shell-name (or $shell-program
@@ -201,9 +201,10 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
               term-scroll-to-bottom-on-output t)
         (-when-let (proc (ignore-errors (get-buffer-process buffer)))
           (set-process-sentinel proc (term//wrap-sentinel (process-sentinel proc))))
-        (add-hook 'term-or-comint-process-exit-hook
-                  'term//terminal-exit-hook
-                  nil :local))
+        (when $shell-buffer-p
+          (add-hook 'term-or-comint-process-exit-hook
+                    'term//terminal-exit-hook
+                    nil :local)))
       buffer)))
 
 
@@ -304,7 +305,7 @@ If $FORCE is non-nil create a new term buffer directly."
                           (buffer-list))))
       (let ((default-directory $directory))
         (with-temp-env! (term//extra-env)
-          (term//create-buffer)))))
+          (term//create-buffer nil t)))))
 
 (defsubst term//get-popup-window ()
   (frame-parameter nil 'term-popup-window))
@@ -331,7 +332,7 @@ If $FORCE is non-nil create a new term buffer directly."
 (defun term/pop-shell-current-directory ()
   (interactive)
   (when-let ((parent-buffer (or term--parent-buffer (current-buffer)))
-             (buffer (term//create-buffer)))
+             (buffer (term//create-buffer nil t)))
     (with-current-buffer buffer
       (setq term-directly-kill-buffer t)
       (local-set-key [f8] #'term/switch-back)

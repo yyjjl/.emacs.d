@@ -1,3 +1,7 @@
+(eval-when-compile
+  (require 'subr-x)
+  (require 'cl))
+
 ;;* Load Path
 ;; Add site-package's path to `load-path'
 (when (fboundp 'normal-top-level-add-to-load-path)

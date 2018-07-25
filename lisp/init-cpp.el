@@ -75,7 +75,7 @@
 (defun cpp//common-cc-setup ()
   "Setup shared by all languages (java/groovy/c++ ...)"
   (highlight-indentation-mode 1)
-  (electric-operator-mode 1)
+  ;; (electric-operator-mode 1)
   (electric-indent-local-mode -1)
   ;; (turn-on-auto-fill)
   (google-set-c-style)
@@ -171,7 +171,7 @@
     (message "Buffer has no file !"))
    (t
     (let* ((file (buffer-file-name))
-           (buffer-name (format "*root:%s*" (buffer-name)))
+           (buffer-name (format "root:%s" (buffer-name)))
            (buffer (get-buffer-create buffer-name))
            (proc (get-buffer-process buffer)))
       (unless (and proc

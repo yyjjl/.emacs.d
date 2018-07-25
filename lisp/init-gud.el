@@ -1,38 +1,33 @@
 (require-packages! gud gdb-mi)
 
-(defvar gdb--info-window nil)
+(defvar gdb--side-window nil)
+(defvar gdb-side-window-height 15)
 (defvar gud--window-configuration nil)
 (defvar-local gud--source-buffer-status nil)
 (defvar-local gud--source-buffer-list nil)
 
-(defmacro gud//gdb-display ($type)
-  (let ((name (intern (format "gud/display-%s" $type))))
-    `(progn
-       (defun ,name (&optional $no-select)
-         (interactive "P")
-         (let ((old-win (selected-window))
-               (buffer (gdb-get-buffer-create ',$type)))
-           (unless (window-live-p gdb--info-window)
-             (when-let ((comint-buffer gud-comint-buffer)
-                        (win (get-buffer-window comint-buffer)))
-               (with-selected-window win
-                 (setq gdb--info-window
-                       (split-window-vertically -10)))))
-           (if (window-live-p gdb--info-window)
-               (progn
-                 (with-selected-window gdb--info-window
-                   (set-window-dedicated-p gdb--info-window nil)
-                   (switch-to-buffer buffer)
-                   (set-window-dedicated-p gdb--info-window t))
-                 (unless $no-select
-                   (select-window gdb--info-window)))
-             (message "Can not display buffer %s" '$type))))
-       #',name)))
+(defun gdb*display-buffer ($buffer)
+  (let ((old-window (selected-window)))
+    (unless (window-live-p gdb--side-window)
+      (when-let ((comint-buffer gud-comint-buffer)
+                 (window (get-buffer-window comint-buffer)))
+        (with-selected-window window
+          (setq gdb--side-window
+                (split-window-vertically (- gdb-side-window-height))))))
+    (if (window-live-p gdb--side-window)
+        (progn
+          (set-window-dedicated-p gdb--side-window nil)
+          (set-window-buffer gdb--side-window $buffer)
+          (set-window-dedicated-p gdb--side-window t)
+          (unless (eq (buffer-local-value 'gdb-buffer-type $buffer)
+                      'gdb-inferior-io)
+            (select-window gdb--side-window)))
+      (with-current-buffer $buffer
+        (error "Can not display buffer %s" gdb-buffer-type)))))
 
 ;; Fix a bug when call commands from source buffer
 (defun gud*display-line-hack (&rest _)
-  (when (and gud-overlay-arrow-position
-             (buffer-live-p (marker-buffer gud-overlay-arrow-position)))
+  (when gud-overlay-arrow-position
     (when-let* ((buffer (marker-buffer gud-overlay-arrow-position))
                 (window (and (buffer-live-p buffer)
                              (get-buffer-window buffer))))
@@ -54,16 +49,26 @@
   (interactive)
   (pop-to-buffer gud-comint-buffer))
 
+(defun gud/side-window ()
+  (if (window-live-p gdb--side-window)
+      (select-window gdb--side-window)
+    (gdb-display-io-buffer)))
+
+(defun gud/quit-process ()
+  (interactive)
+  (when (and (yes-or-no-p "Quit process"))
+    (gud-call "quit")))
+
 (defvar gud--source-mode-map
   (define-key! :map (make-sparse-keymap)
-    ("o" . (gud//gdb-display gdb-inferior-io))
+    ("o" . gdb-display-io-buffer)
     ("g" . gud/pop-to-comint-buffer)
-    ("B" . (gud//gdb-display gdb-breakpoints-buffer))
-    ("T" . (gud//gdb-display gdb-threads-buffer))
-    ("R" . (gud//gdb-display gdb-registers-buffer))
-    ("S" . (gud//gdb-display gdb-stack-buffer))
-    ("A" . (gud//gdb-display gdb-disassembly-buffer))
-    ("m" . (gud//gdb-display gdb-memory-buffer))
+    ("B" . gdb-display-breakpoints-buffer)
+    ("T" . gdb-display-threads-buffer)
+    ("R" . gdb-display-registers-buffer)
+    ("S" . gdb-display-stack-buffer)
+    ("A" . gdb-display-disassembly-buffer)
+    ("m" . gdb-display-memory-buffer)
     ("b" . gud-break)
     ("-" . gud-remove)
     ("t" . gud-tbreak)
@@ -84,12 +89,8 @@
     ("D" . gud-display-all)
     ("*" . gud-pstar)
     ("w" . gud-watch)
-    ("X" . (lambda!
-             (when (and (yes-or-no-p "Quit process"))
-               (gud-call "quit"))))
-    ("C-c C-z" . (lambda!
-                   (when (window-live-p gdb--info-window)
-                     (select-window gdb--info-window))))))
+    ("X" . gud/quit-process)
+    ("C-c C-z" . gud/side-window)))
 
 (define-minor-mode gud-source-mode "minor mode for source file"
   :init-value nil
@@ -142,8 +143,9 @@
   (define-hook! gud|setup-hook (gud-mode-hook)
     (gud-def gud-display "display %e" " " "Display expression")
     (gud-def gud-display-all "display" "\C- " "Display all")
+
     (gud-tooltip-mode 1)
-    (set-window-dedicated-p (selected-window) t)
+    (set-window-dedicated-p (get-buffer-window gud-comint-buffer) t)
     ;; `gud-print' need prompt can be modified
     ;; (setq comint-prompt-read-only t)
     (setq-local comint-scroll-to-bottom-on-output t))
@@ -154,15 +156,7 @@
   (advice-add 'gud-display-line :after #'gud*display-line-hack))
 
 (with-eval-after-load 'gdb-mi
-  (defun gdb-display-io-buffer-action (buffer alist)
-    (gud/display-gdb-inferior-io :no-select))
-  (defun gdb-display-io-buffer-condition (buffer action)
-    (with-current-buffer buffer
-      (eq major-mode 'gdb-inferior-io-mode)))
-
-  (add-to-list 'display-buffer-alist
-               '(gdb-display-io-buffer-condition
-                 gdb-display-io-buffer-action))
+  (advice-add 'gdb-display-buffer :override 'gdb*display-buffer)
 
   (dolist (map (list gdb-inferior-io-mode-map
                      gdb-breakpoints-mode-map

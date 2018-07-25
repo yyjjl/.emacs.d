@@ -30,8 +30,9 @@
           (lsp-cquery-enable)
         (error (message "%s" (error-message-string err))))
       (setq-local company-transformers nil)
+      (setq-local company-idle-delay nil)
       (setq-local company-lsp-cache-candidates nil)
-      (add-to-list 'company-backends '(company-lsp :with company-dabbrev-code))
+      (add-to-list 'company-backends 'company-lsp)
       (add-to-list 'company-backends 'company-files))))
 
 (defun cpp-cquery/create-dot-cquery ($dir)
@@ -141,7 +142,7 @@
   ;; (advice-add 'cquery--publish-semantic-highlighting
   ;;             :around #'cpp-cquery*semantic-highlight)
 
-  (setq cquery-sem-highlight-method nil))
+  (setq cquery-sem-highlight-method 'font-lock))
 
 (with-eval-after-load 'cquery-tree
   (add-hook 'cquery-tree-mode-hook
