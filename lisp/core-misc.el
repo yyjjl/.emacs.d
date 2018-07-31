@@ -193,6 +193,7 @@
   ("C-x , -" . core/copy-file-name)
   ("C-x , c" . core/change-or-new-desktop)
   ("C-x , d" . core/delete-desktop)
+  ("C-x , o" . recentf-open-files)
   ("C-x C-b" . ibuffer)
   ("C-x C-d" . find-name-dired)
 

@@ -45,9 +45,9 @@
   (setq lsp-highlight-symbol-at-point t)
   (setq lsp--show-doc-key "C-c C-d")
   (setq lsp-hover-text-function 'lsp--text-document-hover-string)
-  (setq lsp--show-doc-extra-message
-        (propertize (format " (`%s' to see more ...)" lsp--show-doc-key)
-                    'face font-lock-comment-face))
+  ;; (setq lsp--show-doc-extra-message
+  ;;       (propertize (format " (`%s' to see more ...)" lsp--show-doc-key)
+  ;;                   'face font-lock-comment-face))
 
   (define-key!
     ("M-s h h" . lsp-symbol-highlight)

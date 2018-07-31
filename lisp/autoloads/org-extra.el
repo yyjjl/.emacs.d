@@ -127,10 +127,9 @@ With a prefix BELOW move point to lower block."
                                            :full "\\.\\(png\\|jpe?g\\|svg\\)\\'"))
                    (unless (gethash image-file image-files)
                      (push image-file invalid-files))))))))))
-    (when (and invalid-files
-               (yes-or-no-p (format "Delete %d invalid cache? "
-                                    (length invalid-files))))
+    (when invalid-files
       (dolist (file invalid-files)
         (delete-file file))
+      (message "Deleted %d invalid cache files" (length invalid-files))
       (and directory-conflict-p
            (message "Directories for caching have confict !!")))))

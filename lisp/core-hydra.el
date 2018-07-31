@@ -127,16 +127,13 @@ _d_: subtree
   (forward-thing current-forward-thing (when (numberp $n) (- 0 $n))))
 
 (defhydra hydra-move (:color pink :hint nil)
-;;   "
-;; Current thing: %s(current-forward-thing)
-;; [_p_/_n_] line      [_u_/_v_] scroll   [_b_/_f_] thing
-;; [_a_/_e_] begin/end [_m_/_x_] mark     [_SPC_] scroll
-;; [_s_] symbol      [_c_] char         [_e_] list
-;; [_d_] defun       [_w_] word
-;; [_l_] center      [_q_] quit
-;; "
   "
-Hydra move [%s(current-forward-thing)]
+Current thing: %s(current-forward-thing)
+[_p_/_n_] line      [_u_/_v_] scroll   [_b_/_f_] thing
+[_a_/_e_] begin/end [_m_/_x_] mark     [_SPC_] scroll
+[_s_] symbol      [_c_] char         [_e_] list
+[_d_] defun       [_w_] word
+[_l_] center      [_q_] quit
 "
   ("q" nil :exit t)
   ("n" next-line)
@@ -208,7 +205,7 @@ _q_uit
   ("C-x ^" . hydra-resize-window/enlarge-window)
   ("C-x -" . hydra-resize-window/shrink-window)
 
-  ("C-." . hydra-move-invoker)
+  ("C->" . hydra-move-invoker)
 
   ("C-c O" . hydra-outline/body)
   ("C-x SPC" . hydra-rectangle/body)

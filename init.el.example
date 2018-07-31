@@ -13,8 +13,6 @@
 (require 'core-lib)
 ;; Set some important variables
 (require 'core-vars)
-;; Set envrionment variables
-(require 'core-env-vars)
 (require 'core-defaults)
 ;; Load core packages
 (require 'core-packages-lib)
@@ -43,19 +41,19 @@
   (require 'init-tags))
 
 ;; Programming modes
-;; (require 'init-lsp-mode)
-;; (require 'init-cpp)
-;; (require 'init-cpp-cmake)
-;; (require 'init-cpp-cquery)
-;; (require 'init-haskell)
-;; (require 'init-python)
-;; (require 'init-lisp)
-;; (require 'init-web-mode)
-;; (require 'init-sh)
-;; (require 'init-javascript)
-;; (require 'init-css)
-;; (require 'init-rust)
-;; (require 'init-perl5)
+(require 'init-lsp-mode)
+(require 'init-cpp)
+(require 'init-cpp-cmake)
+(require 'init-cpp-cquery)
+(require 'init-haskell)
+(require 'init-python)
+(require 'init-lisp)
+(require 'init-web-mode)
+(require 'init-sh)
+(require 'init-javascript)
+(require 'init-css)
+(require 'init-rust)
+(require 'init-perl5)
 
 ;; Some keybindings using when editing
 (require 'init-editing)
@@ -66,10 +64,10 @@
 
 ;; Other small tools
 ;; (require 'init-hydra-extra)
-;; (require 'init-prettify-symbols)
+(require 'init-prettify-symbols)
 
-;; (when env-has-mpv-p
-;;   (require 'init-emms))
+(when env-has-mpv-p
+  (require 'init-emms))
 
 (require 'init-extra)
 (require 'init-surround)

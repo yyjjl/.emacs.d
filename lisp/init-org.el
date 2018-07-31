@@ -305,6 +305,7 @@
     ("C-c n" . org-next-block)
     ("C-c p" . org-previous-block)
     ([f5] . org/open-pdf)
+    ([C-f9] . org/create-latex-fragemnt-cache)
     ([f9] . (lambda!
               (save-excursion
                 (without-user-record!

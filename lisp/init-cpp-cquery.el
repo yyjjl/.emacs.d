@@ -124,7 +124,8 @@
   (setq cquery-extra-init-params
         '(:index (:comments 2)
           :diagnostics (:frequencyMs 2000)
-          :cacheFormat "msgpack" :completion (:detailedLabel t)))
+          :cacheFormat "msgpack"
+          :completion (:detailedLabel t)))
 
   ;; (defvar cpp-cquery--semantic-highlight-timer nil)
   ;; (defvar cpp-cquery--semantic-highlight-interval 1)

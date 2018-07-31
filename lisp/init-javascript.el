@@ -63,7 +63,7 @@
 ;;                   "module"
 ;;                   "process" "require" "setInterval" "setTimeout")))
 
-(with-eval-after-load 'js-mode
+(with-eval-after-load 'js
   (require 'lsp-javascript-typescript))
 
 (define-hook! js|setup (js-mode-hook

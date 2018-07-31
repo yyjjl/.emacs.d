@@ -154,6 +154,7 @@
   ("n" . git-gutter:next-hunk)
   ("p" . git-gutter:previous-hunk)
   ("j" . git/ivy-goto-gutter)
+  ("g" . magit-status)
   ("l" . git-link)
   ("c" . git-link-commit)
   ("m" . git-messenger:popup-message)

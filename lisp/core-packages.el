@@ -47,7 +47,11 @@
     (fcitx-aggressive-setup))
   (find-file-noselect (expand-var! "org/*note*"))
   (find-file-noselect (expand-var! "org/*task*"))
-  (desktop-save-mode 1))
+  (desktop-save-mode 1)
+
+  (when (and (>= emacs-major-version 26)
+             (display-graphic-p))
+    (company-posframe-mode 1)))
 
 (define-hook! package|init-emacs (after-init-hook)
   (shackle-mode 1)
@@ -62,10 +66,6 @@
 
   (yas-global-mode 1)
   (global-company-mode 1)
-
-  (when (and (>= emacs-major-version 26)
-             (display-graphic-p))
-    (company-posframe-mode 1))
 
   (which-key-mode 1)
 
