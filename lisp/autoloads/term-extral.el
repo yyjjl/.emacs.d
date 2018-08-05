@@ -172,12 +172,12 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
     (-when-let (window (get-buffer-window (current-buffer)))
       (when (and (window-live-p window)
                  (equal window (term//get-popup-window)))
-        (quit-window nil window)))))
+        (delete-window window)))))
 
-(defun term//create-buffer (&optional $shell-program $shell-buffer-p)
+(defun term//create-buffer (&optional $program $shell-buffer-p)
   "Get term buffer.
 If option SPECIAL-SHELL is `non-nil', will use shell from user input."
-  (let ((shell-name (or $shell-program
+  (let ((shell-name (or $program
                         term-shell-name
                         (getenv "SHELL")
                         (getenv "ESHELL")
@@ -226,17 +226,6 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
 ;;;###autoload
 (defsubst term//extra-env ()
   (term//eval-function-list 'term-default-environment-function-list))
-
-;; (defun term//default-sentinel (proc msg)
-;;   (term-sentinel proc msg)
-;;   (when (memq (process-status proc) '(signal exit))
-;;     (with-current-buffer (process-buffer proc)
-;;       (let ((buffer-read-only nil))
-;;         (insert (propertize "Press `Ctrl-D' or `q' to kill this buffer. "
-;;                             'font-lock-face 'font-lock-comment-face)))
-;;       (setq buffer-read-only t)
-;;       (local-set-key (kbd "C-d") (lambda! (kill-buffer)))
-;;       (local-set-key (kbd "q") (lambda! (kill-buffer))))))
 
 (defun term//get-ssh-info ($arg)
   (let* ((user (file-remote-p default-directory 'user))

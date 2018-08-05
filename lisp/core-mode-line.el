@@ -57,26 +57,30 @@ read-only, and `buffer-file-coding-system'"
         (cl-loop for (symbol . expr) in mode-line-multi-edit-alist
                  when (and (boundp symbol) (symbol-value symbol))
                  do (when-let (count (eval expr))
-                      (return (propertize (format ":%d " count)
+                      (return (propertize (format "e:%d " count)
                                           'face font-lock-constant-face))))
-        (when (and (boundp 'text-scale-mode-amount) (/= text-scale-mode-amount 0))
+        (when (and (boundp 'text-scale-mode-amount)
+                   (/= text-scale-mode-amount 0))
           (propertize (format "%+d " text-scale-mode-amount)
                       'face font-lock-doc-face))
         (when (or defining-kbd-macro executing-kbd-macro)
-          (propertize "macro " 'face font-lock-variable-name-face))
+          (propertize "M " 'face font-lock-variable-name-face))
         (when (buffer-temporary?)
-          (propertize "tmp " 'face font-lock-comment-face))
+          (propertize "t " 'face font-lock-comment-face))
         (when (buffer-modified-p)
-          (propertize "mod " 'face font-lock-negation-char-face))
+          (propertize "m " 'face font-lock-negation-char-face))
         (when buffer-read-only
           (propertize "ro " 'face font-lock-string-face))
         (when visual-line-mode
           (propertize "v " 'face font-lock-type-face))
+        (when visible-mode "V ")
         (when (buffer-base-buffer) "I ")
         (when (eq major-mode 'image-mode)
           (cl-destructuring-bind (width . height)
               (image-size (image-get-display-property) :pixels)
-            (format "%dx%d " width height)))
+            (if image-type
+                (format "%dx%d(%s) " width height image-type)
+              (format "%dx%d " width height))))
         (let ((buffer-encoding (format "%s" buffer-file-coding-system)))
           (if (string-match "\\(dos\\|unix\\|mac\\)" buffer-encoding)
               (match-string 1 buffer-encoding)
@@ -107,7 +111,7 @@ read-only, and `buffer-file-coding-system'"
   (and mode-line-process (list " {" mode-line-process "}")))
 
 (defsubst mode-line//position ()
-  (propertize " %l:%c %p %I " 'face 'font-lock-constant-face))
+  (propertize " %l:%c %p %I" 'face 'font-lock-constant-face))
 
 (defvar mode-line--center-margin 1)
 (defvar mode-line-default-format '("%e" (:eval (mode-line//generate))))
@@ -118,7 +122,8 @@ read-only, and `buffer-file-coding-system'"
                 mode-line//buffer-major-mode
                 mode-line//process
                 mode-line//position)
-     :center nil)
+     :misc nil
+     :root t)
     ((or (memq major-mode '(dired-mode))
          (and (not (derived-mode-p 'text-mode 'prog-mode))
               (string-match-p "^\\*" (buffer-name))))
@@ -127,7 +132,8 @@ read-only, and `buffer-file-coding-system'"
                 mode-line//buffer-major-mode
                 mode-line//buffer-status
                 mode-line//process)
-     :center nil)
+     :misc nil
+     :root nil)
     (t :segments (mode-line//window-number
                   mode-line//buffer-id
                   mode-line//buffer-major-mode
@@ -135,7 +141,8 @@ read-only, and `buffer-file-coding-system'"
                   mode-line//flycheck
                   mode-line//process
                   mode-line//position)
-       :center t)))
+       :misc t
+       :root t)))
 
 (defsubst mode-line//format-line ($lhs $chs $rhs)
   (let* ((lw (string-width $lhs))
@@ -161,9 +168,15 @@ read-only, and `buffer-file-coding-system'"
            (lambda (config)
              (list (car config)
                    (let ((segments (plist-get (cdr config) :segments))
-                         (show-center-p (plist-get (cdr config) :center)))
-                     `(list ,@(mapcar #'list segments)
-                            ,(and show-center-p 'mode-line-misc-info)))))
+                         (show-misc-p (plist-get (cdr config) :misc))
+                         (show-root-p (plist-get (cdr config) :root)))
+                     (--filter
+                      it
+                      `(list ,@(mapcar #'list segments)
+                             ,(and show-misc-p 'mode-line-misc-info)
+                             ,(and show-root-p
+                                   ''(mode-line--cached-root
+                                      ("" " " mode-line--cached-root))))))))
            (or $segments mode-line-config-alist))))))
 
 (mode-line//compile)
@@ -182,10 +195,11 @@ read-only, and `buffer-file-coding-system'"
   (setq-default mode-line-format mode-line-default-format)
   (setq-default mode-line-buffer-identification '("%b"))
   (setq-default mode-line-misc-info
-                '((core-current-desktop-name ("[" core-current-desktop-name "] "))
-                  (projectile-mode ("" mode-line--cached-root " "))
+                '((lsp-mode ("" (:eval (lsp-mode-line))))
+                  (core-current-desktop-name (" <" core-current-desktop-name ">"))
                   ;; (company-mode company-lighter)
-                  (global-mode-string ("" global-mode-string " ")))))
+                  ;; (company-search-mode company-search-lighter)
+                  (global-mode-string ("" " " global-mode-string)))))
 
 (provide 'core-mode-line)
 
