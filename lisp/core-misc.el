@@ -1,8 +1,19 @@
 ;; -*- lexical-binding: t -*-
 
-;;; -*- lexical-binding: t; -*-
-
 (defvar core-current-desktop-name nil)
+(defvar core-view-code-modes
+  '((lispy-mode rainbow-delimiters-count-mode)
+    (t display-line-numbers-mode view-mode)))
+
+(define-minor-mode core-view-code-mode
+  "View code"
+  :init-value nil
+  (let ((switch (if core-view-code-mode 1 -1)))
+    (cl-loop for (condition . modes) in core-view-code-modes
+             when (or (eq condition t)
+                      (symbol-value condition))
+             do (dolist (mode modes)
+                  (funcall mode switch)))))
 
 (defun core*desktop-save-unless-loaded ($fn &rest $args)
   (if (or (called-interactively-p 'interactive)
@@ -37,6 +48,12 @@
 (with-eval-after-load 'display-line-numbers
   (setq display-line-numbers-type 'relative)
   (setq-default display-line-numbers-width 2))
+
+(with-eval-after-load 'view
+  (define-key! :map view-mode-map
+    ("s" . swiper/dispatch)
+    ("q" . View-exit)
+    ("Q" . View-quit)))
 
 (with-eval-after-load 'xref
   (define-key! :map xref--xref-buffer-mode-map
@@ -189,7 +206,7 @@
   ("C-c 4" . ispell-word)
   ("C-c q" . auto-fill-mode)
   ("C-x , ," . core/search-in-chrome)
-  ("C-x , l" . display-line-numbers-mode)
+  ("C-x , s" . core/create-scratch-buffer)
   ("C-x , -" . core/copy-file-name)
   ("C-x , c" . core/change-or-new-desktop)
   ("C-x , d" . core/delete-desktop)
@@ -220,7 +237,7 @@
   ([C-f6] . core/display-latex-fragment-at-point)
 
   ([f10] . compile)
-  ([f7] . core/create-scratch-buffer))
+  ([f7] . core-view-code-mode))
 
 (define-key! :map special-mode-map
   ("u" . scroll-down-command)

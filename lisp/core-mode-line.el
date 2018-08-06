@@ -70,9 +70,9 @@ read-only, and `buffer-file-coding-system'"
         (when (buffer-modified-p)
           (propertize "m " 'face font-lock-negation-char-face))
         (when buffer-read-only
-          (propertize "ro " 'face font-lock-string-face))
+          (propertize (if view-mode "v " "ro ") 'face font-lock-string-face))
         (when visual-line-mode
-          (propertize "v " 'face font-lock-type-face))
+          (propertize "vs " 'face font-lock-type-face))
         (when visible-mode "V ")
         (when (buffer-base-buffer) "I ")
         (when (eq major-mode 'image-mode)
@@ -198,7 +198,7 @@ read-only, and `buffer-file-coding-system'"
                 '((lsp-mode ("" (:eval (lsp-mode-line))))
                   (core-current-desktop-name (" <" core-current-desktop-name ">"))
                   ;; (company-mode company-lighter)
-                  ;; (company-search-mode company-search-lighter)
+                  (company-search-mode company-search-lighter)
                   (global-mode-string ("" " " global-mode-string)))))
 
 (provide 'core-mode-line)

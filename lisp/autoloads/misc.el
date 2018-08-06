@@ -140,14 +140,11 @@ Does not indent buffer, because it is used for a
 ;;;###autoload
 (defun core/eval-and-replace ($start $end)
   (interactive "r")
-  (let ((value (eval
-                `(let ((it (buffer-substring $start $end)))
-                   ,(if (bound-and-true-p
-                         mc--executing-command-for-fake-cursor)
-                        (read (car read-expression-history))
-                      (read--expression "Expression(it): "
-                                        "(eval (read it))")))
-                lexical-binding)))
+  (let* ((it (buffer-substring $start $end))
+         (expr (if (bound-and-true-p mc--executing-command-for-fake-cursor)
+                   (read (car read-expression-history))
+                 (read--expression "Expression(it): " "(read it)")))
+         (value (eval expr `((it . ,it)))))
     (delete-region $start $end)
     (save-excursion
       (goto-char $start)
@@ -359,4 +356,5 @@ directory and extension."
     (error "rainbow-delimiters-mode is not enabled"))
   (if rainbow-delimiters-count-mode
       (setq line-spacing 0.1)
-    (setq line-spacing (default-value 'line-spacing))))
+    (setq line-spacing (default-value 'line-spacing)))
+  (font-lock-flush))
