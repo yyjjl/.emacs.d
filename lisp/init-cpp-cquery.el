@@ -95,10 +95,17 @@
                                 "\n"
                                 :omit-nulls))))))))
 
-(defun cpp-cquery//buffer-compile-command ()
-  (-when-let (args (gethash "args" (cquery-file-info)))
+(defun cpp-cquery//buffer-compile-command (&optional $preprocess-only-p)
+  (let* ((args (or (ignore-errors (gethash "args" (cquery-file-info)))
+                   '("/usr/bin/c++")))
+         (options (cpp-cquery//filter-arguments (cdr args) $preprocess-only-p)))
+    (when $preprocess-only-p
+      (dolist (option '("-E" "-xc++" "-C"))
+        (unless (member option options)
+          (push option options))))
     (concat (car args) " "
-            (string-join (cpp-cquery//filter-arguments (cdr args)) " "))))
+            (string-join options " ")
+            (when $preprocess-only-p " -"))))
 
 
 

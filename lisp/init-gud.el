@@ -1,5 +1,6 @@
 (require-packages! gud gdb-mi)
 
+(defvar gdb-source-window nil)
 (defvar gdb--side-window nil)
 (defvar gdb-side-window-height 15)
 (defvar gud--window-configuration nil)
@@ -26,18 +27,57 @@
         (error "Can not display buffer %s" gdb-buffer-type)))))
 
 ;; Fix a bug when call commands from source buffer
-(defun gud*display-line-hack (&rest _)
-  (when gud-overlay-arrow-position
-    (when-let* ((buffer (marker-buffer gud-overlay-arrow-position))
-                (window (and (buffer-live-p buffer)
-                             (get-buffer-window buffer))))
-      (with-selected-window window
-        (when (save-excursion
-                (goto-char gud-overlay-arrow-position)
-                (swiper--ensure-visible)
-                (forward-line 2)
-                (not (pos-visible-in-window-p)))
-          (recenter))))))
+(defun gud*display-line ($true-file $line)
+  (let* ((last-nonmenu-event t)      ; Prevent use of dialog box for questions.
+         (buffer (with-current-buffer gud-comint-buffer
+                   (gud-find-file $true-file)))
+         (window (and buffer
+                      (or (get-buffer-window buffer)
+                          (when (window-live-p gdb-source-window)
+                            (window--display-buffer buffer gdb-source-window 'reuse))
+                          (display-buffer buffer 'display-buffer-same-window))))
+         (pos))
+    (when buffer
+      (with-current-buffer buffer
+        (unless (or (verify-visited-file-modtime buffer) gud-keep-buffer)
+          (if (yes-or-no-p
+               (format "File %s changed on disk.  Reread from disk? "
+                       (buffer-name)))
+              (revert-buffer t t)
+            (setq gud-keep-buffer t)))
+        (save-restriction
+          (widen)
+          (goto-char (point-min))
+          (forward-line (1- $line))
+          (setq pos (point))
+          (or gud-overlay-arrow-position
+              (setq gud-overlay-arrow-position (make-marker)))
+          (set-marker gud-overlay-arrow-position (point) (current-buffer))
+          ;; ====================
+          (when (window-live-p window)
+            (with-selected-window window
+              (when (save-excursion
+                      (goto-char gud-overlay-arrow-position)
+                      (swiper--ensure-visible)
+                      (forward-line 2)
+                      (not (pos-visible-in-window-p)))
+                (recenter))))
+          ;; ====================
+          ;; If they turned on hl-line, move the hl-line highlight to
+          ;; the arrow's line.
+          (when (featurep 'hl-line)
+            (cond
+             (global-hl-line-mode
+              (global-hl-line-highlight))
+             ((and hl-line-mode hl-line-sticky-flag)
+              (hl-line-highlight)))))
+        (cond ((or (< pos (point-min)) (> pos (point-max)))
+               (widen)
+               (goto-char pos))))
+      (when window
+        (set-window-point window gud-overlay-arrow-position)
+        ;; Always set gdb-source-window
+        (setq gdb-source-window window)))))
 
 (defun gud/pop-to-source-buffer ()
   (interactive)
@@ -50,6 +90,7 @@
   (pop-to-buffer gud-comint-buffer))
 
 (defun gud/side-window ()
+  (interactive)
   (if (window-live-p gdb--side-window)
       (select-window gdb--side-window)
     (gdb-display-io-buffer)))
@@ -119,7 +160,8 @@
       buffer)))
 
 (defun gud*comint-init-hack (&rest _)
-  (setq gud--window-configuration (current-window-configuration)))
+  (setq gud--window-configuration (current-window-configuration))
+  (delete-other-windows))
 
 (defun gud*sentinel-hack ($proc $msg)
   (let ((buffer (process-buffer $proc)))
@@ -153,7 +195,7 @@
   (advice-add 'gud-find-file :around #'gud*find-file-hack)
   (advice-add 'gud-sentinel :after #'gud*sentinel-hack)
   (advice-add 'gud-common-init :before #'gud*comint-init-hack)
-  (advice-add 'gud-display-line :after #'gud*display-line-hack))
+  (advice-add 'gud-display-line :override #'gud*display-line))
 
 (with-eval-after-load 'gdb-mi
   (advice-add 'gdb-display-buffer :override 'gdb*display-buffer)

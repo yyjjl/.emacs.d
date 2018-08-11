@@ -79,38 +79,38 @@ With a prefix BELOW move point to lower block."
       (org-babel-previous-src-block))))
 
 ;;;###autoload
-(defun org/create-latex-fragemnt-cache ($files)
+(defun org/create-latex-fragemnt-cache ($files $clean-invalid-p)
   (interactive
    (list
-    (or (and (not current-prefix-arg)
-             (string-suffix-p ".org" (buffer-file-name))
-             (list (buffer-file-name)))
-        (let ((file-or-dir-name (read-file-name "File or Directory: ")))
-          (if (file-directory-p file-or-dir-name)
-              (directory-files-recursively file-or-dir-name "\\.org\\'")
-            (list file-or-dir-name))))))
-  (let ((ltximg-dirs (make-hash-table :test 'equal))
-        directory-conflict-p
-        invalid-files)
+    (if (and (not current-prefix-arg)
+             (string-suffix-p ".org" (buffer-file-name)))
+        ;; create for current file
+        (list (buffer-file-name))
+      (let ((dir-name
+             (if (equal current-prefix-arg '(4))
+                 default-directory      ; create for files in current directory
+               (read-file-name "File or Directory: "))))
+        (unless (file-directory-p dir-name)
+          (error "%s is not a directory" dir-name))
+        (directory-files-recursively dir-name "\\.org\\'")))
+    current-prefix-arg))
+  (let ((image-files (make-hash-table :test 'equal))
+        (image-dirs (make-hash-table :test 'equal)))
     (dolist (file $files)
       (without-user-record!
        (with-current-buffer (find-file-noselect file)
          (let* ((prefix (concat org-preview-latex-image-directory "org-ltximg"))
-                (absolute-dir (expand-file-name org-preview-latex-image-directory))
-                (image-files (make-hash-table :test 'equal))
-                (delete-invalid-p (not (gethash absolute-dir ltximg-dirs))))
+                (image-dir (expand-file-name org-preview-latex-image-directory)))
+           (puthash image-dir t image-dirs)
            (save-excursion
              (save-restriction
                (widen)
-               (if delete-invalid-p
-                   (puthash absolute-dir t ltximg-dirs)
-                 (setq directory-conflict-p t))
                (org-remove-latex-fragment-image-overlays)
                (org-format-latex prefix
                                  (point-min) (point-max)
                                  default-directory
                                  'overlays
-                                 (concat "Create %s fragment for `" file "'")
+                                 (concat "The %s for `" file "'")
                                  'forbuffer
                                  org-preview-latex-default-process)
                (dolist (ov (org--list-latex-overlays))
@@ -119,17 +119,16 @@ With a prefix BELOW move point to lower block."
                    (puthash (expand-file-name image-file
                                               org-preview-latex-image-directory)
                             t
-                            image-files)))
-               (when (and delete-invalid-p
-                          (file-exists-p absolute-dir))
-                 (dolist (image-file
-                          (directory-files absolute-dir
-                                           :full "\\.\\(png\\|jpe?g\\|svg\\)\\'"))
-                   (unless (gethash image-file image-files)
-                     (push image-file invalid-files))))))))))
-    (when invalid-files
-      (dolist (file invalid-files)
-        (delete-file file))
-      (message "Deleted %d invalid cache files" (length invalid-files))
-      (and directory-conflict-p
-           (message "Directories for caching have confict !!")))))
+                            image-files)))))))))
+    (if $clean-invalid-p
+        (let ((count 0))
+          (cl-loop for image-dir being the hash-keys of image-dirs
+                   when (file-exists-p image-dir)
+                   do (dolist (image-file
+                               (directory-files image-dir
+                                                :full "\\.\\(png\\|jpe?g\\|svg\\)\\'"))
+                        (unless (gethash image-file image-files)
+                          (incf count)
+                          (ignore-errors (delete-file image-file)))))
+          (message "Deleted %d invalid cache files" count))
+      (message "Invalid cache files were not checked"))))

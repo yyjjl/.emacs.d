@@ -1,3 +1,7 @@
+(defvar-local mode-line--git-cache nil)
+(defvar-local mode-line--cached-relative-directory nil)
+(defvar-local mode-line--cached-root nil)
+
 (defsubst mode-line//window-number ()
   (and (bound-and-true-p window-numbering-mode)
        (let ((narrow-p (buffer-narrowed-p)))
@@ -7,8 +11,16 @@
                       (if narrow-p ">" " "))
                      'face 'window-numbering-face))))
 
-(defvar-local mode-line--cached-relative-directory nil)
-(defvar-local mode-line--cached-root nil)
+(defsubst mode-line//git-info ()
+  (when buffer-file-name
+    (or mode-line--git-cache
+        (setq mode-line--git-cache
+              (propertize
+               (concat " Git:"
+                       (when (require 'magit nil :noerror)
+                         (magit-get-current-branch)))
+               'face 'font-lock-doc-face)))))
+
 (defsubst mode-line//relative-directory ()
   (or (and projectile-cached-buffer-file-name
            (equal projectile-cached-buffer-file-name (or buffer-file-name 'none))
@@ -89,22 +101,22 @@ read-only, and `buffer-file-coding-system'"
 
 (defsubst mode-line//flycheck ()
   "Display flycheck status in mode-line."
-  (and (bound-and-true-p flycheck-mode)
-       (concat
-        " "
-        (pcase flycheck-last-status-change
-          (`not-checked (propertize "Waiting" 'face 'font-lock-comment-face))
-          (`no-checker (propertize "No" 'face 'font-lock-comment-face))
-          (`running (propertize "Running" 'face 'font-lock-doc-face))
-          (`errored (propertize "Error" 'face 'flycheck-fringe-error))
-          (`interrupted (propertize "Interrupted" 'face 'flycheck-fringe-warning))
-          (`suspicious (propertize "???" 'face 'flycheck-fringe-error))
-          (`finished (let-alist (flycheck-count-errors flycheck-current-errors)
-                       (concat (propertize (format "%s" (or .error 0))
-                                           'face 'flycheck-fringe-error)
-                               ":"
-                               (propertize (format "%s" (or .warning 0))
-                                           'face 'flycheck-fringe-warning))))))))
+  (when (bound-and-true-p flycheck-mode)
+    (concat
+     " "
+     (pcase flycheck-last-status-change
+       (`not-checked (propertize "Waiting" 'face 'font-lock-comment-face))
+       (`no-checker (propertize "No" 'face 'font-lock-comment-face))
+       (`running (propertize "Running" 'face 'font-lock-doc-face))
+       (`errored (propertize "Error" 'face 'flycheck-fringe-error))
+       (`interrupted (propertize "Interrupted" 'face 'flycheck-fringe-warning))
+       (`suspicious (propertize "???" 'face 'flycheck-fringe-error))
+       (`finished (let-alist (flycheck-count-errors flycheck-current-errors)
+                    (concat (propertize (format "%s" (or .error 0))
+                                        'face 'flycheck-fringe-error)
+                            ":"
+                            (propertize (format "%s" (or .warning 0))
+                                        'face 'flycheck-fringe-warning))))))))
 
 (defsubst mode-line//process ()
   "Display buffer process status."
@@ -140,7 +152,8 @@ read-only, and `buffer-file-coding-system'"
                   mode-line//buffer-status
                   mode-line//flycheck
                   mode-line//process
-                  mode-line//position)
+                  mode-line//position
+                  mode-line//git-info)
        :misc t
        :root t)))
 
@@ -180,6 +193,16 @@ read-only, and `buffer-file-coding-system'"
            (or $segments mode-line-config-alist))))))
 
 (mode-line//compile)
+
+(defun mode-line*trace-magit-checkout ($fn &rest $args)
+  (let ((buffer (current-buffer)))
+    (apply $fn $args)
+    (with-current-buffer buffer
+      (setq mode-line--git-cache nil)
+      (mode-line//git-info))))
+
+(with-eval-after-load 'magit
+  (advice-add 'magit-checkout :around #'mode-line*trace-magit-checkout))
 
 (defvar mode-line--current-window (frame-selected-window))
 (defun mode-line*set-selected-window (&rest _)

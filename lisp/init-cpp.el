@@ -74,7 +74,7 @@
 
 (defun cpp//common-cc-setup ()
   "Setup shared by all languages (java/groovy/c++ ...)"
-  (highlight-indentation-mode 1)
+  ;; (highlight-indentation-mode 1)
   ;; (electric-operator-mode 1)
   (electric-indent-local-mode -1)
   ;; (turn-on-auto-fill)
@@ -241,6 +241,12 @@
       (forward-sexp)
     (call-interactively 'c-end-of-statement)))
 
+(defun cpp/macro-expand ()
+  (interactive)
+  (setq-local c-macro-preprocessor
+              (cpp-cquery//buffer-compile-command t))
+  (call-interactively 'c-macro-expand))
+
 
 
 (with-eval-after-load 'cc-mode
@@ -272,6 +278,7 @@
     ("<")
     (">")
     ("C-c C-d")
+    ("C-c C-e" . cpp/macro-expand)
     ("C-c b" . clang-format-buffer)
     ("C-c C-b" . clang-format-buffer)
     ("C-c C-l" . cpp/load-file-in-root)

@@ -131,6 +131,8 @@
 
 (with-eval-after-load 'magit
   (setq magit-completing-read-function 'ivy-completing-read)
+  ;; Disable interal vc
+  (setq vc-handled-backends nil)
   (require 'magit-autorevert))
 
 (with-eval-after-load 'magit-files

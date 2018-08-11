@@ -239,8 +239,7 @@
 
   (define-hook! org|setup (org-mode-hook)
     (when buffer-file-name
-      (setq-local org-preview-latex-image-directory
-                  (concat "auto/" (file-name-base buffer-file-name) "/")))
+      (setq-local org-preview-latex-image-directory "auto/cache/"))
     (auto-fill-mode -1)
     (eldoc-mode -1)
 
