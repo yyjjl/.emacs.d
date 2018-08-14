@@ -1,5 +1,6 @@
 /bin
 .depend
+network-security.data
 anaconda-mode/
 .wg-file.el
 /url/cache
@@ -61,4 +62,4 @@ private.el
 !/private/sdcv/
 !/private/dired-plus/
 /init.el
-/gnus.el
+# /gnus.el
