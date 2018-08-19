@@ -47,6 +47,7 @@
     (fcitx-aggressive-setup))
   (find-file-noselect (expand-var! "org/*note*"))
   (find-file-noselect (expand-var! "org/*task*"))
+
   (desktop-save-mode 1)
 
   (when (and (>= emacs-major-version 26)

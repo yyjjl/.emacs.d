@@ -116,7 +116,7 @@ The args of the second form will be passed to `add-hook'
 Optional argument $BODY is the function body."
   (declare (indent defun) (debug t) (doc-string 3))
   (let* ((anonymous-p (eq $name :anonymous))
-         (symbol (cond (anonymous-p (cl-gensym "g"))
+         ($symbol (cond (anonymous-p (cl-gensym "g"))
                        ((consp $name) `',(car $name))
                        ((symbolp $name) `',$name)
                        (t (error "Invalid hook name: %s" $name))))
@@ -127,12 +127,12 @@ Optional argument $BODY is the function body."
                          for append-p = (plist-get (cdr-safe hook) :append)
                          for local-p = (plist-get (cdr-safe hook) :local)
                          collect `(add-hook ',hook-name
-                                            ,symbol ,append-p ,local-p))))
+                                            ,$symbol ,append-p ,local-p))))
     (if anonymous-p
-        `(let ((,symbol (lambda ,args ,@$body)))
+        `(let ((,$symbol (lambda ,args ,@$body)))
            ,@forms)
       `(progn
-         (defun ,(cadr symbol) ,args ,@$body)
+         (defun ,(cadr $symbol) ,args ,@$body)
          ,@forms))))
 
 (defmacro define-key! (&rest $args)
@@ -171,7 +171,7 @@ $ARGS should be the form of (:map map :prefix prefix-key key-definitions ...)"
 creating or altering keymaps stored in buffer-local
 `minor-mode-overriding-map-alist'.
 
-$MODE is the minor mode symbol whose map should be overrided.
+$MODE is the minor mode $symbol whose map should be overrided.
 
 $BODY is a group of sexps for defining key bindings
 
@@ -257,6 +257,13 @@ $MAP (default `global-map')."
     (when map
       (define-key $map (kbd $new) (cdr map))
       (define-key $map (kbd $old) nil))))
+
+(defun symbol-orignal-function! ($symbol)
+  "Return original function definition of $SYMBOL"
+  (let ((function-def (advice--symbol-function $symbol)))
+    (while (advice--p function-def)
+      (setq function-def (advice--cdr function-def)))
+    function-def))
 
 (defun ignore-errors! ($fn &rest $args)
   "Use for advice."

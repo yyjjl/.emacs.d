@@ -14,12 +14,11 @@
 (defsubst mode-line//git-info ()
   (when buffer-file-name
     (or mode-line--git-cache
-        (setq mode-line--git-cache
-              (propertize
-               (concat " Git:"
-                       (when (require 'magit nil :noerror)
-                         (magit-get-current-branch)))
-               'face 'font-lock-doc-face)))))
+        (when (require 'magit nil :noerror)
+          (when-let (branch (magit-get-current-branch))
+            (setq mode-line--git-cache
+                  (propertize (concat " Git:" branch)
+                              'face 'font-lock-doc-face)))))))
 
 (defsubst mode-line//relative-directory ()
   (or (and projectile-cached-buffer-file-name

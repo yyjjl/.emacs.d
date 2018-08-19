@@ -1,80 +1,31 @@
 (require-packages!
- lsp-javascript-typescript
+ tide
  js-doc)
 
 
 
-;; (defun js2/print-json-path (&optional $hardcoded-array-index)
-;;   "Print the path to the JSON value under point, and save it in the kill ring.
-;; If HARDCODED-ARRAY-INDEX provided, array index in JSON path is
-;; replaced with it."
-;;   (interactive "P")
-;;   (let (previous-node
-;;         (current-node (js2-node-at-point))
-;;         result)
-;;     ;; The `js2-node-at-point' starts scanning from AST root node.
-;;     ;; So there is no way to optimize it.
-;;     (while (not (js2-ast-root-p current-node))
-;;       (cond
-;;        ;; JSON property node
-;;        ((js2-object-prop-node-p current-node)
-;;         (push (concat "." (js2-prop-node-name
-;;                            (js2-object-prop-node-left current-node)))
-;;               result))
-;;        ;; Array node
-;;        ((or (js2-array-node-p current-node))
-;;         (push (js2-get-element-index-from-array-node
-;;                previous-node
-;;                current-node
-;;                $hardcoded-array-index)
-;;               result))
-;;        ;; Other nodes are ignored
-;;        (t))
-;;       ;; Current node is archived
-;;       (setq previous-node current-node)
-;;       ;; Get parent node and continue the loop
-;;       (setq current-node (js2-node-parent current-node)))
-;;     (if (equal (car result) ".")
-;;         (setq result (cdr result)))
-;;     (setq result (string-join result))
-;;     (if result
-;;         (progn
-;;           (kill-new result)
-;;           (message "%s => kill-ring" result))
-;;       (message "No JSON path found!"))
-;;     result))
 
-;; (with-eval-after-load 'js2-mode
+;; (with-eval-after-load 'js
 ;;   (require 'lsp-javascript-typescript)
-;;   (setq-default js2-use-font-lock-faces t
-;;                 js2-mode-must-byte-compile t
-;;                 js2-idle-timer-delay 1
-;;                 js2-auto-indent-p nil
-;;                 js2-indent-on-enter-key nil
-;;                 js2-skip-preprocessor-directives t
-;;                 js2-strict-inconsistent-return-warning nil
-;;                 js2-enter-indents-newline nil
-;;                 js2-bounce-indent-p t)
-;;   (setq-default js2-additional-externs
-;;                 '("$"
-;;                   "angular" "app" "beforeEach" "browser"
-;;                   "by" "clearInterval" "clearTimeout"
-;;                   "inject" "it" "jQuery" "jasmine"
-;;                   "module"
-;;                   "process" "require" "setInterval" "setTimeout")))
+;;   (define-key js-mode-map (kbd "C-c C-c") 'js/load-run))
 
-(with-eval-after-load 'js
-  (require 'lsp-javascript-typescript))
+(with-eval-after-load 'tide
+  (define-key! :map tide-mode-map
+    ("C-c C-d" . tide-documentation-at-point)
+    ("M-?" . tide-references)
+    ("C-c r r" . tide-refactor)
+    ("C-c r n" . tide-rename-symbol)
+    ("C-c r f" . tide-rename-file)
+    ("C-c b" . tide-format)))
 
-(define-hook! js|setup (js-mode-hook
-                        typescript-mode-hook)
-  ;; (js2-imenu-extras-mode)
+(define-hook! js|setup (js-mode-hook typescript-mode-hook)
+  (tide-setup)
 
-  ;; (js2-mode-toggle-warnings-and-errors)
-  ;; (electric-operator-mode 1)
-  (unless (buffer-temporary?)
-    (lsp-javascript-typescript-enable)
-    (add-to-list 'company-backends 'company-lsp))
+  (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
+
+  (add-to-list 'company-backends 'company-tide)
+
+  (tide-hl-identifier-mode 1)
 
   (setq-local electric-layout-rules
               (delq (assoc ?\; electric-layout-rules)
