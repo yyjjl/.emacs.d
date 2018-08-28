@@ -103,7 +103,8 @@
           (bound-and-true-p cpp-setup-literally)
           (> (buffer-size) core-large-buffer-size))
       (progn
-        (ggtags-mode 1)
+        (when env-has-gtags-p
+          (ggtags-mode 1))
         ;; (setq completion-at-point-functions nil)
         (flycheck-mode -1))
     (setq cpp-cmake-project-root (cpp-cmake//locate-cmakelists))
