@@ -15,9 +15,9 @@
 ;;       chpwd() {print -P "\033AnSiTc %d"}
 ;;   fi
 
-(defun term*setup-environment ($fn &rest $args)
+(defun term*setup-environment (-fn &rest -args)
   (with-temp-env! (term//extra-env)
-    (apply $fn $args)))
+    (apply -fn -args)))
 (advice-add 'compilation-start :around 'term*setup-environment)
 
 (with-eval-after-load 'term

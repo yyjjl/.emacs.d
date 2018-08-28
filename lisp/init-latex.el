@@ -6,10 +6,10 @@
 
 
 
-(defun latex/narrow-to-section (&optional $no-subsections)
+(defun latex/narrow-to-section (&optional -no-subsections)
   (interactive "P")
   (save-mark-and-excursion
-    (LaTeX-mark-section $no-subsections)
+    (LaTeX-mark-section -no-subsections)
     (call-interactively 'narrow-to-region)))
 
 (defun latex/count-words ()
@@ -75,6 +75,10 @@
 
 (autoload 'LaTeX-math-mode "latex" nil t)
 (define-hook! latex|setup (LaTeX-mode-hook)
+  (flycheck-mode -1)
+
+  (setq next-error-function 'TeX-next-error)
+
   (company-auctex-init)
   (add-to-list 'company-backends 'company-reftex-labels)
   (add-to-list 'company-backends 'company-reftex-citations)
@@ -136,6 +140,8 @@
 (with-eval-after-load 'latex
   (require 'tex-fold)
 
+  (setq TeX-debug-bad-boxes nil)
+  (setq TeX-debug-warnings t)
   (setq TeX-outline-extra nil)
   (setq TeX-fold-command-prefix (kbd "C-c C-o"))
 
@@ -160,7 +166,8 @@
     ("C-c s" . LaTeX-section)
     ("C-c e" . LaTeX-environment)
     ("C-c x" . TeX-font)
-    ("C-c C-x" . TeX-font)))
+    ("C-c C-x" . TeX-font)
+    ("C-c f l" . TeX-error-overview)))
 
 (with-eval-after-load 'preview
   (setq preview-auto-cache-preamble t

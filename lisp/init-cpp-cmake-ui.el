@@ -141,9 +141,9 @@
     (widget-insert "\n")
     (let ((available-options (buffer-local-value 'cpp-cmake-available-options
                                                  $buffer)))
+      (widget-insert "(run `C-u M-x cpp/run-cmake' to get available options)\n")
       (if (not available-options)
-          (widget-insert "No Available Options "
-                         "(run `C-u M-x cpp/run-cmake' to get available options")
+          (widget-insert "No Available Options ")
         (apply
          #'widget-create 'list
          :tag "Available Options (Click to add)"

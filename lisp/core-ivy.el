@@ -1,20 +1,20 @@
-(defun core//ivy-switch-buffer-transformer ($string)
+(defun core//ivy-switch-buffer-transformer (-string)
   "Transform STR to more readable format."
-  (let ((buffer (get-buffer $string)))
+  (let ((buffer (get-buffer -string)))
     (cond
      (buffer
-      (format-line! $string (buffer-local-value 'default-directory buffer)))
+      (format-line! -string (buffer-local-value 'default-directory buffer)))
      ((and (eq ivy-virtual-abbreviate 'full)
-           (file-name-directory $string))
-      (format-line! (propertize (file-name-nondirectory $string)
+           (file-name-directory -string))
+      (format-line! (propertize (file-name-nondirectory -string)
                                 'face 'ivy-virtual)
-                    (file-name-directory $string)))
-     (t $string))))
+                    (file-name-directory -string)))
+     (t -string))))
 
-(defun core//counsel-bookmark-transformer ($string)
+(defun core//counsel-bookmark-transformer (-string)
   "Transform STR to more readable format."
-  (format-line! (propertize $string 'face 'font-lock-string-face)
-                (when-let (bm (bookmark-get-bookmark-record $string))
+  (format-line! (propertize -string 'face 'font-lock-string-face)
+                (when-let (bm (bookmark-get-bookmark-record -string))
                   (concat (file-name-nondirectory (cdr (assoc 'filename bm)))
                           (propertize (format " %10d"
                                               (cdr (assoc 'position bm)))
@@ -119,8 +119,8 @@
   (define-key read-expression-map (kbd "C-r") 'counsel-minibuffer-history))
 
 (with-eval-after-load 'counsel-projectile
-  (defun counsel-projectile*hack (&optional $arg)
-    (when (eq $arg '(16))
+  (defun counsel-projectile*hack (&optional -arg)
+    (when (eq -arg '(16))
       (setq projectile-cached-project-root nil)))
   (advice-add 'counsel-projectile :before #'counsel-projectile*hack)
 

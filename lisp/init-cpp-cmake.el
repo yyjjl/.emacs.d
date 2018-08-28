@@ -78,18 +78,18 @@
 
 
 
-(defun cpp-cmake//locate-cmakelists (&optional $dir $last-found $filename)
+(defun cpp-cmake//locate-cmakelists (&optional -dir -last-found -filename)
   "Find the topmost CMakeLists.txt."
-  (let ((new-dir (locate-dominating-file (or $dir default-directory)
-                                         (or $filename
+  (let ((new-dir (locate-dominating-file (or -dir default-directory)
+                                         (or -filename
                                              "CMakeLists.txt"))))
     (if new-dir
         (cpp-cmake//locate-cmakelists (expand-file-name ".." new-dir)
                                new-dir
-                               $filename)
-      $last-found)))
+                               -filename)
+      -last-found)))
 
-(defun cpp-cmake//run-cmake-internal (&optional $callback)
+(defun cpp-cmake//run-cmake-internal (&optional -callback)
   (cl-assert cpp-cmake-project-root nil "Not in a project")
   (let* ((build-directory (cpp-cmake//config-build))
          (buffer (current-buffer))
@@ -106,20 +106,20 @@
         (error "Can not cd to build directory")))
     (with-current-buffer (with-temp-env! (cpp-cmake//config-env)
                            (compilation-start command))
-      (when $callback
+      (when -callback
         (add-hook 'compilation-finish-functions
-                  (lambda (&rest _) (funcall $callback buffer))
+                  (lambda (&rest _) (funcall -callback buffer))
                   nil
                   :local)))))
 
-(defun cpp-cmake//parse-available-options ($buffer)
-  (with-current-buffer $buffer
+(defun cpp-cmake//parse-available-options (-buffer)
+  (with-current-buffer -buffer
     (goto-char (point-min))
     (if (not (search-forward "-- Cache values" nil t))
         (error "Can not parse cmake output")
       (let (available-options)
         (while (re-search-forward
-                "^\\([^:\n]+\\):\\([^=\n]+\\)=\\(.+\\)$" (point-max) t)
+                "^\\([^:\n]+\\):\\([^=\n]+\\)=\\(.+\\)-" (point-max) t)
           (push (list (match-string-no-properties 1)
                       (match-string-no-properties 2)
                       (match-string-no-properties 3))
@@ -133,8 +133,8 @@
     (set-process-sentinel
      (with-temp-env! (cpp-cmake//config-env)
        (start-process "cmake" " *cmake*" "cmake" "-L" build-directory))
-     (lambda ($proc _)
-       (let* ((cmake-buffer (process-buffer $proc))
+     (lambda (-proc _)
+       (let* ((cmake-buffer (process-buffer -proc))
               (result (cpp-cmake//parse-available-options cmake-buffer)))
          (with-current-buffer buffer
            (setq cpp-cmake-available-options result)

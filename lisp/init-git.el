@@ -13,16 +13,16 @@
 ;; @see
 ;; http://blog.binchen.org/posts/enhance-emacs-git-gutter-with-ivy-mode.html
 ;; {{ git gutter with ivy
-(defun git/reshape-gutter ($gutter)
+(defun git//reshape-gutter (-gutter)
   "Re-shape GUTTER for `ivy-read'."
-  (let* ((linenum-start (aref $gutter 3))
-         (linenum-end (aref $gutter 4))
+  (let* ((linenum-start (aref -gutter 3))
+         (linenum-end (aref -gutter 4))
          (target-line "")
          (target-linenum 1)
          (tmp-line "")
          (max-line-length 0))
     (save-excursion
-      ;; find out the longest stripped line in the $gutter
+      ;; find out the longest stripped line in the -gutter
       (while (<= linenum-start linenum-end)
         (forward-line 1)
         (setq tmp-line (replace-regexp-in-string
@@ -37,14 +37,14 @@
         (setq linenum-start (1+ linenum-start))))
     ;; build (key . linenum-start)
     (cons (format "%s %d: %s"
-                  (if (eq 'deleted (aref $gutter 1)) "-" "+")
+                  (if (eq 'deleted (aref -gutter 1)) "-" "+")
                   target-linenum target-line)
           target-linenum)))
 
 (defun git/ivy-goto-gutter ()
   (interactive)
   (if git-gutter:diffinfos
-      (let* ((collection (mapcar 'git/reshape-gutter
+      (let* ((collection (mapcar 'git//reshape-gutter
                                  git-gutter:diffinfos)))
         (ivy-read "git-gutters:"
                   collection
@@ -133,13 +133,12 @@
   (setq magit-completing-read-function 'ivy-completing-read)
   ;; Disable interal vc
   (setq vc-handled-backends nil)
-  (require 'magit-autorevert))
+  (setq magit-auto-revert-mode nil))
 
 (with-eval-after-load 'magit-files
   (define-key! :map magit-file-mode-map
     ("C-x g g" . magit-status)
     ("C-x g")))
-
 
 (define-hook! (git|message-kill-commit-id msg)
   (git-messenger:after-popup-hook)

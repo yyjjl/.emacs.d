@@ -64,13 +64,13 @@
         (lsp-rust-enable)
         (add-to-list 'company-backends 'company-lsp)))))
 
-(defun rust/cargo-dispatch ($use-last-action)
+(defun rust/cargo-dispatch (-use-last-action)
   (interactive "P")
   (let* ((last-action (or (and (boundp 'rust-cargo-history)
                                (car-safe rust-cargo-history))
                           "build"))
          (last-command (cdr (assoc last-action rust-cargo-commands))))
-    (if (and $use-last-action last-command)
+    (if (and -use-last-action last-command)
         (call-interactively last-command)
       (ivy-read "Command: " rust-cargo-commands
                 :require-match t

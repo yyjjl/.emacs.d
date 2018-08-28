@@ -15,29 +15,41 @@
              do (dolist (mode modes)
                   (funcall mode switch)))))
 
-(defun core*desktop-save-unless-loaded ($fn &rest $args)
+(defun core*desktop-save-unless-loaded (-fn &rest -args)
   (if (or (called-interactively-p 'interactive)
           desktop-file-modtime)
-      (apply $fn $args)
+      (apply -fn -args)
     (message "Current desktop was not loaded from a file. Ignored")))
 
 (with-eval-after-load 'desktop
   (advice-add 'desktop-save :around #'core*desktop-save-unless-loaded)
-  (dolist (mode '(company-posframe-mode
-                  orgtbl-mode
+  ;; These minor modes are enabled by core
+  (dolist (mode '(git-gutter-mode
+                  ivy-mode
+                  counsel-mode
+                  projectile-mode
+                  yas-minor-mode
+                  company-mode
+                  which-key-mode
+                  subword-mode
+                  global-auto-revert-mode
+                  company-posframe-mode
+                  flycheck-mode
                   hs-minor-mode
-                  auto-revert-mode))
-    (add-to-list 'desktop-minor-mode-handlers (cons mode 'ignore))))
+                  auto-revert-mode
+                  lsp-mode))
+    (add-to-list 'desktop-minor-mode-table (cons mode nil))))
 
 (with-eval-after-load 'bookmark
   (define-hook! core|setup-buffer-bookmark (find-file-hook)
-    ;; Setup default bookmark
-    (setq bookmark-current-bookmark
-          (ignore-errors
-            (cl-loop for (name . record) in bookmark-alist
-                  when (equal (file-truename (buffer-file-name))
-                              (file-truename (bookmark-get-filename name)))
-                  do (return name)))))
+    (unless (file-remote-p default-directory)
+      ;; Setup default bookmark
+      (setq bookmark-current-bookmark
+            (ignore-errors
+              (cl-loop for (name . record) in bookmark-alist
+                       when (equal (file-truename (buffer-file-name))
+                                   (file-truename (bookmark-get-filename name)))
+                       do (return name))))))
 
   (bookmark-maybe-load-default-file)
   ;; Setup for existing buffers
@@ -87,15 +99,14 @@
                   try-expand-dabbrev-limited-chars-visible
                   try-expand-dabbrev-limited-chars-all-buffers)))
 
-(setq projectile-keymap-prefix (kbd "C-x p"))
-
 (with-eval-after-load 'projectile
+  (define-key projectile-mode-map (kbd "C-x p") projectile-command-map)
   ;; Projectile root-searching functions can cause an infinite cl-loop on TRAMP
   ;; connections, so disable them.
-  (defun core*projectile-locate-dominating-file ($fn &rest $args)
+  (defun core*projectile-locate-dominating-file (-fn &rest -args)
     "Don't traverse the file system if on a remote connection."
     (unless (file-remote-p default-directory)
-      (apply $fn $args)))
+      (apply -fn -args)))
   (advice-add #'projectile-locate-dominating-file
               :around #'core*projectile-locate-dominating-file)
   (setq projectile-mode-line
@@ -111,9 +122,9 @@
   (add-hook 'kill-emacs-hook #'projectile-cleanup-known-projects))
 
 (with-eval-after-load 'yasnippet
-  (defun core*expand-local-snippets ($fn &rest $args)
+  (defun core*expand-local-snippets (-fn &rest -args)
     (or (core//try-expand-local-snippets)
-        (apply $fn $args)))
+        (apply -fn -args)))
 
   (advice-add 'yas-next-field-or-maybe-expand
               :around #'core*expand-local-snippets)
@@ -158,7 +169,7 @@
 ;; Smart tab
 (defvar core--indent-close-list '(?\} ?\$ ?\] ?\' ?\` ?\"))
 (defvar core--indent-compelte-functions '(hippie-expand))
-(defun core*indent-for-tab ($fn &rest $arg)
+(defun core*indent-for-tab (-fn &rest -arg)
   (if (save-excursion
         (forward-line 0)
         (and outline-minor-mode (looking-at-p outline-regexp)))
@@ -166,7 +177,7 @@
       (outline-toggle-children)
     (let ((old-point (point))
           (old-tick (buffer-chars-modified-tick)))
-      (apply $fn $arg)
+      (apply -fn -arg)
       (when (and (eq old-point (point))
                  (eq old-tick (buffer-chars-modified-tick))
                  (called-interactively-p 'interactive))
@@ -190,14 +201,28 @@
                     (throw 'done nil)))))))))))
 (advice-add 'indent-for-tab-command :around #'core*indent-for-tab)
 
-(defun core*desktop-read ($fn &rest $args)
+(defun core*desktop-read (-fn &rest -args)
   "Temporarily disable semantic mode when load desktop"
   (let ((semantic-enable-p semantic-mode))
     (semantic-mode -1)
-    (apply $fn $args)
+    (apply -fn -args)
     (when semantic-enable-p
       (core/enable-semantic))))
 (advice-add 'desktop-read :around #'core*desktop-read)
+
+(defvar core-auto-next-error-buffer-derived-modes
+  '(occur-mode grep-mode ivy-occur-mode))
+(defun core*next-error-before (&rest _)
+  (let ((occur-buffer
+         (cl-loop
+          for window in (window-list)
+          for buffer = (window-buffer window)
+          when (derived-mode? core-auto-next-error-buffer-derived-modes buffer)
+          return buffer)))
+    (when (or (not next-error-last-buffer)
+              (not (eq next-error-last-buffer occur-buffer)))
+      (setq next-error-last-buffer occur-buffer))))
+(advice-add 'next-error :before #'core*next-error-before)
 
 (define-key!
   ("C-<down>" . text-scale-decrease)
@@ -218,6 +243,7 @@
   ("C-x R" . core/rename-this-file-and-buffer)
   ("C-x W" . core/copy-this-file-to-new-file)
   ("C-x c" . core/cleanup-buffer-safe)
+  ("C-x o" . ace-window)
 
   ("C-x w [" . winner-undo)
   ("C-x w ]" . winner-redo)

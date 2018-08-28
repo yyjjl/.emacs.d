@@ -25,7 +25,7 @@
   (add-to-list 'emms-player-mpv-parameters "--no-video")
 
   (advice-add 'emms-lyrics-display-handler :around
-              (lambda ($fn &rest $args) (ignore-errors (apply $fn $args))))
+              (lambda (-fn &rest -args) (ignore-errors (apply -fn -args))))
   (add-hook 'emms-playlist-mode-hook #'emms-mark-mode))
 
 (defun extra/emms-current-name ()

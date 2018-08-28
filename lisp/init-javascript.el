@@ -19,13 +19,15 @@
     ("C-c b" . tide-format)))
 
 (define-hook! js|setup (js-mode-hook typescript-mode-hook)
-  (tide-setup)
+  (unless (and buffer-file-name
+               (string-suffix-p ".json" (downcase buffer-file-name)))
+    (tide-setup)
 
-  (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
+    (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
 
-  (add-to-list 'company-backends 'company-tide)
+    (add-to-list 'company-backends 'company-tide)
 
-  (tide-hl-identifier-mode 1)
+    (tide-hl-identifier-mode 1))
 
   (setq-local electric-layout-rules
               (delq (assoc ?\; electric-layout-rules)

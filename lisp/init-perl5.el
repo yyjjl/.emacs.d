@@ -25,19 +25,19 @@
            perl-perltidy-options)
     (goto-char old-point)))
 
-(defun perl/perltidy-format (&optional $arg)
+(defun perl/perltidy-format (&optional -arg)
   "Format Perl code with perltidy.
 If region is active, operate on it, else operate on line."
   (interactive "p")
   (if (use-region-p)
       (perl//format-region (region-beginning) (region-end))
     (cond
-     ((eq $arg 1)
+     ((eq -arg 1)
       (perl//format-region (save-excursion (beginning-of-defun)
                                           (point))
                           (save-excursion (end-of-defun)
                                           (point))))
-     ((eq $arg 4)
+     ((eq -arg 4)
       (perl//format-region (point-min) (point-max))))))
 
 
@@ -53,12 +53,12 @@ If region is active, operate on it, else operate on line."
  ;; parentheses are indented with the block and not with scope
  cperl-indent-parens-as-block t)
 
-(defun run-perl (&optional $kill)
+(defun run-perl (&optional -kill)
   (interactive "P")
   (let* ((buffer-name "*perl-repl*")
          (buffer (get-buffer buffer-name)))
     (unless (and buffer
-                 (not $kill)
+                 (not -kill)
                  (process-live-p (get-buffer-process buffer))
                  (eq (buffer-local-value 'major-mode buffer)
                      'term-mode))

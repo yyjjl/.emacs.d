@@ -7,7 +7,7 @@
 (defvar-local gud--source-buffer-status nil)
 (defvar-local gud--source-buffer-list nil)
 
-(defun gdb*display-buffer ($buffer)
+(defun gdb*display-buffer (-buffer)
   (let ((old-window (selected-window)))
     (unless (window-live-p gdb--side-window)
       (when-let ((comint-buffer gud-comint-buffer)
@@ -18,19 +18,19 @@
     (if (window-live-p gdb--side-window)
         (progn
           (set-window-dedicated-p gdb--side-window nil)
-          (set-window-buffer gdb--side-window $buffer)
+          (set-window-buffer gdb--side-window -buffer)
           (set-window-dedicated-p gdb--side-window t)
-          (unless (eq (buffer-local-value 'gdb-buffer-type $buffer)
+          (unless (eq (buffer-local-value 'gdb-buffer-type -buffer)
                       'gdb-inferior-io)
             (select-window gdb--side-window)))
-      (with-current-buffer $buffer
+      (with-current-buffer -buffer
         (error "Can not display buffer %s" gdb-buffer-type)))))
 
 ;; Fix a bug when call commands from source buffer
-(defun gud*display-line ($true-file $line)
+(defun gud*display-line (-true-file -line)
   (let* ((last-nonmenu-event t)      ; Prevent use of dialog box for questions.
          (buffer (with-current-buffer gud-comint-buffer
-                   (gud-find-file $true-file)))
+                   (gud-find-file -true-file)))
          (window (and buffer
                       (or (get-buffer-window buffer)
                           (when (window-live-p gdb-source-window)
@@ -48,7 +48,7 @@
         (save-restriction
           (widen)
           (goto-char (point-min))
-          (forward-line (1- $line))
+          (forward-line (1- -line))
           (setq pos (point))
           (or gud-overlay-arrow-position
               (setq gud-overlay-arrow-position (make-marker)))
@@ -149,8 +149,8 @@
       (setq buffer-read-only (car gud--source-buffer-status))))
   (force-mode-line-update))
 
-(defun gud*find-file-hack ($fn $file)
-  (let ((buffer (funcall $fn $file)))
+(defun gud*find-file-hack (-fn -file)
+  (let ((buffer (funcall -fn -file)))
     (when (and buffer gud-comint-buffer)
       (with-current-buffer gud-comint-buffer
         (add-to-list 'gud--source-buffer-list buffer))
@@ -163,10 +163,10 @@
   (setq gud--window-configuration (current-window-configuration))
   (delete-other-windows))
 
-(defun gud*sentinel-hack ($proc $msg)
-  (let ((buffer (process-buffer $proc)))
+(defun gud*sentinel-hack (-proc -msg)
+  (let ((buffer (process-buffer -proc)))
     (when (and (buffer-live-p buffer)
-               (memq (process-status $proc) '(signal exit)))
+               (memq (process-status -proc) '(signal exit)))
       (dolist (src-buf (buffer-local-value 'gud--source-buffer-list buffer))
         (when (buffer-live-p src-buf)
           (with-current-buffer src-buf
@@ -182,9 +182,16 @@
   (define-key gud-mode-map "`" gud--source-mode-map)
   (define-key gud-mode-map (kbd "C-c C-z") #'gud/pop-to-source-buffer)
 
+  (add-hook 'pdb-mode-hook
+            (lambda ()
+              (gud-def gud-display "display %e" " " "Display expression")
+              (gud-def gud-display-all "display" "\C- " "Display all")
+              (gud-def gud-python-until "until  %l" "\C-u"
+                       "Continue to current line or address.")
+              (define-key gud--source-mode-map "u" 'gud-python-until)))
+
   (define-hook! gud|setup-hook (gud-mode-hook)
-    (gud-def gud-display "display %e" " " "Display expression")
-    (gud-def gud-display-all "display" "\C- " "Display all")
+    (define-key gud--source-mode-map "u" 'gud-until)
 
     (gud-tooltip-mode 1)
     (set-window-dedicated-p (get-buffer-window gud-comint-buffer) t)

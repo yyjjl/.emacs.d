@@ -18,29 +18,24 @@
 
 
 
-(defsubst cpp-cquery//dot-cquery-path (&optional $dir)
+(defsubst cpp-cquery//dot-cquery-path (&optional -dir)
   (expand-file-name ".cquery"
-                    (locate-dominating-file (or $dir default-directory)
+                    (locate-dominating-file (or -dir default-directory)
                                             ".cquery")))
 
 (defun cpp-cquery//setup ()
-  (when cpp-has-cquery-p
-    (unless lsp-mode
-      (condition-case err
-          (lsp-cquery-enable)
-        (error (message "%s" (error-message-string err))))
-      (setq-local company-transformers nil)
-      (setq-local company-idle-delay nil)
-      (setq-local company-lsp-cache-candidates nil)
-      (add-to-list 'company-backends 'company-lsp)
-      (add-to-list 'company-backends 'company-files))))
+  (setq-local company-transformers nil)
+  (setq-local company-idle-delay nil)
+  (setq-local company-lsp-cache-candidates nil)
+  (add-to-list 'company-backends 'company-lsp)
+  (add-to-list 'company-backends 'company-files))
 
-(defun cpp-cquery/create-dot-cquery ($dir)
+(defun cpp-cquery/create-dot-cquery (-dir)
   (interactive (list (if current-prefix-arg
                          (read-directory-name "Directory: ")
                        default-directory)))
-  (when $dir
-    (let ((cquery-file (expand-file-name ".cquery" $dir)))
+  (when -dir
+    (let ((cquery-file (expand-file-name ".cquery" -dir)))
       (if (file-exists-p cquery-file)
           (message ".cquery already exists")
         (with-temp-buffer
@@ -60,14 +55,14 @@
 (cpp-cquery//define-find derived "$cquery/derived")
 (cpp-cquery//define-find vars "$cquery/vars")
 
-(defun cpp-cquery//filter-arguments ($args &optional $no-filename)
+(defun cpp-cquery//filter-arguments (-args &optional -no-filename)
   (--filter
    (not (or (string-prefix-p "-working-directory" it)
             (string-prefix-p "-resource-dir" it)
             (string-prefix-p "-fparse-all-comments" it)
-            (and $no-filename
+            (and -no-filename
                  (not (string-prefix-p "-" it)))))
-   $args))
+   -args))
 
 (defun cpp-cquery//include-directories ()
   (let ((args (or (ignore-errors (gethash "args" (cquery-file-info)))
@@ -95,17 +90,17 @@
                                 "\n"
                                 :omit-nulls))))))))
 
-(defun cpp-cquery//buffer-compile-command (&optional $preprocess-only-p)
+(defun cpp-cquery//buffer-compile-command (&optional -preprocess-only-p)
   (let* ((args (or (ignore-errors (gethash "args" (cquery-file-info)))
                    '("/usr/bin/c++")))
-         (options (cpp-cquery//filter-arguments (cdr args) $preprocess-only-p)))
-    (when $preprocess-only-p
+         (options (cpp-cquery//filter-arguments (cdr args) -preprocess-only-p)))
+    (when -preprocess-only-p
       (dolist (option '("-E" "-xc++" "-C"))
         (unless (member option options)
           (push option options))))
     (concat (car args) " "
             (string-join options " ")
-            (when $preprocess-only-p " -"))))
+            (when -preprocess-only-p " -"))))
 
 
 
@@ -137,20 +132,20 @@
   ;; (defvar cpp-cquery--semantic-highlight-timer nil)
   ;; (defvar cpp-cquery--semantic-highlight-interval 1)
   ;; (defvar cpp-cquery--semantic-highlight-params nil)
-  ;; (defun cpp-cquery*semantic-highlight ($fn _ $params)
-  ;;   (setq cpp-cquery--semantic-highlight-params $params)
+  ;; (defun cpp-cquery*semantic-highlight (-fn _ -params)
+  ;;   (setq cpp-cquery--semantic-highlight-params -params)
   ;;   (unless cpp-cquery--semantic-highlight-timer
   ;;     (setq cpp-cquery--semantic-highlight-timer
   ;;           (run-with-idle-timer
   ;;            cpp-cquery--semantic-highlight-interval nil
   ;;            (lambda ()
   ;;              (setq cpp-cquery--semantic-highlight-timer nil)
-  ;;              (funcall $fn nil cpp-cquery--semantic-highlight-params))))))
+  ;;              (funcall -fn nil cpp-cquery--semantic-highlight-params))))))
 
   ;; (advice-add 'cquery--publish-semantic-highlighting
   ;;             :around #'cpp-cquery*semantic-highlight)
 
-  (setq cquery-sem-highlight-method 'font-lock))
+  (setq cquery-sem-highlight-method nil))
 
 (with-eval-after-load 'cquery-tree
   (add-hook 'cquery-tree-mode-hook

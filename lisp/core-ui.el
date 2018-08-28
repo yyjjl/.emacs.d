@@ -77,8 +77,8 @@
 ;; Defer jit font locking slightly to [try to] improve Emacs performance
 ;; (setq-default jit-lock-defer-time 0.3)
 (setq-default jit-lock-defer-time nil)
-(setq-default jit-lock-stealth-nice 0.1)
-(setq-default jit-lock-stealth-time 0.2)
+(setq-default jit-lock-stealth-nice 0.5)
+(setq-default jit-lock-stealth-time 5)
 (setq-default jit-lock-stealth-verbose nil)
  ;; No beeping or blinking please
 (setq-default ring-bell-function #'ignore)

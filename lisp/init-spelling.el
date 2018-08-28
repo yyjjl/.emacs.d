@@ -18,24 +18,24 @@
  (t (setq ispell-program-name nil)
     (message "You need install either aspell or hunspell for ispell")))
 
-(defun spelling//detect-ispell-args (&optional $run-together)
+(defun spelling//detect-ispell-args (&optional -run-together)
   "If RUN-TOGETHER is true, spell check the CamelCase words"
   (when (and (bound-and-true-p ispell-program-name)
              (string-match "aspell$" ispell-program-name))
     (let ((args '("--sug-mode=ultra" "--lang=en_US")))
-      (if $run-together
+      (if -run-together
           (append args '("--run-together"
                          "--run-together-limit=16"
                          "--run-together-min=2"))
         args))))
 
-(defun spelling*set-extra-args ($fn &rest $args)
+(defun spelling*set-extra-args (-fn &rest -args)
   (let ((old-ispell-extra-args ispell-extra-args))
     (ispell-kill-ispell t)
     ;; Use emacs original arguments
     ;; Donot use together
     (setq ispell-extra-args (spelling//detect-ispell-args))
-    (apply $fn $args)
+    (apply -fn -args)
     ;; Restore our own ispell arguments
     (setq ispell-extra-args old-ispell-extra-args)
     (ispell-kill-ispell t)))
@@ -77,7 +77,7 @@
     (setq flyspell-old-buffer-error (current-buffer))
     (goto-char pos)))
 
-(defun flyspell-dwim (&optional $whole-buffer)
+(defun flyspell-dwim (&optional -whole-buffer)
   "Check spelling manually."
   (interactive "p")
   (when-let ((mode-predicate
@@ -85,7 +85,7 @@
                   (and (derived-mode-p 'prog-mode)
                        'flyspell-generic-progmode-verify))))
     (setq flyspell-generic-check-word-predicate mode-predicate))
-  (cond ($whole-buffer
+  (cond (-whole-buffer
          (call-interactively #'flyspell-buffer))
         ((region-active-p)
          (flyspell-region (region-beginning) (region-end)))

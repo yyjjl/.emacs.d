@@ -40,12 +40,8 @@
   "Display buffer id in mode-line."
   (let ((method (file-remote-p default-directory 'method)))
     (list " %["
-          (propertize (if method
-                          (concat "[" method "]")
-                        (mode-line//relative-directory))
-                      'face 'font-lock-string-face)
-          '(:propertize mode-line-buffer-identification
-                        face font-lock-keyword-face)
+          (propertize (mode-line//relative-directory) 'face 'font-lock-string-face)
+          '(:propertize mode-line-buffer-identification face font-lock-keyword-face)
           "%] ")))
 
 (defsubst mode-line//buffer-major-mode ()
@@ -217,8 +213,7 @@ read-only, and `buffer-file-coding-system'"
   (setq-default mode-line-format mode-line-default-format)
   (setq-default mode-line-buffer-identification '("%b"))
   (setq-default mode-line-misc-info
-                '((lsp-mode ("" (:eval (lsp-mode-line))))
-                  (core-current-desktop-name (" <" core-current-desktop-name ">"))
+                '(;; (core-current-desktop-name (" <" core-current-desktop-name ">"))
                   ;; (company-mode company-lighter)
                   (company-search-mode company-search-lighter)
                   (global-mode-string ("" " " global-mode-string)))))

@@ -53,10 +53,10 @@
       (cdr (assoc keys org-block-key-bindings))))
   (add-hook 'org-speed-command-hook 'org-block-speed-command-activate :append)
 
-  (defun org*beginning-of-line ($fn &optional $n)
+  (defun org*beginning-of-line (-fn &optional -n)
     (if (bolp)
         (back-to-indentation)
-      (funcall $fn $n)))
+      (funcall -fn -n)))
   (advice-add 'org-beginning-of-line :around  #'org*beginning-of-line)
 
   ;; Highlight `{{{color(<color>, <text>}}}' form
@@ -217,13 +217,13 @@
           (expand-file-name org-preview-latex-image-directory
                             (or directory default-directory)))))
 
-  (define-hook! (org|after-rename-this-file $old-name $new-name)
+  (define-hook! (org|after-rename-this-file -old-name -new-name)
     (core-after-rename-this-file-hook)
-    (let ((new-dir (file-name-directory $new-name))
-          (old-dir (file-name-directory $old-name))
+    (let ((new-dir (file-name-directory -new-name))
+          (old-dir (file-name-directory -old-name))
           (old-cache-dir org-preview-latex-image-directory)
-          (new-cache-dir (concat "auto/" (file-name-base $new-name) "/")))
-      (when (org//ltximg-directory-local-p $old-name old-dir)
+          (new-cache-dir (concat "auto/" (file-name-base -new-name) "/")))
+      (when (org//ltximg-directory-local-p -old-name old-dir)
         (let ((dir (expand-file-name "auto" new-dir)))
           (when (not (file-exists-p dir))
             (make-directory dir t)))
@@ -258,7 +258,7 @@
       (local-set-key (kbd "C-c C-.") #'ob-ipython-inspect))
     (flycheck-mode -1))
 
-  (defun org*fill-paragraph-hack ($fn &optional $justify region)
+  (defun org*fill-paragraph-hack (-fn &optional -justify region)
     (let* ((element (org-element-context))
            (end (org-element-property :end element))
            (begin (org-element-property :begin element))
@@ -266,7 +266,7 @@
                           '(latex-fragment latex-environment))))
       (if (and latex-p
                (not (region-active-p))
-               $justify)
+               -justify)
           (save-excursion
             (goto-char begin)
             (let ((g1 '(group (not (any "{([" blank))))
@@ -283,7 +283,7 @@
                                     "\\1 \\2 " nil begin end)
               (query-replace-regexp (rx-to-string `(and (group " ") ,g2 ,g3) t)
                                     " \\1 \\2" nil begin end)))
-        (funcall $fn $justify region))
+        (funcall -fn -justify region))
       (when (fboundp #'extra/insert-space-around-chinese)
         (ignore-errors (extra/insert-space-around-chinese begin end)))))
   (advice-add 'org-fill-paragraph :around #'org*fill-paragraph-hack)
@@ -314,13 +314,13 @@
 
 (with-eval-after-load 'ox-html
 
-  (defun org*html-export-with-line-number ($fn &rest $rest)
-    (when (= (length $rest) 5)
-      (let ((num-start (nth 4 $rest)))
+  (defun org*html-export-with-line-number (-fn &rest -rest)
+    (when (= (length -rest) 5)
+      (let ((num-start (nth 4 -rest)))
         (unless num-start
           (setq num-start 0))
-        (setcar (nthcdr 4 $rest) num-start)))
-    (apply $fn $rest))
+        (setcar (nthcdr 4 -rest) num-start)))
+    (apply -fn -rest))
 
   ;; (advice-add 'org-html-do-format-code
   ;;             :around #'org*html-export-with-line-number)
@@ -334,10 +334,10 @@
   (ignore-errors
     (require 'ox-bibtex))
 
-  (defun org*latex-link-hack ($fn $link $desc $info)
-    (let* ((type (org-element-property :type $link))
-           (raw-path (org-element-property :path $link))
-           (search-option (org-element-property :search-option $link))
+  (defun org*latex-link-hack (-fn -link -desc -info)
+    (let* ((type (org-element-property :type -link))
+           (raw-path (org-element-property :path -link))
+           (search-option (org-element-property :search-option -link))
            (project (ignore-errors
                       (org-publish-get-project-from-filename
                        (buffer-file-name)))))
@@ -352,8 +352,8 @@
                    (org-export-file-uri
                     (file-name-sans-extension raw-path)))
                   search-option
-                  (or $desc ""))
-        (funcall $fn $link $desc $info))))
+                  (or -desc ""))
+        (funcall -fn -link -desc -info))))
   (advice-add 'org-latex-link :around #'org*latex-link-hack)
 
   (add-to-list 'org-latex-minted-langs '(ipython "python"))

@@ -90,21 +90,21 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
 
 
 
-(defsubst term//get-buffer-name ($fmt)
+(defsubst term//get-buffer-name (-fmt)
   (let* ((index 1)
-         (name (format $fmt index)))
+         (name (format -fmt index)))
     (while (buffer-live-p (get-buffer name))
-      (setq name (format $fmt index))
+      (setq name (format -fmt index))
       (setq index (1+ index)))
     name))
 
 ;;;###autoload
 (defsubst term//wrap-sentinel (&optional sentinel)
-  (lambda ($proc $msg)
-    (and sentinel (funcall sentinel $proc $msg))
+  (lambda (-proc -msg)
+    (and sentinel (funcall sentinel -proc -msg))
     (ignore-errors (run-hooks 'term-or-comint-process-exit-hook))
-    (when (memq (process-status $proc) '(signal exit))
-      (with-current-buffer (process-buffer $proc)
+    (when (memq (process-status -proc) '(signal exit))
+      (with-current-buffer (process-buffer -proc)
         (if term-directly-kill-buffer
             (kill-buffer)
           (let ((buffer-read-only nil))
@@ -137,7 +137,7 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
        (t (signal 'wrong-type-argument (list 'array bind-key))))
       (define-key term-raw-map bind-key bind-command))))
 
-(defun term//switch-internal ($n)
+(defun term//switch-internal (-n)
   (when term--buffer-list
     (let ((size (length term--buffer-list))
           (index (cl-position (current-buffer) term--buffer-list))
@@ -145,20 +145,20 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
       (set-window-dedicated-p window nil)
       (unwind-protect
           (switch-to-buffer (nth (if index
-                                     (mod (+ index $n) size)
+                                     (mod (+ index -n) size)
                                    0)
                                  term--buffer-list))
         (set-window-dedicated-p window t)))))
 
-(defun term/switch-next ($create-new)
+(defun term/switch-next (-create-new)
   (interactive "P")
-  (if $create-new
+  (if -create-new
       (term/pop-shell-current-directory)
     (term//switch-internal 1)))
 
-(defun term/switch-prev ($create-new)
+(defun term/switch-prev (-create-new)
   (interactive "P")
-  (if $create-new
+  (if -create-new
       (term/pop-shell-current-directory)
     (term//switch-internal -1)))
 
@@ -173,10 +173,10 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
                  (equal window (term//get-popup-window)))
         (delete-window window)))))
 
-(defun term//create-buffer (&optional $program $shell-buffer-p)
+(defun term//create-buffer (&optional -program -shell-buffer-p)
   "Get term buffer.
 If option SPECIAL-SHELL is `non-nil', will use shell from user input."
-  (let ((shell-name (or $program
+  (let ((shell-name (or -program
                         term-shell-name
                         (getenv "SHELL")
                         (getenv "ESHELL")
@@ -200,7 +200,7 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
               term-scroll-to-bottom-on-output t)
         (-when-let (proc (ignore-errors (get-buffer-process buffer)))
           (set-process-sentinel proc (term//wrap-sentinel (process-sentinel proc))))
-        (when $shell-buffer-p
+        (when -shell-buffer-p
           (add-hook 'term-or-comint-process-exit-hook
                     'term//terminal-exit-hook
                     nil :local)))
@@ -226,7 +226,7 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
 (defsubst term//extra-env ()
   (term//eval-function-list 'term-default-environment-function-list))
 
-(defun term//get-ssh-info ($arg)
+(defun term//get-ssh-info (-arg)
   (let* ((user (file-remote-p default-directory 'user))
          (host (file-remote-p default-directory 'host))
          (method (file-remote-p default-directory 'method))
@@ -236,19 +236,19 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
       (setq host (match-string 1 host)))
     (when (and method (not (member method '("sshx" "ssh"))))
       (error "Can not open ssh connection for method `%s'" method))
-    (when (or (= $arg 4) (not user))
+    (when (or (= -arg 4) (not user))
       (setq user (read-string "User: " user)))
-    (when (or (= $arg 4) (not host))
+    (when (or (= -arg 4) (not host))
       (setq user (read-string "Host: " host)))
-    (when (= $arg 4)
+    (when (= -arg 4)
       (setq port (read-string "Port: " "22")))
-    (list user host port (>= $arg 16))))
+    (list user host port (>= -arg 16))))
 
 ;;;###autoload
-(defun term//exec-program ($program $args &optional $name)
-  (let ((term-program-switches $args)
-        (term-buffer-name $name))
-    (term//create-buffer $program)))
+(defun term//exec-program (-program -args &optional -name)
+  (let ((term-program-switches -args)
+        (term-buffer-name -name))
+    (term//create-buffer -program)))
 
 (defun term/switch-back ()
   (interactive)
@@ -266,11 +266,11 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
     (message "No parent buffer or it was killed !!!")))
 
 ;;;###autoload
-(defun term/ssh ($user $host &optional $port $force)
+(defun term/ssh (-user -host &optional -port -force)
   (interactive (term//get-ssh-info (or (car-safe current-prefix-arg) 0)))
-  (let ((args (list (format "%s@%s" $user $host)
-                    (format "-p %s" (or $port 22)))))
-    (or (and (not $force)
+  (let ((args (list (format "%s@%s" -user -host)
+                    (format "-p %s" (or -port 22)))))
+    (or (and (not -force)
              (car (--filter (with-current-buffer it
                               (and (eq major-mode 'term-mode)
                                    (equal args term--ssh-info)))
@@ -280,18 +280,18 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
             (setq term--ssh-info args))
           buffer))))
 
-(defun term//local-shell ($directory &optional $force)
-  "If there is a term buffer whose default-directory is $DIRECTORY,
+(defun term//local-shell (-directory &optional -force)
+  "If there is a term buffer whose default-directory is -DIRECTORY,
 return that buffer. Otherwise create a new term buffer.
 
-If $FORCE is non-nil create a new term buffer directly."
-  (or (and (not $force)
+If -FORCE is non-nil create a new term buffer directly."
+  (or (and (not -force)
            (car (--filter (with-current-buffer it
                             (and (eq major-mode 'term-mode)
-                                 (directory-equal? $directory
+                                 (directory-equal? -directory
                                                    default-directory)))
                           (buffer-list))))
-      (let ((default-directory $directory))
+      (let ((default-directory -directory))
         (with-temp-env! (term//extra-env)
           (term//create-buffer nil t)))))
 
@@ -328,26 +328,26 @@ If $FORCE is non-nil create a new term buffer directly."
       (setq term--parent-buffer parent-buffer))
     (term//pop-to-buffer buffer)))
 
-(defun term//pop-shell-get-buffer (&optional $arg)
+(defun term//pop-shell-get-buffer (&optional -arg)
   (unless (memq major-mode '(eshell-mode term-mode shell-mode))
     (if (file-remote-p default-directory)
-        (apply #'term/ssh (term//get-ssh-info $arg))
-      (term//local-shell (or (and (= $arg 4)
+        (apply #'term/ssh (term//get-ssh-info -arg))
+      (term//local-shell (or (and (= -arg 4)
                                   (term//eval-function-list
                                    'term-default-directory-function-list))
                              default-directory)
-                         (= $arg 16)))))
+                         (= -arg 16)))))
 
 ;;;###autoload
-(defun term/pop-shell (&optional $arg)
+(defun term/pop-shell (&optional -arg)
   "Switch to the term buffer last used, or create a new one if
 none exists, or if the current buffer is already a term."
   (interactive "p")
-  (when-let* ((buffer (term//pop-shell-get-buffer $arg))
+  (when-let* ((buffer (term//pop-shell-get-buffer -arg))
               (parent-buffer (current-buffer)))
     (with-current-buffer buffer
       (setq term-directly-kill-buffer t))
-    (if (= $arg 0)
+    (if (= -arg 0)
         (switch-to-buffer buffer)
       (with-current-buffer buffer
         (local-set-key [f8] #'term/switch-back)

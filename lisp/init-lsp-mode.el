@@ -12,11 +12,32 @@
  'doom-molokai
  '(lsp-face-highlight-textual ((t :background "#444155"))))
 
+(defmacro lsp//enable (-server &rest -args)
+  (declare (indent 1))
+  (let* ((enable-function (intern (format "lsp-%s-enable" -server)))
+         (idle (car-safe (keyword-get! -args :idle)))
+         (success-forms (keyword-get! -args :success))
+         (error-forms (keyword-get! -args :error))
+         (error-symbol (cl-gensym "err"))
+         (buffer-symbol (cl-gensym "buffer"))
+         (forms `(condition-case ,error-symbol
+                     (if lsp-mode
+                         (message "`lsp-mode' is already enabled.")
+                       (,enable-function)
+                       ,@success-forms)
+                   (error (message "%s" ,error-symbol)
+                          ,@error-forms))))
+    (if (and (numberp idle) (> idle 0))
+        `(let ((,buffer-symbol (current-buffer)))
+           (run-with-idle-timer
+            ,idle nil
+            (lambda () (with-current-buffer ,buffer-symbol ,forms))))
+      forms)))
 
 (defvar lsp--code-action-overlay nil)
-(defun lsp//move-code-action-overlay ($beg $end &optional $buffer)
+(defun lsp//move-code-action-overlay (-beg -end &optional -buffer)
   (unless (overlayp lsp--code-action-overlay)
-    (setq lsp--code-action-overlay (make-overlay $beg $end $buffer))
+    (setq lsp--code-action-overlay (make-overlay -beg -end -buffer))
     (overlay-put lsp--code-action-overlay
                  'face '(:underline (:style wave :color "blue")))
     (overlay-put lsp--code-action-overlay
@@ -24,19 +45,19 @@
                  '((lambda (ov after-change &rest args)
                      (when after-change
                        (delete-overlay ov))))))
-  (move-overlay lsp--code-action-overlay $beg $end $buffer))
+  (move-overlay lsp--code-action-overlay -beg -end -buffer))
 
-(defun lsp*after-set-code-action-params ($buffer $actions $params)
-  (when (buffer-live-p $buffer)
-    (with-current-buffer $buffer
-      (when (equal $params (lsp--text-document-code-action-params))
+(defun lsp*after-set-code-action-params (-buffer -actions -params)
+  (when (buffer-live-p -buffer)
+    (with-current-buffer -buffer
+      (when (equal -params (lsp--text-document-code-action-params))
         (when lsp--code-action-overlay
           (delete-overlay lsp--code-action-overlay))
-        (setq lsp-code-actions $actions)
-        (setq lsp-code-action-params $params)
-        (when $actions
+        (setq lsp-code-actions -actions)
+        (setq lsp-code-action-params -params)
+        (when -actions
           (when-let (bounds (bounds-of-thing-at-point 'symbol))
-            (lsp//move-code-action-overlay (car bounds) (cdr bounds) $buffer)))))))
+            (lsp//move-code-action-overlay (car bounds) (cdr bounds) -buffer)))))))
 
 (with-eval-after-load 'lsp-mode
   (require 'lsp-imenu)

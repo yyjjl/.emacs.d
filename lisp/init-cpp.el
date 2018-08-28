@@ -17,6 +17,8 @@
 
 (require 'init-cpp-cquery)
 
+(defvar gud-chdir-before-run t)
+
 (defcustom cpp-setup-literally nil
   "Whether to setup project literally"
   :group 'cmake
@@ -57,15 +59,15 @@
 
 
 
-(defun cpp//compile-command ($dir)
+(defun cpp//compile-command (-dir)
   "Return suitable compile command for current project"
   (cond
    ((bound-and-true-p projectile-project-compilation-cmd)
     projectile-project-compilation-cmd)
-   ((file-exists-p (expand-file-name "build.ninja" $dir))
-    (concat "ninja -C " $dir))
-   ((file-exists-p (expand-file-name "Makefile" $dir))
-    (concat "make --no-print-directory -C " $dir))
+   ((file-exists-p (expand-file-name "build.ninja" -dir))
+    (concat "ninja -C " -dir))
+   ((file-exists-p (expand-file-name "Makefile" -dir))
+    (concat "make --no-print-directory -C " -dir))
    (t nil)))
 
 
@@ -97,9 +99,9 @@
 (defun cpp//setup ()
   (advice-add 'projectile--run-project-cmd
               :around
-              (lambda ($fn &rest $args)
+              (lambda (-fn &rest -args)
                 (with-temp-env! (cpp-cmake//config-env)
-                  (apply $fn $args))))
+                  (apply -fn -args))))
   (if (or (not cpp-has-cmake-p)
           (not cpp-has-cquery-p)
           (file-remote-p default-directory)
@@ -112,7 +114,7 @@
     (setq cpp-cmake-project-root (cpp-cmake//locate-cmakelists))
     (if (or (file-exists-p (cpp-cquery//dot-cquery-path))
             (and cpp-cmake-project-root (file-exists-p (cpp-cmake//cdb-path))))
-        (cpp-cquery//setup)
+        (lsp//enable cquery :success (cpp-cquery//setup))
       (when cpp-cmake-project-root
         (message "Need run `cpp/run-cmake' to setup cquery server")))))
 
@@ -131,7 +133,7 @@
       ;; (hide-ifdef-mode 1)
       ;; Make a #define be left-aligned
       (setq c-electric-pound-behavior '(alignleft))
-      (cpp//font-lock-setup)
+      ;; (cpp//font-lock-setup)
 
       (unless (buffer-temporary?)
         (add-transient-hook!
@@ -140,7 +142,7 @@
 
 
 
-(defun cpp/run-cmake (&optional $set-options)
+(defun cpp/run-cmake (&optional -set-options)
   (interactive "P")
   (if (not cpp-cmake-project-root)
       (message "CMakeLists.txt hasn't been found.")
@@ -154,8 +156,9 @@
              (let ((default-directory cpp-cmake-project-root))
                (make-symbolic-link cdb-path "compile_commands.json"
                                    :ok-if-already-exists)))
-           (cpp-cquery//setup)))))
-    (when $set-options
+           (when cpp-has-cquery-p
+             (lsp//enable cquery :success (cpp-cquery//setup)))))))
+    (when -set-options
       (cpp-cmake//set-cmake-options
        (lambda (_)
          (message "Finish setting cmake options"))))))
@@ -212,16 +215,17 @@
            :must-match))))
   (unless (featurep 'gud)
     (require 'gud nil :noerror))
-  (let ((default-directory directory))
+  (let ((default-directory directory)
+        (gud-chdir-before-run nil))
     (call-interactively #'gdb)))
 
-(defun cpp/electric-star ($arg)
+(defun cpp/electric-star (-arg)
   (interactive "*P")
   (if (eq (char-before) ?\/)
       (progn
-        (self-insert-command (prefix-numeric-value $arg))
-        (insert "*/")
-        (backward-char 2)
+        (self-insert-command (prefix-numeric-value -arg))
+        (insert "  */")
+        (backward-char 3)
         (indent-according-to-mode))
     (call-interactively 'self-insert-command)))
 
@@ -283,6 +287,7 @@
     ("C-c C-b" . clang-format-buffer)
     ("C-c C-l" . cpp/load-file-in-root)
     ("C-c T" . cpp-cmake/toggle-option)
+    ("C-c C" . cpp-cmake/change-config)
     ("C-c D" . cpp-cmake/config)
     ("C-c C-c" . cpp/run-cmake)
     ("M-s l" . cquery-code-lens-mode)
@@ -297,9 +302,8 @@
 ;; Set term default directory
 (when (boundp 'term-default-directory-function-list)
   (add-to-list 'term-default-directory-function-list
-               (byte-compile
-                (lambda ()
-                  (and cpp-cmake-project-root (cpp-cmake//config-build))))))
+               (lambda ()
+                 (and cpp-cmake-project-root (cpp-cmake//config-build)))))
 
 (when (boundp 'term-default-environment-function-list)
   (add-to-list 'term-default-environment-function-list 'cpp-cmake//config-env))

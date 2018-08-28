@@ -4,11 +4,11 @@
 
 (defvar-local ggtags-local-libpath nil)
 
-(defun tags*with-local-libpath ($fn &rest $args)
+(defun tags*with-local-libpath (-fn &rest -args)
   (if (stringp ggtags-local-libpath)
       (with-temp-env! (list (concat "GTAGSLIBPATH=" ggtags-local-libpath))
-        (apply $fn $args))
-    (apply $fn $args)))
+        (apply -fn -args))
+    (apply -fn -args)))
 
 (with-eval-after-load 'ggtags
   (advice-add 'ggtags-process-string :around #'tags*with-local-libpath)

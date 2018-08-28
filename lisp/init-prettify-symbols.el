@@ -5,8 +5,8 @@
 
 (defvar fira-code-font-lock-keywords-alist
   (eval-and-compile
-    (defun extra//make-fix-width-symbol ($alist)
-      (cl-loop for (string . char) in $alist
+    (defun extra//make-fix-width-symbol (-alist)
+      (cl-loop for (string . char) in -alist
             for width = (string-width string)
             collect
             (cons string (if (= width 1)

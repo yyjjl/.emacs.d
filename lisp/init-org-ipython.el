@@ -30,40 +30,40 @@ W\tCopy LaTeX
 (defvar org--ipython-src-block nil)
 (defvar-local org--ipython-error-line 0)
 
-(defun org//ipython-trace-move ($n)
-  (let ((search-func (if (> $n 0)
+(defun org//ipython-trace-move (-n)
+  (let ((search-func (if (> -n 0)
                          #'re-search-forward
-                       (setq $n (- 0 $n))
+                       (setq -n (- 0 -n))
                        #'re-search-backward))
         found)
-    (while (and (> $n 0)
+    (while (and (> -n 0)
                 (setq found
                       (apply search-func '("^-+> \\([0-9]+\\)" nil t))))
-      (setq $n (1- $n)))
+      (setq -n (1- -n)))
     found))
 
-(defun org/ipython-trace-prev (&optional $n)
+(defun org/ipython-trace-prev (&optional -n)
   (interactive "p")
-  (unless (org//ipython-trace-move (- $n))
+  (unless (org//ipython-trace-move (- -n))
     (message "No previous frame")))
 
-(defun org/ipython-trace-next (&optional $n)
+(defun org/ipython-trace-next (&optional -n)
   (interactive "p")
-  (unless (org//ipython-trace-move $n)
+  (unless (org//ipython-trace-move -n)
     (message "No next frame")))
 
-(defun org/ipython-jump ($lineno &optional $do-jump)
+(defun org/ipython-jump (-lineno &optional -do-jump)
   (interactive (list (or org--ipython-error-line 0) t))
   (if (and (buffer-live-p org--ipython-parent-buffer)
            org--ipython-src-block)
       (let ((p (org-babel-where-is-src-block-head org--ipython-src-block))
-            (window (if $do-jump
+            (window (if -do-jump
                         (progn (pop-to-buffer org--ipython-parent-buffer)
                                (selected-window))
                       (display-buffer org--ipython-parent-buffer))))
         (with-selected-window window
           (goto-char p)
-          (forward-line $lineno)
+          (forward-line -lineno)
           (recenter)
           (point)))
     (message "Parent buffer killed or Can not find src block !!!")))
@@ -77,8 +77,8 @@ W\tCopy LaTeX
   (setq org--ipython-parent-buffer (current-buffer))
   (setq org--ipython-src-block (org-element-context)))
 
-(defun org*ipython-trace-setup ($fn &rest $args)
-  (with-current-buffer (apply $fn $args)
+(defun org*ipython-trace-setup (-fn &rest -args)
+  (with-current-buffer (apply -fn -args)
     (use-local-map (copy-keymap special-mode-map))
     (define-key! :map (current-local-map)
       ("q" . org/ipython-trace-bury-buffer)
@@ -144,29 +144,29 @@ W\tCopy LaTeX
     (when sage-shell:source-buffer
       (pop-to-buffer sage-shell:source-buffer)))
 
-  (defun sage*after-ceare-overlay-hack ($ov)
-    (unless (overlay-get $ov 'extra-map)
-      (let ((map (overlay-get $ov 'keymap)))
+  (defun sage*after-ceare-overlay-hack (-ov)
+    (unless (overlay-get -ov 'extra-map)
+      (let ((map (overlay-get -ov 'keymap)))
         (define-key! :map map
           ("?" . (lambda! (display-message-or-buffer
                            (format org--sage-overlay-help-template
-                                   (overlay-get $ov 'text)
-                                   (overlay-get $ov 'math)))))
+                                   (overlay-get -ov 'text)
+                                   (overlay-get -ov 'math)))))
           ;; Regenerate
-          ("R" . (lambda! (sage-shell-view-regenerate $ov)))
+          ("R" . (lambda! (sage-shell-view-regenerate -ov)))
           ;; Show text
-          ("T" . (lambda! (overlay-put $ov 'display nil)))
+          ("T" . (lambda! (overlay-put -ov 'display nil)))
           ("w" . (lambda!
-                   (sage-shell-view-copy-text $ov)
+                   (sage-shell-view-copy-text -ov)
                    (message "Text copied")))
           ("W" . (lambda!
-                   (sage-shell-view-copy-latex $ov)
+                   (sage-shell-view-copy-latex -ov)
                    (message "LaTeX copied")))
           ("=" . (lambda! (sage-shell-view--when-overlay-active
-                              $ov (sage-shell-view-zoom-in $ov))))
+                              -ov (sage-shell-view-zoom-in -ov))))
           ("-" . (lambda! (sage-shell-view--when-overlay-active
-                              $ov (sage-shell-view-zoom-out $ov)))))
-        (overlay-put $ov 'extra-map t))))
+                              -ov (sage-shell-view-zoom-out -ov)))))
+        (overlay-put -ov 'extra-map t))))
 
   (defun sage-shell-edit:delete-temp-dir ()
     (when (and (stringp sage-shell-edit:temp-directory)

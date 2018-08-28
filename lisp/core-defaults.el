@@ -88,7 +88,7 @@
 (setq-default system-time-locale "C")
 (setq-default imenu-max-item-length 1024)
 (setq-default global-auto-revert-non-file-buffers t)
-(setq-default auto-revert-verbose nil)
+(setq-default auto-revert-verbose t)
 (setq-default backup-by-coping t)
 (setq-default delete-old-versions t)
 ;; Use versioned backups
@@ -119,12 +119,12 @@
       (concat ";; Welcome to Emacs " (or user-login-name "") " !!!"))
 
 ;;* Recentf
-(defun core//recentf-keep? ($fn)
+(defun core//recentf-keep? (-fn)
   (and core--recentf-enabled-p
        ;; The order must be kept
-       (or (file-remote-p $fn)
-           (and (file-readable-p $fn)
-                (file-writable-p $fn)))))
+       (or (file-remote-p -fn)
+           (and (file-readable-p -fn)
+                (file-writable-p -fn)))))
 (setq recentf-keep '(core//recentf-keep?))
 (setq recentf-max-saved-items 2048
       recentf-exclude (list "/tmp/" "^/sshx?:" "/sudo:" "\\.elc$"
@@ -138,8 +138,8 @@
 (ignore-errors (savehist-mode 1))
 
 ;;* Handle External Files
-(defun core//external-file-handler ($op &rest $args)
-  (let ((file (expand-file-name (car $args))))
+(defun core//external-file-handler (-op &rest -args)
+  (let ((file (expand-file-name (car -args))))
     (cond ((eq system-type 'darwin)
            (shell-command (concat "open " (shell-quote-argument file))))
           ((eq system-type 'gnu/linux)
@@ -199,14 +199,17 @@
   (when (eq major-mode 'compilation-mode)
     (ansi-color-apply-on-region compilation-filter-start (point-max))))
 
-(define-hook! (core|compilation-finish-hook $buffer _)
+(define-hook! (core|compilation-finish-hook -buffer _)
   (compilation-finish-functions)
-  (when (buffer-live-p $buffer)
-    (with-current-buffer $buffer
+  (when (buffer-live-p -buffer)
+    (with-current-buffer -buffer
       (unless (eq major-mode 'compilation-mode)
-        ;; Sometime it will open a comint $buffer
+        ;; Sometime it will open a comint buffer
         (compilation-mode)
-        (core-popups//push-popup-window (get-buffer-window $buffer) $buffer t)))))
+        ;; Record window as popup window
+        (core-popups//push-window (get-buffer-window -buffer)
+                                  -buffer
+                                  :autoclose)))))
 
 ;; Default prog-mode setup
 (define-hook! core|generic-prog-mode-setup (prog-mode-hook
@@ -233,6 +236,7 @@
 (define-hook! core|generic-text-mode-setup (text-mode-hook)
   (local-set-key [remap completion-at-point] #'counsel-company)
 
+  (whitespace-mode 1)
   (hl-line-mode 1)
   (auto-fill-mode 1)
   ;; (whitespace-mode 1)
@@ -247,6 +251,18 @@
   ;; But don't show trailing whitespace in SQLi, inf-ruby etc.
   (setq show-trailing-whitespace nil)
   (setq-local company-idle-delay nil))
+
+(define-hook! core|hack-local-variables (after-save-hook)
+  (when (and buffer-file-name
+             (member (file-name-nondirectory buffer-file-name)
+                     (eval-and-compile
+                       (list dir-locals-file
+                             (concat (file-name-base dir-locals-file) "-2.el")))))
+    (dolist (buffer (or (ignore-errors (projectile-project-buffers))
+                        (buffer-list)))
+      (with-current-buffer buffer
+        (when buffer-file-name
+          (hack-dir-local-variables-non-file-buffer))))))
 
 (define-hook! core|after-init-hook (after-init-hook)
   ;; global-modes

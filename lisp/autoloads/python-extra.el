@@ -32,20 +32,20 @@
     (message "pdbtrack enabled")))
 
 ;;;###autoload
-(defun python/create-venv-in-workon-home ($name $python-exe &optional $args)
+(defun python/create-venv-in-workon-home (-name -python-exe &optional -args)
   (interactive
    (list (read-from-minibuffer "Name: ")
          (read-shell-command "Python executable: ")
          (when current-prefix-arg
            (read-from-minibuffer "Arguments: "))))
-  (when (and $name $python-exe (> (length $name) 0))
-    (let* ((dir (expand-file-name $name (pyvenv-workon-home)))
+  (when (and -name -python-exe (> (length -name) 0))
+    (let* ((dir (expand-file-name -name (pyvenv-workon-home)))
            (command (format "virtualenv --python=%s %s %s\n"
-                            $python-exe dir (or $args ""))))
+                            -python-exe dir (or -args ""))))
       (compile command))))
 
 ;;;###autoload
-(defun python/create-virtualenv ($dir $python-exe &optional $args)
+(defun python/create-virtualenv (-dir -python-exe &optional -args)
   (interactive
    (list (read-directory-name "Directory: "
                               (ignore-errors (projectile-project-root))
@@ -53,15 +53,15 @@
          (read-shell-command "Python executable: ")
          (when current-prefix-arg
            (read-from-minibuffer "Arguments: "))))
-  (when (and $dir $python-exe)
-    (let* ((dir (expand-file-name ".venv" $dir))
+  (when (and -dir -python-exe)
+    (let* ((dir (expand-file-name ".venv" -dir))
            (command (format "virtualenv --python=%s %s %s\n"
-                            $python-exe dir (or $args ""))))
+                            -python-exe dir (or -args ""))))
       (compile command))))
 
 ;;;###autoload
-(defun python//generate-doc ($params $indent)
-  (setq $indent (concat "\n" $indent))
+(defun python//generate-doc (-params -indent)
+  (setq -indent (concat "\n" -indent))
   (string-join (mapcar (lambda (token)
                          (let ((param (split-string token "=" t " +"))
                                default)
@@ -71,9 +71,9 @@
                                    (if default
                                        (format " (default: %s): " default)
                                      ": ")
-                                   $indent "@type " param ": ")))
-                       (split-string $params "," t " +"))
-               $indent))
+                                   -indent "@type " param ": ")))
+                       (split-string -params "," t " +"))
+               -indent))
 
 ;;;###autoload
 (defun python/generate-doc-at-point ()

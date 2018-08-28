@@ -8,6 +8,11 @@
  macrostep
  (racket-mode :when lisp-has-racket-p))
 
+(defface lisp-argument-face
+  `((t :underline t))
+  "Face for arguments"
+  :group 'lisp)
+
 
 
 (define-hook! lisp|minibuffer-setup (minibuffer-setup-hook
@@ -86,8 +91,8 @@ Emacs Lisp."
                 font-lock-type-face)
                (t font-lock-function-name-face)))
        nil t))
-     ("\\_<@?\\(\\$\\(?:\\sw\\|\\s_\\)+\\)"
-      (1 font-lock-constant-face nil nil)))))
+     ("\\_<@?\\(-[a-zA-Z]\\(?:\\sw\\|\\s_\\)*\\)"
+      (1 'lisp-argument-face nil nil)))))
 
 (with-eval-after-load 'racket-mode
   (add-to-list 'lispy-goto-symbol-alist
@@ -107,11 +112,11 @@ Emacs Lisp."
     (call-interactively #'racket-send-region))
 
   ;; Use `ivy' as default completion backends
-  (defun racket--read-identifier ($prompt $default)
-    (ivy-read $prompt
+  (defun racket--read-identifier (-prompt -default)
+    (ivy-read -prompt
               (racket--get-namespace-symbols)
-              :initial-input $default
-              :preselect $default)))
+              :initial-input -default
+              :preselect -default)))
 
 (with-eval-after-load 'elisp-mode
   (require 'semantic/bovine/el)
@@ -119,12 +124,12 @@ Emacs Lisp."
   (define-key lisp-interaction-mode-map (kbd "C-c e") 'macrostep-expand))
 
 (with-eval-after-load 'lispy
-  (defun lisp*goto-symbol-hack ($fn $symbol)
+  (defun lisp*goto-symbol-hack (-fn -symbol)
     (if (memq major-mode lispy-elisp-modes)
         (condition-case nil
             (elisp-def)
-          (error (lispy-goto-symbol-elisp $symbol)))
-      (funcall $fn $symbol)))
+          (error (lispy-goto-symbol-elisp -symbol)))
+      (funcall -fn -symbol)))
   (advice-add 'lispy-goto-symbol :around #'lisp*goto-symbol-hack))
 
 (provide 'init-lisp)

@@ -31,11 +31,11 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
     ("<" self-insert-command "ins")
     ("o" nil "quit"))
 
-  (defun org/hot-expand ($str &optional $mod)
+  (defun org/hot-expand (-str &optional -mod)
     "Expand org template."
-    (insert $str)
+    (insert -str)
     (org-try-structure-completion)
-    (when $mod (insert $mod) (forward-line)))
+    (when -mod (insert -mod) (forward-line)))
 
   (define-key org-mode-map
     "<" (lambda!
@@ -118,13 +118,13 @@ _d_: subtree
 (defun current-forward-thing ()
   current-forward-thing)
 
-(defun forward-thing* (&optional $n)
+(defun forward-thing* (&optional -n)
   (interactive "p")
-  (forward-thing current-forward-thing $n))
+  (forward-thing current-forward-thing -n))
 
-(defun backward-thing* (&optional $n)
+(defun backward-thing* (&optional -n)
   (interactive "p")
-  (forward-thing current-forward-thing (when (numberp $n) (- 0 $n))))
+  (forward-thing current-forward-thing (when (numberp -n) (- 0 -n))))
 
 (defhydra hydra-move (:color pink :hint nil)
   "
@@ -154,15 +154,15 @@ Current thing: %s(current-forward-thing)
   ("x" exchange-point-and-mark)
   ("l" recenter-top-bottom))
 
-(defmacro core%define-use-other-window ($fn &optional $negative? $name)
-  (unless $name (setq $name $fn))
-  `(defun ,(intern (format "%s-other-window" $name))
-       (&optional $n)
+(defmacro core%define-use-other-window (-fn &optional -negative? -name)
+  (unless -name (setq -name -fn))
+  `(defun ,(intern (format "%s-other-window" -name))
+       (&optional -n)
      (interactive "p")
-     (when (= $n 0) (setq $n 1))
-     ,(when $negative? '(setq $n (- $n)))
+     (when (= -n 0) (setq -n 1))
+     ,(when -negative? '(setq -n (- -n)))
      (with-selected-window (next-window)
-       (,$fn $n))))
+       (,-fn -n))))
 
 (core%define-use-other-window forward-line)
 (core%define-use-other-window forward-line :negative backward-line)
@@ -180,9 +180,9 @@ Current thing: %s(current-forward-thing)
   ("SPC" scroll-other-window)
   ("u" scroll-other-window-down))
 
-(defun hydra-move-invoker (&optional $arg)
+(defun hydra-move-invoker (&optional -arg)
   (interactive "P")
-  (if $arg
+  (if -arg
       (hydra-move-other-window/body)
     (hydra-move/body)))
 

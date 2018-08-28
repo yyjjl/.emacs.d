@@ -1,41 +1,41 @@
-(defun counsel//truncate-string (string width)
-  (when (> (length string) width)
-    (setq string
+(defun counsel//truncate-string (-string -width)
+  (when (> (length -string) -width)
+    (setq -string
           (concat (substring
-                   (replace-regexp-in-string "\n" "\\\\n" string)
-                   0 width)
+                   (replace-regexp-in-string "\n" "\\\\n" -string)
+                   0 -width)
                   " ... ")))
-  string)
+  -string)
 
-(defun counsel//semantic--clean-tag ($tag)
-  (let ((default-value (semantic-tag-get-attribute $tag :default-value))
-        (name (semantic-tag-name $tag)))
+(defun counsel//semantic--clean-tag (-tag)
+  (let ((default-value (semantic-tag-get-attribute -tag :default-value))
+        (name (semantic-tag-name -tag)))
     (when (stringp default-value)
-      (semantic-tag-put-attribute $tag :default-value
+      (semantic-tag-put-attribute -tag :default-value
                                   (counsel//truncate-string default-value 75)))
     (when (stringp name)
-      (semantic-tag-set-name $tag (counsel//truncate-string name 75)))))
+      (semantic-tag-set-name -tag (counsel//truncate-string name 75)))))
 
-(defun counsel//semantic-or-imenu--relative-buffers ($buffer)
+(defun counsel//semantic-or-imenu--relative-buffers (-buffer)
   (let* ((projectile-require-project-root nil)
          (project-buffers (ignore-errors (projectile-project-buffers))))
     (cl-loop for buffer in (buffer-list)
-          when (or (eq $buffer buffer)
+          when (or (eq -buffer buffer)
                    (and (buffer-file-name buffer)
                         (or (eq (buffer-local-value 'major-mode buffer)
-                                (buffer-local-value 'major-mode $buffer))
+                                (buffer-local-value 'major-mode -buffer))
                             (member buffer project-buffers))))
           collect buffer)))
 
-(defun counsel//semantic-or-imenu--candidates ($buffers)
-  (cl-loop for buffer in $buffers
+(defun counsel//semantic-or-imenu--candidates (-buffers)
+  (cl-loop for buffer in -buffers
         nconc
         (mapcar
-         (lambda ($candidate)
-           (if (null (cdr-safe $buffers))
-               $candidate
-             (cons (concat (buffer-name buffer) ": " (car $candidate))
-                   (cdr $candidate))))
+         (lambda (-candidate)
+           (if (null (cdr-safe -buffers))
+               -candidate
+             (cons (concat (buffer-name buffer) ": " (car -candidate))
+                   (cdr -candidate))))
          (with-current-buffer buffer
            ;; Use semantic first
            (if (semantic-active-p)
@@ -52,8 +52,8 @@
                     (items (delete (assoc "*Rescan*" items) items)))
                (counsel-imenu-get-candidates-from items)))))))
 
-(defun counsel//semantic-or-imenu--goto ($candidate)
-  (let ((place (cdr $candidate))
+(defun counsel//semantic-or-imenu--goto (-candidate)
+  (let ((place (cdr -candidate))
         buffer goto-function)
     (if (semantic-tag-p place)
         (setq buffer (semantic-tag-buffer place)
@@ -68,17 +68,17 @@
     (funcall goto-function place)))
 
 ;;;###autoload
-(defun counsel/semantic-or-imenu* ($arg)
+(defun counsel/semantic-or-imenu* (-arg)
   "Jump to a semantic tag in the current buffer."
   (interactive "P")
   (unless (featurep 'imenu)
     (require 'imenu nil t))
   (let* ((buffer (current-buffer))
-         (buffers (if $arg
+         (buffers (if -arg
                       (counsel//semantic-or-imenu--relative-buffers buffer)
                     (list buffer)))
          (candidates (counsel//semantic-or-imenu--candidates buffers)))
-    (ivy-read (if $arg "All Imenu Items: " "Imenu Items: ")
+    (ivy-read (if -arg "All Imenu Items: " "Imenu Items: ")
               candidates
               :preselect (thing-at-point 'symbol)
               :require-match t
@@ -86,7 +86,7 @@
               :caller 'counsel-semantic-or-imenu
               ;; If search for all buffers, do not jump when selecting
               ;; candidate
-              :keymap (if $arg
+              :keymap (if -arg
                           counsel-imenu-map
                         (define-key! :map (make-sparse-keymap)
                           ("C-n" . ivy-next-line-and-call)
@@ -105,22 +105,22 @@
     (setf (ivy-state-prompt ivy-last) prompt)
     (setq ivy--prompt (concat ivy-count-format prompt))))
 
-(defun counsel//kill-buffer-prompt (&optional $hard)
+(defun counsel//kill-buffer-prompt (&optional -hard)
   (format "%sKill buffers (%s): "
-          (if $hard "[hard] " "")
+          (if -hard "[hard] " "")
           (string-join counsel--kill-buffers ", ")))
 
 ;;;###autoload
-(defun counsel/kill-buffer ($arg)
+(defun counsel/kill-buffer (-arg)
   "Kill buffer with ivy backends."
   (interactive "P")
   (setq counsel--kill-buffers nil)
   (let ((ivy-use-virtual-buffers nil))
     (ivy-read (format "%s%sKill buffers (%s): "
-                      (if (eq $arg '(16)) "<hard> " "")
-                      (if $arg (concat "[" (projectile-project-name) "] ") "")
+                      (if (eq -arg '(16)) "<hard> " "")
+                      (if -arg (concat "[" (projectile-project-name) "] ") "")
                       (string-join counsel--kill-buffers ", "))
-              (if $arg
+              (if -arg
                   (mapcar #'buffer-name (projectile-project-buffers))
                 'internal-complete-buffer)
               :preselect (buffer-name (current-buffer))
@@ -131,34 +131,47 @@
   (dolist (buffer counsel--kill-buffers)
     (kill-buffer buffer)))
 
+(defun counsel//sudo-edit-file (filename &optional old-point)
+  (let ((buffer (find-file
+                 (if-let ((remote (file-remote-p filename)))
+                     (format "%s|sudo:%s:%s"
+                             (substring remote 0 (1- (length remote)))
+                             (file-remote-p filename 'host)
+                             (file-remote-p filename 'localname))
+                   (concat "/sudo:root@localhost:" filename)))))
+    (when (and (buffer-live-p buffer) old-point)
+      (with-current-buffer buffer
+        (goto-char old-point)))))
+
 ;;;###autoload
-(defun counsel/sudo-edit (&optional $arg)
+(defun counsel/sudo-edit (&optional -arg)
   "Edit currently visited file as root.
 With a prefix ARG prompt for a file to visit.  Will also prompt
 for a file to visit if current buffer is not visiting a file."
   (interactive "P")
-  (if (or $arg (not buffer-file-name))
+  (if (or -arg
+          (and (not buffer-file-name)
+               (not (eq major-mode 'dired-mode))))
       (ivy-read "Find file(as sudo): :" 'read-file-name-internal
                 :matcher #'counsel--find-file-matcher
                 :initial-input default-directory
                 :action
                 (lambda (x)
                   (with-ivy-window
-                    (find-file (concat "/sudo:root@localhost:"
-                                       (expand-file-name x ivy--directory)))))
+                    (counsel//sudo-edit-file (expand-file-name x ivy--directory))))
                 :keymap counsel-find-file-map
                 :caller 'counsel/sudo-edit)
-    (let ((old-point (point)))
-      (find-file (concat "/sudo:root@localhost:" buffer-file-name))
-      (goto-char old-point))))
+    (counsel//sudo-edit-file (or buffer-file-name
+                                 (expand-file-name default-directory))
+                             (point))))
 
 ;;;###autoload
-(defun swiper/dispatch (&optional $arg)
+(defun swiper/dispatch (&optional -arg)
   (interactive "P")
   (call-interactively
    (cond
-    ((equal $arg 0) #'isearch-forward-regexp)
-    ((equal $arg 9) #'isearch-backward-regexp)
-    ((equal $arg '(4)) #'swiper-multi)
-    ((equal $arg '(16)) #'swiper-all)
+    ((equal -arg 0) #'isearch-forward-regexp)
+    ((equal -arg 9) #'isearch-backward-regexp)
+    ((equal -arg '(4)) #'swiper-multi)
+    ((equal -arg '(16)) #'swiper-all)
     (t #'counsel-grep-or-swiper))))

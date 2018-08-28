@@ -4,13 +4,13 @@
 # --
 (defun ${1:name} (${3:$(if (equal yas-text ":around") "$fn " "")}${2:$(let ((sym (intern yas-text)) args)
   (if (not (fboundp sym))
-      "&rest $args"
+      "&rest -args"
     (setq args (help-function-arglist sym))
     (if (stringp args)
-        "&rest $args"
+        "&rest -args"
       (mapconcat (lambda (x)
                     (setq x (format "%s" x))
-                    (if (string-prefix-p "&" x) x (concat "$" x)))
+                    (if (string-prefix-p "&" x) x (concat "-" x)))
                   args
                   " "))))})
    $0)

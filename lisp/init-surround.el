@@ -19,39 +19,38 @@
                        (concat "\\end{" env "}"))))))))
 (defvar core--suround-origin-pos nil)
 
-(defun core//surround-get-pair ($char)
-  "Get pair from $CHAR"
+(defun core//surround-get-pair (-char)
+  "Get pair from -CHAR"
   (let ((pair (cl-loop for (keys . pair) in core-surround-pair-alist
-                       when (member $char (string-to-list keys))
+                       when (member -char (string-to-list keys))
                        return pair)))
-    (cond ((functionp pair) (funcall pair $char)) ; function
+    (cond ((functionp pair) (funcall pair -char)) ; function
           (pair pair)                             ; normal
-          ((eq $char 13) nil)
-          (t (cons (char-to-string $char)
-                   (char-to-string $char))))))
+          ((eq -char 13) nil)
+          (t (cons (char-to-string -char)
+                   (char-to-string -char))))))
 
-(defun core//surround-get-bounds ($left $right)
-  "Get bounds of pair. If $LEFT and $RIGHT is a open/close delimeter.
+(defun core//surround-get-bounds (-left -right)
+  "Get bounds of pair. If -LEFT and -RIGHT is a open/close delimeter.
 Use `scan-lists', otherwise use simple algorithm."
-  (if (and (string-match-p "^\\s($" $left)
-           (string-match-p "^\\s)$" $right))
+  (if (and (string-match-p "^\\s($" -left)
+           (string-match-p "^\\s)$" -right))
       (ignore-errors
         (cons
          (scan-lists (point) -1 1)
          (scan-lists (point) 1 1)))
     (cons (save-excursion
-            (while (and (search-backward $left)
+            (while (and (search-backward -left)
                         (eq ?\\ (char-before (point)))))
             (point))
           (save-excursion
-            (while (and (search-forward $right)
-                        (eq ?\\ (char-before (- (point) (length $right))))))
+            (while (and (search-forward -right)
+                        (eq ?\\ (char-before (- (point) (length -right))))))
             (point)))))
 
 (defun core//surround-mark ()
   (setq core--suround-origin-pos nil)
   (let* ((char1 (read-char))
-         (char2 (read-char))
          (from-pair (and (not (region-active-p))
                          (core//surround-get-pair char1))))
     (when-let ((pos (and (not (region-active-p))
@@ -64,19 +63,19 @@ Use `scan-lists', otherwise use simple algorithm."
     (list (region-beginning)
           (region-end)
           from-pair
-          (core//surround-get-pair char2))))
+          (core//surround-get-pair (read-char)))))
 
-(defun core/change-surround ($beg $end $from-pair $to-pair)
+(defun core/change-surround (-beg -end -from-pair -to-pair)
   (interactive (core//surround-mark))
-  (unless (equal $from-pair $to-pair)
-    (if (equal $beg $end)
+  (unless (equal -from-pair -to-pair)
+    (if (equal -beg -end)
         (message "Empty region")
-      (let ((from-left (car $from-pair))
-            (from-right (cdr $from-pair))
-            (to-left (car $to-pair))
-            (to-right (cdr $to-pair)))
+      (let ((from-left (car -from-pair))
+            (from-right (cdr -from-pair))
+            (to-left (car -to-pair))
+            (to-right (cdr -to-pair)))
         (save-excursion
-          (goto-char $end)
+          (goto-char -end)
           (let ((rl (length from-right)))
             (when (equal (buffer-substring-no-properties
                           (max (point-min) (- (point) rl)) (point))
@@ -84,7 +83,7 @@ Use `scan-lists', otherwise use simple algorithm."
               (delete-char (- rl))))
           ;; Insert right
           (when to-right (insert to-right))
-          (goto-char $beg)
+          (goto-char -beg)
           (let ((ll (length from-left)))
             (when (equal (buffer-substring-no-properties
                           (point) (min (point-max) (+ (point) ll)))

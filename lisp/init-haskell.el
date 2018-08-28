@@ -15,8 +15,8 @@
 
 
 
-(defun idris/setup-view-keys ($map)
-  (define-key! :map $map
+(defun idris/setup-view-keys (-map)
+  (define-key! :map -map
     ("<tab>" . forward-button)
     ("<backtab>" . backward-button)
     ("SPC" . scroll-up)

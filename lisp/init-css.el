@@ -5,10 +5,10 @@
 
 
 
-(defun css//font-file-to-base64 ($file)
-  (if (file-exists-p $file)
+(defun css//font-file-to-base64 (-file)
+  (if (file-exists-p -file)
       (replace-regexp-in-string "\n" "" (shell-command-to-string
-                                         (concat "cat " $file "|base64")))
+                                         (concat "cat " -file "|base64")))
     ""))
 
 ;; Colourise CSS colour literals

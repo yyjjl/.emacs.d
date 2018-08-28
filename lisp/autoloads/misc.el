@@ -65,7 +65,7 @@
         (switch-to-buffer buf)))))
 
 ;;;###autoload
-(defun core/rename-this-file-and-buffer ($new-name)
+(defun core/rename-this-file-and-buffer (-new-name)
   "Renames both current buffer and file it's visiting to NEW-NAME."
   (interactive
    (list (let (confirm-nonexistent-file-or-buffer)
@@ -78,15 +78,15 @@
                                    new-name)
                new-name)))))
   (let ((filename (buffer-file-name)))
-    (when (or (not (file-exists-p $new-name))
-              (not (equal filename $new-name))
-              (yes-or-no-p (format "'%s' exists, overwrite it? " $new-name)))
-      (set-visited-file-name $new-name)
-      (rename-file filename $new-name)
+    (when (or (not (file-exists-p -new-name))
+              (not (equal filename -new-name))
+              (yes-or-no-p (format "'%s' exists, overwrite it? " -new-name)))
+      (set-visited-file-name -new-name)
+      (rename-file filename -new-name)
       (let ((inhibit-message t))
         (recentf-cleanup))
-      (run-hook-with-args 'core-after-rename-this-file-hook filename $new-name)
-      (message "Rename to %s" $new-name))))
+      (run-hook-with-args 'core-after-rename-this-file-hook filename -new-name)
+      (message "Rename to %s" -new-name))))
 
 ;;;###autoload
 (defun core/create-scratch-buffer ()
@@ -138,19 +138,19 @@ Does not indent buffer, because it is used for a
   (call-interactively 'occur))
 
 ;;;###autoload
-(defun core/eval-and-replace ($start $end)
+(defun core/eval-and-replace (-start -end)
   (interactive "r")
-  (let* ((it (buffer-substring $start $end))
+  (let* ((it (buffer-substring -start -end))
          (expr (if (bound-and-true-p mc--executing-command-for-fake-cursor)
                    (read (car read-expression-history))
                  (read--expression "Expression(it): " "(read it)")))
          (value (eval expr `((it . ,it)))))
-    (delete-region $start $end)
+    (delete-region -start -end)
     (save-excursion
-      (goto-char $start)
+      (goto-char -start)
       (prin1 value (current-buffer))
       (activate-mark 1)
-      (goto-char $start))))
+      (goto-char -start))))
 
 (declare-function browse-url-chrome "browse-url")
 ;;;###autoload
@@ -182,7 +182,7 @@ Does not indent buffer, because it is used for a
    core-search-engine-alist))
 
 ;;;###autoload
-(defun core/search-in-chrome ($engine $keyword)
+(defun core/search-in-chrome (-engine -keyword)
   (interactive
    (let ((engine (core//read-search-engine)))
      (list (nth 2 engine)
@@ -190,7 +190,7 @@ Does not indent buffer, because it is used for a
                                  nil nil 'core-search-history))))
   (unless (featurep 'browse-url)
     (require 'browse-url))
-  (browse-url-chrome (format $engine $keyword))
+  (browse-url-chrome (format -engine -keyword))
   (run-hooks 'core-after-search-hook))
 
 ;;;###autoload
@@ -207,7 +207,7 @@ Does not indent buffer, because it is used for a
     (message "Use socket proxy %s" socks-server)))
 
 ;;;###autoload
-(defun core/copy-file-name (&optional $level $replace)
+(defun core/copy-file-name (&optional -level -replace)
   "Copy current file name to king ring.
 If ARG = 0 copy the current directory. If ARG > 0 copy the file
 name without directory. If ARG < 0 copy the file name without
@@ -215,19 +215,19 @@ directory and extension."
   (interactive "p")
   (let ((path (or (buffer-file-name) default-directory)))
     (message "(-, +, 0) Level %d => %s"
-             $level
-             (kill-new (case $level
+             -level
+             (kill-new (case -level
                          (1 (buffer-name))
                          (2 path)
                          (3 (abbreviate-file-name path))
                          (4 default-directory)
                          (5 (file-name-nondirectory path))
                          (6 (file-name-base path)))
-                       $replace)))
+                       -replace)))
   (set-transient-map
    (define-key! :map (make-sparse-keymap)
-     ("=" . (lambda! (core/copy-file-name (min 6 (1+ $level)) t)))
-     ("-" . (lambda! (core/copy-file-name (max 1 (1- $level)) t)))
+     ("=" . (lambda! (core/copy-file-name (min 6 (1+ -level)) t)))
+     ("-" . (lambda! (core/copy-file-name (max 1 (1- -level)) t)))
      ("0" . (lambda! (core/copy-file-name 1 t))))))
 
 ;;;###autoload
@@ -270,13 +270,13 @@ directory and extension."
         (save-dir-local-variables! 'core--local-snippets-list)))))
 
 ;;;###autoload
-(defun core/delete-http-buffers ($force)
+(defun core/delete-http-buffers (-force)
   (interactive "P")
   (let ((buffers (--filter (and (string-prefix-p " *http " (buffer-name it))
                                 (not (process-live-p (get-buffer-process it))))
                            (buffer-list))))
     (when (and buffers
-               (or (not $force)
+               (or (not -force)
                    (not (called-interactively-p 'interactive)))
                (yes-or-no-p (concat "Delete following buffers? \n"
                                     (string-join (mapcar #'buffer-name buffers) "\n"))))
@@ -292,36 +292,39 @@ directory and extension."
                    (--filter (file-exists-p (file-name-as-directory it))
                              (directory-files (expand-var! "desktop") :full)))))
 ;;;###autoload
-(defun core/change-or-new-desktop ($name)
+(defun core/change-or-new-desktop (-name)
   (interactive (list (completing-read "Change to: "
                                       (list* "default" (core//desktop-files)))))
-  (let ((new-dir (expand-file-name (if (equal $name "default")
+  (let ((new-dir (expand-file-name (if (equal -name "default")
                                        ""
-                                     $name)
+                                     -name)
                                    (expand-var! "desktop"))))
     (if (file-exists-p new-dir)
         (if (not (and desktop-dirname
                       (equal (file-name-as-directory new-dir)
                              (file-name-as-directory desktop-dirname))
                       (file-exists-p (desktop-full-lock-name))))
-            (desktop-change-dir new-dir)
+            (progn
+              (semantic-mode -1)
+              (setq core-current-desktop-name -name)
+              (desktop-change-dir new-dir)
+              (core/enable-semantic))
           (error "Desktop file is in use !!"))
       (make-directory new-dir t)
       (desktop-kill)
-      (desktop-save new-dir))
-    (setq core-current-desktop-name $name)))
+      (desktop-save new-dir))))
 
 ;;;###autoload
-(defun core/delete-desktop ($name)
+(defun core/delete-desktop (-name)
   (interactive (list (completing-read "Delete: "
                                       (core//desktop-files)
                                       nil
                                       :require-match)))
   (let* ((default (expand-var! "desktop"))
-         (dir (expand-file-name $name default)))
+         (dir (expand-file-name -name default)))
     (when (and (file-exists-p dir)
                (not (equal default dir))
-               (y-or-n-p (format "Delete desktop `%s'?" $name)))
+               (y-or-n-p (format "Delete desktop `%s'?" -name)))
       (when (equal (file-name-as-directory dir)
                    (file-name-as-directory desktop-dirname))
         (progn (desktop-change-dir default)
@@ -329,18 +332,18 @@ directory and extension."
                (message "Change to default desktop.")))
       (delete-directory dir t))))
 
-(defun rainbow-delimiters--number-to-subscript ($char $n)
-  (cond ((< $n 0))
-        ((< $n 10)
-         (list $char '(bc . tc) (+ ?₀ $n)))
-        ((< $n 100)
-         (list $char '(bc . tc) (+ ?₀ (/ $n 10)) '(bc . tc) (+ ?₀ (mod $n 10))))))
+(defun rainbow-delimiters--number-to-subscript (-char -n)
+  (cond ((< -n 0))
+        ((< -n 10)
+         (list -char '(bc . tc) (+ ?₀ -n)))
+        ((< -n 100)
+         (list -char '(bc . tc) (+ ?₀ (/ -n 10)) '(bc . tc) (+ ?₀ (mod -n 10))))))
 
-(defun rainbow-delimiters--add-depth-number ($loc $depth _match)
+(defun rainbow-delimiters--add-depth-number (-loc -depth _match)
   (when rainbow-delimiters-count-mode
-    (let* (($char (char-after $loc)))
-      (when-let (components (rainbow-delimiters--number-to-subscript $char $depth))
-        (compose-region $loc (1+ $loc) components)))))
+    (let* ((-char (char-after -loc)))
+      (when-let (components (rainbow-delimiters--number-to-subscript -char -depth))
+        (compose-region -loc (1+ -loc) components)))))
 
 (with-eval-after-load 'rainbow-delimiters
   (advice-add 'rainbow-delimiters--apply-color

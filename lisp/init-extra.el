@@ -78,12 +78,12 @@
 (define-hook! extra|restclient-setup (restclient-mode-hook)
   (add-to-list 'company-backends 'company-restclient))
 
-(defun extra/clipboard-copy ($beg $end)
+(defun extra/clipboard-copy (-beg -end)
   (interactive "r")
   (if (display-graphic-p)
-      (kill-new (buffer-substring-no-properties $beg $end))
+      (kill-new (buffer-substring-no-properties -beg -end))
     (if env-has-xsel-p
-        (if (= 0 (shell-command-on-region $beg $end "xsel -ib"))
+        (if (= 0 (shell-command-on-region -beg -end "xsel -ib"))
             (message "Copy finished")
           (message "Error occured !!!"))
       (message "Executable `xsel' not found !!!"))))

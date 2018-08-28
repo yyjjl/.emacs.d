@@ -1,11 +1,11 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;;;###autoload
-(defun org/next-item (&optional $n)
+(defun org/next-item (&optional -n)
   (interactive "p")
-  (let ((cmd (if (> $n 0) #'org-next-item #'org-previous-item))
+  (let ((cmd (if (> -n 0) #'org-next-item #'org-previous-item))
         (col (current-column))
-        (n (abs $n)))
+        (n (abs -n)))
     (condition-case err
         (while (>= (decf n) 0)
           (funcall cmd))
@@ -13,37 +13,37 @@
     (move-to-column col)))
 
 ;;;###autoload
-(defun org/previous-item (&optional $n)
+(defun org/previous-item (&optional -n)
   (interactive "p")
-  (org/next-item (- $n)))
+  (org/next-item (- -n)))
 
 ;;;###autoload
-(defun company-org-symbols ($command &optional $arg &rest _)
+(defun company-org-symbols (-command &optional -arg &rest _)
   "Complete math symbol in LaTeX fragments, better than `pcomplete'"
   (interactive (list 'interactive))
-  (cl-case $command
+  (cl-case -command
     (interactive (company-begin-backend 'company-org-symbols))
     (prefix (ignore-errors (let ((word (company-grab-word)))
                              (and (= ?\\ (char-before (- (point) (length word))))
                                   word))))
-    (candidates (company-auctex-symbol-candidates $arg))
-    (annotation (company-auctex-symbol-annotation $arg))))
+    (candidates (company-auctex-symbol-candidates -arg))
+    (annotation (company-auctex-symbol-annotation -arg))))
 
 ;;;###autoload
-(defun org/open-pdf (&optional $arg)
+(defun org/open-pdf (&optional -arg)
   (interactive "P")
   (let* ((-fn (buffer-file-name))
          (fn (and -fn
                   (concat (file-name-sans-extension -fn)
                           ".pdf"))))
-    (if (and fn (not $arg) (file-exists-p fn))
+    (if (and fn (not -arg) (file-exists-p fn))
         (find-file fn)
       (counsel-find-file (file-name-base -fn)))))
 
 ;;;###autoload
-(defun org/latexmk-start-watching ($arg)
+(defun org/latexmk-start-watching (-arg)
   (interactive "P")
-  (let* ((file-name (if $arg
+  (let* ((file-name (if -arg
                         (read-file-name "LaTeX file to watch"
                                         nil nil :mustmatch)
                       (buffer-file-name)))
@@ -65,7 +65,7 @@
       (message "latexmk started ..."))))
 
 ;;;###autoload
-(defun org/split-src-block (&optional $below)
+(defun org/split-src-block (&optional -below)
   "Split the current src block.
 With a prefix BELOW move point to lower block."
   (interactive "P")
@@ -75,11 +75,11 @@ With a prefix BELOW move point to lower block."
     (beginning-of-line)
     (insert (format "#+end_src\n#+begin_src %s %s\n" language parameters))
     (beginning-of-line)
-    (when (not $below)
+    (when (not -below)
       (org-babel-previous-src-block))))
 
 ;;;###autoload
-(defun org/create-latex-fragemnt-cache ($files $clean-invalid-p)
+(defun org/create-latex-fragemnt-cache (-files -clean-invalid-p)
   (interactive
    (list
     (if (and (not current-prefix-arg)
@@ -96,7 +96,7 @@ With a prefix BELOW move point to lower block."
     current-prefix-arg))
   (let ((image-files (make-hash-table :test 'equal))
         (image-dirs (make-hash-table :test 'equal)))
-    (dolist (file $files)
+    (dolist (file -files)
       (without-user-record!
        (with-current-buffer (find-file-noselect file)
          (let* ((prefix (concat org-preview-latex-image-directory "org-ltximg"))
@@ -120,7 +120,7 @@ With a prefix BELOW move point to lower block."
                                               org-preview-latex-image-directory)
                             t
                             image-files)))))))))
-    (if $clean-invalid-p
+    (if -clean-invalid-p
         (let ((count 0))
           (cl-loop for image-dir being the hash-keys of image-dirs
                    when (file-exists-p image-dir)

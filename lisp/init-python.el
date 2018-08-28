@@ -64,8 +64,8 @@
 
   (define-key! :map python-mode-map
     ([f5] . python/debug-current-file)
-    ("M-p" . flycheck-previous-error)
-    ("M-n" . flycheck-next-error))
+    ("M-p" . previous-error)
+    ("M-n" . next-error))
 
   (define-hook! python|python-inferior-setup (inferior-python-mode-hook)
     (remove-hook 'comint-output-filter-functions
@@ -102,28 +102,28 @@
 
   (defvar python--elpy-multiedit-buffers nil)
 
-  (defun python//elpy-multiedit-jump-overlay ($buffer &optional $pos $backward-p)
-    (switch-to-buffer $buffer)
-    (unless $pos
-      (setq $pos (if $backward-p (point-max) (point-min))))
-    (let* ((property-fn (if $backward-p
+  (defun python//elpy-multiedit-jump-overlay (-buffer &optional -pos -backward-p)
+    (switch-to-buffer -buffer)
+    (unless -pos
+      (setq -pos (if -backward-p (point-max) (point-min))))
+    (let* ((property-fn (if -backward-p
                             'previous-single-char-property-change
                           'next-single-char-property-change))
            (pos (funcall property-fn
-                         (if (get-char-property $pos 'elpy-multiedit-overlay)
-                             (funcall property-fn $pos 'elpy-multiedit-overlay)
-                           $pos)
+                         (if (get-char-property -pos 'elpy-multiedit-overlay)
+                             (funcall property-fn -pos 'elpy-multiedit-overlay)
+                           -pos)
                          'elpy-multiedit-overlay))
-           (buffers (if $backward-p
+           (buffers (if -backward-p
                         (reverse python--elpy-multiedit-buffers)
                       python--elpy-multiedit-buffers)))
 
-      (if (or (and $backward-p (/= pos (point-min)))
-              (and (not $backward-p) (/= pos (point-max))))
+      (if (or (and -backward-p (/= pos (point-min)))
+              (and (not -backward-p) (/= pos (point-max))))
           (goto-char pos)
-        (-when-let (next-buffer (or (cadr (member $buffer buffers))
+        (-when-let (next-buffer (or (cadr (member -buffer buffers))
                                     (car buffers)))
-          (python//elpy-multiedit-jump-overlay next-buffer nil $backward-p)))))
+          (python//elpy-multiedit-jump-overlay next-buffer nil -backward-p)))))
 
   (defun python/elpy-multiedit-next-overlay ()
     (interactive)
@@ -133,12 +133,12 @@
     (interactive)
     (python//elpy-multiedit-jump-overlay (current-buffer) (point) t))
 
-  (defun python*elpy-multiedit-hack ($fn &optional $arg)
+  (defun python*elpy-multiedit-hack (-fn &optional -arg)
     (setq python--elpy-multiedit-buffers nil)
     (if (and (not elpy-multiedit-overlays)
-             (or $arg (bound-and-true-p iedit-mode)))
+             (or -arg (bound-and-true-p iedit-mode)))
         (call-interactively 'iedit-mode)
-      (funcall $fn $arg)
+      (funcall -fn -arg)
       (dolist (ov elpy-multiedit-overlays)
         (-when-let (buffer (overlay-buffer ov))
           (unless (eq buffer (get-buffer "*Elpy Edit Usages*"))

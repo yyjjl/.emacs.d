@@ -68,5 +68,7 @@
 (gnus-demon-add-handler 'gnus-demon-scan-news 60 30)
 
 (add-to-list 'mode-line-misc-info
-             '(:eval (format " (%d)" gnus--unread-news-count)))
+             '(:eval
+               (when (> gnus--unread-news-count 0)
+                 (format " (%d)" gnus--unread-news-count))))
 

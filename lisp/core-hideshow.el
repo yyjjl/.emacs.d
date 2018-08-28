@@ -102,16 +102,16 @@ BUFFER-OR-NAME defaults to current buffer."
       (setq headline (substring hs-headline 0 hs--headline-max-len)))
     (if hs-headline (concat headline postfix " ") "")))
 
-(defun hs//abstract-overlay ($ov)
-  (let* ((start (overlay-start $ov))
-         (end (overlay-end $ov))
+(defun hs//abstract-overlay (-ov)
+  (let* ((start (overlay-start -ov))
+         (end (overlay-end -ov))
          (str (format " ...%d... " (count-lines start end))) text)
     (setq text (propertize str 'face 'font-lock-builtin-face))
-    (overlay-put $ov 'display text)
-    (overlay-put $ov 'pointer 'hand)
-    (overlay-put $ov 'keymap hs--overlay-map)))
+    (overlay-put -ov 'display text)
+    (overlay-put -ov 'pointer 'hand)
+    (overlay-put -ov 'keymap hs--overlay-map)))
 
-(defun hs//auto-expand (&rest $args)
+(defun hs//auto-expand (&rest -args)
   (save-excursion (hs-show-block)))
 
 (with-eval-after-load 'hideshow

@@ -3,8 +3,8 @@
 (when (>= emacs-major-version 25)
   ;; Do not save to init.el
   (fset 'package--save-selected-packages
-        (lambda ($value)
-          (when $value (setq package-selected-packages $value)))))
+        (lambda (-value)
+          (when -value (setq package-selected-packages -value)))))
 
 (defvar package--use-priority-p nil
   "Non-nil means to use priority defined in variable `package|priority-alist'.
@@ -40,40 +40,40 @@ Archive with high priority will be used when install a package.")
 ;; Setup to select right archive
 (setq package--priority-alist (mapcar #'car package-archives))
 
-(defun package*autoclose-autoloads ($name $pkg-dir)
+(defun package*autoclose-autoloads (-name -pkg-dir)
   "Auto close *-autoloads.el after a package installed."
   (let ((buf (find-file-existing
-               (expand-file-name (concat (if (symbolp $name)
-                                             (symbol-name $name)
-                                           $name)
+               (expand-file-name (concat (if (symbolp -name)
+                                             (symbol-name -name)
+                                           -name)
                                          "-autoloads.el")
-                                 $pkg-dir))))
+                                 -pkg-dir))))
     (when buf (kill-buffer buf))))
 (advice-add 'package-generate-autoloads :after #'package*autoclose-autoloads)
 
-(defsubst package//archive-priority ($archive)
-  (length (member (package-desc-archive $archive) package--priority-alist)))
+(defsubst package//archive-priority (-archive)
+  (length (member (package-desc-archive -archive) package--priority-alist)))
 
-(defun package//get-archive ($name $archives)
+(defun package//get-archive (-name -archives)
   (let (archive tmp)
-    (while (and $archives (not archive))
-      (setq tmp (pop $archives))
-      (when (string= $name (package-desc-archive tmp))
+    (while (and -archives (not archive))
+      (setq tmp (pop -archives))
+      (when (string= -name (package-desc-archive tmp))
         (setq archive tmp)))
     archive))
 
-(defun package//set-archive ($pkg &optional $archive-name)
+(defun package//set-archive (-pkg &optional -archive-name)
   "Set right archive content for PKG. "
-  (let ((pkg-archives (cdr $pkg)) archive)
-    (when $archive-name
-      (setq archive (package//get-archive $archive-name pkg-archives)))
+  (let ((pkg-archives (cdr -pkg)) archive)
+    (when -archive-name
+      (setq archive (package//get-archive -archive-name pkg-archives)))
     (when (and (not archive) package--use-priority-p)
       (setq archive (car (sort pkg-archives
-                                (lambda ($pkg1 $pkg2)
-                                  (> (package//archive-priority $pkg1)
-                                     (package//archive-priority $pkg2)))))))
+                                (lambda (-pkg1 -pkg2)
+                                  (> (package//archive-priority -pkg1)
+                                     (package//archive-priority -pkg2)))))))
     (when archive
-      (setf (cdr $pkg) (list archive)))))
+      (setf (cdr -pkg) (list archive)))))
 
 (defun package*after-read-contents ()
   (dolist (pkg package-archive-contents)
@@ -83,23 +83,23 @@ Archive with high priority will be used when install a package.")
             :after #'package*after-read-contents)
 
 (defvar package--content-freshed-p nil)
-(defun require! ($pkg-name &optional $archive $location)
-  (cond ((eq $location 'built-in) t)
-        ($location (add-to-list 'load-path $location))
+(defun require! (-pkg-name &optional -archive -location)
+  (cond ((eq -location 'built-in) t)
+        (-location (add-to-list 'load-path -location))
         (t
-         (puthash $pkg-name $archive package--required-packages)
-         (unless (package-installed-p $pkg-name)
+         (puthash -pkg-name -archive package--required-packages)
+         (unless (package-installed-p -pkg-name)
            (unless package--content-freshed-p
              (package-refresh-contents)
              (setq package--content-freshed-p t))
-           (message "Installing package `%s' ..." $pkg-name)
+           (message "Installing package `%s' ..." -pkg-name)
            (let ((inhibit-message t))
-             (package-install $pkg-name))))))
+             (package-install -pkg-name))))))
 
-(defmacro require-packages! (&rest $pkg-list)
+(defmacro require-packages! (&rest -pkg-list)
   (declare (indent nil))
   (let (forms compile-forms)
-    (dolist (pkg $pkg-list)
+    (dolist (pkg -pkg-list)
       (if (atom pkg)
           (progn (push `(require! ',pkg) forms)
                  (push `(require ',pkg) compile-forms))
@@ -142,22 +142,22 @@ Archive with high priority will be used when install a package.")
              (- (length files) failed-count)
              failed-count)))
 
-(defun package/compile-elpa-packages (&optional $no-message?)
+(defun package/compile-elpa-packages (&optional -no-message?)
   (interactive)
-  (let ((inhibit-message $no-message?))
+  (let ((inhibit-message -no-message?))
     (byte-recompile-directory package-user-dir nil :force)))
 
-(defun package/compile-config (&optional $no-message?)
+(defun package/compile-config (&optional -no-message?)
   (interactive "P")
   (message "Compile configuration files ...")
   (dolist (file (append
-                 (directory-files emacs-config-directory :full "\\.el$")
+                 (directory-files emacs-config-directory :full "\\.el-")
                  (directory-files-recursively emacs-private-directory "\\.el$")
                  (list user-init-file
                        custom-file)))
     (when file
       (condition-case err
-          (let ((inhibit-message $no-message?))
+          (let ((inhibit-message -no-message?))
             (byte-compile-file file))
         (error (message "Error: %s" err)
                (backtrace)))))
