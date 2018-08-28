@@ -69,6 +69,8 @@
 
 (with-eval-after-load 'xref
   (define-key! :map xref--xref-buffer-mode-map
+    ("M-n" . next-error)
+    ("M-p" . previous-error)
     ("j" . (lambda! () (xref--search-property 'xref-item)))
     ("k" . (lambda! () (xref--search-property 'xref-item t))))
   (define-hook! xref*xref-buffer-setup (xref--xref-buffer-mode-hook)
@@ -211,7 +213,7 @@
 (advice-add 'desktop-read :around #'core*desktop-read)
 
 (defvar core-auto-next-error-buffer-derived-modes
-  '(occur-mode grep-mode ivy-occur-mode))
+  '(occur-mode grep-mode ivy-occur-mode xref--xref-buffer-mode))
 (defun core*next-error-before (&rest _)
   (let ((occur-buffer
          (cl-loop

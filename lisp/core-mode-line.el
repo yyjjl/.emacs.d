@@ -1,3 +1,6 @@
+(eval-when-compile
+  (require 'dash))
+
 (defvar-local mode-line--git-cache nil)
 (defvar-local mode-line--cached-relative-directory nil)
 (defvar-local mode-line--cached-root nil)

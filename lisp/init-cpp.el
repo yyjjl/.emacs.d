@@ -1,21 +1,21 @@
 ;; -*- lexical-binding:t -*-
 
 (setvar!
- cpp-cquery-base-path (expand-var! "cquery")
- cpp-cquery-path (expand-file-name "build/cquery"
-                                   cpp-cquery-base-path)
+ cpp-ccls-base-path (expand-var! "ccls")
+ cpp-ccls-path (expand-file-name "build/ccls"
+                                   cpp-ccls-base-path)
  cpp-has-cmake-p (executable-find "cmake")
- cpp-has-cquery-p (file-exists-p cpp-cquery-base-path))
+ cpp-has-ccls-p (file-exists-p cpp-ccls-base-path))
 
 (require-packages!
  (ggtags :when env-has-gtags-p)
- (lsp-mode :when cpp-has-cquery-p)
- (company-lsp :when cpp-has-cquery-p)
- (cquery :when cpp-has-cquery-p)
+ (lsp-mode :when cpp-has-ccls-p)
+ (company-lsp :when cpp-has-ccls-p)
+ (ccls :when cpp-has-ccls-p)
  clang-format
  google-c-style)
 
-(require 'init-cpp-cquery)
+(require 'init-cpp-ccls)
 
 (defvar gud-chdir-before-run t)
 
@@ -97,13 +97,8 @@
     (font-lock-add-keywords nil cpp--font-lock-keywords)))
 
 (defun cpp//setup ()
-  (advice-add 'projectile--run-project-cmd
-              :around
-              (lambda (-fn &rest -args)
-                (with-temp-env! (cpp-cmake//config-env)
-                  (apply -fn -args))))
   (if (or (not cpp-has-cmake-p)
-          (not cpp-has-cquery-p)
+          (not cpp-has-ccls-p)
           (file-remote-p default-directory)
           (bound-and-true-p cpp-setup-literally)
           (> (buffer-size) core-large-buffer-size))
@@ -112,11 +107,11 @@
         ;; (setq completion-at-point-functions nil)
         (flycheck-mode -1))
     (setq cpp-cmake-project-root (cpp-cmake//locate-cmakelists))
-    (if (or (file-exists-p (cpp-cquery//dot-cquery-path))
+    (if (or (file-exists-p (cpp-ccls//dot-ccls-path))
             (and cpp-cmake-project-root (file-exists-p (cpp-cmake//cdb-path))))
-        (lsp//enable cquery :success (cpp-cquery//setup))
+        (lsp//enable ccls :success (cpp-ccls//setup))
       (when cpp-cmake-project-root
-        (message "Need run `cpp/run-cmake' to setup cquery server")))))
+        (message "Need run `cpp/config-project' to setup ccls server")))))
 
 ;; Do not use `c-mode-hook' and `c++-mode-hook', there is a bug
 (defvar-local cpp--initialized-p nil)
@@ -142,7 +137,7 @@
 
 
 
-(defun cpp/run-cmake (&optional -set-options)
+(defun cpp/config-project (&optional -set-options)
   (interactive "P")
   (if (not cpp-cmake-project-root)
       (message "CMakeLists.txt hasn't been found.")
@@ -156,8 +151,8 @@
              (let ((default-directory cpp-cmake-project-root))
                (make-symbolic-link cdb-path "compile_commands.json"
                                    :ok-if-already-exists)))
-           (when cpp-has-cquery-p
-             (lsp//enable cquery :success (cpp-cquery//setup)))))))
+           (when cpp-has-ccls-p
+             (lsp//enable ccls :success (cpp-ccls//setup)))))))
     (when -set-options
       (cpp-cmake//set-cmake-options
        (lambda (_)
@@ -199,7 +194,7 @@
         (let ((compile-command
                (or (-when-let (dir (cpp-cmake//locate-cmakelists nil nil "Makefile"))
                      (cpp//compile-command dir))
-                   (ignore-errors (cpp-cquery//buffer-compile-command))
+                   (ignore-errors (cpp-ccls//buffer-compile-command))
                    compile-command)))
           (call-interactively 'compile))))))
 
@@ -248,13 +243,19 @@
 (defun cpp/macro-expand ()
   (interactive)
   (setq-local c-macro-preprocessor
-              (cpp-cquery//buffer-compile-command t))
+              (cpp-ccls//buffer-compile-command t))
   (call-interactively 'c-macro-expand))
 
 
 
+(with-eval-after-load 'projectile
+  (advice-add 'projectile--run-project-cmd
+              :around
+              (lambda (-fn &rest -args)
+                (with-temp-env! (cpp-cmake//config-env) (apply -fn -args)))))
+
 (with-eval-after-load 'cc-mode
-  (require 'cquery)
+  (require 'ccls)
 
   (dolist (key '("#" "}" "/" ";" "," ":" "(" ")" "{"))
     (define-key c-mode-base-map key nil))
@@ -274,8 +275,8 @@
     ("C-c o" . ff-find-other-file)
     ("C-c C-j" . semantic-ia-fast-jump)
     ("C-c C-v" . semantic-ia-show-variants)
-    ("M-n" . flycheck-next-error)
-    ("M-p" . flycheck-previous-error)
+    ("M-n" . next-error)
+    ("M-p" . previous-error)
     ("C-M-i" . counsel-company))
 
   (define-key! :map c++-mode-map
@@ -289,13 +290,13 @@
     ("C-c T" . cpp-cmake/toggle-option)
     ("C-c C" . cpp-cmake/change-config)
     ("C-c D" . cpp-cmake/config)
-    ("C-c C-c" . cpp/run-cmake)
-    ("M-s l" . cquery-code-lens-mode)
-    ("M-s c" . cquery-call-hierarchy)
-    ("M-s m" . cquery-member-hierarchy)
-    ("M-s i" . cquery-inheritance-hierarchy)
-    ("C-c j" :map cpp-cquery-jump-map)
-    ([f9] . cpp/run-cmake)
+    ("C-c C-c" . cpp/config-project)
+    ("M-s l" . ccls-code-lens-mode)
+    ("M-s c" . ccls-call-hierarchy)
+    ("M-s m" . ccls-member-hierarchy)
+    ("M-s i" . ccls-inheritance-hierarchy)
+    ("C-c j" :map cpp-ccls-jump-map)
+    ([f9] . cpp/config-project)
     ([f10] . cpp/compile)
     ([f5] . cpp/gdb)))
 

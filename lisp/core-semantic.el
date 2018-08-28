@@ -67,12 +67,9 @@
   (semantic-mode 1)
   ;; (global-semantic-show-parser-state-mode 1)
   ;; (global-semantic-highlight-edits-mode 1)
-  (remove-hook 'completion-at-point-functions
-               'semantic-analyze-completion-at-point-function)
-  (remove-hook 'completion-at-point-functions
-               'semantic-analyze-notc-completion-at-point-function)
-  (remove-hook 'completion-at-point-functions
-               'semantic-analyze-nolongprefix-completion-at-point-function))
+  (fset 'semantic-analyze-completion-at-point-function 'ignore)
+  (fset 'semantic-analyze-notc-completion-at-point-function 'ignore)
+  (fset 'semantic-analyze-nolongprefix-completion-at-point-function 'ignore))
 
 (add-hook 'after-init-hook 'core/enable-semantic)
 
