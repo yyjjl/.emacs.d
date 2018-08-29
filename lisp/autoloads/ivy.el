@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t; -*-
+
 (defun counsel//truncate-string (-string -width)
   (when (> (length -string) -width)
     (setq -string

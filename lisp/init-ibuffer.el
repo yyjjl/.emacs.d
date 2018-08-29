@@ -10,9 +10,10 @@
      ((> (buffer-size) 1048576) (format "%5.1fM" (/ (buffer-size) 1048576.0)))
      ((> (buffer-size) 1024) (format "%5.1fK" (/ (buffer-size) 1024.0)))
      (t (format "%6d" (buffer-size)))))
+
   ;; ibuffer-vc slow down emacs
   ;; +Explicitly require ibuffer-vc to get its column+
-  ;; +definitions,which can't be autoloaded+
+  ;; +definitions, which can't be autoloaded+
   ;; (require 'ibuffer-vc)
 
   (setq ibuffer-expert t

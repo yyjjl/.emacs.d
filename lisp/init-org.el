@@ -10,11 +10,86 @@
 
 
 
-(defmacro org/by-backend (&rest body)
+(defmacro org/by-backend (&rest -body)
   `(case (or (and (boundp 'org-export-current-backend)
                   org-export-current-backend)
              'babel)
-     ,@body))
+     ,@-body))
+
+(defun org//ltximg-directory-local-p (-filename &optional -directory)
+  (and (eq major-mode 'org-mode)
+       (equal org-preview-latex-image-directory
+              (concat "auto/" (file-name-base -filename) "/"))
+       (file-exists-p
+        (expand-file-name org-preview-latex-image-directory
+                          (or -directory default-directory)))))
+
+(defun org*around-html-do-format-code (-fn &rest -rest)
+  (when (= (length -rest) 5)
+    (let ((num-start (nth 4 -rest)))
+      (unless num-start
+        (setq num-start 0))
+      (setcar (nthcdr 4 -rest) num-start)))
+  (apply -fn -rest))
+
+(defun org*around-latex-link (-fn -link -desc -info)
+  (let* ((type (org-element-property :type -link))
+         (raw-path (org-element-property :path -link))
+         (search-option (org-element-property :search-option -link))
+         (project (ignore-errors
+                    (org-publish-get-project-from-filename
+                     (buffer-file-name)))))
+    (if (and project
+             (string= type "file")
+             (string= (file-name-extension raw-path) "org")
+             (equal (car (org-publish-get-project-from-filename
+                          (file-truename raw-path)))
+                    (car project)))
+        (format "\\href{%s.pdf%s}{%s}"
+                (org-latex--protect-text
+                 (org-export-file-uri
+                  (file-name-sans-extension raw-path)))
+                search-option
+                (or -desc ""))
+      (funcall -fn -link -desc -info))))
+
+(defun org*around-fill-paragraph (-fn &optional -justify region)
+  (let* ((element (org-element-context))
+         (end (org-element-property :end element))
+         (begin (org-element-property :begin element))
+         (latex-p (memq (org-element-type element)
+                        '(latex-fragment latex-environment))))
+    (if (and latex-p (not (region-active-p)) -justify)
+        (save-excursion
+          (goto-char begin)
+          (let ((g1 '(group (not (any "{([" blank))))
+                (g2 '(group (or (any ?= ?- ?+ ?/ ?> ?<)
+                                (and "\\" (or "ne" "neq" "le" "ge"
+                                              "cdot" "circ" "cap" "cup"
+                                              "subset" "subsetqe" "lor"
+                                              "land" "in" "to" "rightarrow"
+                                              "Rightarrow")))))
+                (g3 '(group (not (any ")}]" blank)))))
+            (query-replace-regexp (rx-to-string `(and ,g1 ,g2 ,g3) t)
+                                  "\\1 \\2 \\3" nil begin end)
+            (query-replace-regexp (rx-to-string `(and ,g1 ,g2 (group " ")) t)
+                                  "\\1 \\2 " nil begin end)
+            (query-replace-regexp (rx-to-string `(and (group " ") ,g2 ,g3) t)
+                                  " \\1 \\2" nil begin end)))
+      (funcall -fn -justify region))
+    (when (fboundp #'extra/insert-space-around-chinese)
+      (ignore-errors (extra/insert-space-around-chinese begin end)))))
+
+(defun org-block-speed-command-activate (keys)
+  "Hook for activating single-letter block commands."
+  (when (and (bolp)
+             (looking-at
+              (eval-when-compile
+                (concat
+                 "^[\t ]*#\\+begin_?\\([^ \n]+\\)\\(\\([^\n]+\\)\\)?"
+                 "\\|"
+                 "^[\t ]*#\\+end_?\\([^ \n]+\\)$"))))
+    (cdr (assoc keys org-block-key-bindings))))
 
 (with-eval-after-load 'ob
   (define-key! :map org-babel-map
@@ -41,23 +116,12 @@
       ("\C-p" . org-previous-block)
       ("n" . org-next-block)
       ("\C-n" . org-next-block)))
-  (defun org-block-speed-command-activate (keys)
-    "Hook for activating single-letter block commands."
-    (when (and (bolp)
-               (looking-at
-                (eval-when-compile
-                  (concat
-                   "^[\t ]*#\\+begin_?\\([^ \n]+\\)\\(\\([^\n]+\\)\\)?"
-                   "\\|"
-                   "^[\t ]*#\\+end_?\\([^ \n]+\\)$"))))
-      (cdr (assoc keys org-block-key-bindings))))
+
   (add-hook 'org-speed-command-hook 'org-block-speed-command-activate :append)
 
-  (defun org*beginning-of-line (-fn &optional -n)
-    (if (bolp)
-        (back-to-indentation)
-      (funcall -fn -n)))
-  (advice-add 'org-beginning-of-line :around  #'org*beginning-of-line)
+  (advice-add 'org-beginning-of-line
+              :around (lambda (-fn &optional -n)
+                        (if (bolp) (back-to-indentation) (funcall -fn -n))))
 
   ;; Highlight `{{{color(<color>, <text>}}}' form
   (font-lock-add-keywords
@@ -209,14 +273,6 @@
                 (widen))))
            "   - [ ] %^{Task} %?")))
 
-  (defun org//ltximg-directory-local-p (filename &optional directory)
-    (and (eq major-mode 'org-mode)
-         (equal org-preview-latex-image-directory
-                (concat "auto/" (file-name-base filename) "/"))
-         (file-exists-p
-          (expand-file-name org-preview-latex-image-directory
-                            (or directory default-directory)))))
-
   (define-hook! (org|after-rename-this-file -old-name -new-name)
     (core-after-rename-this-file-hook)
     (let ((new-dir (file-name-directory -new-name))
@@ -258,35 +314,8 @@
       (local-set-key (kbd "C-c C-.") #'ob-ipython-inspect))
     (flycheck-mode -1))
 
-  (defun org*fill-paragraph-hack (-fn &optional -justify region)
-    (let* ((element (org-element-context))
-           (end (org-element-property :end element))
-           (begin (org-element-property :begin element))
-           (latex-p (memq (org-element-type element)
-                          '(latex-fragment latex-environment))))
-      (if (and latex-p
-               (not (region-active-p))
-               -justify)
-          (save-excursion
-            (goto-char begin)
-            (let ((g1 '(group (not (any "{([" blank))))
-                  (g2 '(group (or (any ?= ?- ?+ ?/ ?> ?<)
-                                  (and "\\" (or "ne" "neq" "le" "ge"
-                                                "cdot" "circ" "cap" "cup"
-                                                "subset" "subsetqe" "lor"
-                                                "land" "in" "to" "rightarrow"
-                                                "Rightarrow")))))
-                  (g3 '(group (not (any ")}]" blank)))))
-              (query-replace-regexp (rx-to-string `(and ,g1 ,g2 ,g3) t)
-                                    "\\1 \\2 \\3" nil begin end)
-              (query-replace-regexp (rx-to-string `(and ,g1 ,g2 (group " ")) t)
-                                    "\\1 \\2 " nil begin end)
-              (query-replace-regexp (rx-to-string `(and (group " ") ,g2 ,g3) t)
-                                    " \\1 \\2" nil begin end)))
-        (funcall -fn -justify region))
-      (when (fboundp #'extra/insert-space-around-chinese)
-        (ignore-errors (extra/insert-space-around-chinese begin end)))))
-  (advice-add 'org-fill-paragraph :around #'org*fill-paragraph-hack)
+
+  (advice-add 'org-fill-paragraph :around #'org*around-fill-paragraph)
 
   (define-key org-mode-map (kbd "C-c t") org-table-extra-map)
   (define-key! :map org-mode-map
@@ -313,17 +342,9 @@
     ("C-c C-t" . org-todo)))
 
 (with-eval-after-load 'ox-html
-
-  (defun org*html-export-with-line-number (-fn &rest -rest)
-    (when (= (length -rest) 5)
-      (let ((num-start (nth 4 -rest)))
-        (unless num-start
-          (setq num-start 0))
-        (setcar (nthcdr 4 -rest) num-start)))
-    (apply -fn -rest))
-
   ;; (advice-add 'org-html-do-format-code
-  ;;             :around #'org*html-export-with-line-number)
+  ;;             :around #'org*around-html-do-format-code)
+
   (setq org-html-mathjax-template (eval-when-compile
                                     (read-file-content!
                                      (expand-etc! "org-mathjax-template"))))
@@ -334,27 +355,7 @@
   (ignore-errors
     (require 'ox-bibtex))
 
-  (defun org*latex-link-hack (-fn -link -desc -info)
-    (let* ((type (org-element-property :type -link))
-           (raw-path (org-element-property :path -link))
-           (search-option (org-element-property :search-option -link))
-           (project (ignore-errors
-                      (org-publish-get-project-from-filename
-                       (buffer-file-name)))))
-      (if (and project
-               (string= type "file")
-               (string= (file-name-extension raw-path) "org")
-               (equal (car (org-publish-get-project-from-filename
-                            (file-truename raw-path)))
-                      (car project)))
-          (format "\\href{%s.pdf%s}{%s}"
-                  (org-latex--protect-text
-                   (org-export-file-uri
-                    (file-name-sans-extension raw-path)))
-                  search-option
-                  (or -desc ""))
-        (funcall -fn -link -desc -info))))
-  (advice-add 'org-latex-link :around #'org*latex-link-hack)
+  (advice-add 'org-latex-link :around #'org*around-latex-link)
 
   (add-to-list 'org-latex-minted-langs '(ipython "python"))
   (setq org-latex-compiler "xelatex")

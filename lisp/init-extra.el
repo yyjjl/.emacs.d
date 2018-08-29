@@ -1,8 +1,8 @@
+;;; -*- lexical-binding: t; -*-
+
 (require-packages!
  calc
  whitespace
- restclient
- company-restclient
  markdown-mode
  csv-mode
  php-mode
@@ -14,7 +14,7 @@
  buffer-move
  zeal-at-point
  skeletor
- slime)
+ sly)
 
 
 
@@ -27,13 +27,7 @@
 ;; csv
 (setq csv-separators '("," ";" "|" " "))
 
-(setq inferior-lisp-program "ccl")
-
-(with-eval-after-load 'slime
-  (setq slime-contribs '(slime-fancy))
-  (setq slime-protocol-version 'ignore)
-  (setq slime-net-coding-system 'utf-8-unix)
-  (setq slime-complete-symbol*-fancy t))
+(setq inferior-lisp-program "sbcl")
 
 (with-eval-after-load 'graphviz-dot-mode
   (defun extra/dot-complete ()
@@ -69,14 +63,6 @@
 ;; Star dictionary lookup
 (autoload 'sdcv-current-word "sdcv" nil t)
 (autoload 'sdcv-goto-sdcv "sdcv" nil t)
-
-;; `restclient-mode'
-(with-eval-after-load 'restclient
-  (define-key! :map restclient-mode-map
-    ("M-p" . restclient-jump-prev)
-    ("M-n" . restclient-jump-next)))
-(define-hook! extra|restclient-setup (restclient-mode-hook)
-  (add-to-list 'company-backends 'company-restclient))
 
 (defun extra/clipboard-copy (-beg -end)
   (interactive "r")
@@ -149,11 +135,11 @@
   (define-key! :map shackle-mode-map
     ("i" . extra/translate-shell)))
 
-(define-key!
+(define-key! :prefix "C-x w"
   ;; buffer-mode
-  ("C-x w k" . buf-move-up)
-  ("C-x w j" . buf-move-down)
-  ("C-x w h" . buf-move-left)
-  ("C-x w l" . buf-move-right))
+  ("k" . buf-move-up)
+  ("j" . buf-move-down)
+  ("h" . buf-move-left)
+  ("l" . buf-move-right))
 
 (provide 'init-extra)

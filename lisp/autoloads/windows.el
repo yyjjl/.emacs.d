@@ -1,4 +1,4 @@
-;; When splitting window, show (other-buffer) in the new window
+;;; -*- lexical-binding: t; -*-
 
 (defvar window-size-list '("0.25" "0.382" "0.5" "0.618" "0.7"))
 (defun window//split-with-size (-size &optional -vertical?)
@@ -19,26 +19,30 @@
           (windmove-down)
         (windmove-right)))))
 
+;;;###autoload
 (defun window/split-vertically (&optional -arg)
   (interactive "P")
   (window//split-with-size (when -arg (string-to-number
-                                      (completing-read "Float or Integer: "
-                                                       window-size-list)))
-                          :vertial))
+                                       (completing-read "Float or Integer: "
+                                                        window-size-list)))
+                           :vertial))
 
+;;;###autoload
 (defun window/split-horizontally (&optional -arg)
   (interactive "P")
   (window//split-with-size (when -arg (string-to-number
-                                      (completing-read "Float or Integer: "
-                                                       window-size-list)))))
+                                       (completing-read "Float or Integer: "
+                                                        window-size-list)))))
 
 ;; Rearrange split windows
+;;;###autoload
 (defun window/force-split-horizontally (&optional -arg)
   (interactive "P")
   (save-excursion
     (delete-other-windows)
     (window/split-horizontally -arg)))
 
+;;;###autoload
 (defun window/force-split-vertically (&optional -arg)
   (interactive "P")
   (save-excursion
@@ -58,6 +62,7 @@
           (setq -window
                 (funcall split-function (round (/ size -n)))))))))
 
+;;;###autoload
 (defun window/split-window-two-panel (-align -num1 -num2 ratio)
   (interactive (list (read-char "`-' or `|' :")
                      (max (read-number "First: ") 1)
@@ -83,11 +88,3 @@
     (when align
       (window//split-n orig-window -num1 align)
       (window//split-n new-window -num2 align))))
-
-(define-key! :prefix "C-x"
-  ("2" . window/split-vertically)
-  ("3" . window/split-horizontally)
-  ("|" . window/force-split-horizontally)
-  ("_" . window/force-split-vertically))
-
-(provide 'init-windows)

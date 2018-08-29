@@ -1,8 +1,13 @@
 (with-eval-after-load 'semantic
+  ;; (fset 'semantic-analyze-completion-at-point-function 'ignore)
+  ;; (fset 'semantic-analyze-notc-completion-at-point-function 'ignore)
+  ;; (fset 'semantic-analyze-nolongprefix-completion-at-point-function 'ignore)
+
   (semantic-add-system-include "/usr/include/" 'c++-mode)
   (semantic-add-system-include "/usr/include/" 'c-mode)
 
-  (advice-add 'semantic-new-buffer-fcn :around 'ignore-errors!)
+  (advice-add 'semantic-new-buffer-fcn :around #'ignore-remote!)
+
   (advice-add 'semantic-idle-scheduler-function
               :around (lambda (-fn &rest -args)
                         (with-local-quit (apply -fn -args))))
@@ -21,56 +26,10 @@
           global-semantic-mru-bookmark-mode))
   (setq semantic-idle-scheduler-idle-time 1)
 
-  (defun core/semantic-new-buffer-fcn-hack (-fn)
-    (unless (and default-directory (file-remote-p default-directory))
-      (funcall -fn)))
-
-  (advice-add 'semantic-new-buffer-fcn
-              :around #'core/semantic-new-buffer-fcn-hack)
-
   (when env-has-gtags-p
     (dolist (mode '(c++-mode c-mode java-mode))
       (semanticdb-enable-gnu-global-databases mode))))
 
-(defun core//semanticdb-parse-directory (-dir &optional -regex -recursive-p)
-  (without-user-record!
-   (let ((dir (file-name-as-directory -dir)))
-     (dolist (file (directory-files dir))
-       (unless (or (member file '("." ".."))
-                   (member file core-ignored-directories))
-         (let ((full-file (expand-file-name file dir)))
-           (condition-case err
-               (if (and -recursive-p (file-directory-p full-file))
-                   (core//semanticdb-parse-directory full-file -regex -recursive-p)
-                 (if (or (not -regex)
-                         (string= -regex "")
-                         (string-match-p -regex file))
-                     (save-excursion
-                       (semanticdb-file-table-object full-file))))
-             (error (message "Error: %s" err)))))))))
-
-(defun core/semantidb-parse (-regex -dir)
-  (interactive (list (read-regexp "File name regex (default nil)" nil)
-                     (file-name-directory
-                      (completing-read "Directory: "
-                                       #'read-file-name-internal))))
-  (unwind-protect
-      (progn
-        (core//semanticdb-parse-directory -dir -regex t)
-        (semanticdb-cleanup-cache-files))
-    (let ((inhibit-quit t))
-      (semanticdb-save-all-db))
-    (when-let (buffer (get-buffer "*Semanticdb Delete*"))
-      (kill-buffer buffer))))
-
-(defun core/enable-semantic ()
-  (semantic-mode 1)
-  ;; (global-semantic-show-parser-state-mode 1)
-  ;; (global-semantic-highlight-edits-mode 1)
-  (fset 'semantic-analyze-completion-at-point-function 'ignore)
-  (fset 'semantic-analyze-notc-completion-at-point-function 'ignore)
-  (fset 'semantic-analyze-nolongprefix-completion-at-point-function 'ignore))
-
-(add-hook 'after-init-hook 'core/enable-semantic)
+(add-hook 'after-init-hook 'semantic-mode)
 
 (provide 'core-semantic)

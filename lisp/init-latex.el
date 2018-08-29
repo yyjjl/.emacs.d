@@ -100,7 +100,7 @@
   (unless TeX-master
     (setq TeX-master 'dwim))
 
-  (unless (buffer-temporary?)
+  (unless (buffer-temporary-p)
     (reftex-mode 1)
     (TeX-source-correlate-mode 1)
     (TeX-PDF-mode 1)

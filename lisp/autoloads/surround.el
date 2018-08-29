@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t; -*-
+
 (defvar core-surround-pair-alist
   '(("()90" . ("(" . ")"))
     ("{}" . ("{" . "}"))
@@ -65,6 +67,7 @@ Use `scan-lists', otherwise use simple algorithm."
           from-pair
           (core//surround-get-pair (read-char)))))
 
+;;;###autoload
 (defun core/change-surround (-beg -end -from-pair -to-pair)
   (interactive (core//surround-mark))
   (unless (equal -from-pair -to-pair)
@@ -99,7 +102,3 @@ Use `scan-lists', otherwise use simple algorithm."
       ;; Restore original point
       (when core--suround-origin-pos
         (goto-char core--suround-origin-pos)))))
-
-(global-set-key (kbd "M-'") #'core/change-surround)
-
-(provide 'init-surround)

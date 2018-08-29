@@ -3,7 +3,10 @@
 (defvar core-current-desktop-name nil)
 (defvar core-view-code-modes
   '((lispy-mode rainbow-delimiters-count-mode)
-    (t display-line-numbers-mode view-mode)))
+    (t display-line-numbers-mode
+       view-mode
+       highlight-indentation-current-column-mode
+       highlight-indentation-mode)))
 
 (define-minor-mode core-view-code-mode
   "View code"
@@ -81,6 +84,7 @@
 (setq flycheck-keymap-prefix (kbd "C-c f"))
 (with-eval-after-load 'flycheck
   ;; Do not check during newline
+  (setq-default flycheck-checker-error-threshold 50)
   (setq-default flycheck-check-syntax-automatically
                 '(idle-change save mode-enabled))
   (setq flycheck-mode-line-prefix ""
@@ -103,20 +107,16 @@
 
 (with-eval-after-load 'projectile
   (define-key projectile-mode-map (kbd "C-x p") projectile-command-map)
+
   ;; Projectile root-searching functions can cause an infinite cl-loop on TRAMP
   ;; connections, so disable them.
-  (defun core*projectile-locate-dominating-file (-fn &rest -args)
-    "Don't traverse the file system if on a remote connection."
-    (unless (file-remote-p default-directory)
-      (apply -fn -args)))
-  (advice-add #'projectile-locate-dominating-file
-              :around #'core*projectile-locate-dominating-file)
+  (advice-add #'projectile-locate-dominating-file :around #'ignore-remote!)
+
   (setq projectile-mode-line
         '(:eval (and buffer-file-name (projectile-project-name))))
   (setq projectile-require-project-root nil)
   (setq projectile-globally-ignored-file-suffixes
-        '(".pyc" ".elc" ".jpg" ".png" ".svg"
-          ".jpeg" ".pyg" ".pygtex" ".pygstyle"))
+        '(".pyc" ".elc" ".jpg" ".png" ".svg" ".jpeg" ".pyg" ".pygtex" ".pygstyle"))
   (setq projectile-completion-system 'ivy)
   (setq projectile-ignored-projects '("~/" "/tmp"))
   (setq projectile-enable-caching (not noninteractive))
@@ -130,9 +130,9 @@
 
   (advice-add 'yas-next-field-or-maybe-expand
               :around #'core*expand-local-snippets)
+
   (with-eval-after-load 'org
-    (advice-add 'org-cycle
-                :around #'core*expand-local-snippets))
+    (advice-add 'org-cycle :around #'core*expand-local-snippets))
 
   (add-to-list 'auto-mode-alist '("\\.yasnippet\\'" . snippet-mode))
   (setq yas-prompt-functions '(yas-completing-prompt))
@@ -209,22 +209,50 @@
     (semantic-mode -1)
     (apply -fn -args)
     (when semantic-enable-p
-      (core/enable-semantic))))
+      (semantic-mode 1))))
 (advice-add 'desktop-read :around #'core*desktop-read)
 
 (defvar core-auto-next-error-buffer-derived-modes
   '(occur-mode grep-mode ivy-occur-mode xref--xref-buffer-mode))
-(defun core*next-error-before (&rest _)
+(defun core*before-next-error (&rest _)
   (let ((occur-buffer
          (cl-loop
           for window in (window-list)
           for buffer = (window-buffer window)
-          when (derived-mode? core-auto-next-error-buffer-derived-modes buffer)
+          when (with-current-buffer buffer
+                 (apply 'derived-mode-p
+                        core-auto-next-error-buffer-derived-modes))
           return buffer)))
     (when (or (not next-error-last-buffer)
               (not (eq next-error-last-buffer occur-buffer)))
       (setq next-error-last-buffer occur-buffer))))
-(advice-add 'next-error :before #'core*next-error-before)
+(advice-add 'next-error :before #'core*before-next-error)
+
+(define-key! :prefix "C-x"
+  ("2" . window/split-vertically)
+  ("3" . window/split-horizontally)
+  ("|" . window/force-split-horizontally)
+  ("_" . window/force-split-vertically)
+  ("?" . window/split-window-two-panel)
+
+  (", ," . core-view-code-mode)
+  (", g" . core/search-in-chrome)
+  (", s" . core/create-scratch-buffer)
+  (", -" . core/copy-file-name)
+  (", c" . core/change-or-new-desktop)
+  (", d" . core/delete-desktop)
+  (", o" . recentf-open-files)
+  ("C-b" . ibuffer)
+  ("C-d" . find-name-dired)
+
+  ("D" . core/delete-this-file)
+  ("R" . core/rename-this-file-and-buffer)
+  ("W" . core/copy-this-file-to-new-file)
+  ("c" . core/cleanup-buffer-safe)
+  ("o" . ace-window)
+
+  ("w [" . winner-undo)
+  ("w ]" . winner-redo))
 
 (define-key!
   ("C-<down>" . text-scale-decrease)
@@ -232,24 +260,6 @@
 
   ("C-c 4" . ispell-word)
   ("C-c q" . auto-fill-mode)
-  ("C-x , ," . core/search-in-chrome)
-  ("C-x , s" . core/create-scratch-buffer)
-  ("C-x , -" . core/copy-file-name)
-  ("C-x , c" . core/change-or-new-desktop)
-  ("C-x , d" . core/delete-desktop)
-  ("C-x , o" . recentf-open-files)
-  ("C-x C-b" . ibuffer)
-  ("C-x C-d" . find-name-dired)
-
-  ("C-x D" . core/delete-this-file)
-  ("C-x R" . core/rename-this-file-and-buffer)
-  ("C-x W" . core/copy-this-file-to-new-file)
-  ("C-x c" . core/cleanup-buffer-safe)
-  ("C-x o" . ace-window)
-
-  ("C-x w [" . winner-undo)
-  ("C-x w ]" . winner-redo)
-
   ("M--" . er/expand-region)
   ("M-/" . hippie-expand)
 

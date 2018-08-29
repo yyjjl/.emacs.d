@@ -129,9 +129,9 @@
       ;; (hide-ifdef-mode 1)
       ;; Make a #define be left-aligned
       (setq c-electric-pound-behavior '(alignleft))
-      ;; (cpp//font-lock-setup)
+      (cpp//font-lock-setup)
 
-      (unless (buffer-temporary?)
+      (unless (buffer-temporary-p)
         (add-transient-hook!
             (hack-local-variables-hook :local t :name cpp//setup-interal)
           (cpp//setup))))))

@@ -53,7 +53,7 @@
   (setq core-popups--window-list
         (--filter (window-live-p (car it)) core-popups--window-list)))
 
-(defun core-popups*keyboard-quit-hack (&rest _)
+(defun core-popups*before-keyboard-quit (&rest _)
   "When `C-g' pressed, close latest opened popup window"
   (core-popups//clean-window-list)
   ;; `C-g' can deactivate region
@@ -86,7 +86,7 @@
     ;; Record popup window
     (setq core-popups-current-window -window)))
 
-(defun core-popups*shackle-display-buffer-hack (-fn -buffer -alist -plist)
+(defun core-popups*around-shackle-display-buffer (-fn -buffer -alist -plist)
   (core-popups//clean-window-list)
   ;; Set default alignment
   (setq shackle-default-alignment
@@ -107,7 +107,7 @@
       (core-popups//push-window window -buffer autoclose-p action))
     window))
 
-(defun core-popups//display-buffer-popup-window (-buffer -alist -plist)
+(defun core-popups*display-buffer-popup-window (-buffer -alist -plist)
   (let ((frame (shackle--splittable-frame))
         (other-window-p (and (plist-get -plist :other) (not (one-window-p)))))
     (when frame
@@ -125,7 +125,7 @@
           (unless (cdr (assq 'inhibit-switch-frame -alist))
             (window--maybe-raise-frame (window-frame window))))))))
 
-(defun core-popups*window--try-to-split-window-hack (-fn -window &optional -alist)
+(defun core-popups*around-window--try-to-split-window (-fn -window &optional -alist)
   (let ((buffer (and (window-live-p -window)
                      (window-buffer -window))))
     (unless (and buffer
@@ -159,14 +159,14 @@
   (global-set-key (kbd "C-x m") #'view-echo-area-messages)
 
   ;; Can not be advised `:after', keyboard-quit signal `quit'
-  (advice-add 'keyboard-quit :before #'core-popups*keyboard-quit-hack)
-  (advice-add 'other-window :before #'core-popups*keyboard-quit-hack)
+  (advice-add 'keyboard-quit :before #'core-popups*before-keyboard-quit)
+  (advice-add 'other-window :before #'core-popups*before-keyboard-quit)
   (advice-add 'shackle-display-buffer
-              :around #'core-popups*shackle-display-buffer-hack)
+              :around #'core-popups*around-shackle-display-buffer)
   (advice-add 'shackle--display-buffer-popup-window
-              :override #'core-popups//display-buffer-popup-window)
+              :override #'core-popups*display-buffer-popup-window)
   (advice-add 'window--try-to-split-window
-              :around #'core-popups*window--try-to-split-window-hack)
+              :around #'core-popups*around-window--try-to-split-window)
 
   (define-hook! core-popups|autoclose-popup-window (kill-buffer-hook)
     "Auto quit popup window after buffer killed"

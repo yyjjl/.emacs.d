@@ -88,7 +88,7 @@
     (rainbow-delimiters-mode 1)
     (haskell-decl-scan-mode 1)
 
-    (unless (buffer-temporary?)
+    (unless (buffer-temporary-p)
       (define-key! :map haskell-mode-map
         ("M-n" . flycheck-next-error)
         ("M-p" . flycheck-previous-error))

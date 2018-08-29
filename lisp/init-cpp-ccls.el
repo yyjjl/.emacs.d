@@ -149,22 +149,6 @@
           :diagnostics (:frequencyMs 2000)
           :completion (:detailedLabel t)))
 
-  ;; (defvar cpp-ccls--semantic-highlight-timer nil)
-  ;; (defvar cpp-ccls--semantic-highlight-interval 1)
-  ;; (defvar cpp-ccls--semantic-highlight-params nil)
-  ;; (defun cpp-ccls*semantic-highlight (-fn _ -params)
-  ;;   (setq cpp-ccls--semantic-highlight-params -params)
-  ;;   (unless cpp-ccls--semantic-highlight-timer
-  ;;     (setq cpp-ccls--semantic-highlight-timer
-  ;;           (run-with-idle-timer
-  ;;            cpp-ccls--semantic-highlight-interval nil
-  ;;            (lambda ()
-  ;;              (setq cpp-ccls--semantic-highlight-timer nil)
-  ;;              (funcall -fn nil cpp-ccls--semantic-highlight-params))))))
-
-  ;; (advice-add 'ccls--publish-semantic-highlighting
-  ;;             :around #'cpp-ccls*semantic-highlight)
-
   (setq ccls-sem-highlight-method 'font-lock))
 
 (with-eval-after-load 'ccls-tree

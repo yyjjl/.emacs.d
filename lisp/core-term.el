@@ -34,7 +34,8 @@
 (define-hook! term|autoclose-buffer (comint-exec-hook)
   (let ((proc (get-buffer-process (current-buffer))))
     (when proc
-      (set-process-sentinel proc (term//wrap-sentinel (process-sentinel proc))))))
+      (set-process-sentinel proc
+                            (term//wrap-sentinel (process-sentinel proc))))))
 
 (global-set-key [f8] 'term/pop-shell)
 

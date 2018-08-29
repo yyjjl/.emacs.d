@@ -75,7 +75,7 @@ read-only, and `buffer-file-coding-system'"
                       'face font-lock-doc-face))
         (when (or defining-kbd-macro executing-kbd-macro)
           (propertize "M " 'face font-lock-variable-name-face))
-        (when (buffer-temporary?)
+        (when (buffer-temporary-p)
           (propertize "t " 'face font-lock-comment-face))
         (when (buffer-modified-p)
           (propertize "m " 'face font-lock-negation-char-face))

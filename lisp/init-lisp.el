@@ -49,7 +49,7 @@ Emacs Lisp."
 (defun lisp|racket-setup ()
   (lisp|common-setup)
   ;; (setq eldoc-documentation-function 'racket-eldoc-function)
-  (when (buffer-temporary?)
+  (when (buffer-temporary-p)
     (setq completion-at-point-functions nil))
   (setq flycheck-check-syntax-automatically
         '(save mode-enabled))
@@ -61,7 +61,7 @@ Emacs Lisp."
   (lisp|common-setup)
   (flycheck-mode -1)
 
-  (unless (buffer-temporary?)
+  (unless (buffer-temporary-p)
     (auto-compile-on-save-mode)
 
     (lisp//hippie-expand-setup)
@@ -124,12 +124,12 @@ Emacs Lisp."
   (define-key lisp-interaction-mode-map (kbd "C-c e") 'macrostep-expand))
 
 (with-eval-after-load 'lispy
-  (defun lisp*goto-symbol-hack (-fn -symbol)
+  (defun lisp*around-goto-symbol (-fn -symbol)
     (if (memq major-mode lispy-elisp-modes)
         (condition-case nil
             (elisp-def)
           (error (lispy-goto-symbol-elisp -symbol)))
       (funcall -fn -symbol)))
-  (advice-add 'lispy-goto-symbol :around #'lisp*goto-symbol-hack))
+  (advice-add 'lispy-goto-symbol :around #'lisp*around-goto-symbol))
 
 (provide 'init-lisp)

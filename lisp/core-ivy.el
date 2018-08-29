@@ -20,6 +20,10 @@
                                               (cdr (assoc 'position bm)))
                                       'face 'warning)))))
 
+(defun counsel-projectile*before (&optional -arg)
+  (when (eq -arg '(16))
+    (setq projectile-cached-project-root nil)))
+
 (with-eval-after-load 'ivy
   (dolist (caller '(ivy-switch-buffer
                     counsel/kill-buffer
@@ -119,10 +123,7 @@
   (define-key read-expression-map (kbd "C-r") 'counsel-minibuffer-history))
 
 (with-eval-after-load 'counsel-projectile
-  (defun counsel-projectile*hack (&optional -arg)
-    (when (eq -arg '(16))
-      (setq projectile-cached-project-root nil)))
-  (advice-add 'counsel-projectile :before #'counsel-projectile*hack)
+  (advice-add 'counsel-projectile :before #'counsel-projectile*before)
 
   (if env-has-ripgrep-p
       (progn

@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t; -*-
+
 (setvar! python-has-pytest-p (executable-find "pytest")
          python-has-ipython-p (executable-find "ipython3")
          python-has-pylint-path (executable-find "pylint"))
@@ -10,6 +12,32 @@
 
 
 
+(defvar python--elpy-mutiedit-overlay-map
+  (define-key! :map (make-sparse-keymap)
+    ("TAB" . python/elpy-multiedit-next-overlay)
+    ("<tab>" . python/elpy-multiedit-next-overlay)
+    ("<backtab>" . python/elpy-multiedit-previous-overlay)
+    ([remap keyboard-escape-quit] . elpy-multiedit-stop)
+    ([remap keyboard-quit] . elpy-multiedit-stop)))
+
+(defun python*around-elpy-multiedit (-fn &optional -arg)
+  (setq python--elpy-multiedit-buffers nil)
+  (if (and (not elpy-multiedit-overlays)
+           (or -arg (bound-and-true-p iedit-mode)))
+      (call-interactively 'iedit-mode)
+    (funcall -fn -arg)
+    (dolist (ov elpy-multiedit-overlays)
+      (-when-let (buffer (overlay-buffer ov))
+        (unless (eq buffer (get-buffer "*Elpy Edit Usages*"))
+          (overlay-put ov 'elpy-multiedit-overlay t)
+          (overlay-put ov 'keymap python--elpy-mutiedit-overlay-map)
+          (add-to-list 'python--elpy-multiedit-buffers (overlay-buffer ov)))))))
+
+(defun python*after-elpy-multiedit-stop ()
+  (when-let ((buffer (get-buffer "*Elpy Edit Usages*"))
+             (window (get-buffer-window buffer)))
+    (kill-buffer buffer)))
+
 (define-hook! python|setup (python-mode-hook)
   ;; emacs 24.4 only
   (setq electric-indent-chars (delq ?: electric-indent-chars))
@@ -19,7 +47,7 @@
     (setq-local python-shell-interpreter "python3")
     (setq-local python-shell-interpreter-args "-i"))
 
-  (unless (or (buffer-temporary?)
+  (unless (or (buffer-temporary-p)
               (not (eq major-mode 'python-mode)))
     ;; run command `pip install jedi flake8 importmagic` in shell,
     ;; or just check https://github.com/jorgenschaefer/elpy
@@ -31,6 +59,8 @@
         '(pyvenv-virtual-env-name (" [" pyvenv-virtual-env-name "]"))))
 
 (with-eval-after-load 'python
+  (require 'electric-operator)
+
   (when (boundp 'python-shell-completion-native-disabled-interpreters)
     (add-to-list 'python-shell-completion-native-disabled-interpreters
                  "jupyter")
@@ -79,8 +109,10 @@
   (setcar elpy-test-discover-runner-command "python3")
   (setq elpy-rpc-backend "jedi"
         elpy-rpc-python-command "python3"
-        elpy-modules (delete 'elpy-module-django
-                             (delete 'elpy-module-flymake elpy-modules))
+        elpy-modules (delq 'elpy-module-django
+                           (delq 'elpy-module-flymake
+                                 (delq 'elpy-module-highlight-indentation
+                                       elpy-modules)))
         elpy-test-runner 'elpy-test-pytest-runner
         elpy-shell-echo-input nil)
 
@@ -92,68 +124,9 @@
     ("C-c M-d" . python/generate-doc-at-point)
     ("M-i" . elpy-multiedit-python-symbol-at-point))
 
-  (defvar python--elpy-mutiedit-overlay-map
-    (define-key! :map (make-sparse-keymap)
-      ("TAB" . python/elpy-multiedit-next-overlay)
-      ("<tab>" . python/elpy-multiedit-next-overlay)
-      ("<backtab>" . python/elpy-multiedit-previous-overlay)
-      ([remap keyboard-escape-quit] . elpy-multiedit-stop)
-      ([remap keyboard-quit] . elpy-multiedit-stop)))
-
-  (defvar python--elpy-multiedit-buffers nil)
-
-  (defun python//elpy-multiedit-jump-overlay (-buffer &optional -pos -backward-p)
-    (switch-to-buffer -buffer)
-    (unless -pos
-      (setq -pos (if -backward-p (point-max) (point-min))))
-    (let* ((property-fn (if -backward-p
-                            'previous-single-char-property-change
-                          'next-single-char-property-change))
-           (pos (funcall property-fn
-                         (if (get-char-property -pos 'elpy-multiedit-overlay)
-                             (funcall property-fn -pos 'elpy-multiedit-overlay)
-                           -pos)
-                         'elpy-multiedit-overlay))
-           (buffers (if -backward-p
-                        (reverse python--elpy-multiedit-buffers)
-                      python--elpy-multiedit-buffers)))
-
-      (if (or (and -backward-p (/= pos (point-min)))
-              (and (not -backward-p) (/= pos (point-max))))
-          (goto-char pos)
-        (-when-let (next-buffer (or (cadr (member -buffer buffers))
-                                    (car buffers)))
-          (python//elpy-multiedit-jump-overlay next-buffer nil -backward-p)))))
-
-  (defun python/elpy-multiedit-next-overlay ()
-    (interactive)
-    (python//elpy-multiedit-jump-overlay (current-buffer) (point)))
-
-  (defun python/elpy-multiedit-previous-overlay ()
-    (interactive)
-    (python//elpy-multiedit-jump-overlay (current-buffer) (point) t))
-
-  (defun python*elpy-multiedit-hack (-fn &optional -arg)
-    (setq python--elpy-multiedit-buffers nil)
-    (if (and (not elpy-multiedit-overlays)
-             (or -arg (bound-and-true-p iedit-mode)))
-        (call-interactively 'iedit-mode)
-      (funcall -fn -arg)
-      (dolist (ov elpy-multiedit-overlays)
-        (-when-let (buffer (overlay-buffer ov))
-          (unless (eq buffer (get-buffer "*Elpy Edit Usages*"))
-            (overlay-put ov 'elpy-multiedit-overlay t)
-            (overlay-put ov 'keymap python--elpy-mutiedit-overlay-map)
-            (add-to-list 'python--elpy-multiedit-buffers (overlay-buffer ov)))))))
-
   (advice-add 'elpy-multiedit-python-symbol-at-point
-              :around #'python*elpy-multiedit-hack)
+              :around #'python*around-elpy-multiedit)
 
-  (defun python*elpy-multiedit-stop-hack ()
-    (when-let ((buffer (get-buffer "*Elpy Edit Usages*"))
-               (window (get-buffer-window buffer)))
-      (kill-buffer buffer)))
-
-  (advice-add 'elpy-multiedit-stop :after #'python*elpy-multiedit-stop-hack))
+  (advice-add 'elpy-multiedit-stop :after #'python*after-elpy-multiedit-stop))
 
 (provide 'init-python)

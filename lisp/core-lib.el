@@ -226,16 +226,6 @@ file -PATTERNS."
   (dolist (pattern -patterns)
     (add-to-list 'auto-mode-alist (cons pattern -mode))))
 
-(defun derived-mode? (-modes &optional -buffer)
-  "A wrap for `derived-mode-p'.
-
--MODES is a mode list. If -BUFFER is nil, it means current
-buffer."
-  (unless -buffer (setq -buffer (current-buffer)))
-  (when (buffer-live-p (get-buffer -buffer))
-    (with-current-buffer -buffer
-      (apply 'derived-mode-p -modes))))
-
 (defun format-line! (-left-string -right-string)
   "Add space between -LEFT-STRING and -RIGHT-STRING to generate a
 string with the witdh of current frame width."
@@ -269,7 +259,11 @@ string with the witdh of current frame width."
   "Use for advice."
   (ignore-errors (apply -fn -args)))
 
-(defsubst buffer-temporary? ()
+(defun ignore-remote! (-fn &rest -args)
+  (unless (and default-directory (file-remote-p default-directory))
+    (ignore-errors (apply -fn -args))))
+
+(defsubst buffer-temporary-p ()
   "If function `buffer-file-name' return nil or a temp file or
 HTML file converted from org file, it returns t."
   (let ((filename (buffer-file-name)))
@@ -278,7 +272,7 @@ HTML file converted from org file, it returns t."
         (string-match (concat "^" temporary-file-directory)
                       filename))))
 
-(defsubst buffer-too-large? ()
+(defsubst buffer-too-large-p ()
   (let ((filename (buffer-file-name)))
     (and filename
          (> (or (nth 7 (file-attributes filename)) 0)
@@ -322,7 +316,7 @@ HTML file converted from org file, it returns t."
 (defsubst expand-tmp! (-name)
   (expand-file-name -name temporary-file-directory))
 
-(defsubst directory-equal? (-d1 -d2)
+(defsubst directory-equal-p (-d1 -d2)
   (equal (file-truename (concat -d1 "/"))
          (file-truename (concat -d2 "/"))))
 

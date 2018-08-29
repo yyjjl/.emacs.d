@@ -48,7 +48,7 @@
   (rainbow-mode 1)
   (when (require 'css-eldoc nil t)
     (setq eldoc-documentation-function 'css-eldoc-function))
-  (unless (buffer-temporary?)
+  (unless (buffer-temporary-p)
     (setq imenu-create-index-function 'css//imenu-make-index)))
 
 (provide 'init-css)

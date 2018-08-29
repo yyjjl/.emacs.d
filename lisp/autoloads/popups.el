@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t; -*-
+
 ;;;###autoload
 (defun core-popups/last-popup-window ()
   "Display last popup window"

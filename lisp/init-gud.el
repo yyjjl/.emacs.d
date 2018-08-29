@@ -149,7 +149,7 @@
       (setq buffer-read-only (car gud--source-buffer-status))))
   (force-mode-line-update))
 
-(defun gud*find-file-hack (-fn -file)
+(defun gud*around-find-file (-fn -file)
   (let ((buffer (funcall -fn -file)))
     (when (and buffer gud-comint-buffer)
       (with-current-buffer gud-comint-buffer
@@ -159,11 +159,11 @@
           (gud-source-mode 1)))
       buffer)))
 
-(defun gud*comint-init-hack (&rest _)
+(defun gud*before-comint-init (&rest _)
   (setq gud--window-configuration (current-window-configuration))
   (delete-other-windows))
 
-(defun gud*sentinel-hack (-proc -msg)
+(defun gud*after-sentinel (-proc -msg)
   (let ((buffer (process-buffer -proc)))
     (when (and (buffer-live-p buffer)
                (memq (process-status -proc) '(signal exit)))
@@ -199,9 +199,9 @@
     ;; (setq comint-prompt-read-only t)
     (setq-local comint-scroll-to-bottom-on-output t))
 
-  (advice-add 'gud-find-file :around #'gud*find-file-hack)
-  (advice-add 'gud-sentinel :after #'gud*sentinel-hack)
-  (advice-add 'gud-common-init :before #'gud*comint-init-hack)
+  (advice-add 'gud-find-file :around #'gud*around-find-file)
+  (advice-add 'gud-sentinel :after #'gud*after-sentinel)
+  (advice-add 'gud-common-init :before #'gud*before-comint-init)
   (advice-add 'gud-display-line :override #'gud*display-line))
 
 (with-eval-after-load 'gdb-mi

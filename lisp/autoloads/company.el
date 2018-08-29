@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t; -*-
+
 ;;;###autoload
 (defun core/toggle-company-ispell ()
   "Toggle `company-ispell'"

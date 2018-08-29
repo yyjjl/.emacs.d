@@ -102,10 +102,8 @@ W\tCopy LaTeX
                   org--ipython-error-line))))
 
 (with-eval-after-load 'ob-ipython
-  (advice-add 'org-babel-execute:ipython
-              :before #'org*ipython-before-execute)
-  (advice-add 'ob-ipython--create-traceback-buffer
-              :around #'org*ipython-trace-setup)
+  (advice-add 'org-babel-execute:ipython :before #'org*ipython-before-execute)
+  (advice-add 'ob-ipython--create-traceback-buffer :around #'org*ipython-trace-setup)
   ;; Don't prompt me to confirm everytime I want to evaluate a block
   (setq org-confirm-babel-evaluate nil)
 
@@ -118,8 +116,7 @@ W\tCopy LaTeX
 (defvar sage-shell:source-buffer nil)
 (with-eval-after-load 'sage-shell-mode
   (fset 'sage-shell:-process-sentinel-generator 'identity)
-  (advice-add 'sage-shell-view-process-overlay
-              :after 'sage*after-ceare-overlay-hack)
+  (advice-add 'sage-shell-view-process-overlay :after 'sage*after-ceare-overlay)
 
   (define-key! :map sage-shell-mode-map
     ("C-c M-o" . sage/clea-current-buffer)
@@ -144,7 +141,7 @@ W\tCopy LaTeX
     (when sage-shell:source-buffer
       (pop-to-buffer sage-shell:source-buffer)))
 
-  (defun sage*after-ceare-overlay-hack (-ov)
+  (defun sage*after-ceare-overlay (-ov)
     (unless (overlay-get -ov 'extra-map)
       (let ((map (overlay-get -ov 'keymap)))
         (define-key! :map map

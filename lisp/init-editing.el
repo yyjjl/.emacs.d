@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t; -*-
+
 (require-packages!
  ;; Mark tools
  multiple-cursors
@@ -10,123 +12,7 @@
 
 
 
-(defvar core-narrow-dwim-alist
-  '((org-mode org-narrow-to-subtree org-narrow-to-element)
-    (latex-mode LaTeX-narrow-to-environment latex/narrow-to-section)))
-(defun core/narrow-or-widen-dwim (&optional -arg)
-  "If the buffer is narrowed, it widens.
-Otherwise,it narrows to region, or Org subtree.
-Optional argument ARG is used to toggle narrow functions."
-  (interactive "P")
-  (cond ((buffer-narrowed-p) (widen))
-        ((region-active-p) (narrow-to-region (region-beginning) (region-end)))
-        (t (let ((cmd-list (cdr (assoc major-mode core-narrow-dwim-alist))))
-             (if cmd-list
-                 (setq cmd-list (if -arg (cadr cmd-list) (car cmd-list)))
-               (setq cmd-list (if -arg #'narrow-to-page #'narrow-to-defun)))
-             (when cmd-list
-               (message "Use command `%s'" cmd-list)
-               (funcall cmd-list))))))
-
-(defun core/grab-regexp (-regexp)
-  "Grab strings matching REGEXP to list."
-  (let ((case-fold-search nil)
-        (s (buffer-string))
-        (pos 0)
-        item
-        items)
-    (while (setq pos (string-match -regexp s pos))
-      (setq item (match-string-no-properties 0 s))
-      (setq pos (+ pos (length item)))
-      (add-to-list 'items item))
-    items))
-
-(defun core/kill-regexp (-regexp)
-  "Find all strings matching REGEXP in current buffer.
-grab matched string and insert them into `kill-ring'"
-  (interactive
-   (let ((regexp (read-regexp (format "grep regex (default: %s): "
-                                      (car regexp-history))
-                              (car regexp-history))))
-     (list regexp)))
-  (let ((items (core/grab-regexp -regexp)))
-    (kill-new (string-join items "\n"))
-    (message "matched %d strings => kill-ring" (length items))
-    items))
-
-(defconst extra-ascii-before-chinese
-  (rx (group-n 1 (in "a-zA-Z0-9!@#$%^&\\-+|)\\]}\\:;?><.,/"))
-      (group-n 2 (category chinese-two-byte))))
-(defconst extra-non-space-after-punc
-  (rx (group-n 1 (in ",?"))
-      (group-n 2 (not blank))))
-(defconst extra-ascii-after-chinese
-  (rx (group-n 1 (category chinese-two-byte))
-      (group-n 2 (in "a-zA-Z0-9@#$%^&\\-+|(\\[{\\></"))))
-
-(defun extra/insert-space-around-chinese (&optional -start -end)
-  (interactive (cond (current-prefix-arg
-                      (list (point-min) (point-max)))
-                     ((region-active-p)
-                      (list (region-beginning) (region-end)))
-                     (t
-                      (save-mark-and-excursion
-                        (mark-paragraph)
-                        (list (region-beginning) (region-end))))))
-  (save-excursion
-    (goto-char -start)
-    (while (re-search-forward extra-ascii-before-chinese -end t)
-      (replace-match "\\1 \\2" nil nil))
-    (goto-char -start)
-    (while (re-search-forward extra-ascii-after-chinese -end t)
-      (replace-match "\\1 \\2" nil nil))
-    (goto-char -start)
-    (while (re-search-forward extra-non-space-after-punc -end t)
-      (replace-match "\\1 \\2" nil nil))))
-
-(defun goto-next-char-or-select-minibuffer-window (-arg)
-  (interactive "P")
-  (let ((window (aref (car (gethash (selected-frame)
-                                    window-numbering-table))
-                      0)))
-    (if (and window (not (eq window (selected-window))))
-        (select-window window)
-      (let ((char (read-char))
-            (func (if -arg 'search-backward 'search-forward)))
-        (funcall func (char-to-string char) nil)))))
-
-(defun forward-defun (&optional -n)
-  (interactive "p")
-  (forward-thing 'defun -n))
-
-(defun backward-defun (&optional -n)
-  (interactive "p")
-  (forward-thing 'defun (- -n)))
-
-(defun forward-sentence-or-sexp (&optional -n)
-  (interactive "p")
-  (if (or (derived-mode-p 'prog-mode 'latex-mode 'org-mode))
-      (condition-case err
-          (forward-sexp -n)
-        (scan-error
-         (forward-char -n)))
-    (forward-sentence -n)))
-
-(defun backward-sentence-or-sexp (&optional -n)
-  (interactive "p")
-  (forward-sentence-or-sexp (- -n)))
-
-(defun forward-defun-or-paragraph (&optional -n)
-  (interactive "p")
-  (if (or (derived-mode-p 'prog-mode))
-      (forward-defun -n)
-    (forward-paragraph -n)))
-
-(defun backward-defun-or-paragraph (&optional -n)
-  (interactive "p")
-  (forward-defun-or-paragraph (- -n)))
-
-(define-hook! core|init-keybingdings (after-init-idle-hook)
+(define-hook! core|init-editing-keys (after-init-idle-hook)
   (when (display-graphic-p)
     (define-key!
       ("M-]" . forward-defun-or-paragraph)
@@ -183,32 +69,12 @@ _=_ next    _-_ previous    ___ skip-previous  _+_ skip-next _q_ quit
     ("C-c C-a" . artist-mode)))
 
 (with-eval-after-load 'window-numbering
-  (define-key! :map window-numbering-keymap ("M-9") ("M-8") ("M-0")))
-
-(defun avy-goto-word-0-in-line-backward (-arg)
-  (interactive "P")
-  (avy-goto-word-0 -arg (point-at-bol) (point)))
-
-(defun avy-goto-word-0-in-line-forward (-arg)
-  (interactive "P")
-  (avy-goto-word-0 -arg (1+ (point)) (point-at-eol)))
-
-(defun avy-goto-symbol-1-in-defun (-char &optional -arg)
-  (interactive (list (read-char "char: " t)
-                     current-prefix-arg))
-  (let (beg end)
-    (save-excursion
-      (beginning-of-defun-comments)
-      (setq beg (point))
-      (end-of-defun)
-      (setq end (point)))
-    (avy-with avy-goto-symbol-1
-      (avy-goto-word-1 -char -arg beg end t))))
+  (define-key! :map window-numbering-keymap ("M-7") ("M-9") ("M-8") ("M-0")))
 
 ;; `avy' jump commands
 (define-key!
-  ("M-8" . avy-goto-word-0-in-line-backward)
-  ("M-9" . avy-goto-word-0-in-line-forward)
+  ("M-8" . avy-goto-word-1-above)
+  ("M-9" . avy-goto-word-1-below)
   ("M-7" . avy-goto-symbol-1-in-defun)
   ("M-g 1" . avy-goto-char)
   ("M-g ." . avy-goto-char-in-line)
@@ -217,7 +83,8 @@ _=_ next    _-_ previous    ___ skip-previous  _+_ skip-next _q_ quit
   ("M-g s" . avy-goto-symbol-1)
   ("M-g w" . avy-goto-subword-1)
   ("M-g y" . avy-copy-line)
-  ("M-0" . goto-next-char-or-select-minibuffer-window))
+  ("M-0" . goto-next-char-or-select-minibuffer-window)
+  ("M-'" . core/change-surround))
 
 (avy-setup-default)
 

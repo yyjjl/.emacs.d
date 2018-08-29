@@ -49,7 +49,7 @@
   (cargo-minor-mode 1)
   (electric-operator-mode 1)
   (unless (or (not rust-has-rls-p)
-              (buffer-temporary?)
+              (buffer-temporary-p)
               (file-remote-p default-directory)
               (> (buffer-size) core-large-buffer-size))
     (add-transient-hook! (hack-local-variables-hook

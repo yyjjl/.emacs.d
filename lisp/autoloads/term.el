@@ -1,5 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
+(eval-when-compile
+  (require 'term))
+
 ;; Kill the buffer when terminal is exited
 ;;;###autoload
 (defvar term-default-directory-function-list '(projectile-project-root))
@@ -90,6 +93,13 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
 
 
 
+(defsubst term//get-popup-window ()
+  (frame-parameter nil 'term-popup-window))
+
+(defsubst term//set-popup-window (popup-window)
+  (set-window-dedicated-p popup-window t)
+  (set-frame-parameter nil 'term-popup-window popup-window))
+
 (defsubst term//get-buffer-name (-fmt)
   (let* ((index 1)
          (name (format -fmt index)))
@@ -99,7 +109,7 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
     name))
 
 ;;;###autoload
-(defsubst term//wrap-sentinel (&optional sentinel)
+(defun term//wrap-sentinel (&optional sentinel)
   (lambda (-proc -msg)
     (and sentinel (funcall sentinel -proc -msg))
     (ignore-errors (run-hooks 'term-or-comint-process-exit-hook))
@@ -288,19 +298,12 @@ If -FORCE is non-nil create a new term buffer directly."
   (or (and (not -force)
            (car (--filter (with-current-buffer it
                             (and (eq major-mode 'term-mode)
-                                 (directory-equal? -directory
-                                                   default-directory)))
+                                 (directory-equal-p -directory
+                                                    default-directory)))
                           (buffer-list))))
       (let ((default-directory -directory))
         (with-temp-env! (term//extra-env)
           (term//create-buffer nil t)))))
-
-(defsubst term//get-popup-window ()
-  (frame-parameter nil 'term-popup-window))
-
-(defsubst term//set-popup-window (popup-window)
-  (set-window-dedicated-p popup-window t)
-  (set-frame-parameter nil 'term-popup-window popup-window))
 
 ;;;###autoload
 (defun term//pop-to-buffer (buffer)
@@ -330,13 +333,17 @@ If -FORCE is non-nil create a new term buffer directly."
 
 (defun term//pop-shell-get-buffer (&optional -arg)
   (unless (memq major-mode '(eshell-mode term-mode shell-mode))
-    (if (file-remote-p default-directory)
-        (apply #'term/ssh (term//get-ssh-info -arg))
-      (term//local-shell (or (and (= -arg 4)
-                                  (term//eval-function-list
-                                   'term-default-directory-function-list))
-                             default-directory)
-                         (= -arg 16)))))
+    (let ((force (or (= -arg 0) (>= -arg 16))))
+      (if (file-remote-p default-directory)
+          (apply #'term/ssh (term//get-ssh-info -arg))
+        (term//local-shell (or (and (= -arg 4)
+                                    (term//eval-function-list
+                                     'term-default-directory-function-list))
+                               (and force
+                                    (read-directory-name "Directory: "
+                                                         nil nil :mustmatch))
+                               default-directory)
+                           force)))))
 
 ;;;###autoload
 (defun term/pop-shell (&optional -arg)

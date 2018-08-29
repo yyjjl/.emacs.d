@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(defvar python--elpy-multiedit-buffers nil)
+
 ;;;###autoload
 (defun python/autopep8 ()
   (interactive)
@@ -97,3 +99,36 @@
               (python//generate-doc params indent)
               "\n" indent
               "\"\"\""))))
+
+(defun python//elpy-multiedit-jump-overlay (-buffer &optional -pos -backward-p)
+  (switch-to-buffer -buffer)
+  (unless -pos
+    (setq -pos (if -backward-p (point-max) (point-min))))
+  (let* ((property-fn (if -backward-p
+                          'previous-single-char-property-change
+                        'next-single-char-property-change))
+         (pos (funcall property-fn
+                       (if (get-char-property -pos 'elpy-multiedit-overlay)
+                           (funcall property-fn -pos 'elpy-multiedit-overlay)
+                         -pos)
+                       'elpy-multiedit-overlay))
+         (buffers (if -backward-p
+                      (reverse python--elpy-multiedit-buffers)
+                    python--elpy-multiedit-buffers)))
+
+    (if (or (and -backward-p (/= pos (point-min)))
+            (and (not -backward-p) (/= pos (point-max))))
+        (goto-char pos)
+      (-when-let (next-buffer (or (cadr (member -buffer buffers))
+                                  (car buffers)))
+        (python//elpy-multiedit-jump-overlay next-buffer nil -backward-p)))))
+
+;;;###autoload
+(defun python/elpy-multiedit-next-overlay ()
+  (interactive)
+  (python//elpy-multiedit-jump-overlay (current-buffer) (point)))
+
+;;;###autoload
+(defun python/elpy-multiedit-previous-overlay ()
+  (interactive)
+  (python//elpy-multiedit-jump-overlay (current-buffer) (point) t))

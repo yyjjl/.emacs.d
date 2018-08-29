@@ -223,12 +223,6 @@
   (flycheck-mode 1)
   (hl-line-mode 1)
 
-  (unless (buffer-too-large?)
-    ;; (highlight-indentation-current-column-mode 1)
-    ;; (when (fboundp 'display-line-numbers-mode)
-    ;;   (display-line-numbers-mode 1))
-    (highlight-indentation-mode 1))
-
   ;; show trailing spaces in a programming mode
   (setq show-trailing-whitespace t)
   (setq indicate-empty-lines t))
@@ -237,12 +231,9 @@
   (local-set-key [remap completion-at-point] #'counsel-company)
 
   (whitespace-mode 1)
-  (hl-line-mode 1)
   (auto-fill-mode 1)
-  ;; (whitespace-mode 1)
-  ;; (unless (buffer-too-large?)
-  ;;   (when (fboundp 'display-line-numbers-mode)
-  ;;     (display-line-numbers-mode 1)))
+  (hl-line-mode 1)
+
   (setq indicate-empty-lines t))
 
 (define-hook! core|generic-comint-mode-setup (comint-mode-hook)
