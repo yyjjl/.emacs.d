@@ -3,6 +3,8 @@
 (setvar! term-zsh-path (executable-find "zsh")
          term-bash-path (executable-find "bash"))
 
+(require-packages! with-editor term)
+
 (eval-when-compile
   (require 'dash))
 
@@ -12,6 +14,7 @@
 
 ;; Add below code to .zshrc to make term-mode track value changes
 ;;   if [ -n "$INSIDE_EMACS" ];then
+;;       printf '\033AnSiTu %s\n' "$USER"
 ;;       chpwd() {print -P "\033AnSiTc %d"}
 ;;   fi
 
@@ -23,19 +26,21 @@
 (with-eval-after-load 'term
   (define-key term-raw-map [remap term-send-raw] #'term/conditional-send-raw))
 
-(define-hook! term|utf8-setup (term-exec-hook)
-  (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
-
 (defun term*eof-hack (_)
   (setq term-directly-kill-buffer t))
 (advice-add 'comint-delchar-or-maybe-eof :after #'term*eof-hack)
 
+(define-hook! term|utf8-setup (term-exec-hook)
+  (with-editor-export-editor)
+  (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
 
 (define-hook! term|autoclose-buffer (comint-exec-hook)
   (let ((proc (get-buffer-process (current-buffer))))
     (when proc
-      (set-process-sentinel proc
-                            (term//wrap-sentinel (process-sentinel proc))))))
+      (set-process-sentinel proc (term//wrap-sentinel (process-sentinel proc))))))
+
+(add-hook 'shell-mode-hook 'with-editor-export-editor)
+(add-hook 'eshell-mode-hook 'with-editor-export-editor)
 
 (global-set-key [f8] 'term/pop-shell)
 

@@ -14,7 +14,9 @@
   (let ((switch (if core-view-code-mode 1 -1)))
     (cl-loop for (condition . modes) in core-view-code-modes
              when (or (eq condition t)
-                      (symbol-value condition))
+                      (and (symbolp condition)
+                           (symbol-value condition))
+                      (ignore-errors (eval condition t)))
              do (dolist (mode modes)
                   (funcall mode switch)))))
 
@@ -84,7 +86,7 @@
 (setq flycheck-keymap-prefix (kbd "C-c f"))
 (with-eval-after-load 'flycheck
   ;; Do not check during newline
-  (setq-default flycheck-checker-error-threshold 50)
+  (setq-default flycheck-checker-error-threshold 400)
   (setq-default flycheck-check-syntax-automatically
                 '(idle-change save mode-enabled))
   (setq flycheck-mode-line-prefix ""

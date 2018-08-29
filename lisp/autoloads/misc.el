@@ -308,7 +308,7 @@ directory and extension."
               (semantic-mode -1)
               (setq core-current-desktop-name -name)
               (desktop-change-dir new-dir)
-              (core/enable-semantic))
+              (semantic-mode 1))
           (error "Desktop file is in use !!"))
       (make-directory new-dir t)
       (desktop-kill)

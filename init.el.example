@@ -44,7 +44,6 @@
 (require 'init-lsp-mode)
 (require 'init-cpp)
 (require 'init-cpp-cmake)
-(require 'init-cpp-cquery)
 (require 'init-haskell)
 (require 'init-python)
 (require 'init-lisp)
@@ -59,7 +58,6 @@
 (require 'init-editing)
 (require 'init-dired)
 (require 'init-ibuffer)
-(require 'init-windows)
 (require 'init-gud)
 
 ;; Other small tools
@@ -70,4 +68,3 @@
   (require 'init-emms))
 
 (require 'init-extra)
-(require 'init-surround)
