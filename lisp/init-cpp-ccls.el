@@ -45,7 +45,7 @@
 
 (defun cpp-ccls//setup ()
   (setq-local company-transformers nil)
-  (setq-local company-idle-delay 0.3)
+  (setq-local company-idle-delay nil)
   (setq-local company-lsp-cache-candidates nil)
   (add-to-list 'company-backends 'company-lsp)
   (add-to-list 'company-backends 'company-files))
@@ -149,7 +149,7 @@
           :diagnostics (:frequencyMs 2000)
           :completion (:detailedLabel t)))
 
-  (setq ccls-sem-highlight-method 'font-lock))
+  (setq ccls-sem-highlight-method nil))
 
 (with-eval-after-load 'ccls-tree
   (add-hook 'ccls-tree-mode-hook

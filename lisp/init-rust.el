@@ -103,7 +103,8 @@
     ("C-c C-f")
     ([remap delete-char] . c-hungry-delete-forward)
     ([remap delete-backward-char] . c-hungry-delete-backwards)
-    ("C-c b" . rust-format-buffer)))
+    ("C-c b" . rust-format-buffer)
+    ("C-c C-b" . rust-format-buffer)))
 
 (with-eval-after-load 'cargo
   (setq cargo-process--custom-path-to-bin "~/.cargo/bin/cargo"

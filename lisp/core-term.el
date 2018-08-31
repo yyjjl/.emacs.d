@@ -32,6 +32,9 @@
 
 (define-hook! term|utf8-setup (term-exec-hook)
   (with-editor-export-editor)
+  (let ((process (get-buffer-process (current-buffer))))
+    (goto-char (process-mark process))
+    (process-send-string process " clear\n"))
   (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
 
 (define-hook! term|autoclose-buffer (comint-exec-hook)

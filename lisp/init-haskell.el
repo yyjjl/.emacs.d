@@ -63,7 +63,7 @@
   (define-key! :map haskell-mode-map
     ([f5] . haskell-debug)
     ([f10] . haskell-compile)
-    ("C-c b" . haskell-mode-stylish-buffer)
+    ("C-c F" . haskell-mode-stylish-buffer)
     ("C-c s" . haskell-sort-imports)
     ("M-." . haskell-mode-tag-find)
     ("C-c C-." . haskell-indent-put-region-in-literate)

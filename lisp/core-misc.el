@@ -172,7 +172,9 @@
 
 ;; Smart tab
 (defvar core--indent-close-list '(?\} ?\$ ?\] ?\' ?\` ?\"))
-(defvar core--indent-compelte-functions '(hippie-expand))
+(defvar core--indent-compelte-functions '(core//try-expand-local-snippets
+                                          company-complete
+                                          hippie-expand))
 (defun core*indent-for-tab (-fn &rest -arg)
   (if (save-excursion
         (forward-line 0)
@@ -196,13 +198,10 @@
                              (max (point-min) (- (point) 5))))
           ;; If company-idle-delay is nil (which means company is not trigger
           ;; automatically, <tab> will trigger it
-          (or (core//try-expand-local-snippets)
-              (and (eq company-idle-delay nil)
-                   (call-interactively 'company-complete))
-              (catch 'done
-                (dolist (func core--indent-compelte-functions)
-                  (when (ignore-errors (call-interactively func))
-                    (throw 'done nil)))))))))))
+          (catch 'done
+            (dolist (func core--indent-compelte-functions)
+              (when (ignore-errors (call-interactively func))
+                (throw 'done nil))))))))))
 (advice-add 'indent-for-tab-command :around #'core*indent-for-tab)
 
 (defun core*desktop-read (-fn &rest -args)
@@ -215,7 +214,7 @@
 (advice-add 'desktop-read :around #'core*desktop-read)
 
 (defvar core-auto-next-error-buffer-derived-modes
-  '(occur-mode grep-mode ivy-occur-mode xref--xref-buffer-mode))
+  '(occur-mode grep-mode ivy-occur-mode xref--xref-buffer-mode compilation-mode))
 (defun core*before-next-error (&rest _)
   (let ((occur-buffer
          (cl-loop

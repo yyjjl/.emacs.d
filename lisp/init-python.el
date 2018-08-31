@@ -120,7 +120,9 @@
     ("C-c C-n" . nil)
     ("C-c C-p" . nil)
     ("C-c b" . python/autopep8)
+    ("C-c C-b" . python/autopep8)
     ("C-c B" . py-isort-buffer)
+    ("C-c I" . elpy-nav-expand-to-indentation)
     ("C-c M-d" . python/generate-doc-at-point)
     ("M-i" . elpy-multiedit-python-symbol-at-point))
 

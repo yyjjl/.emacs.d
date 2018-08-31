@@ -160,7 +160,7 @@
     ("}" . latex/skip-close-pair)
     (")" . latex/skip-close-pair)
     ("]" . latex/skip-close-pair)
-    ("C-c b" . latex/build)
+    ("C-c B" . latex/build)
     ("C-c h" . TeX-doc)
     ("C-c C-u" . latex/force-update-style)
     ("C-c s" . LaTeX-section)

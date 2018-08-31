@@ -16,7 +16,8 @@
     ("C-c r r" . tide-refactor)
     ("C-c r n" . tide-rename-symbol)
     ("C-c r f" . tide-rename-file)
-    ("C-c b" . tide-format)))
+    ("C-c b" . tide-format)
+    ("C-c C-b" . tide-format)))
 
 (define-hook! js|setup (js-mode-hook typescript-mode-hook)
   (unless (and buffer-file-name
