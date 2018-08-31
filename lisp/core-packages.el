@@ -50,9 +50,10 @@
 
   (desktop-save-mode 1)
 
-  (when (and (>= emacs-major-version 26)
-             (display-graphic-p))
-    (company-posframe-mode 1)))
+  ;; (when (and (>= emacs-major-version 26)
+  ;;            (display-graphic-p))
+  ;;   (company-posframe-mode 1))
+  )
 
 (define-hook! package|init-emacs (after-init-hook)
   (shackle-mode 1)

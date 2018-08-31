@@ -1,9 +1,49 @@
 (eval-when-compile
   (require 'dash))
 
-(defvar-local mode-line--git-cache nil)
+(defvar-local mode-line--cached-git-branch nil)
 (defvar-local mode-line--cached-relative-directory nil)
 (defvar-local mode-line--cached-root nil)
+(defvar mode-line--current-window (frame-selected-window))
+
+(defvar mode-line-multi-edit-alist
+  '((iedit-mode . (iedit-counter))
+    (multiple-cursors-mode . (mc/num-cursors))
+    (elpy-multiedit-overlays . (length elpy-multiedit-overlays))))
+
+(defvar mode-line--center-margin 1)
+(defvar mode-line-default-format '(:eval (mode-line//generate)))
+(defvar mode-line-config-alist
+  '(((not (eq mode-line--current-window (selected-window)))
+     :segments (mode-line//window-number
+                mode-line//buffer-id
+                mode-line//buffer-major-mode
+                mode-line//process
+                mode-line//position)
+     :misc nil
+     :root t)
+    ((or (memq major-mode '(dired-mode))
+         (and (not (derived-mode-p 'text-mode 'prog-mode))
+              (string-match-p "^\\*" (buffer-name))))
+     :segments (mode-line//window-number
+                mode-line//buffer-id
+                mode-line//buffer-major-mode
+                mode-line//buffer-status
+                mode-line//process)
+     :misc nil
+     :root nil)
+    (t :segments (mode-line//window-number
+                  mode-line//buffer-id
+                  mode-line//buffer-major-mode
+                  mode-line//buffer-status
+                  mode-line//flycheck
+                  mode-line//process
+                  mode-line//position
+                  mode-line//git-info)
+       :misc t
+       :root t)))
+
+(autoload 'image-get-display-property "image-mode" nil)
 
 (defsubst mode-line//window-number ()
   (and (bound-and-true-p window-numbering-mode)
@@ -16,10 +56,10 @@
 
 (defsubst mode-line//git-info ()
   (when buffer-file-name
-    (or mode-line--git-cache
+    (or mode-line--cached-git-branch
         (when (require 'magit nil :noerror)
           (when-let (branch (magit-get-current-branch))
-            (setq mode-line--git-cache
+            (setq mode-line--cached-git-branch
                   (propertize (concat " Git:" branch)
                               'face 'font-lock-doc-face)))))))
 
@@ -50,13 +90,6 @@
 (defsubst mode-line//buffer-major-mode ()
   "Display buffer major mode in mode-line."
   '(:propertize mode-name face font-lock-builtin-face))
-
-(autoload 'image-get-display-property "image-mode" nil)
-
-(defvar mode-line-multi-edit-alist
-  '((iedit-mode . (iedit-counter))
-    (multiple-cursors-mode . (mc/num-cursors))
-    (elpy-multiedit-overlays . (length elpy-multiedit-overlays))))
 
 (defsubst mode-line//buffer-status ()
   "Display buffer status.
@@ -123,37 +156,6 @@ read-only, and `buffer-file-coding-system'"
 (defsubst mode-line//position ()
   (propertize " %l:%c %p %I" 'face 'font-lock-constant-face))
 
-(defvar mode-line--center-margin 1)
-(defvar mode-line-default-format '("%e" (:eval (mode-line//generate))))
-(defvar mode-line-config-alist
-  '(((not (eq mode-line--current-window (selected-window)))
-     :segments (mode-line//window-number
-                mode-line//buffer-id
-                mode-line//buffer-major-mode
-                mode-line//process
-                mode-line//position)
-     :misc nil
-     :root t)
-    ((or (memq major-mode '(dired-mode))
-         (and (not (derived-mode-p 'text-mode 'prog-mode))
-              (string-match-p "^\\*" (buffer-name))))
-     :segments (mode-line//window-number
-                mode-line//buffer-id
-                mode-line//buffer-major-mode
-                mode-line//buffer-status
-                mode-line//process)
-     :misc nil
-     :root nil)
-    (t :segments (mode-line//window-number
-                  mode-line//buffer-id
-                  mode-line//buffer-major-mode
-                  mode-line//buffer-status
-                  mode-line//flycheck
-                  mode-line//process
-                  mode-line//position
-                  mode-line//git-info)
-       :misc t
-       :root t)))
 
 (defsubst mode-line//format-line ($lhs $chs $rhs)
   (let* ((lw (string-width $lhs))
@@ -190,19 +192,16 @@ read-only, and `buffer-file-coding-system'"
                                       ("" " " mode-line--cached-root))))))))
            (or $segments mode-line-config-alist))))))
 
-(mode-line//compile)
-
-(defun mode-line*trace-magit-checkout ($fn &rest $args)
+(defun mode-line*trace-magit-checkout (-fn &rest -args)
   (let ((buffer (current-buffer)))
-    (apply $fn $args)
+    (apply -fn -args)
     (with-current-buffer buffer
-      (setq mode-line--git-cache nil)
+      (setq mode-line--cached-git-branch nil)
       (mode-line//git-info))))
 
 (with-eval-after-load 'magit
   (advice-add 'magit-checkout :around #'mode-line*trace-magit-checkout))
 
-(defvar mode-line--current-window (frame-selected-window))
 (defun mode-line*set-selected-window (&rest _)
   "Sets `mode-line--current-window' appropriately"
   (let ((win (frame-selected-window)))
@@ -220,6 +219,8 @@ read-only, and `buffer-file-coding-system'"
                   ;; (company-mode company-lighter)
                   (company-search-mode company-search-lighter)
                   (global-mode-string ("" " " global-mode-string)))))
+
+(mode-line//compile)
 
 (provide 'core-mode-line)
 

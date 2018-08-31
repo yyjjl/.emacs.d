@@ -7,6 +7,21 @@
 (defvar-local gud--source-buffer-status nil)
 (defvar-local gud--source-buffer-list nil)
 
+(when (fboundp 'define-fringe-bitmap)
+  (define-fringe-bitmap 'breakpoint [0 255 255 255 255 255 255 0]))
+
+(defun gud*aorund-gdb-put-string (_ -pos &rest __)
+  (let ((ovs (--filter (overlay-get it 'put-break)
+                       (overlays-in -pos -pos))))
+    (when (= 1 (length ovs))
+      (save-excursion
+        (goto-char -pos)
+        (move-overlay (car ovs)
+                      (line-beginning-position)
+                      (line-beginning-position 2))
+        (overlay-put (car ovs)
+                     'face '(:box (:line-width 1 :color "red" :style line)))))))
+
 (defun gdb*display-buffer (-buffer)
   (let ((old-window (selected-window)))
     (unless (window-live-p gdb--side-window)
@@ -20,9 +35,10 @@
           (set-window-dedicated-p gdb--side-window nil)
           (set-window-buffer gdb--side-window -buffer)
           (set-window-dedicated-p gdb--side-window t)
-          (unless (eq (buffer-local-value 'gdb-buffer-type -buffer)
-                      'gdb-inferior-io)
-            (select-window gdb--side-window)))
+          ;; (unless (eq (buffer-local-value 'gdb-buffer-type -buffer)
+          ;;             'gdb-inferior-io)
+          ;;   (select-window gdb--side-window))
+          )
       (with-current-buffer -buffer
         (error "Can not display buffer %s" gdb-buffer-type)))))
 
@@ -100,6 +116,19 @@
   (when (and (yes-or-no-p "Quit process"))
     (gud-call "quit")))
 
+(defun gud/toggle-breakpoint (-arg)
+  (interactive "P")
+  (if-let* ((ov (car (--filter (overlay-get it 'put-break)
+                               (overlays-in (line-beginning-position)
+                                            (line-beginning-position 2)))))
+            (string (overlay-get ov 'before-string))
+            (bptno (get-text-property 0 'gdb-bptno string)))
+      (let* ((enabled (get-text-property 0 'gdb-enabled string))
+             (cmd (concat (if enabled "disable" "enable") (format " %s" bptno))))
+        (message "Command: %s" cmd)
+        (gud-call cmd -arg))
+    (message "Can not read info about breakpoint.")))
+
 (defvar gud--source-mode-map
   (define-key! :map (make-sparse-keymap)
     ("o" . gdb-display-io-buffer)
@@ -111,7 +140,9 @@
     ("A" . gdb-display-disassembly-buffer)
     ("m" . gdb-display-memory-buffer)
     ("b" . gud-break)
-    ("-" . gud-remove)
+    ("D" . gud-remove)
+    ("-" . gud/toggle-breakpoint)
+    ("=" . gud/toggle-breakpoint)
     ("t" . gud-tbreak)
     ("s" . gud-step)
     ("n" . gud-next)
@@ -127,7 +158,7 @@
     ("C" . gud-call)
     ("p" . gud-print)
     ("d" . gud-display)
-    ("D" . gud-display-all)
+    ("M" . gud-display-all)
     ("*" . gud-pstar)
     ("w" . gud-watch)
     ("X" . gud/quit-process)
@@ -206,6 +237,7 @@
 
 (with-eval-after-load 'gdb-mi
   (advice-add 'gdb-display-buffer :override 'gdb*display-buffer)
+  (advice-add #'gdb-put-string :after #'gud*aorund-gdb-put-string)
 
   (dolist (map (list gdb-inferior-io-mode-map
                      gdb-breakpoints-mode-map

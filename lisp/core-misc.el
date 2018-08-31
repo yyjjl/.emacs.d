@@ -107,8 +107,18 @@
                   try-expand-dabbrev-limited-chars-visible
                   try-expand-dabbrev-limited-chars-all-buffers)))
 
+(defvar core-projectile-invalidate-cache-empty-vars
+  '(mode-line--cached-relative-directory
+    mode-line--cached-root
+    elpy-project-root))
+
 (with-eval-after-load 'projectile
   (define-key projectile-mode-map (kbd "C-x p") projectile-command-map)
+
+  (advice-add 'projectile-maybe-invalidate-cache
+              :after (lambda (_)
+                       (dolist (var core-projectile-invalidate-cache-empty-vars)
+                         (set var nil))))
 
   ;; Projectile root-searching functions can cause an infinite cl-loop on TRAMP
   ;; connections, so disable them.
@@ -186,7 +196,8 @@
       (apply -fn -arg)
       (when (and (eq old-point (point))
                  (eq old-tick (buffer-chars-modified-tick))
-                 (called-interactively-p 'interactive))
+                 (called-interactively-p 'interactive)
+                 (not (eq tab-always-indent 'complete)))
         (cond ;; Skip close paren
          ((memq (char-after) core--indent-close-list)
           (forward-char 1))
