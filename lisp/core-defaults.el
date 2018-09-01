@@ -133,9 +133,27 @@
                             emacs-var-direcotry))
 
 ;;* Savehist
-(setq history-length 1000)
-(setq savehist-additional-variables '(ivy-views))
-(ignore-errors (savehist-mode 1))
+;; (setq history-length 1000)
+;; (setq savehist-additional-variables '(ivy-views))
+;; (ignore-errors (savehist-mode 1))
+
+(defvar core-autosave-interval 300)
+(defvar core-autosave-hook nil)
+
+(defsubst core//save-variable (symbol file)
+  (let ((real-file (expand-var! file))
+        (val (default-value symbol)))
+    (with-temp-buffer
+      (insert (format "(setq-default %s " symbol)
+              (if (consp val) "'" "")
+              (prin1-to-string (default-value symbol))
+              ")")
+      (write-region (point-min) (point-max) real-file))))
+
+(defsubst core//load-variable (symbol file)
+  (let ((real-file (expand-var! file)))
+    (when (file-exists-p real-file)
+      (load real-file :noerror))))
 
 ;;* Handle External Files
 (defun core//external-file-handler (-op &rest -args)
@@ -290,6 +308,7 @@
   (load (file-name-sans-extension custom-file))
 
   (run-with-timer 1 nil #'run-hooks 'after-init-idle-hook)
+  (run-with-idle-timer core-autosave-interval t #'run-hooks 'core-autosave-hook)
 
   (message "Init Time: %s" (emacs-init-time)))
 

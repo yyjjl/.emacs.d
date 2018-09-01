@@ -63,10 +63,39 @@
                 (funcall split-function (round (/ size -n)))))))))
 
 ;;;###autoload
-(defun window/split-window-two-panel (-align -num1 -num2 ratio)
-  (interactive (list (read-char "`-' or `|' :")
-                     (max (read-number "First: ") 1)
-                     (max (read-number "Second: ") 1)
+(defun window//switch-buffer-for-windows (wnd-list)
+  (let ((ivy-use-virtual-buffers nil)
+        (buffers (mapcar #'buffer-name
+                         (--filter (with-current-buffer it
+                                     (or buffer-file-name
+                                         (core-popups//comint-buffer-matcher it)))
+                                   (buffer-list))))
+        window)
+    (while (and wnd-list buffers)
+      (setq window (pop wnd-list))
+      (let ((ol (make-overlay (window-start window)
+                              (window-end window)
+                              (window-buffer window)))
+            buffer)
+        (overlay-put ol 'face `(
+                                :background ,(face-attribute 'default :foreground)
+                                :foreground ,(face-attribute 'default :background)))
+        (overlay-put ol 'window window)
+        (unwind-protect
+            (with-selected-window window
+              (setq buffer (if (= (length buffers) 1)
+                               (car buffers)
+                             (completing-read (format "For window %s: "
+                                                      (window-numbering-get-number-string))
+                                              buffers nil :require-match)))
+              (setq buffers (delete buffer buffers))
+              (switch-to-buffer buffer))
+          (delete-overlay ol))))))
+
+(defun window/split-window-two-panel (-align -num1 -num2 -ratio)
+  (interactive (list (read-char "`-' or `|' : ")
+                     (max (read-number "First: " 1) 1)
+                     (max (read-number "Second: " 1) 1)
                      (if current-prefix-arg
                          (min 0.7 (max 0.3 (read-number "Ratio(0.3-0.7): ")))
                        0.5)))
@@ -77,14 +106,16 @@
     (cond
      ((eq -align ?-)
       (setq new-window (split-window-vertically
-                        (round (* ratio (window-height))))
+                        (round (* -ratio (window-height))))
             align :horizontal))
      ((eq -align ?|)
       (setq new-window (split-window-horizontally
-                        (round (* ratio (window-width))))
+                        (round (* -ratio (window-width))))
             align :vertical))
      (t
       (message "Nothing to do !!!")))
     (when align
       (window//split-n orig-window -num1 align)
-      (window//split-n new-window -num2 align))))
+      (window//split-n new-window -num2 align)
+      (when (> (* -num1 -num2) 1)
+        (window//switch-buffer-for-windows (window-list))))))

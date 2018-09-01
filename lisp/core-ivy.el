@@ -24,7 +24,14 @@
   (when (eq -arg '(16))
     (setq projectile-cached-project-root nil)))
 
+(defvar ivy-views-persistent-file "ivy-views.el")
 (with-eval-after-load 'ivy
+  (core//load-variable 'ivy-views ivy-views-persistent-file)
+
+  (add-hook 'kill-emacs-hook
+            (lambda ()
+              (core//save-variable 'ivy-views ivy-views-persistent-file)))
+
   (dolist (caller '(ivy-switch-buffer
                     counsel/kill-buffer
                     internal-complete-buffer

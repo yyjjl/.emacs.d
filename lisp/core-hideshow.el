@@ -13,7 +13,7 @@
 (defvar hs--overlay-map (make-sparse-keymap)
   "Keymap for hs minor mode overlay.")
 
-(defvar hs-persistent-file (expand-var! "fold.el"))
+(defvar hs-persistent-file "fold.el")
 (defvar hs-persistent-table (make-hash-table :test #'equal))
 
 (defun hs//get-overlays ()
@@ -22,21 +22,13 @@
         collect overlay))
 
 (defun hs//load-persistent-table ()
-  (when (file-exists-p hs-persistent-file)
-    (load hs-persistent-file :noerror :nomessage))
+  (core//load-variable 'hs-persistent-table hs-persistent-file)
   (let ((table hs-persistent-table))
     (when hs-persistent-table
       (dolist (key (hash-table-keys hs-persistent-table))
         (when (file-exists-p key)
           (puthash key (gethash key hs-persistent-table) table))))
     (setq hs-persistent-table table)))
-
-(defun hs//save-persistent-table ()
-  (with-temp-buffer
-    (insert "(setq hs-persistent-table ")
-    (insert (prin1-to-string hs-persistent-table))
-    (insert ")")
-    (write-file hs-persistent-file)))
 
 (defun hs//save-folds (&optional buffer-or-name)
   "Save folds in BUFFER-OR-NAME, which should have associated file.
@@ -83,7 +75,7 @@ BUFFER-OR-NAME defaults to current buffer."
 (defun hs|kill-emacs-hook ()
   "Traverse all buffers and try to save their folds."
   (mapc #'hs//save-folds (buffer-list))
-  (hs//save-persistent-table))
+  (core//save-variable 'hs-persistent-table hs-persistent-file))
 
 (define-minor-mode hs-persistent-mode
   "Toggle `hs-persistent-mode' minor mode."
@@ -91,7 +83,9 @@ BUFFER-OR-NAME defaults to current buffer."
   (let ((fnc (if hs-persistent-mode #'add-hook #'remove-hook)))
     (funcall fnc 'hs-minor-mode-hook #'hs//restore-folds)
     (funcall fnc 'kill-buffer-hook #'hs//save-folds)
-    (funcall fnc 'kill-emacs-hook #'hs|kill-emacs-hook)))
+    (funcall fnc 'kill-emacs-hook #'hs|kill-emacs-hook))
+  (when hs-persistent-mode
+    (mapc #'hs//restore-folds (buffer-list))))
 
 (defun hs//display-headline ()
   (let* ((len (length hs-headline))

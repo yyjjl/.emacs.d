@@ -48,17 +48,17 @@
   (find-file-noselect (expand-var! "org/*note*"))
   (find-file-noselect (expand-var! "org/*task*"))
 
-  (desktop-save-mode 1)
-
   ;; (when (and (>= emacs-major-version 26)
   ;;            (display-graphic-p))
   ;;   (company-posframe-mode 1))
-  )
+
+  (desktop-save-mode 1))
 
 (define-hook! package|init-emacs (after-init-hook)
   (shackle-mode 1)
   (recentf-mode 1)
   (winner-mode 1)
+
   (session-initialize)
 
   (ivy-mode 1)

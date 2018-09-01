@@ -233,10 +233,15 @@ directory and extension."
 ;;;###autoload
 (defvar core--local-snippets-list nil)
 ;;;###autoload
-(defun core/add-local-snippet ()
-  (interactive)
-  (let ((key (read-string "Snippet key: "))
-        (template (read-string "Snippet template: "))
+(defun core/add-local-snippet (&optional -save-snippets)
+  (interactive "P")
+  (let ((template (read-string "Snippet template: "
+                               (if (region-active-p)
+                                   (buffer-substring (region-beginning)
+                                                     (region-end))
+                                 (buffer-substring (line-beginning-position)
+                                                   (line-end-position)))))
+        (key (read-string "Snippet key: "))
         (local-snippets-list (copy-alist core--local-snippets-list)))
     (-if-let (item (assoc-string key local-snippets-list))
         (when (yes-or-no-p (format "Key is used for %s, overwrite it" (cdr item)))
@@ -244,7 +249,8 @@ directory and extension."
       (push (cons (substring-no-properties key) template) local-snippets-list)
       (message "Snippet %s => %s" key template))
     (setq-local core--local-snippets-list local-snippets-list)
-    (save-dir-local-variables! 'core--local-snippets-list)))
+    (when -save-snippets
+      (save-dir-local-variables! 'core--local-snippets-list))))
 
 ;;;###autoload
 (defun core//try-expand-local-snippets ()

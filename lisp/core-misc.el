@@ -155,7 +155,15 @@
   (define-key isearch-mode-map (kbd "C-o") 'isearch-occur))
 
 (with-eval-after-load 'session
-  (setq session-registers '(t (48 . 57) 45 61 92 96  (97 . 122))))
+  (add-hook 'core-autosave-hook 'session-save-session)
+
+  (setq session-globals-max-size 500)
+  (setq session-globals-include '((file-name-history 500)
+                                  (kill-ring 50)
+                                  (session-file-alist 500 t)
+                                  search-ring
+                                  regexp-search-ring))
+  (setq session-registers '(t (48 . 57) 45 61 92 96 (97 . 122))))
 
 ;; `tramp' setup
 (with-eval-after-load 'tramp
@@ -248,6 +256,7 @@
   ("?" . window/split-window-two-panel)
 
   (", ," . core-view-code-mode)
+  (", a" . core/add-local-snippet)
   (", g" . core/search-in-chrome)
   (", s" . core/create-scratch-buffer)
   (", -" . core/copy-file-name)
