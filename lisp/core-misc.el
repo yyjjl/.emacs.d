@@ -285,8 +285,8 @@
   ("M--" . er/expand-region)
   ("M-/" . hippie-expand)
 
-  ("M-g n" . flycheck-next-error)
-  ("M-g p" . flycheck-previous-error)
+  ("M-n" . next-error)
+  ("M-p" . previous-error)
 
   ("M-`" . other-frame)
   ("M-i" . iedit-mode)

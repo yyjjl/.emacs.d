@@ -63,6 +63,10 @@ Emacs Lisp."
     (setq completion-at-point-functions nil))
   (setq flycheck-check-syntax-automatically
         '(save mode-enabled))
+
+  (define-key! :map lispy-mode-map
+    ("M-n"))
+
   (with-local-minor-mode-map! 'lispy-mode
     (lispy-define-key it "e" #'racket-eval-sexp)
     (lispy-define-key it "i" #'racket-indent-sexp)))

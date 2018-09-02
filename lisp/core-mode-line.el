@@ -17,21 +17,17 @@
                                       mode-line//buffer-id
                                       mode-line//buffer-major-mode))
 (defvar mode-line-config-alist
-  `(((not (eq mode-line--current-window (selected-window)))
+  `(((or (memq major-mode '(dired-mode))
+         (and (not (derived-mode-p 'text-mode 'prog-mode))
+              (string-match-p "^\\*" (buffer-name))))
+     :segments (,@mode-line--default-segments
+                mode-line//process)
+     :root current)
+    ((not (eq mode-line--current-window (selected-window)))
      :segments (,@mode-line--default-segments
                 mode-line//process
                 mode-line//position)
      :root project)
-    ((core-popups//comint-buffer-matcher (buffer-name))
-     :segments (,@mode-line--default-segments
-                mode-line//process)
-     :root current)
-    ((or (memq major-mode '(dired-mode))
-         (and (not (derived-mode-p 'text-mode 'prog-mode))
-              (string-match-p "^\\*" (buffer-name))))
-     :segments (,@mode-line--default-segments
-                mode-line//buffer-status
-                mode-line//process))
     (t :segments (,@mode-line--default-segments
                   mode-line//buffer-status
                   mode-line//flycheck
@@ -67,7 +63,7 @@
            mode-line--cached-relative-directory)
       (let ((root (file-truename (projectile-project-root)))
             (directory (file-truename default-directory)))
-        (setq mode-line--cached-root (abbreviate-file-name root))
+        (setq mode-line--cached-root root)
         (setq mode-line--cached-relative-directory
               (if (and (string-prefix-p root directory) (buffer-file-name))
                   (mapconcat
