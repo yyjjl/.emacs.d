@@ -13,35 +13,33 @@
 
 (defvar mode-line--center-margin 1)
 (defvar mode-line-default-format '(:eval (mode-line//generate)))
+(defvar mode-line--default-segments '(mode-line//window-number
+                                      mode-line//buffer-id
+                                      mode-line//buffer-major-mode))
 (defvar mode-line-config-alist
-  '(((not (eq mode-line--current-window (selected-window)))
-     :segments (mode-line//window-number
-                mode-line//buffer-id
-                mode-line//buffer-major-mode
+  `(((not (eq mode-line--current-window (selected-window)))
+     :segments (,@mode-line--default-segments
                 mode-line//process
                 mode-line//position)
-     :misc nil
-     :root t)
+     :root project)
+    ((core-popups//comint-buffer-matcher (buffer-name))
+     :segments (,@mode-line--default-segments
+                mode-line//process)
+     :root current)
     ((or (memq major-mode '(dired-mode))
          (and (not (derived-mode-p 'text-mode 'prog-mode))
               (string-match-p "^\\*" (buffer-name))))
-     :segments (mode-line//window-number
-                mode-line//buffer-id
-                mode-line//buffer-major-mode
+     :segments (,@mode-line--default-segments
                 mode-line//buffer-status
-                mode-line//process)
-     :misc nil
-     :root nil)
-    (t :segments (mode-line//window-number
-                  mode-line//buffer-id
-                  mode-line//buffer-major-mode
+                mode-line//process))
+    (t :segments (,@mode-line--default-segments
                   mode-line//buffer-status
                   mode-line//flycheck
                   mode-line//process
                   mode-line//position
                   mode-line//git-info)
        :misc t
-       :root t)))
+       :root project)))
 
 (autoload 'image-get-display-property "image-mode" nil)
 
@@ -187,9 +185,10 @@ read-only, and `buffer-file-coding-system'"
                       it
                       `(list ,@(mapcar #'list segments)
                              ,(and show-misc-p 'mode-line-misc-info)
-                             ,(and show-root-p
-                                   ''(mode-line--cached-root
-                                      ("" " " mode-line--cached-root))))))))
+                             ,(case show-root-p
+                                (project ''(mode-line--cached-root
+                                            ("" " " mode-line--cached-root)))
+                                (current ''("" " " default-directory))))))))
            (or $segments mode-line-config-alist))))))
 
 (defun mode-line*trace-magit-checkout (-fn &rest -args)

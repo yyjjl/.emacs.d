@@ -198,8 +198,7 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
     (setq term-name (substring term-name 1 (1- (length term-name))))
     (-when-let (buffer
                 (if term-program-switches
-                    (apply #'make-term term-name shell-name nil
-                           term-program-switches)
+                    (apply #'make-term term-name shell-name nil term-program-switches)
                   (make-term term-name shell-name)))
       (setq term--buffer-list (nconc term--buffer-list (list buffer)))
       (with-current-buffer buffer
@@ -211,6 +210,10 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
         (-when-let (proc (ignore-errors (get-buffer-process buffer)))
           (set-process-sentinel proc (term//wrap-sentinel (process-sentinel proc))))
         (when -shell-buffer-p
+          (with-editor-export-editor)
+          (when-let (process (get-buffer-process (current-buffer)))
+            (goto-char (process-mark process))
+            (process-send-string process " clear\n"))
           (add-hook 'term-or-comint-process-exit-hook
                     'term//terminal-exit-hook
                     nil :local)))
@@ -236,24 +239,6 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
 (defsubst term//extra-env ()
   (term//eval-function-list 'term-default-environment-function-list))
 
-(defun term//get-ssh-info (-arg)
-  (let* ((user (file-remote-p default-directory 'user))
-         (host (file-remote-p default-directory 'host))
-         (method (file-remote-p default-directory 'method))
-         port)
-    (when (string-match "\\([^#]+\\)#\\([0-9]+\\)" host)
-      (setq port (match-string 2 host))
-      (setq host (match-string 1 host)))
-    (when (and method (not (member method '("sshx" "ssh"))))
-      (error "Can not open ssh connection for method `%s'" method))
-    (when (or (= -arg 4) (not user))
-      (setq user (read-string "User: " user)))
-    (when (or (= -arg 4) (not host))
-      (setq user (read-string "Host: " host)))
-    (when (= -arg 4)
-      (setq port (read-string "Port: " "22")))
-    (list user host port (>= -arg 16))))
-
 ;;;###autoload
 (defun term//exec-program (-program -args &optional -name)
   (let ((term-program-switches -args)
@@ -275,15 +260,35 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
       (pop-to-buffer term--parent-buffer)
     (message "No parent buffer or it was killed !!!")))
 
+(defun term//get-ssh-info (-arg)
+  (let* ((address (if -arg
+                      (concat "/sshx:" (read-string "/sshx:"))
+                    default-directory))
+         (user (file-remote-p address 'user))
+         (host (file-remote-p address 'host))
+         (method (file-remote-p address 'method))
+         port)
+    (when (and method (not (member method '("sshx" "ssh"))))
+      (error "Can not open ssh connection for method `%s'" method))
+    (when (string-match "\\([^#]+\\)#\\([0-9]+\\)" host)
+      (setq port (match-string 2 host))
+      (setq host (match-string 1 host)))
+    (list user host port)))
+
 ;;;###autoload
 (defun term/ssh (-user -host &optional -port -force)
-  (interactive (term//get-ssh-info (or (car-safe current-prefix-arg) 0)))
-  (let ((args (list (format "%s@%s" -user -host)
-                    (format "-p %s" (or -port 22)))))
+  (interactive
+   (append
+    (term//get-ssh-info current-prefix-arg)
+    (list (equal current-prefix-arg '(16)))))
+  (let ((args (list* (format "%s@%s" -user -host)
+                     (when (numberp -port)
+                       (list "-p" (format "%d" -port))))))
     (or (and (not -force)
              (car (--filter (with-current-buffer it
                               (and (eq major-mode 'term-mode)
-                                   (equal args term--ssh-info)))
+                                   (equal args term--ssh-info)
+                                   (process-live-p (get-buffer-process it))))
                             (buffer-list))))
         (let ((buffer (term//exec-program "ssh" args)))
           (with-current-buffer buffer
@@ -335,7 +340,7 @@ If -FORCE is non-nil create a new term buffer directly."
   (unless (memq major-mode '(eshell-mode term-mode shell-mode))
     (let ((force (or (= -arg 0) (>= -arg 16))))
       (if (file-remote-p default-directory)
-          (apply #'term/ssh (term//get-ssh-info -arg))
+          (call-interactively 'term/ssh)
         (term//local-shell (or (and (= -arg 4)
                                     (term//eval-function-list
                                      'term-default-directory-function-list))

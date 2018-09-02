@@ -117,6 +117,7 @@
         elpy-shell-echo-input nil)
 
   (define-key! :map elpy-mode-map
+    ("C-c C-z" . python/pop-to-shell)
     ("C-c C-n" . nil)
     ("C-c C-p" . nil)
     ("C-c b" . python/autopep8)

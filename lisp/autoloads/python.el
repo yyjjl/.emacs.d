@@ -132,3 +132,9 @@
 (defun python/elpy-multiedit-previous-overlay ()
   (interactive)
   (python//elpy-multiedit-jump-overlay (current-buffer) (point) t))
+
+;;;###autoload
+(defun python/pop-to-shell (&optional -arg)
+  (interactive "P")
+  (let ((elpy-shell-use-project-root (not -arg)))
+    (elpy-shell-switch-to-shell)))

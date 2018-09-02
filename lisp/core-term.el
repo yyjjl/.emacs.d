@@ -31,10 +31,6 @@
 (advice-add 'comint-delchar-or-maybe-eof :after #'term*eof-hack)
 
 (define-hook! term|utf8-setup (term-exec-hook)
-  (with-editor-export-editor)
-  (let ((process (get-buffer-process (current-buffer))))
-    (goto-char (process-mark process))
-    (process-send-string process " clear\n"))
   (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
 
 (define-hook! term|autoclose-buffer (comint-exec-hook)
@@ -42,8 +38,12 @@
     (when proc
       (set-process-sentinel proc (term//wrap-sentinel (process-sentinel proc))))))
 
-(add-hook 'shell-mode-hook 'with-editor-export-editor)
-(add-hook 'eshell-mode-hook 'with-editor-export-editor)
+(add-hook 'shell-mode-hook
+          (lambda () (unless (file-remote-p default-directory)
+                       (with-editor-export-editor))))
+(add-hook 'eshell-mode-hook
+          (lambda () (unless (file-remote-p default-directory)
+                       (with-editor-export-editor))))
 
 (global-set-key [f8] 'term/pop-shell)
 
