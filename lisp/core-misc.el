@@ -297,6 +297,7 @@
   ([C-f6] . core/display-latex-fragment-at-point)
 
   ([f10] . compile)
+  ([f9] . core/run-current-file)
   ([f7] . core-view-code-mode))
 
 (define-key! :map special-mode-map

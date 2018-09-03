@@ -177,3 +177,34 @@ for a file to visit if current buffer is not visiting a file."
     ((equal -arg '(4)) #'swiper-multi)
     ((equal -arg '(16)) #'swiper-all)
     (t #'counsel-grep-or-swiper))))
+
+;;;###autoload
+(defun ivy-occur-filter-lines ()
+  (interactive)
+  (unless (string-prefix-p "ivy-occur" (symbol-name major-mode))
+    (error "Current buffer is not in ivy-occur mode"))
+  (let ((inhibit-read-only t)
+        (regexp (read-regexp "Regexp(! for flush)"))
+        (start (next-single-property-change (point-min) 'font-lock-face)))
+    (funcall (if (string-prefix-p "!" regexp)
+                 #'flush-lines
+               #'keep-lines)
+             (substring regexp 1) start (point-max) t)
+    (save-excursion
+      (goto-char (point-min))
+      (forward-line 1)
+      (if (looking-at "stack> ")
+          (forward-char 7)
+        (insert "stack> "))
+      (insert (format "[%s] " regexp)))))
+
+;;;###autoload
+(defun ivy-occur-undo ()
+  (interactive)
+  (let ((inhibit-read-only t))
+    (if (save-excursion
+          (goto-char (point-min))
+          (forward-line 1)
+          (looking-at "stack> "))
+        (undo)
+      (error "Filter stack is empty"))))

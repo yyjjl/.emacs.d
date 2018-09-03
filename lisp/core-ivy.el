@@ -62,7 +62,10 @@
   (setq ivy-virtual-abbreviate 'full)
   (setq ivy-use-selectable-prompt t)
 
-  (define-hook! ivy|occur-mode-setup (ivy-occur-mode-hook)
+  (define-hook! ivy|occur-mode-setup (ivy-occur-mode-hook
+                                      ivy-occur-grep-mode-hook)
+    (local-set-key "/" #'ivy-occur-filter-lines)
+    (local-set-key (kbd "C-/") #'ivy-occur-undo)
     (toggle-truncate-lines 1))
 
   (define-key!
