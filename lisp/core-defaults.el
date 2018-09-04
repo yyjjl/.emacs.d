@@ -248,7 +248,6 @@
 (define-hook! core|generic-text-mode-setup (text-mode-hook)
   (local-set-key [remap completion-at-point] #'counsel-company)
 
-  (whitespace-mode 1)
   (auto-fill-mode 1)
   (hl-line-mode 1)
 

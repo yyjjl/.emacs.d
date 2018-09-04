@@ -1,43 +1,9 @@
 #!/usr/bin/env bash
 
-# Set up colours
-if tty -s;then
-    export RED=${RED:-$(tput setaf 1)}
-    export allGREEN=${GREEN:-$(tput setaf 2)}
-    export YLW=${YLW:-$(tput setaf 3)}
-    export BLUE=${BLUE:-$(tput setaf 4)}
-    export RESET=${RESET:-$(tput sgr0)}
-else
-    export RED=
-    export GREEN=
-    export YLW=
-    export BLUE=
-    export RESET=
-fi
+current_dir="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd)"
 
-base_dir=$(dirname "$0")
-
-# Timestamp
-now () {
-    date +"%H:%M:%S"
-}
-
-# Logging functions instead of echo
-log () {
-    echo "${BLUE}$(now)${RESET} $1"
-}
-
-info () {
-    log "${GREEN}INFO${RESET}: $1"
-}
-
-warn () {
-    log "${YLW}WARN${RESET}: ${1}"
-}
-
-critical () {
-    log "${RED}CRIT${RESET}: ${1}"
-}
+# shellcheck source=packages/color.sh
+. ${current_dir}/packages/color.sh
 
 # Check whether a command exists - returns 0 if it does, 1 if it does not
 exists() {
@@ -50,22 +16,14 @@ apt-package-installed() {
     return $?
 }
 
-export -f now
-export -f log
-export -f info
-export -f warn
-export -f critical
-export -f exists
-export -f apt-package-installed
+xargs sudo apt install -y < packages/apt-packages || exit 1
+xargs cabal install < packages/cabal-packages || exit 1
+xargs pip3 install < packages/python-packages || exit 1
 
-xargs sudo apt install -y < packages/apt-packages
-xargs cabal install < packages/cabal-packages
-xargs pip3 install < packages/python-packages
-
-sudo apt install nodejs -y
-sudo npm install -g n
-sudo n latest
-sudo apt remove --purge nodejs -y
+sudo apt install nodejs -y || exit 1
+sudo npm install -g n || exit 1
+sudo n latest || exit 1
+sudo apt remove --purge nodejs -y || exit 1
 
 xargs sudo npm install -g < packages/npm-packages
 xargs sudo cpan install < packages/cpan-packages

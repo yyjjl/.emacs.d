@@ -82,10 +82,6 @@
         (shell-command "xsel -ob" t)
       (message "Executable `xsel' not found !!!"))))
 
-;; `whitespace-space' setup
-(with-eval-after-load 'whitespace
-  (setq whitespace-style '(face tabs tab-mark spaces space-mark)))
-
 (with-eval-after-load 'skeletor
   (setq skeletor-completing-read-function 'ivy-completing-read)
 

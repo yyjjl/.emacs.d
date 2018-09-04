@@ -386,7 +386,7 @@ directory and extension."
   (when (buffer-file-name)
     (let* ((exe (cdr-safe (assoc (file-name-extension (buffer-file-name))
                                  core-run-current-file-executable)))
-           (command (or executable-command
+           (command (or (and (boundp 'executable-command) executable-command)
                         (and exe (concat exe " " (buffer-file-name)))
                         (buffer-file-name))))
       (let ((default-directory (or (and -use-project-root-p

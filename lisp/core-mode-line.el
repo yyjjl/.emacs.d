@@ -19,7 +19,7 @@
 (defvar mode-line-config-alist
   `(((or (memq major-mode '(dired-mode))
          (and (not (derived-mode-p 'text-mode 'prog-mode))
-              (string-match-p "^\\*" (buffer-name))))
+              (eq (aref (buffer-name) 0) ?*)))
      :segments (,@mode-line--default-segments
                 mode-line//process)
      :root current)

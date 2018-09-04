@@ -382,7 +382,7 @@
           ("" "verbatim" nil)))
   (let ((common (eval-when-compile
                   (read-file-content!
-                   (expand-file-name "common" org-template-directory)))))
+                   (expand-file-name "common" org-templates-directory)))))
     (add-to-list 'org-latex-classes
                  `("cn-article"
                    ,(concat "\\documentclass[11pt,a4paper]{article}\n"
@@ -406,9 +406,9 @@
   (add-to-list 'org-latex-classes
                `("cn-beamer"
                  ,(s-replace "[ORG-TEMPLATE-DIR]"
-                             org-template-directory
+                             org-templates-directory
                              (read-file-content!
-                              (expand-file-name "beamer" org-template-directory)))
+                              (expand-file-name "beamer" org-templates-directory)))
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")

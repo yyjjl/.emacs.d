@@ -116,7 +116,11 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
     (when (memq (process-status -proc) '(signal exit))
       (with-current-buffer (process-buffer -proc)
         (if term-directly-kill-buffer
-            (kill-buffer)
+            (progn
+              (when (one-window-p)
+                (let ((window (get-buffer-window)))
+                  (set-window-dedicated-p window nil)))
+              (kill-buffer))
           (let ((buffer-read-only nil))
             (insert (propertize "Press `Ctrl-D' or `q' to kill this buffer. "
                                 'font-lock-face 'font-lock-comment-face)))

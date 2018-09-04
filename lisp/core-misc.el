@@ -66,6 +66,11 @@
   (setq display-line-numbers-type 'relative)
   (setq-default display-line-numbers-width 2))
 
+;; `whitespace-space' setup
+(with-eval-after-load 'whitespace
+  (setq whitespace-global-modes '(text-mode latex-mode))
+  (setq whitespace-style '(face tabs tab-mark spaces space-mark empty)))
+
 (with-eval-after-load 'view
   (define-key! :map view-mode-map
     ("s" . swiper/dispatch)

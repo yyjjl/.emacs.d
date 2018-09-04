@@ -21,8 +21,6 @@ Pillow
 PyDelphin
 pyflakes
 pylint
-PyQt5
-python-language-server
 requests
 rope
 scikit-image

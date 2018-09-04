@@ -74,6 +74,8 @@
   ;;`eldoc', show API doc in minibuffer echo area enabled by default
   ;; (global-eldoc-mode 1)
 
+  (global-whitespace-mode 1)
+
   (setq package-selected-packages
         (hash-table-keys package--required-packages))
 

@@ -7,7 +7,7 @@
 
 (defvar perl-perltidy-path "perltidy")
 (defvar perl-perltidy-options nil)
-(defvar perl-shell-path (expand-etc! "perli"))
+(defvar perl-shell-path (expand-etc! "bin/perli"))
 
 
 (defun perl//format-region (beg end)
