@@ -22,16 +22,20 @@
 
 (defun python*around-elpy-multiedit (-fn &optional -arg)
   (setq python--elpy-multiedit-buffers nil)
-  (if (and (not elpy-multiedit-overlays)
-           (or -arg (bound-and-true-p iedit-mode)))
-      (call-interactively 'iedit-mode)
+  (cond
+   ((bound-and-true-p multiple-cursors-mode)
+    (multiple-cursors-mode -1))
+   ((and (not elpy-multiedit-overlays)
+         (or -arg (bound-and-true-p iedit-mode)))
+    (call-interactively 'iedit-mode))
+   (t
     (funcall -fn -arg)
     (dolist (ov elpy-multiedit-overlays)
       (-when-let (buffer (overlay-buffer ov))
         (unless (eq buffer (get-buffer "*Elpy Edit Usages*"))
           (overlay-put ov 'elpy-multiedit-overlay t)
           (overlay-put ov 'keymap python--elpy-mutiedit-overlay-map)
-          (add-to-list 'python--elpy-multiedit-buffers (overlay-buffer ov)))))))
+          (add-to-list 'python--elpy-multiedit-buffers (overlay-buffer ov))))))))
 
 (defun python*after-elpy-multiedit-stop ()
   (when-let ((buffer (get-buffer "*Elpy Edit Usages*"))

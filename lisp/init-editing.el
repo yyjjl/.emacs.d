@@ -12,6 +12,18 @@
 
 
 
+(with-eval-after-load 'multiple-cursors
+  (advice-add 'multiple-cursors-mode
+              :before
+              (lambda (&rest _) (when (bound-and-true-p iedit-mode)
+                                  (iedit-mode -1)))))
+
+(with-eval-after-load 'iedit
+  (advice-add 'iedit-mode
+              :before
+              (lambda (&rest _) (when (bound-and-true-p multiple-cursors-mode)
+                                  (multiple-cursors-mode -1)))))
+
 (define-hook! core|init-editing-keys (after-init-idle-hook)
   (when (display-graphic-p)
     (define-key!

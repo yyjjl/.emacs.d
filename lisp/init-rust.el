@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t; -*-
+
 (setvar!
  rust-has-rls-p (executable-find "rls"))
 

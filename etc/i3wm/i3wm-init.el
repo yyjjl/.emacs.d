@@ -2,7 +2,6 @@
 (require 'core-lib)
 ;; Set some important variables
 (require 'core-vars)
-(require 'core-env-vars)
 (require 'core-defaults)
 (require 'core-packages-lib)
 
