@@ -22,6 +22,8 @@
 (define-hook! js|setup (js-mode-hook typescript-mode-hook)
   (unless (and buffer-file-name
                (string-suffix-p ".json" (downcase buffer-file-name)))
+    (flycheck-mode 1)
+
     (tide-setup)
 
     (setq-local flycheck-check-syntax-automatically '(save mode-enabled))

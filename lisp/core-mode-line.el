@@ -31,6 +31,7 @@
     (t :segments (,@mode-line--default-segments
                   mode-line//buffer-status
                   mode-line//flycheck
+                  mode-line//flymake
                   mode-line//process
                   mode-line//position
                   mode-line//git-info)
@@ -127,21 +128,36 @@ read-only, and `buffer-file-coding-system'"
 (defsubst mode-line//flycheck ()
   "Display flycheck status in mode-line."
   (when (bound-and-true-p flycheck-mode)
-    (concat
-     " "
-     (pcase flycheck-last-status-change
-       (`not-checked (propertize "Waiting" 'face 'font-lock-comment-face))
-       (`no-checker (propertize "No" 'face 'font-lock-comment-face))
-       (`running (propertize "Running" 'face 'font-lock-doc-face))
-       (`errored (propertize "Error" 'face 'flycheck-fringe-error))
-       (`interrupted (propertize "Interrupted" 'face 'flycheck-fringe-warning))
-       (`suspicious (propertize "???" 'face 'flycheck-fringe-error))
-       (`finished (let-alist (flycheck-count-errors flycheck-current-errors)
-                    (concat (propertize (format "%s" (or .error 0))
-                                        'face 'flycheck-fringe-error)
-                            ":"
-                            (propertize (format "%s" (or .warning 0))
-                                        'face 'flycheck-fringe-warning))))))))
+    (pcase flycheck-last-status-change
+      (`not-checked '(:propertize " Waiting" face font-lock-comment-face))
+      (`no-checker '(:propertize " No" face font-lock-comment-face))
+      (`running '(:propertize " Running" face font-lock-doc-face))
+      (`errored '(:propertize " Error" face flycheck-fringe-error))
+      (`interrupted '(:propertize " Interrupted" face flycheck-fringe-warning))
+      (`suspicious '(:propertize "???" face flycheck-fringe-error))
+      (`finished (let-alist (flycheck-count-errors flycheck-current-errors)
+                   `((:propertize ,(format " %d" (or .error 0))
+                                  face flycheck-fringe-error)
+                     ":"
+                     (:propertize ,(format "%d" (or .warning 0))
+                                  face flycheck-fringe-warning)))))))
+
+(defsubst mode-line//flymake ()
+  "Produce a pretty minor mode indicator."
+  (when (bound-and-true-p flymake-mode)
+    (let* ((error-count 0)
+           (warning-count 0))
+      (maphash (lambda (_b state)
+                 (dolist (diag (flymake--backend-state-diags state))
+                   (pcase (flymake--diag-type diag)
+                     (`:error (incf error-count))
+                     (`:warning (incf warning-count)))))
+               flymake--backend-state)
+      `((:propertize ,(format " %d" error-count)
+                     face compilation-error)
+        ":"
+        (:propertize ,(format "%d" warning-count)
+                     face compilation-warning)))))
 
 (defsubst mode-line//process ()
   "Display buffer process status."

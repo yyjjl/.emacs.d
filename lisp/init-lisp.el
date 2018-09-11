@@ -61,11 +61,10 @@ Emacs Lisp."
   ;; (setq eldoc-documentation-function 'racket-eldoc-function)
   (when (buffer-temporary-p)
     (setq completion-at-point-functions nil))
-  (setq flycheck-check-syntax-automatically
-        '(save mode-enabled))
+  (flycheck-mode 1)
 
-  (define-key! :map lispy-mode-map
-    ("M-n"))
+  (setq-local flycheck-check-syntax-automatically
+              '(save mode-enabled))
 
   (with-local-minor-mode-map! 'lispy-mode
     (lispy-define-key it "e" #'racket-eval-sexp)
@@ -138,6 +137,8 @@ Emacs Lisp."
   (define-key lisp-interaction-mode-map (kbd "C-c e") 'macrostep-expand))
 
 (with-eval-after-load 'lispy
+  (define-key! :map lispy-mode-map ("M-n"))
+
   (defun lisp*around-goto-symbol (-fn -symbol)
     (if (memq major-mode lispy-elisp-modes)
         (condition-case nil

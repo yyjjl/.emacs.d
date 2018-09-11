@@ -88,6 +88,34 @@
   (add-to-list 'xref-prompt-for-identifier
                'xref-find-references :append))
 
+(defun core*flymake-eldoc-function ()
+  (let ((diags (flymake-diagnostics (point))))
+    (when diags
+      (eldoc-message (mapconcat #'flymake-diagnostic-text diags "\n")))))
+
+(define-hook! core|setup-flymake-mode (flymake-mode-hook)
+  (if flymake-mode
+      (progn
+        (put 'next-error-function 'flymake-old-next-error-function
+             next-error-function)
+        (setq next-error-function 'flymake-goto-next-error)
+        (add-function :before-until (local 'eldoc-documentation-function)
+                      #'core*flymake-eldoc-function))
+    (setq next-error-function (get 'next-error-function
+                                   'flymake-old-next-error-function))
+    (remove-function (local 'eldoc-documentation-function)
+                     #'core*flymake-eldoc-function)))
+
+(with-eval-after-load 'flymake
+  (define-key flymake-mode-map (kbd "C-c f l")
+    #'flymake-show-diagnostics-buffer)
+
+  (define-key! :map flymake-diagnostics-buffer-mode-map
+    ("n" . next-line)
+    ("j" . next-line)
+    ("p" . previous-line)
+    ("k" . previous-line)))
+
 (setq flycheck-keymap-prefix (kbd "C-c f"))
 (with-eval-after-load 'flycheck
   ;; Do not check during newline

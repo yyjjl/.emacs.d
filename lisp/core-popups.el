@@ -44,6 +44,7 @@
     completion-list-mode
     compilation-mode
     flycheck-error-list-mode
+    flymake-diagnostics-buffer-mode
     profiler-report-mode))
 
 

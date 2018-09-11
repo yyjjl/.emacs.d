@@ -41,7 +41,7 @@
   (require 'init-tags))
 
 ;; Programming modes
-(require 'init-lsp-mode)
+(require 'init-eglot)
 (require 'init-cpp)
 (require 'init-cpp-cmake)
 (require 'init-haskell)

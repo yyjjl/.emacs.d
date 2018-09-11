@@ -7,35 +7,47 @@
 
 (require 'init-cpp-cmake)
 
-(defface cpp-variable-face
-  `((t :foreground ,(face-attribute 'default :foreground)))
-  "Face for variables"
-  :group 'ccls-sem)
+;; (defface cpp-variable-face
+;;   `((t :foreground ,(face-attribute 'default :foreground)))
+;;   "Face for variables"
+;;   :group 'ccls-sem)
 
 (defconst cpp-ccls--default-template
   "%clang \n%c -std=gnu11\n%cpp -std=c++14\n\n")
 
+(defconst ccls-extra-init-params
+  '(
+    :index (:reparseForDependency 1)
+    :diagnostics (:frequencyMs 2000)
+    :completion (:detailedLabel t)))
+
 
 
+
+(defun cpp-ccls//file-info ()
+  (jsonrpc-request (eglot--current-server-or-lose)
+                   :$ccls/fileInfo
+                   (eglot--TextDocumentPositionParams)))
+
 
 (defmacro cpp-ccls//define-find (symbol command &optional extra)
   `(defun ,(intern (format "cpp/xref-find-%s" symbol)) ()
      (interactive)
-     (lsp-find-custom ,command ,extra)))
+     (eglot-find-custom ,command ,extra)))
 
-(cpp-ccls//define-find base "$ccls/base")
-(cpp-ccls//define-find bases "$ccls/inheritanceHierarchy"
+(cpp-ccls//define-find base :$ccls/base)
+(cpp-ccls//define-find bases :$ccls/inheritanceHierarchy
                         '(:flat t :level 3))
-(cpp-ccls//define-find derived "$ccls/inheritanceHierarchy"
+(cpp-ccls//define-find derived :$ccls/inheritanceHierarchy
                        '(:flat t :level 3 :derived t))
-(cpp-ccls//define-find callers "$ccls/callers")
-(cpp-ccls//define-find vars "$ccls/vars")
-(cpp-ccls//define-find members "$ccls/memberHierarchy" '(:flat t))
-(cpp-ccls//define-find references-write "textDocument/references"
+(cpp-ccls//define-find callers :$ccls/callers)
+(cpp-ccls//define-find vars :$ccls/vars)
+(cpp-ccls//define-find members :$ccls/memberHierarchy '(:flat t))
+(cpp-ccls//define-find references-write :textDocument/references
                        '(:context (:role 16)))
-(cpp-ccls//define-find references-read "textDocument/references"
+(cpp-ccls//define-find references-read :textDocument/references
                        '(:context (:role 8)))
-(cpp-ccls//define-find references-address "textDocument/references"
+(cpp-ccls//define-find references-address :textDocument/references
                        '(:context (:role 128)))
 
 (defsubst cpp-ccls//dot-ccls-path (&optional -dir)
@@ -45,10 +57,7 @@
 
 (defun cpp-ccls//setup ()
   (setq-local company-transformers nil)
-  (setq-local company-idle-delay nil)
-  (setq-local company-lsp-cache-candidates nil)
-  (add-to-list 'company-backends 'company-lsp)
-  (add-to-list 'company-backends 'company-files))
+  (eglot-ensure))
 
 (defun cpp-ccls/create-dot-ccls (-dir)
   (interactive (list (if current-prefix-arg
@@ -69,6 +78,7 @@
    (not (or (string-prefix-p "-working-directory" it)
             (string-prefix-p "-resource-dir" it)
             (string-prefix-p "-fparse-all-comments" it)
+            (member it '("-o" "-c"))
             (and -no-filename
                  (not (string-prefix-p "-" it)))))
    -args))
@@ -103,7 +113,8 @@
            (cpp-ccls//filter-include-lines (buffer-substring pos2 pos3))))))))
 
 (defun cpp-ccls//buffer-compile-command (&optional -preprocess-only-p)
-  (let* ((args (or (ignore-errors (gethash "args" (ccls-file-info)))
+  (let* ((args (or (ignore-errors (seq-into (plist-get (cpp-ccls//file-info) :args)
+                                            'list))
                    '("/usr/bin/c++")))
          (options (cpp-ccls//filter-arguments (cdr args) -preprocess-only-p)))
     (when -preprocess-only-p
@@ -131,36 +142,6 @@
 
 (with-eval-after-load 'projectile
   (add-to-list 'projectile-globally-ignored-directories ".ccls-cache"))
-
-(with-eval-after-load 'ccls
-  ;; Need to register snippet capability
-  (require 'company-lsp)
-  (require 'ccls-semantic-highlighting)
-
-  (aset ccls-sem-macro-faces 0 'font-lock-builtin-face)
-  (aset ccls-sem-variable-faces 0 'cpp-variable-face)
-
-  (push 'c++-mode (get 'lsp 'flycheck-modes))
-  (push 'c-mode (get 'lsp 'flycheck-modes))
-  (setq ccls-executable cpp-ccls-path)
-  (setq ccls-extra-init-params
-        '(
-          :index (:reparseForDependency 1)
-          :diagnostics (:frequencyMs 2000)
-          :completion (:detailedLabel t)))
-
-  (setq ccls-sem-highlight-method nil))
-
-(with-eval-after-load 'ccls-tree
-  (add-hook 'ccls-tree-mode-hook
-            (lambda ()
-              (toggle-truncate-lines 1)))
-  (define-key! :map ccls-tree-mode-map
-    ("o" . ccls-tree-press)
-    ("." . ccls-tree-expand-or-set-root)
-    ("^" . ccls-tree-collapse-or-select-parent)
-    ("j" . next-line)
-    ("k" . previous-line)))
 
 
 (provide 'init-cpp-ccls)

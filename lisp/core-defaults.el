@@ -238,7 +238,6 @@
       (hs-minor-mode 1)
     (error (message "%s" (error-message-string err))))
 
-  (flycheck-mode 1)
   (hl-line-mode 1)
 
   ;; show trailing spaces in a programming mode

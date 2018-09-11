@@ -9,9 +9,9 @@
 
 (require-packages!
  (ggtags :when env-has-gtags-p)
- (lsp-mode :when cpp-has-ccls-p)
- (company-lsp :when cpp-has-ccls-p)
- (ccls :when cpp-has-ccls-p)
+ ;; (lsp-mode :when cpp-has-ccls-p)
+ ;; (company-lsp :when cpp-has-ccls-p)
+ ;; (ccls :when cpp-has-ccls-p)
  clang-format
  google-c-style)
 
@@ -110,7 +110,7 @@
     (setq cpp-cmake-project-root (cpp-cmake//locate-cmakelists))
     (if (or (file-exists-p (cpp-ccls//dot-ccls-path))
             (and cpp-cmake-project-root (file-exists-p (cpp-cmake//cdb-path))))
-        (lsp//enable ccls :success (cpp-ccls//setup))
+        (cpp-ccls//setup)
       (when cpp-cmake-project-root
         (message "Need run `cpp/config-project' to setup ccls server")))))
 
@@ -153,7 +153,7 @@
                (make-symbolic-link cdb-path "compile_commands.json"
                                    :ok-if-already-exists)))
            (when cpp-has-ccls-p
-             (lsp//enable ccls :success (cpp-ccls//setup)))))))
+             (cpp-ccls//setup))))))
     (when -set-options
       (cpp-cmake//set-cmake-options
        (lambda (_)
@@ -256,7 +256,7 @@
                 (with-temp-env! (cpp-cmake//config-env) (apply -fn -args)))))
 
 (with-eval-after-load 'cc-mode
-  (require 'ccls)
+  (require 'eglot)
 
   (dolist (key '("#" "}" "/" ";" "," ":" "(" ")" "{"))
     (define-key c-mode-base-map key nil))
@@ -292,10 +292,7 @@
     ("C-c C" . cpp-cmake/change-config)
     ("C-c D" . cpp-cmake/config)
     ("C-c C-c" . cpp/config-project)
-    ("M-s l" . ccls-code-lens-mode)
-    ("M-s c" . ccls-call-hierarchy)
-    ("M-s m" . ccls-member-hierarchy)
-    ("M-s i" . ccls-inheritance-hierarchy)
+    ("M-s l" . ccls//toggle-code-lens)
     ("C-c j" :map cpp-ccls-jump-map)
     ([f9] . cpp/config-project)
     ([f10] . cpp/compile)

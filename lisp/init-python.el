@@ -114,9 +114,8 @@
   (setq elpy-rpc-backend "jedi"
         elpy-rpc-python-command "python3"
         elpy-modules (delq 'elpy-module-django
-                           (delq 'elpy-module-flymake
-                                 (delq 'elpy-module-highlight-indentation
-                                       elpy-modules)))
+                           (delq 'elpy-module-highlight-indentation
+                                 elpy-modules))
         elpy-test-runner 'elpy-test-pytest-runner
         elpy-shell-echo-input nil)
 
