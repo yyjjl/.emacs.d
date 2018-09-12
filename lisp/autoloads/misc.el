@@ -310,7 +310,9 @@ directory and extension."
                       (equal (file-name-as-directory new-dir)
                              (file-name-as-directory desktop-dirname))
                       (file-exists-p (desktop-full-lock-name))))
-            (progn
+            (when (y-or-n-p (format "Change to desktop '%s' (current '%s')? "
+                                    -name
+                                    core-current-desktop-name))
               (semantic-mode -1)
               (setq core-current-desktop-name -name)
               (desktop-change-dir new-dir)

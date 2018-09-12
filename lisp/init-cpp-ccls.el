@@ -1,9 +1,6 @@
 ;; -*- lexical-binding:t -*-
 
-(require-packages!
- lsp-mode
- company-lsp
- ccls)
+(require-packages! eglot)
 
 (require 'init-cpp-cmake)
 
@@ -25,10 +22,12 @@
 
 
 (defun cpp-ccls//file-info ()
-  (jsonrpc-request (eglot--current-server-or-lose)
-                   :$ccls/fileInfo
-                   (eglot--TextDocumentPositionParams)))
-
+  (seq-into
+   (plist-get (jsonrpc-request (eglot--current-server-or-lose)
+                               :$ccls/fileInfo
+                               (eglot--TextDocumentPositionParams))
+              :args)
+   'list))
 
 (defmacro cpp-ccls//define-find (symbol command &optional extra)
   `(defun ,(intern (format "cpp/xref-find-%s" symbol)) ()
@@ -89,7 +88,7 @@
                    (split-string lines "\n" :omit-nulls))))
 
 (defun cpp-ccls//include-directories ()
-  (let ((args (or (ignore-errors (gethash "args" (ccls-file-info)))
+  (let ((args (or (ignore-errors (cpp-ccls//file-info))
                   '("cpp" "-v" "-E"))))
     (with-temp-buffer
       (erase-buffer)
@@ -113,8 +112,7 @@
            (cpp-ccls//filter-include-lines (buffer-substring pos2 pos3))))))))
 
 (defun cpp-ccls//buffer-compile-command (&optional -preprocess-only-p)
-  (let* ((args (or (ignore-errors (seq-into (plist-get (cpp-ccls//file-info) :args)
-                                            'list))
+  (let* ((args (or (ignore-errors (cpp-ccls//file-info))
                    '("/usr/bin/c++")))
          (options (cpp-ccls//filter-arguments (cdr args) -preprocess-only-p)))
     (when -preprocess-only-p

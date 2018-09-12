@@ -93,8 +93,7 @@
   (remove-hook 'python-mode-hook 'elpy-mode)
 
   (define-key! :map inferior-python-mode-map
-    ("C-c C-t" . python/toggle-pdbtrack)
-    ([f5] . python/toggle-pdbtrack))
+    ("C-c C-t" . python/toggle-pdbtrack))
 
   (define-key! :map python-mode-map
     ([f5] . python/debug-current-file)
@@ -106,7 +105,7 @@
                  #'python-pdbtrack-comint-output-filter-function)))
 
 (with-eval-after-load 'py-isort
-  (setq py-isort-options '("--lines=75" "--multi-line=1")))
+  (setq py-isort-options '("--lines=80" "--multi-line=1")))
 
 (with-eval-after-load 'elpy
   (remap! "C-c C-r" "C-c r" elpy-mode-map)

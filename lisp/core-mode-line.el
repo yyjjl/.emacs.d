@@ -64,7 +64,7 @@
            mode-line--cached-relative-directory)
       (let ((root (file-truename (projectile-project-root)))
             (directory (file-truename default-directory)))
-        (setq mode-line--cached-root root)
+        (setq mode-line--cached-root (abbreviate-file-name root))
         (setq mode-line--cached-relative-directory
               (if (and (string-prefix-p root directory) (buffer-file-name))
                   (mapconcat
@@ -189,18 +189,20 @@ read-only, and `buffer-file-coding-system'"
        (cond
         ,@(mapcar
            (lambda (config)
-             (list (car config)
-                   (let ((segments (plist-get (cdr config) :segments))
-                         (show-misc-p (plist-get (cdr config) :misc))
-                         (show-root-p (plist-get (cdr config) :root)))
-                     (--filter
-                      it
-                      `(list ,@(mapcar #'list segments)
-                             ,(and show-misc-p 'mode-line-misc-info)
-                             ,(case show-root-p
-                                (project ''(mode-line--cached-root
-                                            ("" " " mode-line--cached-root)))
-                                (current ''("" " " default-directory))))))))
+             (list
+              (car config)
+              (let ((segments (plist-get (cdr config) :segments))
+                    (show-misc-p (plist-get (cdr config) :misc))
+                    (show-root-p (plist-get (cdr config) :root)))
+                (--filter
+                 it
+                 `(list ,@(mapcar #'list segments)
+                        ,(when show-misc-p ''mode-line-misc-info)
+                        ,@(when show-root-p
+                            (list " "
+                                  (case show-root-p
+                                    (project ''mode-line--cached-root)
+                                    (current ''("%e" (abbreviate-file-name default-directory)))))))))))
            (or $segments mode-line-config-alist))))))
 
 (defun mode-line*trace-magit-checkout (-fn &rest -args)
@@ -226,12 +228,9 @@ read-only, and `buffer-file-coding-system'"
   (setq-default mode-line-format mode-line-default-format)
   (setq-default mode-line-buffer-identification '("%b"))
   (setq-default mode-line-misc-info
-                '(;; (core-current-desktop-name (" <" core-current-desktop-name ">"))
-                  ;; (company-mode company-lighter)
-                  (company-search-mode company-search-lighter)
-                  (global-mode-string ("" " " global-mode-string)))))
+                '((company-search-mode (" " company-search-lighter))
+                  global-mode-string)))
 
 (mode-line//compile)
 
 (provide 'core-mode-line)
-
