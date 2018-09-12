@@ -9,12 +9,13 @@
 
 (require-packages!
  (ggtags :when env-has-gtags-p)
+ (lsp-mode :when cpp-has-ccls-p)
+ (company-lsp :when cpp-has-ccls-p)
+ (ccls :when cpp-has-ccls-p)
  clang-format
  google-c-style)
 
 (require 'init-cpp-ccls)
-
-(defvar gud-chdir-before-run t)
 
 (defcustom cpp-setup-literally nil
   "Whether to setup project literally"
@@ -162,7 +163,10 @@
     ("C-c C" . cpp-cmake/change-config)
     ("C-c D" . cpp-cmake/config)
     ("C-c C-c" . cpp/config-project)
-    ("M-s l" . ccls//toggle-code-lens)
+    ("M-s l" . ccls-code-lens-mode)
+    ("M-s c" . ccls-call-hierarchy)
+    ("M-s m" . ccls-member-hierarchy)
+    ("M-s i" . ccls-inheritance-hierarchy)
     ("C-c j" :map cpp-ccls-jump-map)
     ([f9] . cpp/config-project)
     ([f10] . cpp/compile)

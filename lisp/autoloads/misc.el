@@ -382,16 +382,19 @@ directory and extension."
     ("java" . "javac")))
 
 ;;;###autoload
-(defun core/run-current-file (&optional -use-project-root-p)
+(defun core/run-current-file (&optional directory)
   "Execute the current file."
-  (interactive "P")
+  (interactive
+   (list (or (and (equal current-prefix-arg '(4))
+                  (ignore-errors (projectile-project-root)))
+             (and (equal current-prefix-arg '(16))
+                  (read-directory-name "Run in directory: " nil nil t))
+             default-directory)))
   (when (buffer-file-name)
     (let* ((exe (cdr-safe (assoc (file-name-extension (buffer-file-name))
                                  core-run-current-file-executable)))
            (command (or (and (boundp 'executable-command) executable-command)
                         (and exe (concat exe " " (buffer-file-name)))
-                        (buffer-file-name))))
-      (let ((default-directory (or (and -use-project-root-p
-                                        (ignore-errors (projectile-project-root)))
-                                   default-directory)))
-        (executable-interpret (read-shell-command "Run: " command))))))
+                        (buffer-file-name)))
+           (default-directory directory))
+      (executable-interpret (read-shell-command "Run: " command)))))

@@ -26,6 +26,11 @@ EXTRA is a plist of extra parameters."
 (with-eval-after-load 'eglot
   (add-to-list 'project-find-functions #'project-try-projectile)
 
+  (if-let ((value '(eglot--managed-mode (" [" eglot--mode-line-format "]")))
+           (item (assq 'eglot--managed-mode mode-line-misc-info)))
+      (setcdr item value)
+    (add-to-list 'mode-line-misc-info value))
+
   (define-key! :map eglot-mode-map
     ("C-c C-d" . eglot-help-at-point)
     ("C-c r" . eglot-rename)

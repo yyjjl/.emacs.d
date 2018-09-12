@@ -32,7 +32,7 @@
   (setq company-dabbrev-code-other-buffers t)
   (setq company-show-numbers t)
   ;; Don't auto auto complete
-  (setq company-idle-delay 0.5)
+  (setq company-idle-delay 0.3)
   (setq company-clang-insert-arguments nil)
   (setq company-require-match nil)
   (setq company-etags-ignore-case t)

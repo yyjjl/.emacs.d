@@ -154,7 +154,7 @@ Current thing: %s(current-forward-thing)
   ("x" exchange-point-and-mark)
   ("l" recenter-top-bottom))
 
-(defmacro core%define-use-other-window (-fn &optional -negative? -name)
+(defmacro core//define-use-other-window (-fn &optional -negative? -name)
   (unless -name (setq -name -fn))
   `(defun ,(intern (format "%s-other-window" -name))
        (&optional -n)
@@ -164,16 +164,20 @@ Current thing: %s(current-forward-thing)
      (with-selected-window (next-window)
        (,-fn -n))))
 
-(core%define-use-other-window forward-line)
-(core%define-use-other-window forward-line :negative backward-line)
+(core//define-use-other-window forward-line)
+(core//define-use-other-window forward-line :negative backward-line)
+(core//define-use-other-window scroll-up-line)
+(core//define-use-other-window scroll-down-line)
 
 (defhydra hydra-move-other-window (:color pink :hint nil)
   "
-[_u_/_v_] scroll [_SPC_] scroll [_p_/_n_] line [_l_] recenter [_q_] quit
+[_u_/_v_] [_SPC_] [_p_/_n_] [_l_] [_DEL_/_RET_] [_q_]
 "
   ("q" nil :exit t)
   ("n" forward-line-other-window)
   ("p" backward-line-other-window)
+  ("DEL" scroll-down-line-other-window)
+  ("RET" scroll-up-line-other-window)
   ("l" (with-selected-window (next-window)
          (recenter-top-bottom)))
   ("v" scroll-other-window)
@@ -206,6 +210,11 @@ _q_uit
   ("C-x -" . hydra-resize-window/shrink-window)
 
   ("C->" . hydra-move-invoker)
+  ("M-N" . scroll-down-line-other-window)
+  ("M-P" . scroll-up-line-other-window)
+
+  ([M-f11] . scroll-other-window-down)
+  ([M-f12] . scroll-other-window)
 
   ("C-c O" . hydra-outline/body)
   ("C-x SPC" . hydra-rectangle/body)
