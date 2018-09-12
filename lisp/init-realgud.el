@@ -97,6 +97,7 @@
           (sit-for 0.5))))))
 
 (with-eval-after-load 'realgud
+  (fset 'realgud-populate-common-fn-keys-standard 'ignore)
   (setq realgud-populate-common-fn-keys-function nil)
   (setq realgud-safe-mode nil)
 

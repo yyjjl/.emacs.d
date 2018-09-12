@@ -76,26 +76,28 @@
           (call-interactively 'compile))))))
 
 ;;;###autoload
-(defun cpp/gdb (&optional directory)
-  (interactive
-   (list
-    (or (and current-prefix-arg default-directory)
-        (expand-file-name
-         (read-directory-name
-          "Directory: "
-          (file-name-as-directory (or (and cpp-cmake-project-root
-                                           (cpp-cmake//config-build))
-                                      default-directory))
-          ""
-          :must-match)))))
-  (let ((default-directory directory)
-        (gud-chdir-before-run nil))
-    (call-interactively
-     (cond ((require 'realgud nil :noerror)
-            #'realgud:gdb)
-           ((require 'gud nil :noerror)
-            #'gdb)
-           (t #'ignore)))))
+(defun cpp/debug-current-file (&optional new-session)
+  (interactive "P")
+  (require 'realgud nil :noerror)
+  (let ((cmd-bufs (cl-remove-if-not (lambda (x)
+                                      (and (realgud-cmdbuf? x)
+                                           (process-live-p (get-buffer-process x))))
+                                    (buffer-list))))
+    (if (or new-session (not cmd-bufs))
+        (let ((default-directory
+                (or (and current-prefix-arg default-directory)
+                    (expand-file-name
+                     (read-directory-name
+                      "Directory: "
+                      (file-name-as-directory (or (and cpp-cmake-project-root
+                                                       (cpp-cmake//config-build))
+                                                  default-directory))
+                      nil
+                      :must-match))))
+              (gud-chdir-before-run nil))
+          (call-interactively 'realgud:gdb))
+      (unless realgud-short-key-mode
+        (realgud-short-key-mode 1)))))
 
 ;;;###autoload
 (defun cpp/electric-star (-arg)

@@ -166,7 +166,7 @@
     ("C-c j" :map cpp-ccls-jump-map)
     ([f9] . cpp/config-project)
     ([f10] . cpp/compile)
-    ([f5] . cpp/gdb)))
+    ([f5] . cpp/debug-current-file)))
 
 ;; Set term default directory
 (when (boundp 'term-default-directory-function-list)

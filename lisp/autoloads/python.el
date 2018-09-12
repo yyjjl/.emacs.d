@@ -10,21 +10,24 @@
     (py-autopep8-buffer)))
 
 ;;;###autoload
-(defun python/debug-current-file (&optional directory)
-  (interactive
-   (list
-    (or (and current-prefix-arg default-directory)
-        (expand-file-name
-         (read-directory-name "Directory: " nil nil :must-match)))))
-  (let ((default-directory directory))
-    (cond
-     ((require 'realgud nil :noerror)
-      (realgud:pdb
-       (read-shell-command "Run pdb like this: "
-                           (ignore-errors (car realgud:pdb-minibuffer-history))
-                           'realgud:pdb-minibuffer-history)))
-     ((require 'gud nil :noerror)
-      (call-interactively #'pdb)))))
+(defun python/debug-current-file (&optional new-session)
+  (interactive "P")
+  (require 'realgud nil :noerror)
+  (let ((cmd-bufs (cl-remove-if-not (lambda (x)
+                                      (and (realgud-cmdbuf? x)
+                                           (process-live-p (get-buffer-process x))))
+                                    (buffer-list))))
+    (if (or new-session (not cmd-bufs))
+        (let ((default-directory
+                (or (and current-prefix-arg default-directory)
+                    (expand-file-name
+                     (read-directory-name "Directory: " nil nil :must-match)))))
+          (realgud:pdb
+           (read-shell-command "Run pdb like this: "
+                               (ignore-errors (car realgud:pdb-minibuffer-history))
+                               'realgud:pdb-minibuffer-history)))
+      (unless realgud-short-key-mode
+        (realgud-short-key-mode 1)))))
 
 ;;;###autoload
 (defun python/toggle-pdbtrack ()

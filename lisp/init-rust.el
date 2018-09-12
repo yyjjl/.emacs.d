@@ -6,7 +6,7 @@
 (require-packages!
  (ggtags :when env-has-gtags-p)
  (eglot :when rust-has-rls-p)
- (company-lsp :when rust-has-rls-p)
+ ;; (company-lsp :when rust-has-rls-p)
  cargo
  ;; Emacs 26 has conf-toml-mode
  (toml-mode :when (<= emacs-major-version 25))
