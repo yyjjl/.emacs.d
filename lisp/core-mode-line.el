@@ -202,7 +202,7 @@ read-only, and `buffer-file-coding-system'"
                             (list " "
                                   (case show-root-p
                                     (project ''mode-line--cached-root)
-                                    (current ''("%e" (abbreviate-file-name default-directory)))))))))))
+                                    (current ''(:eval (abbreviate-file-name default-directory)))))))))))
            (or $segments mode-line-config-alist))))))
 
 (defun mode-line*trace-magit-checkout (-fn &rest -args)
