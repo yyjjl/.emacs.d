@@ -43,6 +43,18 @@ _h_tml    ^ ^         ^ ^             _A_SCII:
               (hydra-org-template/body)
             (self-insert-command 1)))))
 
+(defhydra hydra-sort (:color red)
+  "sort"
+  ("r" sort-regexp-fields "regexp")
+  ("f" sort-fields "fields")
+  ("c" sort-columns "columns")
+  ("l" sort-lines "lines")
+  ("n" sort-numeric-fields "numeric")
+  ("F" flush-lines "flush")
+  ("k" keep-lines "keep")
+  ("RET" nil "quit")
+  ("q" nil "quit"))
+
 (defhydra hydra-resize-window (:color pink)
   "shrink"
   ("{" shrink-window-horizontally "-><-")
@@ -218,7 +230,7 @@ _q_uit
 
   ("C-c O" . hydra-outline/body)
   ("C-x SPC" . hydra-rectangle/body)
-
+  ("C-x , s" . hydra-sort/body)
   ("C-x `" . hydra-next-error/body))
 
 (provide 'core-hydra)

@@ -292,7 +292,6 @@
   (", ," . core-view-code-mode)
   (", a" . core/add-local-snippet)
   (", g" . core/search-in-chrome)
-  (", s" . core/create-scratch-buffer)
   (", -" . core/copy-file-name)
   (", c" . core/change-or-new-desktop)
   (", d" . core/delete-desktop)

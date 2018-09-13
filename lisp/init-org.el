@@ -122,7 +122,6 @@
   (advice-add 'org-beginning-of-line
               :around (lambda (-fn &optional -n)
                         (if (bolp) (back-to-indentation) (funcall -fn -n))))
-
   ;; Highlight `{{{color(<color>, <text>}}}' form
   (font-lock-add-keywords
    'org-mode
@@ -144,7 +143,8 @@
            (add-text-properties (- (match-beginning 3) 1) (match-beginning 3)
                                 '(invisible org-link))
            (list (if (equal bg "bg") :background :foreground) color))
-         prepend t)))
+         prepend t))
+     ("\\\\\\\\$" . font-lock-comment-face))
    'append)
 
   (setq org-structure-template-alist

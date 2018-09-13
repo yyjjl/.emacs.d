@@ -35,13 +35,15 @@
   (unless TeX-master
     (setq TeX-master 'dwim))
 
+  ;; Will conflict with latex-mode
+  (electric-pair-local-mode -1)
+  (electric-indent-local-mode -1)
+  (TeX-fold-mode 1)
+
   (unless (buffer-temporary-p)
     (reftex-mode 1)
     (TeX-source-correlate-mode 1)
     (TeX-PDF-mode 1)
-    (TeX-fold-mode 1)
-    ;; Will conflict with latex-mode
-    (electric-pair-local-mode -1)
 
     (setq TeX-engine 'xetex)
 
