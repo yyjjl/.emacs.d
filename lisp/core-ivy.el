@@ -24,6 +24,12 @@
   (when (eq -arg '(16))
     (setq projectile-cached-project-root nil)))
 
+(define-hook! ivy|occur-mode-setup (ivy-occur-mode-hook
+                                    ivy-occur-grep-mode-hook)
+  (local-set-key "/" #'ivy-occur-filter-lines)
+  (local-set-key (kbd "C-/") #'ivy-occur-undo)
+  (toggle-truncate-lines 1))
+
 (defvar ivy-views-persistent-file "ivy-views.el")
 (with-eval-after-load 'ivy
   (core//load-variable 'ivy-views ivy-views-persistent-file)
@@ -49,24 +55,19 @@
   ;; (add-to-list 'ivy-display-functions-alist
   ;;              '(counsel-company . ivy-display-function-overlay))
 
-  (setq ivy-dispatching-done-columns 3)
-  (setq ivy-count-format "(%d/%d) ")
-  ;; (setq ivy-initial-inputs-alist nil)
-  (setq ivy-extra-directories '("./"))
   (setq ivy-action-wrap t)
-
+  (setq ivy-count-format "(%d/%d) ")
+  (setq ivy-extra-directories '("./"))
+  (setq ivy-format-function #'ivy-format-function-line)
+  (setq ivy-initial-inputs-alist nil)
+  (setq ivy-dispatching-done-columns 3)
+  (setq ivy-fixed-height-minibuffer t)
   (setq ivy-re-builders-alist
         '(;; Use regex as default
           (t . ivy--regex-plus)))
   (setq ivy-use-virtual-buffers t)
   (setq ivy-virtual-abbreviate 'full)
   (setq ivy-use-selectable-prompt t)
-
-  (define-hook! ivy|occur-mode-setup (ivy-occur-mode-hook
-                                      ivy-occur-grep-mode-hook)
-    (local-set-key "/" #'ivy-occur-filter-lines)
-    (local-set-key (kbd "C-/") #'ivy-occur-undo)
-    (toggle-truncate-lines 1))
 
   (define-key!
     :map ivy-minibuffer-map
@@ -96,11 +97,9 @@
     ("x" . counsel-linux-app)
     ("v" . counsel-set-variable)
     ("j" . counsel-file-jump)
-    ("g t" . counsel-git)
-    ("g l" . counsel-git-log)
-    ("g g" . counsel-git-grep)
-    ("g q" . counsel-git-grep-query-replace)
-    ("g s" . counsel-git-stash)
+    ("p" . counsel-git)
+    ("g" . counsel-git-grep)
+    ("s" . counsel-git-stash)
     ("h" . counsel-minibuffer-history)
     ("m" . counsel-mark-ring)
     ("/" . counsel-grep)

@@ -10,54 +10,38 @@
 
 
 
-;; @see
-;; http://blog.binchen.org/posts/enhance-emacs-git-gutter-with-ivy-mode.html
-;; {{ git gutter with ivy
-(defun git//reshape-gutter (-gutter)
-  "Re-shape GUTTER for `ivy-read'."
-  (let* ((linenum-start (aref -gutter 3))
-         (linenum-end (aref -gutter 4))
-         (target-line "")
-         (target-linenum 1)
-         (tmp-line "")
-         (max-line-length 0))
-    (save-excursion
-      ;; find out the longest stripped line in the -gutter
-      (while (<= linenum-start linenum-end)
-        (forward-line 1)
-        (setq tmp-line (replace-regexp-in-string
-                        "^[ \t]*" ""
-                        (buffer-substring (line-beginning-position)
-                                          (line-end-position))))
-        (when (> (length tmp-line) max-line-length)
-          (setq target-linenum linenum-start)
-          (setq target-line tmp-line)
-          (setq max-line-length (length tmp-line)))
+(defun git//format-gutter (-gutter)
+  (let ((start-line (aref -gutter 3)))
+    (cons
+     (format "%s %d ~ %d: %s"
+             (pcase (aref -gutter 1)
+               (`added "+")
+               (`deleted "-")
+               (`modified "="))
+             start-line
+             (aref -gutter 4)
+             (ignore-errors
+               (let ((string (nth 1 (split-string (aref -gutter 2)
+                                                  "\n" t))))
+                 (if (string-match-p "^-\\|\\+\\|=" string)
+                     (substring string 1)
+                   string))))
+     start-line)))
 
-        (setq linenum-start (1+ linenum-start))))
-    ;; build (key . linenum-start)
-    (cons (format "%s %d: %s"
-                  (if (eq 'deleted (aref -gutter 1)) "-" "+")
-                  target-linenum target-line)
-          target-linenum)))
-
-(defun git/ivy-goto-gutter ()
+(defun git/goto-gutter ()
   (interactive)
-  (if git-gutter:diffinfos
-      (let* ((collection (mapcar 'git//reshape-gutter
-                                 git-gutter:diffinfos)))
-        (ivy-read "git-gutters:"
-                  collection
-                  :action (lambda (linenum)
-                            (forward-line (- (cdr linenum)
-                                             (line-number-at-pos))))))
-    (message "No git-gutters!")))
-;; }}
+  (unless git-gutter:diffinfos
+    (error "No git-gutters!"))
+  (let ((gutters (mapcar #'git//format-gutter git-gutter:diffinfos)))
+    (ivy-read "git-gutters:" gutters
+              :require-match t
+              :action (lambda (x)
+                        (forward-line (- (cdr x) (line-number-at-pos))))
+              :keymap (define-key! :map (make-sparse-keymap)
+                        ("C-n" . ivy-next-line-and-call)
+                        ("C-p" . ivy-previous-line-and-call)))))
 
-;; @see
-;; http://blog.binchen.org/posts/new-git-timemachine-ui-based-on-ivy-mode.html
-;; {{ git-timemachine
-(defun git/ivy-timemachine-show-selected-revision ()
+(defun git/timemachine-show-selected-revision ()
   "Show last (current) revision of file."
   (interactive)
   (let (collection)
@@ -72,13 +56,16 @@
               :action (lambda (rev)
                         (git-timemachine-show-revision (cdr rev))))))
 
-(defun git/ivy-timemachine ()
+(defun git/timemachine ()
   "Open git snapshot with the selected version.  Based on `ivy-mode'."
   (interactive)
   (unless (featurep 'git-timemachine)
     (require 'git-timemachine))
-  (git-timemachine--start #'git/ivy-timemachine-show-selected-revision))
-;; }}
+  (let ((name (buffer-name)))
+    (condition-case nil
+        (git-timemachine--start #'git/timemachine-show-selected-revision)
+      (quit (kill-buffer (format "timemachine:%s" name))))))
+
 
 (when (fboundp 'define-fringe-bitmap)
   (require 'git-gutter-fringe))
@@ -151,10 +138,10 @@
   ("h" . git-gutter:popup-hunk)
   ("s" . git-gutter:stage-hunk)
   ("r" . git-gutter:revert-hunk)
-  ("t" . git/ivy-timemachine)
+  ("t" . git/timemachine)
   ("n" . git-gutter:next-hunk)
   ("p" . git-gutter:previous-hunk)
-  ("j" . git/ivy-goto-gutter)
+  ("j" . git/goto-gutter)
   ("g" . magit-status)
   ("l" . git-link)
   ("c" . git-link-commit)
