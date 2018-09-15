@@ -73,6 +73,7 @@ See https://github.com/emacs-lsp/lsp-mode."
 (define-hook! lsp|after-open (lsp-after-open-hook)
   (lsp-enable-imenu)
   (setq-local flycheck-check-syntax-automatically nil)
+  (flycheck-mode 1)
   (add-hook 'lsp-after-diagnostics-hook
             (lambda () (when flycheck-mode (flycheck-buffer)))))
 
@@ -80,8 +81,10 @@ See https://github.com/emacs-lsp/lsp-mode."
   (require 'lsp-imenu)
   (setq lsp-eldoc-render-all t)
   (setq lsp-enable-completion-at-point nil)
-  (setq lsp-highlight-symbol-at-point t)
+  (setq lsp-highlight-symbol-at-point nil)
   (setq lsp-hover-text-function 'lsp--text-document-hover-string)
+
+  (add-to-list 'flycheck-checkers 'lsp)
 
   (define-key!
     ("M-s h h" . lsp-symbol-highlight)

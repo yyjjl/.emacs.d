@@ -136,28 +136,49 @@ read-only, and `buffer-file-coding-system'"
       (`interrupted '(:propertize " Interrupted" face flycheck-fringe-warning))
       (`suspicious '(:propertize "???" face flycheck-fringe-error))
       (`finished (let-alist (flycheck-count-errors flycheck-current-errors)
-                   `((:propertize ,(format " %d" (or .error 0))
-                                  face flycheck-fringe-error)
-                     ":"
-                     (:propertize ,(format "%d" (or .warning 0))
-                                  face flycheck-fringe-warning)))))))
+                   `(" ["
+                     (lsp-mode "LSP ")
+                     (:propertize ,(format "%d" (or .error 0))
+                                  face compilation-error)
+                     (:propertize ,(format " %d" (or .warning 0))
+                                  face compilation-warning)
+                     (:propertize ,(format " %d" (or .info 0))
+                                  face compilation-info)
+                     "]"))))))
 
 (defsubst mode-line//flymake ()
   "Produce a pretty minor mode indicator."
   (when (bound-and-true-p flymake-mode)
     (let* ((error-count 0)
-           (warning-count 0))
-      (maphash (lambda (_b state)
-                 (dolist (diag (flymake--backend-state-diags state))
-                   (pcase (flymake--diag-type diag)
-                     (`:error (incf error-count))
-                     (`:warning (incf warning-count)))))
-               flymake--backend-state)
-      `((:propertize ,(format " %d" error-count)
+           (warning-count 0)
+           (note-count 0)
+           (error-severity (warning-numeric-level :error))
+           (warning-severity (warning-numeric-level :warning))
+           (note-severity (warning-numeric-level :debug)))
+      (maphash
+       (lambda (_b state)
+         (dolist (diag (flymake--backend-state-diags state))
+           ;; In this version, level of :error is 3
+           (let ((severity
+                  (flymake--lookup-type-property (flymake--diag-type diag)
+                                                 'severity
+                                                 error-severity)))
+             (cond ((>= severity error-severity)
+                    (incf error-count))
+                   ((>= severity warning-severity)
+                    (incf warning-count))
+                   ((>= severity note-severity)
+                    (incf note-count))))))
+       flymake--backend-state)
+      `(" ["
+        (lsp-mode "LSP ")
+        (:propertize ,(format "%d" error-count)
                      face compilation-error)
-        ":"
-        (:propertize ,(format "%d" warning-count)
-                     face compilation-warning)))))
+        (:propertize ,(format " %d" warning-count)
+                     face compilation-warning)
+        (:propertize ,(format " %d" note-count)
+                     face compilation-info)
+        "]"))))
 
 (defsubst mode-line//process ()
   "Display buffer process status."

@@ -24,17 +24,20 @@
      (lsp-find-custom ,command ,extra)))
 
 (cpp-ccls//define-find base "$ccls/base")
-(cpp-ccls//define-find bases "$ccls/inheritanceHierarchy"
-                        '(:flat t :level 3))
-(cpp-ccls//define-find derived "$ccls/inheritanceHierarchy"
-                       '(:flat t :level 3 :derived t))
+;; (cpp-ccls//define-find bases "$ccls/inheritance" '(:level 3))
+;; (cpp-ccls//define-find derived "$ccls/inheritance" '(:level 3 :derived t))
 (cpp-ccls//define-find callers "$ccls/callers")
-(cpp-ccls//define-find vars "$ccls/vars")
-(cpp-ccls//define-find members "$ccls/memberHierarchy" '(:flat t))
+(cpp-ccls//define-find callee "$ccls/call" '(:callee t))
+;; (cpp-ccls//define-find vars "$ccls/vars")
+(cpp-ccls//define-find members "$ccls/member")
 (cpp-ccls//define-find references-write "textDocument/references"
                        '(:context (:role 16)))
 (cpp-ccls//define-find references-read "textDocument/references"
                        '(:context (:role 8)))
+(cpp-ccls//define-find references-not-call "textDocument/references"
+                       '(:context (:excludeRole 32)))
+(cpp-ccls//define-find references-macro "textDocument/references"
+                       '(:context (:role 64)))
 (cpp-ccls//define-find references-address "textDocument/references"
                        '(:context (:role 128)))
 
@@ -125,14 +128,18 @@
 (defvar cpp-ccls-jump-map
   (define-key! :map (make-sparse-keymap)
     ("b" . cpp/xref-find-base)
-    ("B" . cpp/xref-find-bases)
-    ("d" . cpp/xref-find-derived)
+    ;; ("B" . cpp/xref-find-bases)
+    ;; ("d" . cpp/xref-find-derived)
     ("c" . cpp/xref-find-callers)
-    ("v" . cpp/xref-find-vars)
+    ("e" . cpp/xref-find-callee)
+    ;; ("v" . cpp/xref-find-vars)
     ("m" . cpp/xref-find-members)
+    ("M" . cpp/xref-find-references-macro)
     ("w" . cpp/xref-find-references-write)
+    ("n" . cpp/xref-find-references-not-call)
     ("r" . cpp/xref-find-references-read)
-    ("a" . cpp/xref-find-references-address)))
+    ("a" . cpp/xref-find-references-address)
+    ("R" . ccls-reload)))
 
 (with-eval-after-load 'projectile
   (add-to-list 'projectile-globally-ignored-directories ".ccls-cache"))
@@ -150,7 +157,7 @@
   (setq ccls-extra-init-params
         '(
           :index (:reparseForDependency 1)
-          :diagnostics (:frequencyMs 2000)
+          :diagnostics (:frequencyMs 1000 :onChange :json-false)
           :completion (:detailedLabel t)))
 
   (setq ccls-sem-highlight-method 'font-lock))

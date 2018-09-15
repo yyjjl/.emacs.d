@@ -55,7 +55,8 @@ If this is nil, setup to environment variable of `SHELL'.")
     ("M-r" . term/send-reverse-search-history)
     ("M-d" . term/send-delete-word)
     ("M-," . term-send-raw)
-    ("C-s" . swiper/dispatch)
+    ("M-y" . term/yank-pop)
+    ("C-s" . term/swiper)
     ,@(if (display-graphic-p)
           '(("M-]" . term/switch-next)
             ("M-[" . term/switch-prev)
@@ -94,7 +95,8 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
 
 
 (defsubst term//get-popup-window ()
-  (frame-parameter nil 'term-popup-window))
+  (when-let (window (frame-parameter nil 'term-popup-window))
+    (and (window-live-p window) window)))
 
 (defsubst term//set-popup-window (popup-window)
   (set-window-dedicated-p popup-window t)
@@ -183,8 +185,7 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
   (if term--buffer-list
       (term//switch-internal 0)
     (-when-let (window (get-buffer-window (current-buffer)))
-      (when (and (window-live-p window)
-                 (equal window (term//get-popup-window)))
+      (when (eq window (term//get-popup-window))
         (delete-window window)))))
 
 (defun term//create-buffer (&optional -program -shell-buffer-p)
@@ -314,12 +315,18 @@ If -FORCE is non-nil create a new term buffer directly."
         (with-temp-env! (term//extra-env)
           (term//create-buffer nil t)))))
 
+(defsubst term//window-display-term-buffer-p (window)
+  (and (window-live-p window)
+       (eq 'term-mode
+           (buffer-local-value 'major-mode (window-buffer window)))))
+
 ;;;###autoload
 (defun term//pop-to-buffer (buffer)
-  (let ((popup-window (term//get-popup-window)))
-    (if (and (window-live-p popup-window)
-             (eq 'term-mode
-                 (buffer-local-value 'major-mode (window-buffer popup-window))))
+  (let ((popup-window
+         (car-safe (cl-remove-if-not #'term//window-display-term-buffer-p
+                                     (list* (term//get-popup-window)
+                                            (window-list))))))
+    (if popup-window
         ;; Reuse window
         (progn
           (select-window popup-window)
@@ -381,6 +388,23 @@ none exists, or if the current buffer is already a term."
                             #'term-send-raw
                           command))))
 
+(defun term/yank-pop (&optional -arg)
+  (interactive "P")
+  (let ((ivy-format-function #'counsel--yank-pop-format-function)
+        (kills (counsel--yank-pop-kills)))
+    (unless kills
+      (error "Kill ring is empty or blank"))
+    (ivy-read "kill-ring: " kills
+              :require-match t
+              :preselect (let (interprogram-paste-function)
+                           (current-kill (cond
+                                          (-arg (prefix-numeric-value -arg))
+                                          (counsel-yank-pop-preselect-last 0)
+                                          (t 1))
+                                         t))
+              :action #'term-send-raw-string
+              :caller 'counsel-yank-pop)))
+
 (defun term/kill-line ()
   (interactive)
   (if (term//after-prompt?)
@@ -406,3 +430,21 @@ none exists, or if the current buffer is already a term."
   ;; Fix for Emacs 26
   (setq term-goto-process-mark nil)
   (forward-line -1))
+
+(defun term/swiper ()
+  (interactive)
+  (unless (eq major-mode 'term-mode)
+    (error "Not in `term-mode' buffer"))
+  (let ((buffer (get-buffer-create "*terminal-copy*"))
+        (window (selected-window))
+        (term-buffer (current-buffer)))
+    (set-window-dedicated-p window nil)
+    (set-window-buffer window buffer)
+    (set-window-dedicated-p window t)
+    (with-current-buffer buffer
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (insert-buffer-substring term-buffer))
+      (goto-char (point-min))
+      (special-mode)
+      (call-interactively 'swiper/dispatch))))

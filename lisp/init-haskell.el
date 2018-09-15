@@ -80,6 +80,10 @@
     ("C-c a a" . haskell-process-cabal)
     ("C-c R" . haskell-mode-generate-tags))
 
+  (define-key! :map haskell-mode-map
+    ("M-n" . next-error)
+    ("M-p" . previous-error))
+
   (define-hook! haskell|cabal-setup (haskell-cabal-mode-hook)
     (rainbow-delimiters-mode 1)
     (add-to-list 'company-backends 'company-cabal))
@@ -89,10 +93,6 @@
     (haskell-decl-scan-mode 1)
 
     (unless (buffer-temporary-p)
-      (define-key! :map haskell-mode-map
-        ("M-n" . flycheck-next-error)
-        ("M-p" . flycheck-previous-error))
-
       (if (and haskell-has-stack-p
                (locate-dominating-file default-directory "stack.yaml"))
           (intero-mode 1)
