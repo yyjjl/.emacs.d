@@ -5,11 +5,11 @@
 (defvar x-hydra-delay 0.25)
 (defvar x-hydra-char ",")
 (defvar-local x-hydra-last-buffer-undo-list nil)
-(defun x-hydra-quit (&optional $no-hydra-quit)
+(defun x-hydra-quit (&optional -no-hydra-quit)
   (when x-hydra-timer
     (cancel-timer x-hydra-timer)
     (setq x-hydra-timer nil))
-  (unless $no-hydra-quit
+  (unless -no-hydra-quit
     (hydra-keyboard-quit)))
 
 (defun x-hydra-pre ()
@@ -25,7 +25,7 @@
   (timer-set-function x-hydra-timer 'x-hydra-quit)
   (timer-activate x-hydra-timer))
 
-(defmacro x-hydra-lambda-body ($cmd-or-keys)
+(defmacro x-hydra-lambda-body (-cmd-or-keys)
   `(progn
      (unless buffer-read-only
        (ignore-errors
@@ -33,23 +33,23 @@
            (undo)
            (setq buffer-undo-list x-hydra-last-buffer-undo-list))))
      (x-hydra-quit t)
-     ,(if (functionp $cmd-or-keys)
-          `(call-interactively #',$cmd-or-keys)
+     ,(if (functionp -cmd-or-keys)
+          `(call-interactively #',-cmd-or-keys)
         `(setq unread-command-events
                ', (mapcar (lambda (c) (cons t c))
-                          (listify-key-sequence (kbd $cmd-or-keys)))))))
+                          (listify-key-sequence (kbd -cmd-or-keys)))))))
 
-(defmacro x-hydra-define ($char &rest $binds)
+(defmacro x-hydra-define (-char &rest -binds)
   (declare (indent 1))
   (let (form1 form2)
-    (dolist (bind $binds)
+    (dolist (bind -binds)
       (let* ((key (car bind))
              (def (cadr bind))
              (fn (intern (format "x-hydra/lambda-%s-and-exit" key))))
         (push `(,key (x-hydra-lambda-body ,def)) form1)
         (push (cons key fn) form2)))
     `(progn
-       (setq x-hydra-char ,$char)
+       (setq x-hydra-char ,-char)
        (defhydra x-hydra (:body-pre x-hydra-pre :color blue)
          ,@form1)
        (setq x-hydra/keymap

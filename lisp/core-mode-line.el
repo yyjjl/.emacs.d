@@ -188,22 +188,22 @@ read-only, and `buffer-file-coding-system'"
   (propertize " %l:%c %p %I" 'face 'font-lock-constant-face))
 
 
-(defsubst mode-line//format-line ($lhs $chs $rhs)
-  (let* ((lw (string-width $lhs))
-         (cw (string-width $chs))
-         (rw (string-width $rhs))
+(defsubst mode-line//format-line (-lhs -chs -rhs)
+  (let* ((lw (string-width -lhs))
+         (cw (string-width -chs))
+         (rw (string-width -rhs))
          (tw (window-total-width))
          (margin (/ (- tw (+ lw rw cw)) 2)))
-    (setq $chs
+    (setq -chs
           (if (>= margin mode-line--center-margin)
               (concat (make-string margin ?\s)
-                      $chs
+                      -chs
                       (make-string (max 0 (- tw (+ lw cw rw margin))) ?\s))
             (make-string (max mode-line--center-margin (- tw (+ lw rw))) ?\s)))
-    (concat $lhs $chs $rhs)))
+    (concat -lhs -chs -rhs)))
 
 
-(defmacro mode-line//compile (&rest $segments)
+(defmacro mode-line//compile (&rest -segments)
   `(defun mode-line//generate ()
      "Generate mode-line."
      (unless (bound-and-true-p eldoc-mode-line-string)
@@ -224,7 +224,7 @@ read-only, and `buffer-file-coding-system'"
                                   (case show-root-p
                                     (project ''mode-line--cached-root)
                                     (current ''(:eval (abbreviate-file-name default-directory)))))))))))
-           (or $segments mode-line-config-alist))))))
+           (or -segments mode-line-config-alist))))))
 
 (defun mode-line*trace-magit-checkout (-fn &rest -args)
   (let ((buffer (current-buffer)))

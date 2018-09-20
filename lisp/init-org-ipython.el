@@ -14,17 +14,11 @@
 
 (defconst org--sage-overlay-help-template
   "--------------------
-Text:
-%s
-LaTeX:
-%s
+Text: %s
+LaTeX: %s
 --------------------
-R\tRegenerate
-T\tShow text
-w\tCopy text
-W\tCopy LaTeX
-=\tZoom in
--\tZoom out")
+[R] Regenerate [T] Show text [w] Copy text
+[W] Copy LaTeX [=] Zoom in   [-] Zoom out")
 
 (defvar org--ipython-parent-buffer nil)
 (defvar org--ipython-src-block nil)

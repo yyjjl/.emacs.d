@@ -1,5 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
+(require 'tramp)
 (eval-when-compile
   (require 'term))
 
@@ -84,13 +85,13 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
 (term//define-send-key forward-kill-word "\ed" "Forward kill word in term mode.")
 (term//define-send-key reverse-search-history "\C-r" "Search history reverse.")
 (term//define-send-key delete-word "\ed" "Delete word in term mode")
-(term//define-send-key M-x "\ex"   "Type M-x in term-mode.")
-(term//define-send-key up "\ep"   "Type M-p in term-mode.")
-(term//define-send-key down "\en"   "Type M-n in term-mode.")
-(term//define-send-key M-l "\el"   "Type M-l in term-mode.")
-(term//define-send-key M-c "\ec"   "Type M-c in term-mode.")
-(term//define-send-key M-u "\eu"   "Type M-u in term-mode.")
-(term//define-send-key undo "\C-_"   "Type undo in term-mode.")
+(term//define-send-key M-x "\ex" "Type M-x in term-mode.")
+(term//define-send-key up "\ep" "Type M-p in term-mode.")
+(term//define-send-key down "\en" "Type M-n in term-mode.")
+(term//define-send-key M-l "\el" "Type M-l in term-mode.")
+(term//define-send-key M-c "\ec" "Type M-c in term-mode.")
+(term//define-send-key M-u "\eu" "Type M-u in term-mode.")
+(term//define-send-key undo "\C-_" "Type undo in term-mode.")
 
 
 
@@ -265,29 +266,40 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
       (pop-to-buffer term--parent-buffer)
     (message "No parent buffer or it was killed !!!")))
 
-(defun term//get-ssh-info (-arg)
-  (let* ((address (if -arg
-                      (concat "/sshx:" (read-string "/sshx:"))
-                    default-directory))
-         (user (file-remote-p address 'user))
-         (host (file-remote-p address 'host))
-         (method (file-remote-p address 'method))
-         port)
-    (when (and method (not (member method '("sshx" "ssh"))))
-      (error "Can not open ssh connection for method `%s'" method))
-    (when (string-match "\\([^#]+\\)#\\([0-9]+\\)" host)
-      (setq port (match-string 2 host))
-      (setq host (match-string 1 host)))
-    (list user host port)))
+(defsubst term//parse-sconfig ()
+  (mapcar #'cadr (remove nil (tramp-parse-sconfig "~/.ssh/config"))))
+
+(defun term//get-ssh-info ()
+  (let* ((address
+          (completing-read "[user[#port]@]host: " (term//parse-sconfig) nil nil
+                           (file-remote-p default-directory))))
+    (unless (string-match "\\(?:\\([^#]+\\)#\\([0-9]+\\)@\\)?\\(.+\\)"
+                          address)
+      (error "Invalid address."))
+    (let ((data (cddr (match-data)))
+          result)
+      (while data
+        (let ((beg (pop data))
+              (end (pop data)))
+          (push (when beg (substring address beg end)) result)))
+      result)))
+
+(defun term//ssh-initialize (-host)
+  (term-send-raw-string (format "
+chpwd() {
+    printf '\\033AnSiTu %%s\n' \"sshx:$USER\"
+    print -P \"\\033AnSiTc %%d\"
+    printf '\\033AnSiTh %s\n'
+}
+chpwd;clear
+" -host)))
 
 ;;;###autoload
-(defun term/ssh (-user -host &optional -port -force)
-  (interactive
-   (append
-    (term//get-ssh-info current-prefix-arg)
-    (list (equal current-prefix-arg '(16)))))
-  (let ((args (list* (format "%s@%s" -user -host)
-                     (when (numberp -port)
+(defun term//create-ssh-buffer (-host -port -user &optional -force)
+  (interactive)
+  (let ((args (list* (if -user (format "%s@%s" -user -host) -host)
+                     (unless (or (not -port)
+                                 (zerop (string-to-number -port)))
                        (list "-p" (format "%d" -port))))))
     (or (and (not -force)
              (car (--filter (with-current-buffer it
@@ -295,12 +307,13 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
                                    (equal args term--ssh-info)
                                    (process-live-p (get-buffer-process it))))
                             (buffer-list))))
-        (let ((buffer (term//exec-program "ssh" args)))
+        (let ((buffer (term//exec-program "ssh" args "ssh")))
           (with-current-buffer buffer
+            (term//ssh-initialize -host)
             (setq term--ssh-info args))
           buffer))))
 
-(defun term//local-shell (-directory &optional -force)
+(defun term//create-local-shell (-directory &optional -force)
   "If there is a term buffer whose default-directory is -DIRECTORY,
 return that buffer. Otherwise create a new term buffer.
 
@@ -351,15 +364,25 @@ If -FORCE is non-nil create a new term buffer directly."
   (unless (memq major-mode '(eshell-mode term-mode shell-mode))
     (let ((force (or (= -arg 0) (>= -arg 16))))
       (if (file-remote-p default-directory)
-          (call-interactively 'term/ssh)
-        (term//local-shell (or (and (= -arg 4)
-                                    (term//eval-function-list
-                                     'term-default-directory-function-list))
-                               (and force
-                                    (read-directory-name "Directory: "
-                                                         nil nil :mustmatch))
-                               default-directory)
-                           force)))))
+          (apply #'term//create-ssh-buffer
+                 (append (term//get-ssh-info) (list force)))
+        (term//create-local-shell (or (and (= -arg 4)
+                                           (term//eval-function-list
+                                            'term-default-directory-function-list))
+                                      (and force
+                                           (read-directory-name "Directory: "
+                                                                nil nil :mustmatch))
+                                      default-directory)
+                                  force)))))
+
+;;;###autoload
+(defun term/ssh ()
+  (interactive)
+  (let ((buffer (apply #'term//create-ssh-buffer (term//get-ssh-info))))
+    (with-current-buffer buffer
+      (setq term-directly-kill-buffer nil))
+    (term//pop-to-buffer buffer)
+    buffer))
 
 ;;;###autoload
 (defun term/pop-shell (&optional -arg)

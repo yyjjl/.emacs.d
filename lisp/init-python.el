@@ -26,7 +26,9 @@
    ((bound-and-true-p multiple-cursors-mode)
     (multiple-cursors-mode -1))
    ((and (not elpy-multiedit-overlays)
-         (or -arg (bound-and-true-p iedit-mode)))
+         (or -arg
+             (buffer-narrowed-p)
+             (bound-and-true-p iedit-mode)))
     (call-interactively 'iedit-mode))
    (t
     (funcall -fn -arg)

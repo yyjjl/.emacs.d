@@ -8,31 +8,31 @@
 (defvar cpp-cmake--widgets nil)
 (defvar cpp-cmake--save-button nil)
 
-(defun cpp-cmake//render-buttons ($buffer)
+(defun cpp-cmake//render-buttons (-buffer)
   ;; Apply changes
   (widget-create
    'push-button
    :notify
    (lambda (&rest _)
-     (with-current-buffer $buffer
+     (with-current-buffer -buffer
        (when (member cpp-cmake-current-config-name
                      '("Release" "Debug"))
          (error "`Rlease' or `Debug' can not be delete")))
      (when (yes-or-no-p "Are you sure to delete?")
-       (with-current-buffer $buffer
+       (with-current-buffer -buffer
          (setq cpp-cmake-config-list
                (delq (cpp-cmake//current-config) cpp-cmake-config-list))
          (setq cpp-cmake-current-config-name "Release")
          (save-dir-local-variables! 'cpp-cmake-current-config-name
                                    'cpp-cmake-config-list))
-       (cpp-cmake//render-config-buffer $buffer)
+       (cpp-cmake//render-config-buffer -buffer)
        (message "You may need run cmake manually.")))
    "Delete")
   (widget-insert " ")
   (widget-create 'push-button
                  :notify
                  (lambda (&rest _)
-                   (cpp-cmake//render-config-buffer $buffer))
+                   (cpp-cmake//render-config-buffer -buffer))
                  "Reset")
   (widget-insert " ")
   (setq cpp-cmake--save-button
@@ -42,25 +42,25 @@
          (lambda (&rest _)
            (dolist (widget cpp-cmake--widgets)
              (widget-apply widget :apply-change))
-           (with-current-buffer $buffer
+           (with-current-buffer -buffer
              (save-dir-local-variables! 'cpp-cmake-current-config-name
                                        'cpp-cmake-config-list))
            (message "Changes Applied"))
          "Apply")))
 
-(defun cpp-cmake//render-root-widget ($buffer)
-  (let* ((root (or (buffer-local-value 'cpp-cmake-project-root $buffer) ""))
+(defun cpp-cmake//render-root-widget (-buffer)
+  (let* ((root (or (buffer-local-value 'cpp-cmake-project-root -buffer) ""))
          (widget (widget-create 'directory :tag "Project Root" root)))
     (widget-put widget :apply-change
                 (lambda (widget)
-                  (with-current-buffer $buffer
+                  (with-current-buffer -buffer
                     (let ((value  (widget-value widget)))
                       (setq cpp-cmake-project-root (unless (string= value "")
                                                      value))))))
     (push widget cpp-cmake--widgets)))
 
-(defun cpp-cmake//render-name-widget ($buffer)
-  (let* ((choice-list (with-current-buffer $buffer
+(defun cpp-cmake//render-name-widget (-buffer)
+  (let* ((choice-list (with-current-buffer -buffer
                         `(,@(mapcar (lambda (config)
                                       `(item :format "%t"
                                              :tag ,(car config)
@@ -73,35 +73,35 @@
                  :format "%{%t%}: %[Select%]: %v"
                  :value (buffer-local-value
                          'cpp-cmake-current-config-name
-                         $buffer)
+                         -buffer)
                  :notify
                  (lambda (widget &rest _)
-                   (with-current-buffer $buffer
+                   (with-current-buffer -buffer
                      (setq cpp-cmake-current-config-name
                            (widget-value widget)))
-                   (cpp-cmake//render-config-buffer $buffer)
+                   (cpp-cmake//render-config-buffer -buffer)
                    (message "Change to %s" (widget-value widget)))
                  choice-list)))
     (widget-put widget :apply-change
                 (lambda (_widget)
-                  (with-current-buffer $buffer
+                  (with-current-buffer -buffer
                     (cpp-cmake//new-config cpp-cmake-current-config-name))))
     (push widget cpp-cmake--widgets)))
 
-(defun cpp-cmake//render-build-widget ($buffer)
-  (let* ((build (or (with-current-buffer $buffer
+(defun cpp-cmake//render-build-widget (-buffer)
+  (let* ((build (or (with-current-buffer -buffer
                       (cpp-cmake//config-build))
                     ""))
          (widget (widget-create 'directory :tag "Build Directory" build)))
     (widget-put widget :apply-change
                 (lambda (widget)
-                  (with-current-buffer $buffer
+                  (with-current-buffer -buffer
                     (cpp-cmake//set-config-slot 'build (widget-value widget)))))
     (push widget cpp-cmake--widgets)))
 
-(defun cpp-cmake//render-env-widget ($buffer)
+(defun cpp-cmake//render-env-widget (-buffer)
   (widget-insert "Environment Variable (Need manually quote for shell):\n")
-  (let* ((env (with-current-buffer $buffer
+  (let* ((env (with-current-buffer -buffer
                 (cpp-cmake//config-env)))
          (widget (widget-create 'editable-list
                                 :entry-format "%d %v"
@@ -109,14 +109,14 @@
                                 '(editable-field "NAME=VALUE"))))
     (widget-put widget :apply-change
                 (lambda (widget)
-                  (with-current-buffer $buffer
+                  (with-current-buffer -buffer
                     (cpp-cmake//set-config-slot 'env (widget-value widget)))))
     (push widget cpp-cmake--widgets)))
 
-(defun cpp-cmake//render-options-widget ($buffer)
+(defun cpp-cmake//render-options-widget (-buffer)
   (widget-insert "Current Options ")
   (widget-insert "(Press `enter' to confirm in text fields):\n")
-  (let* ((options (with-current-buffer $buffer
+  (let* ((options (with-current-buffer -buffer
                     (cpp-cmake//config-options)))
          (widget (widget-create 'editable-list
                                 :entry-format "%d %v"
@@ -126,7 +126,7 @@
                                 `(editable-field :value "NAME=VALUE"))))
     (widget-put widget :apply-change
                 (lambda (widget)
-                  (with-current-buffer $buffer
+                  (with-current-buffer -buffer
                     (let (options)
                       (dolist (option (widget-value widget))
                         (setq option (split-string option "="))
@@ -140,7 +140,7 @@
 
     (widget-insert "\n")
     (let ((available-options (buffer-local-value 'cpp-cmake-available-options
-                                                 $buffer)))
+                                                 -buffer)))
       (widget-insert "(run `C-u M-x cpp/run-cmake' to get available options)\n")
       (if (not available-options)
           (widget-insert "No Available Options ")
@@ -163,7 +163,7 @@
                 :value ,name)))
           available-options))))))
 
-(defun cpp-cmake//render-config-buffer ($buffer)
+(defun cpp-cmake//render-config-buffer (-buffer)
   (kill-all-local-variables)
   (set (make-local-variable 'cpp-cmake--widgets) nil)
   (set (make-local-variable 'cpp-cmake--save-button) nil)
@@ -174,19 +174,19 @@
 
     (widget-insert "CMake Configuartion. ")
     (widget-insert "Press `C-x C-s' or push `[Apply]' to apply changes. \n\n")
-    (cpp-cmake//render-buttons $buffer)
+    (cpp-cmake//render-buttons -buffer)
     (widget-insert (propertize "\n\nProject Settings:\n\n"
                                'face font-lock-doc-face))
-    (cpp-cmake//render-root-widget $buffer)
+    (cpp-cmake//render-root-widget -buffer)
     (widget-insert "\n")
-    (cpp-cmake//render-name-widget $buffer)
+    (cpp-cmake//render-name-widget -buffer)
     (widget-insert (propertize "\n\nConfiguration Settings:\n\n"
                                'face font-lock-doc-face))
-    (cpp-cmake//render-build-widget $buffer)
+    (cpp-cmake//render-build-widget -buffer)
     (widget-insert "\n")
-    (cpp-cmake//render-env-widget $buffer)
+    (cpp-cmake//render-env-widget -buffer)
     (widget-insert "\n")
-    (cpp-cmake//render-options-widget $buffer)
+    (cpp-cmake//render-options-widget -buffer)
 
     (setq cpp-cmake--widgets (nreverse cpp-cmake--widgets))
     (use-local-map (copy-keymap widget-keymap))
