@@ -1,6 +1,8 @@
+;;; -*- lexical-binding: t; -*-
+
 ;; Set symbol font
 (set-fontset-font t '(57600 . 57711) "Fira Code Symbol")
-(define-hook! (extra|font-setup frame) (after-make-frame-functions)
+(define-hook! (extra|font-setup _) (after-make-frame-functions)
   (set-fontset-font t '(57600 . 57711) "Fira Code Symbol"))
 
 (defvar fira-code-font-lock-keywords-alist

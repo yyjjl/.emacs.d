@@ -3,6 +3,7 @@
 
 (defvar-local mode-line--cached-git-branch nil)
 (defvar-local mode-line--cached-relative-directory nil)
+(defvar-local mode-line--cached-directory nil)
 (defvar-local mode-line--cached-root nil)
 (defvar mode-line--current-window (frame-selected-window))
 
@@ -41,13 +42,13 @@
 (autoload 'image-get-display-property "image-mode" nil)
 
 (defsubst mode-line//window-number ()
-  (and (bound-and-true-p window-numbering-mode)
+  (and (bound-and-true-p winum-mode)
        (let ((narrow-p (buffer-narrowed-p)))
          (propertize (concat
                       (if narrow-p "<" " ")
-                      (ignore-errors (window-numbering-get-number-string))
+                      (ignore-errors (winum-get-number-string))
                       (if narrow-p ">" " "))
-                     'face 'window-numbering-face))))
+                     'face 'winum-face))))
 
 (defsubst mode-line//git-info ()
   (when buffer-file-name
@@ -59,11 +60,12 @@
                               'face 'font-lock-doc-face)))))))
 
 (defsubst mode-line//relative-directory ()
-  (or (and projectile-cached-buffer-file-name
-           (equal projectile-cached-buffer-file-name (or buffer-file-name 'none))
+  (or (and mode-line--cached-directory
+           (equal mode-line--cached-directory default-directory)
            mode-line--cached-relative-directory)
       (let ((root (file-truename (projectile-project-root)))
             (directory (file-truename default-directory)))
+        (setq mode-line--cached-directory default-directory)
         (setq mode-line--cached-root (abbreviate-file-name root))
         (setq mode-line--cached-relative-directory
               (if (and (string-prefix-p root directory) (buffer-file-name))
@@ -245,7 +247,7 @@ read-only, and `buffer-file-coding-system'"
 
 ;; Setup `mode-line-format'
 (define-hook! mode-line|after-init-hook (after-init-hook)
-  (window-numbering-mode 1)
+  (winum-mode 1)
   (setq-default mode-line-format mode-line-default-format)
   (setq-default mode-line-buffer-identification '("%b"))
   (setq-default mode-line-misc-info

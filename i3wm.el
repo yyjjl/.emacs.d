@@ -18,7 +18,6 @@
 
 (setq-default default-frame-alist
               `((name . "Minibuffer-i3wm")
-                (font . "MonacoB-11")
                 (width . 100)
                 (height . ,(+ 4 ivy-height))
                 (menu-bar-lines . 0)

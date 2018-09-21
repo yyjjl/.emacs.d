@@ -31,13 +31,13 @@
                                       file)))
             :caller 'i3/open-document))
 
-(defun i3//open-document-transformer ($file)
+(defun i3//open-document-transformer (-file)
   "Transform STR to more readable format."
   (concat
-   (propertize (file-name-nondirectory $file)
+   (propertize (file-name-nondirectory -file)
                'face font-lock-string-face)
    " "
-   (propertize (abbreviate-file-name (file-name-directory $file))
+   (propertize (abbreviate-file-name (file-name-directory -file))
                'face font-lock-doc-face)))
 
 

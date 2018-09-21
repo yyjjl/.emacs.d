@@ -60,7 +60,7 @@
  '(ivy-highlight-face ((t (:background "#444155"))))
  '(ivy-current-match ((t (:background "gray0"))))
  '(ivy-virtual ((t (:inherit font-lock-doc-face))))
- '(window-numbering-face ((t (:background "black")))))
+ '(winum-face ((t (:background "black")))))
 
 (with-eval-after-load 'org
   (dolist (face org-level-faces)

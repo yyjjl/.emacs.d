@@ -62,6 +62,23 @@
     (with-current-buffer buffer
       (core|setup-buffer-bookmark))))
 
+(setq winum-keymap
+      (define-key! :map (make-sparse-keymap)
+        ("M-`" . winum-select-window-by-number)
+        ("M-0" . winum-select-window-0-or-10)
+        ("M-1" . winum-select-window-1)
+        ("M-2" . winum-select-window-2)
+        ("M-3" . winum-select-window-3)
+        ("M-4" . winum-select-window-4)
+        ("M-5" . winum-select-window-5)
+        ("M-6" . winum-select-window-6)
+        ("M-7" . winum-select-window-7)))
+(with-eval-after-load 'winum
+  (setq winum-auto-setup-mode-line nil)
+  (setq winnum-scope 'visible
+        winum-reverse-frame-list nil
+        winum-auto-assign-0-to-minibuffer t))
+
 (with-eval-after-load 'display-line-numbers
   (setq display-line-numbers-type 'relative)
   (setq-default display-line-numbers-width 2))

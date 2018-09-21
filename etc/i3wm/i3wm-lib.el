@@ -1,52 +1,53 @@
-(defun i3-msg//command (&rest $args)
+;;; -*- lexical-binding: t; -*-
+
+(defun i3-msg//command (&rest -args)
   (let ((result (with-output-to-string
                   (with-current-buffer standard-output
-                    (apply #'call-process "i3-msg" nil t nil $args))))
+                    (apply #'call-process "i3-msg" nil t nil -args))))
         (json-array-type 'list)
         (json-object-type 'hash-table)
         (json-false nil))
-    (condition-case err
-        (json-read-from-string result)
-      (error (error result)))))
+    (json-read-from-string result)))
 
-(defun i3-msg//workspaces (&optional $property)
-  (--filter (or (eq $property t)
-                (gethash $property it))
+(defun i3-msg//workspaces (&optional -property)
+  (--filter (or (eq -property t)
+                (gethash -property it))
             (i3-msg//command "-t" "get_workspaces")))
 
-(defun i3-msg//get-workspaces-from-tree ($tree $names &optional $window-list)
-  (let ((name (gethash "name" $tree)))
-    (if (member name $names)
-        (push (cons name $tree) $window-list)
-      (dolist (node (gethash "nodes" $tree))
-        (setq $window-list
-              (i3-msg//get-workspaces-from-tree node $names $window-list)))))
-  $window-list)
+(defun i3-msg//get-workspaces-from-tree (-tree -names &optional -window-list)
+  (let ((name (gethash "name" -tree)))
+    (if (member name -names)
+        (push (cons name -tree) -window-list)
+      (dolist (node (gethash "nodes" -tree))
+        (setq -window-list
+              (i3-msg//get-workspaces-from-tree node -names -window-list)))))
+  -window-list)
 
-(defun i3-msg//windows-of-tree ($tree &optional $window-list)
-  (-if-let (nodes (gethash "nodes" $tree))
+(defun i3-msg//windows-of-tree (-tree &optional -window-list)
+  (-if-let (nodes (gethash "nodes" -tree))
       (dolist (node nodes)
-        (setq $window-list (i3-msg//windows-of-tree node $window-list)))
-    (unless (or (equal "dockarea" (gethash "layout" $tree))
+        (setq -window-list (i3-msg//windows-of-tree node -window-list)))
+    (unless (or (equal "dockarea" (gethash "layout" -tree))
                 (string-prefix-p "i3bar for output"
-                                 (gethash "name" $tree ""))
-                (not (gethash "window" $tree)))
-      (push $tree $window-list)))
-  $window-list)
+                                 (gethash "name" -tree ""))
+                (not (gethash "window" -tree)))
+      (push -tree -window-list)))
+  -window-list)
 
-(defun i3-msg//windows (&optional $workspace-property)
+(defun i3-msg//windows (&optional -workspace-property -filter)
   (let ((names (mapcar
                 (lambda (ws) (gethash "name" ws))
-                (i3-msg//workspaces $workspace-property)))
+                (i3-msg//workspaces -workspace-property)))
         (tree (i3-msg//command "-t" "get_tree")))
     (cl-loop for (name . tree) in
              (i3-msg//get-workspaces-from-tree tree names)
              nconc
              (cl-loop for window in (i3-msg//windows-of-tree tree)
+                      when (or (not -filter) (funcall -filter window))
                       collect (cons name window)))))
 
-(defun i3-msg//focus-window ($window)
-  (i3-msg//command (format "[id=%s]" (gethash "window" $window)) "focus"))
+(defun i3-msg//focus-window (-window)
+  (i3-msg//command (format "[id=%s]" (gethash "window" -window)) "focus"))
 
 (defun i3//visible-frame-list ()
   (let ((window-id->frame (--map (cons (frame-parameter it 'outer-window-id) it)
@@ -59,8 +60,8 @@
 
 
 
-(defun i3//window-candidates (&optional $workspace-property)
-  (cl-loop for (name . window) in (i3-msg//windows $workspace-property)
+(defun i3//window-candidates (&optional -workspace-property)
+  (cl-loop for (name . window) in (i3-msg//windows -workspace-property)
            for properies = (gethash "window_properties" window)
            for trimed-name = (string-join (cdr (split-string name ":")) ":")
            collect (cons

@@ -160,7 +160,7 @@
           :diagnostics (:frequencyMs 1000 :onChange :json-false)
           :completion (:detailedLabel t)))
 
-  (setq ccls-sem-highlight-method 'font-lock))
+  (setq ccls-sem-highlight-method nil))
 
 (with-eval-after-load 'ccls-tree
   (add-hook 'ccls-tree-mode-hook

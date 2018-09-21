@@ -80,14 +80,11 @@ _=_ next    _-_ previous    ___ skip-previous  _+_ skip-next _q_ quit
   (define-key! :map picture-mode-map
     ("C-c C-a" . artist-mode)))
 
-(with-eval-after-load 'window-numbering
-  (define-key! :map window-numbering-keymap ("M-7") ("M-9") ("M-8") ("M-0")))
-
 ;; `avy' jump commands
 (define-key!
   ("M-8" . avy-goto-word-1-above)
   ("M-9" . avy-goto-word-1-below)
-  ("M-7" . avy-goto-symbol-1-in-defun)
+  ("M-g d" . avy-goto-symbol-1-in-defun)
   ("M-g 1" . avy-goto-char)
   ("M-g ." . avy-goto-char-in-line)
   ("M-g 2" . avy-goto-char-2)

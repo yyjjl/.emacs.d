@@ -30,14 +30,15 @@
             (pop-to-buffer srcbuf))
         (message "Source buffer is dead.")))))
 
-(defun realgud*around-exec-shell (-fn &rest -args)
+(defun realgud*around-run-debugger (-fn &rest -args)
   (setq realgud--window-configuration (current-window-configuration))
   (delete-other-windows)
   (if (>= (frame-width) (or split-width-threshold 120))
       (split-window-horizontally)
     (split-window-vertically))
-
-  (apply -fn -args))
+  (when-let* ((buffer (apply -fn -args))
+              (window (get-buffer-window)))
+    (set-window-dedicated-p window t)))
 
 (defun realgud*after-term-sentinel (-proc _)
   (let ((buffer (process-buffer -proc)))
@@ -109,11 +110,12 @@
     ("C-c C-z" . realgud/jump-to-cmdbuf))
 
   (advice-add 'realgud-term-sentinel :after #'realgud*after-term-sentinel)
-  (advice-add 'realgud-exec-shell :around #'realgud*around-exec-shell)
+  (advice-add 'realgud:run-debugger :around #'realgud*around-run-debugger)
   (advice-add 'realgud:terminate :before #'realgud*save-breakpoints))
 
 (with-eval-after-load 'comint
   (define-key! :map comint-mode-map
-    ([F5] . realgud-track-mode)))
+    ([F5] . realgud-track-mode)
+    ("M-h" . counsel-shell-history)))
 
 (provide 'init-realgud)

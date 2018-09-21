@@ -2,8 +2,6 @@
 
 (require-packages! eglot)
 
-(require 'flycheck)
-
 (defun project-try-projectile (dir)
   (let ((default-directory dir))
     (cons 'transient (projectile-project-root))))
