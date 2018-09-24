@@ -369,6 +369,8 @@ If -FORCE is non-nil create a new term buffer directly."
         (term//create-local-shell (or (and (= -arg 4)
                                            (term//eval-function-list
                                             'term-default-directory-function-list))
+                                      (and (= -arg 1)
+                                           (projectile-project-root))
                                       (and force
                                            (read-directory-name "Directory: "
                                                                 nil nil :mustmatch))
@@ -471,3 +473,25 @@ none exists, or if the current buffer is already a term."
       (goto-char (point-min))
       (special-mode)
       (call-interactively 'swiper/dispatch))))
+
+;;;###autoload
+(defun term/shell-command-on-server (&optional -arg)
+  (interactive "P")
+  (when (eq major-mode 'term-mode)
+    (error "Current buffer is term buffer"))
+  (let* ((filename (abbreviate-file-name (buffer-file-name)))
+         (command (read-shell-command
+                   "Run: "
+                   (or (and (boundp 'executable-command) executable-command)
+                       (and (boundp 'remote-shell-command-history)
+                            (car-safe remote-shell-command-history))
+                       filename)
+                   'remote-shell-command-history))
+         (buffer (term/ssh)))
+    (with-current-buffer buffer
+      (term-send-raw-string
+       (format " cd %s;git pull;%s\n"
+               (abbreviate-file-name
+                (or (and -arg (read-directory-name "Run in: " nil nil t))
+                    (projectile-ensure-project (projectile-project-root))))
+               command)))))

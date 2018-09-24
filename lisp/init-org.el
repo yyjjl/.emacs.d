@@ -24,6 +24,13 @@
         (expand-file-name org-preview-latex-image-directory
                           (or -directory default-directory)))))
 
+(defun org*around-latex-inline-image (-fn -link -info)
+  (let ((code (funcall -fn -link -info)))
+    (replace-regexp-in-string "\\(\\\\includesvg\\)\\(?:[^{]\\)?*{.*}"
+                              "\\\\includegraphics"
+                              code
+                              nil nil 1)))
+
 (defun org*around-html-do-format-code (-fn &rest -rest)
   (when (= (length -rest) 5)
     (let ((num-start (nth 4 -rest)))
@@ -53,7 +60,7 @@
                 (or -desc ""))
       (funcall -fn -link -desc -info))))
 
-(defun org*around-fill-paragraph (-fn &optional -justify region)
+(defun org*around-fill-paragraph (-fn &optional -justify -region)
   (let* ((element (org-element-context))
          (end (org-element-property :end element))
          (begin (org-element-property :begin element))
@@ -68,7 +75,8 @@
                                               "cdot" "circ" "cap" "cup"
                                               "subset" "subsetqe" "lor"
                                               "land" "in" "to" "rightarrow"
-                                              "Rightarrow")))))
+                                              "Rightarrow")
+                                     word-end))))
                 (g3 '(group (not (any ")}]" blank)))))
             (query-replace-regexp (rx-to-string `(and ,g1 ,g2 ,g3) t)
                                   "\\1 \\2 \\3" nil begin end)
@@ -76,7 +84,7 @@
                                   "\\1 \\2 " nil begin end)
             (query-replace-regexp (rx-to-string `(and (group " ") ,g2 ,g3) t)
                                   " \\1 \\2" nil begin end)))
-      (funcall -fn -justify region))
+      (funcall -fn -justify -region))
     (when (fboundp #'extra/insert-space-around-chinese)
       (ignore-errors (extra/insert-space-around-chinese begin end)))))
 
@@ -122,6 +130,7 @@
   (advice-add 'org-beginning-of-line
               :around (lambda (-fn &optional -n)
                         (if (bolp) (back-to-indentation) (funcall -fn -n))))
+
   ;; Highlight `{{{color(<color>, <text>}}}' form
   (font-lock-add-keywords
    'org-mode
@@ -356,6 +365,7 @@
     (require 'ox-bibtex))
 
   (advice-add 'org-latex-link :around #'org*around-latex-link)
+  (advice-add 'org-latex--inline-image :around #'org*around-latex-inline-image)
 
   (add-to-list 'org-latex-minted-langs '(ipython "python"))
   (setq org-latex-compiler "xelatex")

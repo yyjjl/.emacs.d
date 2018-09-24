@@ -14,9 +14,18 @@
  buffer-move
  zeal-at-point
  skeletor
+ lua-mode
  sly)
 
 
+
+;; Star dictionary lookup
+(autoload 'sdcv-current-word "sdcv" nil t)
+(autoload 'sdcv-goto-sdcv "sdcv" nil t)
+
+;; `calc' setup
+(with-eval-after-load 'calc
+  (add-to-list 'calc-language-alist '(org-mode . latex)))
 
 ;; prolog system
 (setq prolog-system 'swi)
@@ -29,28 +38,41 @@
 
 (setq inferior-lisp-program "sbcl")
 
-(with-eval-after-load 'graphviz-dot-mode
-  (defun extra/dot-complete ()
-    (let* ((b (save-excursion (skip-chars-backward "a-zA-Z0-9_") (point)))
-           (e (save-excursion (skip-chars-forward "a-zA-Z0-9_") (point)))
-           (graphviz-dot-str (buffer-substring b e))
-           (allcomp (all-completions graphviz-dot-str
-                                     (graphviz-dot-get-keywords))))
-      (list b e allcomp)))
+(define-key! :prefix "C-x w"
+  ;; buffer-mode
+  ("k" . buf-move-up)
+  ("j" . buf-move-down)
+  ("h" . buf-move-left)
+  ("l" . buf-move-right))
 
+
+
+(defun extra//dot-complete ()
+  (let* ((b (save-excursion (skip-chars-backward "a-zA-Z0-9_") (point)))
+         (e (save-excursion (skip-chars-forward "a-zA-Z0-9_") (point)))
+         (graphviz-dot-str (buffer-substring b e))
+         (allcomp (all-completions graphviz-dot-str
+                                   (graphviz-dot-get-keywords))))
+    (list b e allcomp)))
+
+(with-eval-after-load 'graphviz-dot-mode
   (setq graphviz-dot-auto-indent-on-semi nil)
   (setq graphviz-dot-indent-width 4)
 
   (define-hook! extra|setup-dot (graphviz-dot-mode-hook)
     (hs-minor-mode 1)
     (make-local-variable 'completion-at-point-functions)
-    (add-to-list 'completion-at-point-functions 'extra/dot-complete)))
+    (add-to-list 'completion-at-point-functions 'extra//dot-complete)))
+
+
 
 (with-eval-after-load 'grep
   (setq grep-highlight-matches t
         grep-scroll-output t)
   (dolist (v core-ignored-directories)
     (add-to-list 'grep-find-ignored-directories v)))
+
+
 
 ;; Zeal at point
 (global-set-key (kbd "C-h z") 'zeal-at-point)
@@ -60,9 +82,7 @@
         (cdr (assoc 'python-mode zeal-at-point-mode-alist)) "python")
   (add-to-list 'zeal-at-point-mode-alist '(cmake-mode . "cmake")))
 
-;; Star dictionary lookup
-(autoload 'sdcv-current-word "sdcv" nil t)
-(autoload 'sdcv-goto-sdcv "sdcv" nil t)
+
 
 (defun extra/clipboard-copy (-beg -end)
   (interactive "r")
@@ -82,6 +102,8 @@
         (shell-command "xsel -ob" t)
       (message "Executable `xsel' not found !!!"))))
 
+
+
 (with-eval-after-load 'skeletor
   (setq skeletor-completing-read-function 'ivy-completing-read)
 
@@ -93,49 +115,51 @@
 (global-set-key (kbd "C-x p n") 'skeletor-create-project)
 (global-set-key (kbd "C-x p N") 'skeletor-create-project-at)
 
-;; `calc' setup
-(with-eval-after-load 'calc
-  (add-to-list 'calc-language-alist '(org-mode . latex)))
+
 
+(defvar extra-translate-shell-repo "https://github.com/soimort/translate-shell")
 (defvar extra-translate-shell-path
-  (eval-when-compile (expand-var! "translate-shell/build/trans")))
+  (eval-when-compile (expand-var! "translate-shell")))
 (defvar extra-translate-shell-args
   (eval-when-compile (split-string "-I -s zh -t en -e google" " ")))
+
 (defun extra/translate-shell ()
   (interactive)
-  (cond
-   ((not (file-exists-p extra-translate-shell-path))
-    (message "Executable `%s' not found !" extra-translate-shell-path))
-   ((not (file-executable-p extra-translate-shell-path))
-    (message "`%s' can't be executed" extra-translate-shell-path))
-   (t
-    (let* ((bname "*translate-shell*")
-           (buffer (get-buffer-create bname))
-           (proc (get-buffer-process buffer)))
-      (when (not (and proc
-                      (process-live-p proc)
-                      (eq (buffer-local-value 'major-mode buffer)
-                          'comint-mode)))
-        (with-current-buffer buffer
-          (let ((buffer-read-only nil))
-            (erase-buffer))
-          (comint-exec buffer
-                       "trans"
-                       extra-translate-shell-path
-                       nil
-                       extra-translate-shell-args)
-          (comint-mode)))
-      (pop-to-buffer buffer)))))
+  (let ((exe (expand-file-name "build/trans" extra-translate-shell-path))
+        (string (when (region-active-p)
+                  (buffer-substring (region-beginning) (region-end)))))
+    (cond
+     ((not (file-exists-p exe))
+      (message "Executable `%s' not found !" exe))
+     ((not (file-executable-p exe))
+      (message "`%s' can't be executed" exe))
+     (t
+      (let* ((buffer (get-buffer-create "*translate-shell*"))
+             (proc (get-buffer-process buffer)))
+        (if (equal (current-buffer) buffer)
+            (quit-window)
+          (when (not (and proc
+                          (process-live-p proc)
+                          (eq (buffer-local-value 'major-mode buffer) 'comint-mode)))
+            (with-current-buffer buffer
+              (let ((buffer-read-only nil))
+                (erase-buffer))
+              (comint-exec buffer "trans" exe nil extra-translate-shell-args)
+              (comint-mode)
+              (setq proc (get-buffer-process buffer))))
+          (with-current-buffer (pop-to-buffer buffer)
+            (comint-send-string proc (concat string "\n")))))))))
 
-(with-eval-after-load 'shackle
-  (define-key! :map shackle-mode-map
-    ("i" . extra/translate-shell)))
+(defun extra/create-or-update-trans ()
+  (interactive)
+  (if (file-directory-p extra-translate-shell-path)
+      (let ((default-directory extra-translate-shell-path))
+        (compilation-start "git pull && git submodule update && make"))
+    (compilation-start (format "git clone  %s %s && cd %s && make"
+                               extra-translate-shell-repo
+                               extra-translate-shell-path
+                               extra-translate-shell-path))))
 
-(define-key! :prefix "C-x w"
-  ;; buffer-mode
-  ("k" . buf-move-up)
-  ("j" . buf-move-down)
-  ("h" . buf-move-left)
-  ("l" . buf-move-right))
+(global-set-key (kbd "C-z i") #'extra/translate-shell)
 
 (provide 'init-extra)

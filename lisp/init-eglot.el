@@ -4,7 +4,7 @@
 
 (defun project-try-projectile (dir)
   (let ((default-directory dir))
-    (cons 'transient (projectile-project-root))))
+    (cons 'transient (projectile-ensure-project (projectile-project-root)))))
 
 (defun eglot-find-custom (method &optional extra)
   "Send request named METHOD and get cross references of the symbol under point.

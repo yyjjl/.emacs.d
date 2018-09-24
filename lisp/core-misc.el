@@ -159,8 +159,8 @@
 
 (defvar core-projectile-invalidate-cache-empty-vars
   '(mode-line--cached-relative-directory
+    mode-line--cached-directory
     mode-line--cached-root
-    projectile-cached-project-root
     elpy-project-root))
 
 (with-eval-after-load 'projectile
@@ -177,7 +177,7 @@
 
   (setq projectile-mode-line
         '(:eval (and buffer-file-name (projectile-project-name))))
-  (setq projectile-require-project-root nil)
+  (setq projectile-require-project-root 'prompt)
   (setq projectile-globally-ignored-file-suffixes
         '(".pyc" ".elc" ".jpg" ".png" ".svg" ".jpeg" ".pyg" ".pygtex" ".pygstyle"))
   (setq projectile-completion-system 'ivy)

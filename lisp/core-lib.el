@@ -339,6 +339,15 @@ HTML file converted from org file, it returns t."
                      (expand-file-name file -dir))))))
     lib-path))
 
+(defun change-file-encodeing! (file &optional encoding)
+  (unless encoding
+    (setq encoding 'utf-8-unix))
+  (unless (file-directory-p file)
+    (with-temp-buffer
+      (insert-file-contents file)
+      (set-buffer-file-coding-system 'utf-8-unix)
+      (write-file file))))
+
 (defun save-dir-local-variables! (&rest -variables)
   (save-window-excursion
     (dolist (var -variables)

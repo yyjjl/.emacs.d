@@ -45,6 +45,8 @@
           (lambda () (unless (file-remote-p default-directory)
                        (with-editor-export-editor))))
 
-(global-set-key [f8] 'term/pop-shell)
+(define-key!
+  ([f8] . term/pop-shell)
+  ([C-f9] . term/shell-command-on-server))
 
 (provide 'core-term)

@@ -41,8 +41,6 @@
 
  ;; '(widget-field ((t (:inherit hl-line :underline t))))
 
- ;; '(window-numbering-face
- ;;   ((t (:foreground "DeepPink" :weight bold :underline t))))
  '(diredp-dir-name ((t (:inherit font-lock-type-face :weight bold))))
 
  '(haskell-keyword-face ((t (:inherit font-lock-builtin-face))))

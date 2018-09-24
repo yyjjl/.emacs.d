@@ -76,6 +76,7 @@
                  "python"))
 
   (setq python-shell-prompt-detect-failure-warning nil)
+  (setq python-pdbtrack-activate nil)
 
   (if python-has-ipython-p
       (setq python-shell-interpreter "ipython3"

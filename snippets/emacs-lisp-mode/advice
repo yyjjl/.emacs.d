@@ -2,7 +2,7 @@
 # name: (defadvice ...)
 # key: ada
 # --
-(defun ${1:name} (${3:$(if (equal yas-text ":around") "$fn " "")}${2:$(let ((sym (intern yas-text)) args)
+(defun ${1:name} (${3:$(if (equal yas-text ":around") "-fn " "")}${2:$(let ((sym (intern yas-text)) args)
   (if (not (fboundp sym))
       "&rest -args"
     (setq args (help-function-arglist sym))

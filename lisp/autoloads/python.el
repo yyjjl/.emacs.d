@@ -5,9 +5,10 @@
 ;;;###autoload
 (defun python/autopep8 ()
   (interactive)
-  (save-restriction
-    (widen)
-    (py-autopep8-buffer)))
+  (let ((temporary-file-directory default-directory))
+    (save-restriction
+      (widen)
+      (py-autopep8-buffer))))
 
 ;;;###autoload
 (defun python/debug-current-file (&optional new-session)
@@ -32,15 +33,10 @@
 ;;;###autoload
 (defun python/toggle-pdbtrack ()
   (interactive)
-  (if (memq 'python-pdbtrack-comint-output-filter-function
-            comint-output-filter-functions)
-      (progn
-        (remove-hook 'comint-output-filter-functions
-                     #'python-pdbtrack-comint-output-filter-function)
-        (message "pdbtrack disabled"))
-    (add-hook 'comint-output-filter-functions
-              #'python-pdbtrack-comint-output-filter-function)
-    (message "pdbtrack enabled")))
+  (setq python-pdbtrack-activate (not python-pdbtrack-activate))
+  (if python-pdbtrack-activate
+      (message "pdbtrack enabled")
+    (message "pdbtrack disabled")))
 
 ;;;###autoload
 (defun python/create-venv-in-workon-home (-name -python-exe &optional -args)

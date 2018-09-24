@@ -56,7 +56,12 @@
 
 (defun realgud/cmd-display (-arg)
   (interactive "P")
-  (realgud:cmd-run-command -arg (if -arg "display-all" "display")))
+  (let ((thing (when (not -arg)
+                 (if (use-region-p)
+                     (buffer-substring-no-properties (region-beginning)
+                                                     (region-end))
+                   (read-string "Thing: ")))))
+    (realgud:cmd-run-command thing (if thing "display" "display-all"))))
 
 (with-eval-after-load 'realgud:pdb-init
   (setf (gethash "breakpoints" realgud:pdb-command-hash) "break")

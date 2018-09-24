@@ -22,7 +22,7 @@
  which-key
  (fcitx :when env-has-fcitx-p)
  ;; Numbering windows
- window-numbering
+ winum
  ;; Highlight braces with their depth
  rainbow-delimiters
  ;; Highlight indentation
@@ -48,9 +48,9 @@
   (find-file-noselect (expand-var! "org/*note*"))
   (find-file-noselect (expand-var! "org/*task*"))
 
-  ;; (when (and (>= emacs-major-version 26)
-  ;;            (display-graphic-p))
-  ;;   (company-posframe-mode 1))
+  (when (and (>= emacs-major-version 26)
+             (display-graphic-p))
+    (company-posframe-mode 1))
 
   (desktop-save-mode 1))
 

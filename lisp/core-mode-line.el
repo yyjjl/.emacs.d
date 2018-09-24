@@ -63,7 +63,7 @@
   (or (and mode-line--cached-directory
            (equal mode-line--cached-directory default-directory)
            mode-line--cached-relative-directory)
-      (let ((root (file-truename (projectile-project-root)))
+      (let ((root (file-truename (or (projectile-project-root) default-directory)))
             (directory (file-truename default-directory)))
         (setq mode-line--cached-directory default-directory)
         (setq mode-line--cached-root (abbreviate-file-name root))
