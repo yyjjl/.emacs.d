@@ -100,6 +100,9 @@
 
   (define-key! :map python-mode-map
     ([f5] . python/debug-current-file)
+    ("C-c b" . python/autopep8)
+    ("C-c C-b" . python/autopep8)
+    ("C-c B" . py-isort-buffer)
     ("M-p" . previous-error)
     ("M-n" . next-error))
 
@@ -123,11 +126,9 @@
 
   (define-key! :map elpy-mode-map
     ("C-c C-z" . python/pop-to-shell)
-    ("C-c C-n" . nil)
-    ("C-c C-p" . nil)
-    ("C-c b" . python/autopep8)
-    ("C-c C-b" . python/autopep8)
-    ("C-c B" . py-isort-buffer)
+    ("C-c C-n")
+    ("C-c C-p")
+    ("C-c C-b")
     ("C-c I" . elpy-nav-expand-to-indentation)
     ("C-c M-d" . python/generate-doc-at-point)
     ("M-i" . elpy-multiedit-python-symbol-at-point))

@@ -47,6 +47,15 @@
     flymake-diagnostics-buffer-mode
     profiler-report-mode))
 
+(defvar core-ctrl-z-map
+  (define-key! :map (make-sparse-keymap)
+    ("l" . core-popups/last-popup-window)
+    ("d" . core-popups/popup-sdcv)
+    ("b" . core-popups/display-buffer)
+    ("RET" . core-popups/fix-popup-window)))
+
+(global-set-key (kbd "C-z") core-ctrl-z-map)
+
 
 
 (defsubst core-popups//clean-window-list ()
@@ -149,16 +158,6 @@
           (string-match-p core-popups-help-buffer-regexp (buffer-name))))))
 
 (with-eval-after-load 'shackle
-  (defvar shackle-mode-map
-    (define-key! :map (make-sparse-keymap)
-      ("l" . core-popups/last-popup-window)
-      ("d" . core-popups/popup-sdcv)
-      ("b" . core-popups/display-buffer)
-      ("RET" . core-popups/fix-popup-window)))
-
-  (global-set-key (kbd "C-z") shackle-mode-map)
-  (global-set-key (kbd "C-x m") #'view-echo-area-messages)
-
   ;; Can not be advised `:after', keyboard-quit signal `quit'
   (advice-add 'keyboard-quit :before #'core-popups*before-keyboard-quit)
   (advice-add 'other-window :before #'core-popups*before-keyboard-quit)

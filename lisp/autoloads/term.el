@@ -369,8 +369,6 @@ If -FORCE is non-nil create a new term buffer directly."
         (term//create-local-shell (or (and (= -arg 4)
                                            (term//eval-function-list
                                             'term-default-directory-function-list))
-                                      (and (= -arg 1)
-                                           (projectile-project-root))
                                       (and force
                                            (read-directory-name "Directory: "
                                                                 nil nil :mustmatch))

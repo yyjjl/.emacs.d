@@ -160,6 +160,8 @@
                                extra-translate-shell-path
                                extra-translate-shell-path))))
 
-(global-set-key (kbd "C-z i") #'extra/translate-shell)
+(define-key! :map core-ctrl-z-map
+  ("i" . extra/translate-shell)
+  ("I" . extra/create-or-update-trans))
 
 (provide 'init-extra)

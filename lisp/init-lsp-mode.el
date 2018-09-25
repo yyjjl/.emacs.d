@@ -127,7 +127,7 @@ See https://github.com/emacs-lsp/lsp-mode."
   (require 'lsp-imenu)
   (setq lsp-eldoc-render-all t)
   (setq lsp-enable-completion-at-point nil)
-  (setq lsp-highlight-symbol-at-point nil)
+  (setq lsp-highlight-symbol-at-point t)
   (setq lsp-hover-text-function 'lsp--text-document-hover-string)
 
   (add-to-list 'flycheck-checkers 'lsp)

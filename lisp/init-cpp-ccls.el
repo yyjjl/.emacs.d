@@ -154,13 +154,12 @@
   (aset ccls-sem-variable-faces 0 'cpp-variable-face)
 
   (setq ccls-executable cpp-ccls-path)
-  (setq ccls-extra-init-params
-        '(
-          :index (:reparseForDependency 1)
-          :diagnostics (:frequencyMs 1000 :onChange :json-false)
-          :completion (:detailedLabel t)))
+  (setq ccls-extra-init-params '(
+                                 :index (:trackDependency 2)
+                                 :diagnostics (:onChange 1000)
+                                 :completion (:detailedLabel t)))
 
-  (setq ccls-sem-highlight-method nil))
+  (setq ccls-sem-highlight-method 'font-lock))
 
 (with-eval-after-load 'ccls-tree
   (add-hook 'ccls-tree-mode-hook

@@ -321,6 +321,7 @@
   ("W" . core/copy-this-file-to-new-file)
   ("c" . core/cleanup-buffer-safe)
   ("o" . ace-window)
+  ("m" . view-echo-area-messages)
 
   ("w [" . winner-undo)
   ("w ]" . winner-redo))
