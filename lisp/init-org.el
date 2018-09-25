@@ -178,8 +178,7 @@
                                      (char-to-string char)))))))
 
   (org-babel-do-load-languages 'org-babel-load-languages
-                               '((ipython . t)
-                                 (python . t)
+                               '((python . t)
                                  (emacs-lisp . t)
                                  (dot . t)
                                  (js . t)

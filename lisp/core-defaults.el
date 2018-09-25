@@ -98,7 +98,7 @@
 (setq-default select-enable-clipboard t)
 (setq-default select-enable-primary t)
 (setq-default fill-column 79)
-
+(setq-default desktop-save 'ask-if-new)
 ;; Scrolling
 (setq-default auto-window-vscroll nil)
 (setq-default scroll-conservatively 0)

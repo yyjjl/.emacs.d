@@ -1,5 +1,4 @@
-(eval-when-compile
-  (require 'dash))
+;;; -*- lexical-binding: t; -*-
 
 (defvar-local mode-line--cached-git-branch nil)
 (defvar-local mode-line--cached-relative-directory nil)
@@ -78,11 +77,10 @@
 
 (defsubst mode-line//buffer-id ()
   "Display buffer id in mode-line."
-  (let ((method (file-remote-p default-directory 'method)))
-    (list " %["
-          (propertize (mode-line//relative-directory) 'face 'font-lock-string-face)
-          '(:propertize mode-line-buffer-identification face font-lock-keyword-face)
-          "%] ")))
+  (list " %["
+        (propertize (mode-line//relative-directory) 'face 'font-lock-string-face)
+        '(:propertize mode-line-buffer-identification face font-lock-keyword-face)
+        "%] "))
 
 (defsubst mode-line//buffer-major-mode ()
   "Display buffer major mode in mode-line."
@@ -217,8 +215,8 @@ read-only, and `buffer-file-coding-system'"
               (let ((segments (plist-get (cdr config) :segments))
                     (show-misc-p (plist-get (cdr config) :misc))
                     (show-root-p (plist-get (cdr config) :root)))
-                (--filter
-                 it
+                (delete
+                 nil
                  `(list ,@(mapcar #'list segments)
                         ,(when show-misc-p ''mode-line-misc-info)
                         ,@(when show-root-p

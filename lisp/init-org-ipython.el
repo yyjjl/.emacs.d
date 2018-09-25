@@ -101,6 +101,9 @@ LaTeX: %s
   ;; Don't prompt me to confirm everytime I want to evaluate a block
   (setq org-confirm-babel-evaluate nil)
 
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               '((ipython . t)))
+
   (define-hook! org|babel-after-execute
     ((org-babel-after-execute-hook :append))
     (core/delete-http-buffers :force)

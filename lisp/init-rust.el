@@ -98,8 +98,8 @@
     (term//pop-to-buffer buffer)))
 
 (with-eval-after-load 'rust-mode
-  (require 'lsp-rust)
-  (require 'cc-mode)
+  (require 'lsp-rust nil t)
+  (require 'cc-mode nil t)
   (setq rust-cargo-bin "~/.cargo/bin/cargo")
   (define-key! :map rust-mode-map
     ("C-c C-f")
