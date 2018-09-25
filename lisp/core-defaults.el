@@ -303,7 +303,8 @@
                (cons core--external-file-regexp #'core//external-file-handler))
 
   ;; Load private configuration
-  (load (file-name-sans-extension custom-file))
+  (when (file-exists-p custom-file)
+    (load (file-name-sans-extension custom-file)))
 
   (run-with-timer 1 nil #'run-hooks 'after-init-idle-hook)
   (run-with-idle-timer core-autosave-interval t #'run-hooks 'core-autosave-hook)

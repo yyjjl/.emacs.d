@@ -15,7 +15,12 @@
 ;; Disable some features when load emacs
 (setq core--buffer-useful-p nil)
 (condition-case err
-    (progn
+    (let ((dired-plus-path (expand-file-name "private/dired-plus" user-emacs-directory))
+          (dired-plus-url "https://github.com/emacsmirror/dired-plus"))
+      (unless (or (file-directory-p dired-plus-path)
+                  (zerop (call-process "git" nil t nil
+                                       "clone" dired-plus-url dired-plus-path)))
+        (error "Cannot install dired-plus"))
       (load (expand-file-name "init.el" user-emacs-directory)
             nil :no-message t)
       (setq-default prog-mode-hook nil)
@@ -24,8 +29,8 @@
 
       (message "Remove *.elc in %s ..."
                (abbreviate-file-name emacs-config-directory))
-      (dolist (elc-file (directory-files-recursively emacs-config-directory
-                                                     "\\.elc$"))
+      (dolist (elc-file (directory-files-recursively emacs-config-directory "\\.elc$")
+                        (directory-files user-emacs-directory t "\\.elc$"))
         (delete-file elc-file))
       ;; Compile all configurations
       (package/generate-autoloads)

@@ -154,8 +154,7 @@ Archive with high priority will be used when install a package.")
                  (directory-files emacs-config-directory :full "\\.el$")
                  (directory-files emacs-autoloads-directory :full "\\.el$")
                  (directory-files-recursively emacs-private-directory "\\.el$")
-                 (list user-init-file
-                       custom-file)))
+                 (directory-files user-emacs-directory :full "\\.el$")))
     (when file
       (condition-case err
           (let ((inhibit-message -no-message?))
