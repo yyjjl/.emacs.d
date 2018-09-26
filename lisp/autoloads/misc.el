@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(require 'cl-lib)
+
 ;;;###autoload
 (defun core/display-latex-fragment-at-point ()
   (interactive)
@@ -216,7 +218,7 @@ directory and extension."
   (let ((path (or (buffer-file-name) default-directory)))
     (message "(-, +, 0) Level %d => %s"
              -level
-             (kill-new (case -level
+             (kill-new (cl-case -level
                          (1 (buffer-name))
                          (2 path)
                          (3 (abbreviate-file-name path))
@@ -300,7 +302,7 @@ directory and extension."
 ;;;###autoload
 (defun core/change-or-new-desktop (-name)
   (interactive (list (completing-read "Change to: "
-                                      (list* "default" (core//desktop-files)))))
+                                      (cl-list* "default" (core//desktop-files)))))
   (let ((new-dir (expand-file-name (if (equal -name "default")
                                        ""
                                      -name)
@@ -398,3 +400,18 @@ directory and extension."
                         (buffer-file-name)))
            (default-directory directory))
       (executable-interpret (read-shell-command "Run: " command)))))
+
+;;;###autoload
+(defun core/rsync-project (-local-path -remote-path)
+  (interactive (list (or (and (not current-prefix-arg)
+                              core-project-rsync-local-path)
+                         (read-string "Local path: "))
+                     (or (and (not current-prefix-arg)
+                              core-project-rsync-remote-path)
+                         (read-string "Remote path: "))))
+  (if (not (file-directory-p -local-path))
+      (message "'%s' doesn't exist." -local-path)
+    (let* ((default-directory -local-path))
+      (compilation-start (format core-project-rsync-command
+                                 (string-join core-project-rsync-extra-options " ")
+                                 -remote-path)))))

@@ -1,5 +1,28 @@
 ;; -*- lexical-binding: t -*-
 
+
+(defcustom core-project-rsync-remote-path nil
+  "."
+  :group 'projectile
+  :type 'directory
+  :safe #'stringp)
+
+(defcustom core-project-rsync-local-path nil
+  "."
+  :group 'projectile
+  :type 'directory
+  :safe #'stringp)
+
+(defcustom core-project-rsync-extra-options nil
+  "."
+  :group 'projectile
+  :type 'directory
+  :safe (lambda (x) (and (listp x) (-all? #'stringp x))))
+
+(defvar core-project-rsync-command
+  "rsync -a --progress --delete --filter=':- .gitignore' %s . %s")
+
+
 (defvar core-current-desktop-name nil)
 (defvar core-view-code-modes
   '((lispy-mode rainbow-delimiters-count-mode)
@@ -345,6 +368,7 @@
   ("RET" . newline-and-indent)
 
   ([C-f6] . core/display-latex-fragment-at-point)
+  ([C-f7] . core/rsync-project)
 
   ([f10] . compile)
   ([f9] . core/run-current-file)
