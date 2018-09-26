@@ -12,11 +12,12 @@
 (defun i3//index-document-files ()
   (let ((case-fold-search t))
     (dolist (directory i3-document-directories)
-      (dolist (file (directory-files-recursively directory
-                                                 i3-document-regexp))
-        (let ((m (recentf-string-member file recentf-list)))
-          (unless m
-            (push file recentf-list))))))
+      (when (file-directory-p directory)
+        (dolist (file (directory-files-recursively directory
+                                                   i3-document-regexp))
+          (let ((m (recentf-string-member file recentf-list)))
+            (unless m
+              (push file recentf-list)))))))
   (recentf-save-list)
   (message "Indexing done"))
 
