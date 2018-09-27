@@ -88,6 +88,11 @@
     (when (fboundp #'extra/insert-space-around-chinese)
       (ignore-errors (extra/insert-space-around-chinese begin end)))))
 
+(defvar org--remove-texfile t)
+(defun org*after-latex-compile (-texfile &optional _)
+  (when org--remove-texfile
+    (delete-file -texfile)))
+
 (defun org-block-speed-command-activate (keys)
   "Hook for activating single-letter block commands."
   (when (and (bolp)
@@ -363,6 +368,9 @@
   (ignore-errors
     (require 'ox-bibtex))
 
+  (advice-add 'org-publish-file :around
+              #'(lambda (-fn &rest -args) (without-user-record! (apply -fn -args))))
+  (advice-add 'org-latex-compile :after #'org*after-latex-compile)
   (advice-add 'org-latex-link :around #'org*around-latex-link)
   (advice-add 'org-latex--inline-image :around #'org*around-latex-inline-image)
 

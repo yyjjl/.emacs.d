@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t; -*-
+
 (add-hook 'sh-mode-hook
           (lambda ()
             (unless (buffer-temporary-p)

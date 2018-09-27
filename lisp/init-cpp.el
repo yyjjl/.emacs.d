@@ -15,6 +15,7 @@
  clang-format
  google-c-style)
 
+(require 'init-cpp-cmake)
 (require 'init-cpp-ccls)
 
 (defcustom cpp-setup-literally nil

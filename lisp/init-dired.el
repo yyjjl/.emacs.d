@@ -1,5 +1,7 @@
+;;; -*- lexical-binding: t; -*-
+
 ;; Improve `dired-mode'
-(require-packages! 
+(require-packages!
  ;; dired+
  dired-narrow)
 

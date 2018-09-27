@@ -31,8 +31,7 @@
 (require 'init-notes)
 (require 'init-org-ipython)
 
-(when (or env-has-aspell-p
-          env-has-hunspell-p)
+(when (or env-has-aspell-p env-has-hunspell-p)
   (require 'init-spelling))
 (when env-has-latex-p
   (require 'init-latex))
@@ -44,14 +43,11 @@
 ;; Programming modes
 (require 'init-lsp-mode)
 (require 'init-cpp)
-(require 'init-cpp-cmake)
 (require 'init-haskell)
 (require 'init-python)
 (require 'init-lisp)
-(require 'init-web-mode)
 (require 'init-sh)
-(require 'init-javascript)
-(require 'init-css)
+(require 'init-web)
 (require 'init-rust)
 (require 'init-perl5)
 

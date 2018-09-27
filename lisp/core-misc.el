@@ -194,6 +194,11 @@
                        (dolist (var core-projectile-invalidate-cache-empty-vars)
                          (set var nil))))
 
+  (advice-add 'projectile-run-compilation
+              :override
+              #'(lambda (-cmd)
+                  (if (functionp -cmd) (funcall -cmd) (compile -cmd t))))
+
   ;; Projectile root-searching functions can cause an infinite cl-loop on TRAMP
   ;; connections, so disable them.
   (advice-add #'projectile-locate-dominating-file :around #'ignore-remote!)

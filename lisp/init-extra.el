@@ -15,6 +15,7 @@
  zeal-at-point
  skeletor
  lua-mode
+ restclient
  sly)
 
 

@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t; -*-
+
 ;; (require-packages! ibuffer-vc)
 
 

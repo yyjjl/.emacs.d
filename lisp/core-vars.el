@@ -124,10 +124,6 @@ will close some features to speed up emacs performance")
   "\\.emacs-project\\'"
   "archive-contents\\'")
 
-;; (add-auto-mode! 'js2-mode "\\.jason\\'" "\\.jshintrc\\'")
-;; (add-auto-mode! 'js2-mode "\\.js\\(\\.erb\\)?\\'")
-;; (add-auto-mode! 'js2-jsx-mode "\\.jsx?\\'")
-
 (add-auto-mode! 'sh-mode
   "\\.basj_profile\\'" "\\.bash_history\\'"
   "\\.sh\\'" "\\.bash\\'" "\\.bashrc.local\\'"
