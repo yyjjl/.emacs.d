@@ -139,6 +139,7 @@
   (let ((buffer (and (window-live-p -window)
                      (window-buffer -window))))
     (unless (and buffer
+                 (not (one-window-p))
                  (window-live-p
                   (buffer-local-value 'core-popups-current-window buffer)))
       (funcall -fn -window -alist))))
