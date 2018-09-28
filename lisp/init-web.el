@@ -57,8 +57,9 @@
 
 (define-hook! web|setup-web (web-mode-hook)
   (if (and buffer-file-name
-           (string-match-p "\\.js[x]?\\'" (downcase buffer-file-name)))
+           (string-match-p "\\.[jt]s[x]?\\'" (downcase buffer-file-name)))
       (progn
+        (setq-local web-mode-enable-auto-quoting nil)
         (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
         (flycheck-mode 1)
         (tide-setup)
@@ -95,6 +96,7 @@
     ("C-c r n" . tide-rename-symbol)
     ("C-c r f" . tide-rename-file)
     ("C-c b" . tide-format)
+    ("C-c B" . tide-organize-imports)
     ("C-c C-b" . tide-format)))
 
 (with-eval-after-load 'web-mode
@@ -115,6 +117,7 @@
           (" \\(ng-[a-z]*\\)=\"\\([^\"]+\\)" 1 2 "=")))
 
   (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
+  (setq web-mode-enable-auto-indentation nil)
 
   (remap! "C-c C-a" "C-c a" web-mode-map)
   (remap! "C-c C-d" "C-c d" web-mode-map)
