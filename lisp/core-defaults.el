@@ -128,6 +128,7 @@
 (setq recentf-keep '(core//recentf-keep?))
 (setq recentf-max-saved-items 2048
       recentf-exclude (list "/tmp/" "^/sshx?:" "/sudo:" "\\.elc$"
+                            "/node_modules/"
                             "\\.\\(gz\\|gif\\|svg\\|png\\|jpe?g\\)$" "/TAGS$"
                             (expand-file-name "~/downloads")
                             emacs-var-direcotry))

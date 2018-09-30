@@ -105,49 +105,6 @@ will close some features to speed up emacs performance")
   "\\.ctags\\'"
   "\\.mailcap\\'")
 
-(add-auto-mode! 'groovy-mode
-  "\\.groovy\\'"
-  "\\.gradle\\'")
-
-(add-auto-mode! 'crontab-mode
-  "\\.?cron\\(tab\\)?\\'")
-
-;; cmake
-(add-auto-mode! 'cmake-mode
-  "CMakeLists\\.txt\\'"
-  "\\.cmake\\'")
-;; markdown
-(add-auto-mode! 'markdown-mode
-  "\\.\\(md\\|markdown\\)\\'")
-
-(add-auto-mode! 'emacs-lisp-mode
-  "\\.emacs-project\\'"
-  "archive-contents\\'")
-
-(add-auto-mode! 'sh-mode
-  "\\.basj_profile\\'" "\\.bash_history\\'"
-  "\\.sh\\'" "\\.bash\\'" "\\.bashrc.local\\'"
-  "\\.zsh\\'" "\\.bashrc\\'" "\\.zshrc\\'")
-
-(add-auto-mode! 'web-mode
-  "\\.phtml\\'" "\\.cmp\\'" "\\.app\\'"
-  "\\.page\\'" "\\.component\\'"
-  "\\.wp\\'" "\\.tmpl\\'" "\\.php\\'"
-  "\\.module\\'" "\\.inc\\'" "\\.hbs\\'"
-  "\\.tpl\\'" "\\.[gj]sp\\'" "\\.as[cp]x\\'"
-  "\\.erb\\'" "\\.mustache\\'"
-  "\\.djhtml\\'" "\\.ftl\\'"
-  "\\.html?\\'" "\\.xul?\\'" "\\.eex?\\'"
-  "\\.xml?\\'")
-
-(add-auto-mode! 'glsl-mode
-  "\\.glsl\\'" "\\.vert\\'"
-  "\\.frag\\'" "\\.geom\\'")
-
-(add-auto-mode! 'latex-mode "\\.tikz\\'")
-
-(setcdr (assoc-string "\\.[tT]e[xX]\\'" auto-mode-alist) 'latex-mode)
-
 (add-to-list 'interpreter-mode-alist '("node" . js-mode))
 (add-to-list 'interpreter-mode-alist '("python" . python-mode))
 

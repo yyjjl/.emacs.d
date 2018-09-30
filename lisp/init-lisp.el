@@ -13,6 +13,10 @@
   "Face for arguments"
   :group 'lisp)
 
+(add-auto-mode! 'emacs-lisp-mode
+  "\\.emacs-project\\'"
+  "archive-contents\\'")
+
 
 
 (defun edebug/remove-all-instrumentation ()

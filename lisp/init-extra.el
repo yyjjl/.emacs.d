@@ -18,6 +18,9 @@
  restclient
  sly)
 
+(add-auto-mode! 'crontab-mode "\\.?cron\\(tab\\)?\\'")
+(add-auto-mode! 'markdown-mode "\\.\\(md\\|markdown\\)\\'")
+
 
 
 ;; Star dictionary lookup

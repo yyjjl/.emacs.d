@@ -8,6 +8,21 @@
  rainbow-mode
  css-eldoc)
 
+(add-auto-mode! 'web-mode
+  "\\.phtml\\'" "\\.cmp\\'" "\\.app\\'"
+  "\\.page\\'" "\\.component\\'"
+  "\\.wp\\'" "\\.tmpl\\'" "\\.php\\'"
+  "\\.module\\'" "\\.inc\\'" "\\.hbs\\'"
+  "\\.tpl\\'" "\\.[gj]sp\\'" "\\.as[cp]x\\'"
+  "\\.erb\\'" "\\.mustache\\'"
+  "\\.djhtml\\'" "\\.ftl\\'"
+  "\\.html?\\'" "\\.xul?\\'" "\\.eex?\\'"
+  "\\.xml?\\'")
+
+(setq auto-mode-alist
+      (cl-subst 'web-mode 'js-jsx-mode
+                (cl-subst 'web-mode 'javascript-mode auto-mode-alist)))
+
 
 
 (defun css//font-file-to-base64 (-file)

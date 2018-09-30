@@ -4,6 +4,9 @@
  company-reftex
  company-auctex)
 
+(setcdr (assoc-string "\\.[tT]e[xX]\\'" auto-mode-alist) 'latex-mode)
+(add-auto-mode! 'latex-mode "\\.tikz\\'")
+
 
 
 ;; C-c RET => Insert macro

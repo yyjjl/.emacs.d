@@ -62,9 +62,9 @@
               goto-function 'semantic-go-to-tag)
       (setq goto-function 'imenu
             buffer (let ((pos (cdr-safe place)))
-                     (if (overlayp pos)
-                         (overlay-buffer pos)
-                       (marker-buffer pos)))))
+                     (cond ((overlayp pos) (overlay-buffer pos))
+                           ((markerp pos) (marker-buffer pos))
+                           (t (current-buffer))))))
     (when buffer
       (switch-to-buffer buffer))
     (funcall goto-function place)))

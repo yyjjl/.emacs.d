@@ -51,12 +51,14 @@
 
 (defsubst mode-line//git-info ()
   (when buffer-file-name
-    (or mode-line--cached-git-branch
-        (when (require 'magit nil :noerror)
-          (when-let (branch (magit-get-current-branch))
-            (setq mode-line--cached-git-branch
-                  (propertize (concat " Git:" branch)
-                              'face 'font-lock-doc-face)))))))
+    (and (not (eq mode-line--cached-git-branch 'none))
+         (or mode-line--cached-git-branch
+             (when (require 'magit nil :noerror)
+               (setq mode-line--cached-git-branch
+                     (if-let (branch (magit-get-current-branch))
+                         (propertize (concat " Git:" branch)
+                                     'face 'font-lock-doc-face)
+                       'none)))))))
 
 (defsubst mode-line//relative-directory ()
   (or (and mode-line--cached-directory

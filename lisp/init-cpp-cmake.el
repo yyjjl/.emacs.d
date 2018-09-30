@@ -32,6 +32,9 @@
 
 (defvar-local cpp-cmake-project-root nil)
 
+(add-auto-mode! 'cmake-mode
+  "CMakeLists\\.txt\\'" "\\.cmake\\'")
+
 
 
 (defsubst cpp-cmake//current-config ()
