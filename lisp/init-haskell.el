@@ -1,46 +1,62 @@
-;; Haskell
+;;; -*- lexical-binding: t; -*-
+
 (setvar!
  haskell-has-stylish-haskell-p (executable-find "stylish-haskell")
  haskell-has-stack-p (executable-find "stack")
  haskell-has-hindent-p (executable-find "hindent")
  haskell-has-cabal-p (executable-find "cabal")
- haskell-has-idris-p (executable-find "idris"))
+ haskell-has-shm-p (executable-find "structured-haskell-mode"))
 
 (require-packages!
  haskell-mode
  (intero :when haskell-has-stack-p)
  (hindent :when haskell-has-hindent-p)
  (company-cabal :when haskell-has-cabal-p)
- (idris-mode :when haskell-has-idris-p))
+ (shm :when haskell-has-shm-p))
 
 
 
-(defun idris/setup-view-keys (-map)
-  (define-key! :map -map
-    ("<tab>" . forward-button)
-    ("<backtab>" . backward-button)
-    ("SPC" . scroll-up)
-    ("e" . scroll-up-line)
-    ("y" . scroll-down-line)
-    ("u" . scroll-down)
-    ("n" . next-line)
-    ("p" . previous-line)))
+(defun haskell*override-hindent ()
+  "Work with `align'"
+  (let (beg end)
+    (if (region-active-p)
+        (setq beg (region-beginning)
+              end (region-end))
+      (let ((start-end (hindent-decl-points)))
+        (when start-end
+          (setq beg (car start-end)
+                end (cdr start-end))
+          (hindent-reformat-region beg end t))))
+    (align beg end)))
+
+(define-hook! haskell|cabal-setup (haskell-cabal-mode-hook)
+  (rainbow-delimiters-mode 1)
+  (add-to-list 'company-backends 'company-cabal))
+
+(define-hook! haskell|setup (haskell-mode-hook)
+  (rainbow-delimiters-mode 1)
+  (haskell-decl-scan-mode 1)
+  (electric-indent-local-mode 1)
+
+  (unless (buffer-temporary-p)
+    (if (and haskell-has-stack-p
+             (locate-dominating-file default-directory "stack.yaml"))
+        (intero-mode 1)
+      (haskell-doc-mode 1)
+      (flycheck-mode -1)))
+
+  (if haskell-has-shm-p
+      (progn
+        (structured-haskell-mode 1)
+        (hl-line-mode -1))
+    (haskell-indentation-mode 1))
+
+  (when haskell-has-hindent-p
+    (hindent-mode 1)))
+
 
 (with-eval-after-load 'hindent
-  ;; Rewrite function
-  (defun hindent-reformat-decl ()
-    "Work with `align'"
-    (interactive)
-    (let (beg end)
-      (if (region-active-p)
-          (setq beg (region-beginning)
-                end (region-end))
-        (let ((start-end (hindent-decl-points)))
-          (when start-end
-            (setq beg (car start-end)
-                  end (cdr start-end))
-            (hindent-reformat-region beg end t))))
-      (align beg end))))
+  (advice-add 'hindent-reformat-decl :override #'haskell*override-hindent))
 
 (with-eval-after-load 'haskell-mode
   (require 'haskell-indent)
@@ -62,46 +78,23 @@
 
   (define-key! :map haskell-mode-map
     ([f5] . haskell-debug)
-    ([f10] . haskell-compile)
+    ([f9] . haskell-compile)
     ("C-c F" . haskell-mode-stylish-buffer)
-    ("C-c s" . haskell-sort-imports)
+    ("C-c R" . haskell-mode-generate-tags)
+    ("C-c j i" . haskell-navigate-imports)
     ("M-." . haskell-mode-tag-find)
+
     ("C-c C-." . haskell-indent-put-region-in-literate)
-    ("C-c ." . haskell-indent-align-guards-and-rhs)
-    ("C-c C-o" . haskell-indent-insert-otherwise)
-    ("C-c C-|")
-    ("C-c C-t" . haskell-process-do-type)
     ("C-c C-\\" . haskell-indent-insert-guard)
-    ("C-c \\" . haskell-indent-insert-guard)
-    ("C-c L" . haskell-process-load-file)
     ("C-c C-z" . haskell-interactive-switch)
-    ("C-c k" . haskell-interactive-mode-clear)
-    ("C-c a b" . haskell-process-cabal-build)
-    ("C-c a a" . haskell-process-cabal)
-    ("C-c R" . haskell-mode-generate-tags))
 
-  (define-key! :map haskell-mode-map
+    ("C-c L" . haskell-process-load-file)
+    ("C-c C-t" . haskell-process-do-type)
+    ("C-c p b" . haskell-process-cabal-build)
+    ("C-c p a" . haskell-process-cabal)
+
     ("M-n" . next-error)
-    ("M-p" . previous-error))
-
-  (define-hook! haskell|cabal-setup (haskell-cabal-mode-hook)
-    (rainbow-delimiters-mode 1)
-    (add-to-list 'company-backends 'company-cabal))
-
-  (define-hook! haskell|setup (haskell-mode-hook)
-    (rainbow-delimiters-mode 1)
-    (haskell-decl-scan-mode 1)
-
-    (unless (buffer-temporary-p)
-      (if (and haskell-has-stack-p
-               (locate-dominating-file default-directory "stack.yaml"))
-          (intero-mode 1)
-        (haskell-doc-mode 1)
-        (flycheck-mode -1)))
-
-    (when haskell-has-hindent-p
-      (hindent-mode 1))
-    (haskell-indentation-mode 1)))
+    ("M-p" . previous-error)))
 
 (with-eval-after-load 'haskell-debug
   (define-key! :map haskell-mode-map :prefix "C-c d"
@@ -121,7 +114,7 @@
 (with-eval-after-load 'haskell-cabal
   (define-key! :map haskell-cabal-mode-map
     ("C-c a c" . haskell-compile)
-    ("C-c a a" . haskell-process-cabal )
+    ("C-c a a" . haskell-process-cabal)
     ("C-c C-c" . haskell-process-cabal-build)
     ("C-c C-z" . haskell-interactive-switch)
     ("C-c C-k" . haskell-interactive-mode-clear)))
@@ -130,39 +123,8 @@
   ;; Do not use too much symbols
   (setq haskell-font-lock-symbols-alist nil))
 
-(with-eval-after-load 'idris-mode
-  (add-hook 'idris-repl-mode-hook
-            #'core|generic-comint-mode-setup)
-
-  (add-hook 'idris-mode-hook
-            (lambda ()
-              (setq-local company-idle-delay nil)))
-
-  (define-key! :map idris-mode-map
-    ("C-c L" . idris-list-holes)
-    ("C-c ." . idris-print-definition-of-name)
-    ("C-c C-." . idris-print-definition-of-name)
-    ("C-c C-/" . idris-browse-namespace)
-    ("M-q" . (lambda! () (save-mark-and-excursion
-                          (mark-paragraph)
-                          (call-interactively #'align)))))
-  (add-to-list 'core-popups-help-modes 'idris-info-mode :append)
-  (add-to-list 'core-popups-help-modes 'idris-compiler-notes-mode :append))
-
 (with-eval-after-load 'intero
   (define-key intero-mode-map (kbd "C-c C-d") 'intero-info))
-
-(with-eval-after-load 'idris-hole-list
-  (idris/setup-view-keys idris-hole-list-mode-map))
-
-(with-eval-after-load 'idris-info
-  (idris/setup-view-keys idris-info-mode-map)
-
-  (define-hook! idris|info-mode-setup (idris-info-mode-hook)
-    (setq-local eldoc-documentation-function 'idris-eldoc-lookup)))
-
-(with-eval-after-load 'idris-tree-info
-  (idris/setup-view-keys idris-tree-info-mode-map))
 
 (with-eval-after-load 'align
   (setq align-region-separate 'group)

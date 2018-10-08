@@ -33,10 +33,15 @@
 ;;;###autoload
 (defun python/toggle-pdbtrack ()
   (interactive)
-  (setq python-pdbtrack-activate (not python-pdbtrack-activate))
-  (if python-pdbtrack-activate
-      (message "pdbtrack enabled")
-    (message "pdbtrack disabled")))
+  (if (memq 'python-pdbtrack-comint-output-filter-function
+            comint-output-filter-functions)
+      (progn
+        (remove-hook 'comint-output-filter-functions
+                     #'python-pdbtrack-comint-output-filter-function)
+        (message "pdbtrack disabled"))
+    (add-hook 'comint-output-filter-functions
+              #'python-pdbtrack-comint-output-filter-function)
+    (message "pdbtrack enabled")))
 
 ;;;###autoload
 (defun python/create-venv-in-workon-home (-name -python-exe &optional -args)

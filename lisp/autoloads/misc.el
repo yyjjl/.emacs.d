@@ -421,3 +421,15 @@ directory and extension."
       (compilation-start (format core-project-rsync-command
                                  (string-join core-project-rsync-extra-options " ")
                                  -remote-path)))))
+
+;;;###autoload
+(defun core/toggle-winum-scope ()
+  (interactive)
+  (setq winum-scope (if (eq winum-scope 'frame-local)
+                        'visible
+                      'frame-local))
+  (message "Current winum scope: %s" (upcase (symbol-name winum-scope)))
+  (dolist (frame (frame-list))
+    (select-frame frame)
+    (winum--update))
+  (force-mode-line-update))

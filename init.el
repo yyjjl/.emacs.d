@@ -50,6 +50,7 @@
 (require 'init-web)
 (require 'init-rust)
 (require 'init-perl5)
+(require 'init-idris)
 
 ;; Some keybindings using when editing
 (require 'init-editing)
