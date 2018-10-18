@@ -98,7 +98,7 @@
         ("M-7" . winum-select-window-7)))
 (with-eval-after-load 'winum
   (setq winum-auto-setup-mode-line nil)
-  (setq winnum-scope 'visible
+  (setq winum-scope 'frame-local
         winum-reverse-frame-list nil
         winum-auto-assign-0-to-minibuffer t))
 

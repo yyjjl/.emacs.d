@@ -50,6 +50,8 @@
   (ivy-set-display-transformer 'counsel-bookmark
                                #'core//counsel-bookmark-transformer)
 
+  (advice-add 'ivy--preselect-index :around #'ignore-errors!)
+
   (require 'ivy-hydra)
 
   ;; (add-to-list 'ivy-display-functions-alist
@@ -113,6 +115,8 @@
     ("O" . counsel-outline)
     ("o" . counsel-org-goto-all)
     ("t" . counsel-tmm))
+
+  (setq counsel-linux-app-format-function #'counsel-linux-app-format-function-name-first)
 
   (setq counsel-yank-pop-separator
         "\n------------------------------------------------------------\n")
