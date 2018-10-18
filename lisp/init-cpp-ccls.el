@@ -148,7 +148,7 @@
 (with-eval-after-load 'ccls
   ;; Need to register snippet capability
   (require 'company-lsp)
-  (require 'ccls-semantic-highlighting)
+  (require 'ccls-semantic-highlight)
 
   (aset ccls-sem-macro-faces 0 'font-lock-builtin-face)
   (aset ccls-sem-variable-faces 0 'cpp-variable-face)
