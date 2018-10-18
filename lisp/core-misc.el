@@ -208,6 +208,7 @@
   (setq projectile-require-project-root 'prompt)
   (setq projectile-globally-ignored-file-suffixes
         '(".pyc" ".elc" ".jpg" ".png" ".svg" ".jpeg" ".pyg" ".pygtex" ".pygstyle"))
+
   (setq projectile-completion-system 'ivy)
   (setq projectile-ignored-projects '("~/" "/tmp"))
   (setq projectile-enable-caching (not noninteractive))

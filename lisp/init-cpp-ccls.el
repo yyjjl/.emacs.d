@@ -142,7 +142,10 @@
     ("R" . ccls-reload)))
 
 (with-eval-after-load 'projectile
-  (add-to-list 'projectile-globally-ignored-directories ".ccls-cache"))
+  (add-to-list 'projectile-globally-ignored-directories ".ccls-cache")
+  (setq projectile-project-root-files-top-down-recurring
+        (append '("compile_commands.json" ".ccls" ".ccls-root")
+                projectile-project-root-files-top-down-recurring)))
 
 
 (with-eval-after-load 'ccls
@@ -154,10 +157,7 @@
   (aset ccls-sem-variable-faces 0 'cpp-variable-face)
 
   (setq ccls-executable cpp-ccls-path)
-  (setq ccls-extra-init-params '(
-                                 :index (:trackDependency 2)
-                                 :diagnostics (:onChange 1000)
-                                 :completion (:detailedLabel t)))
+  (setq ccls-extra-init-params '(:completion (:detailedLabel t)))
 
   (setq ccls-sem-highlight-method 'font-lock))
 
