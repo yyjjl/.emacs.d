@@ -35,6 +35,25 @@ CALLBACK is the status callback passed by Flycheck."
             errors))
     (funcall callback 'finished errors)))
 
+(defun lsp*xref-make-match-item (-filename -location)
+  (let* ((range (gethash "range" -location))
+         (pos-start (gethash "start" range))
+         (pos-end (gethash "end" range))
+         (line (lsp--extract-line-from-buffer pos-start))
+         (start (gethash "character" pos-start))
+         (end (gethash "character" pos-end))
+         (len (length line)))
+    (add-face-text-property (max (min start len) 0)
+                            (max (min end len) 0)
+                            'highlight t line)
+    ;; LINE is nil when FILENAME is not being current visited by any buffer.
+    (xref-make-match (or line -filename)
+                     (xref-make-file-location -filename
+                                              (1+ (gethash "line" pos-start))
+                                              (gethash "character" pos-start))
+                     (let ((length (- end start)))
+                       (and (> length 0) (< length len) length)))))
+
 (flycheck-define-generic-checker 'lsp
   "A syntax checker using the Language Server Protocol (RLS)
 provided by lsp-mode.
