@@ -52,6 +52,25 @@ See https://github.com/emacs-lsp/lsp-mode."
   (add-hook 'lsp-after-diagnostics-hook
             (lambda () (when flycheck-mode (flycheck-buffer)))))
 
+(defun lsp*xref-make-match-item (-filename -location)
+  (let* ((range (gethash "range" -location))
+         (pos-start (gethash "start" range))
+         (pos-end (gethash "end" range))
+         (line (lsp--extract-line-from-buffer pos-start))
+         (start (gethash "character" pos-start))
+         (end (gethash "character" pos-end))
+         (len (length line)))
+    (add-face-text-property (max (min start len) 0)
+                            (max (min end len) 0)
+                            'highlight t line)
+    ;; LINE is nil when FILENAME is not being current visited by any buffer.
+    (xref-make-match (or line -filename)
+                     (xref-make-file-location -filename
+                                              (1+ (gethash "line" pos-start))
+                                              (gethash "character" pos-start))
+                     (let ((length (- end start)))
+                       (and (> length 0) (< length len) length)))))
+
 (with-eval-after-load 'lsp-mode
   (require 'lsp-imenu)
   (setq lsp-eldoc-render-all t)

@@ -27,7 +27,8 @@
           "prolog"
           "Sage"
           (and (*\? not-newline) (in "Rr") "epl" (*\? not-newline))
-          (and (*\? not-newline) (in "Ee") "rror" (*\? not-newline)))
+          ;; (and (*\? not-newline) (in "Ee") "rror" (*\? not-newline))
+          )
       "*"
       (?  "<" (+ digit) ">")
       line-end))
@@ -190,6 +191,7 @@
            :align below :select t :autoclose t)
           (,core-popups-other-window-regexp :regexp t :select t :autoclose t)
           (occur-mode :select t)
+          ("*Flycheck error messages*" :align below :select nil :size 0.3)
           ("*Warnings*" :align below :autoclose t)
           (,core-popups-default-regexp :regexp t))))
 

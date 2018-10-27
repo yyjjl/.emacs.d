@@ -97,6 +97,7 @@
               (delq (assoc ?\; electric-layout-rules)
                     electric-layout-rules)))
 
+(autoload 'turn-on-css-eldoc "css-eldoc")
 (define-hook! web|setup-css (css-mode-hook sass-mode-hook)
   (rainbow-mode 1)
   (turn-on-css-eldoc)
