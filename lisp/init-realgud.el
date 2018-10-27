@@ -116,7 +116,7 @@
     ("C-c C-z" . realgud/jump-to-cmdbuf))
 
   (advice-add 'realgud-term-sentinel :after #'realgud*after-term-sentinel)
-  (advice-add 'realgud:run-process :around  #'realgud*around-run-process)
+  (advice-add 'realgud:run-process :around #'realgud*around-run-process)
   (advice-add 'realgud:terminate :before #'realgud*save-breakpoints))
 
 (with-eval-after-load 'comint

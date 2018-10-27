@@ -159,7 +159,7 @@
   (setq ccls-executable cpp-ccls-path)
   (setq ccls-extra-init-params '(:completion (:detailedLabel t)))
 
-  (setq ccls-sem-highlight-method 'font-lock))
+  (setq ccls-sem-highlight-method 'nil))
 
 (with-eval-after-load 'ccls-tree
   (add-hook 'ccls-tree-mode-hook

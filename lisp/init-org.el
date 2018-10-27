@@ -106,7 +106,9 @@
 
 (with-eval-after-load 'ob
   (define-key! :map org-babel-map
-    ("/" . org/split-src-block)))
+    ("/" . org/split-src-block))
+
+  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images))
 
 ;; Do not load extra backends
 (setq org-export-backends '(html latex beamer))
