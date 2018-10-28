@@ -49,6 +49,7 @@
 (require 'init-sh)
 (require 'init-web)
 (require 'init-rust)
+(require 'init-java)
 (require 'init-perl5)
 (require 'init-idris)
 

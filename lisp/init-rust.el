@@ -63,8 +63,7 @@
       (unless (eq rust-config-cfg-test :unset)
         (lsp-rust-set-build-bin rust-config-cfg-test))
       (with-demoted-errors "Lsp-rust: %s"
-        (lsp-rust-enable)
-        (add-to-list 'company-backends 'company-lsp)))))
+        (lsp-rust-enable)))))
 
 (defun rust/cargo-dispatch (-use-last-action)
   (interactive "P")

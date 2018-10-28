@@ -11,8 +11,14 @@
  '(lsp-face-highlight-textual ((t :background "#444155"))))
 
 (define-hook! lsp|after-open (lsp-after-open-hook)
+  (setq lsp-ui-doc-max-width (/ (frame-width) 2))
   (flycheck-mode 1)
-  (lsp-ui-mode 1))
+  (lsp-ui-mode 1)
+
+  (setq-local company-transformers nil)
+  (setq-local company-lsp-cache-candidates nil)
+  (add-to-list 'company-backends 'company-lsp)
+  (add-to-list 'company-backends 'company-files))
 
 (defun lsp*xref-make-match-item (-filename -location)
   (let* ((range (gethash "range" -location))

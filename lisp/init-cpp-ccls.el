@@ -48,13 +48,7 @@
 
 (defun cpp-ccls//setup ()
   (condition-case err
-      (progn
-        (lsp-ccls-enable)
-        (setq-local company-transformers nil)
-        ;; (setq-local company-idle-delay nil)
-        (setq-local company-lsp-cache-candidates nil)
-        (add-to-list 'company-backends 'company-lsp)
-        (add-to-list 'company-backends 'company-files))
+      (lsp-ccls-enable)
     (error (message "%s" err))))
 
 (defun cpp-ccls/create-dot-ccls (-dir)
