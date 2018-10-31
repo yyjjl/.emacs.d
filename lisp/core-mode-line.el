@@ -189,7 +189,6 @@ read-only, and `buffer-file-coding-system'"
 (defsubst mode-line//position ()
   (propertize " %l:%c %p %I" 'face 'font-lock-constant-face))
 
-
 (defsubst mode-line//format-line (-lhs -chs -rhs)
   (let* ((lw (string-width -lhs))
          (cw (string-width -chs))
@@ -253,6 +252,7 @@ read-only, and `buffer-file-coding-system'"
   (setq-default mode-line-misc-info
                 '((company-search-mode (" " company-search-lighter))
                   global-mode-string)))
+
 
 (mode-line//compile)
 

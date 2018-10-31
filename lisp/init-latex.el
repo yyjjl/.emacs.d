@@ -122,7 +122,6 @@
   (setq preview-map
         (define-key! :map (make-sparse-keymap)
           ("p" . preview-at-point)
-          ("M-p" . preview-at-point)
           ("r" . preview-region)
           ("b" . preview-buffer)
           ("d" . preview-document)
@@ -137,7 +136,7 @@
           ("S" . preview-clearout-section)
           ("B" . preview-clearout-buffer)
           ("D" . preview-clearout-document)))
-  (define-key LaTeX-mode-map (kbd "M-p") preview-map))
+  (define-key LaTeX-mode-map (kbd "C-c p") preview-map))
 
 (with-eval-after-load 'reftex
   (setq reftex-cite-format

@@ -73,7 +73,8 @@
 (define-hook! web|setup-web (web-mode-hook)
   (if (and buffer-file-name
            (string-match-p "\\.[jt]s[x]?\\'" (downcase buffer-file-name)))
-      (progn
+      (add-transient-hook!
+          (hack-local-variables-hook :local t :name web|setup-js-internal)
         (setq-local web-mode-enable-auto-quoting nil)
         (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
         (flycheck-mode 1)
@@ -86,12 +87,14 @@
 (define-hook! web|setup-js (js-mode-hook typescript-mode-hook)
   (when (and buffer-file-name
              (not (string-suffix-p ".json" (downcase buffer-file-name))))
-    (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
-    (flycheck-mode 1)
-    (tide-setup)
+    (add-transient-hook!
+        (hack-local-variables-hook :local t :name web|setup-js-internal)
+      (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
+      (flycheck-mode 1)
+      (tide-setup)
 
-    (add-to-list 'company-backends 'company-tide)
-    (tide-hl-identifier-mode 1))
+      (add-to-list 'company-backends 'company-tide)
+      (tide-hl-identifier-mode 1)))
 
   (setq-local electric-layout-rules
               (delq (assoc ?\; electric-layout-rules)

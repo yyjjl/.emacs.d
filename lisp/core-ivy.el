@@ -20,10 +20,6 @@
                                               (cdr (assoc 'position bm)))
                                       'face 'warning)))))
 
-(defun counsel-projectile*before (&optional -arg)
-  (when (eq -arg '(16))
-    (setq projectile-cached-project-root nil)))
-
 (define-hook! ivy|occur-mode-setup (ivy-occur-mode-hook
                                     ivy-occur-grep-mode-hook)
   (local-set-key "/" #'ivy-occur-filter-lines)
@@ -128,16 +124,9 @@
          ;; file names ending with # or ~
          "\\|\\(?:[#~]\\'\\)"))
 
-  (ivy-set-actions
-   'counsel-find-file
-   `(("x"
-      (lambda (x) (delete-file (expand-file-name x ivy--directory)))
-      ,(propertize "delete" 'face 'font-lock-warning-face))))
   (define-key read-expression-map (kbd "C-r") 'counsel-minibuffer-history))
 
 (with-eval-after-load 'counsel-projectile
-  (advice-add 'counsel-projectile :before #'counsel-projectile*before)
-
   (if env-has-ripgrep-p
       (progn
         (setq counsel-grep-base-command
