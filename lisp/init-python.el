@@ -6,6 +6,8 @@
 
 (require-packages!
  elpy
+ cython-mode
+ flycheck-cython
  gud
  py-autopep8
  py-isort)
@@ -44,6 +46,15 @@
              (window (get-buffer-window buffer)))
     (kill-buffer buffer)))
 
+(define-hook! cython|setup (cython-mode-hook)
+  (setq electric-indent-chars (delq ?: electric-indent-chars))
+  (electric-indent-local-mode 1)
+  (electric-operator-mode 1)
+
+  (unless (or (buffer-temporary-p)
+              (not (eq major-mode 'python-mode)))
+    (flycheck-mode 1)))
+
 (define-hook! python|setup (python-mode-hook)
   ;; emacs 24.4 only
   (setq electric-indent-chars (delq ?: electric-indent-chars))
@@ -60,6 +71,10 @@
     ;; or just check https://github.com/jorgenschaefer/elpy
     (semantic-idle-summary-mode -1)
     (elpy-mode 1)))
+
+(define-hook! python|python-inferior-setup (inferior-python-mode-hook)
+  (remove-hook 'comint-output-filter-functions
+               #'python-pdbtrack-comint-output-filter-function))
 
 (with-eval-after-load 'pyvenv
   (setq pyvenv-mode-line-indicator
@@ -105,12 +120,9 @@
     ("C-c b" . python/autopep8)
     ("C-c C-b" . python/autopep8)
     ("C-c B" . py-isort-buffer)
+    ("C-c T" . python/toggle-breakpoint)
     ("M-p" . previous-error)
-    ("M-n" . next-error))
-
-  (define-hook! python|python-inferior-setup (inferior-python-mode-hook)
-    (remove-hook 'comint-output-filter-functions
-                 #'python-pdbtrack-comint-output-filter-function)))
+    ("M-n" . next-error)))
 
 (with-eval-after-load 'py-isort
   (setq py-isort-options '("--lines=80" "--multi-line=1")))
@@ -131,6 +143,7 @@
     ("C-c C-n")
     ("C-c C-p")
     ("C-c C-b")
+    ("C-c C-c" . python/send-buffer)
     ("C-c I" . elpy-nav-expand-to-indentation)
     ("C-c M-d" . python/generate-doc-at-point)
     ("M-i" . elpy-multiedit-python-symbol-at-point))

@@ -144,7 +144,45 @@
   (python//elpy-multiedit-jump-overlay (current-buffer) (point) t))
 
 ;;;###autoload
-(defun python/pop-to-shell (&optional -arg)
-  (interactive "P")
-  (let ((elpy-shell-use-project-root (not -arg)))
+(defun python/pop-to-shell (&optional -directory)
+  (interactive
+   (let ((arg (prefix-numeric-value current-prefix-arg)))
+     (list
+      (cond ((= arg 0) default-directory)
+            ((= arg 16) (read-directory-name "Directory: "))
+            (t (projectile-ensure-project (projectile-project-root)))))))
+  (let ((elpy-project-root -directory))
     (elpy-shell-switch-to-shell)))
+
+(defun python/send-buffer (&optional -send-main)
+  (interactive (list (= (prefix-numeric-value current-prefix-arg) 4)))
+  (call-interactively #'python/pop-to-shell)
+  (elpy-shell-send-region-or-buffer -send-main))
+
+(defun python/profile-buffer (&optional -directory)
+  (interactive
+   (let ((arg (prefix-numeric-value current-prefix-arg)))
+     (list
+      (cond ((= arg 0) default-directory)
+            ((>= arg 4) (read-directory-name "Directory: "))
+            (t (projectile-ensure-project (projectile-project-root)))))))
+  (let ((default-directory -directory)
+        (python-shell-interpreter "python3"))
+    (elpy-profile--file (buffer-file-name) t)))
+
+;;;###autoload
+(defun python/toggle-breakpoint ()
+  "Add a break point, highlight it."
+  (interactive)
+  (let ((trace (cond ((executable-find "ipdb") "import ipdb; ipdb.set_trace()")
+                     ((executable-find "ipdb3") "import ipdb; ipdb.set_trace()")
+                     ((executable-find "python3.7") "breakpoint()")
+                     ((executable-find "python3.8") "breakpoint()")
+                     (t "import pdb; pdb.set_trace()")))
+        (line (thing-at-point 'line)))
+    (if (and line (string-match trace line))
+        (kill-whole-line)
+      (back-to-indentation)
+      (insert trace)
+      (insert "\n")
+      (python-indent-line))))
