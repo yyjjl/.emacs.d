@@ -122,7 +122,7 @@
         (error "Can not parse cmake output")
       (let (available-options)
         (while (re-search-forward
-                "^\\([^:\n]+\\):\\([^=\n]+\\)=\\(.+\\)-" (point-max) t)
+                "^\\([^:\n]+\\):\\([^=\n]+\\)=\\(.+\\)$" (point-max) t)
           (push (list (match-string-no-properties 1)
                       (match-string-no-properties 2)
                       (match-string-no-properties 3))
