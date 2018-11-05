@@ -184,6 +184,7 @@
   '(mode-line--cached-relative-directory
     mode-line--cached-directory
     mode-line--cached-root
+    mode-line--cached-git-branch
     elpy-project-root))
 
 (with-eval-after-load 'projectile
@@ -229,7 +230,7 @@
   (add-to-list 'auto-mode-alist '("\\.yasnippet\\'" . snippet-mode))
   (setq yas-prompt-functions '(yas-completing-prompt))
   (setq-default yas-indent-line 'fixed)
-  (setq yas-triggers-in-field t))
+  (setq yas-triggers-in-field nil))
 
 (with-eval-after-load 'isearch
   (define-key isearch-mode-map (kbd "C-o") 'isearch-occur))

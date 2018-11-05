@@ -43,7 +43,7 @@
   (require 'lsp-imenu)
   (setq lsp-eldoc-render-all nil)
   (setq lsp-enable-completion-at-point nil)
-  (setq lsp-highlight-symbol-at-point t)
+  (setq lsp-highlight-symbol-at-point nil)
   (setq lsp-hover-text-function 'lsp--text-document-hover-string)
 
   (define-key!
