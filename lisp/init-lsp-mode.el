@@ -41,7 +41,7 @@
 
 (with-eval-after-load 'lsp-mode
   (require 'lsp-imenu)
-  (setq lsp-eldoc-render-all nil)
+  (setq lsp-eldoc-render-all t)
   (setq lsp-enable-completion-at-point nil)
   (setq lsp-highlight-symbol-at-point nil)
   (setq lsp-hover-text-function 'lsp--text-document-hover-string)
@@ -57,8 +57,8 @@
 
 (with-eval-after-load 'lsp-ui
   (setq lsp-ui-peek-enable nil)
-  (setq lsp-ui-doc-enable t)
-  (setq lsp-ui-sideline-delay 0.5)
+  (setq lsp-ui-doc-enable nil)
+  (setq lsp-ui-sideline-enable nil)
   (setq lsp-ui-sideline-show-hover nil))
 
 (with-eval-after-load 'company-lsp
