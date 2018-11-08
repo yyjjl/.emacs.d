@@ -84,6 +84,7 @@
 (defun cpp//setup ()
   (if (or (not cpp-has-cmake-p)
           (not cpp-has-ccls-p)
+          (buffer-base-buffer)
           (file-remote-p default-directory)
           (bound-and-true-p cpp-setup-literally)
           (> (buffer-size) core-large-buffer-size))

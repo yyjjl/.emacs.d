@@ -66,6 +66,7 @@
     (setq-local python-shell-interpreter-args "-i"))
 
   (unless (or (buffer-temporary-p)
+              (buffer-base-buffer)
               (not (eq major-mode 'python-mode)))
     ;; run command `pip install jedi flake8 importmagic` in shell,
     ;; or just check https://github.com/jorgenschaefer/elpy

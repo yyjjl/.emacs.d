@@ -38,7 +38,8 @@
   (haskell-decl-scan-mode 1)
   (electric-indent-local-mode 1)
 
-  (unless (buffer-temporary-p)
+  (unless (or (buffer-temporary-p)
+              (buffer-base-buffer))
     (if (and haskell-has-stack-p
              (locate-dominating-file default-directory "stack.yaml"))
         (intero-mode 1)
