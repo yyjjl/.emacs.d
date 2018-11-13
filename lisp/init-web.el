@@ -87,10 +87,8 @@
           (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
           (flycheck-mode 1)
           (tide-setup)
-          (tide-hl-identifier-mode 1)
-
-          (add-to-list 'company-backends '(company-tide :with company-web-html))))
-    (add-to-list 'company-backends 'company-web-html)))
+          (tide-hl-identifier-mode 1))))
+  (add-to-list 'company-backends 'company-web-html))
 
 (define-hook! web|setup-js (js-mode-hook typescript-mode-hook)
   (when (and buffer-file-name
@@ -102,7 +100,6 @@
         (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
         (flycheck-mode 1)
         (tide-setup)
-
         (add-to-list 'company-backends 'company-tide)
         (tide-hl-identifier-mode 1))))
 

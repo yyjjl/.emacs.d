@@ -125,9 +125,6 @@
     ("M-p" . previous-error)
     ("M-n" . next-error)))
 
-(with-eval-after-load 'py-isort
-  (setq py-isort-options '("--lines=80" "--multi-line=1")))
-
 (with-eval-after-load 'elpy
   (remap! "C-c C-r" "C-c r" elpy-mode-map)
   (setcar elpy-test-discover-runner-command "python3")
