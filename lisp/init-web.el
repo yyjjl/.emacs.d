@@ -79,7 +79,7 @@
         (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
         (flycheck-mode 1)
         (tide-setup)
-        (tide-hl-identifier-mode 1)
+        (tide-hl-identifier-mode -1)
 
         (add-to-list 'company-backends '(company-tide :with company-web-html)))
     (add-to-list 'company-backends 'company-web-html)))
@@ -94,7 +94,7 @@
       (tide-setup)
 
       (add-to-list 'company-backends 'company-tide)
-      (tide-hl-identifier-mode 1)))
+      (tide-hl-identifier-mode -1)))
 
   (setq-local electric-layout-rules
               (delq (assoc ?\; electric-layout-rules)

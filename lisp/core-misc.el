@@ -329,6 +329,34 @@
       (setq next-error-last-buffer occur-buffer))))
 (advice-add 'next-error :before #'core*before-next-error)
 
+(autoload 'awesome-pair-mode "awesome-pair")
+(defconst core-awesome-pair-enable-modes
+  '(
+    c-mode-common c-mode c++-mode java-mode haskell-mode maxima-mode sh-mode
+    makefile-gmake-mode php-mode python-mode js-mode go-mode
+    qml-mode jade-mode css-mode ruby-mode coffee-mode rust-mode
+    qmake-mode lua-mode swift-mode))
+(define-hook! core|awesome-pair-setup (prog-mode-hook)
+  (when (memq major-mode core-awesome-pair-enable-modes)
+    (awesome-pair-mode 1)))
+
+(defun core-awesome-pair-wrap (-n)
+  (interactive "p")
+  (cond ((= -n 1) (awesome-pair-wrap-round))
+        ((= -n 4) (awesome-pair-wrap-bracket))
+        ((= -n 16) (awesome-pair-wrap-curly))))
+
+(with-eval-after-load 'awesome-pair
+  (define-key! :map awesome-pair-mode-map
+    ("M-k" . awesome-pair-kill)
+    (")" . awesome-pair-close-round)
+    ("]" . awesome-pair-close-bracket)
+    ("}" . awesome-pair-close-curly)
+    ("\"" . awesome-pair-double-quote)
+    ("M-\"" . awesome-pair-wrap-double-quote)
+    ("M-(" . core-awesome-pair-wrap)
+    ("M-)" . awesome-pair-unwrap)))
+
 (define-key! :prefix "C-x"
   ("2" . window/split-vertically)
   ("3" . window/split-horizontally)
@@ -364,7 +392,7 @@
   ("C-c q" . auto-fill-mode)
   ("M--" . er/expand-region)
   ("M-/" . hippie-expand)
-
+  ("M-k" . awesome-pair-kill)
   ("M-n" . next-error)
   ("M-p" . previous-error)
 

@@ -50,7 +50,7 @@
 
  '(js2-external-variable ((t (:inherit font-lock-negation-char-face))))
  '(js2-function-call ((t (:inherit font-lock-regexp-grouping-backslash))))
-
+ '(web-mode-jsx-depth-1-face ((t (:background "#2d2e2e"))))
  '(easy-kill-selection ((t (:inverse-video t :inherit warning))))
  ;; '(nlinum-current-line ((t (:inherit font-lock-builtin-face))))
  '(semantic-highlight-func-current-tag-face ((t (:background "gray5"))))

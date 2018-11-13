@@ -154,11 +154,13 @@
   (let ((elpy-project-root -directory))
     (elpy-shell-switch-to-shell)))
 
+;;;###autoload
 (defun python/send-buffer (&optional -send-main)
   (interactive (list (= (prefix-numeric-value current-prefix-arg) 4)))
-  (call-interactively #'python/pop-to-shell)
-  (elpy-shell-send-region-or-buffer -send-main))
+  (elpy-shell-send-region-or-buffer -send-main)
+  (elpy-shell-switch-to-shell))
 
+;;;###autoload
 (defun python/profile-buffer (&optional -directory)
   (interactive
    (let ((arg (prefix-numeric-value current-prefix-arg)))
