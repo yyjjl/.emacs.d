@@ -43,11 +43,11 @@
   (require 'lsp-imenu)
   (setq lsp-eldoc-render-all t)
   (setq lsp-enable-completion-at-point nil)
-  (setq lsp-highlight-symbol-at-point nil)
+  (setq lsp-eldoc-hook '(lsp-hover))
   (setq lsp-hover-text-function 'lsp--text-document-hover-string)
 
   (define-key!
-    ("M-s h h" . lsp-symbol-highlight)
+    ("M-s h h" . lsp-document-highlight)
     ("C-c r" . lsp-rename)
     ("C-c C-d" . lsp-describe-thing-at-point)
     ("C-c C-." . lsp-info-under-point)

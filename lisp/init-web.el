@@ -19,6 +19,12 @@
   "\\.html?\\'" "\\.xul?\\'" "\\.eex?\\'"
   "\\.xml?\\'")
 
+(defcustom web-mode-setup-literally nil
+  "Whether to setup project literally"
+  :group 'cmake
+  :type 'directory
+  :safe #'booleanp)
+
 (setq auto-mode-alist
       (cl-subst 'web-mode 'js-jsx-mode
                 (cl-subst 'web-mode 'javascript-mode auto-mode-alist)))
@@ -76,12 +82,14 @@
       (add-transient-hook!
           (hack-local-variables-hook :local t :name web|setup-js-internal)
         (setq-local web-mode-enable-auto-quoting nil)
-        (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
-        (flycheck-mode 1)
-        (tide-setup)
-        (tide-hl-identifier-mode 1)
+        (if web-mode-setup-literally
+            (progn (electric-indent-local-mode 1))
+          (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
+          (flycheck-mode 1)
+          (tide-setup)
+          (tide-hl-identifier-mode 1)
 
-        (add-to-list 'company-backends '(company-tide :with company-web-html)))
+          (add-to-list 'company-backends '(company-tide :with company-web-html))))
     (add-to-list 'company-backends 'company-web-html)))
 
 (define-hook! web|setup-js (js-mode-hook typescript-mode-hook)
@@ -89,12 +97,14 @@
              (not (string-suffix-p ".json" (downcase buffer-file-name))))
     (add-transient-hook!
         (hack-local-variables-hook :local t :name web|setup-js-internal)
-      (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
-      (flycheck-mode 1)
-      (tide-setup)
+      (if web-mode-setup-literally
+          (progn (electric-indent-local-mode 1))
+        (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
+        (flycheck-mode 1)
+        (tide-setup)
 
-      (add-to-list 'company-backends 'company-tide)
-      (tide-hl-identifier-mode 1)))
+        (add-to-list 'company-backends 'company-tide)
+        (tide-hl-identifier-mode 1))))
 
   (setq-local electric-layout-rules
               (delq (assoc ?\; electric-layout-rules)
