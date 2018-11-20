@@ -70,12 +70,6 @@
   (save-excursion
     (imenu--generic-function '((nil "^ *\\([^ ]+\\) *{ *$" 1)))))
 
-(defun js//setup-tide ()
-  (tide-setup)
-  (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
-  (add-to-list 'company-backends 'company-tide)
-  (tide-hl-identifier-mode 1))
-
 (define-hook! web|setup-web (web-mode-hook)
   (if (and buffer-file-name
            (string-match-p "\\.[jt]s[x]?\\'" (downcase buffer-file-name)))
@@ -87,7 +81,8 @@
           (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
           (flycheck-mode 1)
           (tide-setup)
-          (tide-hl-identifier-mode 1))))
+          (tide-hl-identifier-mode 1)
+          (add-to-list 'company-backends 'company-tide))))
   (add-to-list 'company-backends 'company-web-html))
 
 (define-hook! web|setup-js (js-mode-hook typescript-mode-hook)

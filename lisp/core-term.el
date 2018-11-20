@@ -47,6 +47,7 @@
 
 (define-key!
   ([f8] . term/pop-shell)
+  ([C-f8] . term/ssh)
   ([C-f9] . term/shell-command-on-server))
 
 (provide 'core-term)

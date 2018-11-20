@@ -22,7 +22,8 @@
         (hack-local-variables-hook :local t :name java//setup-interal)
       (when java-setup-use-lsp
         (with-demoted-errors "Lsp-java: %s"
-          (lsp-java-enable))))))
+          (lsp-java-enable)
+          (lsp-ui-doc-mode 1))))))
 
 
 (autoload 'lsp-java-enable "lsp-java")
