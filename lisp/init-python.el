@@ -56,7 +56,6 @@
     (flycheck-mode 1)))
 
 (define-hook! python|setup (python-mode-hook)
-  ;; emacs 24.4 only
   (setq electric-indent-chars (delq ?: electric-indent-chars))
   (electric-indent-local-mode 1)
   (electric-operator-mode 1)
