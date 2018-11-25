@@ -1,10 +1,8 @@
 (require-packages!
  gitignore-mode
  gitconfig-mode
- git-messenger
  git-gutter
  git-gutter-fringe
- git-link
  git-timemachine
  magit)
 
@@ -143,9 +141,9 @@
   ("p" . git-gutter:previous-hunk)
   ("j" . git/goto-gutter)
   ("g" . magit-status)
-  ("l" . git-link)
-  ("c" . git-link-commit)
-  ("m" . git-messenger:popup-message)
+  ;; ("l" . git-link)
+  ;; ("c" . git-link-commit)
+  ;; ("m" . git-messenger:popup-message)
   ("b" . magit-checkout))
 
 

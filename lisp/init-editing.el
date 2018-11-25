@@ -19,6 +19,7 @@
                                   (iedit-mode -1)))))
 
 (with-eval-after-load 'iedit
+  (setq iedit-auto-narrow t)
   (advice-add 'iedit-mode
               :before
               (lambda (&rest _) (when (bound-and-true-p multiple-cursors-mode)
