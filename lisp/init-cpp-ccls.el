@@ -48,7 +48,7 @@
 
 (defun cpp-ccls//setup ()
   (condition-case err
-      (lsp-ccls-enable)
+      (lsp)
     (error (message "%s" err))))
 
 (defun cpp-ccls/create-dot-ccls (-dir)
@@ -135,23 +135,14 @@
     ("a" . cpp/xref-find-references-address)
     ("R" . ccls-reload)))
 
-(with-eval-after-load 'projectile
-  (add-to-list 'projectile-globally-ignored-directories ".ccls-cache")
-  (setq projectile-project-root-files-top-down-recurring
-        (append '("compile_commands.json" ".ccls" ".ccls-root")
-                projectile-project-root-files-top-down-recurring)))
-
-
 (with-eval-after-load 'ccls
-  ;; Need to register snippet capability
-  (require 'company-lsp)
   (require 'ccls-semantic-highlight)
 
   (aset ccls-sem-macro-faces 0 'font-lock-builtin-face)
   (aset ccls-sem-variable-faces 0 'cpp-variable-face)
 
   (setq ccls-executable cpp-ccls-path)
-  (setq ccls-extra-init-params '(:completion (:detailedLabel t)))
+  (setq ccls-initialization-options '(:completion (:detailedLabel t)))
 
   (setq ccls-sem-highlight-method 'nil))
 

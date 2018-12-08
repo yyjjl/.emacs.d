@@ -129,7 +129,7 @@
                 (with-temp-env! (cpp-cmake//config-env) (apply -fn -args)))))
 
 (with-eval-after-load 'cc-mode
-  ;; (require 'eglot nil t)
+  (require 'ccls nil t)
 
   (dolist (key '("#" "}" "/" ";" "," ":" "(" ")" "{"))
     (define-key c-mode-base-map key nil))

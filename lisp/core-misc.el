@@ -204,12 +204,16 @@
   ;; connections, so disable them.
   (advice-add #'projectile-locate-dominating-file :around #'ignore-remote!)
 
+  (add-to-list 'projectile-globally-ignored-directories ".ccls-cache")
+
   (setq projectile-mode-line
         '(:eval (and buffer-file-name (projectile-project-name))))
   (setq projectile-require-project-root 'prompt)
   (setq projectile-globally-ignored-file-suffixes
         '(".pyc" ".elc" ".jpg" ".png" ".svg" ".jpeg" ".pyg" ".pygtex" ".pygstyle"))
-
+  (setq projectile-project-root-files-top-down-recurring
+        (append '("compile_commands.json" ".ccls" ".ccls-root")
+                projectile-project-root-files-top-down-recurring))
   (setq projectile-completion-system 'ivy)
   (setq projectile-ignored-projects '("~/" "/tmp"))
   (setq projectile-enable-caching (not noninteractive))

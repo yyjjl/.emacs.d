@@ -22,11 +22,11 @@
         (hack-local-variables-hook :local t :name java//setup-interal)
       (when java-setup-use-lsp
         (with-demoted-errors "Lsp-java: %s"
-          (lsp-java-enable)
+          (lsp)
           (lsp-ui-doc-mode 1))))))
 
-
-(autoload 'lsp-java-enable "lsp-java")
+(with-eval-after-load 'cc-mode
+  (require 'lsp-java))
 
 (with-eval-after-load 'lsp-java
   (setq lsp-java-server-install-dir (expand-var! "eclipse.jdt.ls/server/"))

@@ -6,30 +6,11 @@
 (require-packages!
  (ggtags :when env-has-gtags-p)
  (lsp-mode :when rust-has-rls-p)
- (lsp-rust :when rust-has-rls-p)
  (company-lsp :when rust-has-rls-p)
  cargo
  ;; Emacs 26 has conf-toml-mode
  (toml-mode :when (<= emacs-major-version 25))
  rust-mode)
-
-(defcustom rust-config-build-lib :unset
-  "Enable(t)/Disable(nil) building the lib target."
-  :group 'lsp-rust
-  :type 'directory
-  :safe (lambda (x) (or (eq x :unset) (booleanp x))))
-
-(defcustom rust-config-build-bin :unset
-  "The bin target to build."
-  :group 'lsp-rust
-  :type 'directory
-  :safe (lambda (x) (or (eq x :unset) (stringp x))))
-
-(defcustom rust-config-cfg-test :unset
-  "Enable(t)/Disable(nil) #[cfg(test)]."
-  :group 'lsp-rust
-  :type 'directory
-  :safe (lambda (x) (or (eq x :unset) (booleanp x))))
 
 (defvar rust-cargo-commands
   (eval-when-compile
@@ -54,17 +35,9 @@
               (buffer-temporary-p)
               (file-remote-p default-directory)
               (> (buffer-size) core-large-buffer-size))
-    (add-transient-hook! (hack-local-variables-hook
-                          :local t :name rust|setup-interal)
-      (unless (eq rust-config-build-bin :unset)
-        (lsp-rust-set-build-bin rust-config-build-bin))
-      (unless (eq rust-config-build-lib :unset)
-        (lsp-rust-set-build-bin rust-config-build-lib))
-      (unless (eq rust-config-cfg-test :unset)
-        (lsp-rust-set-build-bin rust-config-cfg-test))
-      (with-demoted-errors "Lsp-rust: %s"
-        (lsp-rust-enable)
-        (lsp-ui-doc-mode 1)))))
+    (with-demoted-errors "Lsp-rust: %s"
+      (lsp)
+      (lsp-ui-doc-enable 1))))
 
 (defun rust/cargo-dispatch (-use-last-action)
   (interactive "P")
@@ -98,7 +71,6 @@
     (term//pop-to-buffer buffer)))
 
 (with-eval-after-load 'rust-mode
-  (require 'lsp-rust nil t)
   (require 'cc-mode nil t)
 
   (setq rust-cargo-bin "~/.cargo/bin/cargo")
