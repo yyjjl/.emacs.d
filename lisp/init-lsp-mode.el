@@ -2,6 +2,7 @@
 (require-packages!
  lsp-mode
  lsp-ui
+ dap-mode
  company-lsp)
 
 
@@ -43,7 +44,10 @@
                      (let ((length (- end start)))
                        (and (> length 0) (< length len) length)))))
 
-(with-eval-after-load 'lsp-mode
+(with-eval-after-load 'lsp
+  (dap-mode 1)
+  (dap-ui-mode 1)
+
   (setq lsp-session-file (expand-var! "lsp-sessions"))
   (setq lsp-auto-configure nil)
   (setq lsp-eldoc-render-all t)

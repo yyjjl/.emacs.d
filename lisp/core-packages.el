@@ -31,7 +31,6 @@
  page-break-lines
  evil-nerd-commenter
  shackle
- hippie-exp-ext
  electric-operator
  expand-region)
 

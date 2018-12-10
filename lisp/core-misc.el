@@ -166,7 +166,6 @@
         flycheck-idle-change-delay 1))
 
 (with-eval-after-load 'hippie-exp
-  (require 'hippie-exp-ext)
   (setq he-dabbrev-chars "0-9a-zA-Z\\?!_")
   (setq-default hippie-expand-try-functions-list
                 '(try-expand-dabbrev
@@ -175,10 +174,7 @@
                   try-expand-dabbrev-from-kill
                   try-expand-dabbrev-substring
                   try-complete-file-name-partially
-                  try-complete-file-name
-                  try-expand-dabbrev-limited-chars
-                  try-expand-dabbrev-limited-chars-visible
-                  try-expand-dabbrev-limited-chars-all-buffers)))
+                  try-complete-file-name)))
 
 (defvar core-projectile-invalidate-cache-empty-vars
   '(mode-line--cached-relative-directory

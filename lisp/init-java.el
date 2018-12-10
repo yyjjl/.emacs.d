@@ -3,7 +3,6 @@
 (require-packages!
  lsp-mode
  lsp-java
- dap-mode
  company-lsp)
 
 
@@ -40,9 +39,6 @@
     ([f10] . lsp-java-build-project)
     ("C-c b" . lsp-format-buffer)
     ("C-c B" . lsp-java-organize-imports)
-    ("C-c C-d" . lsp-describe-thing-at-point))
-
-  (dap-mode 1)
-  (dap-ui-mode 1))
+    ("C-c C-d" . lsp-describe-thing-at-point)))
 
 (provide 'init-java)
