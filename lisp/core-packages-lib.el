@@ -163,7 +163,8 @@ Archive with high priority will be used when install a package.")
                (backtrace)))))
   (message "Compile finished"))
 
-(package-initialize)
+(when (<= emacs-major-version 26)
+  (package-initialize))
 
 (unless (file-exists-p emacs-autoloads-file)
   (package/generate-autoloads))

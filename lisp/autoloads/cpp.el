@@ -135,3 +135,50 @@
   (setq-local c-macro-preprocessor
               (cpp-ccls//buffer-compile-command t))
   (call-interactively 'c-macro-expand))
+
+(autoload 'cpp-cmake//render-config-buffer "init-cpp-cmake-ui")
+;;;###autoload
+(defun cpp-cmake/config ()
+  (interactive)
+  (let ((original-buffer (current-buffer))
+        (buffer (get-buffer-create "*cpp-cmake-config*")))
+    (with-current-buffer (pop-to-buffer buffer)
+      (cpp-cmake//render-config-buffer original-buffer))))
+
+;;;###autoload
+(defun cpp-cmake/change-config ()
+  (interactive)
+  (let ((name (completing-read
+               "Change to: "
+               (remove cpp-cmake-current-config-name
+                       (mapcar #'car cpp-cmake-config-list))
+               nil
+               :require-match)))
+    (unless (string= name cpp-cmake-current-config-name)
+      (setq cpp-cmake-current-config-name name)
+      (save-dir-local-variables! 'cpp-cmake-current-config-name)
+      (cpp-cmake//run-cmake-internal))))
+
+;;;###autoload
+(defun cpp-cmake/toggle-option ()
+  (interactive)
+  (when-let* ((option (completing-read
+                       "Options: "
+                       (mapcar #'cpp-cmake//option-to-string
+                               (--filter
+                                (member (cdr it)
+                                        '("Release" "Debug" "ON" "OFF"))
+                                (cpp-cmake//config-options)))
+                       nil
+                       :require-match))
+              (nv (split-string (substring option 2) "="))
+              (option-name (car nv))
+              (option-value (string-join (cdr nv)))
+              (option (assoc option-name (cpp-cmake//config-options))))
+    (setcdr option
+            (cond ((equal "Release" option-value) "Debug")
+                  ((equal "Debug" option-value) "Release")
+                  ((equal "ON" option-value) "OFF")
+                  ((equal "OFF" option-value) "ON")))
+    (save-dir-local-variables! 'cpp-cmake-config-list)
+    (cpp-cmake//run-cmake-internal)))

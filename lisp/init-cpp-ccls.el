@@ -75,14 +75,20 @@
                  (not (string-prefix-p "-" it)))))
    -args))
 
+(defsubst cpp-ccls/get-file-args ()
+  (or (when-let (args (ignore-errors (gethash "args" (ccls-file-info))))
+        (when (vectorp args)
+          (setq args (map 'list #'identity args)))
+        args)
+      '("cpp" "-v" "-E")))
+
 (defun cpp-ccls//filter-include-lines (lines)
   (--map (expand-file-name (s-trim it))
          (--filter (string-prefix-p " " it)
                    (split-string lines "\n" :omit-nulls))))
 
 (defun cpp-ccls//include-directories ()
-  (let ((args (or (ignore-errors (gethash "args" (ccls-file-info)))
-                  '("cpp" "-v" "-E"))))
+  (let ((args (cpp-ccls/get-file-args)))
     (with-temp-buffer
       (erase-buffer)
       (apply #'call-process (car args) nil t nil
@@ -105,8 +111,7 @@
            (cpp-ccls//filter-include-lines (buffer-substring pos2 pos3))))))))
 
 (defun cpp-ccls//buffer-compile-command (&optional -preprocess-only-p)
-  (let* ((args (or (ignore-errors (gethash "args" (ccls-file-info)))
-                   '("/usr/bin/c++")))
+  (let* ((args (cpp-ccls/get-file-args))
          (options (cpp-ccls//filter-arguments (cdr args) -preprocess-only-p)))
     (when -preprocess-only-p
       (dolist (option '("-E" "-xc++" "-C"))
@@ -137,9 +142,9 @@
 
 (with-eval-after-load 'projectile
   (add-to-list 'projectile-globally-ignored-directories ".ccls-cache")
-  (setq projectile-project-root-files-top-down-recurring
-        (append '("compile_commands.json" ".ccls" ".ccls-root")
-                projectile-project-root-files-top-down-recurring)))
+  (setq projectile-project-root-files-bottom-up
+        (append '("compile_commands.json" ".ccls-root")
+                projectile-project-root-files-bottom-up)))
 
 
 (with-eval-after-load 'ccls
