@@ -166,7 +166,6 @@
         flycheck-idle-change-delay 1))
 
 (with-eval-after-load 'hippie-exp
-  (require 'hippie-exp-ext)
   (setq he-dabbrev-chars "0-9a-zA-Z\\?!_")
   (setq-default hippie-expand-try-functions-list
                 '(try-expand-dabbrev
@@ -175,10 +174,7 @@
                   try-expand-dabbrev-from-kill
                   try-expand-dabbrev-substring
                   try-complete-file-name-partially
-                  try-complete-file-name
-                  try-expand-dabbrev-limited-chars
-                  try-expand-dabbrev-limited-chars-visible
-                  try-expand-dabbrev-limited-chars-all-buffers)))
+                  try-complete-file-name)))
 
 (defvar core-projectile-invalidate-cache-empty-vars
   '(mode-line--cached-relative-directory
@@ -204,12 +200,16 @@
   ;; connections, so disable them.
   (advice-add #'projectile-locate-dominating-file :around #'ignore-remote!)
 
+  (add-to-list 'projectile-globally-ignored-directories ".ccls-cache")
+
   (setq projectile-mode-line
         '(:eval (and buffer-file-name (projectile-project-name))))
   (setq projectile-require-project-root 'prompt)
   (setq projectile-globally-ignored-file-suffixes
         '(".pyc" ".elc" ".jpg" ".png" ".svg" ".jpeg" ".pyg" ".pygtex" ".pygstyle"))
-
+  (setq projectile-project-root-files-top-down-recurring
+        (append '("compile_commands.json" ".ccls" ".ccls-root")
+                projectile-project-root-files-top-down-recurring))
   (setq projectile-completion-system 'ivy)
   (setq projectile-ignored-projects '("~/" "/tmp"))
   (setq projectile-enable-caching (not noninteractive))

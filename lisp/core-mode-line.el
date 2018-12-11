@@ -29,10 +29,10 @@
                 mode-line//position)
      :root project)
     (t :segments (,@mode-line--default-segments
+                  mode-line//process
                   mode-line//buffer-status
                   mode-line//flycheck
                   mode-line//flymake
-                  mode-line//process
                   mode-line//position
                   mode-line//git-info)
        :misc t
@@ -97,7 +97,7 @@ read-only, and `buffer-file-coding-system'"
         (cl-loop for (symbol . expr) in mode-line-multi-edit-alist
                  when (and (boundp symbol) (symbol-value symbol))
                  do (when-let (count (eval expr))
-                      (return (propertize (format "e:%d " count)
+                      (cl-return (propertize (format "e:%d " count)
                                           'face font-lock-constant-face))))
         (when (and (boundp 'text-scale-mode-amount)
                    (/= text-scale-mode-amount 0))
@@ -166,11 +166,11 @@ read-only, and `buffer-file-coding-system'"
                                                  'severity
                                                  error-severity)))
              (cond ((>= severity error-severity)
-                    (incf error-count))
+                    (cl-incf error-count))
                    ((>= severity warning-severity)
-                    (incf warning-count))
+                    (cl-incf warning-count))
                    ((>= severity note-severity)
-                    (incf note-count))))))
+                    (cl-incf note-count))))))
        flymake--backend-state)
       `(" ["
         (lsp-mode "LSP ")
@@ -184,7 +184,7 @@ read-only, and `buffer-file-coding-system'"
 
 (defsubst mode-line//process ()
   "Display buffer process status."
-  (and mode-line-process (list " {" mode-line-process "}")))
+  `(:propertize ,mode-line-process face font-lock-string-face))
 
 (defsubst mode-line//position ()
   (propertize " %l:%c %p %I" 'face 'font-lock-constant-face))
@@ -222,7 +222,7 @@ read-only, and `buffer-file-coding-system'"
                         ,(when show-misc-p ''mode-line-misc-info)
                         ,@(when show-root-p
                             (list " "
-                                  (case show-root-p
+                                  (cl-case show-root-p
                                     (project ''mode-line--cached-root)
                                     (current ''(:eval (abbreviate-file-name default-directory)))))))))))
            (or -segments mode-line-config-alist))))))
@@ -252,7 +252,6 @@ read-only, and `buffer-file-coding-system'"
   (setq-default mode-line-misc-info
                 '((company-search-mode (" " company-search-lighter))
                   global-mode-string)))
-
 
 (mode-line//compile)
 

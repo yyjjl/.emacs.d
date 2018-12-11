@@ -40,7 +40,8 @@
                    (cdr -candidate))))
          (with-current-buffer buffer
            ;; Use semantic first
-           (if (semantic-active-p)
+           (if (and (semantic-active-p)
+                    (not (bound-and-true-p lsp-mode))) ;; use imenu when lsp-mode is enabled
                (mapcar (lambda (x)
                          (counsel//semantic--clean-tag x)
                          (cons (counsel-semantic-format-tag x) x))
