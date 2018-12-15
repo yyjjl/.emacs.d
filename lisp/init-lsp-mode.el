@@ -5,6 +5,12 @@
  dap-mode
  company-lsp)
 
+(defcustom lsp-enable-in-project-p t
+  "Whether to setup project literally"
+  :group 'lsp
+  :type 'directory
+  :safe #'booleanp)
+
 
 
 (require 'lsp)

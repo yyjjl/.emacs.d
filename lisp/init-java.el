@@ -7,19 +7,13 @@
 
 
 
-(defcustom java-setup-use-lsp nil
-  "Whether to setup project literally"
-  :group 'lsp-java
-  :type 'directory
-  :safe #'booleanp)
-
 (define-hook! java|setup (java-mode-hook)
   (unless (or (buffer-temporary-p)
               (file-remote-p default-directory)
               (> (buffer-size) core-large-buffer-size))
     (add-transient-hook!
         (hack-local-variables-hook :local t :name java//setup-interal)
-      (when java-setup-use-lsp
+      (when (bound-and-true-p lsp-enable-in-project-p)
         (with-demoted-errors "Lsp-java: %s"
           (lsp)
           (lsp-ui-doc-mode 1))))))
@@ -35,7 +29,6 @@
 
   (define-key! :map java-mode-map
     ([f5] . dap-hydra)
-    ([C-f5] . dap-java-debug)
     ([f10] . lsp-java-build-project)
     ("C-c b" . lsp-format-buffer)
     ("C-c B" . lsp-java-organize-imports)
