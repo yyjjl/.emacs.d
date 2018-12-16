@@ -56,7 +56,6 @@
 (defun cpp//common-cc-setup ()
   "Setup shared by all languages (java/groovy/c++ ...)"
   ;; (highlight-indentation-mode 1)
-  ;; (electric-operator-mode 1)
   (electric-indent-local-mode -1)
   ;; (turn-on-auto-fill)
   (google-set-c-style)

@@ -8,7 +8,6 @@
  elpy
  cython-mode
  flycheck-cython
- gud
  py-autopep8
  py-isort)
 
@@ -49,7 +48,6 @@
 (define-hook! cython|setup (cython-mode-hook)
   (setq electric-indent-chars (delq ?: electric-indent-chars))
   (electric-indent-local-mode 1)
-  (electric-operator-mode 1)
 
   (unless (or (buffer-temporary-p)
               (not (eq major-mode 'python-mode)))
@@ -58,7 +56,6 @@
 (define-hook! python|setup (python-mode-hook)
   (setq electric-indent-chars (delq ?: electric-indent-chars))
   (electric-indent-local-mode 1)
-  (electric-operator-mode 1)
 
   (when (file-remote-p default-directory)
     (setq-local python-shell-interpreter "python3")
@@ -81,8 +78,6 @@
         '(pyvenv-virtual-env-name (" [" pyvenv-virtual-env-name "]"))))
 
 (with-eval-after-load 'python
-  (require 'electric-operator)
-
   (when (boundp 'python-shell-completion-native-disabled-interpreters)
     (add-to-list 'python-shell-completion-native-disabled-interpreters
                  "jupyter")

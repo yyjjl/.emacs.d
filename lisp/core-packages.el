@@ -31,7 +31,6 @@
  page-break-lines
  evil-nerd-commenter
  shackle
- electric-operator
  expand-region)
 
 (require 'core-popups)

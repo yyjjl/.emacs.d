@@ -30,7 +30,6 @@
 
 (define-hook! rust|setup (rust-mode-hook)
   (cargo-minor-mode 1)
-  (electric-operator-mode 1)
   (unless (or (not rust-has-rls-p)
               (buffer-temporary-p)
               (file-remote-p default-directory)

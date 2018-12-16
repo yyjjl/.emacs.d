@@ -19,7 +19,7 @@
     (cpp-cmake//run-cmake-internal
      (lambda (buffer)
        (with-current-buffer buffer
-         (unless cpp-setup-literally
+         (when (bound-and-true-p lsp-enable-in-project-p)
            (let ((cdb-path (cpp-cmake//cdb-path)))
              (when (not (file-exists-p cdb-path))
                (error "Can not find compile_commands.json"))
