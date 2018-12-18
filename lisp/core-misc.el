@@ -1,6 +1,5 @@
 ;; -*- lexical-binding: t -*-
 
-
 (defcustom core-project-rsync-remote-path nil
   "."
   :group 'projectile
@@ -172,7 +171,6 @@
                   try-expand-all-abbrevs
                   try-expand-dabbrev-all-buffers
                   try-expand-dabbrev-from-kill
-                  try-expand-dabbrev-substring
                   try-complete-file-name-partially
                   try-complete-file-name)))
 
@@ -265,9 +263,6 @@
   ;; Init fcitx prefix keys
   (setq fcitx-use-dbus nil)
   (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c" "C-z"))
-
-(with-eval-after-load 'electric-operator
-  (setq electric-operator-prose-rules '(("," . ", "))))
 
 ;; Smart tab
 (defvar core--indent-close-list '(?\} ?\$ ?\] ?\' ?\` ?\"))

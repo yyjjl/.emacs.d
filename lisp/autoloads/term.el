@@ -297,10 +297,10 @@ chpwd;clear
 ;;;###autoload
 (defun term//create-ssh-buffer (-host -port -user &optional -force)
   (interactive)
-  (let ((args (list* (if -user (format "%s@%s" -user -host) -host)
-                     (unless (or (not -port)
-                                 (zerop (string-to-number -port)))
-                       (list "-p" (format "%d" -port))))))
+  (let ((args (cl-list* (if -user (format "%s@%s" -user -host) -host)
+                        (unless (or (not -port)
+                                    (zerop (string-to-number -port)))
+                          (list "-p" (format "%d" -port))))))
     (or (and (not -force)
              (car (--filter (with-current-buffer it
                               (and (eq major-mode 'term-mode)
@@ -337,8 +337,8 @@ If -FORCE is non-nil create a new term buffer directly."
 (defun term//pop-to-buffer (buffer)
   (let ((popup-window
          (car-safe (cl-remove-if-not #'term//window-display-term-buffer-p
-                                     (list* (term//get-popup-window)
-                                            (window-list))))))
+                                     (cl-list* (term//get-popup-window)
+                                               (window-list))))))
     (if popup-window
         ;; Reuse window
         (progn

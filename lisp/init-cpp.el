@@ -18,12 +18,6 @@
 (require 'init-cpp-cmake)
 (require 'init-cpp-ccls)
 
-(defcustom cpp-setup-literally nil
-  "Whether to setup project literally"
-  :group 'cmake
-  :type 'directory
-  :safe #'booleanp)
-
 (defconst cpp--font-lock-keywords
   (eval-when-compile
     `((,(concat "\\<"
@@ -62,7 +56,6 @@
 (defun cpp//common-cc-setup ()
   "Setup shared by all languages (java/groovy/c++ ...)"
   ;; (highlight-indentation-mode 1)
-  ;; (electric-operator-mode 1)
   (electric-indent-local-mode -1)
   ;; (turn-on-auto-fill)
   (google-set-c-style)
@@ -86,7 +79,7 @@
           (not cpp-has-ccls-p)
           (buffer-base-buffer)
           (file-remote-p default-directory)
-          (bound-and-true-p cpp-setup-literally)
+          (not (bound-and-true-p lsp-enable-in-project-p))
           (> (buffer-size) core-large-buffer-size))
       (progn
         (when env-has-gtags-p
