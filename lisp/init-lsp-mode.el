@@ -16,7 +16,9 @@
 
 (define-hook! lsp|after-open (lsp-after-open-hook)
   (flycheck-mode 1)
+
   (lsp-ui-mode 1)
+  (lsp-ui-flycheck-enable 1)
 
   ;; default to sort and filter by server
   (setq-local company-transformers nil)
@@ -44,6 +46,13 @@
                      (let ((length (- end start)))
                        (and (> length 0) (< length len) length)))))
 
+(defun lsp/delete-session-cache ()
+  (interactive)
+  (let* ((session (lsp-session))
+         (folders (lsp-session-folders session))
+         (folder (completing-read "Delete folder: " folders nil t)))
+    (setf (lsp-session-folders session) (delete folder folders))))
+
 (with-eval-after-load 'lsp
   (dap-mode 1)
   (dap-ui-mode 1)
@@ -64,6 +73,8 @@
   (advice-add 'lsp--xref-make-item :override #'lsp*xref-make-match-item))
 
 (with-eval-after-load 'lsp-ui
+  (require 'lsp-ui-flycheck)
+
   (setq lsp-ui-peek-enable nil)
   (setq lsp-ui-doc-enable nil)
   (setq lsp-ui-sideline-enable nil)

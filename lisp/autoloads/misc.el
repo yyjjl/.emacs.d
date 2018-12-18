@@ -409,17 +409,16 @@ directory and extension."
 
 ;;;###autoload
 (defun core/rsync-project (-local-path -remote-path)
-  (interactive (list (or (and (not current-prefix-arg)
-                              core-project-rsync-local-path)
-                         (read-string "Local path: "))
-                     (or (and (not current-prefix-arg)
-                              core-project-rsync-remote-path)
-                         (read-string "Remote path: "))))
+  (interactive (list (read-directory-name "Local path: " core-project-rsync-local-path)
+                     (read-string "Remote path: " core-project-rsync-remote-path)))
   (if (not (file-directory-p -local-path))
       (message "'%s' doesn't exist." -local-path)
-    (let* ((default-directory -local-path))
+    (let* ((default-directory -local-path)
+           (options (if (not current-prefix-arg)
+                        (cl-list* "--dry-run" core-project-rsync-extra-options)
+                      core-project-rsync-extra-options)))
       (compilation-start (format core-project-rsync-command
-                                 (string-join core-project-rsync-extra-options " ")
+                                 (string-join options " ")
                                  -remote-path)))))
 
 ;;;###autoload
