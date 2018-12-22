@@ -28,7 +28,7 @@
     (cl-loop for folder in (lsp-session-folders session)
              if (file-exists-p folder)
              do (push folder valid-folders)
-             else do (push folders invalid-folders))
+             else do (push folder invalid-folders))
     (if -remove-invalid
         (if invalid-folders
             (when (yes-or-no-p (format "remove below folders:\n%s\n" (string-join invalid-folders "\n")))
@@ -50,25 +50,6 @@
   (add-to-list 'company-backends 'company-lsp)
   (add-to-list 'company-backends 'company-files))
 
-(defun lsp*xref-make-match-item (-filename -location)
-  (let* ((range (gethash "range" -location))
-         (pos-start (gethash "start" range))
-         (pos-end (gethash "end" range))
-         (line (lsp--extract-line-from-buffer pos-start))
-         (start (gethash "character" pos-start))
-         (end (gethash "character" pos-end))
-         (len (length line)))
-    (add-face-text-property (max (min start len) 0)
-                            (max (min end len) 0)
-                            'highlight t line)
-    ;; LINE is nil when FILENAME is not being current visited by any buffer.
-    (xref-make-match (or line -filename)
-                     (xref-make-file-location -filename
-                                              (1+ (gethash "line" pos-start))
-                                              (gethash "character" pos-start))
-                     (let ((length (- end start)))
-                       (and (> length 0) (< length len) length)))))
-
 (defun lsp/delete-session-cache ()
   (interactive)
   (let* ((session (lsp-session))
@@ -84,16 +65,17 @@
   (setq lsp-auto-configure nil)
   (setq lsp-eldoc-render-all t)
   (setq lsp-enable-completion-at-point nil)
+  (setq lsp-signature-enabled t)
+  (setq lsp-hover-enabled t)
   (setq lsp-eldoc-hook '(lsp-hover))
+  (setq lsp-restart 'auto-restart)
 
   (define-key!
     ("M-s h h" . lsp-document-highlight)
     ("C-c R" . lsp-rename)
     ("C-c S" . lsp-describe-session)
     ("C-c C-d" . lsp-describe-thing-at-point)
-    ("C-c C-SPC" . lsp-execute-code-action))
-
-  (advice-add 'lsp--xref-make-item :override #'lsp*xref-make-match-item))
+    ("C-c C-SPC" . lsp-execute-code-action)))
 
 (with-eval-after-load 'lsp-ui
   (require 'lsp-ui-flycheck)
