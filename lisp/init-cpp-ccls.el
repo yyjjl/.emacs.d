@@ -78,7 +78,7 @@
 (defsubst cpp-ccls/get-file-args ()
   (or (when-let (args (ignore-errors (gethash "args" (ccls-file-info))))
         (when (vectorp args)
-          (setq args (map 'list #'identity args)))
+          (setq args (cl-map 'list #'identity args)))
         args)
       '("cpp" "-v" "-E")))
 

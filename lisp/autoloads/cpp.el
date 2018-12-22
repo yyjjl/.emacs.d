@@ -64,16 +64,15 @@
 (defun cpp/compile ()
   (interactive)
   (with-temp-env! (cpp-cmake//config-env)
-    (let ((command (and cpp-cmake-project-root
-                        (cpp//compile-command (cpp-cmake//config-build)))))
-      (if command
-          (compile command)
-        (let ((compile-command
-               (or (-when-let (dir (cpp-cmake//locate-cmakelists nil nil "Makefile"))
-                     (cpp//compile-command dir))
-                   (ignore-errors (cpp-ccls//buffer-compile-command))
-                   compile-command)))
-          (call-interactively 'compile))))))
+    (-if-let (command (and cpp-cmake-project-root
+                           (cpp//compile-command (cpp-cmake//config-build))))
+        (compile command)
+      (let ((compile-command
+             (or (-when-let (dir (cpp-cmake//locate-cmakelists nil nil "Makefile"))
+                   (cpp//compile-command dir))
+                 (ignore-errors (cpp-ccls//buffer-compile-command))
+                 compile-command)))
+        (call-interactively 'compile)))))
 
 ;;;###autoload
 (defun cpp/debug-current-file (&optional new-session)

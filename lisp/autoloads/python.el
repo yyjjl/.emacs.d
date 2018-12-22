@@ -150,7 +150,7 @@
      (list
       (cond ((= arg 0) default-directory)
             ((= arg 16) (read-directory-name "Directory: "))
-            (t (projectile-ensure-project (projectile-project-root)))))))
+            (t (or (projectile-project-root) default-directory))))))
   (let ((elpy-project-root -directory))
     (elpy-shell-switch-to-shell)))
 
