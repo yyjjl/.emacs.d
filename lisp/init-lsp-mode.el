@@ -20,6 +20,14 @@
  'doom-molokai
  '(lsp-face-highlight-textual ((t :background "#444155"))))
 
+(defun lsp/remove-session-folder ()
+  (interactive)
+  (let* ((session (lsp-session))
+         (folders (lsp-session-folders session))
+         (folder (completing-read "Folder to remove" folders nil t)))
+    (setf (lsp-session-folders (lsp-session))
+          (delete folder folders))))
+
 (define-hook! lsp|after-open (lsp-after-open-hook)
   (flycheck-mode 1)
   (lsp-ui-mode 1)
