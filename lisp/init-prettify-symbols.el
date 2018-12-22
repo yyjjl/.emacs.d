@@ -1,68 +1,67 @@
 ;;; -*- lexical-binding: t; -*-
 
-;; Set symbol font
-(set-fontset-font t '(57600 . 57711) "Fira Code Symbol")
-(define-hook! (extra|font-setup _) (after-make-frame-functions)
-  (set-fontset-font t '(57600 . 57711) "Fira Code Symbol"))
+;; @see https://github.com/tonsky/FiraCode/wiki/Emacs-instructions
+(defun fira-code-mode--make-alist (list)
+  "Generate prettify-symbols alist from LIST."
+  (let ((idx -1))
+    (mapcar
+     (lambda (s)
+       (setq idx (1+ idx))
+       (let* ((code (+ 57600 idx))
+              (width (string-width s))
+              (prefix nil)
+              (suffix '(?\s (Br . Br)))
+              (n 1))
+         (while (< n width)
+           (setq prefix (append prefix '(?\s (Br . Bl))))
+           (setq n (1+ n)))
+         (cons s (append prefix suffix (list (decode-char 'ucs code))))))
+     list)))
 
-(defvar fira-code-font-lock-keywords-alist
+(defconst fira-code-mode--ligatures
   (eval-and-compile
-    (defun extra//make-fix-width-symbol (-alist)
-      (cl-loop for (string . char) in -alist
-            for width = (string-width string)
-            collect
-            (cons string (if (= width 1)
-                             char
-                           (concat "\t" (list char) "\t")))))
-    (extra//make-fix-width-symbol
-     '(("!=" . 57614)
-       ("-->" . 57619)
-       ("->" . 57620)
-       ("->>" . 57621)
-       ("-<" . 57622)
-       ("-<<" . 57623)
-       ("|>" . 57653)
-       ("===" . 57661)
-       ("==>" . 57662)
-       ("=>" . 57663)
-       ("=>>" . 57664)
-       ("<=" . 57665)
-       ("=<<" . 57666)
-       ("=/=" . 57667)
-       (">-" . 57668)
-       (">=" . 57669)
-       (">=>" . 57670)
-       (">>-" . 57672)
-       (">>=" . 57673)
-       (">>>" . 57674)
-       ("<*>" . 57676)
-       ("<|" . 57677)
-       ("<|>" . 57678)
-       ("<$>" . 57680)
-       ("<!--" . 57681)
-       ("<-" . 57682)
-       ("<--" . 57683)
-       ("<->" . 57684)
-       ("<+>" . 57686)
-       ("<=" . 57687)
-       ("<==" . 57688)
-       ("<=>" . 57689)
-       ("<=<" . 57690)
-       ("<>" . 57691)
-       ("<<-" . 57693)
-       ("<<=" . 57694)
-       ("<<<" . 57695)
-       ("<~" . 57696)
-       ("<~~" . 57697)
-       ("</>" . 57699)
-       ("~=" . 57702)
-       ("~>" . 57703)
-       ("~~>" . 57705)))))
+    (fira-code-mode--make-alist
+     '("www" "**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\"
+       "{-" "[]" "::" ":::" ":=" "!!" "!=" "!==" "-}"
+       "--" "---" "-->" "->" "->>" "-<" "-<<" "-~"
+       "#{" "#[" "##" "###" "####" "#(" "#?" "#_" "#_("
+       ".-" ".=" ".." "..<" "..." "?=" "??" ";;" "/*"
+       "/**" "/=" "/==" "/>" "//" "///" "&&" "||" "||="
+       "|=" "|>" "^=" "$>" "++" "+++" "+>" "=:=" "=="
+       "===" "==>" "=>" "=>>" "<=" "=<<" "=/=" ">-" ">="
+       ">=>" ">>" ">>-" ">>=" ">>>" "<*" "<*>" "<|" "<|>"
+       "<$" "<$>" "<!--" "<-" "<--" "<->" "<+" "<+>" "<="
+       "<==" "<=>" "<=<" "<>" "<<" "<<-" "<<=" "<<<" "<~"
+       "<~~" "</" "</>" "~@" "~-" "~=" "~>" "~~" "~~>" "%%"
+       "x" ":" "+" "+" "*"))))
 
-(define-hook! extra|prettify-symbols-setup (prog-mode-hook)
-  (setq prettify-symbols-alist fira-code-font-lock-keywords-alist)
+(defvar fira-code-mode--old-prettify-alist nil)
+
+(defun fira-code-mode--enable ()
+  "Enable Fira Code ligatures in current buffer."
+  (setq-local fira-code-mode--old-prettify-alist prettify-symbols-alist)
+  (setq-local prettify-symbols-alist
+              (append fira-code-mode--ligatures fira-code-mode--old-prettify-alist))
   (prettify-symbols-mode 1))
 
-;; (setq prettify-symbols-unprettify-at-point 'right-edge)
+(defun fira-code-mode--disable ()
+  "Disable Fira Code ligatures in current buffer."
+  (setq-local prettify-symbols-alist fira-code-mode--old-prettify-alist)
+  (prettify-symbols-mode -1))
+
+(define-minor-mode fira-code-mode
+  "Fira Code ligatures minor mode"
+  :lighter " Fira Code"
+  (setq-local prettify-symbols-unprettify-at-point 'right-edge)
+  (if fira-code-mode
+      (fira-code-mode--enable)
+    (fira-code-mode--disable)))
+
+(defun fira-code-mode--setup ()
+  "Setup Fira Code Symbols"
+  (set-fontset-font t '(#Xe100 . #Xe16f) "Fira Code Symbol"))
+
+(fira-code-mode--setup)
+(add-hook 'prog-mode-hook 'fira-code-mode)
 
 (provide 'init-prettify-symbols)
