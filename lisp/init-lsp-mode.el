@@ -10,6 +10,7 @@
   :group 'lsp
   :type 'directory
   :safe #'booleanp)
+(defvar lsp--disable-eldoc-in-minibuffer nil)
 
 
 
@@ -22,6 +23,7 @@
 
 (defun lsp/remove-session-folder (-remove-invalid)
   (interactive "P")
+  (require 'dired)
   (let* ((session (lsp-session))
          invalid-folders
          valid-folders)
@@ -31,11 +33,15 @@
              else do (push folder invalid-folders))
     (if -remove-invalid
         (if invalid-folders
-            (when (yes-or-no-p (format "remove below folders:\n%s\n" (string-join invalid-folders "\n")))
-              (setf (lsp-session-folders (lsp-session)) valid-folders))
+            (when (dired-mark-pop-up
+                   " *lsp-remove*" 'delete invalid-folders 'yes-or-no-p
+                   "Remove these folders ")
+              (setf (lsp-session-folders (lsp-session)) valid-folders)
+              (lsp--persist-session (lsp-session)))
           (message "Nothing to remove."))
       (let ((folder (completing-read "Folder to remove" valid-folders nil t)))
-        (setf (lsp-session-folders (lsp-session)) (delete folder valid-folders))))))
+        (setf (lsp-session-folders (lsp-session)) (delete folder valid-folders))
+        (lsp--persist-session (lsp-session))))))
 
 (define-hook! lsp|after-open (lsp-after-open-hook)
   (flycheck-mode 1)
@@ -57,6 +63,18 @@
          (folder (completing-read "Delete folder: " folders nil t)))
     (setf (lsp-session-folders session) (delete folder folders))))
 
+(defun lsp//ui-doc-toggle (-toggle)
+  (if (> -toggle 0)
+      (progn
+        (setq lsp-eldoc-render-all nil)
+        (lsp-ui-doc-mode 1))
+    (setq lsp-eldoc-render-all t)
+    (lsp-ui-doc-mode -1)))
+
+(defun lsp//eldoc-message (&optional msg)
+  (unless lsp--disable-eldoc-in-minibuffer
+    (run-at-time 0 nil (lambda () (eldoc-message msg)))))
+
 (with-eval-after-load 'lsp
   (dap-mode 1)
   (dap-ui-mode 1)
@@ -69,6 +87,8 @@
   (setq lsp-hover-enabled t)
   (setq lsp-eldoc-hook '(lsp-hover))
   (setq lsp-restart 'auto-restart)
+
+  (advice-add 'lsp--eldoc-message :override 'lsp//eldoc-message)
 
   (define-key!
     ("M-s h h" . lsp-document-highlight)
