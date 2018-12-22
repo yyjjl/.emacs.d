@@ -20,13 +20,22 @@
  'doom-molokai
  '(lsp-face-highlight-textual ((t :background "#444155"))))
 
-(defun lsp/remove-session-folder ()
-  (interactive)
+(defun lsp/remove-session-folder (-remove-invalid)
+  (interactive "P")
   (let* ((session (lsp-session))
-         (folders (lsp-session-folders session))
-         (folder (completing-read "Folder to remove" folders nil t)))
-    (setf (lsp-session-folders (lsp-session))
-          (delete folder folders))))
+         invalid-folders
+         valid-folders)
+    (cl-loop for folder in (lsp-session-folders session)
+             if (file-exists-p folder)
+             do (push folder valid-folders)
+             else do (push folders invalid-folders))
+    (if -remove-invalid
+        (if invalid-folders
+            (when (yes-or-no-p (format "remove below folders:\n%s\n" (string-join invalid-folders "\n")))
+              (setf (lsp-session-folders (lsp-session)) valid-folders))
+          (message "Nothing to remove."))
+      (let ((folder (completing-read "Folder to remove" valid-folders nil t)))
+        (setf (lsp-session-folders (lsp-session)) (delete folder valid-folders))))))
 
 (define-hook! lsp|after-open (lsp-after-open-hook)
   (flycheck-mode 1)
