@@ -264,6 +264,24 @@
   (setq fcitx-use-dbus nil)
   (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c" "C-z"))
 
+(with-eval-after-load 'easy-kill
+  (setq easy-kill-try-things '(url email sexp))
+  (setq easy-kill-alist '((?w word " ")
+                          (?s sexp "\n")
+                          (?L list "\n")
+                          (?f filename "\n")
+                          (?d defun "\n\n")
+                          (?D defun-name " ")
+                          (?l line "\n")
+                          (?b buffer-file-name)))
+  (define-key! :map easy-kill-base-map
+    ("-" . easy-kill-expand)
+    ("+" . easy-kill-shrink)
+    ("=" . easy-kill-shrink)
+    ("M-+" . easy-kill-shrink)
+    ("M-=" . easy-kill-shrink)
+    ("M--" . easy-kill-expand)))
+
 ;; Smart tab
 (defvar core--indent-close-list '(?\} ?\$ ?\] ?\' ?\` ?\"))
 (defvar core--indent-compelte-functions '(core//try-expand-local-snippets
@@ -361,7 +379,8 @@
 
   ("C-c 4" . ispell-word)
   ("C-c q" . auto-fill-mode)
-  ("M--" . er/expand-region)
+  ("M--" . easy-mark)
+  ("M-w" . easy-kill)
   ("M-/" . hippie-expand)
   ("M-n" . next-error)
   ("M-p" . previous-error)
