@@ -16,6 +16,9 @@
  skeletor
  lua-mode
  restclient
+ zone-sl
+ zone-nyan
+ zone-rainbow
  sly)
 
 (add-auto-mode! 'crontab-mode "\\.?cron\\(tab\\)?\\'")
@@ -26,6 +29,15 @@
 ;; Star dictionary lookup
 (autoload 'sdcv-current-word "sdcv" nil t)
 (autoload 'sdcv-goto-sdcv "sdcv" nil t)
+
+(with-eval-after-load 'zone
+  (setq zone-programs
+        (vconcat zone-programs [zone-pgm-sl zone-pgm-rainbow zone-nyan])))
+
+(with-eval-after-load 'zone-nyan
+  (setq zone-nyan-text-size (/ (frame-width) 2))
+  (setq zone-nyan-gui-type 'text)
+  (setq zone-nyan-term-type 'ascii))
 
 ;; `calc' setup
 (with-eval-after-load 'calc
