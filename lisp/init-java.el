@@ -16,7 +16,7 @@
       (when (bound-and-true-p lsp-enable-in-project-p)
         (with-demoted-errors "Lsp-java: %s"
           (lsp)
-          (lsp-ui-doc-mode 1))))))
+          (lsp//ui-doc-toggle 1))))))
 
 (with-eval-after-load 'cc-mode
   (require 'lsp-java))

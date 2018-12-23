@@ -280,14 +280,16 @@ directory and extension."
 ;;;###autoload
 (defun core/delete-http-buffers (-force)
   (interactive "P")
+  (require 'dired)
   (let ((buffers (--filter (and (string-prefix-p " *http " (buffer-name it))
                                 (not (process-live-p (get-buffer-process it))))
                            (buffer-list))))
     (when (and buffers
                (or (not -force)
                    (not (called-interactively-p 'interactive)))
-               (yes-or-no-p (concat "Delete following buffers? \n"
-                                    (string-join (mapcar #'buffer-name buffers) "\n"))))
+               (dired-mark-pop-up
+                " *Deletion*" 'delete (mapcar #'buffer-name buffers) 'yes-or-no-p
+                "Delete these buffers "))
       (dolist (buffer buffers)
         (kill-buffer buffer)))))
 

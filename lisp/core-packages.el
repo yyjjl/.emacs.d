@@ -31,7 +31,7 @@
  page-break-lines
  evil-nerd-commenter
  shackle
- expand-region)
+ easy-kill)
 
 (require 'core-popups)
 (require 'core-ivy)

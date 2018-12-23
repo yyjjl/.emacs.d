@@ -156,6 +156,7 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
 
 (defun term//switch-internal (-n)
   (when term--buffer-list
+    (setq term--buffer-list (--filter (buffer-live-p it) term--buffer-list))
     (let ((size (length term--buffer-list))
           (index (cl-position (current-buffer) term--buffer-list))
           (window (selected-window)))

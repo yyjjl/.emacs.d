@@ -10,6 +10,7 @@
   :group 'lsp
   :type 'directory
   :safe #'booleanp)
+(defvar lsp--disable-eldoc-in-minibuffer nil)
 
 
 
@@ -19,6 +20,28 @@
 (custom-theme-set-faces
  'doom-molokai
  '(lsp-face-highlight-textual ((t :background "#444155"))))
+
+(defun lsp/remove-session-folder (-remove-invalid)
+  (interactive "P")
+  (require 'dired)
+  (let* ((session (lsp-session))
+         invalid-folders
+         valid-folders)
+    (cl-loop for folder in (lsp-session-folders session)
+             if (file-exists-p folder)
+             do (push folder valid-folders)
+             else do (push folder invalid-folders))
+    (if -remove-invalid
+        (if invalid-folders
+            (when (dired-mark-pop-up
+                   " *lsp-remove*" 'delete invalid-folders 'yes-or-no-p
+                   "Remove these folders ")
+              (setf (lsp-session-folders (lsp-session)) valid-folders)
+              (lsp--persist-session (lsp-session)))
+          (message "Nothing to remove."))
+      (let ((folder (completing-read "Folder to remove" valid-folders nil t)))
+        (setf (lsp-session-folders (lsp-session)) (delete folder valid-folders))
+        (lsp--persist-session (lsp-session))))))
 
 (define-hook! lsp|after-open (lsp-after-open-hook)
   (flycheck-mode 1)
@@ -33,31 +56,24 @@
   (add-to-list 'company-backends 'company-lsp)
   (add-to-list 'company-backends 'company-files))
 
-(defun lsp*xref-make-match-item (-filename -location)
-  (let* ((range (gethash "range" -location))
-         (pos-start (gethash "start" range))
-         (pos-end (gethash "end" range))
-         (line (lsp--extract-line-from-buffer pos-start))
-         (start (gethash "character" pos-start))
-         (end (gethash "character" pos-end))
-         (len (length line)))
-    (add-face-text-property (max (min start len) 0)
-                            (max (min end len) 0)
-                            'highlight t line)
-    ;; LINE is nil when FILENAME is not being current visited by any buffer.
-    (xref-make-match (or line -filename)
-                     (xref-make-file-location -filename
-                                              (1+ (gethash "line" pos-start))
-                                              (gethash "character" pos-start))
-                     (let ((length (- end start)))
-                       (and (> length 0) (< length len) length)))))
-
 (defun lsp/delete-session-cache ()
   (interactive)
   (let* ((session (lsp-session))
          (folders (lsp-session-folders session))
          (folder (completing-read "Delete folder: " folders nil t)))
     (setf (lsp-session-folders session) (delete folder folders))))
+
+(defun lsp//ui-doc-toggle (-toggle)
+  (if (> -toggle 0)
+      (progn
+        (setq lsp-eldoc-render-all nil)
+        (lsp-ui-doc-mode 1))
+    (setq lsp-eldoc-render-all t)
+    (lsp-ui-doc-mode -1)))
+
+(defun lsp//eldoc-message (&optional msg)
+  (unless lsp--disable-eldoc-in-minibuffer
+    (run-at-time 0 nil (lambda () (eldoc-message msg)))))
 
 (with-eval-after-load 'lsp
   (dap-mode 1)
@@ -67,16 +83,19 @@
   (setq lsp-auto-configure nil)
   (setq lsp-eldoc-render-all t)
   (setq lsp-enable-completion-at-point nil)
+  (setq lsp-signature-enabled t)
+  (setq lsp-hover-enabled t)
   (setq lsp-eldoc-hook '(lsp-hover))
+  (setq lsp-restart 'auto-restart)
+
+  (advice-add 'lsp--eldoc-message :override 'lsp//eldoc-message)
 
   (define-key!
     ("M-s h h" . lsp-document-highlight)
     ("C-c R" . lsp-rename)
     ("C-c S" . lsp-describe-session)
     ("C-c C-d" . lsp-describe-thing-at-point)
-    ("C-c C-SPC" . lsp-execute-code-action))
-
-  (advice-add 'lsp--xref-make-item :override #'lsp*xref-make-match-item))
+    ("C-c C-SPC" . lsp-execute-code-action)))
 
 (with-eval-after-load 'lsp-ui
   (require 'lsp-ui-flycheck)
