@@ -122,10 +122,19 @@
     ("M-p" . previous-error)
     ("j" . (lambda! () (xref--search-property 'xref-item)))
     ("k" . (lambda! () (xref--search-property 'xref-item t))))
-  (define-hook! xref*xref-buffer-setup (xref--xref-buffer-mode-hook)
-    (toggle-truncate-lines 1))
-  (add-to-list 'xref-prompt-for-identifier
-               'xref-find-references :append))
+
+  (add-hook 'xref--xref-buffer-mode-hook (lambda () (toggle-truncate-lines 1)))
+
+  (defun xref*around-xref-find-definitions (-fn -identifier)
+    (condition-case err
+        (funcall -fn -identifier)
+      (user-error
+       (if-let* ((symbol (thing-at-point 'symbol)))
+           (counsel-rg symbol)
+         (message "%s" (error-message-string err))))))
+
+  (advice-add 'xref-find-definitions :around #'xref*around-xref-find-definitions)
+  (add-to-list 'xref-prompt-for-identifier 'xref-find-references :append))
 
 (defun core*flymake-eldoc-function ()
   (let ((diags (flymake-diagnostics (point))))
@@ -358,6 +367,7 @@
   (", c" . core/change-or-new-desktop)
   (", d" . core/delete-desktop)
   (", o" . recentf-open-files)
+  (", z" . zone)
   ("C-b" . ibuffer)
   ("C-d" . find-name-dired)
 

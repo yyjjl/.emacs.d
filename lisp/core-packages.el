@@ -50,6 +50,7 @@
              (display-graphic-p))
     (company-posframe-mode 1))
 
+  (zone-when-idle 60)
   (desktop-save-mode 1))
 
 (define-hook! package|init-emacs (after-init-hook)

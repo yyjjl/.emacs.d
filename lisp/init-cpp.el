@@ -55,9 +55,6 @@
 
 (defun cpp//common-cc-setup ()
   "Setup shared by all languages (java/groovy/c++ ...)"
-  ;; (highlight-indentation-mode 1)
-  (electric-indent-local-mode -1)
-  ;; (turn-on-auto-fill)
   (google-set-c-style)
   (setq c-basic-offset 4)
   ;; make DEL take all previous whitespace with it
@@ -89,7 +86,9 @@
     (setq cpp-cmake-project-root (cpp-cmake//locate-cmakelists))
     (if (or (file-exists-p (cpp-ccls//dot-ccls-path))
             (and cpp-cmake-project-root (file-exists-p (cpp-cmake//cdb-path))))
-        (cpp-ccls//setup)
+        (progn
+          (cpp-ccls//setup)
+          (electric-indent-local-mode -1))
       (when cpp-cmake-project-root
         (message "Need run `cpp/config-project' to setup ccls server")))))
 
