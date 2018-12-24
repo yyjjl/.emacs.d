@@ -367,7 +367,6 @@
   (", c" . core/change-or-new-desktop)
   (", d" . core/delete-desktop)
   (", o" . recentf-open-files)
-  (", z" . zone)
   ("C-b" . ibuffer)
   ("C-d" . find-name-dired)
 
