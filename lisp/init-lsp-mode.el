@@ -56,20 +56,14 @@
   (add-to-list 'company-backends 'company-lsp)
   (add-to-list 'company-backends 'company-files))
 
-(defun lsp/delete-session-cache ()
-  (interactive)
-  (let* ((session (lsp-session))
-         (folders (lsp-session-folders session))
-         (folder (completing-read "Delete folder: " folders nil t)))
-    (setf (lsp-session-folders session) (delete folder folders))))
-
 (defun lsp//ui-doc-toggle (-toggle)
-  (if (> -toggle 0)
-      (progn
-        (setq lsp-eldoc-render-all nil)
-        (lsp-ui-doc-mode 1))
-    (setq lsp-eldoc-render-all t)
-    (lsp-ui-doc-mode -1)))
+  (when (require 'lsp-ui-doc nil t)
+    (if (> -toggle 0)
+        (progn
+          (setq lsp-eldoc-render-all nil)
+          (lsp-ui-doc-mode 1))
+      (setq lsp-eldoc-render-all t)
+      (lsp-ui-doc-mode -1))))
 
 (defun lsp//eldoc-message (&optional msg)
   (unless lsp--disable-eldoc-in-minibuffer

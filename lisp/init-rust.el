@@ -36,8 +36,7 @@
               (> (buffer-size) core-large-buffer-size))
     (with-demoted-errors "Lsp-rust: %s"
       (lsp)
-      (when (require 'lsp-ui-doc nil t)
-        (lsp-ui-doc-enable 1)))))
+      (lsp//ui-doc-toggle 1))))
 
 (defun rust/cargo-dispatch (-use-last-action)
   (interactive "P")
