@@ -67,3 +67,4 @@
   (require 'init-emms))
 
 (require 'init-extra)
+(require 'init-play)

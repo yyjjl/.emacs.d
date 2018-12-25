@@ -76,7 +76,7 @@
               (cl-loop for (name . record) in bookmark-alist
                        when (equal (file-truename (buffer-file-name))
                                    (file-truename (bookmark-get-filename name)))
-                       do (return name))))))
+                       return name)))))
 
   (bookmark-maybe-load-default-file)
   ;; Setup for existing buffers
@@ -84,18 +84,21 @@
     (with-current-buffer buffer
       (core|setup-buffer-bookmark))))
 
-(setq winum-keymap
-      (define-key! :map (make-sparse-keymap)
-        ("M-`" . winum-select-window-by-number)
-        ("M-0" . winum-select-window-0-or-10)
-        ("M-1" . winum-select-window-1)
-        ("M-2" . winum-select-window-2)
-        ("M-3" . winum-select-window-3)
-        ("M-4" . winum-select-window-4)
-        ("M-5" . winum-select-window-5)
-        ("M-6" . winum-select-window-6)
-        ("M-7" . winum-select-window-7)))
 (with-eval-after-load 'winum
+  (define-key! :map winum-keymap
+    ("C-x w")
+    ("M-`" . winum-select-window-by-number)
+    ("M-0" . winum-select-window-0-or-10)
+    ("M-1" . winum-select-window-1)
+    ("M-2" . winum-select-window-2)
+    ("M-3" . winum-select-window-3)
+    ("M-4" . winum-select-window-4)
+    ("M-5" . winum-select-window-5)
+    ("M-6" . winum-select-window-6)
+    ("M-7" . winum-select-window-7))
+  (setcdr (assoc 'winum-mode minor-mode-map-alist)
+          winum-keymap)
+
   (setq winum-auto-setup-mode-line nil)
   (setq winum-scope 'frame-local
         winum-reverse-frame-list nil
@@ -122,10 +125,19 @@
     ("M-p" . previous-error)
     ("j" . (lambda! () (xref--search-property 'xref-item)))
     ("k" . (lambda! () (xref--search-property 'xref-item t))))
-  (define-hook! xref*xref-buffer-setup (xref--xref-buffer-mode-hook)
-    (toggle-truncate-lines 1))
-  (add-to-list 'xref-prompt-for-identifier
-               'xref-find-references :append))
+
+  (add-hook 'xref--xref-buffer-mode-hook (lambda () (toggle-truncate-lines 1)))
+
+  (defun xref*around-xref-find-definitions (-fn -identifier)
+    (condition-case err
+        (funcall -fn -identifier)
+      (user-error
+       (if-let* ((symbol (thing-at-point 'symbol)))
+           (counsel-rg symbol)
+         (message "%s" (error-message-string err))))))
+
+  (advice-add 'xref-find-definitions :around #'xref*around-xref-find-definitions)
+  (add-to-list 'xref-prompt-for-identifier 'xref-find-references :append))
 
 (defun core*flymake-eldoc-function ()
   (let ((diags (flymake-diagnostics (point))))

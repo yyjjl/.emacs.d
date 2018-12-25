@@ -12,14 +12,14 @@
 
 (custom-theme-set-faces
  'doom-molokai
- '(mode-line
-   ((t (:foreground "#F8F8F2" :background "#2D2D2D"
-                    :box (:line-width 2 :color "#4D4D4D")))))
- '(mode-line-inactive
-   ((t (:foreground "#BCBCBC" :background "#2D2D2D"
-                    :box (:line-width 2 :color "#2D2D2D")))))
- '(mode-line-highlight ((t (:background "black"))))
- '(header-line ((t (:foreground "grey90" :background "#2D2D2D"))))
+ ;; '(mode-line
+ ;;   ((t (:foreground "#F8F8F2" :background "#2D2D2D"
+ ;;                    :box (:line-width 2 :color "#4D4D4D")))))
+ ;; '(mode-line-inactive
+ ;;   ((t (:foreground "#BCBCBC" :background "#2D2D2D"
+ ;;                    :box (:line-width 2 :color "#2D2D2D")))))
+ ;; '(mode-line-highlight ((t (:background "black"))))
+ ;; '(header-line ((t (:foreground "grey90" :background "#2D2D2D"))))
 
  '(font-lock-builtin-face ((t (:foreground "#749e20"))))
  '(font-lock-constant-face ((t (:foreground "#AE81FF"))))
