@@ -217,13 +217,7 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
         (-when-let (proc (ignore-errors (get-buffer-process buffer)))
           (set-process-sentinel proc (term//wrap-sentinel (process-sentinel proc))))
         (when -shell-buffer-p
-          (with-editor-export-editor)
-          (when-let (process (get-buffer-process (current-buffer)))
-            (goto-char (process-mark process))
-            (process-send-string process " clear\n"))
-          (add-hook 'term-or-comint-process-exit-hook
-                    'term//terminal-exit-hook
-                    nil :local)))
+          (add-hook 'term-or-comint-process-exit-hook 'term//terminal-exit-hook nil :local)))
       buffer)))
 
 
