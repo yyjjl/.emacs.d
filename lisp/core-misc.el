@@ -19,7 +19,7 @@
   :safe (lambda (x) (and (listp x) (-all? #'stringp x))))
 
 (defvar core-project-rsync-command
-  "rsync -a --progress --delete --filter=':- .gitignore' %s . %s")
+  "rsync -a --progress --filter=':- .gitignore' %s . %s")
 
 
 (defvar core-current-desktop-name nil)

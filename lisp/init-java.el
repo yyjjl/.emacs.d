@@ -16,7 +16,8 @@
       (when (bound-and-true-p lsp-enable-in-project-p)
         (with-demoted-errors "Lsp-java: %s"
           (lsp)
-          (lsp//ui-doc-toggle 1))))))
+          (lsp//ui-doc-toggle 1)
+          (setq-local c-basic-offset 8))))))
 
 (with-eval-after-load 'cc-mode
   (require 'lsp-java))
@@ -31,6 +32,7 @@
     ([f5] . dap-hydra)
     ([f10] . lsp-java-build-project)
     ("C-c b" . lsp-format-buffer)
+    ("C-c C-b" . lsp-format-buffer)
     ("C-c B" . lsp-java-organize-imports)
     ("C-c C-d" . lsp-describe-thing-at-point)))
 
