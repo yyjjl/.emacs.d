@@ -36,7 +36,6 @@
 (define-hook! haskell|setup (haskell-mode-hook)
   (rainbow-delimiters-mode 1)
   (haskell-decl-scan-mode 1)
-  (electric-indent-local-mode 1)
 
   (unless (or (buffer-temporary-p)
               (buffer-base-buffer))

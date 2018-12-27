@@ -2,7 +2,7 @@
 (require-packages!
  yasnippet
  yasnippet-snippets
- (flycheck :archive "melpa-stable")
+ flycheck
  ;; Code completion framework
  company
  (company-posframe :when (>= emacs-major-version 26))
@@ -73,6 +73,7 @@
   ;; (global-eldoc-mode 1)
 
   (global-whitespace-mode 1)
+  (electric-indent-mode 1)
 
   (setq package-selected-packages
         (hash-table-keys package--required-packages))

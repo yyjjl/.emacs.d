@@ -70,8 +70,8 @@
       (add-transient-hook!
           (hack-local-variables-hook :local t :name web|setup-js-internal)
         (setq-local web-mode-enable-auto-quoting nil)
-        (if (not (bound-and-true-p lsp-enable-in-project-p))
-            (electric-indent-local-mode 1)
+        (when (bound-and-true-p lsp-enable-in-project-p)
+          (electric-indent-local-mode -1)
           (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
           (flycheck-mode 1)
           (tide-setup)
@@ -84,8 +84,8 @@
              (not (string-suffix-p ".json" (downcase buffer-file-name))))
     (add-transient-hook!
         (hack-local-variables-hook :local t :name web|setup-js-internal)
-      (if (not (bound-and-true-p lsp-enable-in-project-p))
-          (electric-indent-local-mode 1)
+      (when (bound-and-true-p lsp-enable-in-project-p)
+        (electric-indent-local-mode -1)
         (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
         (flycheck-mode 1)
         (tide-setup)
