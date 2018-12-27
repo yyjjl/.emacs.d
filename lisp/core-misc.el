@@ -104,6 +104,10 @@
         winum-reverse-frame-list nil
         winum-auto-assign-0-to-minibuffer t))
 
+(with-eval-after-load 'ediff
+  ;; do not use multi-frames
+  (advice-add 'ediff-window-display-p :override #'ignore))
+
 (with-eval-after-load 'display-line-numbers
   (setq display-line-numbers-type 'relative)
   (setq-default display-line-numbers-width 2))

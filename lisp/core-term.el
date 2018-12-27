@@ -3,7 +3,7 @@
 (setvar! term-zsh-path (executable-find "zsh")
          term-bash-path (executable-find "bash"))
 
-(require-packages! with-editor term)
+(require-packages! term)
 
 (eval-when-compile
   (require 'dash))
@@ -37,13 +37,6 @@
   (let ((proc (get-buffer-process (current-buffer))))
     (when proc
       (set-process-sentinel proc (term//wrap-sentinel (process-sentinel proc))))))
-
-(add-hook 'shell-mode-hook
-          (lambda () (unless (file-remote-p default-directory)
-                       (with-editor-export-editor))))
-(add-hook 'eshell-mode-hook
-          (lambda () (unless (file-remote-p default-directory)
-                       (with-editor-export-editor))))
 
 (define-key!
   ([f8] . term/pop-shell)
