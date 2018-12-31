@@ -163,9 +163,6 @@
      ("\\\\\\\\$" . font-lock-comment-face))
    'append)
 
-  (setq org-structure-template-alist
-        (--map (list (car it) (downcase (cadr it)))
-               org-structure-template-alist))
   (setq org-entities-user
         (eval-when-compile
           (when (require 'tex-mode nil :noerror)
@@ -208,7 +205,7 @@
         org-agenda-include-diary t
         org-agenda-window-setup 'current-window
         org-fast-tag-selection-single-key 'expert
-        org-export-kill-product-buffer-when-displayed t
+        org-export-will-product-buffer-when-displayed t
         org-export-with-sub-superscripts t
         org-tags-column -65
         org-ellipsis "  "
