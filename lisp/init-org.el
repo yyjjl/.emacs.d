@@ -224,7 +224,7 @@
         org-preview-latex-default-process 'imagemagick)
 
   (add-to-list 'org-babel-tangle-lang-exts '("ipython" . "py"))
-  (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
+  (setcdr (assoc "dot" org-src-lang-modes) 'graphviz-dot)
 
   ;; Refile targets include this file and any file contributing to the
   ;; agenda - up to 5 levels deep

@@ -44,13 +44,17 @@
                                                        "\\.org\\'"))
                          :history 'org-project-note-history
                          :caller 'org/project-open)))
-    (setq name (expand-file-name name org-project-src-dir))
-    (if (string-suffix-p ".org" name)
-        (and (or (file-exists-p name)
-                 (y-or-n-p (format "Create new note %s"
-                                   (abbreviate-file-name name))))
-             (find-file name))
-      (message "Note must be an org file"))))
+    (setq name (abbreviate-file-name (expand-file-name name org-project-src-dir)))
+    (cond ((not (string-suffix-p ".org" name))
+           (error "filename should endswith \".org\""))
+          ((file-exists-p name)
+           (message "Open existing note: %s" name)
+           (find-file name))
+          ((y-or-n-p (format "Create new note %s" (abbreviate-file-name name)))
+           (make-directory (file-name-directory name) t)
+           (find-file name))
+          (t
+           (error "Nothing to do with %s" name)))))
 
 (defun org/project-sync ()
   (interactive)

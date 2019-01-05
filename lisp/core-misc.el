@@ -181,6 +181,7 @@
         flycheck-idle-change-delay 1))
 
 (with-eval-after-load 'flycheck-posframe
+  (setq flycheck-posframe-buffer " *flycheck-posframe-buffer*")
   (setq flycheck-posframe-warning-prefix "[W] ")
   (setq flycheck-posframe-error-prefix "[E] ")
   (setq flycheck-posframe-info-prefix "[I] ")
