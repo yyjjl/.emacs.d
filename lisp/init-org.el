@@ -210,10 +210,10 @@
         org-tags-column -65
         org-ellipsis "  "
         org-hide-emphasis-markers nil
-        org-hide-leading-stars t
+        org-hide-leading-stars nil
         org-hide-block-startup nil
-        ;; org-startup-indented t
-        ;; org-adapt-indentation nil
+        org-startup-indented nil
+        org-adapt-indentation nil
         org-startup-folded 'content
         org-pretty-entities t
         org-pretty-entities-include-sub-superscripts nil

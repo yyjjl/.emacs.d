@@ -3,14 +3,23 @@
 ;;;###autoload
 (defun org/next-item (&optional -n)
   (interactive "p")
-  (let ((cmd (if (> -n 0) #'org-next-item #'org-previous-item))
-        (col (current-column))
-        (n (abs -n)))
-    (condition-case err
-        (while (>= (decf n) 0)
-          (funcall cmd))
-      (error (message "%s" err)))
-    (move-to-column col)))
+  (cond ((org-in-block-p '("src" "quote" "example"))
+         (org-next-block (abs -n) (< -n 0)))
+        ((org-in-item-p)
+         (let ((cmd (if (> -n 0) #'org-next-item #'org-previous-item))
+               (col (current-column))
+               (n (abs -n)))
+           (condition-case err
+               (progn
+                 (while (>= (decf n) 0)
+                   (funcall cmd))
+                 (move-to-column col))
+             (error (message "%s" err)))))
+        (t
+         (let ((cmd (if (> -n 0)
+                        #'org-next-visible-heading
+                      #'org-previous-visible-heading)))
+           (funcall cmd (abs -n))))))
 
 ;;;###autoload
 (defun org/previous-item (&optional -n)

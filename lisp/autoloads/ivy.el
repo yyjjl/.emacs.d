@@ -209,3 +209,15 @@ for a file to visit if current buffer is not visiting a file."
           (looking-at "stack> "))
         (undo)
       (error "Filter stack is empty"))))
+
+;;;###autoload
+(defun counsel/rg (&optional -arg)
+  (interactive "p")
+  (cond ((= -arg 16)
+         (counsel-rg nil
+                     (read-directory-name "rg in directory: "
+                                          (or (projectile-project-root)
+                                              default-directory))
+                     (read-from-minibuffer "rg args: " "--no-ignore")
+                     "rg no ignore: "))
+        (t (call-interactively 'counsel-rg))))

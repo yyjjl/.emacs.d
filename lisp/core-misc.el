@@ -259,6 +259,13 @@
 (with-eval-after-load 'isearch
   (define-key isearch-mode-map (kbd "C-o") 'isearch-occur))
 
+(with-eval-after-load 'indent
+  (define-key! :map indent-rigidly-map
+    ("h" . indent-rigidly-left)
+    ("l" . indent-rigidly-right)
+    ("H" . indent-rigidly-left-to-tab-stop)
+    ("L" . indent-rigidly-right-to-tab-stop)))
+
 (with-eval-after-load 'session
   (add-hook 'core-autosave-hook 'session-save-session)
 
