@@ -181,6 +181,7 @@
         flycheck-idle-change-delay 1))
 
 (with-eval-after-load 'flycheck-posframe
+  (setq flycheck-posframe-buffer " *flycheck-posframe-buffer*")
   (setq flycheck-posframe-warning-prefix "[W] ")
   (setq flycheck-posframe-error-prefix "[E] ")
   (setq flycheck-posframe-info-prefix "[I] ")
@@ -263,6 +264,13 @@
 
 (with-eval-after-load 'isearch
   (define-key isearch-mode-map (kbd "C-o") 'isearch-occur))
+
+(with-eval-after-load 'indent
+  (define-key! :map indent-rigidly-map
+    ("h" . indent-rigidly-left)
+    ("l" . indent-rigidly-right)
+    ("H" . indent-rigidly-left-to-tab-stop)
+    ("L" . indent-rigidly-right-to-tab-stop)))
 
 (with-eval-after-load 'session
   (add-hook 'core-autosave-hook 'session-save-session)

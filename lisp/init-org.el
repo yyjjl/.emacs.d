@@ -210,10 +210,10 @@
         org-tags-column -65
         org-ellipsis "  "
         org-hide-emphasis-markers nil
-        org-hide-leading-stars t
+        org-hide-leading-stars nil
         org-hide-block-startup nil
-        ;; org-startup-indented t
-        ;; org-adapt-indentation nil
+        org-startup-indented nil
+        org-adapt-indentation nil
         org-startup-folded 'content
         org-pretty-entities t
         org-pretty-entities-include-sub-superscripts nil
@@ -224,7 +224,7 @@
         org-preview-latex-default-process 'imagemagick)
 
   (add-to-list 'org-babel-tangle-lang-exts '("ipython" . "py"))
-  (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
+  (setcdr (assoc "dot" org-src-lang-modes) 'graphviz-dot)
 
   ;; Refile targets include this file and any file contributing to the
   ;; agenda - up to 5 levels deep

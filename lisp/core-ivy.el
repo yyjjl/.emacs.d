@@ -132,7 +132,7 @@
         (setq counsel-rg-base-command
               "rg -M 1000 -S --no-heading --line-number --color never %s .")
         (define-key projectile-command-map "ss" 'counsel-projectile-rg)
-        (global-set-key (kbd "C-c i a") 'counsel-rg))
+        (global-set-key (kbd "C-c i a") 'counsel/rg))
     (define-key projectile-command-map "ss" 'counsel-projectile-grep)
     (global-set-key (kbd "C-c i a") 'counsel-grep))
 
