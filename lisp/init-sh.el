@@ -15,7 +15,7 @@
       (lsp//ui-doc-toggle 1)
       (setq-local lsp--disable-eldoc-in-minibuffer t)
       (setq-local lsp-eldoc-hook '(lsp-document-highlight lsp-hover))
-      (setq-local company-lsp-cache-candidates t))
+      (setq-local company-lsp-cache-candidates 'auto))
     (flycheck-mode 1)
     (add-to-list 'company-backends 'company-files)))
 

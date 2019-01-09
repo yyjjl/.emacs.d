@@ -206,18 +206,24 @@
     mode-line--cached-git-branch
     elpy-project-root))
 
+(defun core*projectile-clear-vars (_)
+  (dolist (buffer (ignore-errors (projectile-project-buffers)))
+    (when (buffer-live-p buffer)
+      (with-current-buffer buffer
+        (dolist (var core-projectile-invalidate-cache-empty-vars)
+          (set var nil))))))
+
+(defun core*projectile-run-compilation (-cmd)
+  (if (functionp -cmd)
+      (funcall -cmd)
+    (compile -cmd t)))
+
 (with-eval-after-load 'projectile
   (define-key projectile-mode-map (kbd "C-x p") projectile-command-map)
 
-  (advice-add 'projectile-invalidate-cache
-              :after (lambda (_)
-                       (dolist (var core-projectile-invalidate-cache-empty-vars)
-                         (set var nil))))
+  (advice-add 'projectile-invalidate-cache :after #'core*projectile-clear-vars)
 
-  (advice-add 'projectile-run-compilation
-              :override
-              #'(lambda (-cmd)
-                  (if (functionp -cmd) (funcall -cmd) (compile -cmd t))))
+  (advice-add 'projectile-run-compilation :override #'core*projectile-run-compilation)
 
   ;; Projectile root-searching functions can cause an infinite cl-loop on TRAMP
   ;; connections, so disable them.

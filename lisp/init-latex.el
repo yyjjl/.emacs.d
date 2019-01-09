@@ -16,7 +16,6 @@
   (flycheck-mode -1)
 
   (setq next-error-function 'TeX-next-error)
-
   (company-auctex-init)
   (add-to-list 'company-backends 'company-reftex-labels)
   (add-to-list 'company-backends 'company-reftex-citations)

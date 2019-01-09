@@ -48,6 +48,7 @@
 
   (lsp-ui-mode 1)
   (lsp-ui-flycheck-enable 1)
+  (lsp-ui-sideline-enable 1)
 
   ;; default to sort and filter by server
   (setq-local company-transformers nil)
@@ -73,6 +74,7 @@
   (dap-mode 1)
   (dap-ui-mode 1)
 
+  (setq lsp-auto-guess-root t)
   (setq lsp-session-file (expand-var! "lsp-sessions"))
   (setq lsp-auto-configure nil)
   (setq lsp-eldoc-render-all t)
@@ -93,11 +95,13 @@
 
 (with-eval-after-load 'lsp-ui
   (require 'lsp-ui-flycheck)
+  (require 'lsp-ui-sideline)
 
   (setq lsp-ui-peek-enable nil)
   (setq lsp-ui-doc-enable nil)
   (setq lsp-ui-sideline-enable nil)
   (setq lsp-ui-sideline-show-hover nil)
+  (setq lsp-ui-sideline-show-diagnostics nil)
   (setq lsp-ui-doc-max-width 80))
 
 (with-eval-after-load 'company-lsp
