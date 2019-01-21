@@ -157,7 +157,6 @@
     ("C-c C" . cpp-cmake/change-config)
     ("C-c D" . cpp-cmake/config)
     ("C-c C-c" . cpp/config-project)
-    ("M-s l" . ccls-code-lens-mode)
     ("M-s c" . ccls-call-hierarchy)
     ("M-s m" . ccls-member-hierarchy)
     ("M-s i" . ccls-inheritance-hierarchy)

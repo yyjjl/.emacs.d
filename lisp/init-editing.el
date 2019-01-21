@@ -83,11 +83,11 @@ _=_ next    _-_ previous    ___ skip-previous  _+_ skip-next _q_ quit
 
 ;; `avy' jump commands
 (define-key!
-  ("M-8" . avy-goto-word-1-above)
-  ("M-9" . avy-goto-word-1-below)
+  ("M-7" . avy-goto-word-1-above)
+  ("M-8" . avy-goto-word-1-below)
+  ("M-9" . avy-goto-char-in-line)
   ("M-g d" . avy-goto-symbol-1-in-defun)
   ("M-g 1" . avy-goto-char)
-  ("M-g ." . avy-goto-char-in-line)
   ("M-g 2" . avy-goto-char-2)
   ("M-g l" . avy-goto-line)
   ("M-g s" . avy-goto-symbol-1)

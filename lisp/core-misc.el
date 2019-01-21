@@ -94,8 +94,7 @@
     ("M-3" . winum-select-window-3)
     ("M-4" . winum-select-window-4)
     ("M-5" . winum-select-window-5)
-    ("M-6" . winum-select-window-6)
-    ("M-7" . winum-select-window-7))
+    ("M-6" . winum-select-window-6))
   (setcdr (assoc 'winum-mode minor-mode-map-alist)
           winum-keymap)
 

@@ -87,6 +87,7 @@
   (advice-add 'lsp--eldoc-message :override 'lsp//eldoc-message)
 
   (define-key!
+    ("M-s l" . lsp-lens-mode)
     ("M-s h h" . lsp-document-highlight)
     ("C-c R" . lsp-rename)
     ("C-c S" . lsp-describe-session)
