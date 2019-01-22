@@ -4,22 +4,18 @@
 
 (defface empty-line-face
   '((t (:foreground "grey50")))
-  "Window number in mode-line"
+  "empty-line-face"
   :group 'fringe)
+
+(defface winum-inactive-face '()
+  "empty-line-face"
+  :group 'winum)
 
 (load-theme 'doom-molokai t)
 (doom-themes-org-config)
 
 (custom-theme-set-faces
  'doom-molokai
- ;; '(mode-line
- ;;   ((t (:foreground "#F8F8F2" :background "#2D2D2D"
- ;;                    :box (:line-width 2 :color "#4D4D4D")))))
- ;; '(mode-line-inactive
- ;;   ((t (:foreground "#BCBCBC" :background "#2D2D2D"
- ;;                    :box (:line-width 2 :color "#2D2D2D")))))
- ;; '(mode-line-highlight ((t (:background "black"))))
- ;; '(header-line ((t (:foreground "grey90" :background "#2D2D2D"))))
 
  '(font-lock-builtin-face ((t (:foreground "#749e20"))))
  '(font-lock-constant-face ((t (:foreground "#AE81FF"))))
@@ -52,16 +48,21 @@
  '(js2-function-call ((t (:inherit font-lock-regexp-grouping-backslash))))
  '(web-mode-jsx-depth-1-face ((t (:background "#2d2e2e"))))
  '(easy-kill-selection ((t (:inverse-video t :inherit warning))))
- ;; '(nlinum-current-line ((t (:inherit font-lock-builtin-face))))
+
  '(semantic-highlight-func-current-tag-face ((t (:background "gray5"))))
  '(shm-current-face ((t (:inherit hl-line))))
  '(ivy-highlight-face ((t (:background "#444155"))))
  '(ivy-current-match ((t (:background "gray0"))))
  '(ivy-virtual ((t (:inherit font-lock-doc-face))))
- '(winum-face ((t (:background "black")))))
+
+ '(winum-face ((t (:inherit org-level-2
+                            :background "black" :box (:line-width 4 :color "black")))))
+ '(winum-inactive-face ((t (:background "black" :box (:line-width 4 :color "black"))))))
 
 (with-eval-after-load 'org
   (dolist (face org-level-faces)
-    (set-face-attribute face nil :height 1.0)))
+    (set-face-attribute face nil :height 1.0))
+  (let ((bgcolor (face-attribute 'winum-face :background))))
+  (set-face-attribute 'winum-face nil :inherit 'org-level-2 :height 1.0))
 
 (provide 'core-theme)
