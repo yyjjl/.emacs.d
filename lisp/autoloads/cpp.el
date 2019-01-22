@@ -94,7 +94,9 @@
                       nil
                       :must-match))))
               (gud-chdir-before-run nil))
-          (call-interactively 'realgud:gdb))
+          (realgud:gdb (or (ignore-errors (realgud:gdb-query-cmdline "gdb"))
+                           (read-shell-command "Run like this: " nil
+                                               'realgud:gdb-minibuffer-history))))
       (unless realgud-short-key-mode
         (realgud-short-key-mode 1)))))
 

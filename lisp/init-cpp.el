@@ -75,6 +75,7 @@
   (if (or (not cpp-has-cmake-p)
           (not cpp-has-ccls-p)
           (buffer-base-buffer)
+          (buffer-temporary-p)
           (file-remote-p default-directory)
           (not (bound-and-true-p lsp-enable-in-project-p))
           (> (buffer-size) core-large-buffer-size))
