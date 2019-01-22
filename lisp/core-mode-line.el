@@ -40,6 +40,9 @@
 
 (autoload 'image-get-display-property "image-mode" nil)
 
+(defsubst mode-line//window-active-p ()
+  (eq mode-line--current-window (selected-window)))
+
 (defsubst mode-line//window-number ()
   (and (bound-and-true-p winum-mode)
        (let ((narrow-p (buffer-narrowed-p)))
@@ -47,7 +50,10 @@
                       (if narrow-p "<" " ")
                       (ignore-errors (winum-get-number-string))
                       (if narrow-p ">" " "))
-                     'face 'winum-face))))
+                     'face
+                     (if (mode-line//window-active-p)
+                         'winum-face
+                       'winum-inactive-face)))))
 
 (defsubst mode-line//git-info ()
   (when buffer-file-name
@@ -70,11 +76,11 @@
         (setq mode-line--cached-root (abbreviate-file-name root))
         (setq mode-line--cached-relative-directory
               (if (and (string-prefix-p root directory) (buffer-file-name))
-                  (mapconcat
-                   (lambda (x) (if (equal x "") "" (substring x 0 1)))
-                   (split-string (substring directory (length root)) "/")
-                   "/")
-                ;; (substring directory (length root))
+                  (substring directory (length root))
+                ;; (mapconcat
+                ;;  (lambda (x) (if (equal x "") "" (substring x 0 1)))
+                ;;  (split-string (substring directory (length root)) "/")
+                ;;  "/")
                 "")))))
 
 (defsubst mode-line//buffer-id ()
@@ -104,16 +110,16 @@ read-only, and `buffer-file-coding-system'"
           (propertize (format "%+d " text-scale-mode-amount)
                       'face font-lock-doc-face))
         (when (or defining-kbd-macro executing-kbd-macro)
-          (propertize "M " 'face font-lock-variable-name-face))
+          (propertize "macro " 'face font-lock-variable-name-face))
         (when (buffer-temporary-p)
-          (propertize "t " 'face font-lock-comment-face))
+          (propertize "tmp " 'face font-lock-comment-face))
         (when (buffer-modified-p)
           (propertize "m " 'face font-lock-negation-char-face))
         (when buffer-read-only
-          (propertize (if view-mode "v " "ro ") 'face font-lock-string-face))
+          (propertize (if view-mode "view " "ro ") 'face font-lock-string-face))
         (when visual-line-mode
           (propertize "vs " 'face font-lock-type-face))
-        (when visible-mode "V ")
+        (when visible-mode "Vis ")
         (when (buffer-base-buffer) "I ")
         (when (eq major-mode 'image-mode)
           (cl-destructuring-bind (width . height)

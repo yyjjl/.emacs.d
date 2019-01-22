@@ -103,6 +103,11 @@
           (realgud-command cmd nil t)
           (sit-for 0.5))))))
 
+(defun realgud*cmd-quit (_arg)
+  (let ((cmdbuf (realgud-get-cmdbuf)))
+    (when cmdbuf
+      (pop-to-buffer cmdbuf))))
+
 (with-eval-after-load 'realgud
   (fset 'realgud-populate-common-fn-keys-standard 'ignore)
   (setq realgud-populate-common-fn-keys-function nil)
@@ -117,7 +122,8 @@
 
   (advice-add 'realgud-term-sentinel :after #'realgud*after-term-sentinel)
   (advice-add 'realgud:run-process :around #'realgud*around-run-process)
-  (advice-add 'realgud:terminate :before #'realgud*save-breakpoints))
+  (advice-add 'realgud:terminate :before #'realgud*save-breakpoints)
+  (advice-add 'realgud:cmd-quit :before #'realgud*cmd-quit))
 
 (with-eval-after-load 'comint
   (define-key! :map comint-mode-map
