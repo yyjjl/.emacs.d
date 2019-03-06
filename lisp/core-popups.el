@@ -1,7 +1,7 @@
 ;;  -*- lexical-binding: t -*-
 (defvar core-popups-default-regexp
   (rx line-start
-      (? " ") "*" (*\? not-newline) "*" (? "<" (+ digit) ">")
+      "*" (*\? not-newline) "*" (? "<" (+ digit) ">")
       line-end))
 
 (defvar core-popups-other-window-regexp

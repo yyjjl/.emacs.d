@@ -120,6 +120,9 @@
   (setq vc-handled-backends nil)
   (setq magit-auto-revert-mode nil))
 
+(with-eval-after-load 'transient
+  (setq transient-mode-line-format nil))
+
 (with-eval-after-load 'magit-files
   (define-key! :map magit-file-mode-map
     ("C-x g g" . magit-status)
