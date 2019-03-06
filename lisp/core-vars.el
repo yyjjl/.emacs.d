@@ -94,6 +94,7 @@ will close some features to speed up emacs performance")
   (setq skeletor-user-directory (expand-etc! "project-templates/"))
   (setq smex-save-file (expand-var! "smex-items.el"))
   (setq srecode-map-save-file (expand-var! "srecode-map.el"))
+  (setq transient-history-file (expand-var! "transient/history.el"))
   (setq tramp-persistency-file-name (expand-var! "tramp.el"))
   (setq url-configuration-directory (expand-var! "url/")))
 

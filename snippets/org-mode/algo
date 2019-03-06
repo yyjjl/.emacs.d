@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: algo
+# key: algo
+# --
+#+latex_header: \usepackage[linesnumbered, lined, ruled]{algorithm2e}

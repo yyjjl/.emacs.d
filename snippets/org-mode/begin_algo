@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: begin_algo
+# key: balgo
+# --
+\begin{algorithm}
+  \SetKwInOut{Input}{Input}
+  # \SetKwFunction{keyword}{content}
+  \Input{$2}
+  $0
+  \caption{$1}
+\end{algorithm}

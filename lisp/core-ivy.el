@@ -73,6 +73,9 @@
     ("C-M-j" . ivy-done)
     ("M-." . ignore)))
 
+(with-eval-after-load 'swiper
+  (setq swiper-stay-on-quit t))
+
 (with-eval-after-load 'counsel
   (define-key!
     ("C-x j j" . counsel-bookmark)
