@@ -19,7 +19,7 @@
   :safe (lambda (x) (and (listp x) (-all? #'stringp x))))
 
 (defvar core-project-rsync-command
-  "rsync -a --progress --filter=':- .gitignore' %s . %s")
+  "rsync -azh --progress --filter=':- .gitignore' %s . %s")
 
 
 (defvar core-current-desktop-name nil)
@@ -113,7 +113,7 @@
 
 ;; `whitespace-space' setup
 (with-eval-after-load 'whitespace
-  (setq whitespace-global-modes '(text-mode latex-mode))
+  (setq whitespace-global-modes '(text-mode))
   (setq whitespace-style '(face tabs tab-mark spaces space-mark empty)))
 
 (with-eval-after-load 'view
@@ -377,7 +377,9 @@
           return buffer)))
     (when (or (not next-error-last-buffer)
               (not (eq next-error-last-buffer occur-buffer)))
-      (setq next-error-last-buffer occur-buffer))))
+      (setq next-error-last-buffer occur-buffer))
+    occur-buffer))
+
 (advice-add 'next-error :before #'core*before-next-error)
 
 (autoload 'awesome-pair-kill "awesome-pair")

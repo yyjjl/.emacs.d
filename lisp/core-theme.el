@@ -55,9 +55,11 @@
  '(ivy-current-match ((t (:background "gray0"))))
  '(ivy-virtual ((t (:inherit font-lock-doc-face))))
 
- '(winum-face ((t (:inherit org-level-2
-                            :background "black" :box (:line-width 4 :color "black")))))
- '(winum-inactive-face ((t (:background "black" :box (:line-width 4 :color "black"))))))
+ ;; '(winum-face ((t (:inherit org-level-2
+ ;;                            :background "black" :box (:line-width 4 :color "black")))))
+ ;; '(winum-inactive-face ((t (:background "black" :box (:line-width 4 :color "black")))))
+ '(winum-face ((t (:inherit org-level-2 :background "black"))))
+ '(winum-inactive-face ((t (:background "black")))))
 
 (with-eval-after-load 'org
   (dolist (face org-level-faces)

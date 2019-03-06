@@ -21,7 +21,7 @@
   (add-to-list 'company-backends 'company-reftex-citations)
   (add-to-list 'company-backends 'company-files)
   (turn-off-auto-fill)
-  (visual-line-mode 1)
+  ;; (visual-line-mode 1)
   ;; (setq company-backends (delete 'company-dabbrev company-backends))
   (LaTeX-math-mode 1)
   ;; Fix conflit with `orgtbl-mode'
@@ -68,7 +68,21 @@
         TeX-source-correlate-start-server nil
         font-latex-fontify-script nil
         ;; Don't insert line-break at inline math
-        LaTeX-fill-break-at-separators nil))
+        LaTeX-fill-break-at-separators nil)
+
+  (defun latex/next-error ()
+    (interactive)
+    (let ((occur-buffer (core*before-next-error)))
+      (call-interactively (if occur-buffer #'next-error #'TeX-next-error))))
+
+  (defun latex/previous-error ()
+    (interactive)
+    (let ((occur-buffer (core*before-next-error)))
+      (call-interactively (if occur-buffer #'previous-error #'TeX-previous-error))))
+
+  (define-key! :map TeX-mode-map
+    ([remap next-error] . latex/next-error)
+    ([remap previous-error] . latex/previous-error)))
 
 (with-eval-after-load 'tex-mode
   (dolist (key '("--" "---"))
@@ -148,6 +162,9 @@
           (?b . "\\blockcquote[]{%l}{}")))
 
   (setq reftex-plug-into-AUCTeX '(t t t t t)
-        reftex-use-fonts t))
+        reftex-use-fonts t)
+
+  (define-key! :map reftex-mode-map
+    ("C-c i i" . reftex-goto-label)))
 
 (provide 'init-latex)
