@@ -111,24 +111,6 @@
         (indent-according-to-mode))
     (call-interactively 'self-insert-command)))
 
-;;;###autoload
-(defun cpp/begining-of-statment ()
-  (interactive)
-  (if (and (not current-prefix-arg)
-           (or (= (char-before) ?\})
-               (= (char-after) ?\})))
-      (backward-sexp)
-    (call-interactively 'c-beginning-of-statement)))
-
-;;;###autoload
-(defun cpp/end-of-statment ()
-  (interactive)
-  (if (and (not current-prefix-arg)
-           (or (= (char-before) ?\{)
-               (= (char-after) ?\{)))
-      (forward-sexp)
-    (call-interactively 'c-end-of-statement)))
-
 (defvar c-macro-preprocessor)
 ;;;###autoload
 (defun cpp/macro-expand ()

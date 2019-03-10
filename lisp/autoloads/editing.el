@@ -80,11 +80,9 @@ grab matched string and insert them into `kill-ring'"
       (replace-match "\\1 \\2" nil nil))))
 
 ;;;###autoload
-(defun goto-next-char-or-select-minibuffer-window (-arg)
+(defun core/goto-next-char-or-minibuffer (-arg)
   (interactive "P")
-  (let ((window (aref (car (gethash (selected-frame)
-                                    window-numbering-table))
-                      0)))
+  (let ((window (winum-get-window-by-number 0)))
     (if (and window (not (eq window (selected-window))))
         (select-window window)
       (let ((char (read-char))
@@ -93,39 +91,51 @@ grab matched string and insert them into `kill-ring'"
 
 ;;;###autoload
 (defun forward-defun (&optional -n)
-  (interactive "p")
+  (interactive "^p")
   (forward-thing 'defun -n))
 
 ;;;###autoload
 (defun backward-defun (&optional -n)
-  (interactive "p")
+  (interactive "^p")
   (forward-thing 'defun (- -n)))
 
 ;;;###autoload
 (defun forward-sentence-or-sexp (&optional -n)
-  (interactive "p")
-  (if (or (derived-mode-p 'prog-mode 'latex-mode 'org-mode))
-      (condition-case nil
-          (forward-sexp -n)
-        (scan-error
-         (forward-char -n)))
-    (forward-sentence -n)))
+  (interactive "^p")
+  (cond ((derived-mode-p 'c-mode 'c++-mode 'java-mode)
+         (if (and (not current-prefix-arg)
+                  (or (= (char-after) ?\{)
+                      (and (< -n 0)
+                           (or (= (char-before) ?\})
+                               (when (= (char-after) ?\})
+                                 (forward-char 1)
+                                 t)))))
+             (forward-sexp -n)
+           (c-end-of-statement -n nil t)))
+        ((derived-mode-p 'python-mode)
+         (python-nav-forward-statement -n))
+        ((derived-mode-p 'prog-mode 'latex-mode 'org-mode)
+         (condition-case nil
+             (forward-sexp -n)
+           (scan-error
+            (forward-char -n))))
+        (t (forward-sentence -n))))
 
 ;;;###autoload
 (defun backward-sentence-or-sexp (&optional -n)
-  (interactive "p")
+  (interactive "^p")
   (forward-sentence-or-sexp (- -n)))
 
 ;;;###autoload
 (defun forward-defun-or-paragraph (&optional -n)
-  (interactive "p")
+  (interactive "^p")
   (if (or (derived-mode-p 'prog-mode))
       (forward-defun -n)
     (forward-paragraph -n)))
 
 ;;;###autoload
 (defun backward-defun-or-paragraph (&optional -n)
-  (interactive "p")
+  (interactive "^p")
   (forward-defun-or-paragraph (- -n)))
 
 ;;;###autoload

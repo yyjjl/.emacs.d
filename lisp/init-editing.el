@@ -93,7 +93,6 @@ _=_ next    _-_ previous    ___ skip-previous  _+_ skip-next _q_ quit
   ("M-g s" . avy-goto-symbol-1)
   ("M-g w" . avy-goto-subword-1)
   ("M-g y" . avy-copy-line)
-  ("M-0" . goto-next-char-or-select-minibuffer-window)
   ("M-'" . core/change-surround))
 
 (avy-setup-default)

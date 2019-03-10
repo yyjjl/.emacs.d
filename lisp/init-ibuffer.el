@@ -60,6 +60,7 @@
                        (name . "^\\.bbdb$")
                        (name . "^\\.newsrc-dribble"))))))
   (define-hook! ibuffer|setup (ibuffer-mode-hook)
+    (ibuffer-auto-mode 1)
     ;; (ibuffer-vc-set-filter-groups-by-vc-root)
     (unless (eq ibuffer-sorting-mode 'filename/process)
       (ibuffer-do-sort-by-filename/process))

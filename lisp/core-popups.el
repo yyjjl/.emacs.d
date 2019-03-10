@@ -111,7 +111,7 @@
          (action 'delete)
          (window (or (funcall -fn -buffer -alist -plist)
                      (progn (setq action 'quit)
-                            (funcall -fn -buffer -alist (list* :other t -plist))))))
+                            (funcall -fn -buffer -alist (cl-list* :other t -plist))))))
     (unless (eq window old-window)
       (when dedicated-p
         (set-window-dedicated-p window t))

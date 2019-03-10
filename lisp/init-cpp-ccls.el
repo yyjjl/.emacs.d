@@ -13,7 +13,7 @@
   :group 'ccls-sem)
 
 (defconst cpp-ccls--default-template
-  "%clang \n%c -std=gnu11\n%cpp -std=c++14\n\n")
+  "clang \n%c -std=gnu11\n%cpp -std=c++14\n\n")
 
 
 

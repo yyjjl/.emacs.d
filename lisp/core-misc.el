@@ -88,7 +88,7 @@
   (define-key! :map winum-keymap
     ("C-x w")
     ("M-`" . winum-select-window-by-number)
-    ("M-0" . winum-select-window-0-or-10)
+    ("M-0" . core/goto-next-char-or-minibuffer)
     ("M-1" . winum-select-window-1)
     ("M-2" . winum-select-window-2)
     ("M-3" . winum-select-window-3)
@@ -306,6 +306,7 @@
   (setq easy-kill-try-things '(url email sexp))
   (setq easy-kill-alist '((?w word " ")
                           (?s sexp "\n")
+                          (?e list "\n")
                           (?L list "\n")
                           (?f filename "\n")
                           (?d defun "\n\n")

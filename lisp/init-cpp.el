@@ -137,8 +137,6 @@
 
   (define-key! :map c-mode-base-map
     ("*" . cpp/electric-star)
-    ("M-a" . cpp/begining-of-statment)
-    ("M-e" . cpp/end-of-statment)
     ("C-c o" . ff-find-other-file)
     ("C-c C-j" . semantic-ia-fast-jump)
     ("C-c C-v" . semantic-ia-show-variants)
