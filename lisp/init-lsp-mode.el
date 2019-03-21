@@ -48,7 +48,7 @@
 
   (lsp-ui-mode 1)
   (lsp-ui-flycheck-enable 1)
-  (lsp-ui-sideline-enable 1)
+  ;; (lsp-ui-sideline-enable 1)
 
   ;; default to sort and filter by server
   (setq-local company-transformers nil)
