@@ -25,12 +25,6 @@
               (lambda (&rest _) (when (bound-and-true-p multiple-cursors-mode)
                                   (multiple-cursors-mode -1)))))
 
-(define-hook! core|init-editing-keys (after-init-idle-hook)
-  (when (display-graphic-p)
-    (define-key!
-      ("M-]" . forward-defun-or-paragraph)
-      ("M-[" . backward-defun-or-paragraph))))
-
 (define-key!
   ("C-x , SPC" . extra/insert-space-around-chinese)
   ("M-Q" . extra/insert-space-around-chinese)

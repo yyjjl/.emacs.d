@@ -105,7 +105,7 @@
          (default-directory build-directory))
     (when (not (file-exists-p (or build-directory "")))
       (if (yes-or-no-p (format "`%s' doesn't exist, create?" build-directory))
-          (make-directory build-directory)
+          (make-directory build-directory t)
         (error "Can not cd to build directory")))
     (with-current-buffer (with-temp-env! (cpp-cmake//config-env)
                            (compilation-start command))
