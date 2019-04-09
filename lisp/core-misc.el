@@ -84,6 +84,9 @@
     (with-current-buffer buffer
       (core|setup-buffer-bookmark))))
 
+(with-eval-after-load 'ffap
+  (advice-add 'ffap-guesser :around #'ignore-errors!))
+
 (with-eval-after-load 'winum
   (define-key! :map winum-keymap
     ("C-x w")

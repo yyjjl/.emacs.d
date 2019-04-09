@@ -89,6 +89,7 @@
             (and cpp-cmake-project-root (file-exists-p (cpp-cmake//cdb-path))))
         (progn
           (cpp-ccls//setup)
+          (setq-local lsp-enable-links nil)
           (electric-indent-local-mode -1))
       (when cpp-cmake-project-root
         (message "Need run `cpp/config-project' to setup ccls server")))))
