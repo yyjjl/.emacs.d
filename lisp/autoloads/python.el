@@ -155,10 +155,13 @@
     (elpy-shell-switch-to-shell)))
 
 ;;;###autoload
-(defun python/send-buffer (&optional -send-main)
-  (interactive (list (= (prefix-numeric-value current-prefix-arg) 4)))
-  (elpy-shell-send-region-or-buffer -send-main)
-  (elpy-shell-switch-to-shell))
+(defun python/send-buffer ()
+  (interactive)
+  (let ((buffer (current-buffer)))
+    (call-interactively #'python/pop-to-shell)
+    (with-current-buffer buffer
+      (elpy-shell-send-region-or-buffer
+       (= (prefix-numeric-value current-prefix-arg) 4)))))
 
 ;;;###autoload
 (defun python/profile-buffer (&optional -directory)
