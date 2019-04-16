@@ -39,7 +39,7 @@
           (unless (and (fboundp 'emms-playlist-current-selected-track)
                        (emms-playlist-current-selected-track))
             (unless (featurep 'emms) (require 'emms))
-            (emms-play-playlist (ivy-read "Playlist:" emms-playlist-list))))
+            (emms-play-playlist (ivy-read "Playlist: " emms-playlist-list))))
   "
 %s(extra/emms-current-name)
 [_=_/_-_]volume raise/lower  [_d_/_D_]play directory subtree/current
