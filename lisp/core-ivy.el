@@ -97,7 +97,7 @@
     ("i" . counsel/semantic-or-imenu*)
     ("x" . counsel-linux-app)
     ("v" . counsel-set-variable)
-    ("j" . counsel-file-jump)
+    ("j" . counsel/file-jump)
     ("p" . counsel-git)
     ("g" . counsel-git-grep)
     ("s" . counsel-git-stash)

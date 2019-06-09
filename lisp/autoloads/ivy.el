@@ -221,3 +221,9 @@ for a file to visit if current buffer is not visiting a file."
                      (read-from-minibuffer "rg args: " "--no-ignore")
                      "rg no ignore: "))
         (t (call-interactively 'counsel-rg))))
+
+;;;###autoload
+(defun counsel/file-jump ()
+  (interactive)
+  (let ((counsel-fzf-cmd "rg --files --no-ignore"))
+    (call-interactively #'counsel-fzf)))

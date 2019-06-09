@@ -21,7 +21,7 @@
   (setq emms-lyrics-display-p nil)
   (setq emms-source-file-default-directory "~/music/")
 
-  (setq emms-player-list '(emms-player-mplayer))
+  (setq emms-player-list '(emms-player-mpv))
   (add-to-list 'emms-player-mpv-parameters "--no-video")
 
   (advice-add 'emms-lyrics-display-handler :around #'ignore-errors!)

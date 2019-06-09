@@ -19,6 +19,7 @@
     (flycheck-mode 1)
     (add-to-list 'company-backends 'company-files)))
 
-(add-hook 'makefile-mode #'whitespace-mode)
+(with-eval-after-load 'make-mode
+  (add-hook 'makefile-mode-hook #'whitespace-mode))
 
 (provide 'init-sh)
