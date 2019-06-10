@@ -55,7 +55,8 @@
   (setq-local company-lsp-cache-candidates nil)
 
   (add-to-list 'company-backends 'company-lsp)
-  (add-to-list 'company-backends 'company-files))
+  ;; (add-to-list 'company-backends 'company-files)
+  )
 
 (defun lsp//ui-doc-toggle (-toggle)
   (when (require 'lsp-ui-doc nil t)

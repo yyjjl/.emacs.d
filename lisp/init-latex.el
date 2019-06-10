@@ -19,7 +19,7 @@
   (company-auctex-init)
   (add-to-list 'company-backends 'company-reftex-labels)
   (add-to-list 'company-backends 'company-reftex-citations)
-  (add-to-list 'company-backends 'company-files)
+  ;; (add-to-list 'company-backends 'company-files)
   (turn-off-auto-fill)
   ;; (visual-line-mode 1)
   ;; (setq company-backends (delete 'company-dabbrev company-backends))
@@ -109,6 +109,7 @@
   (define-key! :map LaTeX-mode-map
     ("M-=" . latex/count-words)
     ("C-c t" :map org-table-extra-map)
+    ("C-c E" . TeX-error-overview)
     ("C-t" . TeX-fold-dwim)
     ("}" . latex/skip-close-pair)
     (")" . latex/skip-close-pair)

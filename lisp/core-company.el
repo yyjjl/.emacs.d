@@ -15,7 +15,8 @@
   (setq-default company-backends
                 '(company-nxml
                   company-css
-                  (company-files company-cmake)
+                  ;; (company-files company-cmake)
+                  company-cmake
                   company-capf
                   (company-dabbrev-code
                    company-etags
@@ -54,6 +55,7 @@
 (define-key!
   ("C-c <tab>" . company-complete)
   ("C-c TAB" . company-complete)
+  ("C-c F" . company-files)
 
   ("C-}" . core/company-yasnippet)
   ([f6] . core/toggle-company-ispell))
