@@ -60,7 +60,6 @@
                   which-key-mode
                   subword-mode
                   global-auto-revert-mode
-                  company-posframe-mode
                   flycheck-mode
                   hs-minor-mode
                   auto-revert-mode
@@ -181,16 +180,6 @@
                 '(idle-change save mode-enabled))
   (setq flycheck-mode-line-prefix ""
         flycheck-idle-change-delay 1))
-
-(with-eval-after-load 'flycheck-posframe
-  (setq flycheck-posframe-buffer " *flycheck-posframe-buffer*")
-  (setq flycheck-posframe-warning-prefix "[W] ")
-  (setq flycheck-posframe-error-prefix "[E] ")
-  (setq flycheck-posframe-info-prefix "[I] ")
-  (custom-set-faces
-   '(flycheck-posframe-warning-face ((t :inherit warning)))
-   '(flycheck-posframe-info-face ((t :foreground "#b6e63e")))
-   '(flycheck-posframe-error-face ((t :inherit error)))))
 
 (with-eval-after-load 'hippie-exp
   (setq he-dabbrev-chars "0-9a-zA-Z\\?!_")
