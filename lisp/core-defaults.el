@@ -45,6 +45,7 @@
 (setq-default apropos-do-all t)
  ;; kill compilation process before starting another
 (setq-default compilation-always-kill t)
+(setq-default compilation-skip-threshold 2)
 (setq-default compilation-scroll-output t)
 (setq-default confirm-nonexistent-file-or-buffer t)
 (setq-default delete-by-moving-to-trash t)

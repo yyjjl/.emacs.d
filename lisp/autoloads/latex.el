@@ -60,3 +60,29 @@
 (defun latex/force-update-style ()
   (interactive)
   (TeX-update-style t))
+
+;;;###autoload
+(defun latex/forward-sexp (&optional -n)
+  (interactive "^p")
+  (let ((current-point (point)))
+    (if (save-excursion
+          (LaTeX-find-matching-begin)
+          (let ((target-point (point)))
+            (and (looking-at "\\\\begin{[a-zA-Z0-9\\*]+}")
+                 (< current-point (match-end 0))
+                 (>= current-point target-point))))
+        (LaTeX-find-matching-end)
+      (forward-sentence-or-sexp -n))))
+
+;;;###autoload
+(defun latex/backward-sexp (&optional -n)
+  (interactive "^p")
+  (let ((current-point (point)))
+    (if (save-excursion
+          (LaTeX-find-matching-end)
+          (let ((target-point (point)))
+            (and (looking-back "\\\\end{[a-zA-Z0-9\\*]+}" (line-beginning-position))
+                 (< current-point target-point)
+                 (>= current-point (match-beginning 0)))))
+        (LaTeX-find-matching-begin)
+      (backward-sentence-or-sexp -n))))

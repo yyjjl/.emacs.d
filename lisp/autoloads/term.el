@@ -33,7 +33,7 @@ If this is nil, setup to environment variable of `SHELL'.")
 (defvar term-bind-key-alist
   `(("C-c C-c" . term-interrupt-subjob)
     ("C-c C-e" . term/send-esc)
-    ("C-c C-p" . term/previous-line)
+    ("C-c C-l" . term-line-mode)
     ;; ("C-n" . next-line)
     ("C-/" . term/send-undo)
     ("M-c" . term/send-M-c)
@@ -401,22 +401,17 @@ none exists, or if the current buffer is already a term."
                             #'term-send-raw
                           command))))
 
-(defun term/yank-pop (&optional -arg)
+(with-eval-after-load 'counsel
+  (add-to-list 'ivy-format-functions-alist '(term/yank-pop . counsel--yank-pop-format-function)))
+
+(defun term/yank-pop (&optional _)
   (interactive "P")
-  (let ((ivy-format-function #'counsel--yank-pop-format-function)
-        (kills (counsel--yank-pop-kills)))
-    (unless kills
-      (error "Kill ring is empty or blank"))
-    (ivy-read "kill-ring: " kills
+  (if (term-in-line-mode)
+      (call-interactively #'counsel-yank-pop)
+    (ivy-read "kill-ring: " (or (counsel--yank-pop-kills) (error "Kill ring is empty or blank"))
               :require-match t
-              :preselect (let (interprogram-paste-function)
-                           (current-kill (cond
-                                          (-arg (prefix-numeric-value -arg))
-                                          (counsel-yank-pop-preselect-last 0)
-                                          (t 1))
-                                         t))
               :action #'term-send-raw-string
-              :caller 'counsel-yank-pop)))
+              :caller 'term/yank-pop)))
 
 (defun term/kill-line ()
   (interactive)
@@ -437,12 +432,6 @@ none exists, or if the current buffer is already a term."
   (if (term//after-prompt?)
       (term-send-raw-string "\ef")
     (call-interactively #'forward-word)))
-
-(defun term/previous-line ()
-  (interactive)
-  ;; Fix for Emacs 26
-  (setq term-goto-process-mark nil)
-  (forward-line -1))
 
 (defun term/swiper ()
   (interactive)
