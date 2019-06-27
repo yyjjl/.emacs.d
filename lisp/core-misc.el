@@ -165,13 +165,13 @@
 (with-eval-after-load 'flymake
   (when (boundp 'flymake-mode-map)
     (define-key flymake-mode-map (kbd "C-c f l")
-      #'flymake-show-diagnostics-buffer))
+      #'flymake-show-diagnostics-buffer)
 
-  (define-key! :map flymake-diagnostics-buffer-mode-map
-    ("n" . next-line)
-    ("j" . next-line)
-    ("p" . previous-line)
-    ("k" . previous-line)))
+    (define-key! :map flymake-diagnostics-buffer-mode-map
+      ("n" . next-line)
+      ("j" . next-line)
+      ("p" . previous-line)
+      ("k" . previous-line))))
 
 (setq flycheck-keymap-prefix (kbd "C-c f"))
 (with-eval-after-load 'flycheck
