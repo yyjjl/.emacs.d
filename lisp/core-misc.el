@@ -163,7 +163,7 @@
                      #'core*flymake-eldoc-function)))
 
 (with-eval-after-load 'flymake
-  (when (boundp flymake-mode-map)
+  (when (boundp 'flymake-mode-map)
     (define-key flymake-mode-map (kbd "C-c f l")
       #'flymake-show-diagnostics-buffer))
 
