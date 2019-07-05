@@ -8,7 +8,7 @@ _c_enter  _q_uote     _E_macs-lisp    _L_aTeX:
 _l_atex   _e_xample   _C_pp           _i_ndex:
 _a_scii   _v_erse     _I_NCLUDE:      _j_avascript
 _s_rc     _S_hell     ^ ^             _H_TML:
-_h_tml    ^ ^         ^ ^             _A_SCII:
+_h_tml    _'_         ^ ^             _A_SCII:
 "
     ("s" (yas-expand-snippet "#+begin_src $1\n$0\n#+end_src"))
     ("e" (org//hot-expand "example"))

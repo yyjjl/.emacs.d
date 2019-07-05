@@ -175,9 +175,10 @@ for a file to visit if current buffer is not visiting a file."
    (cond
     ((equal -arg 0) #'isearch-forward-regexp)
     ((equal -arg 9) #'isearch-backward-regexp)
-    ((equal -arg '(4)) #'swiper-multi)
-    ((equal -arg '(16)) #'swiper-all)
-    (t #'counsel-grep-or-swiper))))
+    ((equal -arg '(4)) #'counsel-grep-or-swiper)
+    ((equal -arg '(16)) #'swiper-multi)
+    ((equal -arg '(64)) #'swiper-all)
+    (t #'swiper-isearch))))
 
 ;;;###autoload
 (defun ivy-occur-filter-lines ()
