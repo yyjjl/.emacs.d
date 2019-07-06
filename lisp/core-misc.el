@@ -409,6 +409,8 @@
   ("C-<down>" . text-scale-decrease)
   ("C-<up>" . text-scale-increase)
 
+  ("C-." . symbol-overlay-put)
+
   ("M-k" . awesome-pair-kill)
 
   ("C-c 4" . ispell-word)

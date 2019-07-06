@@ -95,7 +95,17 @@
   "Create a new scratch buffer to work in. (could be *scratch* - *scratchX*)."
   (interactive)
   (let ((n 0)
-        (mode major-mode)
+        (mode
+         (if current-prefix-arg
+             (intern
+              (ivy-read "Select Mode: " obarray
+                        :predicate (lambda (sym)
+                                     (and (fboundp sym)
+                                          (string-suffix-p "mode" (symbol-name sym))))
+                        :require-match t
+                        :preselect (symbol-name major-mode)
+                        :sort t))
+           major-mode))
         bufname)
     (while (progn
              (setq bufname (concat "*scratch"

@@ -30,6 +30,7 @@
  page-break-lines
  evil-nerd-commenter
  shackle
+ symbol-overlay
  easy-kill)
 
 (require 'core-popups)

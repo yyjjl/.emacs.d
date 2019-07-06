@@ -63,8 +63,6 @@
 
 (with-eval-after-load 'org
   (dolist (face org-level-faces)
-    (set-face-attribute face nil :height 1.0))
-  (let ((bgcolor (face-attribute 'winum-face :background))))
-  (set-face-attribute 'winum-face nil :inherit 'org-level-2 :height 1.0))
+    (set-face-attribute face nil :height 1.0)))
 
 (provide 'core-theme)
