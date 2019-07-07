@@ -10,6 +10,14 @@
   :type 'directory
   :safe #'stringp)
 
+(defun org*wrap-publish-fn (-fn -plist -filename -pub-dir)
+  (condition-case nil
+      (funcall -fn -plist -filename -pub-dir)
+    (error (message "Fail to publish file %s / %s" -filename -pub-dir))))
+
+(advice-add 'org-latex-publish-to-pdf :around #'org*wrap-publish-fn)
+(advice-add 'org-html-publish-to-html :around #'org*wrap-publish-fn)
+
 (setq org-publish-project-alist
       `(("note-pdf"                     ; These are the main web files
          :base-directory ,org-project-src-dir
@@ -17,6 +25,19 @@
          :publishing-directory ,org-project-src-dir
          :recursive t
          :publishing-function org-latex-publish-to-pdf
+         :headline-levels 4             ; Just the default for this project.
+         :auto-preamble nil
+         :section-numbers t
+         :table-of-contents t
+         :with-sub-superscript nil
+         :auto-sitemap t
+         :sitemap-filename "index.org")
+        ("note-html"                     ; These are the main web files
+         :base-directory ,org-project-src-dir
+         :base-extension "org"
+         :publishing-directory ,org-project-src-dir
+         :recursive t
+         :publishing-function org-html-publish-to-html
          :headline-levels 4             ; Just the default for this project.
          :auto-preamble nil
          :section-numbers t

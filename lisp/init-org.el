@@ -357,9 +357,14 @@
   ;; (advice-add 'org-html-do-format-code
   ;;             :around #'org*around-html-do-format-code)
 
+  (setq org-html-head (eval-when-compile
+                        (concat "<style type=\"text/css\">\n/*<![CDATA[*/\n"
+                                (read-file-content! (expand-etc! "org-manual.css"))
+                                "\n/*]]>*/\n</style>")))
   (setq org-html-mathjax-template (eval-when-compile
                                     (read-file-content!
                                      (expand-etc! "org-mathjax-template"))))
+
   (setcdr (assoc 'scale org-html-mathjax-options) '("90"))
   (setcdr (assoc 'align org-html-mathjax-options) '("center")))
 
