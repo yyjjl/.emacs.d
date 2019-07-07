@@ -4,6 +4,8 @@
  git-gutter
  git-gutter-fringe
  git-timemachine
+ hl-todo
+ magit-todos
  magit)
 
 
@@ -111,14 +113,13 @@
               (> (buffer-size) core-large-buffer-size))
     (git-gutter-mode 1)))
 
-(with-eval-after-load 'git-messenger
-  (setq git-messenger:show-detail t))
-
 (with-eval-after-load 'magit
   (setq magit-completing-read-function 'ivy-completing-read)
   ;; Disable interal vc
   (setq vc-handled-backends nil)
-  (setq magit-auto-revert-mode nil))
+  (setq magit-auto-revert-mode nil)
+
+  (add-hook 'magit-status-mode-hook 'magit-todos-mode))
 
 (with-eval-after-load 'transient
   (setq transient-mode-line-format nil))

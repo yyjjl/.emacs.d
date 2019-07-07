@@ -31,6 +31,7 @@
  evil-nerd-commenter
  shackle
  symbol-overlay
+ hl-todo
  easy-kill)
 
 (require 'core-popups)
@@ -69,6 +70,7 @@
   ;; (global-eldoc-mode 1)
 
   (global-whitespace-mode 1)
+  (global-hl-todo-mode 1)
   (electric-indent-mode 1)
 
   (setq package-selected-packages
