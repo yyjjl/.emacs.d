@@ -1,15 +1,19 @@
 ;;; -*- lexical-binding: t; -*-
 
+(defmacro org//with-master-file! (&rest body)
+  (declare (indent nil))
+  `(save-window-excursion
+     (unless (and (file-exists-p org-master-file)
+                  (file-regular-p org-master-file))
+       (error (format "Can not open %s" org-master-file)))
+     (with-current-buffer (find-file org-master-file)
+       ,@body)))
+
 ;;;###autoload
 (defun org/publish-current-file ()
   (interactive)
   (if org-master-file
-      (save-window-excursion
-        (unless (and (file-exists-p org-master-file)
-                     (file-regular-p org-master-file))
-          (error (format "Can not open %s" org-master-file)))
-        (with-current-buffer (find-file org-master-file)
-          (call-interactively #'org-publish-current-file)))
+      (org//with-master-file! (call-interactively #'org-publish-current-file))
     (call-interactively #'org-publish-current-file)))
 
 ;;;###autoload
@@ -23,7 +27,7 @@
                (n (abs -n)))
            (condition-case err
                (progn
-                 (while (>= (decf n) 0)
+                 (while (>= (cl-decf n) 0)
                    (funcall cmd))
                  (move-to-column col))
              (error (message "%s" err)))))
@@ -51,15 +55,15 @@
     (annotation (company-auctex-symbol-annotation -arg))))
 
 ;;;###autoload
-(defun org/open-pdf (&optional -arg)
-  (interactive "P")
-  (let* ((-fn (buffer-file-name))
-         (fn (and -fn
-                  (concat (file-name-sans-extension -fn)
-                          ".pdf"))))
-    (if (and fn (not -arg) (file-exists-p fn))
-        (find-file fn)
-      (counsel-find-file (file-name-base -fn)))))
+(defun org/open-pdf ()
+  (interactive)
+  (let ((filename (if (and org-master-file (file-exists-p org-master-file))
+                      (file-truename org-master-file)
+                    (buffer-file-name))))
+    (setq filename (concat (file-name-sans-extension filename) ".pdf"))
+    (if (and filename (file-exists-p filename))
+        (find-file filename)
+      (counsel-find-file (file-name-sans-extension filename)))))
 
 ;;;###autoload
 (defun org/latexmk-start-watching (-arg)
@@ -149,7 +153,7 @@ With a prefix BELOW move point to lower block."
                                (directory-files image-dir
                                                 :full "\\.\\(png\\|jpe?g\\|svg\\)\\'"))
                         (unless (gethash image-file image-files)
-                          (incf count)
+                          (cl-incf count)
                           (ignore-errors (delete-file image-file)))))
           (message "Deleted %d invalid cache files" count))
       (message "Invalid cache files were not checked"))))
