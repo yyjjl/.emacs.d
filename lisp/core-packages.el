@@ -32,7 +32,7 @@
  shackle
  symbol-overlay
  hl-todo
- easy-kill)
+ expand-region)
 
 (require 'core-popups)
 (require 'core-ivy)

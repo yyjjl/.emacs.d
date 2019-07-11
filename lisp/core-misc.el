@@ -84,7 +84,9 @@
       (core|setup-buffer-bookmark))))
 
 (with-eval-after-load 'ffap
-  (advice-add 'ffap-guesser :around #'ignore-errors!))
+  (advice-add 'ffap-guesser :around #'ignore-errors!)
+  ;; do not use ping, it's very slow
+  (setq ffap-machine-p-known 'reject))
 
 (with-eval-after-load 'winum
   (define-key! :map winum-keymap
@@ -161,6 +163,11 @@
                                    'flymake-old-next-error-function))
     (remove-function (local 'eldoc-documentation-function)
                      #'core*flymake-eldoc-function)))
+
+(with-eval-after-load 'symbol-overlay
+  (define-key! :map symbol-overlay-map
+    ("<tab>" . symbol-overlay-jump-next)
+    ("<backtab>" . symbol-overlay-jump-prev)))
 
 (with-eval-after-load 'flymake
   (when (boundp 'flymake-mode-map)
@@ -295,25 +302,6 @@
   (setq fcitx-use-dbus nil)
   (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c" "C-z"))
 
-(with-eval-after-load 'easy-kill
-  (setq easy-kill-try-things '(url email sexp))
-  (setq easy-kill-alist '((?w word " ")
-                          (?s sexp "\n")
-                          (?e list "\n")
-                          (?L list "\n")
-                          (?f filename "\n")
-                          (?d defun "\n\n")
-                          (?D defun-name " ")
-                          (?l line "\n")
-                          (?b buffer-file-name)))
-  (define-key! :map easy-kill-base-map
-    ("-" . easy-kill-expand)
-    ("+" . easy-kill-shrink)
-    ("=" . easy-kill-shrink)
-    ("M-+" . easy-kill-shrink)
-    ("M-=" . easy-kill-shrink)
-    ("M--" . easy-kill-expand)))
-
 ;; Smart tab
 (defvar core--indent-close-list '(?\} ?\$ ?\] ?\' ?\` ?\"))
 (defvar core--indent-compelte-functions '(core//try-expand-local-snippets
@@ -415,8 +403,8 @@
 
   ("C-c 4" . ispell-word)
   ("C-c q" . auto-fill-mode)
-  ("M--" . easy-mark)
-  ("M-w" . easy-kill)
+ 
+  ("M--" . er/expand-region)
   ("M-/" . hippie-expand)
   ("M-n" . next-error)
   ("M-p" . previous-error)

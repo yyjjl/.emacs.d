@@ -225,6 +225,7 @@
 
   (add-to-list 'org-babel-tangle-lang-exts '("ipython" . "py"))
   (setcdr (assoc "dot" org-src-lang-modes) 'graphviz-dot)
+  (setcdr (assoc 'file org-link-frame-setup) 'find-file)
 
   ;; Refile targets include this file and any file contributing to the
   ;; agenda - up to 5 levels deep
@@ -346,10 +347,7 @@
     ("C-c p" . org-previous-block)
     ([f5] . org/open-pdf)
     ([C-f9] . org/create-latex-fragemnt-cache)
-    ([f9] . (lambda!
-              (save-excursion
-                (without-user-record!
-                 (org-publish-current-file)))))
+    ([f9] . org/publish-current-file)
     ([f10] . org-publish)
     ("C-c C-t" . org-todo)))
 
@@ -372,8 +370,7 @@
   (ignore-errors
     (require 'ox-bibtex))
 
-  (advice-add 'org-publish-file :around
-              #'(lambda (-fn &rest -args) (without-user-record! (apply -fn -args))))
+  (advice-add 'org-publish-file :around #'without-user-record!!)
   (advice-add 'org-latex-compile :after #'org*after-latex-compile)
   (advice-add 'org-latex-link :around #'org*around-latex-link)
   (advice-add 'org-latex--inline-image :around #'org*around-latex-inline-image)

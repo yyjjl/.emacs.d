@@ -21,6 +21,10 @@
     ([remap keyboard-escape-quit] . elpy-multiedit-stop)
     ([remap keyboard-quit] . elpy-multiedit-stop)))
 
+(defun python*unless-shell-running (-fn &rest -args)
+  (unless (python//shell-running-p)
+    (apply -fn -args)))
+
 (defun python*around-elpy-multiedit (-fn &optional -arg)
   (setq python--elpy-multiedit-buffers nil)
   (cond
@@ -76,6 +80,8 @@
         '(pyvenv-virtual-env-name (" [" pyvenv-virtual-env-name "]"))))
 
 (with-eval-after-load 'python
+  (advice-add 'python-ffap-module-path :around #'python*unless-shell-running)
+
   (when (boundp 'python-shell-completion-native-disabled-interpreters)
     (add-to-list 'python-shell-completion-native-disabled-interpreters
                  "jupyter")

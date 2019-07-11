@@ -2,6 +2,13 @@
 
 (defvar python--elpy-multiedit-buffers nil)
 
+(defun python//shell-running-p ()
+  (when-let* ((process (or (and (derived-mode-p 'inferior-python-mode)
+                                (get-buffer-process (current-buffer)))
+                           (python-shell-get-process))))
+    (with-current-buffer (process-buffer process)
+      (not comint-last-prompt))))
+
 ;;;###autoload
 (defun python/autopep8 ()
   (interactive)
@@ -159,6 +166,7 @@
   (interactive)
   (let ((buffer (current-buffer)))
     (call-interactively #'python/pop-to-shell)
+    (sit-for 0.1)
     (with-current-buffer buffer
       (elpy-shell-send-region-or-buffer
        (= (prefix-numeric-value current-prefix-arg) 4)))))

@@ -200,6 +200,9 @@ Example:
          core--recentf-enabled-p)
      ,@-body))
 
+(defun without-user-record!! (-fn &rest -args)
+  (without-user-record! (apply -fn -args)))
+
 (defun read-file-content! (-filename)
   "Read file named -FILENAME as string."
   (without-user-record!

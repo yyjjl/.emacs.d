@@ -1,6 +1,18 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;;;###autoload
+(defun org/publish-current-file ()
+  (interactive)
+  (if org-master-file
+      (save-window-excursion
+        (unless (and (file-exists-p org-master-file)
+                     (file-regular-p org-master-file))
+          (error (format "Can not open %s" org-master-file)))
+        (with-current-buffer (find-file org-master-file)
+          (call-interactively #'org-publish-current-file)))
+    (call-interactively #'org-publish-current-file)))
+
+;;;###autoload
 (defun org/next-item (&optional -n)
   (interactive "p")
   (cond ((org-in-block-p '("src" "quote" "example"))
