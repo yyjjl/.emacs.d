@@ -257,12 +257,15 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
     (message "No parent buffer or it was killed !!!")))
 
 (defsubst term//parse-sconfig ()
-  (mapcar #'cadr (remove nil (tramp-parse-sconfig "~/.ssh/config"))))
+  (remove nil (mapcar #'cadr (tramp-parse-sconfig "~/.ssh/config"))))
 
 (defun term//get-ssh-info ()
-  (let* ((address
-          (completing-read "[user[#port]@]host: " (term//parse-sconfig) nil nil
-                           (file-remote-p default-directory))))
+  (let* ((address (completing-read "[user[#port]@]host: " (term//parse-sconfig)
+                                   nil  ; predicate
+                                   nil  ; require-match
+                                   (let ((user (file-remote-p default-directory 'user))
+                                         (host (file-remote-p default-directory 'host)))
+                                     (if user (concat user "@" host) host)))))
     (unless (string-match "\\(?:\\([^#]+\\)#\\([0-9]+\\)@\\)?\\(.+\\)"
                           address)
       (error "Invalid address."))

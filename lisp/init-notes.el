@@ -50,9 +50,9 @@
     result))
 
 (defun org*wrap-publish-fn (-fn -plist -filename -pub-dir)
-  (condition-case nil
+  (condition-case err
       (funcall -fn -plist -filename -pub-dir)
-    (error (message "Fail to publish file %s / %s" -filename -pub-dir))))
+    (error (message "Fail to publish file %s: %s" -filename err))))
 
 (with-eval-after-load 'ox
   (advice-add 'org-export-expand-include-keyword :around #'org*around-export-expand-include-keyword))

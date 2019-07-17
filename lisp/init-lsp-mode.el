@@ -14,8 +14,9 @@
 
 
 
-(require 'lsp)
-(require 'lsp-clients)
+(ignore-errors
+  (require 'lsp)
+  (require 'lsp-clients))
 
 (custom-theme-set-faces
  'doom-molokai
