@@ -67,7 +67,7 @@
       (setq lsp-eldoc-render-all t)
       (lsp-ui-doc-mode -1))))
 
-(defun lsp//eldoc-message (&optional msg)
+(defun lsp*override-eldoc-message (&optional msg)
   (unless lsp--disable-eldoc-in-minibuffer
     (run-at-time 0 nil (lambda () (eldoc-message msg)))))
 
@@ -85,7 +85,7 @@
   (setq lsp-eldoc-hook '(lsp-hover))
   (setq lsp-restart 'auto-restart)
 
-  (advice-add 'lsp--eldoc-message :override 'lsp//eldoc-message)
+  (advice-add 'lsp--eldoc-message :override 'lsp*override-eldoc-message)
 
   (define-key!
     ("M-s l" . lsp-lens-mode)
