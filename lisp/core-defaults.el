@@ -187,6 +187,8 @@
 
 ;;* Generic hooks
 (define-hook! core|minibuffer-setup (minibuffer-setup-hook)
+  (setq line-spacing 4)
+
   (local-set-key (kbd "C-k") 'kill-line)
   (setq gc-cons-threshold most-positive-fixnum))
 
