@@ -16,19 +16,11 @@
  skeletor
  lua-mode
  restclient
- sly
- company-tabnine)
+ sly)
 
 (add-auto-mode! 'crontab-mode "\\.?cron\\(tab\\)?\\'")
-(add-auto-mode! 'markdown-mode "\\.\\(md\\|markdown\\)\\'")
 
 
-
-(define-hook! company|tabnine-setup (prog-mode-hook)
-  (add-transient-hook!
-      (hack-local-variables-hook :local t :name company//tabnine-setup)
-    (unless (derived-mode-p 'c-mode 'c++-mode)
-      (ignore-errors (company/toggle-tabnine)))))
 
 ;; Star dictionary lookup
 (autoload 'sdcv-current-word "sdcv" nil t)

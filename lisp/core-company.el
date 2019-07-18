@@ -7,7 +7,7 @@
     ("M-n" . company-next-page)
     ("M-p" . company-previous-page))
 
-  (company-statistics-mode 1)
+  ;; (company-statistics-mode 1)
   ;; (add-to-list 'company-transformers
   ;;              'company-sort-by-backend-importance :append)
 

@@ -83,12 +83,9 @@
   (advice-add 'python-ffap-module-path :around #'python*unless-shell-running)
 
   (when (boundp 'python-shell-completion-native-disabled-interpreters)
-    (add-to-list 'python-shell-completion-native-disabled-interpreters
-                 "jupyter")
-    (add-to-list 'python-shell-completion-native-disabled-interpreters
-                 "python3")
-    (add-to-list 'python-shell-completion-native-disabled-interpreters
-                 "python"))
+    (add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
+    (add-to-list 'python-shell-completion-native-disabled-interpreters "python3")
+    (add-to-list 'python-shell-completion-native-disabled-interpreters "python"))
 
   (setq python-shell-prompt-detect-failure-warning nil)
   (setq python-pdbtrack-activate t)

@@ -67,4 +67,5 @@
   (require 'init-emms))
 
 (require 'init-extra)
+(require 'init-tabnine)
 (require 'init-play)

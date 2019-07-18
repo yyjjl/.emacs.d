@@ -1,6 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
-(require-packages! ibuffer-projectile)
+;; (require-packages! ibuffer-projectile)
 
 
 
@@ -25,7 +25,8 @@
     (unless (eq ibuffer-sorting-mode 'filename/process)
       (ibuffer-do-sort-by-filename/process))
 
-    (setq ibuffer-filter-groups (ibuffer-projectile-generate-filter-groups)))
+    ;; (setq ibuffer-filter-groups (ibuffer-projectile-generate-filter-groups))
+    )
 
 
   ;; Modify the default ibuffer-formats

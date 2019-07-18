@@ -35,8 +35,7 @@
               (file-remote-p default-directory)
               (> (buffer-size) core-large-buffer-size))
     (with-demoted-errors "Lsp-rust: %s"
-      (lsp)
-      (lsp//ui-doc-toggle 1))))
+      (lsp))))
 
 (defun rust/cargo-dispatch (-use-last-action)
   (interactive "P")
