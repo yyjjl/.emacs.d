@@ -29,7 +29,7 @@
 ;; All packages required in this section are defined in their init files
 (require 'init-org)
 (require 'init-notes)
-(require 'init-org-ipython)
+(require 'init-jupyter)
 
 (when (or env-has-aspell-p env-has-hunspell-p)
   (require 'init-spelling))
