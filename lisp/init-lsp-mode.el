@@ -53,7 +53,6 @@
 
   ;; default to sort and filter by server
   (setq-local company-transformers nil)
-  (setq-local company-lsp-cache-candidates nil)
 
   (add-to-list 'company-backends 'company-lsp)
   ;; (add-to-list 'company-backends 'company-files)
