@@ -24,7 +24,8 @@
 (advice-add 'compilation-start :around 'term*setup-environment)
 
 (with-eval-after-load 'term
-  (define-key term-raw-map [remap term-send-raw] #'term/conditional-send-raw))
+  (define-key term-raw-map [remap term-send-raw] #'term/conditional-send-raw)
+  (define-key term-mode-map (kbd "M-o") #'term/ivy-switch))
 
 (defun term*eof-hack (_)
   (setq term-directly-kill-buffer t))
@@ -37,6 +38,10 @@
   (let ((proc (get-buffer-process (current-buffer))))
     (when proc
       (set-process-sentinel proc (term//wrap-sentinel (process-sentinel proc))))))
+
+(define-hook! term|setup-name (term-mode-hook)
+  (setq term--extra-name nil)
+  (setq mode-line-buffer-identification '("%b" (term--extra-name (": " term--extra-name)))))
 
 (define-key!
   ([f8] . term/pop-shell)
