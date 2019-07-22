@@ -184,7 +184,13 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
   (interactive)
   (unless (term//term-buffer-p (current-buffer))
     (error "You can switch to another term buffer from a term buffer"))
-  (let ((term-buffer-list (mapcar #'buffer-name (term//get-buffer-list))))
+  (let ((term-buffer-list
+         (mapcar (lambda (buffer)
+                   (let ((name (buffer-local-value 'term--extra-name buffer)))
+                     (if name
+                         (concat (buffer-name buffer) ": " name)
+                       (buffer-name buffer))))
+                 (term//get-buffer-list))))
     (if (<= (length term-buffer-list) 1)
         (error "There is only one term buffer")
       (ivy-read "Switch to term buffer: " term-buffer-list
