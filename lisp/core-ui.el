@@ -58,11 +58,11 @@
 (setq-default display-line-numbers-width 3)
 (setq-default frame-inhibit-implied-resize t)
  ;; Remove continuation arrow on right fringe
-(setq-default highlight-nonselected-windows nil)
+(setq-default highlight-nonselected-windows t)
 (setq-default image-animate-loop t)
 (setq-default indicate-buffer-boundaries nil)
 (setq-default indicate-empty-lines nil)
-(setq-default max-mini-window-height 0.3)
+(setq-default max-mini-window-height 0.25)
 ;; Disable mode-line mouseovers
 (setq-default mode-line-default-help-echo nil)
  ;; Minibuffer resizing
@@ -73,7 +73,7 @@
 (setq-default visible-cursor nil)
 (setq-default x-stretch-cursor nil)
 (setq-default widget-image-enable nil)
-(setq-default use-default-font-for-symbols nil)
+(setq-default use-default-font-for-symbols t)
 ;; Defer jit font locking slightly to [try to] improve Emacs performance
 ;; (setq-default jit-lock-defer-time 0.3)
 (setq-default jit-lock-defer-time nil)

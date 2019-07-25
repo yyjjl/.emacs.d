@@ -61,7 +61,7 @@
 
 ;; Other small tools
 ;; (require 'init-hydra-extra)
-(require 'init-prettify-symbols)
+;; (require 'init-prettify-symbols)
 
 (when env-has-mpv-p
   (require 'init-emms))

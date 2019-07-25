@@ -6,7 +6,6 @@
  ;; `wgrep' allows you to edit a grep buffer and apply those changes
  ;; to the file buffer.
  wgrep
- picture
  ;; provide tree style search jump
  avy)
 
