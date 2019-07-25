@@ -20,3 +20,14 @@
   (company-abort)
   (or (ignore-errors (call-interactively 'company-yasnippet))
       (call-interactively 'company-abbrev)))
+
+;;;###autoload
+(defun company/toggle-modeline ()
+  (interactive)
+  (let ((item '(company-mode company-lighter)))
+    (if (member item mode-line-misc-info)
+        (progn
+          (setq mode-line-misc-info (remove item mode-line-misc-info))
+          (message "Company diabled in modeline"))
+      (push item mode-line-misc-info)
+      (message "Company enabled in modeline"))))

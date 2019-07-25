@@ -53,7 +53,6 @@
 
   ;; default to sort and filter by server
   (setq-local company-transformers nil)
-  (setq-local company-lsp-cache-candidates nil)
 
   (add-to-list 'company-backends 'company-lsp)
   ;; (add-to-list 'company-backends 'company-files)
@@ -88,7 +87,7 @@
 
   (advice-add 'lsp--eldoc-message :override 'lsp*override-eldoc-message)
 
-  (define-key!
+  (define-key! :map lsp-mode-map
     ("M-s l" . lsp-lens-mode)
     ("M-s h h" . lsp-document-highlight)
     ("C-c R" . lsp-rename)

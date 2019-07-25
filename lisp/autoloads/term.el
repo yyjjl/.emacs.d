@@ -10,9 +10,9 @@
 ;;;###autoload
 (defvar term-default-environment-function-list nil)
 
-(defvar term--buffer-list nil)
 (defvar-local term--ssh-info nil)
 (defvar-local term--parent-buffer nil)
+(defvar-local term--extra-name nil)
 
 ;;;###autoload
 (defvar-local term-directly-kill-buffer nil)
@@ -44,7 +44,6 @@ If this is nil, setup to environment variable of `SHELL'.")
     ("C-k" . term/kill-line)
     ("M-f" . term/send-forward-word)
     ("M-b" . term/send-backward-word)
-    ("M-o" . term/send-backspace)
     ("M-p" . term/send-up)
     ("M-n" . term/send-down)
     ("M-M" . term/send-forward-kill-word)
@@ -60,6 +59,8 @@ If this is nil, setup to environment variable of `SHELL'.")
     ("C-s" . term/swiper)
     ("M-}" . term/switch-next)
     ("M-{" . term/switch-prev)
+    ("M-o" . term/ivy-switch)
+    ("M-N" . term/set-extra-name)
     ("C-S-t" . term/pop-shell-current-directory)
     ("C-g" . keyboard-quit))
   "The key alist that will need to be bind.
@@ -149,19 +150,57 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
        (t (signal 'wrong-type-argument (list 'array bind-key))))
       (define-key term-raw-map bind-key bind-command))))
 
-(defun term//switch-internal (-n)
-  (when term--buffer-list
-    (setq term--buffer-list (--filter (buffer-live-p it) term--buffer-list))
-    (let ((size (length term--buffer-list))
-          (index (cl-position (current-buffer) term--buffer-list))
-          (window (selected-window)))
-      (set-window-dedicated-p window nil)
-      (unwind-protect
-          (switch-to-buffer (nth (if index
-                                     (mod (+ index -n) size)
-                                   0)
-                                 term--buffer-list))
-        (set-window-dedicated-p window t)))))
+(defsubst term//term-buffer-p (buffer)
+  (and (buffer-live-p buffer)
+       (not (string-prefix-p " " (buffer-name buffer)))
+       (with-current-buffer buffer
+         (derived-mode-p 'term-mode 'shell-mode 'eshell-mode))))
+
+(defsubst term//window-display-term-buffer-p (window)
+  (and (window-live-p window)
+       (term//term-buffer-p (window-buffer window))))
+
+(defun term//get-buffer-list ()
+  (--sort
+   (string< (buffer-name it) (buffer-name other))
+   (--filter (term//term-buffer-p it) (buffer-list))))
+
+(defun term//switch-internal (-n &optional -ignore-self)
+  (let ((term-buffer-list (term//get-buffer-list)))
+    (when -ignore-self
+      (setq term-buffer-list (remove (current-buffer) term-buffer-list)))
+    (when term-buffer-list
+      (let ((size (length term-buffer-list))
+            (index (cl-position (current-buffer) term-buffer-list))
+            (window (selected-window)))
+        (set-window-dedicated-p window nil)
+        (unwind-protect
+            (switch-to-buffer (nth (if index (mod (+ index -n) size) 0)
+                                   term-buffer-list))
+          (set-window-dedicated-p window t))))))
+
+
+(defun term/ivy-switch ()
+  (interactive)
+  (unless (term//term-buffer-p (current-buffer))
+    (error "You can switch to another term buffer from a term buffer"))
+  (let ((term-buffer-list
+         (mapcar (lambda (buffer)
+                   (let ((name (buffer-local-value 'term--extra-name buffer)))
+                     (if name
+                         (concat (buffer-name buffer) ": " name)
+                       (buffer-name buffer))))
+                 (term//get-buffer-list))))
+    (if (<= (length term-buffer-list) 1)
+        (error "There is only one term buffer")
+      (ivy-read "Switch to term buffer: " term-buffer-list
+                :require-match t
+                :action (lambda (buffer-name)
+                          (let ((window (selected-window)))
+                            (set-window-dedicated-p window nil)
+                            (unwind-protect
+                                (switch-to-buffer buffer-name)
+                              (set-window-dedicated-p window t))))))))
 
 (defun term/switch-next (-create-new)
   (interactive "P")
@@ -176,11 +215,7 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
     (term//switch-internal -1)))
 
 (defun term//terminal-exit-hook ()
-  (setq term--buffer-list
-        (delq (current-buffer)
-              (--filter (buffer-live-p it) term--buffer-list)))
-  (if term--buffer-list
-      (term//switch-internal 0)
+  (unless (term//switch-internal 0 t)
     (-when-let (window (get-buffer-window (current-buffer)))
       (when (eq window (term//get-popup-window))
         (delete-window window)))))
@@ -202,7 +237,6 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
                 (if term-program-switches
                     (apply #'make-term term-name shell-name nil term-program-switches)
                   (make-term term-name shell-name)))
-      (setq term--buffer-list (nconc term--buffer-list (list buffer)))
       (with-current-buffer buffer
         (term-mode)
         (term-char-mode)
@@ -321,17 +355,11 @@ If -FORCE is non-nil create a new term buffer directly."
         (with-temp-env! (term//extra-env)
           (term//create-buffer nil t)))))
 
-(defsubst term//window-display-term-buffer-p (window)
-  (and (window-live-p window)
-       (eq 'term-mode
-           (buffer-local-value 'major-mode (window-buffer window)))))
-
 ;;;###autoload
 (defun term//pop-to-buffer (buffer)
   (let ((popup-window
          (car-safe (cl-remove-if-not #'term//window-display-term-buffer-p
-                                     (cl-list* (term//get-popup-window)
-                                               (window-list))))))
+                                     (cl-list* (term//get-popup-window) (window-list))))))
     (if popup-window
         ;; Reuse window
         (progn
@@ -475,3 +503,11 @@ none exists, or if the current buffer is already a term."
                 (or (and -arg (read-directory-name "Run in: " nil nil t))
                     (projectile-ensure-project (projectile-project-root))))
                command)))))
+
+;;;###autoload
+(defun term/set-extra-name ()
+  (interactive)
+  (unless (term//term-buffer-p (current-buffer))
+    (error "Not in a term buffer"))
+  (let ((name (read-from-minibuffer "Extra name: " term--extra-name nil nil 'term-extra-name-history)))
+    (setq term--extra-name (if (string= name "") nil name))))
