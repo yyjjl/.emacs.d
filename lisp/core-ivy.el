@@ -96,10 +96,11 @@
     ("i" . counsel/semantic-or-imenu*)
     ("x" . counsel-linux-app)
     ("v" . counsel-set-variable)
-    ("j" . counsel-file-jump)
-    ("p" . counsel-git)
-    ("g" . counsel-git-grep)
-    ("s" . counsel-git-stash)
+    ("j" . counsel/rg-file-jump)
+    ("p" . counsel/file-jump)
+    ("g" . counsel-git)
+    ("s" . counsel-git-grep)
+    ("S" . counsel-git-stash)
     ("h" . counsel-minibuffer-history)
     ("m" . counsel-mark-ring)
     ("/" . counsel-grep)
@@ -132,7 +133,7 @@
   (if env-has-ripgrep-p
       (progn
         (setq counsel-rg-base-command
-              "rg -M 1000 -S --no-heading --line-number --color never %s .")
+              "rg -M 1000 -S --no-heading --line-number --color never -- %s .")
         (define-key projectile-command-map "ss" 'counsel-projectile-rg)
         (global-set-key (kbd "C-c i a") 'counsel/rg))
     (define-key projectile-command-map "ss" 'counsel-projectile-grep)

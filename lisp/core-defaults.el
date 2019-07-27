@@ -7,9 +7,8 @@
 (when (fboundp 'normal-top-level-add-to-load-path)
   (dolist (dir (directory-files emacs-private-directory))
     (unless (string-match "^\\." dir)
-      (push (expand-file-name dir emacs-private-directory)
-            load-path)))
-  (push emacs-private-directory load-path))
+      (add-to-list 'load-path (expand-file-name dir emacs-private-directory))))
+  (add-to-list 'load-path emacs-private-directory))
 
 (setq file-name-handler-alist nil)
 ;; Don't GC during startup to save time

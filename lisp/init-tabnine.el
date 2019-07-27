@@ -97,13 +97,13 @@ from the rest of the backends in the group, if any, will be left at the end."
       (company//disable-tabnine)
     (company//enable-tabnine)))
 
-(define-hook! company|tabnine-setup (prog-mode-hook)
-  (when (not (buffer-temporary-p))
-    (let ((buffer (current-buffer)))
-      (run-with-idle-timer
-       1 nil
-       (lambda ()
-         (with-current-buffer buffer
-           (ignore-errors (company//enable-tabnine))))))))
+;; (define-hook! company|tabnine-setup (prog-mode-hook)
+;;   (when (not (buffer-temporary-p))
+;;     (let ((buffer (current-buffer)))
+;;       (run-with-idle-timer
+;;        1 nil
+;;        (lambda ()
+;;          (with-current-buffer buffer
+;;            (ignore-errors (company//enable-tabnine))))))))
 
 (provide 'init-tabnine)
