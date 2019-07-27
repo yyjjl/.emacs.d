@@ -194,6 +194,11 @@
         org-use-speed-commands t
         org-edit-src-content-indentation 0
         org-edit-timestamp-down-means-later t
+
+        ;; special ctrl-a/e behaviour
+        org-special-ctrl-a/e t
+        org-special-ctrl-k t
+
         org-catch-invisible-edits 'smart
         ;; Number of empty lines needed to keep an empty line between
         ;; collapsed trees.

@@ -160,3 +160,10 @@ grab matched string and insert them into `kill-ring'"
       (setq end (point)))
     (avy-with avy-goto-symbol-1
       (avy-goto-word-1 -char -arg beg end t))))
+
+;;;###autoload
+(defun core/smart-move-begining-of-line ()
+  (interactive)
+  (if (bolp)
+      (back-to-indentation)
+    (move-beginning-of-line 1)))

@@ -15,8 +15,8 @@
  swiper
  projectile
  counsel-projectile
- ;; `counsel-M-x' need smex to get history
- smex
+ ;; `counsel-M-x' need amx to get history
+ amx
  ;; Show key bindings when pressing
  which-key
  (fcitx :when env-has-fcitx-p)
