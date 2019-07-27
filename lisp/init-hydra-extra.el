@@ -3,8 +3,10 @@
 
 (defvar x-hydra-timer nil)
 (defvar x-hydra-delay 0.25)
-(defvar x-hydra-char ",")
+(defvar x-hydra-char nil)
+
 (defvar-local x-hydra-last-buffer-undo-list nil)
+
 (defun x-hydra-quit (&optional -no-hydra-quit)
   (when x-hydra-timer
     (cancel-timer x-hydra-timer)
@@ -16,6 +18,7 @@
   ;; Make sure timer is canceled
   (x-hydra-quit t)
   (setq x-hydra-timer (timer-create))
+  ;; Save undo list
   (setq x-hydra-last-buffer-undo-list buffer-undo-list)
   (hydra-set-property 'x-hydra :verbosity 0)
   (unless buffer-read-only (insert x-hydra-char))
@@ -66,7 +69,16 @@
         (call-interactively 'self-insert-command))
     (call-interactively 'x-hydra/body)))
 
-(x-hydra-define ","
+(defvar x-hydra-minor-mode-map
+  (define-key! :map (make-sparse-keymap)
+    ("SPC" . x-hydra-invoker)))
+
+(define-minor-mode x-hydra-minor-mode
+  "use space as leader key"
+  :init-value nil
+  :keymap x-hydra-minor-mode-map)
+
+(x-hydra-define " "
   ("f" find-file)
   ("i" "C-c i")
   ("r" "C-x r")
@@ -75,10 +87,6 @@
   ("4" "C-x 4")
   ("5" "C-x 5")
   ("p" "C-x p")
-  ("," switch-to-buffer))
-
-(global-set-key "," #'x-hydra-invoker)
-(define-hook! x-hydra|setup-hook (c-mode-common-hook)
-  (local-set-key "," #'x-hydra-invoker))
+  ("SPC" switch-to-buffer))
 
 (provide 'init-hydra-extra)

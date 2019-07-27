@@ -36,9 +36,7 @@
   (let ((switch (if core-view-code-mode 1 -1)))
     (cl-loop for (condition . modes) in core-view-code-modes
              when (or (eq condition t)
-                      (and (symbolp condition)
-                           (symbol-value condition))
-                      (ignore-errors (eval condition t)))
+                      (and (symbolp condition) (symbol-value condition)))
              do (dolist (mode modes)
                   (funcall mode switch)))))
 
@@ -112,7 +110,7 @@
   (advice-add 'ediff-window-display-p :override #'ignore))
 
 (with-eval-after-load 'display-line-numbers
-  (setq display-line-numbers-type 'relative)
+  (setq display-line-numbers-type t)
   (setq-default display-line-numbers-width 2))
 
 ;; `whitespace-space' setup
@@ -403,7 +401,7 @@
 
   ("C-c 4" . ispell-word)
   ("C-c q" . auto-fill-mode)
- 
+
   ("M--" . er/expand-region)
   ("M-/" . hippie-expand)
   ("M-n" . next-error)

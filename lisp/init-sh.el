@@ -16,6 +16,8 @@
       (setq-local lsp--disable-eldoc-in-minibuffer t)
       (setq-local lsp-eldoc-hook '(lsp-document-highlight lsp-hover))
       (setq-local company-lsp-cache-candidates 'auto))
+
+    (add-to-list 'flycheck-disabled-checkers 'sh-shellcheck)
     (flycheck-mode 1)
     ;; (add-to-list 'company-backends 'company-files)
     ))

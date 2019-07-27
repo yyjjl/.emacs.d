@@ -6,7 +6,6 @@
  ;; `wgrep' allows you to edit a grep buffer and apply those changes
  ;; to the file buffer.
  wgrep
- picture
  ;; provide tree style search jump
  avy)
 
@@ -38,6 +37,7 @@
   ("C-M-b" . backward-sentence)
   ("C-M-f" . forward-sentence)
 
+  ([remap move-beginning-of-line] . core/smart-move-begining-of-line)
   ("C-=" . hydra-mc/mc/mark-next-like-this)
   ("C--" . hydra-mc/mc/mark-previous-like-this))
 

@@ -4,14 +4,10 @@
 
 
 
-(defun company//sort-by-tabnine (candidates)
-  "Sort CANDIDATES as two priority groups.
-If `company-backend' is a function, do nothing.  If it's a list, move
-candidates from backends before keyword `:with' to the front.  Candidates
-from the rest of the backends in the group, if any, will be left at the end."
+(defun company*around-transform-candidates (-fn candidates)
   (if (or (functionp company-backend)
           (not (and (listp company-backend) (memq 'company-tabnine company-backend))))
-      candidates
+      (funcall -fn candidates)
     (let ((candidates-table (make-hash-table :test #'equal))
           candidates-1
           candidates-2)
@@ -22,7 +18,7 @@ from the rest of the backends in the group, if any, will be left at the end."
               (push candidate candidates-2))
           (push candidate candidates-1)
           (puthash candidate t candidates-table)))
-      (setq candidates-1 (nreverse candidates-1))
+      (setq candidates-1 (funcall -fn (nreverse candidates-1)))
       (setq candidates-2 (nreverse candidates-2))
       (nconc (seq-take candidates-1 1)
              (seq-take candidates-2 1)
@@ -70,9 +66,6 @@ from the rest of the backends in the group, if any, will be left at the end."
                 (mapcar (lambda (backend)
                           (company//remove-backend-from-backend backend 'company-tabnine))
                         (remove 'company-tabnine company-backends)))
-
-    (setq-local company-transformers
-                (remove 'company//sort-by-tabnine company-transformers))
     (message "TabNine disabled")))
 
 (defun company//enable-tabnine ()
@@ -86,9 +79,6 @@ from the rest of the backends in the group, if any, will be left at the end."
       (setq-local company-backends
                   (cons (company//attach-backend-to-backend (car company-backends) 'company-tabnine)
                         (cdr backends))))
-    (unless (memq 'company//sort-by-tabnine company-transformers)
-      (setq-local company-transformers
-                  (append company-transformers '(company//sort-by-tabnine))))
     (message "TabNine enable")))
 
 (defun company/toggle-tabnine ()
@@ -105,5 +95,8 @@ from the rest of the backends in the group, if any, will be left at the end."
 ;;        (lambda ()
 ;;          (with-current-buffer buffer
 ;;            (ignore-errors (company//enable-tabnine))))))))
+
+(with-eval-after-load 'company
+  (advice-add 'company--transform-candidates :around #'company*around-transform-candidates))
 
 (provide 'init-tabnine)

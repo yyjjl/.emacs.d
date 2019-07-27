@@ -79,6 +79,7 @@
   (define-key!
     ("C-x j j" . counsel-bookmark)
     ("C-s" . swiper/dispatch)
+    ("C-r" . swiper-isearch-backward)
     ("C-x C-f" . counsel-find-file)
     ("C-x k" . counsel/kill-buffer)
     ("C-x b" . ivy-switch-buffer)

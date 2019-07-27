@@ -1,15 +1,21 @@
 (make-variable-buffer-local 'company-backends)
+
+(defun company//complete-common ()
+  (interactive)
+  (unless (ignore-errors (yas-expand))
+    (company-complete-common)))
+
 (with-eval-after-load 'company
   (define-key! :map company-active-map
     ("C-d" . nil)
+    ([tab] . company//complete-common)
+    ("TAB" . company//complete-common)
     ("C-n" . company-select-next)
     ("C-p" . company-select-previous)
     ("M-n" . company-next-page)
     ("M-p" . company-previous-page))
 
-  ;; (company-statistics-mode 1)
-  ;; (add-to-list 'company-transformers
-  ;;              'company-sort-by-backend-importance :append)
+  (company-statistics-mode 1)
 
   ;; Make company-files a work before capf
   (setq-default company-backends

@@ -131,11 +131,15 @@
         elpy-test-runner 'elpy-test-pytest-runner
         elpy-shell-echo-input nil)
 
+  (define-key! :map elpy-pdb-map
+    (";" . elpy-pdb-toggle-breakpoint-at-point))
+
   (define-key! :map elpy-mode-map
     ("C-c C-z" . python/pop-to-shell)
     ("C-c C-n")
     ("C-c C-p")
     ("C-c C-b")
+    ("C-c ;" :map elpy-pdb-map)
     ("C-c C-c" . python/send-buffer)
     ("C-c I" . elpy-nav-expand-to-indentation)
     ("C-c M-d" . python/generate-doc-at-point)
