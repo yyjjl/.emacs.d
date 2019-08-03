@@ -10,19 +10,31 @@
 
 
 
+;; Do not load extra backends
+(setq org-export-backends '(html latex beamer))
+
+(defvar org--remove-texfile t)
+(defvar org-block-key-bindings
+  '(("p" . org-previous-block)
+    ("\C-p" . org-previous-block)
+    ("n" . org-next-block)
+    ("\C-n" . org-next-block)))
+
+(defvar org-table-extra-map
+  (define-key! :map (make-sparse-keymap)
+    ("t" . orgtbl-insert-radio-table)
+    ("c" . org-table-create)
+    ("I" . org-table-import)
+    ("e" . org-table-export)
+    ("d" . org-table-delete-column)
+    ("i" . org-table-insert-column)
+    ("r" . org-table-show-reference)))
+
 (defmacro org/by-backend (&rest -body)
   `(case (or (and (boundp 'org-export-current-backend)
                   org-export-current-backend)
              'babel)
      ,@-body))
-
-(defun org//ltximg-directory-local-p (-filename &optional -directory)
-  (and (eq major-mode 'org-mode)
-       (equal org-preview-latex-image-directory
-              (concat "auto/" (file-name-base -filename) "/"))
-       (file-exists-p
-        (expand-file-name org-preview-latex-image-directory
-                          (or -directory default-directory)))))
 
 (defun org*around-latex-inline-image (-fn -link -info)
   (let ((code (funcall -fn -link -info)))
@@ -88,7 +100,6 @@
     (when (fboundp #'extra/insert-space-around-chinese)
       (ignore-errors (extra/insert-space-around-chinese begin end)))))
 
-(defvar org--remove-texfile t)
 (defun org*after-latex-compile (-texfile &optional _)
   (when org--remove-texfile
     (delete-file -texfile)))
@@ -110,29 +121,28 @@
 
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images))
 
-;; Do not load extra backends
-(setq org-export-backends '(html latex beamer))
-(setq org-mouse-1-follows-link nil)
-(defvar org-table-extra-map
-  (define-key! :map (make-sparse-keymap)
-    ("t" . orgtbl-insert-radio-table)
-    ("c" . org-table-create)
-    ("I" . org-table-import)
-    ("e" . org-table-export)
-    ("d" . org-table-delete-column)
-    ("i" . org-table-insert-column)
-    ("r" . org-table-show-reference)))
+(define-hook! org|setup (org-mode-hook)
+  (when buffer-file-name
+    (setq-local org-preview-latex-image-directory "auto/cache/"))
+  (auto-fill-mode -1)
+  (eldoc-mode -1)
+
+  ;; Add context-sensitive completion for meta options
+  (make-local-variable 'completion-at-point-functions)
+  (add-to-list 'completion-at-point-functions
+               (lambda ()
+                 (ignore-errors (pcomplete-completions-at-point))))
+  (add-to-list 'company-backends 'company-org-symbols))
+
+(define-hook! org|src-setup (org-src-mode-hook)
+  (flycheck-mode -1))
 
 (with-eval-after-load 'org
   (require 'company-auctex)
 
-  (defvar org-block-key-bindings
-    '(("p" . org-previous-block)
-      ("\C-p" . org-previous-block)
-      ("n" . org-next-block)
-      ("\C-n" . org-next-block)))
-
   (add-hook 'org-speed-command-hook 'org-block-speed-command-activate :append)
+
+  (advice-add 'org-fill-paragraph :around #'org*around-fill-paragraph)
 
   (advice-add 'org-beginning-of-line
               :around (lambda (-fn &optional -n)
@@ -163,6 +173,15 @@
      ("\\\\\\\\$" . font-lock-comment-face))
    'append)
 
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               '((python . t)
+                                 (emacs-lisp . t)
+                                 (dot . t)
+                                 (js . t)
+                                 (perl . t)
+                                 (latex . t)
+                                 (haskell . t)))
+
   (setq org-entities-user
         (eval-when-compile
           (when (require 'tex-mode nil :noerror)
@@ -180,16 +199,9 @@
                                      name
                                      name
                                      (char-to-string char)))))))
-
-  (org-babel-do-load-languages 'org-babel-load-languages
-                               '((python . t)
-                                 (emacs-lisp . t)
-                                 (dot . t)
-                                 (js . t)
-                                 (perl . t)
-                                 (latex . t)
-                                 (haskell . t)))
   ;; Various preferences
+  (setq org-mouse-1-follows-link nil)
+
   (setq org-log-done t
         org-use-speed-commands t
         org-edit-src-content-indentation 0
@@ -228,7 +240,6 @@
         org-src-fontify-natively t
         org-preview-latex-default-process 'imagemagick)
 
-  (add-to-list 'org-babel-tangle-lang-exts '("ipython" . "py"))
   (setcdr (assoc "dot" org-src-lang-modes) 'graphviz-dot)
   (setcdr (assoc 'file org-link-frame-setup) 'find-file)
 
@@ -242,9 +253,9 @@
   ;; the next level of targets etc
   (setq org-outline-path-complete-in-steps t)
   (setq org-todo-keywords
-        (quote ((sequence "TODO(t)" "STARTED(s)" "|" "DONE(d!/!)")
-                (sequence "WAITING(w@/!)" "SOMEDAY(S)"
-                          "PROJECT(P@)" "|" "CANCELLED(c@/!)"))))
+        '((sequence "TODO(t)" "STARTED(s)" "|" "DONE(d!/!)")
+          (sequence "WAITING(w@/!)" "SOMEDAY(S)"
+                    "PROJECT(P@)" "|" "CANCELLED(c@/!)")))
   (setq org-imenu-depth 9)
 
   (setq org-capture-templates
@@ -291,53 +302,8 @@
                 (widen))))
            "   - [ ] %^{Task} %?")))
 
-  (define-hook! (org|after-rename-this-file -old-name -new-name)
-    (core-after-rename-this-file-hook)
-    (let ((new-dir (file-name-directory -new-name))
-          (old-dir (file-name-directory -old-name))
-          (old-cache-dir org-preview-latex-image-directory)
-          (new-cache-dir (concat "auto/" (file-name-base -new-name) "/")))
-      (when (org//ltximg-directory-local-p -old-name old-dir)
-        (let ((dir (expand-file-name "auto" new-dir)))
-          (when (not (file-exists-p dir))
-            (make-directory dir t)))
-        (rename-file (expand-file-name (directory-file-name old-cache-dir) old-dir)
-                     (expand-file-name (directory-file-name new-cache-dir) new-dir))
-        (setq-local org-preview-latex-image-directory new-cache-dir))))
-
-  (define-hook! org|after-delete-this-file (core-after-delete-this-file-hook)
-    (when (and (org//ltximg-directory-local-p buffer-file-name)
-               (yes-or-no-p (format "Delete org preview cache '%s'? "
-                                    org-preview-latex-image-directory)))
-      (delete-directory org-preview-latex-image-directory :recursive)))
-
-  (define-hook! org|setup (org-mode-hook)
-    (when buffer-file-name
-      (setq-local org-preview-latex-image-directory "auto/cache/"))
-    (auto-fill-mode -1)
-    (eldoc-mode -1)
-
-    ;; Add context-sensitive completion for meta options
-    (make-local-variable 'completion-at-point-functions)
-    (add-to-list 'completion-at-point-functions
-                 (lambda ()
-                   (ignore-errors (pcomplete-completions-at-point))))
-    (add-to-list 'company-backends 'company-org-symbols))
-
-  (define-hook! org|src-setup (org-src-mode-hook)
-    (when (eq major-mode 'python-mode)
-      ;; `company-ob-ipython' is very slow
-      (setq-local company-idle-delay nil)
-      (add-to-list 'company-backends #'company-ob-ipython)
-      (local-set-key (kbd "C-c C-.") #'ob-ipython-inspect))
-    (flycheck-mode -1))
-
-
-  (advice-add 'org-fill-paragraph :around #'org*around-fill-paragraph)
-
-  (define-key org-mode-map (kbd "C-c t") org-table-extra-map)
   (define-key! :map org-mode-map
-    ("C-c C-." . ob-ipython-inspect)
+    ("C-c t" :map org-table-extra-map)
     ("C-c [" . org-reftex-citation)
     ("C-c {" . org-reftex-citation)
     ("C-c C-x [" . org-agenda-file-to-front)
@@ -381,6 +347,8 @@
   (advice-add 'org-latex--inline-image :around #'org*around-latex-inline-image)
 
   (add-to-list 'org-latex-minted-langs '(ipython "python"))
+  (add-to-list 'org-latex-minted-langs '(jupyter-python "python"))
+
   (setq org-latex-compiler "xelatex")
   (setq org-latex-pdf-process
         '("latexmk -g -pdf -dvi- -ps- -pdflatex=\"xelatex -shell-escape -interaction=nonstopmode %%O %%S\" -outdir=%o %f"))

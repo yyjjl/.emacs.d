@@ -2,6 +2,8 @@
 
 (require 'transient)
 
+(defvar counsel--rg-current-directory nil)
+
 (defun counsel//truncate-string (-string -width)
   (when (> (length -string) -width)
     (setq -string
@@ -220,7 +222,8 @@ for a file to visit if current buffer is not visiting a file."
   (unless (member "--pretty" -args)
     (setq -args (append -args '("--no-heading"))))
 
-  (let ((counsel-rg-base-command (concat "rg " (string-join -args " ") " %s .")))
+  (let ((counsel-rg-base-command (concat "rg " (string-join -args " ") " %s ."))
+        (default-directory (or counsel--rg-current-directory default-directory)))
     (counsel-rg nil nil -extra-args)))
 
 (defun counsel//file-jump-function (string)
@@ -269,7 +272,7 @@ for a file to visit if current buffer is not visiting a file."
             (car choices))
       (cl-call-next-method))))
 
-;;;###autoload
+;;;###autoload (autoload 'counsel/rg "../lisp/autoloads/ivy" nil t)
 (define-transient-command counsel/rg (&optional -directory)
   "Run ripgrep"
   ["Switches"
@@ -299,12 +302,14 @@ for a file to visit if current buffer is not visiting a file."
       (or (and current-prefix-arg
                (read-directory-name "Run ripgrep in directory: " directory))
           directory))))
+
   (setf (nth 1 (aref (car (last (get 'counsel/rg 'transient--layout))) 2))
         (concat "Run in " (abbreviate-file-name -directory)))
-  (let ((default-directory -directory))
-    (if current-prefix-arg
-        (transient-setup 'counsel/rg)
-      (counsel//rg))))
+
+  (setq counsel--rg-current-directory -directory)
+  (if current-prefix-arg
+      (transient-setup 'counsel/rg)
+    (counsel//rg)))
 
 ;;;###autoload
 (defun counsel/rg-file-jump ()

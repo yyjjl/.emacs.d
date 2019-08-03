@@ -93,8 +93,9 @@
 ;;       (run-with-idle-timer
 ;;        1 nil
 ;;        (lambda ()
-;;          (with-current-buffer buffer
-;;            (ignore-errors (company//enable-tabnine))))))))
+;;          (when (buffer-live-p buffer)
+;;            (with-current-buffer buffer
+;;              (ignore-errors (company//enable-tabnine)))))))))
 
 (with-eval-after-load 'company
   (advice-add 'company--transform-candidates :around #'company*around-transform-candidates))

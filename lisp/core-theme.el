@@ -29,13 +29,10 @@
 
  '(org-meta-line ((t :inherit font-lock-doc-face)))
  '(org-document-info-keyword ((t :inherit font-lock-builtin-face)))
- '(org-latex-and-related ((t (:foreground "burlywood" :weight bold))))
 
  '(flycheck-error ((t (:underline (:style wave :color "#e74c3c")))))
  '(flycheck-info ((t (:underline (:style wave :color "#b6e63e")))))
  '(flycheck-warning ((t (:underline (:style wave :color "#e2c770")))))
-
- ;; '(widget-field ((t (:inherit hl-line :underline t))))
 
  '(diredp-dir-name ((t (:inherit font-lock-type-face :weight bold))))
 
@@ -51,13 +48,7 @@
 
  '(semantic-highlight-func-current-tag-face ((t (:background "gray5"))))
  '(shm-current-face ((t (:inherit hl-line))))
- '(ivy-highlight-face ((t (:background "#444155"))))
- '(ivy-current-match ((t (:background "gray0"))))
- '(ivy-virtual ((t (:inherit font-lock-doc-face))))
 
- ;; '(winum-face ((t (:inherit org-level-2
- ;;                            :background "black" :box (:line-width 4 :color "black")))))
- ;; '(winum-inactive-face ((t (:background "black" :box (:line-width 4 :color "black")))))
  '(winum-face ((t (:inherit org-level-2 :background "black"))))
  '(winum-inactive-face ((t (:background "black")))))
 

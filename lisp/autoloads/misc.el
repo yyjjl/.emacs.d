@@ -2,6 +2,9 @@
 
 (require 'cl-lib)
 
+(defvar core-after-rename-this-file-hook nil)
+(defvar core-after-delete-this-file-hook nil)
+
 ;;;###autoload
 (defun core/display-latex-fragment-at-point ()
   (interactive)
