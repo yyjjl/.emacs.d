@@ -53,49 +53,49 @@
         (car target)
       target)))
 
-(defun company//tabnine-enable-p ()
-  (let ((first-backend (car company-backends)))
-    (and (listp first-backend)
-         (memq 'company-tabnine first-backend))))
+(defsubst company//tabnine-enable-p ()
+  (let ((parent-of-main-backend (company//find-main-backend company-backends)))
+    (memq 'company-tabnine (car parent-of-main-backend))))
 
 (defun company//disable-tabnine ()
   (company//check-tabnine)
 
   (when (company//tabnine-enable-p)
-    (setq-local company-backends
-                (mapcar (lambda (backend)
-                          (company//remove-backend-from-backend backend 'company-tabnine))
-                        (remove 'company-tabnine company-backends)))
-    (message "TabNine disabled")))
+    (let ((parent-of-main-backend (company//find-main-backend company-backends)))
+      (setcar parent-of-main-backend
+              (remove 'company-tabnine (car parent-of-main-backend))))
+    t))
 
 (defun company//enable-tabnine ()
   (company//check-tabnine)
 
   (unless (company//tabnine-enable-p)
-    (let* ((backends (copy-sequence company-backends))
-           (capf (memq 'company-capf backends)))
-      (when capf
-        (setcar capf '(company-capf company-tabnine :separate)))
-      (setq-local company-backends
-                  (cons (company//attach-backend-to-backend (car company-backends) 'company-tabnine)
-                        (cdr backends))))
-    (message "TabNine enable")))
+    (let ((parent-of-main-backend (company//find-main-backend company-backends)))
+      (insert-before! :with 'company-tabnine (car parent-of-main-backend)))
+    t))
 
-(defun company/toggle-tabnine ()
-  (interactive)
-  (if (company//tabnine-enable-p)
-      (company//disable-tabnine)
-    (company//enable-tabnine)))
-
-;; (define-hook! company|tabnine-setup (prog-mode-hook)
-;;   (when (not (buffer-temporary-p))
-;;     (let ((buffer (current-buffer)))
-;;       (run-with-idle-timer
-;;        1 nil
-;;        (lambda ()
-;;          (when (buffer-live-p buffer)
-;;            (with-current-buffer buffer
-;;              (ignore-errors (company//enable-tabnine)))))))))
+(defun company/toggle-tabnine (&optional -global)
+  (interactive "P")
+  (if -global
+      (let (hook-fn toggle-fn message-string)
+        (if (memq 'company//enable-tabnine prog-mode-hook)
+            (setq hook-fn #'remove-hook
+                  toggle-fn #'company//disable-tabnine
+                  message-string "TabNine is disabled globally")
+          (setq hook-fn #'add-hook
+                toggle-fn #'company//enable-tabnine
+                message-string "TabNine is enabled globally"))
+        (funcall hook-fn 'prog-mode-hook 'company//enable-tabnine)
+        (dolist (buffer (buffer-list))
+          (with-current-buffer buffer
+            (when (derived-mode-p 'prog-mode)
+              (funcall toggle-fn))))
+        (message "%s" message-string))
+    (if (company//tabnine-enable-p)
+        (when (company//disable-tabnine)
+          (message "TabNine is disabled"))
+      (when (company//enable-tabnine)
+        (message "TabNine is enabled")))))
 
 (with-eval-after-load 'company
   (advice-add 'company--transform-candidates :around #'company*around-transform-candidates))

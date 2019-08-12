@@ -7,8 +7,6 @@
         ("C-x t l" . hs-hide-level)
         ("C-x t t" . hs-toggle-hiding)))
 
-(global-set-key (kbd "C-T") 'hs-toggle-hiding)
-
 (defvar hs--headline-max-len 30
   "*Maximum length of `hs-headline' to display.")
 (defvar hs--overlay-map (make-sparse-keymap)

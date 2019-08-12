@@ -10,9 +10,9 @@
 (define-hook! java|setup (java-mode-hook)
   (unless (or (buffer-temporary-p)
               (file-remote-p default-directory)
-              (> (buffer-size) core-large-buffer-size))
+              (buffer-too-large-p))
     (add-transient-hook!
-        (hack-local-variables-hook :local t :name java//setup-interal)
+        (hack-local-variables-hook :local t :name java//setup-internal)
       (when (bound-and-true-p lsp-enable-in-project-p)
         (with-demoted-errors "Lsp-java: %s"
           (lsp)

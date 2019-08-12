@@ -149,9 +149,11 @@
 
 (with-eval-after-load 'cmake-mode
   (define-key cmake-mode-map [f10] 'compile)
-  (add-hook 'cmake-mode-hook
-            (lambda ()
-              (font-lock-mode 1)
-              (cmake-font-lock-activate))))
+
+  (define-hook! cmake|setup (cmake-mode-hook)
+    (font-lock-mode 1)
+    (cmake-font-lock-activate)
+
+    (company//add-backend 'company-cmake)))
 
 (provide 'init-cpp-cmake)

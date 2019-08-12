@@ -10,14 +10,6 @@
 
 
 
-(defvar term-goto-process-mark nil)
-
-;; Add below code to .zshrc to make term-mode track value changes
-;;   if [ -n "$INSIDE_EMACS" ];then
-;;       printf '\033AnSiTu %s\n' "$USER"
-;;       chpwd() {print -P "\033AnSiTc %d"}
-;;   fi
-
 (defun term*setup-environment (-fn &rest -args)
   (with-temp-env! (term//extra-env)
     (apply -fn -args)))
@@ -26,6 +18,24 @@
 (with-eval-after-load 'term
   (define-key term-raw-map [remap term-send-raw] #'term/conditional-send-raw)
   (define-key term-mode-map (kbd "M-o") #'term/ivy-switch))
+
+(with-eval-after-load 'vterm-mode
+  (define-hook! (vterm|set-title title) (vterm-set-title-functions)
+    (setq term--extra-name title))
+
+  (define-key! :map vterm-copy-mode-map
+    ("C-c C-k" . vterm-copy-mode))
+  (define-key! :map vterm-mode-map
+    ("M-}" . term/switch-next)
+    ("M-{" . term/switch-prev)
+    ("M-o" . term/ivy-switch)
+    ("M-N" . term/set-extra-name)
+    ("M-y" . term/yank-pop)
+    ("C-k" . term/kill-line)
+    ("C-s" . term/swiper)
+    ("C-c C-l" . vterm-copy-mode)
+    ("<C-backspace>" . vterm-send-meta-backspace)
+    ("C-S-t" . term/pop-shell-current-directory)))
 
 (defun term*eof-hack (_)
   (setq term-directly-kill-buffer t))
@@ -39,9 +49,13 @@
     (when proc
       (set-process-sentinel proc (term//wrap-sentinel (process-sentinel proc))))))
 
-(define-hook! term|setup-name (term-mode-hook)
+(define-hook! term|setup-name (term-mode-hook vterm-mode-hook)
+  (setq term-goto-process-mark nil)
   (setq term--extra-name nil)
-  (setq mode-line-buffer-identification '("%b" (term--extra-name (": " term--extra-name)))))
+  (setq mode-line-buffer-identification '("%b" (term--extra-name (": " term--extra-name))))
+
+  (when (eq major-mode 'vterm-mode)
+    (setq mode-line-show-root-p nil)))
 
 (define-key!
   ([f8] . term/pop-shell)

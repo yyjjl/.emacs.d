@@ -78,7 +78,7 @@
           (buffer-temporary-p)
           (file-remote-p default-directory)
           (not (bound-and-true-p lsp-enable-in-project-p))
-          (> (buffer-size) core-large-buffer-size))
+          (buffer-too-large-p))
       (progn
         (when env-has-gtags-p
           (ggtags-mode 1))
@@ -87,12 +87,9 @@
     (setq cpp-cmake-project-root (cpp-cmake//locate-cmakelists))
     (if (or (file-exists-p (cpp-ccls//dot-ccls-path))
             (and cpp-cmake-project-root (file-exists-p (cpp-cmake//cdb-path))))
-        (progn
-          (cpp-ccls//setup)
-          (setq-local lsp-enable-links nil)
-          (electric-indent-local-mode -1))
+        (cpp-ccls//setup)
       (when cpp-cmake-project-root
-        (message "Need run `cpp/config-project' to setup ccls server")))))
+        (message "Need to run `cpp/config-project' to setup ccls server")))))
 
 ;; Do not use `c-mode-hook' and `c++-mode-hook', there is a bug
 (defvar-local cpp--initialized-p nil)
@@ -113,7 +110,7 @@
 
       (unless (buffer-temporary-p)
         (add-transient-hook!
-            (hack-local-variables-hook :local t :name cpp//setup-interal)
+            (hack-local-variables-hook :local t :name cpp//setup-internal)
           (cpp//setup))))))
 
 (with-eval-after-load 'projectile

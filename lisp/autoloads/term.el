@@ -4,6 +4,8 @@
 (eval-when-compile
   (require 'term))
 
+(defvar term-prefer-vterm t)
+
 ;; Kill the buffer when terminal is exited
 ;;;###autoload
 (defvar term-default-directory-function-list '(projectile-project-root))
@@ -30,6 +32,13 @@ If this is nil, setup to environment variable of `SHELL'.")
 (defvar term-unbind-key-list '("C-z" "C-x" "C-c" "C-h" "C-y" "<ESC>" "C-u")
   "The key list that will need to be unbind.")
 
+(defconst term--setup-directory-tracking
+  '((term-mode
+     ("zsh" . " chpwd() { printf '\\033AnSiTu %s\\n' \"$USER\"; print -P '\\033AnSiTc %d'; }; clear\n"))
+    (vterm-mode
+     ("zsh" . " chpwd() { print -Pn '\\e]51;A$(pwd)\\e\\\\'; }; clear\n")
+     ("bash" . " cd() { builtin cd \"$@\" || return; [ \"$OLDPWD\" = \"$PWD\" ] || echo -e \"\\e]51;A$(pwd)\\e\\\\\"; }; clear\n"))))
+
 (defvar term-bind-key-alist
   `(("C-c C-c" . term-interrupt-subjob)
     ("C-c C-e" . term/send-esc)
@@ -46,8 +55,6 @@ If this is nil, setup to environment variable of `SHELL'.")
     ("M-b" . term/send-backward-word)
     ("M-p" . term/send-up)
     ("M-n" . term/send-down)
-    ("M-M" . term/send-forward-kill-word)
-    ("M-N" . term/send-backward-kill-word)
     ("<C-backspace>" . term/send-backward-kill-word)
     ("<M-backspace>" . term/send-backward-kill-word)
     ("C-DEL" . term/send-backward-kill-word)
@@ -154,7 +161,7 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
   (and (buffer-live-p buffer)
        (not (string-prefix-p " " (buffer-name buffer)))
        (with-current-buffer buffer
-         (derived-mode-p 'term-mode 'shell-mode 'eshell-mode))))
+         (derived-mode-p 'term-mode 'shell-mode 'eshell-mode 'vterm-mode))))
 
 (defsubst term//window-display-term-buffer-p (window)
   (and (window-live-p window)
@@ -183,7 +190,7 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
 (defun term/ivy-switch ()
   (interactive)
   (unless (term//term-buffer-p (current-buffer))
-    (error "You can switch to another term buffer from a term buffer"))
+    (user-error "You can switch to another term buffer from a term buffer"))
   (let ((term-buffer-list
          (mapcar (lambda (buffer)
                    (let ((name (buffer-local-value 'term--extra-name buffer)))
@@ -192,7 +199,7 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
                        (buffer-name buffer))))
                  (term//get-buffer-list))))
     (if (<= (length term-buffer-list) 1)
-        (error "There is only one term buffer")
+        (user-error "There is only one term buffer")
       (ivy-read "Switch to term buffer: " term-buffer-list
                 :require-match t
                 :action (lambda (buffer-name)
@@ -216,7 +223,7 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
 
 (defun term//terminal-exit-hook ()
   (unless (term//switch-internal 0 t)
-    (-when-let (window (get-buffer-window (current-buffer)))
+    (when-let (window (get-buffer-window (current-buffer)))
       (when (eq window (term//get-popup-window))
         (delete-window window)))))
 
@@ -230,23 +237,37 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
                         "/bin/sh"))
         (term-name (term//get-buffer-name (concat "*" term-buffer-name "<%s>*")))
         (default-directory (or default-directory
-                               (expand-file-name term-default-directory))))
-    ;; Make term, details to see function `make-term' in `term.el'.
-    (setq term-name (substring term-name 1 (1- (length term-name))))
-    (-when-let (buffer
-                (if term-program-switches
-                    (apply #'make-term term-name shell-name nil term-program-switches)
-                  (make-term term-name shell-name)))
+                               (expand-file-name term-default-directory)))
+        buffer)
+    (if (and term-prefer-vterm (require 'vterm nil t))
+        (let ((vterm-shell shell-name))
+          (with-current-buffer (setq buffer (get-buffer-create term-name))
+            (vterm-mode)))
+      ;; Make term, details to see function `make-term' in `term.el'.
+      (setq term-name (substring term-name 1 (1- (length term-name))))
+      (setq buffer (if term-program-switches
+                       (apply #'make-term term-name shell-name nil term-program-switches)
+                     (make-term term-name shell-name)))
+      (when buffer
+        (with-current-buffer buffer
+          (term-mode)
+          (term-char-mode)
+          (term//setup-keybindings)
+          (setq term-scroll-show-maximum-output nil
+                term-scroll-to-bottom-on-output t))))
+    (when (buffer-live-p buffer)
       (with-current-buffer buffer
-        (term-mode)
-        (term-char-mode)
-        (term//setup-keybindings)
-        (setq term-scroll-show-maximum-output nil
-              term-scroll-to-bottom-on-output t)
-        (-when-let (proc (ignore-errors (get-buffer-process buffer)))
+        (when-let (proc (ignore-errors (get-buffer-process buffer)))
           (set-process-sentinel proc (term//wrap-sentinel (process-sentinel proc))))
         (when -shell-buffer-p
-          (add-hook 'term-or-comint-process-exit-hook 'term//terminal-exit-hook nil :local)))
+          (add-hook 'term-or-comint-process-exit-hook 'term//terminal-exit-hook nil :local)
+          (when-let (setup-code (-some->> term--setup-directory-tracking
+                                          (assoc major-mode)
+                                          (assoc (file-name-base shell-name))
+                                          cdr-safe))
+            (if (eq major-mode 'term-mode)
+                (term-send-raw-string setup-code)
+              (vterm-send-string setup-code)))))
       buffer)))
 
 
@@ -302,7 +323,7 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
                                      (if user (concat user "@" host) host)))))
     (unless (string-match "\\(?:\\([^#]+\\)#\\([0-9]+\\)@\\)?\\(.+\\)"
                           address)
-      (error "Invalid address."))
+      (user-error "Invalid address."))
     (let ((data (cddr (match-data)))
           result)
       (while data
@@ -437,20 +458,23 @@ none exists, or if the current buffer is already a term."
 
 (defun term/yank-pop (&optional _)
   (interactive "P")
-  (if (term-in-line-mode)
-      (call-interactively #'counsel-yank-pop)
-    (ivy-read "kill-ring: " (or (counsel--yank-pop-kills) (error "Kill ring is empty or blank"))
-              :require-match t
-              :action #'term-send-raw-string
-              :caller 'term/yank-pop)))
+  (let ((inhibit-read-only t))
+    (cl-letf (((symbol-function 'insert-for-yank)
+               (if (eq major-mode 'vterm-mode)
+                   (lambda (str) (vterm-send-string str t))
+                 (lambda (str) (term-send-raw-string str)))))
+      (call-interactively #'counsel-yank-pop))))
 
 (defun term/kill-line ()
   (interactive)
-  (if (term//after-prompt?)
-      (progn
-        (kill-new (buffer-substring (point) (line-end-position)))
-        (term-send-raw-string "\C-k"))
-    (call-interactively #'kill-line)))
+  (if (eq major-mode 'term-mode)
+      (if (term//after-prompt?)
+          (progn
+            (kill-new (buffer-substring (point) (line-end-position)))
+            (term-send-raw-string "\C-k"))
+        (call-interactively #'kill-line))
+    (kill-new (buffer-substring (point) (line-end-position)))
+    (call-interactively #'vterm--self-insert)))
 
 (defun term/send-backward-word ()
   (interactive)
@@ -466,27 +490,19 @@ none exists, or if the current buffer is already a term."
 
 (defun term/swiper ()
   (interactive)
-  (unless (eq major-mode 'term-mode)
-    (error "Not in `term-mode' buffer"))
-  (let ((buffer (get-buffer-create "*terminal-copy*"))
-        (window (selected-window))
-        (term-buffer (current-buffer)))
-    (set-window-dedicated-p window nil)
-    (set-window-buffer window buffer)
-    (set-window-dedicated-p window t)
-    (with-current-buffer buffer
-      (let ((inhibit-read-only t))
-        (erase-buffer)
-        (insert-buffer-substring term-buffer))
-      (goto-char (point-min))
-      (special-mode)
-      (call-interactively 'swiper/dispatch))))
+  (unless (term//term-buffer-p (current-buffer))
+    (user-error "Not in `term-mode' buffer"))
+  (if (eq major-mode 'term-mode)
+      (term-line-mode)
+    (vterm-copy-mode 1))
+
+  (call-interactively 'swiper/dispatch))
 
 ;;;###autoload
 (defun term/shell-command-on-server (&optional -arg)
   (interactive "P")
   (when (eq major-mode 'term-mode)
-    (error "Current buffer is term buffer"))
+    (user-error "Current buffer is term buffer"))
   (let* ((filename (abbreviate-file-name (buffer-file-name)))
          (command (read-shell-command
                    "Run: "
@@ -508,6 +524,6 @@ none exists, or if the current buffer is already a term."
 (defun term/set-extra-name ()
   (interactive)
   (unless (term//term-buffer-p (current-buffer))
-    (error "Not in a term buffer"))
+    (user-error "Not in a term buffer"))
   (let ((name (read-from-minibuffer "Extra name: " term--extra-name nil nil 'term-extra-name-history)))
     (setq term--extra-name (if (string= name "") nil name))))

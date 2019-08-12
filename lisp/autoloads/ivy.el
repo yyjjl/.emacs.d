@@ -359,3 +359,59 @@ for a file to visit if current buffer is not visiting a file."
                   ((equal -backend "projectile") #'counsel-projectile)
                   (t #'counsel/rg-file-jump))))
     (funcall backend)))
+
+(defun counsel/flycheck-action-goto-error (-candidate)
+  "Visit error of CANDIDATE."
+  (let* ((err (cdr -candidate))
+         (buffer (flycheck-error-buffer err))
+         (lineno (flycheck-error-line err))
+         (column (or (flycheck-error-column err) 0)))
+    (with-current-buffer buffer
+      (switch-to-buffer buffer)
+      (goto-char (point-min))
+      (forward-line (1- lineno))
+      (move-to-column (1- column))
+      (let ((recenter-redisplay nil))
+        (recenter)))))
+
+(defun counsel//flycheck-candidate-display-string (-err)
+  "Return a string of message constructed from ERROR."
+  (let ((face (-> -err
+                  flycheck-error-level
+                  flycheck-error-level-error-list-face)))
+    (format "%-8s L%-5s C%-3s %s"
+            (propertize (upcase (symbol-name (flycheck-error-level -err)))
+                        'font-lock-face face)
+            (propertize (number-to-string (flycheck-error-line -err))
+                        'face 'flycheck-error-list-line-number)
+            (propertize (-if-let (column (flycheck-error-column -err))
+                            (number-to-string column)
+                          0)
+                        'face 'flycheck-error-list-column-number)
+            (or (flycheck-error-message -err) ""))))
+
+;;;###autoload
+(defun counsel/flycheck (&optional -only-error)
+  (interactive "P")
+  (let ((errors (sort flycheck-current-errors #'flycheck-error-<))
+        (lineno (1+ (current-line))))
+    (when -only-error
+      (setq errors
+            (seq-filter (lambda (err)
+                          (>=
+                           (flycheck-error-level-severity (flycheck-error-level err))
+                           (flycheck-error-level-severity 'error)))
+                        errors)))
+    (setq errors
+          (mapcar (lambda (err)
+                    (cons (counsel//flycheck-candidate-display-string err) err))
+                  errors))
+    (ivy-read "Goto: " errors
+              :preselect
+              (car (cl-find-if
+                    (lambda (err)
+                      (ignore-errors (>= (flycheck-error-line (cdr err)) lineno)))
+                    errors))
+              :require-match t
+              :action #'counsel/flycheck-action-goto-error)))
+

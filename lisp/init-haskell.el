@@ -8,6 +8,7 @@
  haskell-has-shm-p (executable-find "structured-haskell-mode"))
 
 (require-packages!
+ align
  haskell-mode
  (intero :when haskell-has-stack-p)
  (hindent :when haskell-has-hindent-p)
@@ -31,14 +32,13 @@
 
 (define-hook! haskell|cabal-setup (haskell-cabal-mode-hook)
   (rainbow-delimiters-mode 1)
-  (add-to-list 'company-backends 'company-cabal))
+  (company//add-backend 'company-cabal))
 
 (define-hook! haskell|setup (haskell-mode-hook)
   (rainbow-delimiters-mode 1)
   (haskell-decl-scan-mode 1)
 
-  (unless (or (buffer-temporary-p)
-              (buffer-base-buffer))
+  (unless (buffer-temporary-p)
     (if (and haskell-has-stack-p
              (locate-dominating-file default-directory "stack.yaml"))
         (intero-mode 1)

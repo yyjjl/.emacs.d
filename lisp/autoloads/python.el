@@ -1,7 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
-(defvar python--elpy-multiedit-buffers nil)
-
+;;;###autoload
 (defun python//shell-running-p ()
   (when-let* ((process (or (and (derived-mode-p 'inferior-python-mode)
                                 (get-buffer-process (current-buffer)))

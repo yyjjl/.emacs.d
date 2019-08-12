@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(defvar-local mode-line-show-root-p t)
+
 (defvar-local mode-line--cached-git-branch nil)
 (defvar-local mode-line--cached-relative-directory nil)
 (defvar-local mode-line--cached-directory nil)
@@ -104,7 +106,7 @@ read-only, and `buffer-file-coding-system'"
                  when (and (boundp symbol) (symbol-value symbol))
                  do (when-let (count (eval expr))
                       (cl-return (propertize (format "e:%d " count)
-                                          'face font-lock-constant-face))))
+                                             'face font-lock-constant-face))))
         (when (and (boundp 'text-scale-mode-amount)
                    (/= text-scale-mode-amount 0))
           (propertize (format "%+d " text-scale-mode-amount)
@@ -228,9 +230,10 @@ read-only, and `buffer-file-coding-system'"
                         ,(when show-misc-p ''mode-line-misc-info)
                         ,@(when show-root-p
                             (list " "
-                                  (cl-case show-root-p
-                                    (project ''mode-line--cached-root)
-                                    (current ''(:eval (abbreviate-file-name default-directory)))))))))))
+                                  `'(mode-line-show-root-p
+                                     ,(cl-case show-root-p
+                                        (project 'mode-line--cached-root)
+                                        (current '(:eval (abbreviate-file-name default-directory))))))))))))
            (or -segments mode-line-config-alist))))))
 
 (defun mode-line*trace-magit-checkout (-fn &rest -args)

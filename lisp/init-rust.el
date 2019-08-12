@@ -33,9 +33,12 @@
   (unless (or (not rust-has-rls-p)
               (buffer-temporary-p)
               (file-remote-p default-directory)
-              (> (buffer-size) core-large-buffer-size))
-    (with-demoted-errors "Lsp-rust: %s"
-      (lsp))))
+              (buffer-too-large-p))
+    (add-transient-hook!
+        (hack-local-variables-hook :local t :name rust|setup-internal)
+      (when (bound-and-true-p lsp-enable-in-project-p)
+        (with-demoted-errors "Lsp-rust: %s"
+          (lsp))))))
 
 (defun rust/cargo-dispatch (-use-last-action)
   (interactive "P")

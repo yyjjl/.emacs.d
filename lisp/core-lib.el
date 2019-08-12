@@ -272,20 +272,34 @@ HTML file converted from org file, it returns t."
   (let ((filename (buffer-file-name)))
     (or (not core--buffer-useful-p)
         (not filename)
+        (buffer-base-buffer)
         (string-match (concat "^" temporary-file-directory)
                       filename))))
 
 (defsubst buffer-too-large-p ()
   (let ((filename (buffer-file-name)))
-    (and filename
-         (> (or (nth 7 (file-attributes filename)) 0)
-            core-large-buffer-size))))
+    (or (and filename
+             (> (or (nth 7 (file-attributes filename)) 0)
+                core-large-buffer-size))
+        (> (buffer-size)
+           core-large-buffer-size))))
 
-(defun insert-after! (-val -ele -plist)
-  "Find -VAL and Add -ELE to -LIST after it."
-  (let ((pair (memq -val -plist)))
+(defun insert-after! (-after-value -new-value -lst)
+  "Find -AFTER-VALUE and Add -NEW-VALUE to -LST after it."
+  (let ((pair (memq -after-value -lst)))
     (when pair
-      (setcdr pair (cons -ele (cdr pair))))))
+      (setcdr pair (cons -new-value (cdr pair))))))
+
+(defun insert-before! (-before-value -new-value -lst)
+  "Find -BEFORE-VALUE and Add -NEW-VALUE to -LST after it."
+  (if (equal -before-value (car -lst))
+      (progn
+        (setcdr -lst (cons (car -lst) (cdr -lst)))
+        (setcar -lst -new-value))
+    (let ((x -lst))
+      (while (and (listp x) (not (equal -before-value (cadr x))))
+        (setq x (cdr x)))
+      (setcdr x (cons -new-value (cdr x))))))
 
 (defun get-caller-name! ()
   "Get the current function' caller function name"

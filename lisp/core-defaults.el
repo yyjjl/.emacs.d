@@ -163,7 +163,7 @@
            (shell-command (concat "open " (shell-quote-argument file))))
           ((eq system-type 'gnu/linux)
            (let ((process-connection-type nil))
-             (add-to-list 'recentf-list file)
+             (recentf-push file)
              (start-process "external-process" nil "xdg-open" file))))
     (kill-buffer)
     (let (debug-on-error)

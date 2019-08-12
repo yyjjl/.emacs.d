@@ -16,12 +16,9 @@
   "\\.tpl\\'" "\\.[gj]sp\\'" "\\.as[cp]x\\'"
   "\\.erb\\'" "\\.mustache\\'"
   "\\.djhtml\\'" "\\.ftl\\'"
-  "\\.html?\\'" "\\.xul?\\'" "\\.eex?\\'"
-  "\\.xml?\\'")
+  "\\.html?\\'" "\\.xul?\\'" "\\.eex?\\'")
 
-(setq auto-mode-alist
-      (cl-subst 'web-mode 'js-jsx-mode
-                (cl-subst 'web-mode 'javascript-mode auto-mode-alist)))
+(setq auto-mode-alist (cl-subst 'web-mode 'js-jsx-mode auto-mode-alist))
 
 
 
@@ -64,37 +61,33 @@
   (save-excursion
     (imenu--generic-function '((nil "^ *\\([^ ]+\\) *{ *$" 1)))))
 
+(defun web|setup-js-internal ()
+  (when (bound-and-true-p lsp-enable-in-project-p)
+    (electric-indent-local-mode -1)
+    (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
+    (flycheck-mode 1)
+    (tide-setup)
+    (tide-hl-identifier-mode 1)
+
+    (company//add-backend 'company-tide)))
+
 (define-hook! web|setup-web (web-mode-hook)
   (if (and buffer-file-name
-           (string-match-p "\\.[jt]s[x]?\\'" (downcase buffer-file-name)))
+           (string-match-p "\\.[jt]sx?\\'" (downcase buffer-file-name)))
       (add-transient-hook!
-          (hack-local-variables-hook :local t :name web|setup-js-internal)
-        (setq-local web-mode-enable-auto-quoting nil)
-        (when (bound-and-true-p lsp-enable-in-project-p)
-          (electric-indent-local-mode -1)
-          (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
-          (flycheck-mode 1)
-          (tide-setup)
-          (tide-hl-identifier-mode 1)
-          (add-to-list 'company-backends 'company-tide))))
-  (add-to-list 'company-backends 'company-web-html))
+          (hack-local-variables-hook :local t :name web|setup-web-hook)
+        (web|setup-js-internal)))
+  (company//add-backend 'company-web-html))
 
 (define-hook! web|setup-js (js-mode-hook typescript-mode-hook)
   (when (and buffer-file-name
              (not (string-suffix-p ".json" (downcase buffer-file-name))))
     (add-transient-hook!
-        (hack-local-variables-hook :local t :name web|setup-js-internal)
-      (when (bound-and-true-p lsp-enable-in-project-p)
-        (electric-indent-local-mode -1)
-        (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
-        (flycheck-mode 1)
-        (tide-setup)
-        (add-to-list 'company-backends 'company-tide)
-        (tide-hl-identifier-mode 1))))
+        (hack-local-variables-hook :local t :name web|setup-js-hook)
+      (web|setup-js-internal)))
 
   (setq-local electric-layout-rules
-              (delq (assoc ?\; electric-layout-rules)
-                    electric-layout-rules)))
+              (delq (assoc ?\; electric-layout-rules) electric-layout-rules)))
 
 (autoload 'turn-on-css-eldoc "css-eldoc")
 (define-hook! web|setup-css (css-mode-hook sass-mode-hook)
@@ -131,7 +124,7 @@
           ;; angular imenu
           (" \\(ng-[a-z]*\\)=\"\\([^\"]+\\)" 1 2 "=")))
 
-  (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
+  (setq web-mode-content-types-alist nil)
   (setq web-mode-enable-auto-indentation nil)
 
   (remap! "C-c C-a" "C-c a" web-mode-map)
@@ -156,6 +149,6 @@
 (add-hook 'sgml-mode-hook 'emmet-mode)
 (add-hook 'web-mode-hook 'emmet-mode)
 (add-hook 'nxml-mode 'emmet-mode)
-(add-hook 'css-mode-hook  'emmet-mode)
+(add-hook 'css-mode-hook 'emmet-mode)
 
 (provide 'init-web)

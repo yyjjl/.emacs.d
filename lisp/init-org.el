@@ -130,9 +130,9 @@
   ;; Add context-sensitive completion for meta options
   (make-local-variable 'completion-at-point-functions)
   (add-to-list 'completion-at-point-functions
-               (lambda ()
-                 (ignore-errors (pcomplete-completions-at-point))))
-  (add-to-list 'company-backends 'company-org-symbols))
+               (lambda () (ignore-errors (pcomplete-completions-at-point))))
+
+  (company//add-backend 'company-org-symbols :main-backend? nil))
 
 (define-hook! org|src-setup (org-src-mode-hook)
   (flycheck-mode -1))

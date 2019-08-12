@@ -13,6 +13,8 @@
 
 
 
+(defvar python--elpy-multiedit-buffers nil)
+
 (defvar python--elpy-mutiedit-overlay-map
   (define-key! :map (make-sparse-keymap)
     ("TAB" . python/elpy-multiedit-next-overlay)
@@ -64,12 +66,13 @@
     (setq-local python-shell-interpreter-args "-i"))
 
   (unless (or (buffer-temporary-p)
-              (buffer-base-buffer)
               (not (eq major-mode 'python-mode)))
     ;; run command `pip install jedi flake8 importmagic` in shell,
     ;; or just check https://github.com/jorgenschaefer/elpy
     (semantic-idle-summary-mode -1)
-    (elpy-mode 1)))
+    (elpy-mode 1)
+
+    (company//add-backend 'elpy-company-backend)))
 
 (define-hook! python|python-inferior-setup (inferior-python-mode-hook)
   (remove-hook 'comint-output-filter-functions

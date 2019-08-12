@@ -48,7 +48,10 @@
 
 (defun cpp-ccls//setup ()
   (condition-case err
-      (lsp)
+      (progn
+        (lsp)
+        (setq-local lsp-enable-links nil)
+        (electric-indent-local-mode -1))
     (error (message "%s" err))))
 
 (defun cpp-ccls/create-dot-ccls (-dir)

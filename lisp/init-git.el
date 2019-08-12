@@ -110,12 +110,12 @@
 (define-hook! git|generic-prog-mode-setup ((prog-mode-hook :append))
   (unless (or (file-remote-p default-directory)
               (buffer-temporary-p)
-              (> (buffer-size) core-large-buffer-size))
+              (buffer-too-large-p))
     (git-gutter-mode 1)))
 
 (with-eval-after-load 'magit
   (setq magit-completing-read-function 'ivy-completing-read)
-  ;; Disable interal vc
+  ;; Disable internal vc
   (setq vc-handled-backends nil)
   (setq magit-auto-revert-mode nil)
 

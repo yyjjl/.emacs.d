@@ -185,7 +185,10 @@
   (setq-default flycheck-check-syntax-automatically
                 '(idle-change save mode-enabled))
   (setq flycheck-mode-line-prefix ""
-        flycheck-idle-change-delay 1))
+        flycheck-idle-change-delay 1)
+
+  (define-key! :map flycheck-command-map
+    ("j" . counsel/flycheck)))
 
 (with-eval-after-load 'hippie-exp
   (setq he-dabbrev-chars "0-9a-zA-Z\\?!_")

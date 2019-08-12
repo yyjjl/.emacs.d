@@ -15,21 +15,14 @@
     ("M-n" . company-next-page)
     ("M-p" . company-previous-page))
 
-  (company-statistics-mode 1)
-
-  ;; Make company-files a work before capf
   (setq-default company-backends
-                '(company-nxml
-                  company-css
-                  ;; (company-files company-cmake)
-                  company-cmake
-                  company-capf
-                  (company-dabbrev-code
-                   company-etags
-                   company-gtags
-                   company-keywords)
-                  company-dabbrev
-                  company-yasnippet))
+                `((company-capf
+                   company-dabbrev-code company-keywords
+                   ;; company-files
+                   :with company-yasnippet
+                   :separate)
+                  (company-gtags company-etags)
+                  company-dabbrev))
 
   ;; Company should be case sensitive
   (setq company-dabbrev-downcase nil)
@@ -45,9 +38,6 @@
   (setq company-etags-ignore-case t)
   (setq company-minimum-prefix-length 3)
   (setq company-tooltip-align-annotations t)
-  ;; press SPACE will accept the highlighted candidate and insert a space
-  ;; `M-x describe-variable company-auto-complete-chars` for details
-  ;; That's BAD idea.
   (setq company-auto-complete nil)
   ;; Not to load company-mode for certain major modes.
   (setq company-global-modes
@@ -57,6 +47,32 @@
 
 (with-eval-after-load 'company-capf
   (advice-add 'company-capf :around #'ignore-errors!))
+
+(defsubst company//find-main-backend (backends)
+  (let ((x backends))
+    (while (and (consp x)
+                (not (and (listp (car x)) (memq :with (car x)))))
+      (setq x (cdr x)))
+    x))
+
+(cl-defun company//add-backend (backend &key (main-backend? t) (after nil))
+  ;; deep copy the backends list
+  (let ((backends (mapcar (lambda (x) (if (consp x) (copy-sequence x) x))
+                          company-backends)))
+    (if main-backend?
+        (when-let* ((parent-of-main-backend (company//find-main-backend backends)))
+          ;; remove backend first
+          (setq backends (delete backend backends))
+          ;; remove 'company-capf
+          (setcar parent-of-main-backend
+                  (delete 'company-capf (car parent-of-main-backend)))
+          (if after
+              (insert-after! after backend (car parent-of-main-backend))
+            (cl-pushnew backend (car parent-of-main-backend))))
+      (if after
+          (insert-after! after backend backends)
+        (cl-pushnew backend backends)))
+    (setq-local company-backends backends)))
 
 (define-key!
   ("C-c <tab>" . company-complete)

@@ -15,19 +15,11 @@
 (define-hook! latex|setup (LaTeX-mode-hook)
   (flycheck-mode -1)
 
-  (setq next-error-function 'TeX-next-error)
   (company-auctex-init)
-  (add-to-list 'company-backends 'company-reftex-labels)
-  (add-to-list 'company-backends 'company-reftex-citations)
-  ;; (add-to-list 'company-backends 'company-files)
-  (turn-off-auto-fill)
-  ;; (visual-line-mode 1)
-  ;; (setq company-backends (delete 'company-dabbrev company-backends))
-  (LaTeX-math-mode 1)
-  ;; Fix conflit with `orgtbl-mode'
-  (define-key LaTeX-math-mode-map "``" (lambda () (interactive)
-                                         (insert-char ?\`)))
-  ;; (orgtbl-mode 1)
+  (company//add-backend 'company-reftex-labels :main-backend? nil)
+  (company//add-backend 'company-reftex-citations :main-backend? nil)
+
+  (setq next-error-function 'TeX-next-error)
 
   (setq-local prettify-symbols-alist tex--prettify-symbols-alist)
   (add-function :override (local 'prettify-symbols-compose-predicate)
@@ -41,6 +33,8 @@
   (electric-pair-local-mode -1)
   (electric-indent-local-mode -1)
   (TeX-fold-mode 1)
+  (turn-off-auto-fill)
+  (LaTeX-math-mode 1)
 
   (unless (buffer-temporary-p)
     (reftex-mode 1)

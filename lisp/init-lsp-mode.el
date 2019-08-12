@@ -10,7 +10,8 @@
   :group 'lsp
   :type 'directory
   :safe #'booleanp)
-(defvar lsp--disable-eldoc-in-minibuffer nil)
+(defvar lsp-disable-eldoc-in-minibuffer nil)
+(defvar ivy-lsp-symbols-request-id nil)
 
 
 
@@ -21,6 +22,80 @@
 (custom-theme-set-faces
  'doom-molokai
  '(lsp-face-highlight-textual ((t :background "#444155"))))
+
+
+(defun ivy//lsp-cannel-request ()
+  (when ivy-lsp-symbols-request-id
+    (lsp--cancel-request ivy-lsp-symbols-request-id)
+    (setq ivy-lsp-symbols-request-id nil)))
+
+(defun ivy//lsp-transform-candidate (candidate)
+  (let* ((container-name (gethash "containerName" candidate))
+         (name (gethash "name" candidate))
+         (uri (gethash "uri" candidate))
+         (type (or (alist-get (gethash "kind" candidate) lsp--symbol-kind)
+                   "Unknown"))
+         (string (concat (if (s-blank? container-name)
+                             name
+                           (concat container-name "." name))
+                         " "
+                         (propertize (concat "(" type ")")
+                                     'face 'font-lock-keyword-face)
+                         " "
+                         (lsp--uri-to-path uri))))
+    (put-text-property 0 1 'lsp-symbol candidate string)
+    string))
+
+(defun ivy//lsp-callback (candidates)
+  (when ivy-lsp-symbols-request-id
+    (setq ivy-lsp-symbols-request-id nil)
+    (ivy--set-candidates (mapcar #'ivy//lsp-transform-candidate candidates))
+    (ivy--insert-minibuffer (ivy--format ivy--all-candidates))))
+
+(defun ivy//lsp-workspace-symbol-candidates (pattern workspaces)
+  (with-lsp-workspaces workspaces
+    ;; cancel if there is pending request
+    (ivy//lsp-cannel-request)
+
+    (-let (((request &as &plist :id request-id)
+            (lsp-send-request-async
+             (lsp-make-request "workspace/symbol" (list :query pattern))
+             #'ivy//lsp-callback
+             'detached)))
+
+      (setq ivy-lsp-symbols-request-id request-id)
+      (lsp-send-request-async request #'ivy//lsp-callback 'detached)
+      nil)))
+
+(defun ivy//lsp-workspace-symbol-action (candidate)
+  "Action for ivy workspace symbol. CANDIDATE is the selected item."
+  (-let* (((&hash "uri" "range" (&hash "start" (&hash "line" "character")))
+           (gethash "location" (get-text-property 0 'lsp-symbol candidate))))
+    (find-file (lsp--uri-to-path uri))
+    (goto-char (point-min))
+    (forward-line line)
+    (forward-char character)))
+
+(defun ivy/lsp-workspace-symbol (&optional -global)
+  (interactive "P")
+  (let ((workspaces (if -global
+                        (-uniq (-flatten (ht-values (lsp-session-folder->servers (lsp-session)))))
+                      (lsp-workspaces))))
+    (unless workspaces
+      (user-error "No LSP workspace active"))
+
+    (ivy-read (format "%s workspace: " (if -global "Global" "Current"))
+              (lambda (pattern)
+                (or (let ((ivy-text pattern))
+                      (ivy-more-chars))
+                    (ivy//lsp-workspace-symbol-candidates pattern workspaces)))
+              :dynamic-collection t
+              :unwind (lambda ()
+                        (ivy//lsp-cannel-request)
+                        (swiper--cleanup))
+              :action #'ivy//lsp-workspace-symbol-action
+              :caller 'ivy-lsp
+              :history 'ivy-lsp-history)))
 
 (defun lsp/remove-session-folder (-remove-invalid)
   (interactive "P")
@@ -54,9 +129,8 @@
   ;; default to sort and filter by server
   (setq-local company-transformers nil)
 
-  (add-to-list 'company-backends 'company-lsp)
-  ;; (add-to-list 'company-backends 'company-files)
-  )
+  ;; (company//add-backend 'company-files)
+  (company//add-backend 'company-lsp))
 
 (defun lsp//ui-doc-toggle (-toggle)
   (when (require 'lsp-ui-doc nil t)
@@ -68,7 +142,7 @@
       (lsp-ui-doc-mode -1))))
 
 (defun lsp*override-eldoc-message (&optional msg)
-  (unless lsp--disable-eldoc-in-minibuffer
+  (unless lsp-disable-eldoc-in-minibuffer
     (run-at-time 0 nil (lambda () (eldoc-message msg)))))
 
 (with-eval-after-load 'lsp
@@ -91,6 +165,7 @@
     ("M-s l" . lsp-lens-mode)
     ("M-s h h" . lsp-document-highlight)
     ("C-c R" . lsp-rename)
+    ("C-c I" . ivy/lsp-workspace-symbol)
     ("C-c S" . lsp-describe-session)
     ("C-c C-d" . lsp-describe-thing-at-point)
     ("C-c C-SPC" . lsp-execute-code-action)))

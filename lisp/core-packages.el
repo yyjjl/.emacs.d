@@ -5,7 +5,7 @@
  flycheck
  ;; Code completion framework
  company
- company-statistics
+ ;; company-statistics
  ;; Save session to disk
  session
  hydra

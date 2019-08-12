@@ -16,7 +16,8 @@
           "sdcv"
           "lispy-message"
           (and (*\? not-newline) (in "Hh") "elp" (*\? not-newline))
-          (and (*\? not-newline) (in "Dd") "escribe" (*\? not-newline)))
+          (and (*\? not-newline) (in "Dd") "escribe" (*\? not-newline))
+          (and (*\? not-newline) (in "Dd") "ocumentation" (*\? not-newline)))
       "*"
       line-end))
 
@@ -38,6 +39,7 @@
 (put 'core-popups-current-window 'permanent-local t)
 (defvar core-popups-comint-modes
   '(term-mode
+    vterm-mode
     haskell-interactive-mode))
 (defvar core-popups-help-modes
   '(help-mode

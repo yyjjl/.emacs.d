@@ -11,16 +11,17 @@
 (define-hook! sh|setup (sh-mode-hook)
   (unless (buffer-temporary-p)
     (when bash-language-server-executable
-      (lsp)
-      (lsp//ui-doc-toggle 1)
-      (setq-local lsp--disable-eldoc-in-minibuffer t)
-      (setq-local lsp-eldoc-hook '(lsp-document-highlight lsp-hover))
-      (setq-local company-lsp-cache-candidates 'auto))
+      (add-transient-hook!
+          (hack-local-variables-hook :local t :name sh|setup-internal)
+        (lsp)
+        (lsp//ui-doc-toggle 1)
+
+        (setq-local lsp-disable-eldoc-in-minibuffer t)
+        (setq-local lsp-eldoc-hook '(lsp-document-highlight lsp-hover))
+        (setq-local company-lsp-cache-candidates 'auto)))
 
     (add-to-list 'flycheck-disabled-checkers 'sh-shellcheck)
-    (flycheck-mode 1)
-    ;; (add-to-list 'company-backends 'company-files)
-    ))
+    (flycheck-mode 1)))
 
 (with-eval-after-load 'make-mode
   (add-hook 'makefile-mode-hook #'whitespace-mode))
