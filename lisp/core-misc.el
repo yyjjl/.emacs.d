@@ -89,7 +89,6 @@
 (with-eval-after-load 'winum
   (define-key! :map winum-keymap
     ("C-x w")
-    ("M-`" . winum-select-window-by-number)
     ("M-0" . core/goto-next-char-or-minibuffer)
     ("M-1" . winum-select-window-1)
     ("M-2" . winum-select-window-2)

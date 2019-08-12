@@ -97,6 +97,7 @@ will close some features to speed up emacs performance")
   (setq srecode-map-save-file (expand-var! "srecode-map.el"))
   (setq transient-history-file (expand-var! "transient/history.el"))
   (setq tramp-persistency-file-name (expand-var! "tramp.el"))
+  (setq treemacs-persist-file (expand-var! "treemacs-persist"))
   (setq url-configuration-directory (expand-var! "url/")))
 
 (add-auto-mode! 'conf-mode

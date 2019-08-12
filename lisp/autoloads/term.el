@@ -194,19 +194,20 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
   (let ((term-buffer-list
          (mapcar (lambda (buffer)
                    (let ((name (buffer-local-value 'term--extra-name buffer)))
-                     (if name
-                         (concat (buffer-name buffer) ": " name)
-                       (buffer-name buffer))))
+                     (cons (if name
+                               (concat (buffer-name buffer) ": " name)
+                             (buffer-name buffer))
+                           buffer)))
                  (term//get-buffer-list))))
     (if (<= (length term-buffer-list) 1)
         (user-error "There is only one term buffer")
       (ivy-read "Switch to term buffer: " term-buffer-list
                 :require-match t
-                :action (lambda (buffer-name)
+                :action (lambda (candidate)
                           (let ((window (selected-window)))
                             (set-window-dedicated-p window nil)
                             (unwind-protect
-                                (switch-to-buffer buffer-name)
+                                (switch-to-buffer (cdr candidate))
                               (set-window-dedicated-p window t))))))))
 
 (defun term/switch-next (-create-new)

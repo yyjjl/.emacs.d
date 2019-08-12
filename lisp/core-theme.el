@@ -46,6 +46,8 @@
  '(web-mode-jsx-depth-1-face ((t (:background "#2d2e2e"))))
  '(easy-kill-selection ((t (:inverse-video t :inherit warning))))
 
+ '(ivy-current-match ((t (:background "gray0"))))
+
  '(semantic-highlight-func-current-tag-face ((t (:background "gray5"))))
  '(shm-current-face ((t (:inherit hl-line))))
 

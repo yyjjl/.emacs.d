@@ -312,6 +312,8 @@
   (run-with-timer 1 nil #'run-hooks 'after-init-idle-hook)
   (run-with-idle-timer core-autosave-interval t #'run-hooks 'core-autosave-hook)
 
+  ;; GC all sneaky breeky like
+  (add-hook 'focus-out-hook #'garbage-collect)
   (message "Init Time: %s" (emacs-init-time)))
 
 (provide 'core-defaults)

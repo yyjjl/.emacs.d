@@ -69,3 +69,4 @@
 (require 'init-extra)
 (require 'init-tabnine)
 (require 'init-play)
+(require 'init-treemacs)
