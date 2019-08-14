@@ -167,6 +167,7 @@
     ("C-c R" . lsp-rename)
     ("C-c I" . ivy/lsp-workspace-symbol)
     ("C-c S" . lsp-describe-session)
+    ("C-c B" . lsp-format-buffer)
     ("C-c C-d" . lsp-describe-thing-at-point)
     ("C-c C-SPC" . lsp-execute-code-action)))
 

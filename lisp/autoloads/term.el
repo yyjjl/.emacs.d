@@ -4,8 +4,6 @@
 (eval-when-compile
   (require 'term))
 
-(defvar term-prefer-vterm t)
-
 ;; Kill the buffer when terminal is exited
 ;;;###autoload
 (defvar term-default-directory-function-list '(projectile-project-root))

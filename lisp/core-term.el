@@ -1,9 +1,12 @@
 ;;; -*- lexical-binding: t; -*-
 
 (setvar! term-zsh-path (executable-find "zsh")
-         term-bash-path (executable-find "bash"))
+         term-bash-path (executable-find "bash")
+         term-prefer-vterm t)
 
-(require-packages! term)
+(require-packages!
+ term
+ (vterm :when term-prefer-vterm))
 
 (eval-when-compile
   (require 'dash))
