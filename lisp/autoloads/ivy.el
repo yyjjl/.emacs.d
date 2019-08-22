@@ -218,13 +218,14 @@ for a file to visit if current buffer is not visiting a file."
 (defun counsel//rg (&optional -args -extra-args)
   (interactive (list (transient-args 'counsel/rg) nil))
   (unless -args
-    (setq -args '("--color never" "-M 200" "--line-number")))
+    (setq -args '("--color never" "-M 200")))
   (unless (member "--pretty" -args)
     (setq -args (append -args '("--no-heading"))))
+  (unless (member "--no-line-number" -args)
+    (setq -args (append -args '("--line-number"))))
 
-  (let ((counsel-rg-base-command (concat "rg " (string-join -args " ") " %s ."))
-        (default-directory (or counsel--rg-current-directory default-directory)))
-    (counsel-rg nil nil -extra-args)))
+  (let ((counsel-rg-base-command (concat "rg " (string-join -args " ") " %s .")))
+    (counsel-rg nil (or counsel--rg-current-directory default-directory) -extra-args)))
 
 (defun counsel//file-jump-function (string)
   "Grep in the current directory for STRING."
@@ -298,10 +299,9 @@ for a file to visit if current buffer is not visiting a file."
    [("RET" "Search pattern in file" counsel//rg)]]
   (interactive
    (list
-    (let ((directory (or (projectile-project-root) default-directory)))
-      (or (and current-prefix-arg
-               (read-directory-name "Run ripgrep in directory: " directory))
-          directory))))
+    (or (and current-prefix-arg
+             (read-directory-name "Run ripgrep in directory: " default-directory))
+        (or (projectile-project-root) default-directory))))
 
   (setf (nth 1 (aref (car (last (get 'counsel/rg 'transient--layout))) 2))
         (concat "Run in " (abbreviate-file-name -directory)))
@@ -365,7 +365,7 @@ for a file to visit if current buffer is not visiting a file."
   (let* ((err (cdr -candidate))
          (buffer (flycheck-error-buffer err))
          (lineno (flycheck-error-line err))
-         (column (or (flycheck-error-column err) 0)))
+         (column (or (flycheck-error-column err) 1)))
     (with-current-buffer buffer
       (switch-to-buffer buffer)
       (goto-char (point-min))
@@ -386,7 +386,7 @@ for a file to visit if current buffer is not visiting a file."
                         'face 'flycheck-error-list-line-number)
             (propertize (-if-let (column (flycheck-error-column -err))
                             (number-to-string column)
-                          0)
+                          "0")
                         'face 'flycheck-error-list-column-number)
             (or (flycheck-error-message -err) ""))))
 
@@ -394,7 +394,7 @@ for a file to visit if current buffer is not visiting a file."
 (defun counsel/flycheck (&optional -only-error)
   (interactive "P")
   (let ((errors (sort flycheck-current-errors #'flycheck-error-<))
-        (lineno (1+ (current-line))))
+        (lineno (line-number-at-pos)))
     (when -only-error
       (setq errors
             (seq-filter (lambda (err)
