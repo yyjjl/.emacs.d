@@ -22,7 +22,7 @@
   (define-key term-raw-map [remap term-send-raw] #'term/conditional-send-raw)
   (define-key term-mode-map (kbd "M-o") #'term/ivy-switch))
 
-(with-eval-after-load 'vterm-mode
+(with-eval-after-load 'vterm
   (define-hook! (vterm|set-title title) (vterm-set-title-functions)
     (setq term--extra-name title))
 

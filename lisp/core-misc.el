@@ -218,12 +218,21 @@
       (funcall -cmd)
     (compile -cmd t)))
 
+(defun core*edit-dir-locals (&optional directory)
+  "Edit or create a .dir-locals.el file of the project."
+  (interactive (list (let ((root (projectile-project-root)))
+                       (or (and current-prefix-arg
+                                (read-directory-name "Select root" root))
+                           root))))
+  (let ((default-directory directory))
+    (call-interactively #'add-dir-local-variable)))
+
 (with-eval-after-load 'projectile
   (define-key projectile-mode-map (kbd "C-x p") projectile-command-map)
 
   (advice-add 'projectile-invalidate-cache :after #'core*projectile-clear-vars)
-
   (advice-add 'projectile-run-compilation :override #'core*projectile-run-compilation)
+  (advice-add 'projectile-edit-dir-locals :override #'core*edit-dir-locals)
 
   ;; Projectile root-searching functions can cause an infinite cl-loop on TRAMP
   ;; connections, so disable them.
