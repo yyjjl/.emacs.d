@@ -16,6 +16,8 @@
  skeletor
  lua-mode
  restclient
+ cython-mode
+ flycheck-cython
  sly)
 
 (add-auto-mode! 'crontab-mode "\\.?cron\\(tab\\)?\\'")
@@ -47,6 +49,13 @@
   ("j" . buf-move-down)
   ("h" . buf-move-left)
   ("l" . buf-move-right))
+
+(define-hook! cython|setup (cython-mode-hook)
+  (setq electric-indent-chars (delq ?: electric-indent-chars))
+
+  (unless (or (buffer-temporary-p)
+              (not (eq major-mode 'python-mode)))
+    (flycheck-mode 1)))
 
 
 
