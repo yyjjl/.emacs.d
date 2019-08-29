@@ -9,6 +9,16 @@
 
 
 
+(defun latex/next-error ()
+  (interactive)
+  (let ((occur-buffer (core*before-next-error)))
+    (call-interactively (if occur-buffer #'next-error #'TeX-next-error))))
+
+(defun latex/previous-error ()
+  (interactive)
+  (let ((occur-buffer (core*before-next-error)))
+    (call-interactively (if occur-buffer #'previous-error #'TeX-previous-error))))
+
 ;; C-c RET => Insert macro
 
 (autoload 'LaTeX-math-mode "latex" nil t)
@@ -63,16 +73,6 @@
         font-latex-fontify-script nil
         ;; Don't insert line-break at inline math
         LaTeX-fill-break-at-separators nil)
-
-  (defun latex/next-error ()
-    (interactive)
-    (let ((occur-buffer (core*before-next-error)))
-      (call-interactively (if occur-buffer #'next-error #'TeX-next-error))))
-
-  (defun latex/previous-error ()
-    (interactive)
-    (let ((occur-buffer (core*before-next-error)))
-      (call-interactively (if occur-buffer #'previous-error #'TeX-previous-error))))
 
   (define-key! :map TeX-mode-map
     ([remap next-error] . latex/next-error)

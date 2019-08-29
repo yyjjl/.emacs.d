@@ -47,6 +47,7 @@
     messages-buffer-mode
     completion-list-mode
     compilation-mode
+    TeX-error-overview-mode
     flycheck-error-list-mode
     flymake-diagnostics-buffer-mode
     profiler-report-mode))
