@@ -13,6 +13,7 @@
   (rx line-start
       "*"
       (or "Compile-Log"
+          (and "poporg: " (*\? not-newline))
           "sdcv"
           "lispy-message"
           (and (*\? not-newline) (in "Hh") "elp" (*\? not-newline))

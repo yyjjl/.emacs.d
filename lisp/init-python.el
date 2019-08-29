@@ -70,7 +70,8 @@
                #'python-pdbtrack-comint-output-filter-function))
 
 (with-eval-after-load 'lsp-pyls
-  (setq lsp-pyls-configuration-sources ["flake8"]))
+  (setq lsp-pyls-configuration-sources ["flake8"])
+  (setq lsp-pyls-plugins-pylint-enabled nil))
 
 (with-eval-after-load 'pyvenv
   (setq pyvenv-mode-line-indicator
