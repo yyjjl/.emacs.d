@@ -307,8 +307,8 @@ HTML file converted from org file, it returns t."
          (frame (backtrace-frame index))
          (found 0))
     (while (not (equal found 2))
-      (setq frame (backtrace-frame (incf index)))
-      (when (equal t (first frame)) (incf found)))
+      (setq frame (backtrace-frame (cl-incf index)))
+      (when (equal t (first frame)) (cl-incf found)))
     (second frame)))
 
 (defun get-call-stack! ()
@@ -318,7 +318,7 @@ HTML file converted from org file, it returns t."
         (index 5))
     (while (setq frame (backtrace-frame index))
       (push frame frames)
-      (incf index))
+      (cl-incf index))
     (cl-remove-if-not 'car frames)))
 
 (defsubst expand-var! (-name &optional -make-p)

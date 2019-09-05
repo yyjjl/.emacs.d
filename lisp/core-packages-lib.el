@@ -115,9 +115,9 @@ Archive with high priority will be used when install a package.")
          (eval-when-compile
            ,@(nreverse compile-forms))))))
 
+(autoload 'generate-file-autoloads "autoload")
 (defun package/generate-autoloads ()
   (interactive)
-  (require 'autoload)
   (let ((files (directory-files emacs-autoloads-directory :full "\\.el\\'"))
         (failed-count 0))
     (with-current-buffer (find-file-noselect emacs-autoloads-file)
@@ -126,7 +126,7 @@ Archive with high priority will be used when install a package.")
         (condition-case nil
             (generate-file-autoloads file)
           (error (message "Generating for %s failed" file)
-                 (incf failed-count))))
+                 (cl-incf failed-count))))
       (save-buffer))
     (message "%d generated, %d failed"
              (- (length files) failed-count)
@@ -155,6 +155,7 @@ Archive with high priority will be used when install a package.")
 
 (when (<= emacs-major-version 26)
   (package-initialize))
+(auto-compile-on-load-mode 1)
 
 (unless (file-exists-p emacs-autoloads-file)
   (package/generate-autoloads))
