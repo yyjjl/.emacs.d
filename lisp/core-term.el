@@ -13,6 +13,27 @@
 
 
 
+
+(defun vterm*self-insert ()
+  "Sends invoking key to libvterm. Fix meta key error in terminal"
+  (interactive)
+  (when vterm--term
+    (let* ((modifiers (event-modifiers
+                       (or (and (not (display-graphic-p))
+                                (ignore-errors
+                                  (->> (seq-subseq (nreverse (recent-keys t)) 1)
+                                       (seq-take-while (lambda (x) (not (consp x))))
+                                       nreverse
+                                       key-description
+                                       kbd
+                                       listify-key-sequence)))
+                           last-input-event)))
+           (shift (memq 'shift modifiers))
+           (meta (memq 'meta modifiers))
+           (ctrl (memq 'control modifiers)))
+      (when-let ((key (key-description (vector (event-basic-type last-input-event)))))
+        (vterm-send-key key shift meta ctrl)))))
+
 (defun term*setup-environment (-fn &rest -args)
   (with-temp-env! (term//extra-env)
     (apply -fn -args)))
@@ -23,6 +44,8 @@
   (define-key term-mode-map (kbd "M-o") #'term/ivy-switch))
 
 (with-eval-after-load 'vterm
+  (advice-add 'vterm--self-insert :override #'vterm*self-insert)
+
   (define-hook! (vterm|set-title title) (vterm-set-title-functions)
     (setq term--extra-name title))
 
