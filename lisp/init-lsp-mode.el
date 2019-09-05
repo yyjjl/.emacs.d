@@ -132,18 +132,36 @@
   ;; (company//add-backend 'company-files)
   (company//add-backend 'company-lsp))
 
-(defun lsp//ui-doc-toggle (-toggle)
+(defun lsp/toggle-doc ()
+  (interactive)
   (when (require 'lsp-ui-doc nil t)
-    (if (> -toggle 0)
+    (if lsp-ui-doc-mode
         (progn
-          (setq lsp-eldoc-render-all nil)
-          (lsp-ui-doc-mode 1))
-      (setq lsp-eldoc-render-all t)
-      (lsp-ui-doc-mode -1))))
+          (setq lsp-eldoc-render-all t)
+          (lsp-ui-doc-mode -1))
+      (setq lsp-eldoc-render-all nil)
+      (lsp-ui-doc-mode 1))))
 
 (defun lsp*override-eldoc-message (&optional msg)
   (unless lsp-disable-eldoc-in-minibuffer
     (run-at-time 0 nil (lambda () (eldoc-message msg)))))
+
+(defun lsp*around-render-on-hover-content (-fn -contents -render-all)
+  (let ((content (funcall -fn -contents -render-all)))
+    (unless (equal (buffer-name) "*lsp-help*")
+      (let ((content-length (length content))
+            (split-pos (string-match (rx line-end) content)))
+        (when (or (< split-pos content-length)
+                  (>= split-pos (frame-width)))
+          (setq content
+                (concat (substring content 0 (min split-pos (- (frame-width) 30)))
+                        (propertize
+                         (if-let (keys (where-is-internal 'lsp-describe-thing-at-point))
+                             (format " ... (%s to see more)"
+                                     (key-description (car keys)))
+                           " ...")
+                         'face 'font-lock-comment-face))))))
+    content))
 
 (with-eval-after-load 'lsp
   (dap-mode 1)
@@ -154,12 +172,10 @@
   (setq lsp-auto-configure nil)
   (setq lsp-eldoc-render-all t)
   (setq lsp-enable-completion-at-point nil)
-  (setq lsp-signature-enabled t)
-  (setq lsp-hover-enabled t)
-  (setq lsp-eldoc-hook '(lsp-hover))
   (setq lsp-restart 'auto-restart)
 
-  (advice-add 'lsp--eldoc-message :override 'lsp*override-eldoc-message)
+  (advice-add 'lsp--eldoc-message :override #'lsp*override-eldoc-message)
+  (advice-add 'lsp--render-on-hover-content :around #'lsp*around-render-on-hover-content)
 
   (define-key! :map lsp-mode-map
     ("M-s l" . lsp-lens-mode)
