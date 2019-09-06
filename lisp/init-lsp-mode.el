@@ -3,7 +3,8 @@
  lsp-mode
  lsp-ui
  dap-mode
- company-lsp)
+ company-lsp
+ ivy)
 
 (defcustom lsp-enable-in-project-p t
   "Whether to setup project literally"

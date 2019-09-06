@@ -1,4 +1,9 @@
 ;;  -*- lexical-binding: t -*-
+
+(eval-when-compile
+  (require 'dash)
+  (require 'shackle))
+
 (defvar core-popups-default-regexp
   (rx line-start
       "*" (*\? not-newline) "*" (? "<" (+ digit) ">")

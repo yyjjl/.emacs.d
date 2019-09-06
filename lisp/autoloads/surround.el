@@ -97,7 +97,7 @@ Use `scan-lists', otherwise use simple algorithm."
           ;; Insert left
           (when to-left
             (when core--suround-origin-pos
-              (incf core--suround-origin-pos (length to-left)))
+              (cl-incf core--suround-origin-pos (length to-left)))
             (insert to-left))))
       ;; Restore original point
       (when core--suround-origin-pos
