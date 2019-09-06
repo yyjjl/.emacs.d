@@ -367,13 +367,23 @@ return that buffer. Otherwise create a new term buffer.
 If -FORCE is non-nil create a new term buffer directly."
   (or (and (not -force)
            (car (--filter (with-current-buffer it
-                            (and (eq major-mode 'term-mode)
-                                 (directory-equal-p -directory
-                                                    default-directory)))
+                            (and (term//term-buffer-p it)
+                                 (directory-equal-p -directory default-directory)))
                           (buffer-list))))
       (let ((default-directory -directory))
         (with-temp-env! (term//extra-env)
           (term//create-buffer nil t)))))
+
+(defun term//pop-shell-get-buffer (&optional -arg)
+  (unless (term//term-buffer-p (current-buffer))
+    (let ((force (or (= -arg 0) (>= -arg 16))))
+      (if (file-remote-p default-directory)
+          (apply #'term//create-ssh-buffer (append (term//get-ssh-info) (list force)))
+        (term//create-local-shell
+         (or (and (= -arg 4) (term//eval-function-list 'term-default-directory-function-list))
+             (and force (read-directory-name "Directory: " nil nil :mustmatch))
+             default-directory)
+         force)))))
 
 ;;;###autoload
 (defun term//pop-to-buffer (buffer)
@@ -401,21 +411,6 @@ If -FORCE is non-nil create a new term buffer directly."
       (setq term--parent-buffer parent-buffer))
     (term//pop-to-buffer buffer)))
 
-(defun term//pop-shell-get-buffer (&optional -arg)
-  (unless (memq major-mode '(eshell-mode term-mode shell-mode))
-    (let ((force (or (= -arg 0) (>= -arg 16))))
-      (if (file-remote-p default-directory)
-          (apply #'term//create-ssh-buffer
-                 (append (term//get-ssh-info) (list force)))
-        (term//create-local-shell (or (and (= -arg 4)
-                                           (term//eval-function-list
-                                            'term-default-directory-function-list))
-                                      (and force
-                                           (read-directory-name "Directory: "
-                                                                nil nil :mustmatch))
-                                      default-directory)
-                                  force)))))
-
 ;;;###autoload
 (defun term/ssh ()
   (interactive)
@@ -427,8 +422,10 @@ If -FORCE is non-nil create a new term buffer directly."
 
 ;;;###autoload
 (defun term/pop-shell (&optional -arg)
-  "Switch to the term buffer last used, or create a new one if
-none exists, or if the current buffer is already a term."
+  "Popup to a term buffer.
+-ARG = 0: create a term buffer in current window
+-ARG >= 16: try to find a old term buffer by given directory
+else: try to find a old term buffer and pop to it"
   (interactive "p")
   (when-let* ((buffer (term//pop-shell-get-buffer -arg))
               (parent-buffer (current-buffer)))

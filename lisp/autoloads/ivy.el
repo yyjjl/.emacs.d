@@ -218,14 +218,15 @@ for a file to visit if current buffer is not visiting a file."
 (defun counsel//rg (&optional -args -extra-args)
   (interactive (list (transient-args 'counsel/rg) nil))
   (unless -args
-    (setq -args '("--color never" "-M 200")))
+    (setq -args '("--color never" "-M 1000")))
   (unless (member "--pretty" -args)
     (setq -args (append -args '("--no-heading"))))
   (unless (member "--no-line-number" -args)
     (setq -args (append -args '("--line-number"))))
 
   (let ((counsel-rg-base-command (concat "rg " (string-join -args " ") " %s .")))
-    (counsel-rg nil (or counsel--rg-current-directory default-directory) -extra-args)))
+    (let ((shell-file-name "/bin/sh"))
+      (counsel-rg nil (or counsel--rg-current-directory default-directory) -extra-args))))
 
 (defun counsel//file-jump-function (string)
   "Grep in the current directory for STRING."

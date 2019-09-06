@@ -225,7 +225,13 @@
                                 (read-directory-name "Select root" root))
                            root))))
   (let ((default-directory directory))
-    (call-interactively #'add-dir-local-variable)))
+    (condition-case nil
+        (call-interactively #'add-dir-local-variable)
+      (quit
+       (when-let ((files (dir-locals--all-files directory)))
+         (if (= (length files) 1)
+             (find-file (car files))
+           (find-file (ivy-read "Open file: " files :require-match t))))))))
 
 (with-eval-after-load 'projectile
   (define-key projectile-mode-map (kbd "C-x p") projectile-command-map)

@@ -101,11 +101,13 @@
     ("R" . TeX-fold-region) ("C-r"))
 
   (define-key! :map LaTeX-mode-map
+    ([f5] . TeX-interactive-mode)
     ("M-a" . latex/backward-sexp)
     ("M-e" . latex/forward-sexp)
     ("M-=" . latex/count-words)
     ("C-c t" :map org-table-extra-map)
     ("C-c E" . TeX-error-overview)
+    ("C-c f l" . TeX-error-overview)
     ("C-t" . TeX-fold-dwim)
     ("}" . latex/skip-close-pair)
     (")" . latex/skip-close-pair)
@@ -116,8 +118,7 @@
     ("C-c s" . LaTeX-section)
     ("C-c e" . LaTeX-environment)
     ("C-c x" . TeX-font)
-    ("C-c C-x" . TeX-font)
-    ("C-c f l" . TeX-error-overview)))
+    ("C-c C-x" . TeX-font)))
 
 (with-eval-after-load 'preview
   (setq preview-auto-cache-preamble t
