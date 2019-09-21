@@ -59,11 +59,10 @@
     (semantic-idle-summary-mode -1)
 
     (add-transient-hook! (hack-local-variables-hook :local t :name python|setup-internal)
-      (if python-has-pyls-p
-          (lsp)
-
-        (elpy-mode 1)
-        (company//add-backend 'elpy-company-backend)))))
+      (or (and python-has-pyls-p (or (ignore-errors (lsp)) t))
+          (progn
+            (elpy-mode 1)
+            (company//add-backend 'elpy-company-backend))))))
 
 (define-hook! python|python-inferior-setup (inferior-python-mode-hook)
   (remove-hook 'comint-output-filter-functions
