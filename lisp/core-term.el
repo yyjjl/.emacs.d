@@ -2,7 +2,7 @@
 
 (setvar! term-zsh-path (executable-find "zsh")
          term-bash-path (executable-find "bash")
-         term-prefer-vterm t)
+         term-prefer-vterm (not emacs-lite-setup-p))
 
 (require-packages!
  term

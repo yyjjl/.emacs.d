@@ -76,11 +76,9 @@
    (list (let (confirm-nonexistent-file-or-buffer)
            (unless buffer-file-name
              (error "Current buffer is not visiting a file!"))
-           (let ((new-name (completing-read "New file name: "
-                                            #'read-file-name-internal)))
+           (let ((new-name (completing-read "New file name: " #'read-file-name-internal)))
              (if (file-directory-p new-name)
-                 (expand-file-name (file-name-nondirectory buffer-file-name)
-                                   new-name)
+                 (expand-file-name (file-name-nondirectory buffer-file-name) new-name)
                new-name)))))
   (let ((filename (buffer-file-name)))
     (when (or (not (file-exists-p -new-name))

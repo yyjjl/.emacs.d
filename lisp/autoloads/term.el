@@ -292,7 +292,8 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
 ;;;###autoload
 (defun term//exec-program (-program -args &optional -name)
   (let ((term-program-switches -args)
-        (term-buffer-name -name))
+        (term-buffer-name -name)
+        (term-prefer-vterm nil))
     (term//create-buffer -program)))
 
 (defun term/switch-back ()
