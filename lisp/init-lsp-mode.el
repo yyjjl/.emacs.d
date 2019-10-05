@@ -149,7 +149,7 @@
 
 (defun lsp*around-render-on-hover-content (-fn -contents -render-all)
   (let ((content (funcall -fn -contents -render-all)))
-    (unless (equal (buffer-name) "*lsp-help*")
+    (unless (core-popups//help-buffer-matcher (current-buffer))
       (let ((content-length (length content))
             (split-pos (string-match (rx line-end) content)))
         (when (or (< split-pos content-length)
