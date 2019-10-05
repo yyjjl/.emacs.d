@@ -199,6 +199,13 @@
 
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 
+(defun core//skip-special-buffers (buffer)
+  (or (buffer-file-name buffer)
+      (not (string-prefix-p "*" (buffer-name buffer)))))
+
+(define-hook! (core|default-frame-setup frame) (after-make-frame-functions)
+  (set-frame-parameter frame 'buffer-predicate 'core//skip-special-buffers))
+
 ;; Make scratch buffer un-killable
 (define-hook! core|unkillable-buffer (kill-buffer-query-functions)
   (let ((bn (buffer-name)))

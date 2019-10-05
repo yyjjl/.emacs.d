@@ -123,9 +123,8 @@
 (define-hook! lsp|after-open (lsp-after-open-hook)
   (flycheck-mode 1)
 
-  (lsp-ui-mode 1)
   (lsp-ui-flycheck-enable 1)
-  ;; (lsp-ui-sideline-enable 1)
+  (lsp-ui-sideline-enable 1)
 
   ;; default to sort and filter by server
   (setq-local company-transformers nil)
@@ -168,12 +167,13 @@
   (dap-mode 1)
   (dap-ui-mode 1)
 
-  (setq lsp-auto-guess-root t)
-  (setq lsp-session-file (expand-var! "lsp-sessions"))
   (setq lsp-auto-configure nil)
+  (setq lsp-auto-guess-root t)
   (setq lsp-eldoc-render-all t)
   (setq lsp-enable-completion-at-point nil)
+  (setq lsp-prefer-flymake nil)
   (setq lsp-restart 'auto-restart)
+  (setq lsp-session-file (expand-var! "lsp-sessions"))
 
   (advice-add 'lsp--eldoc-message :override #'lsp*override-eldoc-message)
   (advice-add 'lsp--render-on-hover-content :around #'lsp*around-render-on-hover-content)
@@ -197,6 +197,7 @@
   (setq lsp-ui-sideline-enable nil)
   (setq lsp-ui-sideline-show-hover nil)
   (setq lsp-ui-sideline-show-diagnostics nil)
+  (setq lsp-ui-sideline-show-code-actions t)
   (setq lsp-ui-doc-max-width 80))
 
 (with-eval-after-load 'company-lsp
