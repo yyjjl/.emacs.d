@@ -158,6 +158,9 @@
     ("a" . cpp/xref-find-references-address)
     ("R" . ccls-reload)))
 
+(with-eval-after-load 'lsp-mode
+  (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.ccls-cache$"))
+
 (with-eval-after-load 'ccls
   (require 'ccls-semantic-highlight)
 
