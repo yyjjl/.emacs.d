@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: pde
+# key: pde
+# --
+__import__("pdb").post_mortem()
