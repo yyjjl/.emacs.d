@@ -155,7 +155,7 @@ Archive with high priority will be used when install a package.")
 
 (when (<= emacs-major-version 26)
   (package-initialize))
-(auto-compile-on-load-mode 1)
+(ignore-errors (auto-compile-on-load-mode 1))
 
 (unless (file-exists-p emacs-autoloads-file)
   (package/generate-autoloads))

@@ -105,7 +105,6 @@
     ("M-a" . latex/backward-sexp)
     ("M-e" . latex/forward-sexp)
     ("M-=" . latex/count-words)
-    ("C-c t" :map org-table-extra-map)
     ("C-c E" . TeX-error-overview)
     ("C-c f l" . TeX-error-overview)
     ("C-t" . TeX-fold-dwim)
