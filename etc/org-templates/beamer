@@ -1,4 +1,4 @@
-\documentclass[xcolor=svgnames,bigger,presentation]{beamer}
+\documentclass[xcolor=svgnames, bigger, presentation]{beamer}
 % default packages
 [DEFAULT-PACKAGES]
 %
@@ -17,31 +17,31 @@
 \usepackage{[ORG-TEMPLATE-DIR]/beamer-theme/beamerthememetropolis} %{Darmstadt}
 %
 \usepackage{verbatim}
-\definecolor{codeblockbg}{rgb}{0.95,0.95,0.95}
-\definecolor{linkcolor}{rgb}{0.1,0.3,0.5}
-\hypersetup{colorlinks=true,linkcolor=linkcolor}
+\definecolor{codeblockbg}{rgb}{0.95, 0.95, 0.95}
+\definecolor{linkcolor}{rgb}{0.1, 0.3, 0.5}
+\hypersetup{colorlinks=true, linkcolor=linkcolor}
 \renewcommand{\theFancyVerbLine}{%
-  \sffamily \textcolor[rgb]{1.0,0.2,1.0}{%
+  \sffamily \textcolor[rgb]{1.0, 0.2, 1.0}{%
     \scriptsize \oldstylenums{\arabic{FancyVerbLine}}}}
 \renewcommand\listoflistingscaption{Program Code List}
 \renewcommand\listingscaption{Program Code}
 \surroundwithmdframed{minted}
 \surroundwithmdframed{quote}
 \mdfsetup{%
-  topline=false,bottomline=false,rightline=false,
-  linewidth=1pt,linecolor=black,
+  topline=false, bottomline=false, rightline=false, 
+  linewidth=1pt, linecolor=black, 
   backgroundcolor=codeblockbg
 }
 \setminted{%
-  style=colorful,
-  fontsize=\small,
-  autogobble=true,breaklines=true,frame=none,linenos=true,tabsize=4,
-  breakautoindent=false,mathescape=true,escapeinside=\#\%,
+  style=colorful, 
+  fontsize=\small, 
+  autogobble=true, breaklines=true, frame=none, linenos=true, tabsize=4, 
+  breakautoindent=false, mathescape=true, escapeinside=\#\%, 
   breaksymbolleft=\raisebox{0.8ex}{%
-    \rotatebox{90}{\small\ensuremath{\curvearrowleft}}},
-  breaksymbolindentleft=0pt,
-breaksymbolsepleft=0pt,
-breaksymbolright=\rotatebox{270}{\small\ensuremath{\curvearrowright}},
+    \rotatebox{90}{\small\ensuremath{\curvearrowleft}}}, 
+  breaksymbolindentleft=0pt, 
+breaksymbolsepleft=0pt, 
+breaksymbolright=\rotatebox{270}{\small\ensuremath{\curvearrowright}}, 
 breaksymbolindentright=0pt,
 breaksymbolsepright=0pt
 }
