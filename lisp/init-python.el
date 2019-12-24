@@ -6,6 +6,7 @@
          python-has-pyls-p (executable-find "pyls"))
 
 (require-packages!
+ importmagic
  lsp-mode
  elpy
  py-autopep8
@@ -57,6 +58,7 @@
   (unless (or (buffer-temporary-p)
               (not (eq major-mode 'python-mode)))
     (semantic-idle-summary-mode -1)
+    (importmagic-mode)
 
     (add-transient-hook! (hack-local-variables-hook :local t :name python|setup-internal)
       (or (and python-has-pyls-p (or (ignore-errors (lsp)) t))
