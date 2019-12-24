@@ -32,6 +32,13 @@
 (with-eval-after-load 'calc
   (add-to-list 'calc-language-alist '(org-mode . latex)))
 
+(with-eval-after-load 'octave
+  (define-key! :map octave-mode-map
+    ("C-c C-d" . octave-help)
+    ("C-c C-c" . octave-send-buffer)
+    ("C-c C-l" . octave-send-line)
+    ("C-c C-e" . octave-send-defun)))
+
 ;; prolog system
 (setq prolog-system 'swi)
 ;; erc

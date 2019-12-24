@@ -8,7 +8,7 @@
    ((file-exists-p (expand-file-name "build.ninja" -dir))
     (concat "ninja -C " -dir))
    ((file-exists-p (expand-file-name "Makefile" -dir))
-    (concat "make --no-print-directory -C " -dir))
+    (concat "make -j 4 --no-print-directory -C" -dir))
    (t nil)))
 
 ;;;###autoload

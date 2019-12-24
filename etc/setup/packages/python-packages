@@ -1,7 +1,9 @@
+Pillow
+PyDelphin
 autopep8
 beautifulsoup4
-bs4
 configparser
+epc
 flake8
 html5lib
 importmagic
@@ -17,10 +19,9 @@ nltk
 notebook
 numpy
 pandas
-Pillow
-PyDelphin
 pyflakes
 pylint
+python-language-server
 requests
 rope
 scikit-image

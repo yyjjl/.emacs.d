@@ -1,19 +1,17 @@
 ;;; -*- lexical-binding: t; -*-
 
 (setvar!
+ haskell-has-hie-p (executable-find "hie")
  haskell-has-stylish-haskell-p (executable-find "stylish-haskell")
- haskell-has-stack-p (executable-find "stack")
  haskell-has-hindent-p (executable-find "hindent")
- haskell-has-cabal-p (executable-find "cabal")
- haskell-has-shm-p (executable-find "structured-haskell-mode"))
+ haskell-has-cabal-p (executable-find "cabal"))
 
 (require-packages!
  align
  haskell-mode
- (intero :when haskell-has-stack-p)
+ (lsp-haskell :when haskell-has-hie-p)
  (hindent :when haskell-has-hindent-p)
- (company-cabal :when haskell-has-cabal-p)
- (shm :when haskell-has-shm-p))
+ (company-cabal :when haskell-has-cabal-p))
 
 
 
@@ -39,18 +37,13 @@
   (haskell-decl-scan-mode 1)
 
   (unless (buffer-temporary-p)
-    (if (and haskell-has-stack-p
-             (locate-dominating-file default-directory "stack.yaml"))
-        (intero-mode 1)
-      (haskell-doc-mode 1)
-      (flycheck-mode -1)))
+    (add-transient-hook! (hack-local-variables-hook :local t :name haskell|setup-internal)
+      (or (and haskell-has-hie-p (or (ignore-errors (lsp)) t))
+          (progn
+            (haskell-doc-mode 1)
+            (flycheck-mode -1)))))
 
-  (if haskell-has-shm-p
-      (progn
-        (structured-haskell-mode 1)
-        (hl-line-mode -1))
-    (haskell-indentation-mode 1))
-
+  (haskell-indentation-mode 1)
   (when haskell-has-hindent-p
     (hindent-mode 1)))
 
@@ -122,9 +115,6 @@
 (with-eval-after-load 'haskell-font-lock
   ;; Do not use too much symbols
   (setq haskell-font-lock-symbols-alist nil))
-
-(with-eval-after-load 'intero
-  (define-key intero-mode-map (kbd "C-c C-d") 'intero-info))
 
 (with-eval-after-load 'align
   (setq align-region-separate 'group)

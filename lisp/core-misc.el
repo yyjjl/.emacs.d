@@ -24,7 +24,7 @@
 
 (defvar core-current-desktop-name nil)
 (defvar core-view-code-modes
-  '((lispy-mode rainbow-delimiters-count-mode)
+  '(;; (lispy-mode rainbow-delimiters-count-mode)
     (t display-line-numbers-mode
        view-mode
        highlight-indentation-current-column-mode

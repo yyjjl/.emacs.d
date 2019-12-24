@@ -45,7 +45,7 @@
 ;; Programming modes
 (unless emacs-lite-setup-p
   (require 'init-cpp)
-  (require 'init-haskell)
+  ;; (require 'init-haskell)
   (require 'init-web)
   (require 'init-rust)
   (require 'init-java)
