@@ -127,6 +127,9 @@
   (auto-fill-mode -1)
   (eldoc-mode -1)
 
+  (when (fboundp 'org-num-mode)
+    (org-num-mode 1))
+
   ;; Add context-sensitive completion for meta options
   (make-local-variable 'completion-at-point-functions)
   (add-to-list 'completion-at-point-functions

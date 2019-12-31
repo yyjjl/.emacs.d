@@ -58,10 +58,12 @@
   (unless (or (buffer-temporary-p)
               (not (eq major-mode 'python-mode)))
     (semantic-idle-summary-mode -1)
-    (importmagic-mode)
+    (importmagic-mode 1)
 
     (add-transient-hook! (hack-local-variables-hook :local t :name python|setup-internal)
-      (or (and python-has-pyls-p (or (ignore-errors (lsp)) t))
+      (or (and python-has-pyls-p
+               (ignore-errors (lsp))
+               (bound-and-true-p lsp-mode))
           (progn
             (elpy-mode 1)
             (company//add-backend 'elpy-company-backend))))))
@@ -138,6 +140,7 @@
   (remap! "C-c C-r" "C-c r" elpy-mode-map)
   (setcar elpy-test-discover-runner-command "python3")
   (setq elpy-rpc-python-command "python3"
+        elpy-rpc-virtualenv-path 'system
         elpy-modules (delq 'elpy-module-django
                            (delq 'elpy-module-highlight-indentation
                                  elpy-modules))
