@@ -1,15 +1,5 @@
-(defvar emacs-config-directory
-  (expand-file-name "lisp" user-emacs-directory)
-  "All configuration in this directory")
-
-(defvar emacs-var-direcotry
-  (expand-file-name "var" user-emacs-directory)
-  "All data and external executable file in this direcotry")
-
-(defvar emacs-lite-setup-p (getenv "EMACS_LITE"))
-
-;; Add `emacs-config-directory' to `load-path'
-(add-to-list 'load-path emacs-config-directory)
+(when (< emacs-major-version 27)
+  (load (expand-file-name "early-init" user-emacs-directory)))
 
 ;; All packages required in this section are defined in `init-packages'
 (require 'core-lib)
@@ -18,7 +8,6 @@
 (require 'core-defaults)
 ;; Load core packages
 (require 'core-packages-lib)
-;; (package-initialize)
 (require 'core-ui)
 (require 'core-packages)
 (require 'core-semantic)

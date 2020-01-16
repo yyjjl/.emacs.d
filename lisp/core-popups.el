@@ -135,11 +135,10 @@
       (let ((window (if other-window-p
                         (next-window nil 'nominibuf)
                       (shackle--split-some-window frame -alist))))
-        (prog1 (window--display-buffer -buffer
-                                       window
-                                       (if other-window-p 'reuse 'window)
-                                       -alist
-                                       display-buffer-mark-dedicated)
+        (prog1 (shackle--window-display-buffer -buffer
+                                               window
+                                               (if other-window-p 'reuse 'window)
+                                               -alist)
           (when window
             (setq shackle-last-window window
                   shackle-last-buffer -buffer))
