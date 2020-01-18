@@ -1,14 +1,8 @@
-(defvar emacs-config-directory
-  (expand-file-name "lisp" user-emacs-directory)
-  "All configuration in this directory")
+(load (expand-file-name "early-init" user-emacs-directory))
 
 (defvar emacs-i3wm-config-directory
   (expand-file-name "etc/i3wm" user-emacs-directory)
   "All i3wm configuration in this directory")
-
-(defvar emacs-var-direcotry
-  (expand-file-name "var/i3" user-emacs-directory)
-  "All data and external executable file in this direcotry")
 
 (add-to-list 'load-path emacs-config-directory)
 (add-to-list 'load-path emacs-i3wm-config-directory)
