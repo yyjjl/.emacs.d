@@ -1,5 +1,7 @@
 (load (expand-file-name "early-init" user-emacs-directory))
 
+(setq emacs-var-direcotry (expand-file-name "var/i3" user-emacs-directory))
+
 (defvar emacs-i3wm-config-directory
   (expand-file-name "etc/i3wm" user-emacs-directory)
   "All i3wm configuration in this directory")
