@@ -60,6 +60,8 @@
 (define-hook! cython|setup (cython-mode-hook)
   (setq electric-indent-chars (delq ?: electric-indent-chars))
 
+  (local-set-key (kbd "C-c C-b") nil)
+
   (unless (or (buffer-temporary-p)
               (not (eq major-mode 'python-mode)))
     (flycheck-mode 1)))
