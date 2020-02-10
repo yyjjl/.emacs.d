@@ -74,6 +74,12 @@
 (define-hook! web|setup-web (web-mode-hook)
   (if (and buffer-file-name
            (string-match-p "\\.[jt]sx?\\'" (downcase buffer-file-name)))
+      (lsp//try-enable
+       python|setup-internal
+       :enable python-has-pyls-p
+       :fallback (progn
+                   (elpy-mode 1)
+                   (company//add-backend 'elpy-company-backend)))
       (add-transient-hook!
           (hack-local-variables-hook :local t :name web|setup-web-hook)
         (web|setup-js-internal)))

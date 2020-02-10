@@ -106,13 +106,12 @@
 
 (defun org/project-open ()
   (interactive)
-  (let* ((prefix-length (length (file-name-as-directory
-                                 (file-truename org-project-src-dir))))
+  (let* ((src-dir (file-truename org-project-src-dir))
+         (prefix-length (length (file-name-as-directory src-dir)))
          (name (ivy-read "Open note: "
                          (--map
                           (substring it prefix-length)
-                          (directory-files-recursively org-project-src-dir
-                                                       "\\.org\\'"))
+                          (directory-files-recursively src-dir "\\.org\\'"))
                          :history 'org-project-note-history
                          :caller 'org/project-open)))
     (setq name (abbreviate-file-name (expand-file-name name org-project-src-dir)))

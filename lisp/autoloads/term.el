@@ -4,6 +4,8 @@
 (eval-when-compile
   (require 'term))
 
+(defvar term-prefer-vterm)
+
 ;; Kill the buffer when terminal is exited
 ;;;###autoload
 (defvar term-default-directory-function-list '(projectile-project-root))
@@ -261,9 +263,9 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
         (when -shell-buffer-p
           (add-hook 'term-or-comint-process-exit-hook 'term//terminal-exit-hook nil :local)
           (when-let (setup-code (-some->> term--setup-directory-tracking
-                                          (assoc major-mode)
-                                          (assoc (file-name-base shell-name))
-                                          cdr-safe))
+                                  (assoc major-mode)
+                                  (assoc (file-name-base shell-name))
+                                  cdr-safe))
             (if (eq major-mode 'term-mode)
                 (term-send-raw-string setup-code)
               (vterm-send-string setup-code)))))

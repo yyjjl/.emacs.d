@@ -174,6 +174,13 @@ for a file to visit if current buffer is not visiting a file."
 
 ;;;###autoload
 (defun swiper/dispatch (&optional -arg)
+  "prefix arg
+0 => isearch-forward-regexp
+9 => isearch-backward-regexp
+C-u => swiper-isearch
+C-u C-u => swiper-multi
+C-u C-u C-u => swiper-all
+"
   (interactive "P")
   (call-interactively
    (cond

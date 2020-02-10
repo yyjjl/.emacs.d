@@ -75,7 +75,7 @@ Emacs Lisp."
 (defun lisp|racket-setup ()
   (lisp|common-setup)
   ;; (setq eldoc-documentation-function 'racket-eldoc-function)
-  (when (buffer-temporary-p)
+  (unless (buffer-enable-rich-feature-p)
     (setq completion-at-point-functions nil))
   (flycheck-mode 1)
 
@@ -90,7 +90,7 @@ Emacs Lisp."
   (lisp|common-setup)
   (flycheck-mode -1)
 
-  (unless (buffer-temporary-p)
+  (when (buffer-enable-rich-feature-p)
     (auto-compile-on-save-mode)
 
     (lisp//hippie-expand-setup)

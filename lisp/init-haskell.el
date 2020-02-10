@@ -36,12 +36,13 @@
   (rainbow-delimiters-mode 1)
   (haskell-decl-scan-mode 1)
 
-  (unless (buffer-temporary-p)
-    (add-transient-hook! (hack-local-variables-hook :local t :name haskell|setup-internal)
-      (or (and haskell-has-hie-p (or (ignore-errors (lsp)) t))
-          (progn
-            (haskell-doc-mode 1)
-            (flycheck-mode -1)))))
+  (when (buffer-enable-rich-feature-p)
+    ((lsp//try-enable
+      haskell|setup-internal
+      :enable haskell-has-hie-p
+      :fallback (progn
+                  (haskell-doc-mode 1)
+                  (flycheck-mode -1)))))
 
   (haskell-indentation-mode 1)
   (when haskell-has-hindent-p

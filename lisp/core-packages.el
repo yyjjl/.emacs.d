@@ -9,6 +9,7 @@
  ;; Save session to disk
  session
  hydra
+ pretty-hydra
  ivy
  ivy-hydra
  counsel

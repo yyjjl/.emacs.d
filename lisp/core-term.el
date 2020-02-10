@@ -5,7 +5,6 @@
          term-prefer-vterm (not emacs-lite-setup-p))
 
 (require-packages!
- term
  (vterm :when term-prefer-vterm))
 
 (eval-when-compile

@@ -6,7 +6,6 @@
 (require-packages!
  (ggtags :when env-has-gtags-p)
  (lsp-mode :when rust-has-rls-p)
- (company-lsp :when rust-has-rls-p)
  cargo
  ;; Emacs 26 has conf-toml-mode
  (toml-mode :when (<= emacs-major-version 25))
@@ -30,15 +29,10 @@
 
 (define-hook! rust|setup (rust-mode-hook)
   (cargo-minor-mode 1)
-  (unless (or (not rust-has-rls-p)
-              (buffer-temporary-p)
-              (file-remote-p default-directory)
-              (buffer-too-large-p))
-    (add-transient-hook!
-        (hack-local-variables-hook :local t :name rust|setup-internal)
-      (when (bound-and-true-p lsp-enable-in-project-p)
-        (with-demoted-errors "Lsp-rust: %s"
-          (lsp))))))
+  (when (buffer-enable-rich-feature-p)
+    (lsp//try-enable
+     rust|setup-internal
+     :enable rust-has-rls-p)))
 
 (defun rust/cargo-dispatch (-use-last-action)
   (interactive "P")
@@ -87,7 +81,7 @@
         cargo-process--command-flags "--color never")
 
   (define-key! :map cargo-minor-mode-map
-    ("C-c C-c" . rust/cargo-dispatch)
+    ("c-c C-c" . rust/cargo-dispatch)
     ("C-c C-l" . rust/cargo-run)))
 
 (provide 'init-rust)

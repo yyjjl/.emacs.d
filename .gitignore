@@ -1,4 +1,6 @@
 /bin
+/games
+/elpy
 .depend
 network-security.data
 anaconda-mode/

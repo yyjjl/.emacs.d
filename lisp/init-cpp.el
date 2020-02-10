@@ -3,15 +3,13 @@
 (setvar!
  cpp-ccls-base-path (expand-var! "ccls")
  cpp-ccls-path (expand-file-name "build/ccls"
-                                   cpp-ccls-base-path)
+                                 cpp-ccls-base-path)
  cpp-has-cmake-p (executable-find "cmake")
  cpp-has-ccls-p (file-exists-p cpp-ccls-base-path))
 
 (require-packages!
  (ggtags :when env-has-gtags-p)
  (lsp-mode :when cpp-has-ccls-p)
- (company-lsp :when cpp-has-ccls-p)
- (ccls :when cpp-has-ccls-p)
  clang-format
  google-c-style)
 
@@ -71,26 +69,6 @@
                      1)))
     (font-lock-add-keywords nil cpp--font-lock-keywords)))
 
-(defun cpp//setup ()
-  (if (or (not cpp-has-cmake-p)
-          (not cpp-has-ccls-p)
-          (buffer-base-buffer)
-          (buffer-temporary-p)
-          (file-remote-p default-directory)
-          (not (bound-and-true-p lsp-enable-in-project-p))
-          (buffer-too-large-p))
-      (progn
-        (when env-has-gtags-p
-          (ggtags-mode 1))
-        ;; (setq completion-at-point-functions nil)
-        (flycheck-mode -1))
-    (setq cpp-cmake-project-root (cpp-cmake//locate-cmakelists))
-    (if (or (file-exists-p (cpp-ccls//dot-ccls-path))
-            (and cpp-cmake-project-root (file-exists-p (cpp-cmake//cdb-path))))
-        (cpp-ccls//setup)
-      (when cpp-cmake-project-root
-        (message "Need to run `cpp/config-project' to setup ccls server")))))
-
 ;; Do not use `c-mode-hook' and `c++-mode-hook', there is a bug
 (defvar-local cpp--initialized-p nil)
 (define-hook! cpp|common-setup (c-mode-common-hook)
@@ -108,10 +86,26 @@
       (setq c-electric-pound-behavior '(alignleft))
       (cpp//font-lock-setup)
 
-      (unless (buffer-temporary-p)
-        (add-transient-hook!
-            (hack-local-variables-hook :local t :name cpp//setup-internal)
-          (cpp//setup))))))
+      (when (buffer-enable-rich-feature-p)
+        (lsp//try-enable
+         cpp|setup-internal
+         :enable
+         (and cpp-has-ccls-p
+              (or (and
+                   cpp-has-cmake-p
+                   (setq cpp-cmake-project-root (cpp-cmake//locate-cmakelists))
+                   (file-exists-p (cpp-cmake//cdb-path)))
+                  (file-exists-p (cpp-ccls//dot-ccls-path))))
+         :init
+         (electric-indent-local-mode -1)
+         :fallback
+         (progn
+           (when cpp-cmake-project-root
+             (message "Need to run `cpp/config-project' to setup ccls server"))
+           (when env-has-gtags-p
+             (ggtags-mode 1))
+           ;; (setq completion-at-point-functions nil)
+           (flycheck-mode -1)))))))
 
 (with-eval-after-load 'projectile
   (advice-add 'projectile--run-project-cmd

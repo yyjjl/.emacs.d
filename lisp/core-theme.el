@@ -15,7 +15,7 @@
 (doom-themes-org-config)
 
 (custom-theme-set-faces
- 'doom-molokai
+ 'user
 
  '(font-lock-builtin-face ((t (:foreground "#749e20"))))
  '(font-lock-constant-face ((t (:foreground "#AE81FF"))))

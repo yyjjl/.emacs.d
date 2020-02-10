@@ -62,8 +62,7 @@
 
   (local-set-key (kbd "C-c C-b") nil)
 
-  (unless (or (buffer-temporary-p)
-              (not (eq major-mode 'python-mode)))
+  (when (buffer-enable-rich-feature-p)
     (flycheck-mode 1)))
 
 

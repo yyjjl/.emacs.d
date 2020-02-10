@@ -1,15 +1,5 @@
-(defvar emacs-config-directory
-  (expand-file-name "lisp" user-emacs-directory)
-  "All configuration in this directory")
-
-(defvar emacs-var-direcotry
-  (expand-file-name "var" user-emacs-directory)
-  "All data and external executable file in this direcotry")
-
-(defvar emacs-lite-setup-p (getenv "EMACS_LITE"))
-
-;; Add `emacs-config-directory' to `load-path'
-(add-to-list 'load-path emacs-config-directory)
+(when (< emacs-major-version 27)
+  (load (expand-file-name "early-init" user-emacs-directory)))
 
 ;; All packages required in this section are defined in `init-packages'
 (require 'core-lib)
@@ -18,11 +8,18 @@
 (require 'core-defaults)
 ;; Load core packages
 (require 'core-packages-lib)
-;; (package-initialize)
 (require 'core-ui)
 (require 'core-packages)
 (require 'core-semantic)
 (require 'core-hideshow)
+
+(let ((private-file (expand-file-name "private.el" user-emacs-directory)))
+  (when (file-exists-p private-file)
+    (load private-file)))
+
+(require 'init-editing)
+(require 'init-dired)
+(require 'init-ibuffer)
 
 ;; ----------------------------------------
 ;; Optional packages
@@ -45,7 +42,7 @@
 ;; Programming modes
 (unless emacs-lite-setup-p
   (require 'init-cpp)
-  ;; (require 'init-haskell)
+  (require 'init-haskell)
   (require 'init-web)
   (require 'init-rust)
   (require 'init-java)
@@ -57,10 +54,6 @@
 (require 'init-lisp)
 (require 'init-sh)
 
-;; Some keybindings using when editing
-(require 'init-editing)
-(require 'init-dired)
-(require 'init-ibuffer)
 (require 'init-realgud)
 
 ;; Other small tools
@@ -74,4 +67,4 @@
 (unless emacs-lite-setup-p
   (require 'init-tabnine)
   (require 'init-play))
-;; (require 'init-treemacs)
+(require 'init-treemacs)

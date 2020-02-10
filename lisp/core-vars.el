@@ -1,21 +1,3 @@
-(defvar emacs-gc-cons-threshold (* 100 1024 1024))
-
-(defvar emacs-file-name-handler-alist file-name-handler-alist
-  "Save `file-name-handler-alist' temporarily and set it to nil
-which means on every .el and .elc file loaded during start up, it
-hasn't to runs those regexps against the filename.")
-
-(defvar emacs-private-directory
-  (expand-file-name "private" user-emacs-directory)
-  "Local packages in this directory")
-
-(defvar emacs-etc-direcotry
-  (expand-file-name "etc" user-emacs-directory)
-  "Some configuration file in this directory")
-
-(defvar emacs-autoloads-directory
-  (expand-file-name "autoloads" emacs-config-directory)
-  "Autoloads files in this directory")
 (defvar emacs-autoloads-file (expand-var! "autoloads.el")
   "Autoloads file")
 

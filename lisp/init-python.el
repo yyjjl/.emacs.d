@@ -6,7 +6,6 @@
          python-has-pyls-p (executable-find "pyls"))
 
 (require-packages!
- importmagic
  lsp-mode
  elpy
  py-autopep8
@@ -55,18 +54,16 @@
     (setq-local python-shell-interpreter "python3")
     (setq-local python-shell-interpreter-args "-i"))
 
-  (unless (or (buffer-temporary-p)
-              (not (eq major-mode 'python-mode)))
+  (when (and (buffer-enable-rich-feature-p)
+             (eq major-mode 'python-mode))
     (semantic-idle-summary-mode -1)
-    (importmagic-mode 1)
 
-    (add-transient-hook! (hack-local-variables-hook :local t :name python|setup-internal)
-      (or (and python-has-pyls-p
-               (ignore-errors (lsp))
-               (bound-and-true-p lsp-mode))
-          (progn
-            (elpy-mode 1)
-            (company//add-backend 'elpy-company-backend))))))
+    (lsp//try-enable
+     python|setup-internal
+     :enable python-has-pyls-p
+     :fallback (progn
+                 (elpy-mode 1)
+                 (company//add-backend 'elpy-company-backend)))))
 
 (define-hook! python|python-inferior-setup (inferior-python-mode-hook)
   (remove-hook 'comint-output-filter-functions

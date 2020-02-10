@@ -284,6 +284,12 @@ HTML file converted from org file, it returns t."
         (> (buffer-size)
            core-large-buffer-size))))
 
+(defsubst buffer-enable-rich-feature-p ()
+  (not (or (buffer-temporary-p)
+           (buffer-too-large-p)
+           (buffer-base-buffer)
+           (file-remote-p default-directory))))
+
 (defun insert-after! (-after-value -new-value -lst)
   "Find -AFTER-VALUE and Add -NEW-VALUE to -LST after it."
   (let ((pair (memq -after-value -lst)))

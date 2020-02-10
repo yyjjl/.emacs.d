@@ -108,9 +108,7 @@
 ;; This setup function must run before `semantic-mode' invoke to avoid
 ;; a error
 (define-hook! git|generic-prog-mode-setup ((prog-mode-hook :append))
-  (unless (or (file-remote-p default-directory)
-              (buffer-temporary-p)
-              (buffer-too-large-p))
+  (when (buffer-enable-rich-feature-p)
     (git-gutter-mode 1)))
 
 (with-eval-after-load 'magit

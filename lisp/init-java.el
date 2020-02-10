@@ -2,22 +2,14 @@
 
 (require-packages!
  lsp-mode
- lsp-java
- company-lsp)
+ lsp-java)
 
 
 
 (define-hook! java|setup (java-mode-hook)
-  (unless (or (buffer-temporary-p)
-              (file-remote-p default-directory)
-              (buffer-too-large-p))
-    (add-transient-hook!
-        (hack-local-variables-hook :local t :name java//setup-internal)
-      (when (bound-and-true-p lsp-enable-in-project-p)
-        (with-demoted-errors "Lsp-java: %s"
-          (lsp)
-          (lsp//ui-doc-toggle 1)
-          (setq-local c-basic-offset 8))))))
+  (when (buffer-enable-rich-feature-p)
+    (setq-local c-basic-offset 8)
+    (lsp//try-enable java|setup-internal)))
 
 (with-eval-after-load 'cc-mode
   (require 'lsp-java))

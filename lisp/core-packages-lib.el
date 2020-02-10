@@ -153,8 +153,8 @@ Archive with high priority will be used when install a package.")
                (backtrace)))))
   (message "Compile finished"))
 
-(when (<= emacs-major-version 26)
-  (package-initialize))
+(package-initialize)
+
 (ignore-errors (auto-compile-on-load-mode 1))
 
 (unless (file-exists-p emacs-autoloads-file)
