@@ -1,5 +1,41 @@
 (eval-when-compile
+  (require 'rect)
   (require 'hydra))
+
+(require 'pretty-hydra)
+
+(defvar hydra-local-toggles-heads-list nil)
+
+(pretty-hydra-define hydra-global-toggles
+  (:title "Toggles" :color amaranth :quit-key "q")
+  ("Global"
+   (("f7" (core-view-code-mode (if core-view-code-mode -1 1))
+     "view code" :toggle core-view-code-mode :color blue)
+    ("E" toggle-debug-on-error "debug on error" :toggle (default-value 'debug-on-error))
+    ("Q" toggle-debug-on-quit "debug on quit" :toggle (default-value 'debug-on-quit))
+    ("W" (setq-default show-trailing-whitespace (not show-trailing-whitespace))
+     "whitespace" :toggle show-trailing-whitespace)
+    ("N" (display-line-numbers-mode (if display-line-numbers-mode -1 1))
+     "line number" :toggle display-line-numbers-mode))))
+
+(defun hydra-global-toggles/update ()
+  (eval
+   (pretty-hydra--generate
+    'hydra-global-toggles
+    '(:title "Toggles" :color amaranth :quit-key "q")
+    (pretty-hydra--normalize-heads-plist!
+     (append `("Global" ,(lax-plist-get hydra-global-toggles/heads-plist "Global"))
+             (cl-loop for (key . value) in hydra-local-toggles-heads-list
+                      when (eval key) append value)))))
+
+  (define-key hydra-global-toggles/keymap [f7] #'hydra-global-toggles/lambda-f7-and-exit)
+
+  (prog1 (eval hydra-global-toggles/hint)
+    (setq hydra-global-toggles/hint hydra-global-toggles/hint-cache)))
+
+;; add additional columns dynamicly
+(setq hydra-global-toggles/hint-cache '(hydra-global-toggles/update))
+(setq hydra-global-toggles/hint hydra-global-toggles/hint-cache)
 
 (with-eval-after-load 'org
   (defhydra hydra-org-template (:color blue :hint nil)
@@ -19,7 +55,7 @@ _h_tml    _'_         ^ ^             _A_SCII:
     ("h" (org//hot-expand "html"))
     ("a" (org//hot-expand "ascii"))
     ("i" (org//hot-expand "index"))
-    ("E" (org//hot-expand "src " "emacs-lisp"))
+    ("E" (org//hot-expand "src "))
     ("C" (yas-expand-snippet "#+begin_src cpp\n$0\n#+end_src"))
     ("S" (yas-expand-snippet "#+begin_src sh\n$0\n#+end_src"))
     ("j" (yas-expand-snippet "#+begin_src javascript\n$0\n#+end_src"))
@@ -225,6 +261,8 @@ _q_uit
 
   ([M-f11] . scroll-other-window-down)
   ([M-f12] . scroll-other-window)
+
+  ([f7] . hydra-global-toggles/body)
 
   ("C-c O" . hydra-outline/body)
   ("C-x SPC" . hydra-rectangle/body)

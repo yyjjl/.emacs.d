@@ -434,8 +434,7 @@
   ([C-f7] . core/rsync-project)
 
   ([f10] . compile)
-  ([f9] . core/run-current-file)
-  ([f7] . core-view-code-mode))
+  ([f9] . core/run-current-file))
 
 (define-key! :map special-mode-map
   ("u" . scroll-down-command)

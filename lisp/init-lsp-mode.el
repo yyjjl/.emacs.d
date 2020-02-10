@@ -3,7 +3,6 @@
  lsp-mode
  lsp-ui
  lsp-ivy
- company-lsp
  ivy)
 
 (defcustom lsp-enable-in-project-p t
@@ -11,8 +10,6 @@
   :group 'lsp
   :type 'directory
   :safe #'booleanp)
-(defvar lsp-disable-eldoc-in-minibuffer nil)
-(defvar ivy-lsp-symbols-request-id nil)
 
 
 
@@ -23,6 +20,15 @@
 (custom-theme-set-faces
  'doom-molokai
  '(lsp-face-highlight-textual ((t :background "#444155"))))
+
+(cl-defmacro lsp//try-enable (name &key (enable t) (init nil) (fallback nil))
+  `(add-transient-hook! (hack-local-variables-hook :local t :name ,name)
+     (if (and ,enable
+              lsp-enable-in-project-p
+              (ignore-errors (lsp))
+              (bound-and-true-p lsp-mode))
+         ,init
+       ,fallback)))
 
 (defun lsp/signature-activate ()
   (interactive)
@@ -56,25 +62,10 @@
 
 (define-hook! lsp|after-open (lsp-after-open-hook)
   (flycheck-mode 1)
-
-  (lsp-ui-flycheck-enable 1)
+  (lsp-flycheck-enable 1)
   (lsp-ui-sideline-enable 1)
-
   ;; default to sort and filter by server
-  (setq-local company-transformers nil)
-
-  ;; (company//add-backend 'company-files)
-  (company//add-backend 'company-lsp))
-
-(defun lsp/toggle-doc ()
-  (interactive)
-  (when (require 'lsp-ui-doc nil t)
-    (if lsp-ui-doc-mode
-        (progn
-          (setq lsp-eldoc-render-all t)
-          (lsp-ui-doc-mode -1))
-      (setq lsp-eldoc-render-all nil)
-      (lsp-ui-doc-mode 1))))
+  (setq-local company-transformers nil))
 
 (defun lsp*around-render-on-hover-content (-fn -contents -render-all)
   (let ((content (funcall -fn -contents -render-all)))
@@ -105,8 +96,8 @@
   (setq lsp-auto-configure nil)
   (setq lsp-auto-guess-root t)
   (setq lsp-eldoc-render-all t)
-  (setq lsp-enable-completion-at-point nil)
-  (setq lsp-prefer-flymake nil)
+  (setq lsp-enable-completion-at-point t)
+  (setq lsp-diagnostic-package :auto)
   (setq lsp-restart 'auto-restart)
   (setq lsp-session-file (expand-var! "lsp-sessions"))
 
@@ -126,18 +117,33 @@
     ("C-S-SPC" . lsp/signature-activate)))
 
 (with-eval-after-load 'lsp-ui
-  (require 'lsp-ui-flycheck)
   (require 'lsp-ui-sideline)
 
-  (setq lsp-ui-peek-enable nil)
-  (setq lsp-ui-doc-enable nil)
-  (setq lsp-ui-sideline-enable nil)
+  (add-to-list
+   'hydra-local-toggles-heads-list
+   '(lsp-mode
+     "LSP Doc"
+     (("d e" (lsp-ui-doc-enable (not lsp-ui-doc-mode))
+       "enable" :toggle lsp-ui-doc-mode)
+      ("d s" (setq lsp-ui-doc-include-signature (not lsp-ui-doc-include-signature))
+       "signature" :toggle lsp-ui-doc-include-signature)
+      ("d t" (setq lsp-ui-doc-position 'top)
+       "top" :toggle (eq lsp-ui-doc-position 'top))
+      ("d b" (setq lsp-ui-doc-position 'bottom)
+       "bottom" :toggle (eq lsp-ui-doc-position 'bottom))
+      ("d p" (setq lsp-ui-doc-position 'at-point)
+       "at point" :toggle (eq lsp-ui-doc-position 'at-point))
+      ("d f" (setq lsp-ui-doc-alignment 'frame)
+       "align frame" :toggle (eq lsp-ui-doc-alignment 'frame))
+      ("d w" (setq lsp-ui-doc-alignment 'window)
+       "align window" :toggle (eq lsp-ui-doc-alignment 'window)))))
+
+  (setq lsp-ui-sideline-show-symbol nil)
   (setq lsp-ui-sideline-show-hover nil)
   (setq lsp-ui-sideline-show-diagnostics nil)
   (setq lsp-ui-sideline-show-code-actions t)
-  (setq lsp-ui-doc-max-width 80))
-
-(with-eval-after-load 'company-lsp
-  (setq company-lsp-async t))
+  (setq lsp-ui-sideline-ignore-duplicate t)
+  (setq lsp-ui-doc-max-width 80)
+  (setq lsp-ui-doc-delay 0.5))
 
 (provide 'init-lsp-mode)

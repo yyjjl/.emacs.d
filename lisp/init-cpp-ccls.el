@@ -2,7 +2,6 @@
 
 (require-packages!
  lsp-mode
- company-lsp
  ccls)
 
 (require 'init-cpp-cmake)
@@ -60,14 +59,6 @@
   (expand-file-name ".ccls"
                     (locate-dominating-file (or -dir default-directory)
                                             ".ccls")))
-
-(defun cpp-ccls//setup ()
-  (condition-case err
-      (progn
-        (lsp)
-        (setq-local lsp-enable-links nil)
-        (electric-indent-local-mode -1))
-    (error (message "%s" err))))
 
 (defun cpp-ccls/create-dot-ccls (-dir)
   (interactive (list (if current-prefix-arg

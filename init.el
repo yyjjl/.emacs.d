@@ -13,6 +13,14 @@
 (require 'core-semantic)
 (require 'core-hideshow)
 
+(let ((private-file (expand-file-name "private.el" user-emacs-directory)))
+  (when (file-exists-p private-file)
+    (load private-file)))
+
+(require 'init-editing)
+(require 'init-dired)
+(require 'init-ibuffer)
+
 ;; ----------------------------------------
 ;; Optional packages
 ;; ----------------------------------------
@@ -34,7 +42,7 @@
 ;; Programming modes
 (unless emacs-lite-setup-p
   (require 'init-cpp)
-  ;; (require 'init-haskell)
+  (require 'init-haskell)
   (require 'init-web)
   (require 'init-rust)
   (require 'init-java)
@@ -46,10 +54,6 @@
 (require 'init-lisp)
 (require 'init-sh)
 
-;; Some keybindings using when editing
-(require 'init-editing)
-(require 'init-dired)
-(require 'init-ibuffer)
 (require 'init-realgud)
 
 ;; Other small tools
@@ -63,4 +67,4 @@
 (unless emacs-lite-setup-p
   (require 'init-tabnine)
   (require 'init-play))
-;; (require 'init-treemacs)
+(require 'init-treemacs)

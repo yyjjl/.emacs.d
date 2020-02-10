@@ -46,7 +46,7 @@
   (turn-off-auto-fill)
   (LaTeX-math-mode 1)
 
-  (unless (buffer-temporary-p)
+  (when (buffer-enable-rich-feature-p)
     (reftex-mode 1)
     (TeX-source-correlate-mode 1)
     (TeX-PDF-mode 1)

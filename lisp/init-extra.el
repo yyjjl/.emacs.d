@@ -60,8 +60,7 @@
 (define-hook! cython|setup (cython-mode-hook)
   (setq electric-indent-chars (delq ?: electric-indent-chars))
 
-  (unless (or (buffer-temporary-p)
-              (not (eq major-mode 'python-mode)))
+  (when (buffer-enable-rich-feature-p)
     (flycheck-mode 1)))
 
 

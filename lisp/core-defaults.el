@@ -105,6 +105,8 @@
 (setq-default scroll-preserve-screen-position t)
 
 (setq-default vc-make-backup-files nil)
+;; increase process buffer
+(setq read-process-output-max (* 2 1024 1024))
 
 ;; be quiet at startup; don't load or display anything unnecessary
 (advice-add #'display-startup-echo-area-message :override #'ignore)
@@ -320,7 +322,12 @@
   (run-with-idle-timer core-autosave-interval t #'run-hooks 'core-autosave-hook)
 
   ;; GC all sneaky breeky like
-  (add-hook 'focus-out-hook #'garbage-collect)
+   (if (boundp 'after-focus-change-function)
+       (add-function :after after-focus-change-function
+                     (lambda ()
+                       (unless (frame-focus-state)
+                         (garbage-collect))))
+     (add-hook 'focus-out-hook 'garbage-collect))
   (message "Init Time: %s" (emacs-init-time)))
 
 (provide 'core-defaults)
