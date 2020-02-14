@@ -61,9 +61,10 @@
     (lsp//try-enable
      python|setup-internal
      :enable python-has-pyls-p
-     :fallback (progn
-                 (elpy-mode 1)
-                 (company//add-backend 'elpy-company-backend)))))
+     :fallback
+     (progn
+       (elpy-mode 1)
+       (company//add-backend 'elpy-company-backend)))))
 
 (define-hook! python|python-inferior-setup (inferior-python-mode-hook)
   (remove-hook 'comint-output-filter-functions

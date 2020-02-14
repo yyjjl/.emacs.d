@@ -1,6 +1,6 @@
 (eval-when-compile
   (require 'subr-x)
-  (require 'cl))
+  (require 'cl-lib))
 
 ;;* Load Path
 ;; Add site-package's path to `load-path'

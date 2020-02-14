@@ -414,8 +414,6 @@
 
   ("C-." . symbol-overlay-put)
 
-  ("M-k" . awesome-pair-kill)
-
   ("C-c 4" . ispell-word)
   ("C-c q" . auto-fill-mode)
 

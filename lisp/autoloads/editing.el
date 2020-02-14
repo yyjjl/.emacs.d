@@ -49,14 +49,14 @@ grab matched string and insert them into `kill-ring'"
     items))
 
 (defconst extra-ascii-before-chinese
-  (rx (group-n 1 (in "a-zA-Z0-9!@#$%^&\\-+|)\\]}\\:;?><.,/"))
+  (rx (group-n 1 (any (?A . ?Z) (?a . ?z) (?0 . ?9) "!@#$%^&-+|)]}:;?><.,/\\"))
       (group-n 2 (category chinese-two-byte))))
 (defconst extra-non-space-after-punc
   (rx (group-n 1 (in ","))
       (group-n 2 (not blank))))
 (defconst extra-ascii-after-chinese
   (rx (group-n 1 (category chinese-two-byte))
-      (group-n 2 (in "a-zA-Z0-9@#$%^&\\-+|(\\[{\\></"))))
+      (group-n 2 (in (?A . ?Z) (?a . ?z) (?0 . ?9) "@#$%^&-+|([{></\\"))))
 
 ;;;###autoload
 (defun extra/insert-space-around-chinese (&optional -start -end)

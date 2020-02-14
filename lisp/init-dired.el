@@ -2,7 +2,6 @@
 
 ;; Improve `dired-mode'
 (require-packages!
- ;; dired+
  dired-narrow)
 
 
@@ -44,13 +43,7 @@ The app is chosen from your OS's preference."
     (";" . dired-kill-subdir))
 
   (require 'dired-x)
-  (require 'dired+)
   (setq dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$\\|^\\..*$"))
-
-(with-eval-after-load 'dired+
-  (remove-hook 'dired-mode-hook 'diredp-nb-marked-in-mode-name)
-  (remove-hook 'dired-readin 'diredp-nb-marked-in-mode-name)
-  (diredp-toggle-find-file-reuse-dir 1))
 
 
 (provide 'init-dired)

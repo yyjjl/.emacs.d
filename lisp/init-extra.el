@@ -1,6 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 (require-packages!
+ octave
  calc
  whitespace
  markdown-mode
@@ -14,7 +15,6 @@
  buffer-move
  zeal-at-point
  skeletor
- lua-mode
  restclient
  cython-mode
  flycheck-cython

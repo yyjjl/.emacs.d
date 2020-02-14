@@ -17,9 +17,9 @@
   (require 'lsp)
   (require 'lsp-clients))
 
-(custom-theme-set-faces
- 'doom-molokai
- '(lsp-face-highlight-textual ((t :background "#444155"))))
+;; (custom-theme-set-faces
+;;  'user
+;;  '(lsp-face-highlight-textual ((t :background "#444155"))))
 
 (cl-defmacro lsp//try-enable (name &key (enable t) (init nil) (fallback nil))
   `(add-transient-hook! (hack-local-variables-hook :local t :name ,name)
@@ -29,14 +29,6 @@
               (bound-and-true-p lsp-mode))
          ,init
        ,fallback)))
-
-(defun lsp/signature-activate ()
-  (interactive)
-  (setq-local lsp--last-signature nil)
-  (setq-local lsp--last-signature-index nil)
-  (add-hook 'post-command-hook #'lsp-signature-maybe-stop)
-  (lsp-signature)
-  (lsp-signature-mode t))
 
 (defun lsp/remove-session-folder (-remove-invalid)
   (interactive "P")
@@ -61,9 +53,7 @@
         (lsp--persist-session (lsp-session))))))
 
 (define-hook! lsp|after-open (lsp-after-open-hook)
-  (flycheck-mode 1)
-  (lsp-flycheck-enable 1)
-  (lsp-ui-sideline-enable 1)
+  (setq-local company-backends (remove 'company-capf company-backends))
   ;; default to sort and filter by server
   (setq-local company-transformers nil))
 
@@ -93,15 +83,31 @@
     (let ((lv-force-update t))
       (lv-message (replace-regexp-in-string "%" "%%" message))))
 
-  (setq lsp-auto-configure nil)
+  (setq lsp-auto-configure t)
   (setq lsp-auto-guess-root t)
   (setq lsp-eldoc-render-all t)
-  (setq lsp-enable-completion-at-point t)
   (setq lsp-diagnostic-package :auto)
   (setq lsp-restart 'auto-restart)
   (setq lsp-session-file (expand-var! "lsp-sessions"))
 
+  (setq lsp-prefer-capf t)
+  (setq lsp-enable-completion-at-point t)
+  (setq lsp-symbol-highlighting-skip-current t)
+
   (advice-add 'lsp--render-on-hover-content :around #'lsp*around-render-on-hover-content)
+
+  (add-to-list
+   'hydra-local-toggles-heads-list
+   '(lsp-mode
+     "LSP"
+     (("t i" lsp-toggle-trace-io
+       "trace io" :toggle lsp-print-io)
+      ("t h" lsp-toggle-symbol-highlight
+       "highlight" :toggle lsp-enable-symbol-highlighting)
+      ("t t" lsp-toggle-on-type-formatting
+       "on type formating" :toggle lsp-enable-on-type-formatting)
+      ("t s" lsp-toggle-signature-auto-activate
+       "signature" :toggle lsp-signature-auto-activate))))
 
   (define-key! :map lsp-mode-map
     ("M-s l" . lsp-lens-mode)
@@ -114,7 +120,7 @@
     ("C-c B" . lsp-format-buffer)
     ("C-c C-d" . lsp-describe-thing-at-point)
     ("C-c C-SPC" . lsp-execute-code-action)
-    ("C-S-SPC" . lsp/signature-activate)))
+    ("C-S-SPC" . lsp-signature-activate)))
 
 (with-eval-after-load 'lsp-ui
   (require 'lsp-ui-sideline)
@@ -138,12 +144,13 @@
       ("d w" (setq lsp-ui-doc-alignment 'window)
        "align window" :toggle (eq lsp-ui-doc-alignment 'window)))))
 
+  (setq lsp-ui-doc-enable nil)
+  (setq lsp-ui-peek-enable nil)
   (setq lsp-ui-sideline-show-symbol nil)
   (setq lsp-ui-sideline-show-hover nil)
   (setq lsp-ui-sideline-show-diagnostics nil)
   (setq lsp-ui-sideline-show-code-actions t)
   (setq lsp-ui-sideline-ignore-duplicate t)
-  (setq lsp-ui-doc-max-width 80)
   (setq lsp-ui-doc-delay 0.5))
 
 (provide 'init-lsp-mode)

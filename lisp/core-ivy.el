@@ -48,10 +48,7 @@
 
   (advice-add 'ivy--preselect-index :around #'ignore-errors!)
 
-  (require 'ivy-hydra)
-
-  ;; (add-to-list 'ivy-display-functions-alist
-  ;;              '(counsel-company . ivy-display-function-overlay))
+  (setq ivy-read-action-format-function #'ivy-hydra-read-action)
 
   (setq ivy-action-wrap t)
   (setq ivy-count-format "(%d/%d) ")
@@ -68,6 +65,7 @@
 
   (define-key!
     :map ivy-minibuffer-map
+    ("C-r" . ivy-reverse-i-search)
     ("C-j" . ivy-immediate-done)
     ("C-M-j" . ivy-done)
     ("M-." . ignore)))
