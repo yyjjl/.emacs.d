@@ -153,7 +153,11 @@ Archive with high priority will be used when install a package.")
                (backtrace)))))
   (message "Compile finished"))
 
-(package-initialize)
+(if (bound-and-true-p core-dumped)
+    (progn
+      (setq load-path core-dumped-load-path))
+  ;; add load-path’s and load autoload files
+  (package-initialize))
 
 (ignore-errors (auto-compile-on-load-mode 1))
 

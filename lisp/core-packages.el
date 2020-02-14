@@ -1,5 +1,6 @@
 ;; Core packages
 (require-packages!
+ helpful
  yasnippet
  yasnippet-snippets
  flycheck

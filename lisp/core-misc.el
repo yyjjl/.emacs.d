@@ -379,8 +379,6 @@
 
 (advice-add 'next-error :before #'core*before-next-error)
 
-(autoload 'awesome-pair-kill "awesome-pair")
-
 (define-key! :prefix "C-x"
   ("2" . window/split-vertically)
   ("3" . window/split-horizontally)
@@ -409,6 +407,10 @@
   ("w ]" . winner-redo))
 
 (define-key!
+  ("C-h k" . helpful-key)
+  ("C-h F" . helpful-function)
+  ("C-h C" . helpful-command)
+
   ("C-<down>" . text-scale-decrease)
   ("C-<up>" . text-scale-increase)
 
@@ -438,5 +440,8 @@
   ("u" . scroll-down-command)
   ("y" . scroll-down-line)
   ("e" . scroll-up-line))
+
+(setq counsel-describe-function-function #'helpful-callable)
+(setq counsel-describe-variable-function #'helpful-variable)
 
 (provide 'core-misc)

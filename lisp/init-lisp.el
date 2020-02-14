@@ -15,22 +15,6 @@
 
 
 
-(defun lisp/describe-at-point ()
-  (interactive)
-  (let* ((symbol (symbol-at-point))
-         (symbol-types (and symbol (remove nil (list (when (symbol-function symbol) 'function)
-                                              (when (boundp symbol) 'variable))))))
-    (unless symbol
-      (user-error "Nothing is at point."))
-    (unless symbol-types
-      (user-error "`%s' is undefined" symbol))
-    (let ((symbol-type (if (null (cdr symbol-types))
-                           (car symbol-types)
-                         (intern (ivy-read "Type: " symbol-types :require-match t)))))
-      (cl-case symbol-type
-        (function (describe-function symbol))
-        (variable (describe-variable symbol))))))
-
 (defun edebug/remove-all-instrumentation ()
   "Remove all edebug instrumentation by visiting each function
 definition and running `eval-defun`."
@@ -152,11 +136,11 @@ Emacs Lisp."
 
   (define-key! :map emacs-lisp-mode-map
     ("C-c e" . macrostep-expand)
-    ("C-c C-d" . lisp/describe-at-point))
+    ("C-c C-d" . helpful-at-point))
 
   (define-key! :map lisp-interaction-mode-map
     ("C-c e" . macrostep-expand)
-    ("C-c C-d" . lisp/describe-at-point)))
+    ("C-c C-d" . helpful-at-point)))
 
 (with-eval-after-load 'lispy
   (define-key! :map lispy-mode-map ("M-n"))

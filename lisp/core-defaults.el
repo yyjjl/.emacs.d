@@ -285,6 +285,7 @@
 
 (define-hook! core|after-init-hook (after-init-hook)
   ;; global-modes
+  (global-font-lock-mode 1)
   (global-subword-mode 1)
   (global-page-break-lines-mode 1)
   (global-auto-revert-mode 1)
@@ -322,12 +323,12 @@
   (run-with-idle-timer core-autosave-interval t #'run-hooks 'core-autosave-hook)
 
   ;; GC all sneaky breeky like
-   (if (boundp 'after-focus-change-function)
-       (add-function :after after-focus-change-function
-                     (lambda ()
-                       (unless (frame-focus-state)
-                         (garbage-collect))))
-     (add-hook 'focus-out-hook 'garbage-collect))
+  (if (boundp 'after-focus-change-function)
+      (add-function :after after-focus-change-function
+                    (lambda ()
+                      (unless (frame-focus-state)
+                        (garbage-collect))))
+    (add-hook 'focus-out-hook 'garbage-collect))
   (message "Init Time: %s" (emacs-init-time)))
 
 (provide 'core-defaults)
