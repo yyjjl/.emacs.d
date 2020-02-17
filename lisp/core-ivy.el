@@ -48,7 +48,7 @@
 
   (advice-add 'ivy--preselect-index :around #'ignore-errors!)
 
-  (setq ivy-read-action-format-function #'ivy-hydra-read-action)
+  (setq ivy-read-action-function #'ivy-hydra-read-action)
 
   (setq ivy-action-wrap t)
   (setq ivy-count-format "(%d/%d) ")

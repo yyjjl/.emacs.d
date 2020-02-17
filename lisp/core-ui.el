@@ -1,5 +1,5 @@
 (require 'core-theme)
-(require 'core-mode-line)
+(require 'core-modeline)
 
 (blink-cursor-mode -1)
 (tooltip-mode -1)

@@ -49,9 +49,9 @@
   (and (bound-and-true-p winum-mode)
        (let ((narrow-p (buffer-narrowed-p)))
          (propertize (concat
-                      (if narrow-p "<" " ")
+                      (if narrow-p ">" "-")
                       (ignore-errors (winum-get-number-string))
-                      (if narrow-p ">" " "))
+                      (if narrow-p "<" "-"))
                      'face
                      (if (mode-line//window-active-p)
                          'winum-face
@@ -64,8 +64,7 @@
              (when (require 'magit nil :noerror)
                (setq mode-line--cached-git-branch
                      (if-let (branch (magit-get-current-branch))
-                         (propertize (concat " Git:" branch)
-                                     'face 'font-lock-doc-face)
+                         (propertize branch 'face 'font-lock-doc-face)
                        'none)))))))
 
 (defsubst mode-line//relative-directory ()
@@ -87,10 +86,10 @@
 
 (defsubst mode-line//buffer-id ()
   "Display buffer id in mode-line."
-  (list " %["
+  (list "%["
         (propertize (mode-line//relative-directory) 'face 'font-lock-string-face)
         '(:propertize mode-line-buffer-identification face font-lock-keyword-face)
-        "%] "))
+        "%]"))
 
 (defsubst mode-line//buffer-major-mode ()
   "Display buffer major mode in mode-line."
@@ -101,7 +100,7 @@
 
 Whether it is temporary file, whether it is modified, whether is
 read-only, and `buffer-file-coding-system'"
-  (list " ("
+  (list "("
         (cl-loop for (symbol . expr) in mode-line-multi-edit-alist
                  when (and (boundp symbol) (symbol-value symbol))
                  do (when-let (count (eval expr))
@@ -139,22 +138,20 @@ read-only, and `buffer-file-coding-system'"
   "Display flycheck status in mode-line."
   (when (bound-and-true-p flycheck-mode)
     (pcase flycheck-last-status-change
-      (`not-checked '(:propertize " Waiting" face font-lock-comment-face))
-      (`no-checker '(:propertize " No" face font-lock-comment-face))
-      (`running '(:propertize " Running" face font-lock-doc-face))
-      (`errored '(:propertize " Error" face flycheck-fringe-error))
-      (`interrupted '(:propertize " Interrupted" face flycheck-fringe-warning))
+      (`not-checked '(:propertize "Waiting" face font-lock-comment-face))
+      (`no-checker '(:propertize "No" face font-lock-comment-face))
+      (`running '(:propertize "Running" face font-lock-doc-face))
+      (`errored '(:propertize "Error" face flycheck-fringe-error))
+      (`interrupted '(:propertize "Interrupted" face flycheck-fringe-warning))
       (`suspicious '(:propertize "???" face flycheck-fringe-error))
-      (`finished (let-alist (flycheck-count-errors flycheck-current-errors)
-                   `(" ["
-                     (lsp-mode "LSP ")
-                     (:propertize ,(format "%d" (or .error 0))
-                                  face compilation-error)
-                     (:propertize ,(format " %d" (or .warning 0))
-                                  face compilation-warning)
-                     (:propertize ,(format " %d" (or .info 0))
-                                  face compilation-info)
-                     "]"))))))
+      (`finished
+       (let-alist (flycheck-count-errors flycheck-current-errors)
+         `("["
+           (lsp-mode "LSP:")
+           (:propertize ,(format "%d" (or \.error 0)) face compilation-error)
+           (:propertize ,(format ":%d" (or \.warning 0)) face compilation-warning)
+           (:propertize ,(format ":%d" (or \.info 0)) face compilation-info)
+           "]"))))))
 
 (defsubst mode-line//flymake ()
   "Produce a pretty minor mode indicator."
@@ -180,14 +177,11 @@ read-only, and `buffer-file-coding-system'"
                    ((>= severity note-severity)
                     (cl-incf note-count))))))
        flymake--backend-state)
-      `(" ["
-        (lsp-mode "LSP ")
-        (:propertize ,(format "%d" error-count)
-                     face compilation-error)
-        (:propertize ,(format " %d" warning-count)
-                     face compilation-warning)
-        (:propertize ,(format " %d" note-count)
-                     face compilation-info)
+      `("["
+        (lsp-mode "LSP:")
+        (:propertize ,(format "%d" error-count) face compilation-error)
+        (:propertize ,(format ":%d" warning-count) face compilation-warning)
+        (:propertize ,(format ":%d" note-count) face compilation-info)
         "]"))))
 
 (defsubst mode-line//process ()
@@ -195,7 +189,7 @@ read-only, and `buffer-file-coding-system'"
   `(:propertize ,mode-line-process face font-lock-string-face))
 
 (defsubst mode-line//position ()
-  (propertize " %l:%c %p %I" 'face 'font-lock-constant-face))
+  (propertize "%l:%c %p %I" 'face 'font-lock-constant-face))
 
 (defsubst mode-line//format-line (-lhs -chs -rhs)
   (let* ((lw (string-width -lhs))
@@ -216,25 +210,28 @@ read-only, and `buffer-file-coding-system'"
   `(defun mode-line//generate ()
      "Generate mode-line."
      (unless (bound-and-true-p eldoc-mode-line-string)
-       (cond
-        ,@(mapcar
-           (lambda (config)
-             (list
-              (car config)
-              (let ((segments (plist-get (cdr config) :segments))
-                    (show-misc-p (plist-get (cdr config) :misc))
-                    (show-root-p (plist-get (cdr config) :root)))
-                (delete
-                 nil
-                 `(list ,@(mapcar #'list segments)
-                        ,(when show-misc-p ''mode-line-misc-info)
-                        ,@(when show-root-p
-                            (list " "
-                                  `'(mode-line-show-root-p
-                                     ,(cl-case show-root-p
-                                        (project 'mode-line--cached-root)
-                                        (current '(:eval (abbreviate-file-name default-directory))))))))))))
-           (or -segments mode-line-config-alist))))))
+       (replace-regexp-in-string
+        (rx (>= 2 space)) " "
+        (format-mode-line
+         (cond
+          ,@(mapcar
+             (lambda (config)
+               (list
+                (car config)
+                (let ((segments (plist-get (cdr config) :segments))
+                      (show-misc-p (plist-get (cdr config) :misc))
+                      (show-root-p (plist-get (cdr config) :root)))
+                  (delete
+                   nil
+                   `(list ,@(cdr (mapcan (lambda (segment) (list " " `(,segment))) segments))
+                          ,(when show-misc-p ''mode-line-misc-info)
+                          ,@(when show-root-p
+                              (list " "
+                                    `'(mode-line-show-root-p
+                                       ,(cl-case show-root-p
+                                          (project 'mode-line--cached-root)
+                                          (current '(:eval (abbreviate-file-name default-directory))))))))))))
+             (or -segments mode-line-config-alist))))))))
 
 (defun mode-line*trace-magit-checkout (-fn &rest -args)
   (let ((buffer (current-buffer)))
@@ -264,4 +261,4 @@ read-only, and `buffer-file-coding-system'"
 
 (mode-line//compile)
 
-(provide 'core-mode-line)
+(provide 'core-modeline)

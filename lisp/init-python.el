@@ -79,6 +79,9 @@
         '(pyvenv-virtual-env-name (" [" pyvenv-virtual-env-name "]"))))
 
 (with-eval-after-load 'python
+  (setq lsp-python-ms-dir (expand-var! "mspyls/"))
+  (require 'lsp-python-ms)
+
   (advice-add 'python-ffap-module-path :around #'python*unless-shell-running)
 
   (when (boundp 'python-shell-completion-native-disabled-interpreters)

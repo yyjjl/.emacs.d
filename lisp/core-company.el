@@ -48,6 +48,11 @@
 (with-eval-after-load 'company-capf
   (advice-add 'company-capf :around #'ignore-errors!))
 
+(with-eval-after-load 'company-posframe
+  (setq company-posframe-show-metadata nil)
+  (setq company-posframe-show-indicator nil)
+  (setq company-posframe-quickhelp-delay nil))
+
 (defsubst company//find-main-backend (backends)
   (let ((x backends))
     (while (and (consp x)
