@@ -1,24 +1,60 @@
+;; -*- lexical-binding: t -*-
+
+(defun core//package-install-transformer (-string)
+  (let ((package (cadr (assoc-string -string package-archive-contents))))
+    (format "%-30s %-16s %-7s %s"
+            -string
+            (if package
+                (propertize (package-version-join (package-desc-version package))
+                            'face font-lock-comment-face)
+              "")
+            (if package
+                (propertize (package-desc-archive package)
+                            'face font-lock-builtin-face)
+              "")
+            (if package
+                (propertize (package-desc-summary package)
+                            'face font-lock-doc-face)
+              ""))))
+
+(defun core//counsel-find-file-transformer (-string)
+  (concat
+   (ivy-read-file-transformer -string)
+   (propertize
+    (let* ((default-directory ivy--directory)
+           (type (-> -string
+                     expand-file-name
+                     directory-file-name
+                     file-attributes
+                     car)))
+      (if (stringp type)
+          (concat "-> " (expand-file-name type))
+        ""))
+    'face 'font-lock-doc-face)))
+
 (defun core//ivy-switch-buffer-transformer (-string)
   "Transform STR to more readable format."
   (let ((buffer (get-buffer -string)))
     (cond
      (buffer
-      (format-line! -string (buffer-local-value 'default-directory buffer)))
+      (format "%-60s %s" -string (buffer-local-value 'default-directory buffer)))
      ((and (eq ivy-virtual-abbreviate 'full)
            (file-name-directory -string))
-      (format-line! (propertize (file-name-nondirectory -string)
-                                'face 'ivy-virtual)
-                    (file-name-directory -string)))
+      (format "%-60s %s" (propertize (file-name-nondirectory -string)
+                                     'face 'ivy-virtual)
+              (file-name-directory -string)))
      (t -string))))
 
 (defun core//counsel-bookmark-transformer (-string)
   "Transform STR to more readable format."
-  (format-line! (propertize -string 'face 'font-lock-string-face)
-                (when-let (bm (bookmark-get-bookmark-record -string))
-                  (concat (file-name-nondirectory (cdr (assoc 'filename bm)))
-                          (propertize (format " %10d"
-                                              (cdr (assoc 'position bm)))
-                                      'face 'warning)))))
+  (let ((bm (bookmark-get-bookmark-record -string)))
+    (format "%-40s %s %s"
+            (propertize -string 'face 'font-lock-string-face)
+            (if bm
+                (propertize (format "%-10d" (cdr (assoc 'position bm)))
+                            'face 'warning)
+              "")
+            (if bm (file-name-nondirectory (cdr (assoc 'filename bm))) ""))))
 
 (define-hook! ivy|occur-mode-setup (ivy-occur-mode-hook
                                     ivy-occur-grep-mode-hook)
@@ -40,9 +76,11 @@
                     ivy-switch-buffer-other-window
                     counsel-projectile-switch-to-buffer
                     counsel-projectile))
-    (ivy-set-display-transformer caller
-                                 #'core//ivy-switch-buffer-transformer))
+    (ivy-set-display-transformer caller #'core//ivy-switch-buffer-transformer))
 
+  (ivy-set-display-transformer 'package-install #'core//package-install-transformer)
+  (ivy-set-display-transformer 'counsel-find-file
+                               #'core//counsel-find-file-transformer)
   (ivy-set-display-transformer 'counsel-bookmark
                                #'core//counsel-bookmark-transformer)
 

@@ -49,6 +49,7 @@
     haskell-interactive-mode))
 (defvar core-popups-help-modes
   '(help-mode
+    helpful-mode
     messages-buffer-mode
     completion-list-mode
     compilation-mode
