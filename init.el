@@ -1,6 +1,10 @@
 (when (< emacs-major-version 27)
   (load (expand-file-name "early-init" user-emacs-directory)))
 
+(let ((private-file (expand-file-name "private.el" user-emacs-directory)))
+  (when (file-exists-p private-file)
+    (load private-file)))
+
 ;; All packages required in this section are defined in `init-packages'
 (require 'core-lib)
 ;; Set some important variables
@@ -12,10 +16,6 @@
 (require 'core-packages)
 (require 'core-semantic)
 (require 'core-hideshow)
-
-(let ((private-file (expand-file-name "private.el" user-emacs-directory)))
-  (when (file-exists-p private-file)
-    (load private-file)))
 
 (require 'init-editing)
 (require 'init-dired)
