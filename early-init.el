@@ -21,6 +21,9 @@ hasn't to runs those regexps against the filename.")
   (expand-file-name "private" user-emacs-directory)
   "Local packages in this directory")
 
+(defvar emacs-use-gnutls-p (gnutls-available-p)
+  "Use gnutls to download packages")
+
 (defvar emacs-etc-direcotry
   (expand-file-name "etc" user-emacs-directory)
   "Some configuration file in this directory")

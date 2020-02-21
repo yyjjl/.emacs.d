@@ -14,6 +14,8 @@
 ;; Disable some features when load emacs
 (setq core--buffer-useful-p nil)
 (with-demoted-errors "%s"
+  (setq load-prefer-newer t)
+
   (let ((early-init-file (expand-file-name "early-init.el" user-emacs-directory)))
     (when (file-exists-p early-init-file)
       (load early-init-file nil :no-message t)))

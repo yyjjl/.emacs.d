@@ -17,7 +17,7 @@ Archive with high priority will be used when install a package.")
 
 ;; The index of archive represents its priority
 (setq package-archives
-      (if (gnutls-available-p)
+      (if emacs-use-gnutls-p
           '(("melpa-stable" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa-stable/")
             ("gnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
             ("melpa" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
