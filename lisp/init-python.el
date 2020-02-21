@@ -80,7 +80,7 @@
 
 (with-eval-after-load 'python
   (setq lsp-python-ms-dir (expand-var! "mspyls/"))
-  (require 'lsp-python-ms)
+  (ignore-errors (require 'lsp-python-ms))
 
   (advice-add 'python-ffap-module-path :around #'python*unless-shell-running)
 
