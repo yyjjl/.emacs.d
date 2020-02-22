@@ -86,6 +86,9 @@
   ;; do not use ping, it's very slow
   (setq ffap-machine-p-known 'reject))
 
+(with-eval-after-load 'which-key
+  (setq which-key-allow-imprecise-window-fit nil))
+
 (with-eval-after-load 'winum
   (define-key! :map winum-keymap
     ("C-x w")

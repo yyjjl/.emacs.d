@@ -35,15 +35,16 @@
 
 ;; Programming modes
 (unless emacs-lite-setup-p
-  (require 'init-cpp)
+  (require 'init-go)
   (require 'init-haskell)
-  (require 'init-web)
-  (require 'init-rust)
+  (require 'init-idris)
   (require 'init-java)
-  (require 'init-idris))
+  (require 'init-rust)
+  (require 'init-web))
 
 (require 'init-lsp-mode)
 (require 'init-perl5)
+(require 'init-cpp)
 (require 'init-python)
 (require 'init-lisp)
 (require 'init-sh)

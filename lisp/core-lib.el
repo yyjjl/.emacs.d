@@ -397,6 +397,20 @@ HTML file converted from org file, it returns t."
       (with-current-buffer buffer
         (hack-dir-local-variables-non-file-buffer)))))
 
+(cl-defun run-command! (&key name callback error-callback command directory)
+  (let ((default-directory (or directory default-directory))
+        (command-buffer (compilation-start
+                         command
+                         nil
+                         (lambda (_) (format "run command: %s" name)))))
+    (with-current-buffer command-buffer
+      (add-transient-hook!
+          (compilation-finish-functions
+           :name core//run-command-callback :arguments (buffer status))
+        (if (string-match-p "finished" status)
+            (and callback (funcall callback buffer status))
+          (and error-callback (funcall error-callback buffer status)))))))
+
 (unless (fboundp 'when-let*)
   (defalias 'when-let* 'when-let))
 

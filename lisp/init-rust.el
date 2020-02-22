@@ -1,10 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
-(define-variable! :pkg rust rls)
-
 (require-packages!
- (ggtags :when emacs-use-gtags-p)
- (lsp-mode :when rust-use-rls-p)
  cargo
  ;; Emacs 26 has conf-toml-mode
  (toml-mode :when (<= emacs-major-version 25))
@@ -27,9 +23,7 @@
 (define-hook! rust|setup (rust-mode-hook)
   (cargo-minor-mode 1)
   (when (buffer-enable-rich-feature-p)
-    (lsp//try-enable
-     rust|setup-internal
-     :enable rust-use-rls-p)))
+    (lsp//try-enable rust|setup-internal)))
 
 (defun rust/cargo-dispatch (-use-last-action)
   (interactive "P")

@@ -77,7 +77,7 @@ Emacs Lisp."
   (flycheck-mode -1)
 
   (when (buffer-enable-rich-feature-p)
-    (auto-compile-on-save-mode)
+    (auto-compile-on-save-mode 1)
 
     (lisp//hippie-expand-setup)
     (checkdoc-minor-mode)))

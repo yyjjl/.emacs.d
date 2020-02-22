@@ -46,6 +46,12 @@
              (window (get-buffer-window buffer)))
     (kill-buffer buffer)))
 
+(defun python/install-tools ()
+  (interactive)
+  (run-command!
+   :name "install pyls"
+   :command "pip3 install --user 'python-language-server[all]'"))
+
 (define-hook! python|setup (python-mode-hook)
   (setq electric-indent-chars (delq ?: electric-indent-chars))
 
@@ -59,7 +65,6 @@
 
     (lsp//try-enable
      python|setup-internal
-     :enable python-use-pyls-p
      :fallback
      (progn
        (elpy-mode 1)
@@ -132,7 +137,6 @@
 
         (define-key! :map inferior-python-mode-map
           ("C-c C-z" . python/pop-to-shell)))
-
     (elpy-enable)
     (remove-hook 'python-mode-hook 'elpy-mode)))
 

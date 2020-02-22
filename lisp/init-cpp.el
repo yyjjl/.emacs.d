@@ -2,14 +2,11 @@
 
 (defvar cpp-ccls-base-path (expand-var! "ccls"))
 (defvar cpp-ccls-path (expand-file-name "build/ccls" cpp-ccls-base-path))
-(define-variable!
-  :format "cpp-use-%s-p"
-  cmake
-  (ccls :value (file-exists-p cpp-ccls-base-path)))
+
+(define-variable! :pkg cpp cmake)
 
 (require-packages!
  (ggtags :when emacs-use-gtags-p)
- (lsp-mode :when cpp-use-ccls-p)
  clang-format
  google-c-style)
 
@@ -90,12 +87,11 @@
         (lsp//try-enable
          cpp|setup-internal
          :enable
-         (and cpp-use-ccls-p
-              (or (and
-                   cpp-use-cmake-p
-                   (setq cpp-cmake-project-root (cpp-cmake//locate-cmakelists))
-                   (file-exists-p (cpp-cmake//cdb-path)))
-                  (file-exists-p (cpp-ccls//dot-ccls-path))))
+         (or (and
+              cpp-use-cmake-p
+              (setq cpp-cmake-project-root (cpp-cmake//locate-cmakelists))
+              (file-exists-p (cpp-cmake//cdb-path)))
+             (file-exists-p (cpp-ccls//dot-ccls-path)))
          :init
          (electric-indent-local-mode -1)
          :fallback

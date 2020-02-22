@@ -35,7 +35,6 @@
   (when (buffer-enable-rich-feature-p)
     (lsp//try-enable
      haskell|setup-internal
-     :enable haskell-use-hie-p
      :fallback (progn
                  (haskell-doc-mode 1)
                  (flycheck-mode -1))))

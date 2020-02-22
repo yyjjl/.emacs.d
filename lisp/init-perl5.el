@@ -1,7 +1,5 @@
 (defalias 'perl-mode 'cperl-mode)
 
-
-
 ;; perltidy
 ;; Devel::REPL
 

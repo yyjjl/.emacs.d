@@ -144,14 +144,26 @@
          (kill-buffer cmake-buffer))
        (funcall callback buffer)))))
 
+(defun cmake/install-tools ()
+  (interactive)
+  (run-command!
+   :name "install pyls"
+   :command "pip3 install --user 'cmake-language-server'"))
+
+(define-hook! cmake|setup (cmake-mode-hook)
+  (font-lock-mode 1)
+  (cmake-font-lock-activate)
+
+  (lsp//try-enable
+   cmake|setup-internal
+   :init
+   (progn
+     (setq-local lsp-signature-auto-activate nil)
+     (lsp--update-signature-help-hook :cleanup))
+   :fallback
+   (company//add-backend 'company-cmake)))
 
 (with-eval-after-load 'cmake-mode
-  (define-key cmake-mode-map [f10] 'compile)
-
-  (define-hook! cmake|setup (cmake-mode-hook)
-    (font-lock-mode 1)
-    (cmake-font-lock-activate)
-
-    (company//add-backend 'company-cmake)))
+  (define-key cmake-mode-map [f10] 'compile))
 
 (provide 'init-cpp-cmake)

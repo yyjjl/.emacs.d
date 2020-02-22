@@ -1,7 +1,4 @@
-(require-packages!
- (emms :when emacs-use-mpv-p))
-
-
+(require-packages! emms)
 
 (defvar emms-playlist-list
   (eval-when-compile

@@ -24,13 +24,15 @@
     (if (file-exists-p cpp-ccls-base-path)
         (if -upgrade
             (let ((default-directory cpp-ccls-base-path))
-              (compilation-start
-               (concat "git pull && git submodule update && " build-command)))
+              (run-command!
+               :name "update ccls"
+               :command (concat "git pull && git submodule update && " build-command)))
           (message "ccls directory exists"))
       (let ((default-directory emacs-var-direcotry))
         (make-directory cpp-ccls-base-path t)
-        (compilation-start
-         (concat download-command " && " build-command))))))
+        (run-command!
+         :name "install ccls"
+         :command (concat download-command " && " build-command))))))
 
 (defmacro cpp-ccls//define-find (symbol command &optional extra)
   `(defun ,(intern (format "cpp/xref-find-%s" symbol)) ()
