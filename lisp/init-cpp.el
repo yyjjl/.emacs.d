@@ -1,15 +1,15 @@
 ;; -*- lexical-binding:t -*-
 
-(setvar!
- cpp-ccls-base-path (expand-var! "ccls")
- cpp-ccls-path (expand-file-name "build/ccls"
-                                 cpp-ccls-base-path)
- cpp-has-cmake-p (executable-find "cmake")
- cpp-has-ccls-p (file-exists-p cpp-ccls-base-path))
+(defvar cpp-ccls-base-path (expand-var! "ccls"))
+(defvar cpp-ccls-path (expand-file-name "build/ccls" cpp-ccls-base-path))
+(define-variable!
+  :format "cpp-use-%s-p"
+  cmake
+  (ccls :value (file-exists-p cpp-ccls-base-path)))
 
 (require-packages!
- (ggtags :when env-has-gtags-p)
- (lsp-mode :when cpp-has-ccls-p)
+ (ggtags :when emacs-use-gtags-p)
+ (lsp-mode :when cpp-use-ccls-p)
  clang-format
  google-c-style)
 
@@ -90,9 +90,9 @@
         (lsp//try-enable
          cpp|setup-internal
          :enable
-         (and cpp-has-ccls-p
+         (and cpp-use-ccls-p
               (or (and
-                   cpp-has-cmake-p
+                   cpp-use-cmake-p
                    (setq cpp-cmake-project-root (cpp-cmake//locate-cmakelists))
                    (file-exists-p (cpp-cmake//cdb-path)))
                   (file-exists-p (cpp-ccls//dot-ccls-path))))
@@ -102,7 +102,7 @@
          (progn
            (when cpp-cmake-project-root
              (message "Need to run `cpp/config-project' to setup ccls server"))
-           (when env-has-gtags-p
+           (when emacs-use-gtags-p
              (ggtags-mode 1))
            ;; (setq completion-at-point-functions nil)
            (flycheck-mode -1)))))))

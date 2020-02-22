@@ -25,10 +25,10 @@
                   ""))
       (unless (eq major-mode 'org-mode)
         (org-mode))
-      (org-remove-latex-fragment-image-overlays)
+      (org-clear-latex-preview)
       (let ((org-format-latex-options
              (plist-put (copy-sequence org-format-latex-options) :scale 2)))
-        (org-toggle-latex-fragment '(16)))
+        (org-latex-preview '(16)))
       (when-let (window (get-buffer-window buffer))
         (fit-window-to-buffer window 15)
         (special-mode))
@@ -245,6 +245,8 @@ directory and extension."
 
 ;;;###autoload
 (defvar core--local-snippets-list nil)
+(put 'core--local-snippets-list  'safe-local-variable #'listp)
+
 ;;;###autoload
 (defun core/add-local-snippet (&optional -save-snippets)
   (interactive "P")

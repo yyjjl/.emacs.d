@@ -108,7 +108,7 @@
   (interactive "r")
   (if (display-graphic-p)
       (kill-new (buffer-substring-no-properties -beg -end))
-    (if env-has-xsel-p
+    (if emacs-use-xsel-p
         (if (= 0 (shell-command-on-region -beg -end "xsel -ib"))
             (message "Copy finished")
           (message "Error occured !!!"))
@@ -118,7 +118,7 @@
   (interactive)
   (if (display-graphic-p)
       (yank 1)
-    (if env-has-xsel-p
+    (if emacs-use-xsel-p
         (shell-command "xsel -ob" t)
       (message "Executable `xsel' not found !!!"))))
 

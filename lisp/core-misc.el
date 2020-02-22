@@ -363,21 +363,14 @@
 
 (defvar core-auto-next-error-buffer-derived-modes
   '(occur-mode grep-mode ivy-occur-mode xref--xref-buffer-mode compilation-mode))
-(defun core*before-next-error (&rest _)
-  (let ((occur-buffer
-         (cl-loop
-          for window in (window-list)
-          for buffer = (window-buffer window)
-          when (with-current-buffer buffer
-                 (apply 'derived-mode-p
-                        core-auto-next-error-buffer-derived-modes))
-          return buffer)))
-    (when (or (not next-error-last-buffer)
-              (not (eq next-error-last-buffer occur-buffer)))
-      (setq next-error-last-buffer occur-buffer))
-    occur-buffer))
+(defun core*around-next-error (-fn &rest -args)
+  (let ((occur-buffer (next-error-find-buffer)))
+    (if-let (window (and occur-buffer (get-buffer-window occur-buffer)))
+        (with-selected-window window
+          (apply -fn -args))
+      (apply -fn -args))))
 
-(advice-add 'next-error :before #'core*before-next-error)
+(advice-add 'next-error :around  #'core*around-next-error)
 
 (define-key! :prefix "C-x"
   ("2" . window/split-vertically)
@@ -443,5 +436,17 @@
 
 (setq counsel-describe-function-function #'helpful-callable)
 (setq counsel-describe-variable-function #'helpful-variable)
+
+(put 'projectile-project-run-cmd 'safe-local-variable #'stringp)
+(put 'projectile-project-test-cmd 'safe-local-variable #'stringp)
+(put 'projectile-project-compilation-cmd 'safe-local-variable #'stringp)
+(put 'projectile-project-configure-cmd 'safe-local-variable #'stringp)
+(put 'projectile-project-compilation-dir 'safe-local-variable #'stringp)
+(put 'scroll-left 'disabled nil)
+(put 'narrow-to-region 'disabled nil)
+(put 'narrow-to-page 'disabled nil)
+(put 'narrow-to-defun 'disabled nil)
+(put 'erase-buffer 'disabled nil)
+(put 'list-timers 'disabled nil)
 
 (provide 'core-misc)

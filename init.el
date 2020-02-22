@@ -1,21 +1,17 @@
 (when (< emacs-major-version 27)
   (load (expand-file-name "early-init" user-emacs-directory)))
 
-(let ((private-file (expand-file-name "private.el" user-emacs-directory)))
-  (when (file-exists-p private-file)
-    (load private-file)))
-
 ;; All packages required in this section are defined in `init-packages'
 (require 'core-lib)
 ;; Set some important variables
 (require 'core-vars)
 (require 'core-defaults)
+(require 'core-custom)
+
 ;; Load core packages
 (require 'core-packages-lib)
 (require 'core-ui)
-(require 'core-packages)
-(require 'core-semantic)
-(require 'core-hideshow)
+(require 'core-features)
 
 (require 'init-editing)
 (require 'init-dired)
@@ -26,17 +22,15 @@
 ;; ----------------------------------------
 
 ;; All packages required in this section are defined in their init files
-
-(when (or env-has-aspell-p env-has-hunspell-p)
-  (require 'init-spelling))
-(when env-has-latex-p
+(require 'init-spelling)
+(when emacs-use-latex-p
   (require 'init-latex)
   (require 'init-org)
   (require 'init-notes)
   (require 'init-jupyter))
-(when env-has-git-p
+(when emacs-use-git-p
   (require 'init-git))
-(when env-has-gtags-p
+(when emacs-use-gtags-p
   (require 'init-tags))
 
 ;; Programming modes
@@ -60,7 +54,7 @@
 ;; (require 'init-hydra-extra)
 ;; (require 'init-prettify-symbols)
 
-(when env-has-mpv-p
+(when emacs-use-mpv-p
   (require 'init-emms))
 
 (require 'init-extra)

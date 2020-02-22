@@ -1,9 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
-(setvar! python-has-pytest-p (executable-find "pytest")
-         python-has-ipython-p (executable-find "ipython3")
-         python-has-pylint-path (executable-find "pylint")
-         python-has-pyls-p (executable-find "pyls"))
+(define-variable! :pkg python pytest ipython pylint pyls)
 
 (require-packages!
  lsp-mode
@@ -11,10 +8,12 @@
  py-autopep8
  py-isort)
 
+(eval-when-compile
+  (require 'lsp-pyls))
+
 
 
 (defvar python--elpy-multiedit-buffers nil)
-
 (defvar python--elpy-mutiedit-overlay-map
   (define-key! :map (make-sparse-keymap)
     ("TAB" . python/elpy-multiedit-next-overlay)
@@ -60,7 +59,7 @@
 
     (lsp//try-enable
      python|setup-internal
-     :enable python-has-pyls-p
+     :enable python-use-pyls-p
      :fallback
      (progn
        (elpy-mode 1)
@@ -92,7 +91,7 @@
   (setq python-shell-prompt-detect-failure-warning nil)
   (setq python-pdbtrack-activate t)
 
-  (if python-has-ipython-p
+  (if python-use-ipython-p
       (setq python-shell-interpreter "ipython3"
             python-shell-interpreter-args "--simple-prompt")
     (setq python-shell-interpreter "python3"
@@ -102,8 +101,8 @@
     ;; (setq flycheck-python-pylint-executable "python3")
     (setq flycheck-python-flake8-executable "python3")
     (setq flycheck-python-pycompile-executable "python3"))
-  (when python-has-pylint-path
-    (setq python-check-command python-has-pylint-path))
+  (when python-use-pylint-p
+    (setq python-check-command python-use-pylint-p))
 
   (define-key! :map inferior-python-mode-map
     ("C-c C-t" . python/toggle-pdbtrack)
@@ -120,7 +119,7 @@
     ("M-n" . next-error))
 
   ;; Setup elpy or pyls
-  (if python-has-pyls-p
+  (if python-use-pyls-p
       (progn
         (pyvenv-mode 1)
 
@@ -164,5 +163,7 @@
 
   (advice-add 'elpy-multiedit-python-symbol-at-point :around #'python*around-elpy-multiedit)
   (advice-add 'elpy-multiedit-stop :after #'python*after-elpy-multiedit-stop))
+
+(put 'elpy-shell-use-project-root 'safe-local-variable #'booleanp)
 
 (provide 'init-python)

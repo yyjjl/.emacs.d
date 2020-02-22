@@ -1,4 +1,6 @@
-(setvar! lisp-has-racket-p (executable-find "racket"))
+
+(define-variable! :pkg lisp racket)
+
 (require-packages!
  ;; Auto compile after .el file load or save
  auto-compile
@@ -6,7 +8,7 @@
  lispy
  elisp-def
  macrostep
- (racket-mode :when lisp-has-racket-p))
+ (racket-mode :when lisp-use-racket-p))
 
 (defface lisp-argument-face
   `((t :underline t))

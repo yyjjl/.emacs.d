@@ -11,8 +11,6 @@
   :type 'directory
   :safe #'booleanp)
 
-
-
 (ignore-errors
   (require 'lsp)
   (require 'lsp-clients))
@@ -79,7 +77,7 @@
   (require 'lsp-ivy)
 
   (defun lsp--lv-message (message)
-    (setq lsp--last-signature-buffer (current-buffer))
+    (setq lsp--signature-last-buffer (current-buffer))
     (let ((lv-force-update t))
       (lv-message (replace-regexp-in-string "%" "%%" message))))
 

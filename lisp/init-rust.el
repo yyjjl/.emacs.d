@@ -1,11 +1,10 @@
 ;;; -*- lexical-binding: t; -*-
 
-(setvar!
- rust-has-rls-p (executable-find "rls"))
+(define-variable! :pkg rust rls)
 
 (require-packages!
- (ggtags :when env-has-gtags-p)
- (lsp-mode :when rust-has-rls-p)
+ (ggtags :when emacs-use-gtags-p)
+ (lsp-mode :when rust-use-rls-p)
  cargo
  ;; Emacs 26 has conf-toml-mode
  (toml-mode :when (<= emacs-major-version 25))
@@ -25,14 +24,12 @@
                             commands)))))
       commands)))
 
-
-
 (define-hook! rust|setup (rust-mode-hook)
   (cargo-minor-mode 1)
   (when (buffer-enable-rich-feature-p)
     (lsp//try-enable
      rust|setup-internal
-     :enable rust-has-rls-p)))
+     :enable rust-use-rls-p)))
 
 (defun rust/cargo-dispatch (-use-last-action)
   (interactive "P")

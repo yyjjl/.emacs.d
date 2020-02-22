@@ -164,4 +164,7 @@
   (define-key! :map reftex-mode-map
     ("C-c i i" . reftex-goto-label)))
 
+(put 'TeX-narrow-to-group 'disabled nil)
+(put 'LaTeX-narrow-to-environment 'disabled nil)
+
 (provide 'init-latex)

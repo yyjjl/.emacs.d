@@ -1,10 +1,13 @@
 (require 'package)
 
-(when (>= emacs-major-version 25)
-  ;; Do not save to init.el
-  (fset 'package--save-selected-packages
-        (lambda (-value)
-          (when -value (setq package-selected-packages -value)))))
+(advice-add
+ 'package--save-selected-packages
+ :override
+ (lambda (-value)
+   (when -value
+     (setq package-selected-packages -value))
+   (unless after-init-time
+     (add-hook 'after-init-hook #'package--save-selected-packages))))
 
 (defvar package--use-priority-p nil
   "Non-nil means to use priority defined in variable `package|priority-alist'.
@@ -17,18 +20,16 @@ Archive with high priority will be used when install a package.")
 
 ;; The index of archive represents its priority
 (setq package-archives
-      (if emacs-use-gnutls-p
-          '(("melpa-stable" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa-stable/")
-            ("gnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-            ("melpa" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-            ("org" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/org/"))
-        '(("melpa-stable" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa-stable/")
-          ("gnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-          ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-          ("org" . "http://orgmode.org/elpa/"))))
-
+      '(("melpa-stable" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa-stable/")
+        ("gnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+        ("melpa" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+        ("org" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/org/")))
 ;; Setup to select right archive
 (setq package--priority-alist (mapcar #'car package-archives))
+
+(unless emacs-use-gnutls-p
+  (dolist (item package-archives)
+    (setcdr item (concat "http://" (string-trim-left (cdr item) "https://")))))
 
 (defun package*autoclose-autoloads (-name -pkg-dir)
   "Auto close *-autoloads.el after a package installed."
@@ -154,8 +155,7 @@ Archive with high priority will be used when install a package.")
   (message "Compile finished"))
 
 (if (bound-and-true-p core-dumped)
-    (progn
-      (setq load-path core-dumped-load-path))
+    (setq load-path core-dumped-load-path)
   ;; add load-path’s and load autoload files
   (package-initialize))
 

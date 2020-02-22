@@ -1,12 +1,10 @@
 ;;; -*- lexical-binding: t; -*-
 
-(setvar! idris-has-idris-p (executable-find "idris"))
+(define-variable! :pkg idris idris)
 
 (require-packages!
  haskell-mode
- (idris-mode :when idris-has-idris-p))
-
-
+ (idris-mode :when idris-use-idris-p))
 
 (defun idris//setup-view-keys (-map)
   (define-key! :map -map

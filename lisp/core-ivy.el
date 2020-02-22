@@ -167,7 +167,7 @@
   (define-key read-expression-map (kbd "C-r") 'counsel-minibuffer-history))
 
 (with-eval-after-load 'counsel-projectile
-  (if env-has-ripgrep-p
+  (if emacs-use-ripgrep-p
       (progn
         (setq counsel-rg-base-command
               "rg -M 1000 -S --no-heading --line-number --color never %s .")

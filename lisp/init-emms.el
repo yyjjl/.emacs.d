@@ -1,5 +1,5 @@
 (require-packages!
- (emms :when env-has-mpv-p))
+ (emms :when emacs-use-mpv-p))
 
 
 

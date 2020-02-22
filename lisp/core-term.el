@@ -1,17 +1,16 @@
 ;;; -*- lexical-binding: t; -*-
 
-(setvar! term-zsh-path (executable-find "zsh")
-         term-bash-path (executable-find "bash")
-         term-prefer-vterm (not emacs-lite-setup-p))
-
-(require-packages!
- (vterm :when term-prefer-vterm))
-
 (eval-when-compile
   (require 'dash))
 
-
+(define-variable!
+  :format "term-%s-path"
+  zsh
+  bash
+  (vterm :name term-prefer-vterm (not emacs-lite-setup-p)))
 
+(require-packages!
+ (vterm :when term-prefer-vterm))
 
 (defun vterm*self-insert ()
   "Sends invoking key to libvterm. Fix meta key error in terminal"
@@ -67,12 +66,12 @@
 (advice-add 'comint-delchar-or-maybe-eof :after #'term*eof-hack)
 
 (define-hook! term|utf8-setup (term-exec-hook)
-  (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
+  (when-let (proc (get-buffer-process (current-buffer)))
+    (set-process-coding-system proc 'utf-8-unix 'utf-8-unix)))
 
 (define-hook! term|autoclose-buffer (comint-exec-hook)
-  (let ((proc (get-buffer-process (current-buffer))))
-    (when proc
-      (set-process-sentinel proc (term//wrap-sentinel (process-sentinel proc))))))
+  (when-let (proc (get-buffer-process (current-buffer)))
+    (set-process-sentinel proc (term//wrap-sentinel (process-sentinel proc)))))
 
 (define-hook! term|setup-name (term-mode-hook vterm-mode-hook)
   (setq term-goto-process-mark nil)

@@ -22,7 +22,7 @@
  amx
  ;; Show key bindings when pressing
  which-key
- (fcitx :when env-has-fcitx-p)
+ (fcitx :when emacs-use-fcitx-p)
  ;; Numbering windows
  winum
  ;; Highlight braces with their depth
@@ -43,9 +43,11 @@
 (require 'core-term)
 (require 'core-misc)
 (require 'core-hydra)
+(require 'core-semantic)
+(require 'core-hideshow)
 
 (define-hook! package|idle-init-emacs (after-init-idle-hook)
-  (when (and env-has-fcitx-p (display-graphic-p))
+  (when (and emacs-use-fcitx-p (display-graphic-p))
     (fcitx-aggressive-setup))
   (find-file-noselect (expand-var! "org/*note*"))
   (find-file-noselect (expand-var! "org/*task*"))
@@ -84,4 +86,4 @@
 
   (add-to-list 'recentf-exclude (file-truename package-user-dir)))
 
-(provide 'core-packages)
+(provide 'core-features)

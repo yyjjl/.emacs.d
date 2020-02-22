@@ -8,8 +8,6 @@
  poporg
  company-auctex)
 
-
-
 ;; Do not load extra backends
 (setq org-export-backends '(html latex beamer))
 
@@ -412,5 +410,7 @@
 (define-key!
   ("C-c '" . poporg-dwim)
   ([C-f12] . org-capture))
+
+(put 'org-preview-latex-image-directory 'safe-local-variable #'stringp)
 
 (provide 'init-org)

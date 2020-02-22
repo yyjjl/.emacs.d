@@ -1,17 +1,13 @@
 ;;; -*- lexical-binding: t; -*-
 
-(setvar!
- haskell-has-hie-p (executable-find "hie")
- haskell-has-stylish-haskell-p (executable-find "stylish-haskell")
- haskell-has-hindent-p (executable-find "hindent")
- haskell-has-cabal-p (executable-find "cabal"))
+(define-variable! :pkg haskell hie stylish-haskell hindent cabal)
 
 (require-packages!
  align
  haskell-mode
- (lsp-haskell :when haskell-has-hie-p)
- (hindent :when haskell-has-hindent-p)
- (company-cabal :when haskell-has-cabal-p))
+ (lsp-haskell :when haskell-use-hie-p)
+ (hindent :when haskell-use-hindent-p)
+ (company-cabal :when haskell-use-cabal-p))
 
 
 
@@ -37,15 +33,15 @@
   (haskell-decl-scan-mode 1)
 
   (when (buffer-enable-rich-feature-p)
-    ((lsp//try-enable
-      haskell|setup-internal
-      :enable haskell-has-hie-p
-      :fallback (progn
-                  (haskell-doc-mode 1)
-                  (flycheck-mode -1)))))
+    (lsp//try-enable
+     haskell|setup-internal
+     :enable haskell-use-hie-p
+     :fallback (progn
+                 (haskell-doc-mode 1)
+                 (flycheck-mode -1))))
 
   (haskell-indentation-mode 1)
-  (when haskell-has-hindent-p
+  (when haskell-use-hindent-p
     (hindent-mode 1)))
 
 

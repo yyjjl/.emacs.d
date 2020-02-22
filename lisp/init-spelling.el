@@ -1,13 +1,9 @@
-(require-packages!
- ispell
- flyspell)
-
-
+(require-packages! ispell flyspell)
 
 (cond
- (env-has-aspell-p
+ (emacs-use-aspell-p
   (setq ispell-program-name "aspell"))
- (env-has-hunspell-p
+ (emacs-use-hunspell-p
   (setq ispell-program-name "hunspell")
   ;; Just reset dictionary to the safe one "en_US" for hunspell.  if
   ;; we need use different dictionary, we specify it in command line
@@ -15,8 +11,7 @@
   (setq ispell-local-dictionary "en_US")
   (setq ispell-local-dictionary-alist
         '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil nil nil utf-8))))
- (t (setq ispell-program-name nil)
-    (message "You need install either aspell or hunspell for ispell")))
+ (t (setq ispell-program-name nil)))
 
 (defun spelling//detect-ispell-args (&optional -run-together)
   "If RUN-TOGETHER is true, spell check the CamelCase words"
@@ -101,13 +96,13 @@
   (advice-add 'flyspell-auto-correct-word :around #'spelling*set-extra-args))
 
 (defhydra hydra-flyspell
-  (:color blue :hint nil
-          :body-pre
-          (unless (featurep 'flyspell)
-            (require 'flyspell nil :no-error)))
+  (:color blue
+   :hint nil
+   :body-pre
+   (unless (featurep 'flyspell)
+     (require 'flyspell nil :no-error)))
   "
-_SPC_ line-or-region _b_ buffer  _p_ previous-error _n_ next-error _q_ quit
-"
+_SPC_ line-or-region _b_ buffer  _p_ prev _n_ next _q_ quit"
   ("b" (flyspell-dwim :whole-buffer) :exit nil)
   ("SPC" (flyspell-dwim) :exit nil)
   ("p" flyspell-goto-previous-error :exit nil)

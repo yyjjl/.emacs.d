@@ -1,13 +1,11 @@
 ;;; -*- lexical-binding: t; -*-
 
-(setvar!
- org-has-juypter-p (executable-find "jupyter")
- org-has-sage-p (executable-find "sage"))
+(define-variable! :pkg org jupyter sage)
 
 (require-packages!
  ;; IPython notebook feature in `org-mode'
- (jupyter :when org-has-juypter-p)
- (sage-shell-mode :when org-has-sage-p
+ (jupyter :when org-use-jupyter-p)
+ (sage-shell-mode :when org-use-sage-p
                   :compile (sage-shell-mode sage-shell-view)))
 
 

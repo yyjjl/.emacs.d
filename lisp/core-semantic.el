@@ -25,7 +25,7 @@
           global-semantic-mru-bookmark-mode))
   (setq semantic-idle-scheduler-idle-time 1)
 
-  (when env-has-gtags-p
+  (when emacs-use-gtags-p
     (dolist (mode '(c++-mode c-mode java-mode))
       (semanticdb-enable-gnu-global-databases mode))))
 

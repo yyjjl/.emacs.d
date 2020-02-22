@@ -1,8 +1,6 @@
 ;; -*- lexical-binding:t -*-
 
-(require-packages!
- cmake-mode
- cmake-font-lock)
+(require-packages! cmake-mode cmake-font-lock)
 
 (defcustom cpp-cmake-config-list
   '(("Release"

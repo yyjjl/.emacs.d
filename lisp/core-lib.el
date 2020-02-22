@@ -21,7 +21,7 @@
 
 (require 'subr-x)
 (eval-when-compile
-  (require 'cl))
+  (require 'cl-lib))
 
 (defvar core--recentf-enabled-p t)
 (defvar core--buffer-useful-p t
@@ -51,15 +51,30 @@ for defining functions."
             (setq -plist nil)))))
     result))
 
-(defmacro setvar! (&rest -body)
-  (let (forms
-        (setter (if (bound-and-true-p byte-compile-current-file)
-                    'defvar 'setq)))
-    (while (not (null -body))
-      (push `(,setter ,(pop -body)
-                      (eval-when-compile ,(pop -body)))
-            forms))
-    `(progn ,@(nreverse forms))))
+(defmacro define-variable! (&rest -body)
+  (declare (indent 0))
+
+  (let ((fmt "emacs-use-%s-p"))
+    (while (keywordp (car -body))
+      (pcase (pop -body)
+        (:format (setq fmt (pop -body)))
+        (:pkg (setq fmt (concat (symbol-name (pop -body)) "-use-%s-p")))))
+    `(progn
+       ,@(cl-loop
+          for variable in -body
+          collect
+          (let* ((args (when (listp variable)
+                         (prog1 (cdr variable)
+                           (setq variable (car variable)))))
+                 (name (or (plist-get args :name)
+                           (intern (format fmt (symbol-name variable)))))
+                 (value (or `(eval-when-compile ,(plist-get args :value))
+                            `(eval-when-compile
+                               (executable-find ,(or (plist-get args :exe)
+                                                     (symbol-name variable)))))))
+            (if (bound-and-true-p byte-compile-current-file)
+                `(defvar ,name ,value ,(or (plist-get args :doc) ""))
+              `(setq ,name ,value)))))))
 
 (defmacro lambda! (&rest -body)
   "A shortcut for inline interactive lambdas.
@@ -314,8 +329,8 @@ HTML file converted from org file, it returns t."
          (found 0))
     (while (not (equal found 2))
       (setq frame (backtrace-frame (cl-incf index)))
-      (when (equal t (first frame)) (cl-incf found)))
-    (second frame)))
+      (when (equal t (cl-first frame)) (cl-incf found)))
+    (cl-second frame)))
 
 (defun get-call-stack! ()
   "Return the current call stack frames."

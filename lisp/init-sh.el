@@ -1,7 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
-(setvar!
- bash-language-server-executable (executable-find "bash-language-server"))
+(define-variable! (bash-language-server :name bash-language-server-executable))
 
 (add-auto-mode! 'sh-mode
   "\\.basj_profile\\'" "\\.bash_history\\'"

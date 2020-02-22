@@ -12,17 +12,14 @@
 
 (setq file-name-handler-alist nil)
 ;; Don't GC during startup to save time
-(setq gc-cons-threshold most-positive-fixnum
-      gc-cons-percentage 0.6)
+(setq gc-cons-threshold most-positive-fixnum)
+(setq gc-cons-percentage 0.6)
 
 ;;* Default Values
 ;; No tool bar or scroll bar
-(when (fboundp 'tool-bar-mode)
-  (tool-bar-mode -1))
-(when (fboundp 'set-scroll-bar-mode)
-  (set-scroll-bar-mode nil))
-(when (fboundp 'menu-bar-mode)
-  (menu-bar-mode -1))
+(when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(when (fboundp 'set-scroll-bar-mode) (set-scroll-bar-mode nil))
+(when (fboundp 'menu-bar-mode) (menu-bar-mode -1))
 ;; Do not show mode-line until setup finished
 (setq-default mode-line-format nil)
 
@@ -54,8 +51,7 @@
  ;; keep the point out of the minibuffer
 (setq-default mark-ring-max 128)
 (setq-default minibuffer-prompt-properties
-              '(read-only t point-entered minibuffer-avoid-prompt
-                          face minibuffer-prompt))
+              '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt))
 ;; History & backup settings
 (setq-default auto-save-default t)
 (setq-default auto-save-timeout 8)
@@ -77,8 +73,6 @@
 (setq-default mouse-yank-at-point t)
 (setq-default set-mark-command-repeat-pop t)
 (setq-default echo-keystrokes 0.25)
-;; Bad idea, could accidentally edit others' code
-;; (setq-default                require-final-newline t)
 (setq-default tooltip-delay 0.5)
 (setq-default truncate-lines nil)
 (setq-default truncate-partial-width-windows 50)
@@ -128,8 +122,8 @@
            (and (file-readable-p -fn)
                 (file-writable-p -fn)))))
 (setq recentf-keep '(core//recentf-keep?))
-(setq recentf-max-saved-items 2048
-      recentf-exclude (list "/tmp/" "^/sshx?:" "/sudo:" "\\.elc$"
+(setq recentf-max-saved-items 2048)
+(setq recentf-exclude (list "/tmp/" "^/sshx?:" "/sudo:" "\\.elc$"
                             "/node_modules/"
                             "\\.\\(gz\\|gif\\|svg\\|png\\|jpe?g\\)$" "/TAGS$"
                             (expand-file-name "~/downloads")
@@ -309,16 +303,12 @@
   (auto-save-visited-mode 1)
 
   ;; Restore `file-name-handler-alist'
-  (setq file-name-handler-alist emacs-file-name-handler-alist
-        gc-cons-threshold emacs-gc-cons-threshold
-        gc-cons-percentage 0.1)
+  (setq file-name-handler-alist emacs-file-name-handler-alist)
+  (setq gc-cons-threshold emacs-gc-cons-threshold)
+  (setq gc-cons-percentage 0.1)
 
   (add-to-list 'file-name-handler-alist
                (cons core--external-file-regexp #'core//external-file-handler))
-
-  ;; Load private configuration
-  (when (file-exists-p custom-file)
-    (load (file-name-sans-extension custom-file)))
 
   (run-with-timer 1 nil #'run-hooks 'after-init-idle-hook)
   (run-with-idle-timer core-autosave-interval t #'run-hooks 'core-autosave-hook)
