@@ -68,10 +68,11 @@ for defining functions."
                            (setq variable (car variable)))))
                  (name (or (plist-get args :name)
                            (intern (format fmt (symbol-name variable)))))
-                 (value (or `(eval-when-compile ,(plist-get args :value))
-                            `(eval-when-compile
-                               (executable-find ,(or (plist-get args :exe)
-                                                     (symbol-name variable)))))))
+                 (value (if-let ((value (plist-get args :value)))
+                            `(eval-when-compile ,value)
+                          `(eval-when-compile
+                             (executable-find ,(or (plist-get args :exe)
+                                                   (symbol-name variable)))))))
             (if (bound-and-true-p byte-compile-current-file)
                 `(defvar ,name ,value ,(or (plist-get args :doc) ""))
               `(setq ,name ,value)))))))

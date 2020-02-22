@@ -364,7 +364,14 @@
 (defvar core-auto-next-error-buffer-derived-modes
   '(occur-mode grep-mode ivy-occur-mode xref--xref-buffer-mode compilation-mode))
 (defun core*around-next-error (-fn &rest -args)
-  (let ((occur-buffer (next-error-find-buffer)))
+  (let ((occur-buffer
+         (cl-loop
+          for window in (window-list)
+          for buffer = (window-buffer window)
+          when (with-current-buffer buffer
+                 (apply 'derived-mode-p
+                        core-auto-next-error-buffer-derived-modes))
+          return buffer)))
     (if-let (window (and occur-buffer (get-buffer-window occur-buffer)))
         (with-selected-window window
           (apply -fn -args))
