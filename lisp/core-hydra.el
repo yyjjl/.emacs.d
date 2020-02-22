@@ -9,8 +9,8 @@
 (pretty-hydra-define hydra-global-toggles
   (:title "Toggles" :color amaranth :quit-key "q")
   ("Global"
-   (("f7" (core-view-code-mode (if core-view-code-mode -1 1))
-     "view code" :toggle core-view-code-mode :color blue)
+   (("v" (core-view-code-mode (if core-view-code-mode -1 1))
+     "view code" :toggle core-view-code-mode)
     ("E" toggle-debug-on-error "debug on error" :toggle (default-value 'debug-on-error))
     ("Q" toggle-debug-on-quit "debug on quit" :toggle (default-value 'debug-on-quit))
     ("W" (setq-default show-trailing-whitespace (not show-trailing-whitespace))
@@ -27,9 +27,8 @@
      (append `("Global" ,(lax-plist-get hydra-global-toggles/heads-plist "Global"))
              (cl-loop for (key . value) in hydra-local-toggles-heads-list
                       when (eval key) append value)))))
-
-  (define-key hydra-global-toggles/keymap [f7] #'hydra-global-toggles/lambda-f7-and-exit)
-
+  (define-key hydra-global-toggles/keymap
+    (where-is-internal 'hydra-global-toggles/body nil t) #'hydra-global-toggles/nil)
   (prog1 (eval hydra-global-toggles/hint)
     (setq hydra-global-toggles/hint hydra-global-toggles/hint-cache)))
 

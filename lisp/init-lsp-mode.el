@@ -15,10 +15,6 @@
   (require 'lsp)
   (require 'lsp-clients))
 
-;; (custom-theme-set-faces
-;;  'user
-;;  '(lsp-face-highlight-textual ((t :background "#444155"))))
-
 (cl-defmacro lsp//try-enable (name &key (enable t) (init nil) (fallback nil))
   `(add-transient-hook! (hack-local-variables-hook :local t :name ,name)
      (if (and ,enable
@@ -51,7 +47,9 @@
         (lsp--persist-session (lsp-session))))))
 
 (define-hook! lsp|after-open (lsp-after-open-hook)
-  (setq-local company-backends (remove 'company-capf company-backends))
+  (lsp-ui-mode 1)
+  (lsp-flycheck-enable)
+
   ;; default to sort and filter by server
   (setq-local company-transformers nil))
 
@@ -76,6 +74,8 @@
   (require 'lsp-ui)
   (require 'lsp-ivy)
 
+  (advice-add 'lsp--auto-configure :override #'ignore)
+
   (defun lsp--lv-message (message)
     (setq lsp--signature-last-buffer (current-buffer))
     (let ((lv-force-update t))
@@ -88,7 +88,6 @@
   (setq lsp-restart 'auto-restart)
   (setq lsp-session-file (expand-var! "lsp-sessions"))
 
-  (setq lsp-prefer-capf t)
   (setq lsp-enable-completion-at-point t)
   (setq lsp-symbol-highlighting-skip-current t)
 

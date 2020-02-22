@@ -72,7 +72,7 @@
         cargo-process--command-flags "--color never")
 
   (define-key! :map cargo-minor-mode-map
-    ("c-c C-c" . rust/cargo-dispatch)
+    ("C-c C-c" . rust/cargo-dispatch)
     ("C-c C-l" . rust/cargo-run)))
 
 (provide 'init-rust)
