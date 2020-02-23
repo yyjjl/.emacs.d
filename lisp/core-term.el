@@ -7,7 +7,7 @@
   :format "term-%s-path"
   zsh
   bash
-  (vterm :name term-prefer-vterm (not emacs-lite-setup-p)))
+  (vterm :name term-prefer-vterm :value (not emacs-lite-setup-p)))
 
 (require-packages!
  (vterm :when term-prefer-vterm))
