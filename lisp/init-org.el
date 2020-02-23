@@ -226,7 +226,7 @@
         org-export-will-product-buffer-when-displayed t
         org-export-with-sub-superscripts t
         org-tags-column -65
-        org-ellipsis "  "
+        org-ellipsis "...#"
         org-hide-emphasis-markers nil
         org-hide-leading-stars nil
         org-hide-block-startup nil

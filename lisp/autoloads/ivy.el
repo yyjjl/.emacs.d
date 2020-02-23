@@ -172,24 +172,26 @@ for a file to visit if current buffer is not visiting a file."
                                  (expand-file-name default-directory))
                              (point))))
 
+(defhydra swiper-hydra (:color blue :hint nil)
+  "
+[_s_/_C-s_/_m_/_a_] swiper-isearch/multi/all
+[_i_/_I_]   isearch-forward(regexp)
+[_r_/_R_]   isearch-backward(regexp)
+"
+  ("s" swiper-isearch)
+  ("C-s" swiper-isearch)
+  ("i" isearch-forward)
+  ("I" isearch-forward-regexp)
+  ("r" isearch-backward)
+  ("R" isearch-backward-regexp)
+  ("m" swiper-multi)
+  ("a" swiper-all))
+
 ;;;###autoload
 (defun swiper/dispatch (&optional -arg)
-  "prefix arg
-0 => isearch-forward-regexp
-9 => isearch-backward-regexp
-C-u => swiper-isearch
-C-u C-u => swiper-multi
-C-u C-u C-u => swiper-all
-"
+  "if -ARG is not nil, call swiper-hydra/body else call counsel-grep-or-swiper"
   (interactive "P")
-  (call-interactively
-   (cond
-    ((equal -arg 0) #'isearch-forward-regexp)
-    ((equal -arg 9) #'isearch-backward-regexp)
-    ((equal -arg '(4)) #'swiper-isearch)
-    ((equal -arg '(16)) #'swiper-multi)
-    ((equal -arg '(64)) #'swiper-all)
-    (t #'counsel-grep-or-swiper))))
+  (call-interactively (if -arg #'swiper-hydra/body #'counsel-grep-or-swiper)))
 
 ;;;###autoload
 (defun ivy-occur-filter-lines ()

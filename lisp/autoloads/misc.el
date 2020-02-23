@@ -244,8 +244,11 @@ directory and extension."
      ("0" . (lambda! (core/copy-file-name 1 t))))))
 
 ;;;###autoload
-(defvar core--local-snippets-list nil)
-(put 'core--local-snippets-list  'safe-local-variable #'listp)
+(defcustom core--local-snippets-list nil
+  "local snippets"
+  :group 'editing
+  :type 'directory
+  :safe #'listp)
 
 ;;;###autoload
 (defun core/add-local-snippet (&optional -save-snippets)

@@ -44,4 +44,6 @@
                                (/ (- rest-duration core--doctor-rest-secs) 60.0))
                  :urgency 'critical))))))))
 
+(core//start-doctor-timer 60 3600 900 60)
+
 (provide 'init-doctor)

@@ -4,6 +4,8 @@
  git-gutter
  git-gutter-fringe
  git-timemachine
+ git-messenger
+ git-link
  hl-todo
  magit-todos
  magit)
@@ -105,9 +107,8 @@
   (setq git-gutter:update-hooks '(after-save-hook))
   (setq git-gutter:handled-backends '(svn hg git)))
 
-;; This setup function must run before `semantic-mode' invoke to avoid
-;; a error
-(define-hook! git|generic-prog-mode-setup ((prog-mode-hook :append))
+;; This setup function must run before `semantic-mode' invoke to avoid a error
+(define-hook! git|generic-prog-mode-setup ((prog-mode-hook :append) org-mode-hook)
   (when (buffer-enable-rich-feature-p)
     (git-gutter-mode 1)))
 
@@ -143,9 +144,9 @@
   ("p" . git-gutter:previous-hunk)
   ("j" . git/goto-gutter)
   ("g" . magit-status)
-  ;; ("l" . git-link)
-  ;; ("c" . git-link-commit)
-  ;; ("m" . git-messenger:popup-message)
+  ("l" . git-link)
+  ("c" . git-link-commit)
+  ("m" . git-messenger:popup-message)
   ("b" . magit-checkout))
 
 

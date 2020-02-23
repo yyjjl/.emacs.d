@@ -1,5 +1,6 @@
 ;; Core packages
 (require-packages!
+ cnfonts
  paradox
  helpful
  yasnippet
@@ -49,6 +50,9 @@
 (define-hook! package|idle-init-emacs (after-init-idle-hook)
   (when (and emacs-use-fcitx-p (display-graphic-p))
     (fcitx-aggressive-setup))
+
+  (cnfonts-enable)
+
   (find-file-noselect (expand-var! "org/*note*"))
   (find-file-noselect (expand-var! "org/*task*"))
 
