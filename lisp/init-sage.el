@@ -1,10 +1,10 @@
 ;;; -*- lexical-binding: t; -*-
 
-(define-variable! :pkg org jupyter sage)
+(define-variable! :pkg org sage)
 
 (require-packages!
  ;; IPython notebook feature in `org-mode'
- (jupyter :when org-use-jupyter-p)
+ ;; (jupyter :when org-use-jupyter-p)
  (sage-shell-mode :when org-use-sage-p
                   :compile (sage-shell-mode sage-shell-view)))
 
@@ -18,10 +18,10 @@ LaTeX: %s
 [R] Regenerate [T] Show text [w] Copy text
 [W] Copy LaTeX [=] Zoom in   [-] Zoom out")
 
-(with-eval-after-load 'jupyter-org-client
-  (define-key! :map jupyter-org-interaction-mode-map
-    ("M-i"))
-  (jupyter-org-define-key (kbd "C-c C-d") #'jupyter-inspect-at-point))
+;; (with-eval-after-load 'jupyter-org-client
+;;   (define-key! :map jupyter-org-interaction-mode-map
+;;     ("M-i"))
+;;   (jupyter-org-define-key (kbd "C-c C-d") #'jupyter-inspect-at-point))
 
 (defvar sage-shell:source-buffer nil)
 (with-eval-after-load 'sage-shell-mode
@@ -97,8 +97,4 @@ LaTeX: %s
               'sage-shell-edit:delete-temp-dir
               nil :local)))
 
-(with-eval-after-load 'org
-  (require 'ob-jupyter)
-  (add-to-list 'org-babel-load-languages '(jupyter . t)))
-
-(provide 'init-jupyter)
+(provide 'init-sage)

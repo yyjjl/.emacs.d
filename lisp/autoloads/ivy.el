@@ -5,13 +5,12 @@
 (defvar counsel--rg-current-directory nil)
 
 (defun counsel//truncate-string (-string -width)
-  (when (> (length -string) -width)
-    (setq -string
-          (concat (substring
-                   (replace-regexp-in-string "\n" "\\\\n" -string)
-                   0 -width)
-                  " ... ")))
-  -string)
+  (if (> (length -string) -width)
+      (concat (substring
+               (replace-regexp-in-string "\n" "\\\\n" -string)
+               0 -width)
+              " ... ")
+    -string))
 
 (defun counsel//semantic--clean-tag (-tag)
   (let ((default-value (semantic-tag-get-attribute -tag :default-value))
@@ -44,20 +43,21 @@
                    (cdr -candidate))))
          (with-current-buffer buffer
            ;; Use semantic first
-           (if (and (semantic-active-p)
-                    (not (bound-and-true-p lsp-mode))) ;; use imenu when lsp-mode is enabled
-               (mapcar (lambda (x)
-                         (counsel//semantic--clean-tag x)
-                         (cons (counsel-semantic-format-tag x) x))
-                       (counsel-semantic-tags))
-             (let* ((inhibit-message t)
-                    (imenu-auto-rescan t)
-                    (imenu-auto-rescan-maxout (if current-prefix-arg
-                                                  (buffer-size)
-                                                imenu-auto-rescan-maxout))
-                    (items (ignore-errors (imenu--make-index-alist :noerror)))
-                    (items (delete (assoc "*Rescan*" items) items)))
-               (counsel-imenu-get-candidates-from items)))))))
+           (or (and (semantic-active-p)
+                    (not (bound-and-true-p lsp-mode))
+                    (ignore-errors
+                      (mapcar (lambda (x)
+                                (counsel//semantic--clean-tag x)
+                                (cons (counsel-semantic-format-tag x) x))
+                              (counsel-semantic-tags))))
+               (let* ((inhibit-message t)
+                      (imenu-auto-rescan t)
+                      (imenu-auto-rescan-maxout (if current-prefix-arg
+                                                    (buffer-size)
+                                                  imenu-auto-rescan-maxout))
+                      (items (ignore-errors (imenu--make-index-alist :noerror)))
+                      (items (delete (assoc "*Rescan*" items) items)))
+                 (counsel-imenu-get-candidates-from items)))))))
 
 (defun counsel//semantic-or-imenu--goto (-candidate)
   (let ((place (cdr -candidate))

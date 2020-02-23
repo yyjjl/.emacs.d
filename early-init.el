@@ -10,7 +10,7 @@
 
 (defvar emacs-lite-setup-p (getenv "EMACS_LITE"))
 
-(defvar emacs-gc-cons-threshold (* 100 1024 1024))
+(defvar emacs-gc-cons-threshold (* 10 1024 1024))
 
 (defvar emacs-file-name-handler-alist file-name-handler-alist
   "Save `file-name-handler-alist' temporarily and set it to nil

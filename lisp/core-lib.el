@@ -73,9 +73,7 @@ for defining functions."
                           `(eval-when-compile
                              (executable-find ,(or (plist-get args :exe)
                                                    (symbol-name variable)))))))
-            (if (bound-and-true-p byte-compile-current-file)
-                `(defvar ,name ,value ,(or (plist-get args :doc) ""))
-              `(setq ,name ,value)))))))
+            `(defvar ,name ,value ,(or (plist-get args :doc) "")))))))
 
 (defmacro lambda! (&rest -body)
   "A shortcut for inline interactive lambdas.

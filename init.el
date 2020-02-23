@@ -27,7 +27,7 @@
   (require 'init-latex)
   (require 'init-org)
   (require 'init-notes)
-  (require 'init-jupyter))
+  (require 'init-sage))
 (when emacs-use-git-p
   (require 'init-git))
 (when emacs-use-gtags-p

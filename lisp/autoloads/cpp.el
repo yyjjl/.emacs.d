@@ -19,15 +19,13 @@
     (cpp-cmake//run-cmake-internal
      (lambda (buffer)
        (with-current-buffer buffer
-         (when (bound-and-true-p lsp-enable-in-project-p)
-           (let ((cdb-path (cpp-cmake//cdb-path)))
-             (when (not (file-exists-p cdb-path))
-               (error "Can not find compile_commands.json"))
-             (let ((default-directory cpp-cmake-project-root))
-               (make-symbolic-link cdb-path "compile_commands.json"
-                                   :ok-if-already-exists)))
-           (when cpp-has-ccls-p
-             (cpp-ccls//setup))))))
+         (let ((cdb-path (cpp-cmake//cdb-path)))
+           (when (not (file-exists-p cdb-path))
+             (error "Can not find compile_commands.json"))
+           (let ((default-directory cpp-cmake-project-root))
+             (make-symbolic-link cdb-path "compile_commands.json"
+                                 :ok-if-already-exists)))
+         (cpp//main-setup))))
     (when -set-options
       (cpp-cmake//set-cmake-options
        (lambda (_)
