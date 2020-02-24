@@ -116,53 +116,14 @@ Archive with high priority will be used when install a package.")
          (eval-when-compile
            ,@(nreverse compile-forms))))))
 
-(autoload 'generate-file-autoloads "autoload")
-(defun package/generate-autoloads ()
-  (interactive)
-  (let ((files (directory-files emacs-autoloads-directory :full "\\.el\\'"))
-        (failed-count 0))
-    (with-current-buffer (find-file-noselect emacs-autoloads-file)
-      (erase-buffer)
-      (dolist (file files)
-        (condition-case nil
-            (generate-file-autoloads file)
-          (error (message "Generating for %s failed" file)
-                 (cl-incf failed-count))))
-      (save-buffer))
-    (message "%d generated, %d failed"
-             (- (length files) failed-count)
-             failed-count)))
-
-(defun package/compile-elpa-packages (&optional -no-message?)
-  (interactive)
-  (let ((inhibit-message -no-message?))
-    (byte-recompile-directory package-user-dir nil :force)))
-
-(defun package/compile-config (&optional -no-message?)
-  (interactive "P")
-  (message "Compile configuration files ...")
-  (dolist (file (append
-                 (directory-files emacs-config-directory :full "\\.el$")
-                 (directory-files emacs-autoloads-directory :full "\\.el$")
-                 (directory-files-recursively emacs-private-directory "\\.el$")
-                 (directory-files user-emacs-directory :full "\\.el$")))
-    (when file
-      (condition-case err
-          (let ((inhibit-message -no-message?))
-            (byte-compile-file file))
-        (error (message "Error: %s" err)
-               (backtrace)))))
-  (message "Compile finished"))
-
 (if (bound-and-true-p core-dumped)
     (setq load-path core-dumped-load-path)
   ;; add load-path’s and load autoload files
   (package-initialize))
 
-(ignore-errors (auto-compile-on-load-mode 1))
-
 (unless (file-exists-p emacs-autoloads-file)
   (package/generate-autoloads))
+
 (load emacs-autoloads-file)
 
 (provide 'core-packages-lib)

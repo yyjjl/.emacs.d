@@ -29,6 +29,7 @@
 
  '(org-meta-line ((t :inherit font-lock-doc-face)))
  '(org-document-info-keyword ((t :inherit font-lock-builtin-face)))
+ '(org-latex-and-related ((t (:foreground "orange red" :weight bold))))
 
  '(flycheck-error ((t (:underline (:style wave :color "#e74c3c")))))
  '(flycheck-info ((t (:underline (:style wave :color "#b6e63e")))))

@@ -1,5 +1,45 @@
 ;;; -*- lexical-binding: t; -*-
 
+(defun org//hot-expand (-type)
+  "Expand org template."
+  (org-insert-structure-template -type))
+
+(defhydra hydra-org-template (:color blue :hint nil)
+  "
+_c_enter  _q_uote     _E_macs-lisp    _L_aTeX:
+_l_atex   _e_xample   _C_pp           _i_ndex:
+_a_scii   _v_erse     _I_NCLUDE:      _j_avascript
+_s_rc     _S_hell     ^ ^             _H_TML:
+_h_tml    _'_         ^ ^             _A_SCII:
+"
+  ("s" (yas-expand-snippet "#+begin_src $1\n$0\n#+end_src"))
+  ("e" (org//hot-expand "example"))
+  ("q" (org//hot-expand "quote"))
+  ("v" (org//hot-expand "verse"))
+  ("c" (org//hot-expand "center"))
+  ("l" (org//hot-expand "latex"))
+  ("h" (org//hot-expand "html"))
+  ("a" (org//hot-expand "ascii"))
+  ("i" (org//hot-expand "index"))
+  ("E" (org//hot-expand "src "))
+  ("C" (yas-expand-snippet "#+begin_src cpp\n$0\n#+end_src"))
+  ("S" (yas-expand-snippet "#+begin_src sh\n$0\n#+end_src"))
+  ("j" (yas-expand-snippet "#+begin_src javascript\n$0\n#+end_src"))
+  ("L" (org//hot-expand "export latex"))
+  ("H" (org//hot-expand "export html"))
+  ("A" (org//hot-expand "export ascii"))
+  ("I" (yas-expand-snippet "#+include: $0"))
+  ("'" (yas-expand-snippet "#+begin_${1:type}\n$0\n#+end_$1"))
+  ("<" self-insert-command "self-insert")
+  ("o" nil "quit"))
+
+;;;###autoload
+(defun org/hot-expand ()
+  (interactive)
+  (if (looking-back "^\\s-*" (line-beginning-position))
+      (hydra-org-template/body)
+    (self-insert-command 1)))
+
 (defmacro org//with-master-file! (&rest body)
   (declare (indent nil))
   `(save-window-excursion
@@ -130,7 +170,7 @@ With a prefix BELOW move point to lower block."
            (save-excursion
              (save-restriction
                (widen)
-               (org-remove-latex-fragment-image-overlays)
+               (org-clear-latex-preview)
                (org-format-latex prefix
                                  (point-min) (point-max)
                                  default-directory
@@ -138,9 +178,11 @@ With a prefix BELOW move point to lower block."
                                  (concat "The %s for `" file "'")
                                  'forbuffer
                                  org-preview-latex-default-process)
-               (dolist (ov (org--list-latex-overlays))
+               (dolist (ov (overlays-in (point-min) (point-max)))
                  (-when-let (image-file
-                             (plist-get (cdr-safe (overlay-get ov 'display)) :file))
+                             (and (eq (overlay-get ov 'org-overlay-type)
+                                      'org-latex-overlay)
+                                  (plist-get (cdr-safe (overlay-get ov 'display)) :file)))
                    (puthash (expand-file-name image-file
                                               org-preview-latex-image-directory)
                             t

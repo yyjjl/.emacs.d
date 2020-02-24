@@ -46,12 +46,6 @@
              (window (get-buffer-window buffer)))
     (kill-buffer buffer)))
 
-(defun python/install-tools ()
-  (interactive)
-  (run-command!
-   :name "install pyls"
-   :command "pip3 install --user 'python-language-server[all]'"))
-
 (define-hook! python|setup (python-mode-hook)
   (setq electric-indent-chars (delq ?: electric-indent-chars))
 

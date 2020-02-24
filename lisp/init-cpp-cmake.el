@@ -144,12 +144,6 @@
          (kill-buffer cmake-buffer))
        (funcall callback buffer)))))
 
-(defun cmake/install-tools ()
-  (interactive)
-  (run-command!
-   :name "install pyls"
-   :command "pip3 install --user 'cmake-language-server'"))
-
 (define-hook! cmake|setup (cmake-mode-hook)
   (font-lock-mode 1)
   (cmake-font-lock-activate)

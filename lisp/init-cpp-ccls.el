@@ -1,10 +1,6 @@
 ;; -*- lexical-binding:t -*-
 
-(require-packages!
- lsp-mode
- ccls)
-
-(require 'init-cpp-cmake)
+(require-packages! lsp-mode ccls)
 
 (defface cpp-variable-face
   `((t :foreground ,(face-attribute 'default :foreground)))
@@ -59,8 +55,7 @@
 
 (defsubst cpp-ccls//dot-ccls-path (&optional -dir)
   (expand-file-name ".ccls"
-                    (locate-dominating-file (or -dir default-directory)
-                                            ".ccls")))
+                    (locate-dominating-file (or -dir default-directory) ".ccls")))
 
 (defun cpp-ccls/create-dot-ccls (-dir)
   (interactive (list (if current-prefix-arg

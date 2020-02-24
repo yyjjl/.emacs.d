@@ -10,72 +10,14 @@
  magit-todos
  magit)
 
-
-
-(defun git//format-gutter (-gutter)
-  (let ((start-line (aref -gutter 3)))
-    (cons
-     (format "%s %d ~ %d: %s"
-             (pcase (aref -gutter 1)
-               (`added "+")
-               (`deleted "-")
-               (`modified "="))
-             start-line
-             (aref -gutter 4)
-             (ignore-errors
-               (let ((string (nth 1 (split-string (aref -gutter 2)
-                                                  "\n" t))))
-                 (if (string-match-p "^-\\|\\+\\|=" string)
-                     (substring string 1)
-                   string))))
-     start-line)))
-
-(defun git/goto-gutter ()
-  (interactive)
-  (unless git-gutter:diffinfos
-    (error "No git-gutters!"))
-  (let ((gutters (mapcar #'git//format-gutter git-gutter:diffinfos)))
-    (ivy-read "git-gutters:" gutters
-              :require-match t
-              :action (lambda (x)
-                        (forward-line (- (cdr x) (line-number-at-pos))))
-              :keymap (define-key! :map (make-sparse-keymap)
-                        ("C-n" . ivy-next-line-and-call)
-                        ("C-p" . ivy-previous-line-and-call)))))
-
-(defun git/timemachine-show-selected-revision ()
-  "Show last (current) revision of file."
-  (interactive)
-  (let (collection)
-    (setq collection
-          (mapcar (lambda (rev)
-                    ;; re-shape list for the ivy-read
-                    (cons (concat (substring (nth 0 rev) 0 7) "|"
-                                  (nth 5 rev) "|" (nth 6 rev)) rev))
-                  (git-timemachine--revisions)))
-    (ivy-read "commits:"
-              collection
-              :action (lambda (rev)
-                        (git-timemachine-show-revision (cdr rev))))))
-
-(defun git/timemachine ()
-  "Open git snapshot with the selected version.  Based on `ivy-mode'."
-  (interactive)
-  (unless (featurep 'git-timemachine)
-    (require 'git-timemachine))
-  (let ((name (buffer-name)))
-    (condition-case nil
-        (git-timemachine--start #'git/timemachine-show-selected-revision)
-      (quit (kill-buffer (format "timemachine:%s" name))))))
-
 
 (when (fboundp 'define-fringe-bitmap)
   (require 'git-gutter-fringe))
 (with-eval-after-load 'git-gutter
   (when (fboundp 'define-fringe-bitmap)
     (set-face-foreground 'git-gutter-fr:modified "yellow")
-    (set-face-foreground 'git-gutter-fr:added    "green")
-    (set-face-foreground 'git-gutter-fr:deleted  "red")
+    (set-face-foreground 'git-gutter-fr:added "green")
+    (set-face-foreground 'git-gutter-fr:deleted "red")
     (setq git-gutter-fr:side 'right-fringe)
     (define-fringe-bitmap 'git-gutter-fr:modified
       [#b00000000
@@ -112,6 +54,13 @@
   (when (buffer-enable-rich-feature-p)
     (git-gutter-mode 1)))
 
+(define-hook! (git|message-kill-commit-id msg)
+  (git-messenger:after-popup-hook)
+  ;; extract commit id and put into the kill ring
+  (when (string-match "\\(commit *: *\\)\\([0-9a-z]+\\)" msg)
+    (kill-new (match-string 2 msg))
+    (message "commit hash %s => kill-ring" (match-string 2 msg))))
+
 (with-eval-after-load 'magit
   (setq magit-completing-read-function 'ivy-completing-read)
   ;; Disable internal vc
@@ -128,13 +77,6 @@
     ("C-x g g" . magit-status)
     ("C-x g")))
 
-(define-hook! (git|message-kill-commit-id msg)
-  (git-messenger:after-popup-hook)
-  ;; extract commit id and put into the kill ring
-  (when (string-match "\\(commit *: *\\)\\([0-9a-z]+\\)" msg)
-    (kill-new (match-string 2 msg))
-    (message "commit hash %s => kill-ring" (match-string 2 msg))))
-
 (define-key! :prefix "C-x g"
   ("h" . git-gutter:popup-hunk)
   ("s" . git-gutter:stage-hunk)
@@ -148,6 +90,5 @@
   ("c" . git-link-commit)
   ("m" . git-messenger:popup-message)
   ("b" . magit-checkout))
-
 
 (provide 'init-git)

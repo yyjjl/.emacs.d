@@ -57,6 +57,7 @@
     ("M-y" . term/yank-pop)
     ("C-k" . term/kill-line)
     ("C-s" . term/swiper)
+    ("C-c C-j" . vterm-copy-mode)
     ("C-c C-l" . vterm-copy-mode)
     ("<C-backspace>" . vterm-send-meta-backspace)
     ("C-S-t" . term/pop-shell-current-directory)))

@@ -1,8 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 (require-packages!
- ;; (org :compile (org ob ox-html org-table))
- (org-plus-contrib :compile (org ob ox-html org-table))
+ (org :compile (org ob ox-html org-table))
  ;; Export colorful src block in `org-mode'
  htmlize
  poporg
@@ -112,6 +111,27 @@
                  "\\|"
                  "^[\t ]*#\\+end_?\\([^ \n]+\\)$"))))
     (cdr (assoc keys org-block-key-bindings))))
+
+(defun org//generate-long-term-task ()
+  (goto-char (point-min))
+  (unless (re-search-forward "^\\* Long-term Task")
+    (error "Can not find heading `Long-term Task'"))
+  (unwind-protect
+      (progn
+        (org-narrow-to-subtree)
+        (let* ((headings (cdr (counsel-outline-candidates)))
+               (result (assoc
+                        (completing-read
+                         "Select subsection: "
+                         headings
+                         nil
+                         :require-match
+                         nil
+                         'org-capture-long-term-task-history)
+                        headings)))
+          (goto-char (cdr result))
+          (end-of-line 1)))
+    (widen)))
 
 (with-eval-after-load 'ob
   (define-key! :map org-babel-map
@@ -279,31 +299,11 @@
   Captured: %U
   %?")
           ("L" "Long term tasks" checkitem
-           (file+function
-            ,(expand-var! "org/*task*")
-            (lambda ()
-              (goto-char (point-min))
-              (unless (re-search-forward "^\\* Long-term Task")
-                (error "Can not find heading `Long-term Task'"))
-              (unwind-protect
-                  (progn
-                    (org-narrow-to-subtree)
-                    (let* ((headings (cdr (counsel-outline-candidates)))
-                           (result (assoc
-                                    (completing-read
-                                     "Select subsection: "
-                                     headings
-                                     nil
-                                     :require-match
-                                     nil
-                                     'org-capture-long-term-task-history)
-                                    headings)))
-                      (goto-char (cdr result))
-                      (end-of-line 1)))
-                (widen))))
+           (file+function ,(expand-var! "org/*task*") org//generate-long-term-task)
            "   - [ ] %^{Task} %?")))
 
   (define-key! :map org-mode-map
+    ("<" . org/hot-expand)
     ("C-c t" :map org-table-extra-map)
     ("C-c [" . org-reftex-citation)
     ("C-c {" . org-reftex-citation)

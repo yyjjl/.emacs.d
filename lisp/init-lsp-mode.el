@@ -2,7 +2,6 @@
 (require-packages!
  lsp-mode
  lsp-ui
- lsp-ivy
  ivy)
 
 (defcustom lsp-enable-in-project-p t
@@ -23,28 +22,6 @@
               (bound-and-true-p lsp-mode))
          ,init
        ,fallback)))
-
-(defun lsp/remove-session-folder (-remove-invalid)
-  (interactive "P")
-  (require 'dired)
-  (let* ((session (lsp-session))
-         invalid-folders
-         valid-folders)
-    (cl-loop for folder in (lsp-session-folders session)
-             if (file-exists-p folder)
-             do (push folder valid-folders)
-             else do (push folder invalid-folders))
-    (if -remove-invalid
-        (if invalid-folders
-            (when (dired-mark-pop-up
-                   " *lsp-remove*" 'delete invalid-folders 'yes-or-no-p
-                   "Remove these folders ")
-              (setf (lsp-session-folders (lsp-session)) valid-folders)
-              (lsp--persist-session (lsp-session)))
-          (message "Nothing to remove."))
-      (let ((folder (completing-read "Folder to remove" valid-folders nil t)))
-        (setf (lsp-session-folders (lsp-session)) (delete folder valid-folders))
-        (lsp--persist-session (lsp-session))))))
 
 (define-hook! lsp|after-open (lsp-after-open-hook)
   (lsp-ui-mode 1)
@@ -111,8 +88,7 @@
     ("M-s h h" . lsp-document-highlight)
     ("M-s '" . lsp-avy-lens)
     ("C-c R" . lsp-rename)
-    ("C-c I" . lsp-ivy-workspace-symbol)
-    ("C-c G" . lsp-ivy-global-workspace-symbol)
+    ("C-c I" . lsp/ivy-workspace-symbol)
     ("C-c S" . lsp-describe-session)
     ("C-c B" . lsp-format-buffer)
     ("C-c C-d" . lsp-describe-thing-at-point)

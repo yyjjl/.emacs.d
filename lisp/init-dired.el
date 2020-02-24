@@ -1,30 +1,14 @@
 ;;; -*- lexical-binding: t; -*-
 
-;; Improve `dired-mode'
-(require-packages!
- dired-narrow)
+(require-packages! dired-narrow)
 
-
-
-(defun dired/open-externally ()
-  "Open the current file or dired marked files in external app.
-The app is chosen from your OS's preference."
-  (interactive)
-  (let* ((file-list (if (eq major-mode 'dired-mode)
-                        (dired-get-marked-files)
-                      (list (buffer-file-name))))
-         (do-it-p (or (<= (length file-list) 5)
-                      (y-or-n-p "Open more than 5 files? "))))
-    (when do-it-p
-      (open! file-list))))
+(define-hook! dired|setup (dired-mode-hook)
+  (setq mode-line-buffer-identification
+        '("%b" (dired-omit-mode " (omit)")))
+  ;; (auto-revert-mode 1)
+  (dired-hide-details-mode 1))
 
 (with-eval-after-load 'dired
-  (define-hook! dired|setup (dired-mode-hook)
-    (setq mode-line-buffer-identification
-          '("%b" (dired-omit-mode " (omit)")))
-    ;; (auto-revert-mode 1)
-    (dired-hide-details-mode 1))
-
   (setq dired-dwim-target t)
   ;; search file name only when focus is over file
   (setq dired-isearch-filenames 'dwim)

@@ -2,15 +2,6 @@
 
 (require-packages! go-mode go-tag)
 
-(defun go/install-tools ()
-  (interactive)
-  (run-command!
-   :name "install gopls"
-   :command "GO111MODULE=on go get golang.org/x/tools/gopls@latest")
-  (run-command!
-   :name "install go-tag"
-   :command "go get -u github.com/fatih/gomodifytags"))
-
 (with-eval-after-load 'go-mode
   (define-key! :map go-mode-map
     ("C-c t t" . go-tag-add)

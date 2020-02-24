@@ -25,7 +25,7 @@
      :segments (,@mode-line--default-segments
                 mode-line//process)
      :root current)
-    ((not (eq mode-line--current-window (selected-window)))
+    ((not (mode-line//window-active-p))
      :segments (,@mode-line--default-segments
                 mode-line//process
                 mode-line//position)
@@ -238,7 +238,8 @@ read-only, and `buffer-file-coding-system'"
     (apply -fn -args)
     (with-current-buffer buffer
       (setq mode-line--cached-git-branch nil)
-      (mode-line//git-info))))
+      (mode-line//git-info)
+      (force-mode-line-update))))
 
 (with-eval-after-load 'magit
   (advice-add 'magit-checkout :around #'mode-line*trace-magit-checkout))

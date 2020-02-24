@@ -1,6 +1,18 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;;;###autoload
+(defun latex/next-error ()
+  (interactive)
+  (let ((occur-buffer (core*before-next-error)))
+    (call-interactively (if occur-buffer #'next-error #'TeX-next-error))))
+
+;;;###autoload
+(defun latex/previous-error ()
+  (interactive)
+  (let ((occur-buffer (core*before-next-error)))
+    (call-interactively (if occur-buffer #'previous-error #'TeX-previous-error))))
+
+;;;###autoload
 (defun latex/narrow-to-section (&optional -no-subsections)
   (interactive "P")
   (save-mark-and-excursion

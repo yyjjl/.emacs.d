@@ -6,30 +6,6 @@
 
 (defvar realgud--window-configuration nil)
 
-(defun realgud/jump-to-cmdbuf ()
-  (interactive)
-  (let ((cmdbuf (realgud-get-cmdbuf))
-        (display-buffer-overriding-action
-         '(display-buffer-use-some-window . ((inhibit-same-window . t)))))
-    (unless (eq cmdbuf (current-buffer))
-      (if (buffer-live-p cmdbuf)
-          (if-let (window (get-buffer-window cmdbuf))
-              (select-window window)
-            (pop-to-buffer cmdbuf))
-        (message "Command buffer is dead.")))))
-
-(defun realgud/jump-to-srcbuf ()
-  (interactive)
-  (let ((srcbuf (realgud-get-current-srcbuf))
-        (display-buffer-overriding-action
-         '(display-buffer-use-some-window . ((inhibit-same-window . t)))))
-    (unless (eq srcbuf (current-buffer))
-      (if (buffer-live-p srcbuf)
-          (if-let (window (get-buffer-window srcbuf))
-              (select-window window)
-            (pop-to-buffer srcbuf))
-        (message "Source buffer is dead.")))))
-
 (defun realgud*around-run-process (-fn &rest -args)
   (setq realgud--window-configuration (current-window-configuration))
   (delete-other-windows)
@@ -50,19 +26,6 @@
       (when (window-configuration-p realgud--window-configuration)
         (set-window-configuration realgud--window-configuration)
         (setq realgud--window-configuration nil)))))
-
-(defun realgud/cmd-breakpoints (-arg)
-  (interactive "P")
-  (realgud:cmd-run-command -arg "breakpoints"))
-
-(defun realgud/cmd-display (-arg)
-  (interactive "P")
-  (let ((thing (when (not -arg)
-                 (if (use-region-p)
-                     (buffer-substring-no-properties (region-beginning)
-                                                     (region-end))
-                   (read-string "Thing: ")))))
-    (realgud:cmd-run-command thing (if thing "display" "display-all"))))
 
 (with-eval-after-load 'realgud:pdb-init
   (setf (gethash "breakpoints" realgud:pdb-command-hash) "break")
@@ -91,17 +54,6 @@
                      collect (let ((line-num (realgud-loc-line-number loc))
                                    (filename (realgud-loc-filename loc)))
                                (cons filename line-num)))))))
-
-(defun realgud/restore-breakpoints ()
-  (interactive)
-  (when-let (cmdbuf (realgud-get-cmdbuf))
-    (with-current-buffer-safe cmdbuf
-      (unless realgud--saved-breakpoints
-        (error "No saved breakpoints."))
-      (dolist (bp realgud--saved-breakpoints)
-        (let ((cmd (format "break %s:%s" (car bp) (cdr bp))))
-          (realgud-command cmd nil t)
-          (sit-for 0.5))))))
 
 (defun realgud*cmd-quit (_arg)
   (let ((cmdbuf (realgud-get-cmdbuf)))

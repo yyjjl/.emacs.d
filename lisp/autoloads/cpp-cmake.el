@@ -1,4 +1,5 @@
-;; -*- lexical-binding:t -*-
+;;; -*- lexical-binding: t; -*-
+
 (require 'widget)
 
 (eval-when-compile
@@ -24,7 +25,7 @@
                (delq (cpp-cmake//current-config) cpp-cmake-config-list))
          (setq cpp-cmake-current-config-name "Release")
          (save-dir-local-variables! 'cpp-cmake-current-config-name
-                                   'cpp-cmake-config-list))
+                                    'cpp-cmake-config-list))
        (cpp-cmake//render-config-buffer -buffer)
        (message "You may need run cmake manually.")))
    "Delete")
@@ -44,7 +45,7 @@
              (widget-apply widget :apply-change))
            (with-current-buffer -buffer
              (save-dir-local-variables! 'cpp-cmake-current-config-name
-                                       'cpp-cmake-config-list))
+                                        'cpp-cmake-config-list))
            (message "Changes Applied"))
          "Apply")))
 
@@ -54,7 +55,7 @@
     (widget-put widget :apply-change
                 (lambda (widget)
                   (with-current-buffer -buffer
-                    (let ((value  (widget-value widget)))
+                    (let ((value (widget-value widget)))
                       (setq cpp-cmake-project-root (unless (string= value "")
                                                      value))))))
     (push widget cpp-cmake--widgets)))
@@ -158,7 +159,7 @@
                 ,(lambda (&rest _)
                    (widget-put widget :args
                                `((editable-field :value
-                                                 ,(concat name "=" value))))
+                                   ,(concat name "=" value))))
                    (widget-editable-list-insert-before widget nil))
                 :value ,name)))
           available-options))))))
@@ -197,4 +198,17 @@
                    (lambda! (kill-this-buffer)))
     (goto-char (min old-point (point-max)))))
 
-(provide 'init-cpp-cmake-ui)
+;;;###autoload
+(defun cmake/install-tools ()
+  (interactive)
+  (run-command!
+   :name "install pyls"
+   :command "pip3 install --user 'cmake-language-server'"))
+
+;;;###autoload
+(defun cpp-cmake/config ()
+  (interactive)
+  (let ((original-buffer (current-buffer))
+        (buffer (get-buffer-create "*cpp-cmake-config*")))
+    (with-current-buffer (pop-to-buffer buffer)
+      (cpp-cmake//render-config-buffer original-buffer))))

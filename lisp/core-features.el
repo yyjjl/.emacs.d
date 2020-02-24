@@ -1,7 +1,6 @@
 ;; Core packages
 (require-packages!
  cnfonts
- paradox
  helpful
  yasnippet
  yasnippet-snippets
@@ -75,8 +74,6 @@
 
   (setq which-key-dont-use-unicode t)
   (which-key-mode 1)
-
-  (paradox-enable)
 
   ;;`eldoc', show API doc in minibuffer echo area enabled by default
   ;; (global-eldoc-mode 1)

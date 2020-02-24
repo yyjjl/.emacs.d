@@ -51,10 +51,6 @@
 
 (require 'init-realgud)
 
-;; Other small tools
-;; (require 'init-hydra-extra)
-;; (require 'init-prettify-symbols)
-
 (when emacs-use-mpv-p
   (require 'init-emms))
 

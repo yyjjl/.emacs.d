@@ -7,18 +7,6 @@
 (setcdr (assoc-string "\\.[tT]e[xX]\\'" auto-mode-alist) 'latex-mode)
 (add-auto-mode! 'latex-mode "\\.tikz\\'")
 
-
-
-(defun latex/next-error ()
-  (interactive)
-  (let ((occur-buffer (core*before-next-error)))
-    (call-interactively (if occur-buffer #'next-error #'TeX-next-error))))
-
-(defun latex/previous-error ()
-  (interactive)
-  (let ((occur-buffer (core*before-next-error)))
-    (call-interactively (if occur-buffer #'previous-error #'TeX-previous-error))))
-
 ;; C-c RET => Insert macro
 
 (autoload 'LaTeX-math-mode "latex" nil t)

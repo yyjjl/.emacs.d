@@ -15,41 +15,6 @@
   "Face for arguments"
   :group 'lisp)
 
-
-
-;; Remove hook
-;; @see https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-elisp.el
-(defun lisp/remove-hook-at-point ()
-  "Remove the hook at the point in the *Help* buffer."
-  (interactive)
-  (unless (or (eq major-mode 'help-mode)
-              (eq major-mode 'helpful-mode)
-              (string= (buffer-name) "*Help*"))
-    (error "Only for help-mode or helpful-mode"))
-  (let ((orig-point (point)))
-    (save-excursion
-      (when-let
-          ((hook (progn (goto-char (point-min)) (symbol-at-point)))
-           (func (when (and
-                        (or (re-search-forward (format "^Value:?[\s|\n]") nil t)
-                            (goto-char orig-point))
-                        (sexp-at-point))
-                   (end-of-sexp)
-                   (backward-char 1)
-                   (catch 'break
-                     (while t
-                       (condition-case _err
-                           (backward-sexp)
-                         (scan-error (throw 'break nil)))
-                       (let ((bounds (bounds-of-thing-at-point 'sexp)))
-                         (when (<= (car bounds) orig-point (cdr bounds))
-                           (throw 'break (sexp-at-point)))))))))
-        (when (yes-or-no-p (format "Remove %s from %s? " func hook))
-          (remove-hook hook func)
-          (if (eq major-mode 'helpful-mode)
-              (helpful-update)
-            (revert-buffer nil t)))))))
-
 ;; Align indent keywords
 ;; @see https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned
 (defun lisp*override-indent-function (indent-point state)
@@ -121,16 +86,6 @@ Lisp function does not specify a special indentation."
                                      indent-point normal-indent))
               (method
                (funcall method indent-point state))))))))
-
-(defun edebug/remove-all-instrumentation ()
-  "Remove all edebug instrumentation by visiting each function
-definition and running `eval-defun`."
-  (interactive)
-  (mapatoms (lambda (symbol)
-              (when-let (pos (car-safe (get symbol 'edebug)))
-                (with-current-buffer (marker-buffer pos)
-                  (goto-char (marker-position pos))
-                  (eval-defun nil))))))
 
 (define-hook! lisp|minibuffer-setup (minibuffer-setup-hook
                                      minibuffer-exit-hook)
@@ -219,19 +174,6 @@ Emacs Lisp."
 (with-eval-after-load 'racket-mode
   (add-to-list 'lispy-goto-symbol-alist
                '(racket-mode racket-visit-definition racket-mode))
-
-  (defun racket-indent-sexp ()
-    (interactive)
-    (unless (region-active-p)
-      (lispy-mark-list 1))
-    (call-interactively #'indent-region)
-    (lispy-different))
-
-  (defun racket-eval-sexp ()
-    (interactive)
-    (unless (region-active-p)
-      (lispy-mark-list 1))
-    (call-interactively #'racket-send-region))
 
   ;; Use `ivy' as default completion backends
   (defun racket--read-identifier (-prompt -default)

@@ -117,15 +117,6 @@
               (cpp-ccls//buffer-compile-command t))
   (call-interactively 'c-macro-expand))
 
-(autoload 'cpp-cmake//render-config-buffer "init-cpp-cmake-ui")
-;;;###autoload
-(defun cpp-cmake/config ()
-  (interactive)
-  (let ((original-buffer (current-buffer))
-        (buffer (get-buffer-create "*cpp-cmake-config*")))
-    (with-current-buffer (pop-to-buffer buffer)
-      (cpp-cmake//render-config-buffer original-buffer))))
-
 ;;;###autoload
 (defun cpp-cmake/change-config ()
   (interactive)

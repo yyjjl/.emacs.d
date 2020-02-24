@@ -28,7 +28,7 @@
     (unless -included
       (save-excursion
         (goto-char (point-min))
-        (while (re-search-forward org-any-link-re nil t)
+        (while (re-search-forward org-link-any-re nil t)
           (let ((link-end (point))
                 (link (save-excursion
                         (forward-char -1)
@@ -50,7 +50,7 @@
                                           (buffer-substring-no-properties contents-begin contents-end))))
                       (delete-region (org-element-property :begin link)
                                      (org-element-property :end link))
-                      (insert (org-make-link-string search-option description) " "))))))))))
+                      (insert (org-link-make-string search-option description) " "))))))))))
     result))
 
 (defun org*wrap-publish-fn (-fn -plist -filename -pub-dir)
@@ -103,35 +103,6 @@
            :recursive t
            :publishing-function org-publish-attachment)
           ("note" :components ("note-pdf" "note-static")))))
-
-(defun org/project-open ()
-  (interactive)
-  (let* ((src-dir (file-truename org-project-src-dir))
-         (prefix-length (length (file-name-as-directory src-dir)))
-         (name (ivy-read "Open note: "
-                         (--map
-                          (substring it prefix-length)
-                          (directory-files-recursively src-dir "\\.org\\'"))
-                         :history 'org-project-note-history
-                         :caller 'org/project-open)))
-    (setq name (abbreviate-file-name (expand-file-name name org-project-src-dir)))
-    (cond ((not (string-suffix-p ".org" name))
-           (error "filename should endswith \".org\""))
-          ((file-exists-p name)
-           (message "Open existing note: %s" name)
-           (find-file name))
-          ((y-or-n-p (format "Create new note %s" (abbreviate-file-name name)))
-           (make-directory (file-name-directory name) t)
-           (find-file name))
-          (t
-           (error "Nothing to do with %s" name)))))
-
-(defun org/project-sync ()
-  (interactive)
-  (unless org-project-sync-command
-    (error "Variable `org-project-sync-command' is not set."))
-  (let ((default-directory org-project-base-dir))
-    (compilation-start org-project-sync-command)))
 
 (global-set-key (kbd "C-x O") 'org/project-open)
 

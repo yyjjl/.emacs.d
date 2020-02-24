@@ -29,10 +29,10 @@ LaTeX: %s
   (advice-add 'sage-shell-view-process-overlay :after 'sage*after-ceare-overlay)
 
   (define-key! :map sage-shell-mode-map
-    ("C-c M-o" . sage/clea-current-buffer)
+    ("C-c M-o" . sage/clean-current-buffer)
     ("C-c C-z" . sage/pop-to-source-buffer))
 
-  (defun sage/clea-current-buffer ()
+  (defun sage/clean-current-buffer ()
     (interactive)
     (sage-shell:-delete-output (point-min))
     (sage-shell-edit:delete-temp-dir))

@@ -20,9 +20,9 @@
  flycheck-cython
  sly)
 
-(add-auto-mode! 'crontab-mode "\\.?cron\\(tab\\)?\\'")
-
 
+
+(add-auto-mode! 'crontab-mode "\\.?cron\\(tab\\)?\\'")
 
 ;; Star dictionary lookup
 (autoload 'sdcv-current-word "sdcv" nil t)
@@ -67,22 +67,16 @@
 
 
 
-(defun extra//dot-complete ()
-  (let* ((b (save-excursion (skip-chars-backward "a-zA-Z0-9_") (point)))
-         (e (save-excursion (skip-chars-forward "a-zA-Z0-9_") (point)))
-         (graphviz-dot-str (buffer-substring b e))
-         (allcomp (all-completions graphviz-dot-str
-                                   (graphviz-dot-get-keywords))))
-    (list b e allcomp)))
-
 (with-eval-after-load 'graphviz-dot-mode
+  (require 'company-graphviz-dot)
+  (remove-hook 'company-backends 'company-graphviz-dot-backend)
+
   (setq graphviz-dot-auto-indent-on-semi nil)
   (setq graphviz-dot-indent-width 4)
 
   (define-hook! extra|setup-dot (graphviz-dot-mode-hook)
     (hs-minor-mode 1)
-    (make-local-variable 'completion-at-point-functions)
-    (add-to-list 'completion-at-point-functions 'extra//dot-complete)))
+    (company//add-backend 'company-graphviz-dot-backend)))
 
 
 
@@ -104,26 +98,6 @@
 
 
 
-(defun extra/clipboard-copy (-beg -end)
-  (interactive "r")
-  (if (display-graphic-p)
-      (kill-new (buffer-substring-no-properties -beg -end))
-    (if emacs-use-xsel-p
-        (if (= 0 (shell-command-on-region -beg -end "xsel -ib"))
-            (message "Copy finished")
-          (message "Error occured !!!"))
-      (message "Executable `xsel' not found !!!"))))
-
-(defun extra/clipboard-paste ()
-  (interactive)
-  (if (display-graphic-p)
-      (yank 1)
-    (if emacs-use-xsel-p
-        (shell-command "xsel -ob" t)
-      (message "Executable `xsel' not found !!!"))))
-
-
-
 (with-eval-after-load 'skeletor
   (setq skeletor-completing-read-function 'ivy-completing-read)
 
@@ -136,49 +110,6 @@
 (global-set-key (kbd "C-x p N") 'skeletor-create-project-at)
 
 
-
-(defvar extra-translate-shell-repo "https://github.com/soimort/translate-shell")
-(defvar extra-translate-shell-path
-  (eval-when-compile (expand-var! "translate-shell")))
-(defvar extra-translate-shell-args
-  (eval-when-compile (split-string "-I -s zh -t en -e google" " ")))
-
-(defun extra/translate-shell ()
-  (interactive)
-  (let ((exe (expand-file-name "build/trans" extra-translate-shell-path))
-        (string (when (region-active-p)
-                  (buffer-substring (region-beginning) (region-end)))))
-    (cond
-     ((not (file-exists-p exe))
-      (message "Executable `%s' not found !" exe))
-     ((not (file-executable-p exe))
-      (message "`%s' can't be executed" exe))
-     (t
-      (let* ((buffer (get-buffer-create "*translate-shell*"))
-             (proc (get-buffer-process buffer)))
-        (if (equal (current-buffer) buffer)
-            (quit-window)
-          (when (not (and proc
-                          (process-live-p proc)
-                          (eq (buffer-local-value 'major-mode buffer) 'comint-mode)))
-            (with-current-buffer buffer
-              (let ((buffer-read-only nil))
-                (erase-buffer))
-              (comint-exec buffer "trans" exe nil extra-translate-shell-args)
-              (comint-mode)
-              (setq proc (get-buffer-process buffer))))
-          (with-current-buffer (pop-to-buffer buffer)
-            (comint-send-string proc (concat string "\n")))))))))
-
-(defun extra/create-or-update-trans ()
-  (interactive)
-  (if (file-directory-p extra-translate-shell-path)
-      (let ((default-directory extra-translate-shell-path))
-        (compilation-start "git pull && git submodule update && make"))
-    (compilation-start (format "git clone  %s %s && cd %s && make"
-                               extra-translate-shell-repo
-                               extra-translate-shell-path
-                               extra-translate-shell-path))))
 
 (define-key! :map core-ctrl-z-map
   ("i" . extra/translate-shell)

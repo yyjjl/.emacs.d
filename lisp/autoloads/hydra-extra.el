@@ -73,6 +73,7 @@
   (define-key! :map (make-sparse-keymap)
     ("SPC" . x-hydra-invoker)))
 
+;;;###autoload
 (define-minor-mode x-hydra-minor-mode
   "use space as leader key"
   :init-value nil
@@ -88,5 +89,3 @@
   ("5" "C-x 5")
   ("p" "C-x p")
   ("SPC" switch-to-buffer))
-
-(provide 'init-hydra-extra)

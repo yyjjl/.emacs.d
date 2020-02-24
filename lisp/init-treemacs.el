@@ -2,32 +2,17 @@
 
 (require-packages! treemacs)
 
-(global-set-key [f12] #'treemacs)
-
-(defun treemacs/select-window ()
-  (interactive)
-  (if (eq major-mode 'treemacs-mode)
-      (other-window 1)
-    (treemacs-select-window)))
-
-(defun treemacs/select-window-1 ()
-  "Jump to window 1 or treemacs-window."
-  (interactive)
-  (let ((windows (window-list))
-        (treemacs-window (treemacs-get-local-window)))
-    (if (or (and (= 2 (length windows))
-                 (memq treemacs-window windows)
-                 (not (eq major-mode 'treemacs-mode)))
-            (and treemacs-window
-                 (equal 1 (winum-get-number))))
-        (treemacs-select-window)
-      (winum-select-window-by-number 1))))
+(with-eval-after-load 'winum
+  (define-key! :map winum-keymap
+    ("M-`" . treemacs/select-window)))
 
 (with-eval-after-load 'treemacs
   (with-eval-after-load 'winum
-  (define-key! :map winum-keymap
-    ("M-`" . treemacs/select-window)
-    ("M-1" . treemacs/select-window-1)))
+    (define-key! :map winum-keymap
+      ("M-1" . treemacs/select-window-1)))
+
+  (advice-add 'winum-select-window-by-number
+              :around #'treemacs*around-select-window-by-number)
 
   (define-key! :map treemacs-mode-map
     ("E" . treemacs-edit-workspaces))
@@ -64,5 +49,7 @@
         treemacs-tag-follow-cleanup t
         treemacs-tag-follow-delay 1.5
         treemacs-width 30))
+
+(global-set-key [f12] #'treemacs)
 
 (provide 'init-treemacs)
