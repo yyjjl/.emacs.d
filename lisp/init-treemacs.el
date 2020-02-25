@@ -2,20 +2,28 @@
 
 (require-packages! treemacs)
 
-(with-eval-after-load 'winum
-  (define-key! :map winum-keymap
-    ("M-`" . treemacs/select-window)))
+(config! winum
+  :bind (:map winum-keymap ("M-`" . treemacs/select-window)))
 
-(with-eval-after-load 'treemacs
-  (with-eval-after-load 'winum
-    (define-key! :map winum-keymap
-      ("M-1" . treemacs/select-window-1)))
+(config! treemacs
+  :bind
+  (:map treemacs-mode-map ("E" . treemacs-edit-workspaces))
 
-  (advice-add 'winum-select-window-by-number
-              :around #'treemacs*around-select-window-by-number)
+  :advice
+  (:around winum-select-window-by-number
+   :define (fn &optional arg)
+   "Jump to window 1 or treemacs-window."
+   (interactive)
+   (if (and (eq major-mode 'treemacs-mode)
+            (integerp arg)
+            (> arg 1)
+            (not (winum-get-window-by-number arg)))
+       (funcall fn (1- arg))
+     (funcall fn arg)))
 
-  (define-key! :map treemacs-mode-map
-    ("E" . treemacs-edit-workspaces))
+  :config
+  (config! winum
+    :bind (:map winum-keymap ("M-1" . treemacs/select-window-1)))
 
   (treemacs-fringe-indicator-mode -1)
   (treemacs-tag-follow-mode 1)

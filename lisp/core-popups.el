@@ -41,12 +41,16 @@
       line-end))
 
 (defvar core-popups--window-list nil)
+
 (defvar-local core-popups-current-window nil)
+
 (put 'core-popups-current-window 'permanent-local t)
+
 (defvar core-popups-comint-modes
   '(term-mode
     vterm-mode
     haskell-interactive-mode))
+
 (defvar core-popups-help-modes
   '(help-mode
     helpful-mode
@@ -66,37 +70,10 @@
     ("b" . core-popups/display-buffer)
     ("RET" . core-popups/fix-popup-window)))
 
-(global-set-key (kbd "C-z") core-ctrl-z-map)
-
-
-
 (defsubst core-popups//clean-window-list ()
   ;; Remove inactive window
   (setq core-popups--window-list
         (--filter (window-live-p (car it)) core-popups--window-list)))
-
-(defun core-popups*before-keyboard-quit (&rest _)
-  "When `C-g' pressed, close latest opened popup window"
-  (core-popups//clean-window-list)
-  ;; `C-g' can deactivate region
-  (when (and (called-interactively-p 'interactive)
-             (not (region-active-p)))
-    (let (window action)
-      (if (one-window-p)
-          (progn
-            (setq window (selected-window))
-            (when (equal (buffer-local-value 'core-popups-current-window
-                                             (window-buffer window))
-                         window)
-              (winner-undo)))
-        (setq window (car (car core-popups--window-list)))
-        (setq action (cdr (car core-popups--window-list)))
-        (when (window-live-p window)
-          (if (eq action 'quit)
-              (quit-window nil window)
-            (delete-window window))
-
-          (pop core-popups--window-list))))))
 
 (defun core-popups//push-window (-window -buffer &optional -autoclose-p -action)
   (when -autoclose-p
@@ -107,53 +84,6 @@
   (with-current-buffer -buffer
     ;; Record popup window
     (setq core-popups-current-window -window)))
-
-(defun core-popups*around-shackle-display-buffer (-fn -buffer -alist -plist)
-  (core-popups//clean-window-list)
-  ;; Set default alignment
-  (setq shackle-default-alignment
-        (if (> (frame-width)
-               (or split-width-threshold 120))
-            'right
-          'below))
-  (let* ((autoclose-p (plist-get -plist :autoclose))
-         (dedicated-p (plist-get -plist :dedicated))
-         (old-window (get-buffer-window -buffer))
-         (action 'delete)
-         (window (or (funcall -fn -buffer -alist -plist)
-                     (progn (setq action 'quit)
-                            (funcall -fn -buffer -alist (cl-list* :other t -plist))))))
-    (unless (eq window old-window)
-      (when dedicated-p
-        (set-window-dedicated-p window t))
-      (core-popups//push-window window -buffer autoclose-p action))
-    window))
-
-(defun core-popups*display-buffer-popup-window (-buffer -alist -plist)
-  (let ((frame (shackle--splittable-frame))
-        (other-window-p (and (plist-get -plist :other) (not (one-window-p)))))
-    (when frame
-      (let ((window (if other-window-p
-                        (next-window nil 'nominibuf)
-                      (shackle--split-some-window frame -alist))))
-        (prog1 (shackle--window-display-buffer -buffer
-                                               window
-                                               (if other-window-p 'reuse 'window)
-                                               -alist)
-          (when window
-            (setq shackle-last-window window
-                  shackle-last-buffer -buffer))
-          (unless (cdr (assq 'inhibit-switch-frame -alist))
-            (window--maybe-raise-frame (window-frame window))))))))
-
-(defun core-popups*around-window--try-to-split-window (-fn -window &optional -alist)
-  (let ((buffer (and (window-live-p -window)
-                     (window-buffer -window))))
-    (unless (and buffer
-                 (not (one-window-p))
-                 (window-live-p
-                  (buffer-local-value 'core-popups-current-window buffer)))
-      (funcall -fn -window -alist))))
 
 (defun core-popups//comint-buffer-matcher (-buffer)
   (let ((case-fold-search t))
@@ -169,28 +99,103 @@
                (apply #'derived-mode-p core-popups-help-modes))
           (string-match-p core-popups-help-buffer-regexp (buffer-name))))))
 
-(with-eval-after-load 'shackle
+(config! shackle
+  :prefix core-popups
+
+  :bind (("C-z" :map core-ctrl-z-map))
+
+  :hook
+  (autoclose-popup-window
+   :define (kill-buffer-hook)
+   "Auto quit popup window after buffer killed"
+   (let ((window (get-buffer-window)))
+     (when (and window
+                (equal window core-popups-current-window)
+                (not (one-window-p))
+                (not (minibuffer-window-active-p window))
+                (or (not (boundp 'lv-wnd))
+                    (not (eq (next-window) lv-wnd))))
+       (quit-window nil window))))
+
+  :advice
   ;; Can not be advised `:after', keyboard-quit signal `quit'
-  (advice-add 'keyboard-quit :before #'core-popups*before-keyboard-quit)
-  (advice-add 'other-window :before #'core-popups*before-keyboard-quit)
-  (advice-add 'shackle-display-buffer
-              :around #'core-popups*around-shackle-display-buffer)
-  (advice-add 'shackle--display-buffer-popup-window
-              :override #'core-popups*display-buffer-popup-window)
-  (advice-add 'window--try-to-split-window
-              :around #'core-popups*around-window--try-to-split-window)
+  (:before keyboard-quit
+   :define (&rest _)
+   "When `C-g' pressed, close latest opened popup window"
+   (core-popups//clean-window-list)
+   ;; `C-g' can deactivate region
+   (when (and (called-interactively-p 'interactive)
+              (not (region-active-p)))
+     (let (window action)
+       (if (one-window-p)
+           (progn
+             (setq window (selected-window))
+             (when (equal (buffer-local-value 'core-popups-current-window
+                                              (window-buffer window))
+                          window)
+               (winner-undo)))
+         (setq window (car (car core-popups--window-list)))
+         (setq action (cdr (car core-popups--window-list)))
+         (when (window-live-p window)
+           (if (eq action 'quit)
+               (quit-window nil window)
+             (delete-window window))
 
-  (define-hook! core-popups|autoclose-popup-window (kill-buffer-hook)
-    "Auto quit popup window after buffer killed"
-    (let ((window (get-buffer-window)))
-      (when (and window
-                 (equal window core-popups-current-window)
-                 (not (one-window-p))
-                 (not (minibuffer-window-active-p window))
-                 (or (not (boundp 'lv-wnd))
-                     (not (eq (next-window) lv-wnd))))
-        (quit-window nil window))))
+           (pop core-popups--window-list))))))
 
+  (:before other-window :use keyboard-quit)
+
+  (:around shackle-display-buffer
+   :define (-fn -buffer -alist -plist)
+   (core-popups//clean-window-list)
+   ;; Set default alignment
+   (setq shackle-default-alignment
+         (if (> (frame-width)
+                (or split-width-threshold 120))
+             'right
+           'below))
+   (let* ((autoclose-p (plist-get -plist :autoclose))
+          (dedicated-p (plist-get -plist :dedicated))
+          (old-window (get-buffer-window -buffer))
+          (action 'delete)
+          (window (or (funcall -fn -buffer -alist -plist)
+                      (progn (setq action 'quit)
+                             (funcall -fn -buffer -alist (cl-list* :other t -plist))))))
+     (unless (eq window old-window)
+       (when dedicated-p
+         (set-window-dedicated-p window t))
+       (core-popups//push-window window -buffer autoclose-p action))
+     window))
+
+  (:override shackle--display-buffer-popup-window
+   :define (-buffer -alist -plist)
+   (let ((frame (shackle--splittable-frame))
+         (other-window-p (and (plist-get -plist :other) (not (one-window-p)))))
+     (when frame
+       (let ((window (if other-window-p
+                         (next-window nil 'nominibuf)
+                       (shackle--split-some-window frame -alist))))
+         (prog1 (shackle--window-display-buffer -buffer
+                                                window
+                                                (if other-window-p 'reuse 'window)
+                                                -alist)
+           (when window
+             (setq shackle-last-window window
+                   shackle-last-buffer -buffer))
+           (unless (cdr (assq 'inhibit-switch-frame -alist))
+             (window--maybe-raise-frame (window-frame window))))))))
+
+  (:around window--try-to-split-window
+   :define (-fn -window &optional -alist)
+   (let ((buffer (and (window-live-p -window)
+                      (window-buffer -window))))
+     (unless (and buffer
+                  (not (one-window-p))
+                  (window-live-p
+                   (buffer-local-value 'core-popups-current-window buffer)))
+       (funcall -fn -window -alist))))
+
+  :config
   (setq shackle-default-alignment 'below
         shackle-default-size 0.4
         shackle-default-rule nil

@@ -1,14 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
 
-(setq hs-minor-mode-map
-      (define-key! :map (make-sparse-keymap)
-        ("C-x t h" . hs-hide-block)
-        ("C-x t s" . hs-show-block)
-        ("C-x t H" . hs-hide-all)
-        ("C-x t S" . hs-show-all)
-        ("C-x t l" . hs-hide-level)
-        ("C-x t t" . hs-toggle-hiding)))
-
 (defvar hs--overlay-map (make-sparse-keymap)
   "Keymap for hs minor mode overlay.")
 
@@ -24,15 +15,26 @@
 (defun hs//auto-expand (&rest _)
   (save-excursion (hs-show-block)))
 
-(with-eval-after-load 'hideshow
+(config! hideshow
+  :bind
+  (:map hs-minor-mode-map
+   ("C-x t h" . hs-hide-block)
+   ("C-x t s" . hs-show-block)
+   ("C-x t H" . hs-hide-all)
+   ("C-x t S" . hs-show-all)
+   ("C-x t l" . hs-hide-level)
+   ("C-x t t" . hs-toggle-hiding))
+
+  :advice
+  (:after goto-line :name hs//auto-expand)
+  (:after find-tag :name hs//auto-expand)
+
+  :config
   (setq hs-isearch-open t)
   (setq hs-allow-nesting t)
   (setq hs-set-up-overlay 'hs//abstract-overlay)
 
-  (hs-persistent-mode 1)
-
-  (advice-add 'goto-line :after #'hs//auto-expand)
-  (advice-add 'find-tag :after #'hs//auto-expand))
+  (hs-persistent-mode 1))
 
 
 (provide 'core-hideshow)

@@ -20,28 +20,35 @@
                             commands)))))
       commands)))
 
-(define-hook! rust|setup (rust-mode-hook)
-  (cargo-minor-mode 1)
-  (when (buffer-enable-rich-feature-p)
-    (lsp//try-enable rust|setup-internal)))
+(config! rust-mode
+  :bind
+  (:map rust-mode-map
+   ("C-c C-f")
+   ([remap delete-char] . c-hungry-delete-forward)
+   ([remap delete-backward-char] . c-hungry-delete-backwards)
+   ("C-c b" . rust-format-buffer)
+   ("C-c C-b" . rust-format-buffer))
 
-(with-eval-after-load 'rust-mode
-  (require 'cc-mode nil t)
+  :hook
+  (setup
+   :define (rust-mode-hook)
+   (cargo-minor-mode 1)
+   (when (buffer-enable-rich-feature-p)
+     (lsp//try-enable rust|setup-internal)))
 
-  (setq rust-cargo-bin "~/.cargo/bin/cargo")
-  (define-key! :map rust-mode-map
-    ("C-c C-f")
-    ([remap delete-char] . c-hungry-delete-forward)
-    ([remap delete-backward-char] . c-hungry-delete-backwards)
-    ("C-c b" . rust-format-buffer)
-    ("C-c C-b" . rust-format-buffer)))
+  :config
+  (require 'cc-mode)
 
-(with-eval-after-load 'cargo
+  (setq rust-cargo-bin "~/.cargo/bin/cargo"))
+
+(config! cargo
+  :bind
+  (:map cargo-minor-mode-map
+   ("C-c C-c" . rust/cargo-dispatch)
+   ("C-c C-l" . rust/cargo-run))
+
+  :config
   (setq cargo-process--custom-path-to-bin "~/.cargo/bin/cargo"
-        cargo-process--command-flags "--color never")
-
-  (define-key! :map cargo-minor-mode-map
-    ("C-c C-c" . rust/cargo-dispatch)
-    ("C-c C-l" . rust/cargo-run)))
+        cargo-process--command-flags "--color never"))
 
 (provide 'init-rust)

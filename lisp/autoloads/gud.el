@@ -47,7 +47,7 @@
   (when-let (cmdbuf (realgud-get-cmdbuf))
     (with-current-buffer-safe cmdbuf
       (unless realgud--saved-breakpoints
-        (error "No saved breakpoints."))
+        (user-error "No saved breakpoints."))
       (dolist (bp realgud--saved-breakpoints)
         (let ((cmd (format "break %s:%s" (car bp) (cdr bp))))
           (realgud-command cmd nil t)

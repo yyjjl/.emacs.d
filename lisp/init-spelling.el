@@ -1,5 +1,7 @@
 (require-packages! ispell flyspell)
 
+(autoload 'hydra-flyspell/body "autoloads/spelling" nil t)
+
 (defun spelling//detect-ispell-args (&optional -run-together)
   "If RUN-TOGETHER is true, spell check the CamelCase words"
   (when (and (bound-and-true-p ispell-program-name)
@@ -11,18 +13,22 @@
                          "--run-together-min=2"))
         args))))
 
-(defun spelling*set-extra-args (-fn &rest -args)
-  (let ((old-ispell-extra-args ispell-extra-args))
-    (ispell-kill-ispell t)
-    ;; Use emacs original arguments
-    ;; Donot use together
-    (setq ispell-extra-args (spelling//detect-ispell-args))
-    (apply -fn -args)
-    ;; Restore our own ispell arguments
-    (setq ispell-extra-args old-ispell-extra-args)
-    (ispell-kill-ispell t)))
+(config! ispell
+  :advice
+  (:around ispell-word
+   :use set-extra-args
+   :define (-fn &rest -args)
+   (let ((old-ispell-extra-args ispell-extra-args))
+     (ispell-kill-ispell t)
+     ;; Use emacs original arguments
+     ;; Donot use together
+     (setq ispell-extra-args (spelling//detect-ispell-args))
+     (apply -fn -args)
+     ;; Restore our own ispell arguments
+     (setq ispell-extra-args old-ispell-extra-args)
+     (ispell-kill-ispell t)))
 
-(with-eval-after-load 'ispell
+  :config
   (cond
    (emacs-use-aspell-p
     (setq ispell-program-name "aspell"))
@@ -38,17 +44,16 @@
 
   ;; `ispell-extra-args' is the command arguments which will *always*
   ;; be used when start ispell process
-  (setq-default ispell-extra-args (spelling//detect-ispell-args t))
-  (advice-add 'ispell-word :around #'spelling*set-extra-args))
+  (setq-default ispell-extra-args (spelling//detect-ispell-args t)))
 
-(with-eval-after-load 'flyspell
+(config! flyspell
+  :advice
+  (:around flyspell-auto-correct-word :name ispell*around-set-extra-args)
+  :config
   (setq flyspell-large-region 1)
   ;; Better performance
-  (setq flyspell-issue-message-flag nil)
+  (setq flyspell-issue-message-flag nil))
 
-  (advice-add 'flyspell-auto-correct-word :around #'spelling*set-extra-args))
-
-(autoload 'hydra-flyspell/body "autoloads/spelling" nil t)
 (global-set-key (kbd "C-\"") #'hydra-flyspell/body)
 
 (provide 'init-spelling)

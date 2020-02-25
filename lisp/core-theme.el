@@ -1,7 +1,5 @@
 (require-packages! doom-themes)
 
-(require 'doom-themes)
-
 (defface empty-line-face
   '((t (:foreground "grey50")))
   "empty-line-face"
@@ -55,7 +53,8 @@
  '(winum-face ((t (:inherit org-level-2 :background "black"))))
  '(winum-inactive-face ((t (:background "black")))))
 
-(with-eval-after-load 'org
+(config! org
+  :config
   (dolist (face org-level-faces)
     (set-face-attribute face nil :height 1.0)))
 

@@ -13,7 +13,7 @@
                          :caller 'org/project-open)))
     (setq name (abbreviate-file-name (expand-file-name name org-project-src-dir)))
     (cond ((not (string-suffix-p ".org" name))
-           (error "filename should endswith \".org\""))
+           (user-error "filename should endswith \".org\""))
           ((file-exists-p name)
            (message "Open existing note: %s" name)
            (find-file name))
@@ -21,12 +21,12 @@
            (make-directory (file-name-directory name) t)
            (find-file name))
           (t
-           (error "Nothing to do with %s" name)))))
+           (user-error "Nothing to do with %s" name)))))
 
 ;;;###autoload
 (defun org/project-sync ()
   (interactive)
   (unless org-project-sync-command
-    (error "Variable `org-project-sync-command' is not set."))
+    (user-error "Variable `org-project-sync-command' is not set."))
   (let ((default-directory org-project-base-dir))
     (compilation-start org-project-sync-command)))

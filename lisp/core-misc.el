@@ -21,33 +21,17 @@
 (defvar core-project-rsync-command
   "rsync -azh --progress --filter=':- .gitignore' %s . %s")
 
+(config! desktop
+  :advice
+  (:around desktop-save
+   :use save-unless-loaded
+   :define (-fn &rest -args)
+   (if (or (called-interactively-p 'interactive)
+           desktop-file-modtime)
+       (apply -fn -args)
+     (message "Current desktop was not loaded from a file. Ignored")))
 
-(defvar core-current-desktop-name nil)
-(defvar core-view-code-modes
-  '(;; (lispy-mode rainbow-delimiters-count-mode)
-    (t display-line-numbers-mode
-       view-mode
-       highlight-indentation-current-column-mode
-       highlight-indentation-mode)))
-
-(define-minor-mode core-view-code-mode
-  "View code"
-  :init-value nil
-  (let ((switch (if core-view-code-mode 1 -1)))
-    (cl-loop for (condition . modes) in core-view-code-modes
-             when (or (eq condition t)
-                      (and (symbolp condition) (symbol-value condition)))
-             do (dolist (mode modes)
-                  (funcall mode switch)))))
-
-(defun core*desktop-save-unless-loaded (-fn &rest -args)
-  (if (or (called-interactively-p 'interactive)
-          desktop-file-modtime)
-      (apply -fn -args)
-    (message "Current desktop was not loaded from a file. Ignored")))
-
-(with-eval-after-load 'desktop
-  (advice-add 'desktop-save :around #'core*desktop-save-unless-loaded)
+  :config
   ;; These minor modes are enabled by core
   (dolist (mode '(git-gutter-mode
                   ivy-mode
@@ -64,41 +48,48 @@
                   lsp-mode))
     (add-to-list 'desktop-minor-mode-table (cons mode nil))))
 
-(with-eval-after-load 'bookmark
-  (define-hook! core|setup-buffer-bookmark (find-file-hook)
-    (unless (file-remote-p default-directory)
-      ;; Setup default bookmark
-      (setq bookmark-current-bookmark
-            (ignore-errors
-              (cl-loop for (name . record) in bookmark-alist
-                       when (equal (file-truename (buffer-file-name))
-                                   (file-truename (bookmark-get-filename name)))
-                       return name)))))
+(config! bookmark
+  :hook
+  (setup-buffer
+   :define (find-file-hook)
+   (unless (file-remote-p default-directory)
+     ;; Setup default bookmark
+     (setq bookmark-current-bookmark
+           (ignore-errors
+             (cl-loop for (name . record) in bookmark-alist
+                      when (equal (file-truename (buffer-file-name))
+                                  (file-truename (bookmark-get-filename name)))
+                      return name)))))
 
+  :config
   (bookmark-maybe-load-default-file)
   ;; Setup for existing buffers
   (dolist (buffer (buffer-list))
     (with-current-buffer buffer
-      (core|setup-buffer-bookmark))))
+      (bookmark|setup-buffer))))
 
-(with-eval-after-load 'ffap
-  (advice-add 'ffap-guesser :around #'ignore-errors!)
+(config! ffap
+  :advice (:around ffap-guesser :name ignore-errors!)
   ;; do not use ping, it's very slow
-  (setq ffap-machine-p-known 'reject))
+  :config (setq ffap-machine-p-known 'reject))
 
-(with-eval-after-load 'which-key
-  (setq which-key-allow-imprecise-window-fit nil))
+(config! which-key
+  :init (setq which-key-dont-use-unicode t)
+  :config (setq which-key-allow-imprecise-window-fit nil))
 
-(with-eval-after-load 'winum
-  (define-key! :map winum-keymap
-    ("C-x w")
-    ("M-0" . core/goto-next-char-or-minibuffer)
-    ("M-1" . winum-select-window-1)
-    ("M-2" . winum-select-window-2)
-    ("M-3" . winum-select-window-3)
-    ("M-4" . winum-select-window-4)
-    ("M-5" . winum-select-window-5)
-    ("M-6" . winum-select-window-6))
+(config! winum
+  :bind
+  (:map winum-keymap
+   ("C-x w")
+   ("M-0" . core/goto-next-char-or-minibuffer)
+   ("M-1" . winum-select-window-1)
+   ("M-2" . winum-select-window-2)
+   ("M-3" . winum-select-window-3)
+   ("M-4" . winum-select-window-4)
+   ("M-5" . winum-select-window-5)
+   ("M-6" . winum-select-window-6))
+
+  :config
   (setcdr (assoc 'winum-mode minor-mode-map-alist)
           winum-keymap)
 
@@ -107,92 +98,104 @@
         winum-reverse-frame-list nil
         winum-auto-assign-0-to-minibuffer t))
 
-(with-eval-after-load 'ediff
-  ;; do not use multi-frames
-  (advice-add 'ediff-window-display-p :override #'ignore))
-
-(with-eval-after-load 'display-line-numbers
+(config! display-line-numbers
+  :config
   (setq display-line-numbers-type t)
   (setq-default display-line-numbers-width 2))
 
 ;; `whitespace-space' setup
-(with-eval-after-load 'whitespace
+(config! whitespace
+  :config
   (setq whitespace-global-modes '(text-mode))
   (setq whitespace-style '(face tabs tab-mark spaces space-mark empty)))
 
-(with-eval-after-load 'view
-  (define-key! :map view-mode-map
-    ("s" . swiper/dispatch)
-    ("q" . View-exit)
-    ("Q" . View-quit)))
+(config! view
+  :bind
+  (:map view-mode-map
+   ("s" . swiper/dispatch)
+   ("q" . View-exit)
+   ("Q" . View-quit)))
 
-(with-eval-after-load 'xref
-  (define-key! :map xref--xref-buffer-mode-map
-    ("M-n" . next-error)
-    ("M-p" . previous-error)
-    ("j" . (lambda! () (xref--search-property 'xref-item)))
-    ("k" . (lambda! () (xref--search-property 'xref-item t))))
+(config! xref
+  :bind
+  (:map xref--xref-buffer-mode-map
+   ("M-n" . next-error)
+   ("M-p" . previous-error)
+   ("j" . (lambda! () (xref--search-property 'xref-item)))
+   ("k" . (lambda! () (xref--search-property 'xref-item t))))
 
-  (add-hook 'xref--xref-buffer-mode-hook (lambda () (toggle-truncate-lines 1)))
+  :hook
+  (:anonymous
+   :define (xref--xref-buffer-mode-hook)
+   (toggle-truncate-lines 1))
 
-  (defun xref*around-xref-find-definitions (-fn -identifier)
-    (condition-case err
-        (funcall -fn -identifier)
-      (user-error
-       (if-let* ((symbol (thing-at-point 'symbol)))
-           (counsel-rg symbol)
-         (message "%s" (error-message-string err))))))
+  :advice
+  (:around xref-find-definitions
+   :define (-fn -identifier)
+   (condition-case err
+       (funcall -fn -identifier)
+     (user-error
+      (if-let* ((symbol (thing-at-point 'symbol)))
+          (counsel-rg symbol)
+        (message "%s" (error-message-string err))))))
 
-  (advice-add 'xref-find-definitions :around #'xref*around-xref-find-definitions)
+  :config
   (add-to-list 'xref-prompt-for-identifier 'xref-find-references :append))
 
-(defun core*flymake-eldoc-function ()
-  (let ((diags (flymake-diagnostics (point))))
-    (when diags
+(config! grep
+  :config
+  (setq grep-highlight-matches t)
+  (setq grep-scroll-output t)
+  (dolist (v core-ignored-directories)
+    (add-to-list 'grep-find-ignored-directories v)))
+
+(config! flymake
+  :bind
+  (:map flymake-mode-map ("C-c f l" . flymake-show-diagnostics-buffer))
+  (:map flymake-diagnostics-buffer-mode-map
+   ("n" . next-line)
+   ("j" . next-line)
+   ("p" . previous-line)
+   ("k" . previous-line))
+
+  :hook
+  (setup
+   :define (flymake-mode-hook)
+   (if flymake-mode
+       (progn
+         (put 'next-error-function
+              'flymake-old-next-error-function next-error-function)
+         (setq next-error-function 'flymake-goto-next-error)
+         (add-function :before-until (local 'eldoc-documentation-function)
+           #'core*flymake-eldoc-function))
+     (setq next-error-function
+           (get 'next-error-function 'flymake-old-next-error-function))
+     (remove-function (local 'eldoc-documentation-function)
+                      #'core*flymake-eldoc-function)))
+  :config
+  (defun core*flymake-eldoc-function ()
+    (when-let (diags (flymake-diagnostics (point)))
       (eldoc-message (mapconcat #'flymake-diagnostic-text diags "\n")))))
 
-(define-hook! core|setup-flymake-mode (flymake-mode-hook)
-  (if flymake-mode
-      (progn
-        (put 'next-error-function 'flymake-old-next-error-function
-             next-error-function)
-        (setq next-error-function 'flymake-goto-next-error)
-        (add-function :before-until (local 'eldoc-documentation-function)
-                      #'core*flymake-eldoc-function))
-    (setq next-error-function (get 'next-error-function
-                                   'flymake-old-next-error-function))
-    (remove-function (local 'eldoc-documentation-function)
-                     #'core*flymake-eldoc-function)))
+(config! symbol-overlay
+  :bind
+  (:map symbol-overlay-map
+   ("<tab>" . symbol-overlay-jump-next)
+   ("<backtab>" . symbol-overlay-jump-prev)))
 
-(with-eval-after-load 'symbol-overlay
-  (define-key! :map symbol-overlay-map
-    ("<tab>" . symbol-overlay-jump-next)
-    ("<backtab>" . symbol-overlay-jump-prev)))
-
-(with-eval-after-load 'flymake
-  (when (boundp 'flymake-mode-map)
-    (define-key flymake-mode-map (kbd "C-c f l")
-      #'flymake-show-diagnostics-buffer)
-
-    (define-key! :map flymake-diagnostics-buffer-mode-map
-      ("n" . next-line)
-      ("j" . next-line)
-      ("p" . previous-line)
-      ("k" . previous-line))))
-
-(setq flycheck-keymap-prefix (kbd "C-c f"))
-(with-eval-after-load 'flycheck
+(config! flycheck
+  :bind (:map flycheck-command-map ("j" . counsel/flycheck))
+  :init
+  (setq flycheck-keymap-prefix (kbd "C-c f"))
+  :config
   ;; Do not check during newline
   (setq-default flycheck-checker-error-threshold 400)
-  (setq-default flycheck-check-syntax-automatically
-                '(idle-change save mode-enabled))
-  (setq flycheck-mode-line-prefix ""
-        flycheck-idle-change-delay 1)
+  (setq-default flycheck-check-syntax-automatically '(idle-change save mode-enabled))
+  (setq flycheck-mode-line-prefix "")
+  (setq flycheck-idle-change-delay 1))
 
-  (define-key! :map flycheck-command-map
-    ("j" . counsel/flycheck)))
-
-(with-eval-after-load 'hippie-exp
+(config! hippie-exp
+  :config
   (setq he-dabbrev-chars "0-9a-zA-Z\\?!_")
   (setq-default hippie-expand-try-functions-list
                 '(try-expand-dabbrev
@@ -209,44 +212,48 @@
     mode-line--cached-git-branch
     elpy-project-root))
 
-(defun core*projectile-clear-vars (_)
-  (dolist (buffer (ignore-errors (projectile-project-buffers)))
-    (when (buffer-live-p buffer)
-      (with-current-buffer buffer
-        (dolist (var core-projectile-invalidate-cache-empty-vars)
-          (set var nil))))))
+(config! projectile
+  :prefix core
+  :bind (:map projectile-mode-map ("C-x p" :map projectile-command-map))
 
-(defun core*projectile-run-compilation (-cmd)
-  (if (functionp -cmd)
-      (funcall -cmd)
-    (compile -cmd t)))
+  :hook (projectile-cleanup-known-projects (kill-emacs-hook))
 
-(defun core*edit-dir-locals (&optional directory)
-  "Edit or create a .dir-locals.el file of the project."
-  (interactive (list (let ((root (projectile-project-root)))
-                       (or (and current-prefix-arg
-                                (read-directory-name "Select root" root))
-                           root))))
-  (let ((default-directory directory))
-    (condition-case nil
-        (call-interactively #'add-dir-local-variable)
-      (quit
-       (when-let ((files (dir-locals--all-files directory)))
-         (if (= (length files) 1)
-             (find-file (car files))
-           (find-file (ivy-read "Open file: " files :require-match t))))))))
+  :advice
+  (:after projectile-invalidate-cache
+   :define (_)
+   (dolist (buffer (ignore-errors (projectile-project-buffers)))
+     (when (buffer-live-p buffer)
+       (with-current-buffer buffer
+         (dolist (var core-projectile-invalidate-cache-empty-vars)
+           (set var nil))))))
 
-(with-eval-after-load 'projectile
-  (define-key projectile-mode-map (kbd "C-x p") projectile-command-map)
+  (:override projectile-run-compilation
+   :define (-cmd)
+   (if (functionp -cmd)
+       (funcall -cmd)
+     (compile -cmd t)))
 
-  (advice-add 'projectile-invalidate-cache :after #'core*projectile-clear-vars)
-  (advice-add 'projectile-run-compilation :override #'core*projectile-run-compilation)
-  (advice-add 'projectile-edit-dir-locals :override #'core*edit-dir-locals)
+  (:override projectile-edit-dir-locals
+   :define (&optional -directory)
+   "Edit or create a .dir-locals.el file of the project."
+   (interactive (list (let ((root (projectile-project-root)))
+                        (or (and current-prefix-arg
+                                 (read-directory-name "Select root" root))
+                            root))))
+   (let ((default-directory -directory))
+     (condition-case nil
+         (call-interactively #'add-dir-local-variable)
+       (quit
+        (when-let ((files (dir-locals--all-files -directory)))
+          (if (= (length files) 1)
+              (find-file (car files))
+            (find-file (ivy-read "Open file: " files :require-match t))))))))
 
   ;; Projectile root-searching functions can cause an infinite cl-loop on TRAMP
   ;; connections, so disable them.
-  (advice-add #'projectile-locate-dominating-file :around #'ignore-remote!)
+  (:around projectile-locate-dominating-file :name ignore-remote!)
 
+  :config
   (add-to-list 'projectile-globally-ignored-directories ".ccls-cache")
 
   (setq projectile-mode-line
@@ -259,39 +266,50 @@
                 projectile-project-root-files-bottom-up))
   (setq projectile-completion-system 'ivy)
   (setq projectile-ignored-projects '("~/" "/tmp"))
-  (setq projectile-enable-caching (not noninteractive))
+  (setq projectile-enable-caching (not noninteractive)))
 
-  (add-hook 'kill-emacs-hook #'projectile-cleanup-known-projects))
+(config! yasnippet
+  :advice
+  (:around yas-next-field-or-maybe-expand
+   :use expand-local-snippets
+   :define (-fn &rest -args)
+   (or (core//try-expand-local-snippets)
+       (apply -fn -args)))
 
-(with-eval-after-load 'yasnippet
-  (defun core*expand-local-snippets (-fn &rest -args)
-    (or (core//try-expand-local-snippets)
-        (apply -fn -args)))
-
-  (advice-add 'yas-next-field-or-maybe-expand
-              :around #'core*expand-local-snippets)
-
-  (with-eval-after-load 'org
-    (advice-add 'org-cycle :around #'core*expand-local-snippets))
+  :config
+  (config! org
+    :advice (:around org-cycle :name yasnippet*around-expand-local-snippets))
 
   (add-to-list 'auto-mode-alist '("\\.yasnippet\\'" . snippet-mode))
   (setq yas-prompt-functions '(yas-completing-prompt))
   (setq-default yas-indent-line 'fixed)
   (setq yas-triggers-in-field nil))
 
-(with-eval-after-load 'isearch
-  (define-key isearch-mode-map (kbd "C-o") 'isearch-occur))
+(config! isearch
+  :bind (:map isearch-mode-map ("C-o" . isearch-occur)))
 
-(with-eval-after-load 'indent
-  (define-key! :map indent-rigidly-map
-    ("h" . indent-rigidly-left)
-    ("l" . indent-rigidly-right)
-    ("H" . indent-rigidly-left-to-tab-stop)
-    ("L" . indent-rigidly-right-to-tab-stop)))
+(config! recentf
+  :hook (recentf-save-list (core-autosave-hook))
 
-(with-eval-after-load 'session
-  (add-hook 'core-autosave-hook 'session-save-session)
+  :config
+  (defun core//recentf-keep? (-fn)
+    (and core--recentf-enabled-p
+         ;; The order must be kept
+         (or (file-remote-p -fn)
+             (and (file-readable-p -fn)
+                  (file-writable-p -fn)))))
 
+  (setq recentf-keep '(core//recentf-keep?))
+  (setq recentf-max-saved-items 2048)
+  (setq recentf-exclude (list "/tmp/" "^/sshx?:" "/sudo:" "\\.elc$"
+                              "/node_modules/"
+                              "\\.\\(gz\\|gif\\|svg\\|png\\|jpe?g\\)$" "/TAGS$"
+                              (expand-file-name "~/downloads")
+                              emacs-var-direcotry)))
+(config! session
+  :hook (session-save-session (core-autosave-hook))
+
+  :config
   (setq session-globals-max-size 500)
   (setq session-globals-include '((file-name-history 500)
                                   (kill-ring 50)
@@ -300,25 +318,28 @@
                                   regexp-search-ring))
   (setq session-registers '(t (48 . 57) 45 61 92 96 (97 . 122))))
 
-;; `tramp' setup
-(with-eval-after-load 'tramp
+(config! tramp
+  :config
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+
   (setq tramp-terminal-type "tramp")
   (setq tramp-default-method "ssh")
   (setq backup-enable-predicate
         (lambda (name)
           (and (normal-backup-enable-predicate name)
                (not (file-remote-p name 'method)))))
-  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
   (setq tramp-chunksize 8192)
   (setq tramp-verbose 1)
   ;; @see https://github.com/syl20bnr/spacemacs/issues/1921
   (setq tramp-ssh-controlmaster-options
         "-o ControlMaster=auto -o ControlPath='tramp.%%C' -o ControlPersist=no"))
 
-(with-eval-after-load 'fcitx
-  ;; Init fcitx prefix keys
+(config! fcitx
+  :config ;; Init fcitx prefix keys
   (setq fcitx-use-dbus nil)
   (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c" "C-z"))
+
+
 
 ;; Smart tab
 (defvar core--indent-close-list '(?\} ?\$ ?\] ?\' ?\` ?\"))
@@ -438,6 +459,12 @@
 
   ([f10] . compile)
   ([f9] . core/run-current-file))
+
+(define-key! :map indent-rigidly-map
+  ("[" . indent-rigidly-left)
+  ("]" . indent-rigidly-right)
+  ("{" . indent-rigidly-left-to-tab-stop)
+  ("}" . indent-rigidly-right-to-tab-stop))
 
 (define-key! :map special-mode-map
   ("u" . scroll-down-command)

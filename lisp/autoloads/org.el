@@ -45,7 +45,7 @@ _h_tml    _'_         ^ ^             _A_SCII:
   `(save-window-excursion
      (unless (and (file-exists-p org-master-file)
                   (file-regular-p org-master-file))
-       (error (format "Can not open %s" org-master-file)))
+       (user-error (format "Can not open %s" org-master-file)))
      (with-current-buffer (find-file org-master-file)
        ,@body)))
 
@@ -65,12 +65,10 @@ _h_tml    _'_         ^ ^             _A_SCII:
          (let ((cmd (if (> -n 0) #'org-next-item #'org-previous-item))
                (col (current-column))
                (n (abs -n)))
-           (condition-case err
-               (progn
-                 (while (>= (cl-decf n) 0)
-                   (funcall cmd))
-                 (move-to-column col))
-             (error (message "%s" err)))))
+           (with-demoted-errors "%s"
+             (while (>= (cl-decf n) 0)
+               (funcall cmd))
+             (move-to-column col))))
         (t
          (let ((cmd (if (> -n 0)
                         #'org-next-visible-heading
@@ -120,7 +118,7 @@ _h_tml    _'_         ^ ^             _A_SCII:
             (progn
               (kill-process proc)
               (sit-for 0.1))
-          (error "Process latexmk is still active")))
+          (user-error "Process latexmk is still active")))
       (start-process
        "latexmk" (get-buffer-create "LaTeXMK")
        "latexmk" "-quiet" "-pvc" "-g" "-pdf" "-dvi-" "-ps-"
@@ -151,14 +149,14 @@ With a prefix BELOW move point to lower block."
              (string-suffix-p ".org" (buffer-file-name)))
         ;; create for current file
         (list (buffer-file-name))
-      (let ((dir-name
-             (if (equal current-prefix-arg '(4))
-                 default-directory      ; create for files in current directory
-               (read-file-name "File or Directory: "))))
-        (unless (file-directory-p dir-name)
-          (error "%s is not a directory" dir-name))
-        (directory-files-recursively dir-name "\\.org\\'")))
-    current-prefix-arg))
+      (let ((dir-or-file-name (read-file-name "File or Directory: ")))
+        (cond
+         ((file-directory-p dir-or-file-name)
+          (directory-files-recursively dir-or-file-name "\\.org\\'"))
+         ((file-exists-p dir-or-file-name)
+          (list dir-or-file-name))
+         (t (user-error "%s is neither a directory nor file" dir-or-file-name)))))
+    (and current-prefix-arg (yes-or-no-p "Clean invalid cache?"))))
   (let ((image-files (make-hash-table :test 'equal))
         (image-dirs (make-hash-table :test 'equal)))
     (dolist (file -files)

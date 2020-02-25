@@ -35,7 +35,7 @@ definition and running `eval-defun`."
   (unless (or (eq major-mode 'help-mode)
               (eq major-mode 'helpful-mode)
               (string= (buffer-name) "*Help*"))
-    (error "Only for help-mode or helpful-mode"))
+    (user-error "Only for help-mode or helpful-mode"))
   (let ((orig-point (point)))
     (save-excursion
       (when-let

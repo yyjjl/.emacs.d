@@ -197,7 +197,7 @@ for a file to visit if current buffer is not visiting a file."
 (defun ivy-occur-filter-lines ()
   (interactive)
   (unless (string-prefix-p "ivy-occur" (symbol-name major-mode))
-    (error "Current buffer is not in ivy-occur mode"))
+    (user-error "Current buffer is not in ivy-occur mode"))
   (let ((inhibit-read-only t)
         (regexp (read-regexp "Regexp(! for flush)"))
         (start (next-single-property-change (point-min) 'font-lock-face)))
@@ -222,7 +222,7 @@ for a file to visit if current buffer is not visiting a file."
           (forward-line 1)
           (looking-at "stack> "))
         (undo)
-      (error "Filter stack is empty"))))
+      (user-error "Filter stack is empty"))))
 
 (defun counsel//rg (&optional -args -extra-args)
   (interactive (list (transient-args 'counsel/rg) nil))

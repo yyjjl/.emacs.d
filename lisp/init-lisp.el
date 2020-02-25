@@ -151,10 +151,8 @@ Emacs Lisp."
 (dolist (hook '(lisp-mode-hook scheme-mode-hook))
   (add-hook hook #'lisp|common-setup))
 
-
-
-(with-eval-after-load 'lisp-mode
-  (require 'hippie-exp)
+(config! lisp-mode
+  :config
   ;; Add keyword `define-hook!'
   (font-lock-add-keywords
    'emacs-lisp-mode
@@ -171,43 +169,47 @@ Emacs Lisp."
      ("\\_<@?\\(-[a-zA-Z]\\(?:\\sw\\|\\s_\\)*\\)"
       (1 'lisp-argument-face nil nil)))))
 
-(with-eval-after-load 'racket-mode
-  (add-to-list 'lispy-goto-symbol-alist
-               '(racket-mode racket-visit-definition racket-mode))
-
+(config! racket-mode
+  :advice
   ;; Use `ivy' as default completion backends
-  (defun racket--read-identifier (-prompt -default)
-    (ivy-read -prompt
-              (racket--get-namespace-symbols)
-              :initial-input -default
-              :preselect -default)))
+  (:override racket--read-identifier
+   :define (-prompt -default)
+   (ivy-read -prompt
+             (racket--get-namespace-symbols)
+             :initial-input -default
+             :preselect -default))
 
-(with-eval-after-load 'helpful
-  (define-key! :map helpful-mode-map
-    ("R" . lisp/remove-hook-at-point))
-  (define-key! :map help-mode-map
-    ("R" . lisp/remove-hook-at-point)))
+  :config
+  (add-to-list 'lispy-goto-symbol-alist
+               '(racket-mode racket-visit-definition racket-mode)))
 
-(with-eval-after-load 'elisp-mode
-  (require 'semantic/bovine/el)
+(config! helpful
+  :bind
+  (:map helpful-mode-map ("R" . lisp/remove-hook-at-point))
+  (:map help-mode-map ("R" . lisp/remove-hook-at-point)))
 
-  (define-key! :map emacs-lisp-mode-map
-    ("C-c e" . macrostep-expand)
-    ("C-c C-d" . helpful-at-point))
+(config! elisp-mode
+  :bind
+  (:map emacs-lisp-mode-map
+   ("C-c e" . macrostep-expand)
+   ("C-c C-d" . helpful-at-point))
+  (:map lisp-interaction-mode-map
+   ("C-c e" . macrostep-expand)
+   ("C-c C-d" . helpful-at-point))
 
-  (define-key! :map lisp-interaction-mode-map
-    ("C-c e" . macrostep-expand)
-    ("C-c C-d" . helpful-at-point)))
+  :config
+  (require 'semantic/bovine/el))
 
-(with-eval-after-load 'lispy
-  (define-key! :map lispy-mode-map ("M-n"))
+(config! lispy
+  :bind (:map lispy-mode-map ("M-n"))
 
-  (defun lisp*around-goto-symbol (-fn -symbol)
-    (if (memq major-mode lispy-elisp-modes)
-        (condition-case nil
-            (elisp-def)
-          (error (lispy-goto-symbol-elisp -symbol)))
-      (funcall -fn -symbol)))
-  (advice-add 'lispy-goto-symbol :around #'lisp*around-goto-symbol))
+  :advice
+  (:around lispy-goto-symbol
+   :define (-fn -symbol)
+   (if (memq major-mode lispy-elisp-modes)
+       (condition-case nil
+           (elisp-def)
+         (user-error (lispy-goto-symbol-elisp -symbol)))
+     (funcall -fn -symbol))))
 
 (provide 'init-lisp)

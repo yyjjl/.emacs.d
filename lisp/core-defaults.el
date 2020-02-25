@@ -114,21 +114,6 @@
 (setq initial-scratch-message
       (concat ";; Welcome to Emacs " (or user-login-name "") " !!!"))
 
-;;* Recentf
-(defun core//recentf-keep? (-fn)
-  (and core--recentf-enabled-p
-       ;; The order must be kept
-       (or (file-remote-p -fn)
-           (and (file-readable-p -fn)
-                (file-writable-p -fn)))))
-(setq recentf-keep '(core//recentf-keep?))
-(setq recentf-max-saved-items 2048)
-(setq recentf-exclude (list "/tmp/" "^/sshx?:" "/sudo:" "\\.elc$"
-                            "/node_modules/"
-                            "\\.\\(gz\\|gif\\|svg\\|png\\|jpe?g\\)$" "/TAGS$"
-                            (expand-file-name "~/downloads")
-                            emacs-var-direcotry))
-
 ;;* Savehist
 ;; (setq history-length 1000)
 ;; (setq savehist-additional-variables '(ivy-views))
@@ -163,7 +148,7 @@
              (start-process "external-process" nil "xdg-open" file))))
     (kill-buffer)
     (let (debug-on-error)
-      (error "Opened %s in external program" (file-name-nondirectory file)))))
+      (user-error "Opened %s in external program" (file-name-nondirectory file)))))
 
 (put 'core//external-file-handler 'safe-magic t)
 (put 'core//external-file-handler 'operations '(insert-file-contents))
@@ -243,7 +228,7 @@
 
   (condition-case err
       (hs-minor-mode 1)
-    (error (message "%s" (error-message-string err))))
+    (user-error (message "%s" (error-message-string err))))
 
   (hl-line-mode 1)
 

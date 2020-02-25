@@ -1,5 +1,7 @@
 ;; -*- lexical-binding: t -*-
 
+(defvar ivy-views-persistent-file "ivy-views.el")
+
 (defun core//package-install-transformer (-string)
   (let ((package (cadr (assoc-string -string package-archive-contents))))
     (format "%-30s %-16s %-7s %s"
@@ -56,35 +58,46 @@
               "")
             (if bm (file-name-nondirectory (cdr (assoc 'filename bm))) ""))))
 
-(define-hook! ivy|occur-mode-setup (ivy-occur-mode-hook
-                                    ivy-occur-grep-mode-hook)
-  (local-set-key "/" #'ivy-occur-filter-lines)
-  (local-set-key (kbd "C-/") #'ivy-occur-undo)
-  (toggle-truncate-lines 1))
+(config! ivy
+  :prefix ivy
 
-(defvar ivy-views-persistent-file "ivy-views.el")
-(with-eval-after-load 'ivy
+  :bind
+  (:map ivy-minibuffer-map
+   ("C-r" . ivy-reverse-i-search)
+   ("C-j" . ivy-immediate-done)
+   ("C-M-j" . ivy-done)
+   ("M-." . ignore))
+
+  :advice
+  (:around ivy--preselect-index :name ignore-errors!)
+
+  :hook
+  (occur-mode-setup
+   :define (ivy-occur-mode-hook ivy-occur-grep-mode-hook)
+   (local-set-key "/" #'ivy-occur-filter-lines)
+   (local-set-key (kbd "C-/") #'ivy-occur-undo)
+   (toggle-truncate-lines 1))
+
+  (:anonymous
+   :define (kill-emacs-hook)
+   (core//save-variable 'ivy-views ivy-views-persistent-file))
+
+  :config
   (core//load-variable 'ivy-views ivy-views-persistent-file)
-
-  (add-hook 'kill-emacs-hook
-            (lambda ()
-              (core//save-variable 'ivy-views ivy-views-persistent-file)))
-
   (dolist (caller '(ivy-switch-buffer
                     counsel/kill-buffer
                     internal-complete-buffer
                     ivy-switch-buffer-other-window
                     counsel-projectile-switch-to-buffer
                     counsel-projectile))
-    (ivy-set-display-transformer caller #'core//ivy-switch-buffer-transformer))
-
-  (ivy-set-display-transformer 'package-install #'core//package-install-transformer)
+    (ivy-set-display-transformer caller
+                                 #'core//ivy-switch-buffer-transformer))
+  (ivy-set-display-transformer 'package-install
+                               #'core//package-install-transformer)
   (ivy-set-display-transformer 'counsel-find-file
                                #'core//counsel-find-file-transformer)
   (ivy-set-display-transformer 'counsel-bookmark
                                #'core//counsel-bookmark-transformer)
-
-  (advice-add 'ivy--preselect-index :around #'ignore-errors!)
 
   (setq ivy-read-action-function #'ivy-hydra-read-action)
 
@@ -99,60 +112,17 @@
           (t . ivy--regex-plus)))
   (setq ivy-use-virtual-buffers t)
   (setq ivy-virtual-abbreviate 'full)
-  (setq ivy-use-selectable-prompt t)
+  (setq ivy-use-selectable-prompt t))
 
-  (define-key!
-    :map ivy-minibuffer-map
-    ("C-r" . ivy-reverse-i-search)
-    ("C-j" . ivy-immediate-done)
-    ("C-M-j" . ivy-done)
-    ("M-." . ignore)))
-
-(with-eval-after-load 'swiper
+(config! swiper
+  :config
   (setq swiper-stay-on-quit t))
 
-(with-eval-after-load 'counsel
-  (define-key!
-    ("C-x j j" . counsel-bookmark)
-    ("C-s" . swiper/dispatch)
-    ("C-r" . swiper-isearch-backward)
-    ("C-x C-f" . counsel-find-file)
-    ("C-x k" . counsel/kill-buffer)
-    ("C-x b" . ivy-switch-buffer)
-    ("C-x w -" . ivy-pop-view)
-    ("C-x w =" . ivy-push-view))
+(config! counsel
+  :config
 
-  (define-key! :prefix "C-c i"
-    ("r" . ivy-resume)
-    ("l l" . counsel-load-library)
-    ("l t" . counsel-load-theme)
-    ("l p" . counsel-list-processes)
-    ("l f" . counsel-find-library)
-    ("u" . counsel-unicode-char)
-    ("d" . counsel-dired-jump)
-    ("i" . counsel/semantic-or-imenu*)
-    ("x" . counsel-linux-app)
-    ("v" . counsel-set-variable)
-    ("j" . counsel/rg-file-jump)
-    ("p" . counsel/file-jump)
-    ("g" . counsel-git)
-    ("s" . counsel-git-grep)
-    ("S" . counsel-git-stash)
-    ("h" . counsel-minibuffer-history)
-    ("m" . counsel-mark-ring)
-    ("/" . counsel-grep)
-    ("L" . counsel-locate)
-    ("f" . counsel-describe-face)
-    ("S" . counsel-find-symbol)
-    ("F" . counsel-faces)
-    ("W" . counsel-colors-web)
-    ("E" . counsel-colors-emacs)
-    ("e" . counsel/sudo-edit)
-    ("O" . counsel-outline)
-    ("o" . counsel-org-goto-all)
-    ("t" . counsel-tmm))
-
-  (setq counsel-linux-app-format-function #'counsel-linux-app-format-function-name-first)
+  (setq counsel-linux-app-format-function
+        #'counsel-linux-app-format-function-name-first)
 
   (setq counsel-yank-pop-separator
         "\n------------------------------------------------------------\n")
@@ -162,11 +132,17 @@
          ;; file names beginning with # or .
          "\\(?:\\`[#]\\)"
          ;; file names ending with # or ~
-         "\\|\\(?:[#~]\\'\\)"))
+         "\\|\\(?:[#~]\\'\\)")))
 
-  (define-key read-expression-map (kbd "C-r") 'counsel-minibuffer-history))
+(config! counsel-projectile
+  :bind
+  (:map projectile-command-map
+   ("s a" . counsel-projectile-ag)
+   ("p" . counsel-projectile)
+   ("K" . projectile-kill-buffers)
+   ("w" . projectile-switch-project))
 
-(with-eval-after-load 'counsel-projectile
+  :config
   (if emacs-use-ripgrep-p
       (progn
         (setq counsel-rg-base-command
@@ -174,12 +150,48 @@
         (define-key projectile-command-map "ss" 'counsel-projectile-rg)
         (global-set-key (kbd "C-c i a") 'counsel/rg))
     (define-key projectile-command-map "ss" 'counsel-projectile-grep)
-    (global-set-key (kbd "C-c i a") 'counsel-grep))
+    (global-set-key (kbd "C-c i a") 'counsel-grep)))
 
-  (define-key! :map projectile-command-map
-    ("s a" . counsel-projectile-ag)
-    ("p" . counsel-projectile)
-    ("K" . projectile-kill-buffers)
-    ("w" . projectile-switch-project)))
+(define-key!
+  ("C-x j j" . counsel-bookmark)
+  ("C-s" . swiper/dispatch)
+  ("C-r" . swiper-isearch-backward)
+  ("C-x C-f" . counsel-find-file)
+  ("C-x k" . counsel/kill-buffer)
+  ("C-x b" . ivy-switch-buffer)
+  ("C-x w -" . ivy-pop-view)
+  ("C-x w =" . ivy-push-view))
+
+(define-key! :prefix "C-c i"
+  ("r" . ivy-resume)
+  ("l l" . counsel-load-library)
+  ("l t" . counsel-load-theme)
+  ("l p" . counsel-list-processes)
+  ("l f" . counsel-find-library)
+  ("u" . counsel-unicode-char)
+  ("d" . counsel-dired-jump)
+  ("i" . counsel/semantic-or-imenu*)
+  ("x" . counsel-linux-app)
+  ("v" . counsel-set-variable)
+  ("j" . counsel/rg-file-jump)
+  ("p" . counsel/file-jump)
+  ("g" . counsel-git)
+  ("s" . counsel-git-grep)
+  ("S" . counsel-git-stash)
+  ("h" . counsel-minibuffer-history)
+  ("m" . counsel-mark-ring)
+  ("/" . counsel-grep)
+  ("L" . counsel-locate)
+  ("f" . counsel-describe-face)
+  ("S" . counsel-find-symbol)
+  ("F" . counsel-faces)
+  ("W" . counsel-colors-web)
+  ("E" . counsel-colors-emacs)
+  ("e" . counsel/sudo-edit)
+  ("O" . counsel-outline)
+  ("o" . counsel-org-goto-all)
+  ("t" . counsel-tmm))
+
+(define-key read-expression-map (kbd "C-r") 'counsel-minibuffer-history)
 
 (provide 'core-ivy)

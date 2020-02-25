@@ -22,7 +22,7 @@
 (defun git/goto-gutter ()
   (interactive)
   (unless git-gutter:diffinfos
-    (error "No git-gutters!"))
+    (user-error "No git-gutters!"))
   (let ((gutters (mapcar #'git//format-gutter git-gutter:diffinfos)))
     (ivy-read "git-gutters:" gutters
               :require-match t

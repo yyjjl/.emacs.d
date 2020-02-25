@@ -1,5 +1,7 @@
 ;; -*- lexical-binding:t -*-
+
 (require-packages!
+ dap-mode
  lsp-mode
  lsp-ui
  ivy)
@@ -15,6 +17,7 @@
   (require 'lsp-clients))
 
 (cl-defmacro lsp//try-enable (name &key (enable t) (init nil) (fallback nil))
+  (declare (indent 1))
   `(add-transient-hook! (hack-local-variables-hook :local t :name ,name)
      (if (and ,enable
               lsp-enable-in-project-p
@@ -30,34 +33,48 @@
   ;; default to sort and filter by server
   (setq-local company-transformers nil))
 
-(defun lsp*around-render-on-hover-content (-fn -contents -render-all)
-  (let ((content (funcall -fn -contents -render-all)))
-    (unless (core-popups//help-buffer-matcher (current-buffer))
-      (let ((content-length (length content))
-            (split-pos (string-match (rx line-end) content)))
-        (when (or (< split-pos content-length)
-                  (>= split-pos (frame-width)))
-          (setq content
-                (concat (substring content 0 (min split-pos (- (frame-width) 30)))
-                        (propertize
-                         (if-let (keys (where-is-internal 'lsp-describe-thing-at-point))
-                             (format " ... (%s to see more)"
-                                     (key-description (car keys)))
-                           " ...")
-                         'face 'font-lock-comment-face))))))
-    content))
+(config! lsp
+  :bind
+  (:map lsp-mode-map
+   ("M-s l" . lsp-lens-mode)
+   ("M-s h h" . lsp-document-highlight)
+   ("M-s '" . lsp-avy-lens)
+   ("C-c R" . lsp-rename)
+   ("C-c I" . lsp/ivy-workspace-symbol)
+   ("C-c S" . lsp-describe-session)
+   ("C-c B" . lsp-format-buffer)
+   ("C-c C-d" . lsp-describe-thing-at-point)
+   ("C-c C-SPC" . lsp-execute-code-action)
+   ("C-S-SPC" . lsp-signature-activate))
 
-(with-eval-after-load 'lsp
-  (require 'lsp-ui)
-  (require 'lsp-ivy)
+  :advice
+  (:override lsp--auto-configure :name ignore)
 
-  (advice-add 'lsp--auto-configure :override #'ignore)
+  (:override lsp--lv-message
+   :define (message)
+   (setq lsp--signature-last-buffer (current-buffer))
+   (let ((lv-force-update t))
+     (lv-message (replace-regexp-in-string "%" "%%" message))))
 
-  (defun lsp--lv-message (message)
-    (setq lsp--signature-last-buffer (current-buffer))
-    (let ((lv-force-update t))
-      (lv-message (replace-regexp-in-string "%" "%%" message))))
+  (:around lsp--render-on-hover-content
+   :define (-fn -contents -render-all)
+   (let ((content (funcall -fn -contents -render-all)))
+     (unless (core-popups//help-buffer-matcher (current-buffer))
+       (let ((content-length (length content))
+             (split-pos (string-match (rx line-end) content)))
+         (when (or (< split-pos content-length)
+                   (>= split-pos (frame-width)))
+           (setq content
+                 (concat (substring content 0 (min split-pos (- (frame-width) 30)))
+                         (propertize
+                          (if-let (keys (where-is-internal 'lsp-describe-thing-at-point))
+                              (format " ... (%s to see more)"
+                                      (key-description (car keys)))
+                            " ...")
+                          'face 'font-lock-comment-face))))))
+     content))
 
+  :config
   (setq lsp-auto-configure t)
   (setq lsp-auto-guess-root t)
   (setq lsp-eldoc-render-all t)
@@ -67,8 +84,6 @@
 
   (setq lsp-enable-completion-at-point t)
   (setq lsp-symbol-highlighting-skip-current t)
-
-  (advice-add 'lsp--render-on-hover-content :around #'lsp*around-render-on-hover-content)
 
   (add-to-list
    'hydra-local-toggles-heads-list
@@ -81,23 +96,10 @@
       ("t t" lsp-toggle-on-type-formatting
        "on type formating" :toggle lsp-enable-on-type-formatting)
       ("t s" lsp-toggle-signature-auto-activate
-       "signature" :toggle lsp-signature-auto-activate))))
+       "signature" :toggle lsp-signature-auto-activate))))) ()
 
-  (define-key! :map lsp-mode-map
-    ("M-s l" . lsp-lens-mode)
-    ("M-s h h" . lsp-document-highlight)
-    ("M-s '" . lsp-avy-lens)
-    ("C-c R" . lsp-rename)
-    ("C-c I" . lsp/ivy-workspace-symbol)
-    ("C-c S" . lsp-describe-session)
-    ("C-c B" . lsp-format-buffer)
-    ("C-c C-d" . lsp-describe-thing-at-point)
-    ("C-c C-SPC" . lsp-execute-code-action)
-    ("C-S-SPC" . lsp-signature-activate)))
-
-(with-eval-after-load 'lsp-ui
-  (require 'lsp-ui-sideline)
-
+(config! lsp-ui
+  :config
   (add-to-list
    'hydra-local-toggles-heads-list
    '(lsp-mode

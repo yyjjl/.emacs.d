@@ -20,14 +20,3 @@
                  (equal 1 (winum-get-number))))
         (treemacs-select-window)
       (winum-select-window-by-number 1))))
-
-;;;###autoload
-(defun treemacs*around-select-window-by-number (fn &optional arg)
-  "Jump to window 1 or treemacs-window."
-  (interactive)
-  (if (and (eq major-mode 'treemacs-mode)
-           (integerp arg)
-           (> arg 1)
-           (not (winum-get-window-by-number arg)))
-      (funcall fn (1- arg))
-    (funcall fn arg)))

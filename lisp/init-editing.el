@@ -9,20 +9,27 @@
  ;; provide tree style search jump
  avy)
 
-
+(avy-setup-default)
 
-(with-eval-after-load 'multiple-cursors
-  (advice-add 'multiple-cursors-mode
-              :before
-              (lambda (&rest _) (when (bound-and-true-p iedit-mode)
-                                  (iedit-mode -1)))))
+(autoload 'hydra-mc/mc/mark-next-like-this "autoloads/editing" nil t)
+(autoload 'hydra-mc/mc/mark-previous-like-this "autoloads/editing" nil t)
 
-(with-eval-after-load 'iedit
-  (setq iedit-auto-narrow t)
-  (advice-add 'iedit-mode
-              :before
-              (lambda (&rest _) (when (bound-and-true-p multiple-cursors-mode)
-                                  (multiple-cursors-mode -1)))))
+(config! multiple-cursors
+  :advice (:before multiple-cursors-mode
+           :define (&rest _)
+           (when (bound-and-true-p iedit-mode) (iedit-mode -1))))
+
+
+(config! iedit
+  :advice (:before iedit-mode
+           :define (&rest _)
+           (when (bound-and-true-p multiple-cursors-mode)
+             (multiple-cursors-mode -1)))
+  :config
+  (setq iedit-auto-narrow t))
+
+(config! picture
+  :bind (:map picture-mode-map ("C-c C-a" . artist-mode)))
 
 (define-key!
   ("C-x , SPC" . extra/insert-space-around-chinese)
@@ -57,24 +64,6 @@
   ("-" . hydra-mc/mc/mark-previous-like-this)
   ([C-S-mouse-1] . mc/add-cursor-on-click))
 
-(defhydra hydra-mc (:color blue :hint nil)
-  "
-_=_ next    _-_ previous    ___ skip-previous  _+_ skip-next _q_ quit
-"
-  ("=" mc/mark-next-like-this :exit nil)
-  ("-" mc/mark-previous-like-this :exit nil)
-  ("_" mc/skip-to-previous-like-this :exit nil)
-  ("+" mc/skip-to-next-like-this :exit nil)
-  ("RET" nil)
-  ("q" nil))
-
-(with-eval-after-load 'multiple-cursors-core
-  (require 'mc-hide-unmatched-lines-mode))
-
-(with-eval-after-load 'picture
-  (define-key! :map picture-mode-map
-    ("C-c C-a" . artist-mode)))
-
 ;; `avy' jump commands
 (define-key!
   ("M-7" . avy-goto-word-1-above)
@@ -88,7 +77,5 @@ _=_ next    _-_ previous    ___ skip-previous  _+_ skip-next _q_ quit
   ("M-g w" . avy-goto-subword-1)
   ("M-g y" . avy-copy-line)
   ("M-'" . core/change-surround))
-
-(avy-setup-default)
 
 (provide 'init-editing)

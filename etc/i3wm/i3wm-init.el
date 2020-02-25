@@ -3,9 +3,9 @@
 ;; Set some important variables
 (require 'core-vars)
 (require 'core-defaults)
-(require 'core-packages-lib)
+(require 'core-packages)
 
-(fset 'require! 'ignore)
+(advice-add 'request! :override #'ignore)
 
 (require 'core-ivy)
 (require 'core-misc)

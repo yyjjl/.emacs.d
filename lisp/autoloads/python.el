@@ -1,19 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;;;###autoload
-(defun python*unless-shell-running (-fn &rest -args)
-  (unless (python//shell-running-p)
-    (apply -fn -args)))
-
-;;;###autoload
-(defun python//shell-running-p ()
-  (when-let* ((process (or (and (derived-mode-p 'inferior-python-mode)
-                                (get-buffer-process (current-buffer)))
-                           (python-shell-get-process))))
-    (with-current-buffer (process-buffer process)
-      (not comint-last-prompt))))
-
-;;;###autoload
 (defun python/autopep8 ()
   (interactive)
   (let ((temporary-file-directory default-directory))

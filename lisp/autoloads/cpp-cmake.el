@@ -18,7 +18,7 @@
      (with-current-buffer -buffer
        (when (member cpp-cmake-current-config-name
                      '("Release" "Debug"))
-         (error "`Rlease' or `Debug' can not be delete")))
+         (user-error "`Rlease' or `Debug' can not be delete")))
      (when (yes-or-no-p "Are you sure to delete?")
        (with-current-buffer -buffer
          (setq cpp-cmake-config-list
@@ -132,7 +132,7 @@
                       (dolist (option (widget-value widget))
                         (setq option (split-string option "="))
                         (if (< (length option) 2)
-                            (error "Invalid Option %s" option)
+                            (user-error "Invalid Option %s" option)
                           (push (cons (car option)
                                       (string-join (cdr option)))
                                 options)))

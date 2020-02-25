@@ -240,9 +240,7 @@ read-only, and `buffer-file-coding-system'"
       (setq mode-line--cached-git-branch nil)
       (mode-line//git-info)
       (force-mode-line-update))))
-
-(with-eval-after-load 'magit
-  (advice-add 'magit-checkout :around #'mode-line*trace-magit-checkout))
+(advice-add 'magit-checkout :around #'mode-line*trace-magit-checkout)
 
 (defun mode-line*set-selected-window (&rest _)
   "Sets `mode-line--current-window' appropriately"

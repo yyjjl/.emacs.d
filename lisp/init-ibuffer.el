@@ -1,10 +1,15 @@
 ;;; -*- lexical-binding: t; -*-
 
-;; (require-packages! ibuffer-projectile)
+(config! ibuffer
+  :hook
+  (setup
+   :define (ibuffer-mode-hook)
+    ;; (ibuffer-vc-set-filter-groups-by-vc-root)
+    ;; (ibuffer-auto-mode 1)
+   (unless (eq ibuffer-sorting-mode 'filename/process)
+     (ibuffer-do-sort-by-filename/process)))
 
-
-
-(with-eval-after-load 'ibuffer
+  :config
   ;; Use human readable Size column instead of original one
   (define-ibuffer-column size-h
     (:name "Size" :inline t)
@@ -18,16 +23,6 @@
         ibuffer-show-empty-filter-groups nil
         ibuffer-movement-cycle nil
         ibuffer-display-summary nil)
-
-  (define-hook! ibuffer|setup (ibuffer-mode-hook)
-    ;; (ibuffer-auto-mode 1)
-    ;; (ibuffer-vc-set-filter-groups-by-vc-root)
-    (unless (eq ibuffer-sorting-mode 'filename/process)
-      (ibuffer-do-sort-by-filename/process))
-
-    ;; (setq ibuffer-filter-groups (ibuffer-projectile-generate-filter-groups))
-    )
-
 
   ;; Modify the default ibuffer-formats
   (setq ibuffer-formats

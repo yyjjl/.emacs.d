@@ -7,15 +7,14 @@
        (unless (or (member file '("." ".."))
                    (member file core-ignored-directories))
          (let ((full-file (expand-file-name file dir)))
-           (condition-case err
-               (if (and -recursive-p (file-directory-p full-file))
-                   (core//semanticdb-parse-directory full-file -regex -recursive-p)
-                 (if (or (not -regex)
-                         (string= -regex "")
-                         (string-match-p -regex file))
-                     (save-excursion
-                       (semanticdb-file-table-object full-file))))
-             (error (message "Error: %s" err)))))))))
+           (with-demoted-errors "Error: %s"
+             (if (and -recursive-p (file-directory-p full-file))
+                 (core//semanticdb-parse-directory full-file -regex -recursive-p)
+               (if (or (not -regex)
+                       (string= -regex "")
+                       (string-match-p -regex file))
+                   (save-excursion
+                     (semanticdb-file-table-object full-file)))))))))))
 
 ;;;###autoload
 (defun core/semantidb-parse (-regex -dir)

@@ -9,7 +9,7 @@
 (require 'core-custom)
 
 ;; Load core packages
-(require 'core-packages-lib)
+(require 'core-packages)
 (require 'core-ui)
 (require 'core-features)
 
@@ -17,11 +17,6 @@
 (require 'init-dired)
 (require 'init-ibuffer)
 
-;; ----------------------------------------
-;; Optional packages
-;; ----------------------------------------
-
-;; All packages required in this section are defined in their init files
 (require 'init-spelling)
 (when emacs-use-latex-p
   (require 'init-latex)
@@ -48,7 +43,6 @@
 (require 'init-python)
 (require 'init-lisp)
 (require 'init-sh)
-
 (require 'init-realgud)
 
 (when emacs-use-mpv-p

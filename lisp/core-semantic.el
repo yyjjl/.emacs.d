@@ -1,15 +1,17 @@
-(with-eval-after-load 'semantic
+;; -*- lexical-binding: t; -*-
+
+(config! semantic
+  :advice
+  (:override semantic-analyze-completion-at-point-function :name ignore)
+  (:override semantic-analyze-notc-completion-at-point-function :name ignore)
+  (:override semantic-analyze-nolongprefix-completion-at-point-function :name ignore)
+  (:around semantic-new-buffer-fcn :name ignore-remote!)
+  (:around semantic-idle-scheduler-function
+   :define (-fn &rest -args) (with-local-quit (apply -fn -args)))
+
+  :config
   (semantic-add-system-include "/usr/include/" 'c++-mode)
   (semantic-add-system-include "/usr/include/" 'c-mode)
-
-  (advice-add 'semantic-analyze-completion-at-point-function :override #'ignore)
-  (advice-add 'semantic-analyze-notc-completion-at-point-function :override #'ignore)
-  (advice-add 'semantic-analyze-nolongprefix-completion-at-point-function :override #'ignore)
-  (advice-add 'semantic-new-buffer-fcn :around #'ignore-remote!)
-
-  (advice-add 'semantic-idle-scheduler-function
-              :around (lambda (-fn &rest -args)
-                        (with-local-quit (apply -fn -args))))
 
   ;; It's too slow, when file is large
   ;; (require 'stickyfunc-enhance)
@@ -28,7 +30,5 @@
   (when emacs-use-gtags-p
     (dolist (mode '(c++-mode c-mode java-mode))
       (semanticdb-enable-gnu-global-databases mode))))
-
-(add-hook 'after-init-hook 'semantic-mode)
 
 (provide 'core-semantic)

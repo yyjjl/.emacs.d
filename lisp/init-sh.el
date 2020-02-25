@@ -7,12 +7,13 @@
 
 (define-hook! sh|setup (sh-mode-hook)
   (when (buffer-enable-rich-feature-p)
-    (lsp//try-enable sh|setup-internal :init (setq-local lsp-eldoc-render-all nil))
+    (lsp//try-enable sh|setup-internal
+      :init (setq-local lsp-eldoc-render-all nil))
 
     (add-to-list 'flycheck-disabled-checkers 'sh-shellcheck)
     (flycheck-mode 1)))
 
-(with-eval-after-load 'make-mode
-  (add-hook 'makefile-mode-hook #'whitespace-mode))
+(config! make-mode
+  :hook (whitespace-mode (makefile-mode-hook)))
 
 (provide 'init-sh)

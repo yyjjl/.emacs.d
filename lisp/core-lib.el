@@ -133,7 +133,7 @@ Optional argument -BODY is the function body."
          (-symbol (cond (anonymous-p (cl-gensym "g"))
                        ((consp -name) `',(car -name))
                        ((symbolp -name) `',-name)
-                       (t (error "Invalid hook name: %s" -name))))
+                       (t (user-error "Invalid hook name: %s" -name))))
          (args (when (consp -name) (cdr -name)))
          (hooks (if (listp -hooks) -hooks (list -hooks)))
          (forms (cl-loop for hook in hooks
@@ -408,6 +408,14 @@ HTML file converted from org file, it returns t."
         (if (string-match-p "finished" status)
             (and callback (funcall callback buffer status))
           (and error-callback (funcall error-callback buffer status)))))))
+
+(defun replace! (-value -keyword -transformer-fn)
+  (if (and (not (null -value)) (listp -value))
+      (if (eq (car -value) -keyword)
+          (funcall -transformer-fn -value)
+        (cons (replace! (car -value) -keyword -transformer-fn)
+              (replace! (cdr -value) -keyword -transformer-fn)))
+    -value))
 
 (unless (fboundp 'when-let*)
   (defalias 'when-let* 'when-let))

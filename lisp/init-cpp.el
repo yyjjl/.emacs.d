@@ -47,7 +47,6 @@
 
 
 ;; Setup
-
 (defun cpp//common-cc-setup ()
   "Setup shared by all languages (java/groovy/c++ ...)"
   (google-set-c-style)
@@ -88,74 +87,66 @@
      ;; (setq completion-at-point-functions nil)
      (flycheck-mode -1))))
 
-;; Do not use `c-mode-hook' and `c++-mode-hook', there is a bug
-(defvar-local cpp--initialized-p nil)
-(define-hook! cpp|common-setup (c-mode-common-hook)
-  (unless cpp--initialized-p
-    (setq cpp--initialized-p t)
-    (if (>= (string-to-number c-version) 5.33)
-        (run-hooks 'prog-mode-hook))
+(config! projectile
+  :advice
+  (:around projectile--run-project-cmd
+   :define (-fn &rest -args)
+   (with-temp-env! (cpp-cmake//config-env) (apply -fn -args))))
 
-    (cpp//common-cc-setup)
+(config! cc-mode
+  :prefix cpp
+  :bind
+  (:map c-mode-base-map
+   ("*" . cpp/electric-star)
+   ("C-c o" . ff-find-other-file)
+   ("C-c C-j" . semantic-ia-fast-jump)
+   ("C-c C-v" . semantic-ia-show-variants)
+   ("M-n" . next-error)
+   ("M-p" . previous-error)
+   ("C-M-i" . counsel-company))
+  (:map c++-mode-map
+   ("<")
+   (">")
+   ("C-c C-d")
+   ("C-c C-e" . cpp/macro-expand)
+   ("C-c b" . clang-format-buffer)
+   ("C-c C-b" . clang-format-buffer)
+   ("C-c C-l" . cpp/load-file-in-root)
+   ("C-c T" . cpp-cmake/toggle-option)
+   ("C-c C" . cpp-cmake/change-config)
+   ("C-c D" . cpp-cmake/config)
+   ("C-c C-c" . cpp/config-project)
+   ("M-s c" . ccls-call-hierarchy)
+   ("M-s m" . ccls-member-hierarchy)
+   ("M-s i" . ccls-inheritance-hierarchy)
+   ("C-c j" :map cpp-ccls-jump-map)
+   ([f9] . cpp/config-project)
+   ([f10] . cpp/compile)
+   ([f5] . cpp/debug-current-file))
 
-    (unless (or (derived-mode-p 'java-mode)
-                (derived-mode-p 'groovy-mode))
-      ;; (hide-ifdef-mode 1)
-      ;; Make a #define be left-aligned
-      (setq c-electric-pound-behavior '(alignleft))
-      (cpp//font-lock-setup)
+  :hook
+  (common-setup
+   :define (c-mode-common-hook)
+   (cpp//common-cc-setup)
 
-      (when (buffer-enable-rich-feature-p)
-        (cpp//main-setup)))))
+   (unless (or (derived-mode-p 'java-mode)
+               (derived-mode-p 'groovy-mode))
+     ;; (hide-ifdef-mode 1)
+     ;; Make a #define be left-aligned
+     (setq c-electric-pound-behavior '(alignleft))
+     (cpp//font-lock-setup)
 
-(with-eval-after-load 'projectile
-  (advice-add 'projectile--run-project-cmd
-              :around
-              (lambda (-fn &rest -args)
-                (with-temp-env! (cpp-cmake//config-env) (apply -fn -args)))))
+     (when (buffer-enable-rich-feature-p)
+       (cpp//main-setup))))
 
-(with-eval-after-load 'cc-mode
+  :advice ;; Smart tab
+  (:around c-indent-line-or-region :name core*indent-for-tab)
+
+  :config
   (require 'ccls nil t)
 
   (dolist (key '("#" "}" "/" ";" "," ":" "(" ")" "{"))
-    (define-key c-mode-base-map key nil))
-
-  ;; Smart tab
-  (advice-add 'c-indent-line-or-region :around #'core*indent-for-tab)
-
-  (when (>= (string-to-number c-version) 5.33)
-    (put 'c++-mode 'derived-mode-parent 'prog-mode)
-    (put 'c-mode 'derived-mode-parent 'prog-mode)
-    (put 'java-mode 'derived-mode-parent 'prog-mode))
-
-  (define-key! :map c-mode-base-map
-    ("*" . cpp/electric-star)
-    ("C-c o" . ff-find-other-file)
-    ("C-c C-j" . semantic-ia-fast-jump)
-    ("C-c C-v" . semantic-ia-show-variants)
-    ("M-n" . next-error)
-    ("M-p" . previous-error)
-    ("C-M-i" . counsel-company))
-
-  (define-key! :map c++-mode-map
-    ("<")
-    (">")
-    ("C-c C-d")
-    ("C-c C-e" . cpp/macro-expand)
-    ("C-c b" . clang-format-buffer)
-    ("C-c C-b" . clang-format-buffer)
-    ("C-c C-l" . cpp/load-file-in-root)
-    ("C-c T" . cpp-cmake/toggle-option)
-    ("C-c C" . cpp-cmake/change-config)
-    ("C-c D" . cpp-cmake/config)
-    ("C-c C-c" . cpp/config-project)
-    ("M-s c" . ccls-call-hierarchy)
-    ("M-s m" . ccls-member-hierarchy)
-    ("M-s i" . ccls-inheritance-hierarchy)
-    ("C-c j" :map cpp-ccls-jump-map)
-    ([f9] . cpp/config-project)
-    ([f10] . cpp/compile)
-    ([f5] . cpp/debug-current-file)))
+    (define-key c-mode-base-map key nil)))
 
 ;; Set term default directory
 (when (boundp 'term-default-directory-function-list)
@@ -171,9 +162,8 @@
              '((c++-mode . 1) (c-mode . 1) (t . t))))
       ((listp font-lock-maximum-decoration)
        (dolist (mode '(c++-mode c-mode))
-         (let ((cell (assoc mode font-lock-maximum-decoration)))
-           (if cell
-               (setcdr cell 1)
-             (push (cons mode 1) font-lock-maximum-decoration))))))
+         (if-let (cell (assoc mode font-lock-maximum-decoration))
+             (setcdr cell 1)
+           (push (cons mode 1) font-lock-maximum-decoration)))))
 
 (provide 'init-cpp)

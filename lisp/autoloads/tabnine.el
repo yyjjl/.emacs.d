@@ -3,7 +3,7 @@
 (defun company//check-tabnine ()
   (unless (and (require 'company-tabnine nil t)
                (company-tabnine--executable-path))
-    (error "Can not load TabNine")))
+    (user-error "Can not load TabNine")))
 
 (defun company//attach-backend-to-backend (target attachment)
   (cond ((symbolp target)

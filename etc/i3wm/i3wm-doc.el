@@ -44,7 +44,7 @@
 
 
 (with-eval-after-load 'ivy
-  (ivy-set-display-transformer 'i3/open-document
-                               #'i3//open-document-transformer))
+  (ivy-configure 'i3/open-document
+    :display-transformer-fn #'i3//open-document-transformer))
 
 (provide 'i3wm-doc)

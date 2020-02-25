@@ -18,56 +18,58 @@
 
 
 (defvar org--included-files (make-hash-table :test #'equal))
-(defun org*around-export-expand-include-keyword (-fn &optional -included -directory &rest -args)
-  "Remove relative file path when including files"
-  (if (not -included) ;; function called at top level
-      (clrhash org--included-files)
-    (puthash (file-truename (caar -included)) t org--included-files))
-
-  (let ((result (apply -fn -included -directory -args)))
-    (unless -included
-      (save-excursion
-        (goto-char (point-min))
-        (while (re-search-forward org-link-any-re nil t)
-          (let ((link-end (point))
-                (link (save-excursion
-                        (forward-char -1)
-                        (save-match-data (org-element-context)))))
-            (when (eq 'link (org-element-type link))
-              (let ((link-begin (org-element-property :begin link)))
-                (goto-char link-begin)
-                (let* ((path (org-element-property :path link))
-                       (search-option (org-element-property :search-option link)))
-                  (if (not (and search-option
-                                (eq 'bracket (org-element-property :format link))
-                                (string= "file" (org-element-property :type link))
-                                (gethash (file-truename (expand-file-name path -directory))
-                                         org--included-files)))
-                      (goto-char link-end)
-                    (let* ((contents-begin (org-element-property :contents-begin link))
-                           (contents-end (org-element-property :contents-end link))
-                           (description (when (and contents-begin contents-end)
-                                          (buffer-substring-no-properties contents-begin contents-end))))
-                      (delete-region (org-element-property :begin link)
-                                     (org-element-property :end link))
-                      (insert (org-link-make-string search-option description) " "))))))))))
-    result))
 
 (defun org*wrap-publish-fn (-fn -plist -filename -pub-dir)
   (condition-case err
       (funcall -fn -plist -filename -pub-dir)
-    (error (message "Fail to publish file %s: %s" -filename err))))
+    (user-error (message "Fail to publish file %s: %s" -filename err))))
 
-(with-eval-after-load 'ox
-  (advice-add 'org-export-expand-include-keyword :around #'org*around-export-expand-include-keyword))
+(config! ox
+  :advice
+  (:around org-export-expand-include-keyword
+   :define (-fn &optional -included -directory &rest -args)
+   "Remove relative file path when including files"
+   (if (not -included) ;; function called at top level
+       (clrhash org--included-files)
+     (puthash (file-truename (caar -included)) t org--included-files))
 
-(with-eval-after-load 'ox-html
-  (advice-add 'org-html-publish-to-html :around #'org*wrap-publish-fn))
+   (let ((result (apply -fn -included -directory -args)))
+     (unless -included
+       (save-excursion
+         (goto-char (point-min))
+         (while (re-search-forward org-link-any-re nil t)
+           (let ((link-end (point))
+                 (link (save-excursion
+                         (forward-char -1)
+                         (save-match-data (org-element-context)))))
+             (when (eq 'link (org-element-type link))
+               (let ((link-begin (org-element-property :begin link)))
+                 (goto-char link-begin)
+                 (let* ((path (org-element-property :path link))
+                        (search-option (org-element-property :search-option link)))
+                   (if (not (and search-option
+                                 (eq 'bracket (org-element-property :format link))
+                                 (string= "file" (org-element-property :type link))
+                                 (gethash (file-truename (expand-file-name path -directory))
+                                          org--included-files)))
+                       (goto-char link-end)
+                     (let* ((contents-begin (org-element-property :contents-begin link))
+                            (contents-end (org-element-property :contents-end link))
+                            (description (when (and contents-begin contents-end)
+                                           (buffer-substring-no-properties contents-begin contents-end))))
+                       (delete-region (org-element-property :begin link)
+                                      (org-element-property :end link))
+                       (insert (org-link-make-string search-option description) " "))))))))))
+     result)))
 
-(with-eval-after-load 'ox-latex
-  (advice-add 'org-latex-publish-to-pdf :around #'org*wrap-publish-fn))
+(config! ox-html
+  :advice (:around org-html-publish-to-html :name org*wrap-publish-fn))
 
-(with-eval-after-load 'ox-publish
+(config! ox-latex
+  :advice (:around org-latex-publish-to-pdf :name org*wrap-publish-fn))
+
+(config! ox-publish
+  :config
   (setq org-publish-project-alist
         `(("note-pdf"                   ; These are the main web files
            :base-directory ,org-project-src-dir

@@ -20,48 +20,12 @@
 
 (setq auto-mode-alist (cl-subst 'web-mode 'js-jsx-mode auto-mode-alist))
 
-
-
-(defun css//font-file-to-base64 (-file)
-  (if (file-exists-p -file)
-      (replace-regexp-in-string "\n" "" (shell-command-to-string
-                                         (concat "cat " -file "|base64")))
-    ""))
-
-;; Colourise CSS colour literals
-(defun css/convert-binary-to-code ()
-  "Convert binary (image, font...) into css."
-  (interactive)
-  (let* ((file (completing-read "The image path: " #'read-file-name-internal))
-         (file-ext (file-name-extension file))
-         (file-base (file-name-sans-extension file))
-         (result
-          (if (member file-ext '("ttf" "eot" "woff"))
-              (concat "@font-face {\n"
-                      "  font-family: familarName;\n"
-                      "  src: url('data:font/eot;base64,"
-                      (css//font-file-to-base64 (concat file-base ".eot"))
-                      "') format('embedded-opentype'),\n"
-                      "       url('data:application/x-font-woff;base64,"
-                      (css//font-file-to-base64 (concat file-base ".woff"))
-                      "') format('woff'),\n"
-                      "       url('data:font/ttf;base64,"
-                      (css//font-file-to-base64 (concat file-base ".ttf"))
-                      "') format('truetype');"
-                      "\n}")
-            (concat "background:url(\"data:image/"
-                    file-ext
-                    ";base64,"
-                    (css//font-file-to-base64 file)
-                    "\") no-repeat 0 0;"))))
-    (kill-new result)
-    (message "css code => clipboard & yank ring")))
 
 (defun css//imenu-make-index ()
   (save-excursion
     (imenu--generic-function '((nil "^ *\\([^ ]+\\) *{ *$" 1)))))
 
-(defun web|setup-js-internal ()
+(defun web|setup-internal ()
   (when (bound-and-true-p lsp-enable-in-project-p)
     (electric-indent-local-mode -1)
     (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
@@ -71,43 +35,53 @@
 
     (company//add-backend 'company-tide)))
 
-(define-hook! web|setup-web (web-mode-hook)
-  (if (and buffer-file-name
-           (string-match-p "\\.[jt]sx?\\'" (downcase buffer-file-name)))
-      (add-transient-hook!
-          (hack-local-variables-hook :local t :name web|setup-web-hook)
-        (web|setup-js-internal)))
-  (company//add-backend 'company-web-html))
-
 (define-hook! web|setup-js (js-mode-hook typescript-mode-hook)
   (when (and buffer-file-name
              (not (string-suffix-p ".json" (downcase buffer-file-name))))
     (add-transient-hook!
         (hack-local-variables-hook :local t :name web|setup-js-hook)
-      (web|setup-js-internal)))
+      (web|setup-internal)))
 
   (setq-local electric-layout-rules
               (delq (assoc ?\; electric-layout-rules) electric-layout-rules)))
 
-(autoload 'turn-on-css-eldoc "css-eldoc")
-(define-hook! web|setup-css (css-mode-hook sass-mode-hook)
-  (rainbow-mode 1)
-  (turn-on-css-eldoc)
+(config! css-mode
+  :hook
+  (setup
+   :define (css-mode-hook)
+   (rainbow-mode 1)
+   (setq-local eldoc-documentation-function #'css-eldoc-function)
+   (setq imenu-create-index-function 'css//imenu-make-index)))
 
-  (setq imenu-create-index-function 'css//imenu-make-index))
+(config! tide
+  :bind
+  (:map tide-mode-map
+   ("C-c C-d" . tide-documentation-at-point)
+   ("M-?" . tide-references)
+   ("C-c r r" . tide-refactor)
+   ("C-c r n" . tide-rename-symbol)
+   ("C-c r f" . tide-rename-file)
+   ("C-c b" . tide-format)
+   ("C-c B" . tide-organize-imports)
+   ("C-c C-b" . tide-format)))
 
-(with-eval-after-load 'tide
-  (define-key! :map tide-mode-map
-    ("C-c C-d" . tide-documentation-at-point)
-    ("M-?" . tide-references)
-    ("C-c r r" . tide-refactor)
-    ("C-c r n" . tide-rename-symbol)
-    ("C-c r f" . tide-rename-file)
-    ("C-c b" . tide-format)
-    ("C-c B" . tide-organize-imports)
-    ("C-c C-b" . tide-format)))
+(config! web-mode
+  :bind
+  (:map web-mode-map
+   ("M-e" . web-mode-element-next)
+   ("M-a" . web-mode-element-previous))
 
-(with-eval-after-load 'web-mode
+  :hook
+  (setup
+   :define (web-mode-hook)
+   (if (and buffer-file-name
+            (string-match-p "\\.[jt]sx?\\'" (downcase buffer-file-name)))
+       (add-transient-hook!
+           (hack-local-variables-hook :local t :name web|setup-web-hook)
+         (web|setup-internal)))
+   (company//add-backend 'company-web-html))
+
+  :config
   (setq web-mode-enable-auto-closing t) ;; Enable auto close tag in `web-mode'
   (setq web-mode-enable-auto-pairing t)
   (setq web-mode-enable-css-colorization t)
@@ -130,14 +104,11 @@
   (remap! "C-c C-a" "C-c a" web-mode-map)
   (remap! "C-c C-d" "C-c d" web-mode-map)
   (remap! "C-c C-e" "C-c e" web-mode-map)
-  (remap! "C-c C-t" "C-c t" web-mode-map)
-
-  (define-key! :map web-mode-map
-    ("M-e" . web-mode-element-next)
-    ("M-a" . web-mode-element-previous)))
+  (remap! "C-c C-t" "C-c t" web-mode-map))
 
 
-(with-eval-after-load 'projectile
+(config! projectile
+  :config
   (projectile-register-project-type 'npm '("package.json")
                                     :configure "npm install"
                                     :compile "npm run build"
@@ -148,7 +119,7 @@
 (add-hook 'html-mode-hook 'emmet-mode)
 (add-hook 'sgml-mode-hook 'emmet-mode)
 (add-hook 'web-mode-hook 'emmet-mode)
-(add-hook 'nxml-mode 'emmet-mode)
+(add-hook 'nxml-mode-hook 'emmet-mode)
 (add-hook 'css-mode-hook 'emmet-mode)
 
 (provide 'init-web)

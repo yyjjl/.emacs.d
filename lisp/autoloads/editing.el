@@ -1,5 +1,16 @@
 ;;; -*- lexical-binding: t; -*-
 
+(defhydra hydra-mc (:color blue :hint nil)
+  "
+_=_ next    _-_ previous    ___ skip-previous  _+_ skip-next _q_ quit
+"
+  ("=" mc/mark-next-like-this :exit nil)
+  ("-" mc/mark-previous-like-this :exit nil)
+  ("_" mc/skip-to-previous-like-this :exit nil)
+  ("+" mc/skip-to-next-like-this :exit nil)
+  ("RET" nil)
+  ("q" nil))
+
 ;;;###autoload
 (defvar core-narrow-dwim-alist
   '((org-mode org-narrow-to-subtree org-narrow-to-element)

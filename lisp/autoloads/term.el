@@ -14,7 +14,8 @@
 
 (defvar-local term--ssh-info nil)
 (defvar-local term--parent-buffer nil)
-(defvar-local term--extra-name nil)
+;;;###autoload
+(defvar-local term-extra-name nil)
 
 ;;;###autoload
 (defvar-local term-directly-kill-buffer nil)
@@ -193,7 +194,7 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
     (user-error "You can switch to another term buffer from a term buffer"))
   (let ((term-buffer-list
          (mapcar (lambda (buffer)
-                   (let ((name (buffer-local-value 'term--extra-name buffer)))
+                   (let ((name (buffer-local-value 'term-extra-name buffer)))
                      (cons (if name
                                (concat (buffer-name buffer) ": " name)
                              (buffer-name buffer))
@@ -452,8 +453,10 @@ else: try to find a old term buffer and pop to it"
                             #'term-send-raw
                           command))))
 
-(with-eval-after-load 'counsel
-  (add-to-list 'ivy-format-functions-alist '(term/yank-pop . counsel--yank-pop-format-function)))
+(config! counsel
+  :config
+  (ivy-configure 'term/yank-pop
+    :format-fn #'counsel--yank-pop-format-function))
 
 (defun term/yank-pop (&optional _)
   (interactive "P")
@@ -524,5 +527,5 @@ else: try to find a old term buffer and pop to it"
   (interactive)
   (unless (term//term-buffer-p (current-buffer))
     (user-error "Not in a term buffer"))
-  (let ((name (read-from-minibuffer "Extra name: " term--extra-name nil nil 'term-extra-name-history)))
-    (setq term--extra-name (if (string= name "") nil name))))
+  (let ((name (read-from-minibuffer "Extra name: " term-extra-name nil nil 'term-extra-name-history)))
+    (setq term-extra-name (if (string= name "") nil name))))

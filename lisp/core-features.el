@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t; -*-
+
 ;; Core packages
 (require-packages!
  cnfonts
@@ -71,8 +73,8 @@
 
   (yas-global-mode 1)
   (global-company-mode 1)
+  (semantic-mode 1)
 
-  (setq which-key-dont-use-unicode t)
   (which-key-mode 1)
 
   ;;`eldoc', show API doc in minibuffer echo area enabled by default

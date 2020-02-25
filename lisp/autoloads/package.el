@@ -3,14 +3,15 @@
 ;;;###autoload
 (defun package/generate-autoloads ()
   (interactive)
+  (require 'autoload)
   (let ((files (directory-files emacs-autoloads-directory :full "\\.el\\'"))
         (failed-count 0))
     (with-current-buffer (find-file-noselect emacs-autoloads-file)
       (erase-buffer)
       (dolist (file files)
-        (condition-case nil
+        (condition-case err
             (generate-file-autoloads file)
-          (error (message "Generating for %s failed" file)
+          (user-error (message "Generating for %s failed: %s" file err)
                  (cl-incf failed-count))))
       (save-buffer))
     (message "%d generated, %d failed"

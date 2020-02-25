@@ -2,8 +2,30 @@
 
 (require 'cl-lib)
 
+;;;###autoload
+(defvar core-current-desktop-name nil)
+
 (defvar core-after-rename-this-file-hook nil)
 (defvar core-after-delete-this-file-hook nil)
+
+;;;###autoload
+(defvar core-view-code-modes
+  '(;; (lispy-mode rainbow-delimiters-count-mode)
+    (t display-line-numbers-mode
+       view-mode
+       highlight-indentation-current-column-mode
+       highlight-indentation-mode)))
+
+;;;###autoload
+(define-minor-mode core-view-code-mode
+  "View code"
+  :init-value nil
+  (let ((switch (if core-view-code-mode 1 -1)))
+    (cl-loop for (condition . modes) in core-view-code-modes
+             when (or (eq condition t)
+                      (and (symbolp condition) (symbol-value condition)))
+             do (dolist (mode modes)
+                  (funcall mode switch)))))
 
 ;;;###autoload
 (defun core/display-latex-fragment-at-point ()
@@ -43,7 +65,8 @@
 (defun core/delete-this-file ()
   "Delete the current file, and kill the buffer."
   (interactive)
-  (or (buffer-file-name) (error "No file is currently being edited"))
+  (unless (buffer-file-name)
+      (user-error "No file is currently being edited"))
   (when (yes-or-no-p (format "Really delete '%s'?"
                              (file-name-nondirectory buffer-file-name)))
     (delete-file (buffer-file-name))
@@ -75,7 +98,7 @@
   (interactive
    (list (let (confirm-nonexistent-file-or-buffer)
            (unless buffer-file-name
-             (error "Current buffer is not visiting a file!"))
+             (user-error "Current buffer is not visiting a file!"))
            (let ((new-name (completing-read "New file name: " #'read-file-name-internal)))
              (if (file-directory-p new-name)
                  (expand-file-name (file-name-nondirectory buffer-file-name) new-name)
@@ -337,7 +360,7 @@ directory and extension."
               (setq core-current-desktop-name -name)
               (desktop-change-dir new-dir)
               (semantic-mode 1))
-          (error "Desktop file is in use !!"))
+          (user-error "Desktop file is in use !!"))
       (make-directory new-dir t)
       (desktop-kill)
       (desktop-save new-dir))))
@@ -373,10 +396,6 @@ directory and extension."
       (when-let (components (rainbow-delimiters--number-to-subscript -char -depth))
         (compose-region -loc (1+ -loc) components)))))
 
-(with-eval-after-load 'rainbow-delimiters
-  (advice-add 'rainbow-delimiters--apply-color
-              :after #'rainbow-delimiters--add-depth-number))
-
 ;;;###autoload
 (define-minor-mode rainbow-delimiters-count-mode
   "Add count below parentheses."
@@ -384,10 +403,17 @@ directory and extension."
   (unless (or (bound-and-true-p rainbow-delimiters-mode)
               (display-graphic-p))
     (setq rainbow-delimiters-count-mode nil)
-    (error "rainbow-delimiters-mode is not enabled"))
+    (user-error "rainbow-delimiters-mode is not enabled"))
+
   (if rainbow-delimiters-count-mode
-      (setq line-spacing 0.1)
-    (setq line-spacing (default-value 'line-spacing)))
+      (progn
+        (setq line-spacing 0.1)
+        (advice-add 'rainbow-delimiters--apply-color
+                    :after #'rainbow-delimiters--add-depth-number))
+    (decompose-region (point-min) (point-max))
+    (setq line-spacing (default-value 'line-spacing))
+    (advice-remove 'rainbow-delimiters--apply-color
+                   #'rainbow-delimiters--add-depth-number))
   (font-lock-flush))
 
 (defvar core-run-current-file-executable

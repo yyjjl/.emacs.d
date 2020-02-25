@@ -33,74 +33,6 @@
              'babel)
      ,@-body))
 
-(defun org*around-latex-inline-image (-fn -link -info)
-  (let ((code (funcall -fn -link -info)))
-    (replace-regexp-in-string "\\(\\\\includesvg\\)\\(?:[^{]\\)?*{.*}"
-                              "\\\\includegraphics"
-                              code
-                              nil nil 1)))
-
-(defun org*around-html-do-format-code (-fn &rest -rest)
-  (when (= (length -rest) 5)
-    (let ((num-start (nth 4 -rest)))
-      (unless num-start
-        (setq num-start 0))
-      (setcar (nthcdr 4 -rest) num-start)))
-  (apply -fn -rest))
-
-(defun org*around-latex-link (-fn -link -desc -info)
-  (let* ((type (org-element-property :type -link))
-         (raw-path (org-element-property :path -link))
-         (search-option (org-element-property :search-option -link))
-         (project (ignore-errors
-                    (org-publish-get-project-from-filename
-                     (buffer-file-name)))))
-    (if (and project
-             (string= type "file")
-             (string= (file-name-extension raw-path) "org")
-             (equal (car (org-publish-get-project-from-filename
-                          (file-truename raw-path)))
-                    (car project)))
-        (format "\\href{%s.pdf%s}{%s}"
-                (org-latex--protect-text
-                 (org-export-file-uri
-                  (file-name-sans-extension raw-path)))
-                search-option
-                (or -desc ""))
-      (funcall -fn -link -desc -info))))
-
-(defun org*around-fill-paragraph (-fn &optional -justify -region)
-  (let* ((element (org-element-context))
-         (end (org-element-property :end element))
-         (begin (org-element-property :begin element))
-         (latex-p (memq (org-element-type element)
-                        '(latex-fragment latex-environment))))
-    (if (and latex-p (not (region-active-p)) -justify)
-        (save-excursion
-          (goto-char begin)
-          (let ((g1 '(group (not (any "{([" blank))))
-                (g2 '(group (or (any ?= ?- ?+ ?/ ?> ?<)
-                                (and "\\" (or "ne" "neq" "le" "ge"
-                                              "cdot" "circ" "cap" "cup"
-                                              "subset" "subsetqe" "lor"
-                                              "land" "in" "to" "rightarrow"
-                                              "Rightarrow")
-                                     word-end))))
-                (g3 '(group (not (any ")}]" blank)))))
-            (query-replace-regexp (rx-to-string `(and ,g1 ,g2 ,g3) t)
-                                  "\\1 \\2 \\3" nil begin end)
-            (query-replace-regexp (rx-to-string `(and ,g1 ,g2 (group " ")) t)
-                                  "\\1 \\2 " nil begin end)
-            (query-replace-regexp (rx-to-string `(and (group " ") ,g2 ,g3) t)
-                                  " \\1 \\2" nil begin end)))
-      (funcall -fn -justify -region))
-    (when (fboundp #'extra/insert-space-around-chinese)
-      (ignore-errors (extra/insert-space-around-chinese begin end)))))
-
-(defun org*after-latex-compile (-texfile &optional _)
-  (when org--remove-texfile
-    (delete-file -texfile)))
-
 (defun org-block-speed-command-activate (keys)
   "Hook for activating single-letter block commands."
   (when (and (bolp)
@@ -115,7 +47,7 @@
 (defun org//generate-long-term-task ()
   (goto-char (point-min))
   (unless (re-search-forward "^\\* Long-term Task")
-    (error "Can not find heading `Long-term Task'"))
+    (user-error "Can not find heading `Long-term Task'"))
   (unwind-protect
       (progn
         (org-narrow-to-subtree)
@@ -133,41 +65,92 @@
           (end-of-line 1)))
     (widen)))
 
-(with-eval-after-load 'ob
-  (define-key! :map org-babel-map
-    ("/" . org/split-src-block))
+(config! ob
+  :bind (:map org-babel-map ("/" . org/split-src-block))
+  :hook (org-redisplay-inline-images (org-babel-after-execute-hook)))
 
-  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images))
+(config! org
+  :bind
+  (:map org-mode-map
+   ("<" . org/hot-expand)
+   ("C-c t" :map org-table-extra-map)
+   ("C-c [" . org-reftex-citation)
+   ("C-c {" . org-reftex-citation)
+   ("C-c C-x [" . org-agenda-file-to-front)
+   ("C-c v" . org/open-pdf)
+   ("M-," . org-mark-ring-goto)
+   ("M-." . org-mark-ring-push)
+   ("M-n" . org/next-item)
+   ("M-p" . org/previous-item)
+   ("C-c l" . org-store-link)
+   ("C-M-i" . completion-at-point)
+   ("C-c n" . org-next-block)
+   ("C-c p" . org-previous-block)
+   ([f5] . org/open-pdf)
+   ([C-f9] . org/create-latex-fragemnt-cache)
+   ([f9] . org/publish-current-file)
+   ([f10] . org-publish)
+   ("C-c C-t" . org-todo))
 
-(define-hook! org|setup (org-mode-hook)
-  (when buffer-file-name
-    (setq-local org-preview-latex-image-directory "auto/cache/"))
-  (auto-fill-mode -1)
-  (eldoc-mode -1)
+  :advice
+  (:around org-fill-paragraph
+   :define (-fn &optional -justify -region)
+   (let* ((element (org-element-context))
+          (end (org-element-property :end element))
+          (begin (org-element-property :begin element))
+          (latex-p (memq (org-element-type element)
+                         '(latex-fragment latex-environment))))
+     (if (and latex-p (not (region-active-p)) -justify)
+         (save-excursion
+           (goto-char begin)
+           (let ((g1 '(group (not (any "{([" blank))))
+                 (g2 '(group (or (any ?= ?- ?+ ?/ ?> ?<)
+                                 (and "\\" (or "ne" "neq" "le" "ge"
+                                               "cdot" "circ" "cap" "cup"
+                                               "subset" "subsetqe" "lor"
+                                               "land" "in" "to" "rightarrow"
+                                               "Rightarrow")
+                                      word-end))))
+                 (g3 '(group (not (any ")}]" blank)))))
+             (query-replace-regexp (rx-to-string `(and ,g1 ,g2 ,g3) t)
+                                   "\\1 \\2 \\3" nil begin end)
+             (query-replace-regexp (rx-to-string `(and ,g1 ,g2 (group " ")) t)
+                                   "\\1 \\2 " nil begin end)
+             (query-replace-regexp (rx-to-string `(and (group " ") ,g2 ,g3) t)
+                                   " \\1 \\2" nil begin end)))
+       (funcall -fn -justify -region))
+     (when (fboundp #'extra/insert-space-around-chinese)
+       (ignore-errors (extra/insert-space-around-chinese begin end)))))
 
-  (when (fboundp 'org-num-mode)
-    (org-num-mode 1))
+  (:around org-beginning-of-line
+   :define (-fn &optional -n)
+   (if (bolp) (back-to-indentation) (funcall -fn -n)))
 
-  ;; Add context-sensitive completion for meta options
-  (make-local-variable 'completion-at-point-functions)
-  (add-to-list 'completion-at-point-functions
-               (lambda () (ignore-errors (pcomplete-completions-at-point))))
+  :hook
+  (setup
+   :define (org-mode-hook)
+   (when buffer-file-name
+     (setq-local org-preview-latex-image-directory "auto/cache/"))
 
-  (company//add-backend 'company-org-symbols :main-backend? nil))
+   (auto-fill-mode -1)
+   (eldoc-mode -1)
 
-(define-hook! org|src-setup (org-src-mode-hook)
-  (flycheck-mode -1))
+   (when (fboundp 'org-num-mode)
+     (org-num-mode 1))
 
-(with-eval-after-load 'org
-  (require 'company-auctex)
+   ;; Add context-sensitive completion for meta options
+   (make-local-variable 'completion-at-point-functions)
+   (add-to-list 'completion-at-point-functions
+                (lambda () (ignore-errors (pcomplete-completions-at-point))))
 
-  (add-hook 'org-speed-command-hook 'org-block-speed-command-activate :append)
+   (company//add-backend 'company-org-symbols :main-backend? nil))
 
-  (advice-add 'org-fill-paragraph :around #'org*around-fill-paragraph)
+  (src-setup
+   :define (org-src-mode-hook) (flycheck-mode -1))
 
-  (advice-add 'org-beginning-of-line
-              :around (lambda (-fn &optional -n)
-                        (if (bolp) (back-to-indentation) (funcall -fn -n))))
+  (org-block-speed-command-activate (org-speed-command-hook))
+
+  :config
 
   ;; Highlight `{{{color(<color>, <text>}}}' form
   (font-lock-add-keywords
@@ -237,7 +220,7 @@
         ;; collapsed trees.
         org-cycle-separator-lines 2 ;; default = 2
         org-agenda-start-on-weekday nil
-        org-agenda-inhibit-startup t       ;; ~50x speedup
+        org-agenda-inhibit-startup t ;; ~50x speedup
         org-agenda-use-tag-inheritance nil ;; 3-4x speedup
         org-agenda-span 14
         org-agenda-include-diary t
@@ -300,52 +283,73 @@
   %?")
           ("L" "Long term tasks" checkitem
            (file+function ,(expand-var! "org/*task*") org//generate-long-term-task)
-           "   - [ ] %^{Task} %?")))
+           "   - [ ] %^{Task} %?"))))
 
-  (define-key! :map org-mode-map
-    ("<" . org/hot-expand)
-    ("C-c t" :map org-table-extra-map)
-    ("C-c [" . org-reftex-citation)
-    ("C-c {" . org-reftex-citation)
-    ("C-c C-x [" . org-agenda-file-to-front)
-    ("C-c v" . org/open-pdf)
-    ("M-," . org-mark-ring-goto)
-    ("M-." . org-mark-ring-push)
-    ("M-n" . org/next-item)
-    ("M-p" . org/previous-item)
-    ("C-c l" . org-store-link)
-    ("C-M-i" . completion-at-point)
-    ("C-c n" . org-next-block)
-    ("C-c p" . org-previous-block)
-    ([f5] . org/open-pdf)
-    ([C-f9] . org/create-latex-fragemnt-cache)
-    ([f9] . org/publish-current-file)
-    ([f10] . org-publish)
-    ("C-c C-t" . org-todo)))
+(config! ox-html
+  ;; :advice
+  ;; (:around org-html-do-format-code
+  ;;  :define (-fn &rest -rest)
+  ;;  (when (= (length -rest) 5)
+  ;;    (let ((num-start (nth 4 -rest)))
+  ;;      (unless num-start
+  ;;        (setq num-start 0))
+  ;;      (setcar (nthcdr 4 -rest) num-start)))
+  ;;  (apply -fn -rest))
 
-(with-eval-after-load 'ox-html
-  ;; (advice-add 'org-html-do-format-code
-  ;;             :around #'org*around-html-do-format-code)
-
-  (setq org-html-head (eval-when-compile
-                        (concat "<style type=\"text/css\">\n/*<![CDATA[*/\n"
-                                (read-file-content! (expand-etc! "org-manual.css"))
-                                "\n/*]]>*/\n</style>")))
-  (setq org-html-mathjax-template (eval-when-compile
-                                    (read-file-content!
-                                     (expand-etc! "org-mathjax-template"))))
+  :config
+  (setq org-html-head
+        (eval-when-compile
+          (concat "<style type=\"text/css\">\n/*<![CDATA[*/\n"
+                  (read-file-content! (expand-etc! "org-manual.css"))
+                  "\n/*]]>*/\n</style>")))
+  (setq org-html-mathjax-template
+        (eval-when-compile
+          (read-file-content!
+           (expand-etc! "org-mathjax-template"))))
 
   (setcdr (assoc 'scale org-html-mathjax-options) '("90"))
   (setcdr (assoc 'align org-html-mathjax-options) '("center")))
 
-(with-eval-after-load 'ox-latex
-  (ignore-errors
-    (require 'ox-bibtex))
+(config! ox-latex
+  :advice
+  (:around org-publish-file :name without-user-record!!)
 
-  (advice-add 'org-publish-file :around #'without-user-record!!)
-  (advice-add 'org-latex-compile :after #'org*after-latex-compile)
-  (advice-add 'org-latex-link :around #'org*around-latex-link)
-  (advice-add 'org-latex--inline-image :around #'org*around-latex-inline-image)
+  (:after org-latex-compile
+   :define (-texfile &optional _)
+   (when org--remove-texfile (delete-file -texfile)))
+
+  (:around org-latex-link
+   :define (-fn -link -desc -info)
+   (let* ((type (org-element-property :type -link))
+          (raw-path (org-element-property :path -link))
+          (search-option (org-element-property :search-option -link))
+          (project (ignore-errors
+                     (org-publish-get-project-from-filename
+                      (buffer-file-name)))))
+     (if (and project
+              (string= type "file")
+              (string= (file-name-extension raw-path) "org")
+              (equal (car (org-publish-get-project-from-filename
+                           (file-truename raw-path)))
+                     (car project)))
+         (format "\\href{%s.pdf%s}{%s}"
+                 (org-latex--protect-text
+                  (org-export-file-uri
+                   (file-name-sans-extension raw-path)))
+                 search-option
+                 (or -desc ""))
+       (funcall -fn -link -desc -info))))
+
+  (:around org-latex--inline-image
+   :define (-fn -link -info)
+   (let ((code (funcall -fn -link -info)))
+     (replace-regexp-in-string "\\(\\\\includesvg\\)\\(?:[^{]\\)?*{.*}"
+                               "\\\\includegraphics"
+                               code
+                               nil nil 1)))
+
+  :config
+  (ignore-errors (require 'ox-bibtex))
 
   (add-to-list 'org-latex-minted-langs '(ipython "python"))
   (add-to-list 'org-latex-minted-langs '(jupyter-python "python"))
@@ -394,7 +398,8 @@
                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                    ("\\paragraph{%s}" . "\\paragraph*{%s}")))))
 
-(with-eval-after-load 'ox-beamer
+(config! ox-beamer
+  :config
   (add-to-list 'org-latex-classes
                `("cn-beamer"
                  ,(s-replace "[ORG-TEMPLATE-DIR]"
