@@ -2,7 +2,43 @@
 
 (require 'transient)
 
-(defvar counsel--rg-current-directory nil)
+(defclass transient-option-with-default (transient-option)
+  ((value :initarg :value)))
+
+(defclass transient-option-path (transient-option-with-default) ())
+
+(cl-defmethod transient-init-value ((obj transient-option-with-default))
+  (oset obj value (format "%s" (oref obj value))))
+
+(cl-defmethod transient-format-value :around ((obj transient-option-with-default))
+  (let ((choices (oref obj choices))
+        (value (oref obj value)))
+    (if choices
+        (format
+         (propertize (format "[%s]"
+                             (mapconcat (lambda (choice)
+                                          (if (equal choice value) "%s" choice))
+                                        choices
+                                        "|"))
+                     'face 'transient-inactive-value)
+         (propertize value 'face 'font-lock-warning-face))
+      (cl-call-next-method))))
+
+(cl-defmethod transient-infix-read ((obj transient-option-with-default))
+  (let ((choices (oref obj choices)))
+    (if choices
+        (or (when-let ((value (oref obj value)))
+              (cadr (member value choices)))
+            (car choices))
+      (cl-call-next-method))))
+
+(cl-defmethod transient-infix-read ((obj transient-option-path))
+  (let ((default-directory (oref obj value)))
+    (condition-case nil
+        (read-directory-name "Path=" nil nil :must-match)
+      (quit default-directory))))
+
+
 
 (defun counsel//truncate-string (-string -width)
   (if (> (length -string) -width)
@@ -233,93 +269,63 @@ for a file to visit if current buffer is not visiting a file."
   (unless (member "--no-line-number" -args)
     (setq -args (append -args '("--line-number"))))
 
-  (let ((counsel-rg-base-command (concat "rg " (string-join -args " ") " %s .")))
+  (let* ((initial-directory (cl-loop for arg in -args if (eq (aref arg 0) ?@)
+                                     return (substring arg 1)))
+         (args (--filter (not (eq (aref it 0) ?@)) -args))
+         (counsel-rg-base-command (concat "rg " (string-join args " ") " %s .")))
     (let ((shell-file-name "/bin/sh"))
-      (counsel-rg nil (or counsel--rg-current-directory default-directory) -extra-args))))
-
-(defun counsel//file-jump-function (string)
-  "Grep in the current directory for STRING."
-  (let* ((command-args (counsel--split-command-args string))
-         (search-term (cdr command-args)))
-    (or
-     (let ((ivy-text search-term))
-       (ivy-more-chars))
-     (let* ((default-directory (ivy-state-directory ivy-last))
-            (regex (counsel--grep-regex search-term))
-            (switches (concat (car command-args)
-                              (counsel--ag-extra-switches regex)
-                              (and (ivy--case-fold-p string) " -i "))))
-       (counsel--async-command (counsel--format-ag-command
-                                switches
-                                (shell-quote-argument regex)))
-       nil))))
-
-(defclass transient-option-with-default (transient-option)
-  ((value :initarg :value)))
-
-(cl-defmethod transient-init-value ((obj transient-option-with-default))
-  (oset obj value (format "%s" (oref obj value))))
-
-(cl-defmethod transient-format-value :around ((obj transient-option-with-default))
-  (let ((choices (oref obj choices))
-        (value (oref obj value)))
-    (if choices
-        (format (propertize (concat "["
-                                    (string-join
-                                     (mapcar (lambda (choice)
-                                               (if (equal choice value) "%s" choice))
-                                             choices)
-                                     "|")
-                                    "]")
-                            'face 'transient-inactive-value)
-                (propertize value 'face 'font-lock-warning-face))
-      (cl-call-next-method))))
-
-(cl-defmethod transient-infix-read ((obj transient-option-with-default))
-  (let ((choices (oref obj choices)))
-    (if choices
-        (or (when-let ((value (oref obj value)))
-              (cadr (member value choices)))
-            (car choices))
-      (cl-call-next-method))))
+      (counsel-rg nil initial-directory -extra-args))))
 
 ;;;###autoload (autoload 'counsel/rg "../lisp/autoloads/ivy" nil t)
 (define-transient-command counsel/rg (&optional -directory)
   "Run ripgrep"
   ["Switches"
-   ("z" "Search zip files" "--search-zip")
-   ("x" "Match the whole line" "--line-regexp")
-   ("v" "Show lines that do not match the given patterns" "--invert-match")
-   ("l" "Only print the paths with at least one match" "--files-with-matches")
-   ("L" "Follow symbolic links" "--follow")
-   ("p" "Alias for '--color always --heading --line-number'" "--pretty")
-   ("N" "Suppress line numbers" "--no-line-number")
-   ("o" "Print only the matched (non-empty) parts" "--only-matching")
-   ("I" "Don't respect ignore files" "--no-ignore")]
+   (3 "-h" "Search hidden files" "--hidden")
+   (6 "-a" "Search binary files" "--text")
+   (4 "-z" "Search zipped files" "--search-zip")
+   (4 "-v" "Invert match" "--invert-match")
+   (4 "-U" "Multi line" "--multiline-dotall --multiline")
+   (3 "-w" "Search words" "--word-regexp")
+   (5 "-x" "Search lines" "--line-regexp")
+   (5 "-P" "Use PCRE2 regexps" "--pcre2")
+   (4 "-1" "Don't cross file system" "--one-file-system")
+   (6 "-L" "Follow symlinks" "--follow")
+   (3 "-n" "Override ignore files" "--no-ignore")
+   (3 "-l" "Only print the paths with at least one match" "--files-with-matches")
+   (3 "-p" "Alias for '--color always --heading --line-number'" "--pretty")
+   (3 "-N" "Suppress line numbers" "--no-line-number")
+   (4 "-o" "Print only the matched (non-empty) parts" "--only-matching")]
   ["Options"
    ("c" "Use colors" "--color "
     :class transient-option-with-default
     :choices ("auto" "ansi" "always" "never")
     :value "never")
-   ("A" "After context" "--after-context " :class transient-option)
-   ("B" "Before context" "--before-context " :class transient-option)
-   ("C" "Show context" "--context " :class transient-option)
-   ("M" "Max columns" "--max-columns " :class transient-option-with-default :value 200)]
+   (3 "A" "After context" "--after-context " :class transient-option)
+   (3 "B" "Before context" "--before-context " :class transient-option)
+   (3 "C" "Show context" "--context " :class transient-option)
+   (3 "M" "Max columns" "--max-columns " :class transient-option-with-default :value 200)
+   (4 "g" "Filter files glob" "--glob=")
+   (6 "i" "Filter files glob (no case)" "--iglob=")
+   (4 "T" "Exclude files types" "--type-not=")
+   (4 "S" "Sort result" "--sort=")
+   (5 "R" "Reverse sort result" "--sortr=")
+   (6 "E" "Force encoding" "--encoding=")
+   (6 "r" "Replace match" "--replace=")]
   ["Actions"
-   [("RET" "Search pattern in file" counsel//rg)]]
+   [("SPC" "Set directory" "@=" :class transient-option-path)]
+   [("RET" "Search" counsel//rg)]]
   (interactive
-   (list
-    (or (and current-prefix-arg
-             (read-directory-name "Run ripgrep in directory: " default-directory))
-        (or (projectile-project-root) default-directory))))
+   (list (or (and (not current-prefix-arg) (projectile-project-root))
+             default-directory)))
 
-  (setf (nth 1 (aref (car (last (get 'counsel/rg 'transient--layout))) 2))
-        (concat "Run in " (abbreviate-file-name -directory)))
+  (transient-insert-suffix 'counsel/rg
+    "SPC"
+    `("SPC" "Set directory" "@" :class transient-option-path :value ,-directory))
 
-  (setq counsel--rg-current-directory -directory)
   (if current-prefix-arg
       (transient-setup 'counsel/rg)
-    (counsel//rg)))
+    (let ((default-directory -directory))
+      (counsel//rg))))
 
 ;;;###autoload
 (defun counsel/rg-file-jump ()
@@ -358,17 +364,17 @@ for a file to visit if current buffer is not visiting a file."
                             (list (and (counsel--git-root) "git")
                                   "rg"
                                   (and (projectile-project-root) "projectile"))))
-          (backend (if (or (null (cdr backends))
-                           (not current-prefix-arg))
+          (backend (if (or (not current-prefix-arg) (= (length backends) 1))
                        (car backends)
                      (ivy-read "Select backends: " backends :require-match t))))
      (list directory backend)))
   (let ((default-directory -directory)
-        (backend (cond
-                  ((equal -backend "git") #'counsel-git)
-                  ((equal -backend "projectile") #'counsel-projectile)
-                  (t #'counsel/rg-file-jump))))
-    (funcall backend)))
+        (backend-fn (cond
+                     ((equal -backend "git") #'counsel-git)
+                     ((equal -backend "projectile") #'counsel-projectile)
+                     (t #'counsel/rg-file-jump))))
+    (let ((ivy-count-format (format "[%s](%%d/%%d)" -backend)))
+      (funcall backend-fn))))
 
 (defun counsel/flycheck-action-goto-error (-candidate)
   "Visit error of CANDIDATE."

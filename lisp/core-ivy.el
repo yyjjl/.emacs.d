@@ -119,6 +119,19 @@
   (setq swiper-stay-on-quit t))
 
 (config! counsel
+  :advice
+  (:around counsel-cd
+   :define (-fn)
+   (let ((enable-recursive-minibuffers t))
+     (funcall -fn)))
+
+  (:around counsel--async-command
+   :define (-fn -cmd &rest -args)
+   (lv-message "Command: (@%s) %s"
+               (propertize default-directory 'face font-lock-constant-face)
+               (propertize -cmd 'face font-lock-doc-face))
+   (apply -fn -cmd -args))
+
   :config
 
   (setq counsel-linux-app-format-function
@@ -173,7 +186,7 @@
   ("i" . counsel/semantic-or-imenu*)
   ("x" . counsel-linux-app)
   ("v" . counsel-set-variable)
-  ("j" . counsel/rg-file-jump)
+  ("j" . counsel/file-jump)
   ("p" . counsel/file-jump)
   ("g" . counsel-git)
   ("s" . counsel-git-grep)

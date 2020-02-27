@@ -1,7 +1,6 @@
 ;; -*- lexical-binding:t -*-
 
 (require-packages!
- dap-mode
  lsp-mode
  lsp-ui
  ivy)
