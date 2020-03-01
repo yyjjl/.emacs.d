@@ -35,6 +35,8 @@
   (special-mode)
   (setq cursor-type nil))
 
+(setq ivy-read-action-function #'ivy-read-action-ivy)
+
 (setq-default mode-line-format nil)
 (setq-default window-min-height 1)
 

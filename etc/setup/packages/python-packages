@@ -3,7 +3,6 @@ PyDelphin
 autopep8
 beautifulsoup4
 configparser
-epc
 flake8
 html5lib
 importmagic
@@ -21,12 +20,10 @@ numpy
 pandas
 pyflakes
 pylint
-python-language-server
+python-language-server[all]
 requests
-rope
 scikit-image
 scikit-learn
 scipy
 svgwrite
 urllib3
-yapf

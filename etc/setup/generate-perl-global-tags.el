@@ -11,7 +11,6 @@
                                :omit-nulls
                                "\n\t ")))
     (let ((link path))
-      (file-name-base (directory-file-name "/usr/local/lib/x86_64-linux-gnu/perl/5.26.1"))
       (while (and link
                   (not (string-match-p
                         "perl"

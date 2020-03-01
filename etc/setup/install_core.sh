@@ -9,7 +9,7 @@ if [ "$EUID" -ne 0 ]; then
     critical "This script should be run as root !!!"
     exit 1
 else
-    # apt-key add "${current_dir}/packages/trusted-keys"
+    apt-key add "${current_dir}/packages/trusted-keys"
     while IFS='' read -r line || [[ -n "$line" ]]; do
         if ! apt-add-repository -y "${line}"; then
             critical "Fail to add repository ${line}"

@@ -95,9 +95,9 @@
 (defun core-popups//help-buffer-matcher (-buffer)
   (let ((case-fold-search t))
     (with-current-buffer -buffer
-      (or (and (not (string-prefix-p "ivy-occur" (symbol-name major-mode)))
-               (apply #'derived-mode-p core-popups-help-modes))
-          (string-match-p core-popups-help-buffer-regexp (buffer-name))))))
+      (and (not (string-prefix-p "ivy-occur" (symbol-name major-mode)))
+           (or (apply #'derived-mode-p core-popups-help-modes)
+               (string-match-p core-popups-help-buffer-regexp (buffer-name)))))))
 
 (config! shackle
   :prefix core-popups

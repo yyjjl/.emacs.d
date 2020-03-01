@@ -65,7 +65,8 @@
    (setq mode-line-show-root-p nil)
    (setq term-extra-name nil)
    (setq mode-line-buffer-identification
-         '("%b" (term-extra-name (": " term-extra-name)))))
+         '("%b" (vterm-copy-mode (:propertize "[copy]" face font-lock-builtin-face))
+           (term-extra-name (": " term-extra-name)))))
 
   :advice
   (:override vterm--self-insert

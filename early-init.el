@@ -10,7 +10,7 @@
 
 (defvar emacs-lite-setup-p (getenv "EMACS_LITE"))
 
-(defvar emacs-gc-cons-threshold (* 10 1024 1024))
+(defvar emacs-gc-cons-threshold (* 100 1024 1024))
 
 (defvar emacs-file-name-handler-alist file-name-handler-alist
   "Save `file-name-handler-alist' temporarily and set it to nil
@@ -47,3 +47,4 @@ hasn't to runs those regexps against the filename.")
 (push '(menu-bar-lines . 0) default-frame-alist)
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
+(push '(undecorated . t) default-frame-alist)

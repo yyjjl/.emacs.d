@@ -1,4 +1,3 @@
-rls-preview
-rustfmt-preview
+rls
 rust-analysis
 rust-src

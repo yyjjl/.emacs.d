@@ -31,7 +31,7 @@
 (config! lsp-pyls
   :config
   (setq lsp-pyls-configuration-sources ["flake8"])
-  (setq lsp-pyls-plugins-pylint-enabled nil))
+  (setq lsp-pyls-plugins-rope-completion-enabled nil))
 
 (config! pyvenv
   :config
@@ -105,11 +105,13 @@
   ;; Setup elpy or pyls
   (if python-use-pyls-p
       (progn
-        (pyvenv-mode 1)
         ;; init some parts of elpy
         (require 'elpy)
+
         (add-hook 'inferior-python-mode-hook 'elpy-shell--enable-output-filter)
-        (let ((elpy-modules '(elpy-module-sane-defaults elpy-module-yasnippet)))
+        (let ((elpy-modules '(elpy-module-sane-defaults
+                              elpy-module-yasnippet
+                              elpy-module-pyvenv)))
           (elpy-modules-global-init)))
     (elpy-enable)
     (remove-hook 'python-mode-hook 'elpy-mode)))

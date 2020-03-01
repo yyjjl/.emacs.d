@@ -13,7 +13,7 @@
 (setq file-name-handler-alist nil)
 ;; Don't GC during startup to save time
 (setq gc-cons-threshold most-positive-fixnum)
-(setq gc-cons-percentage 0.6)
+(setq gc-cons-percentage 0.5)
 
 ;;* Default Values
 ;; No tool bar or scroll bar
@@ -278,7 +278,7 @@
   (electric-indent-mode -1)
 
   ;; Keep mouse at upper-right corner when typing
-  (mouse-avoidance-mode 'banish)
+  ;; (mouse-avoidance-mode 'banish)
   ;; Purges buffers which haven't been displayed in 3 days
   (midnight-mode 1)
   ;; (display-time-mode 1)

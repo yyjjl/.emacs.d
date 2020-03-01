@@ -1,7 +1,7 @@
+arc-theme
 aria2
 autoconf
 automake
-cabal-install
 clang
 clang-format
 curl
@@ -11,16 +11,13 @@ exuberant-ctags
 fcitx-libpinyin
 ffmpeg
 figlet
-ghc
 gimp
 git
+global
 gnuplot
 google-chrome-stable
 gparted
 graphviz
-hoogle
-i3
-i3blocks
 inkscape
 latexmk
 libboost-dev

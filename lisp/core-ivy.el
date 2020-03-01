@@ -125,12 +125,14 @@
    (let ((enable-recursive-minibuffers t))
      (funcall -fn)))
 
-  (:around counsel--async-command
-   :define (-fn -cmd &rest -args)
+  (:before counsel--async-command
+   :define (-cmd &rest _)
    (lv-message "Command: (@%s) %s"
                (propertize default-directory 'face font-lock-constant-face)
-               (propertize -cmd 'face font-lock-doc-face))
-   (apply -fn -cmd -args))
+               (propertize -cmd 'face font-lock-doc-face)))
+
+  (:after counsel--grep-unwind
+   :define (&optional _) (lv-delete-window))
 
   :config
 

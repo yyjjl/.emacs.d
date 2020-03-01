@@ -13,9 +13,11 @@
 (require 'i3wm-doc)
 
 (setq-default default-frame-alist
-              `((name . "Minibuffer-i3wm")
+              `((name . "Emacs")
                 (width . 100)
-                (height . ,(+ 4 ivy-height))
+                (top . 300)
+                (left . 350)
+                (height . ,(+ 3 ivy-height))
                 (menu-bar-lines . 0)
                 (tool-bar-lines . 0)
                 (vertical-scroll-bars . nil)
