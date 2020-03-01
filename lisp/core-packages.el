@@ -128,9 +128,8 @@ Archive with high priority will be used when install a package.")
 
 (defmacro config! (-package-name &rest -body)
   (declare (indent 1) (debug t))
-  (let* ((args (->> -body
-                    (--partition-by (keywordp it))
-                    (--map (if (keywordp (car it)) (car it) it))))
+  (let* ((args (--map (if (keywordp (car it)) (car it) it)
+                      (--partition-by (keywordp it) -body)))
          (prefix (or (car (plist-get args :prefix)) -package-name))
          before-forms
          after-forms)
@@ -148,13 +147,9 @@ Archive with high priority will be used when install a package.")
           (push (cons order form)
                 (if (> order 0) after-forms before-forms))))
     (setq after-forms
-          (->> (sort after-forms (lambda (x y) (< (car x) (car y))))
-               (mapcan #'cdr)
-               (cl-remove nil)))
+          (cl-remove nil (mapcan #'cdr (sort after-forms (lambda (x y) (< (car x) (car y)))))))
     (setq before-forms
-          (->> (sort before-forms (lambda (x y) (< (car x) (car y))))
-               (mapcan #'cdr)
-               (cl-remove nil)))
+          (cl-remove nil (mapcan #'cdr (sort before-forms (lambda (x y) (< (car x) (car y)))))))
     `(progn
        (eval-when-compile
          (require ',-package-name))
