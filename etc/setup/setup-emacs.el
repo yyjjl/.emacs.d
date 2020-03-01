@@ -31,6 +31,7 @@
   (setq enable-local-variables :all)
 
   (message "Remove *.elc in %s ..." (abbreviate-file-name emacs-config-directory))
+  (delete-file (expand-var! "autoloads.el"))
   (dolist (elc-file (directory-files-recursively emacs-config-directory "\\.elc$")
                     (directory-files user-emacs-directory t "\\.elc$"))
     (delete-file elc-file))

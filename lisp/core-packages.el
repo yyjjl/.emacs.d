@@ -214,6 +214,7 @@ Archive with high priority will be used when install a package.")
   (package-initialize))
 
 (unless (file-exists-p emacs-autoloads-file)
+  (autoload 'package/generate-autoloads "autoloads/package" nil t)
   (package/generate-autoloads))
 
 (load emacs-autoloads-file)
