@@ -159,8 +159,9 @@ Archive with high priority will be used when install a package.")
     (setq before-forms
           (cl-remove nil (mapcan #'cdr (sort before-forms (lambda (x y) (< (car x) (car y)))))))
     `(progn
-       (eval-when-compile
-         (require ',-package-name))
+       (ignore-errors
+        (eval-when-compile
+          (require ',-package-name)))
        ,@before-forms
        (with-eval-after-load ',-package-name
          ,@after-forms))))
