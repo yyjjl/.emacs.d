@@ -1,6 +1,6 @@
 (eval-when-compile
   (require 'dash)
-  (require 'cl))
+  (require 'cl-lib))
 
 (let ((default-directory (expand-var! "perl-modules")))
   (dolist (path (--filter

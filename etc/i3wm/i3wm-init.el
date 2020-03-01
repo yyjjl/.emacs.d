@@ -12,7 +12,7 @@
 (require 'core-ui)
 
 (eval-when-compile
-  (require 'cl))
+  (require 'cl-lib))
 (require 'dash)
 (require 'json)
 
