@@ -3,7 +3,7 @@
 (require-packages! treemacs)
 
 (config! winum
-  :bind (:map winum-keymap ("M-`" . treemacs/select-window)))
+  :bind (:map winum-keymap ("M-`" . treemacs)))
 
 (config! treemacs
   :bind
@@ -57,7 +57,5 @@
         treemacs-tag-follow-cleanup t
         treemacs-tag-follow-delay 1.5
         treemacs-width 30))
-
-(global-set-key [f12] #'treemacs)
 
 (provide 'init-treemacs)

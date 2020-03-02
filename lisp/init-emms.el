@@ -29,7 +29,7 @@
   (add-to-list 'emms-player-mpv-parameters "--no-video"))
 
 (autoload 'hydra-emms/body "autoloads/emms" nil t)
-(global-set-key [C-f12] #'hydra-emms/body)
+(global-set-key [f12] #'hydra-emms/body)
 
 
 (provide 'init-emms)

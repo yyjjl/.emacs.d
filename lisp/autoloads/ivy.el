@@ -138,9 +138,7 @@
 (defvar counsel--kill-buffers nil)
 (defun counsel//kill-buffer-action (x)
   (if (member x counsel--kill-buffers)
-      (unless (memq this-command '(ivy-done
-                                   ivy-alt-done
-                                   ivy-immediate-done))
+      (unless (memq this-command '(ivy-done ivy-alt-done ivy-immediate-done))
         (setq counsel--kill-buffers (delete x counsel--kill-buffers)))
     (unless (equal x "")
       (setq counsel--kill-buffers (append counsel--kill-buffers (list x)))))
@@ -210,12 +208,12 @@ for a file to visit if current buffer is not visiting a file."
 
 (defhydra swiper-hydra (:color blue :hint nil)
   "
-[_s_/_C-s_/_m_/_a_] swiper-isearch/multi/all
+[_RET_/_C-s_/_m_/_a_] swiper/multi/all
 [_i_/_I_]   isearch-forward(regexp)
 [_r_/_R_]   isearch-backward(regexp)
 "
-  ("s" swiper-isearch)
-  ("C-s" swiper-isearch)
+  ("RET" swiper)
+  ("C-s" swiper)
   ("i" isearch-forward)
   ("I" isearch-forward-regexp)
   ("r" isearch-backward)
@@ -227,37 +225,45 @@ for a file to visit if current buffer is not visiting a file."
 (defun swiper/dispatch (&optional -arg)
   "if -ARG is not nil, call swiper-hydra/body else call counsel-grep-or-swiper"
   (interactive "P")
-  (call-interactively (if -arg #'swiper-hydra/body #'counsel-grep-or-swiper)))
+  (if -arg
+      (call-interactively #'swiper-hydra/body)
+    (cl-letf (((symbol-function 'swiper) #'swiper-isearch))
+      (call-interactively #'counsel-grep-or-swiper))))
+
+(defvar ivy-occur-filter-prefix ">>> ")
 
 ;;;###autoload
-(defun ivy-occur-filter-lines ()
+(defun ivy-occur/filter-lines ()
   (interactive)
   (unless (string-prefix-p "ivy-occur" (symbol-name major-mode))
     (user-error "Current buffer is not in ivy-occur mode"))
+
   (let ((inhibit-read-only t)
         (regexp (read-regexp "Regexp(! for flush)"))
-        (start (next-single-property-change (point-min) 'font-lock-face)))
-    (funcall (if (string-prefix-p "!" regexp)
-                 #'flush-lines
-               #'keep-lines)
-             (substring regexp 1) start (point-max) t)
+        (start (save-excursion
+                 (goto-char (point-min))
+                 (re-search-forward "[0-9]+ candidates:"))))
+    (if (string-prefix-p "!" regexp)
+        (flush-lines (substring regexp 1) start (point-max))
+      (keep-lines regexp start (point-max)))
     (save-excursion
       (goto-char (point-min))
-      (forward-line 1)
-      (if (looking-at "stack> ")
-          (forward-char 7)
-        (insert "stack> "))
-      (insert (format "[%s] " regexp)))))
+      (let ((item (propertize (format "[%s]" regexp) 'face 'ivy-current-match)))
+        (if (looking-at ivy-occur-filter-prefix)
+            (progn
+              (goto-char (line-end-position))
+              (insert item))
+          (insert ivy-occur-filter-prefix item "\n"))))))
 
 ;;;###autoload
-(defun ivy-occur-undo ()
+(defun ivy-occur/undo ()
   (interactive)
   (let ((inhibit-read-only t))
     (if (save-excursion
           (goto-char (point-min))
-          (forward-line 1)
-          (looking-at "stack> "))
-        (undo)
+          (looking-at ivy-occur-filter-prefix))
+        (save-excursion
+          (undo))
       (user-error "Filter stack is empty"))))
 
 (defun counsel//rg (&optional -args -extra-args)
@@ -269,9 +275,9 @@ for a file to visit if current buffer is not visiting a file."
   (unless (member "--no-line-number" -args)
     (setq -args (append -args '("--line-number"))))
 
-  (let* ((initial-directory (cl-loop for arg in -args if (eq (aref arg 0) ?@)
+  (let* ((initial-directory (cl-loop for arg in -args if (string-prefix-p "@" arg)
                                      return (substring arg 1)))
-         (args (--filter (not (eq (aref it 0) ?@)) -args))
+         (args (--filter (not (string-prefix-p "@" it)) -args))
          (counsel-rg-base-command (concat "rg " (string-join args " ") " %s .")))
     (let ((shell-file-name "/bin/sh"))
       (counsel-rg nil initial-directory -extra-args))))
@@ -410,7 +416,8 @@ for a file to visit if current buffer is not visiting a file."
 (defun counsel/flycheck (&optional -only-error)
   (interactive "P")
   (let ((errors (sort flycheck-current-errors #'flycheck-error-<))
-        (lineno (line-number-at-pos)))
+        (lineno (line-number-at-pos))
+        (current-point (point)))
     (when -only-error
       (setq errors
             (seq-filter (lambda (err)
@@ -422,12 +429,17 @@ for a file to visit if current buffer is not visiting a file."
           (mapcar (lambda (err)
                     (cons (counsel//flycheck-candidate-display-string err) err))
                   errors))
-    (ivy-read "Goto: " errors
-              :preselect
-              (car (cl-find-if
-                    (lambda (err)
-                      (ignore-errors (>= (flycheck-error-line (cdr err)) lineno)))
-                    errors))
-              :require-match t
-              :action #'counsel/flycheck-action-goto-error)))
+    (condition-case nil
+        (ivy-read "Goto: " errors
+                  :preselect
+                  (car (cl-find-if
+                        (lambda (err)
+                          (ignore-errors (>= (flycheck-error-line (cdr err)) lineno)))
+                        errors))
+                  :require-match t
+                  :action #'counsel/flycheck-action-goto-error
+                  :keymap (define-key! :map (make-sparse-keymap)
+                            ("C-n" . ivy-next-line-and-call)
+                            ("C-p" . ivy-previous-line-and-call)))
+      (quit (goto-char current-point)))))
 
