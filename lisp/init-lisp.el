@@ -103,20 +103,14 @@ Lisp function does not specify a special indentation."
 
 (defun lisp|common-setup ()
   "Enable features useful in any Lisp mode."
+  (setq-local hippie-expand-try-functions-list
+              (append hippie-expand-try-functions-list '(try-complete-lisp-symbol)))
+
   (highlight-indentation-mode -1)
   (rainbow-delimiters-mode 1)
   ;; (rainbow-delimiters-count-mode 1)
   (lispy-mode 1)
   (local-set-key (kbd "M-,") 'xref-pop-marker-stack))
-
-;; Hippie-expand
-(defun lisp//hippie-expand-setup ()
-  "Locally set `hippie-expand' completion functions for use with
-Emacs Lisp."
-  (make-local-variable 'hippie-expand-try-functions-list)
-  (add-to-list 'hippie-expand-try-functions-list
-               'try-complete-lisp-symbol
-               :append))
 
 (defun lisp|racket-setup ()
   (lisp|common-setup)
@@ -140,8 +134,6 @@ Emacs Lisp."
 
   (when (buffer-enable-rich-feature-p)
     (auto-compile-on-save-mode 1)
-
-    (lisp//hippie-expand-setup)
     (checkdoc-minor-mode)))
 
 (add-hook 'emacs-lisp-mode-hook #'lisp|elisp-setup)

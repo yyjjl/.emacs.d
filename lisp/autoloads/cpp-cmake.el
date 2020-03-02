@@ -166,8 +166,8 @@
 
 (defun cpp-cmake//render-config-buffer (-buffer)
   (kill-all-local-variables)
-  (set (make-local-variable 'cpp-cmake--widgets) nil)
-  (set (make-local-variable 'cpp-cmake--save-button) nil)
+  (setq-local cpp-cmake--widgets nil)
+  (setq-local cpp-cmake--save-button nil)
   (let ((inhibit-read-only t)
         (old-point (point)))
     (erase-buffer)

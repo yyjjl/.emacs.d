@@ -161,7 +161,7 @@ Archive with high priority will be used when install a package.")
     `(progn
        (ignore-errors
         (eval-when-compile
-          (require ',-package-name)))
+          (require ',-package-name nil t)))
        ,@before-forms
        (with-eval-after-load ',-package-name
          ,@after-forms))))

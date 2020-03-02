@@ -139,9 +139,10 @@
      (org-num-mode 1))
 
    ;; Add context-sensitive completion for meta options
-   (make-local-variable 'completion-at-point-functions)
-   (add-to-list 'completion-at-point-functions
-                (lambda () (ignore-errors (pcomplete-completions-at-point))))
+   (setq-local completion-at-point-functions
+               (append completion-at-point-functions
+                       (list (lambda ()
+                               (ignore-errors (pcomplete-completions-at-point))))))
 
    (company//add-backend 'company-org-symbols :main-backend? nil))
 

@@ -195,7 +195,7 @@
   (setq flycheck-idle-change-delay 1))
 
 (config! hippie-exp
-  :config
+  :init
   (setq he-dabbrev-chars "0-9a-zA-Z\\?!_")
   (setq-default hippie-expand-try-functions-list
                 '(try-expand-dabbrev
