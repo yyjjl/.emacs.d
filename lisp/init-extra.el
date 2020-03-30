@@ -1,6 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 (require-packages!
+ json-mode
  octave
  calc
  whitespace

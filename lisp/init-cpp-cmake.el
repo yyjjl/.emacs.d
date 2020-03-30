@@ -92,7 +92,7 @@
    (font-lock-mode 1)
    (cmake-font-lock-activate)
 
-   (lsp//try-enable cmake|setup-internal
+   (lsp//try-enable cmake|setup
      :init
      (progn
        (setq-local lsp-signature-auto-activate nil)

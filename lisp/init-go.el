@@ -13,6 +13,6 @@
   (setup
    :define (go-mode-hook)
    (when (buffer-enable-rich-feature-p)
-     (lsp//try-enable go|setup-internal))))
+     (lsp//try-enable go|setup))))
 
 (provide 'init-go)

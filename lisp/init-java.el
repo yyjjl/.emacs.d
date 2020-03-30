@@ -19,7 +19,7 @@
      (require 'lsp-java)
 
      (setq-local c-basic-offset 8)
-     (lsp//try-enable java|setup-internal))))
+     (lsp//try-enable java|setup))))
 
 (config! lsp-java
   :config

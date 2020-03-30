@@ -72,7 +72,7 @@
    (when (and (buffer-enable-rich-feature-p)
               (eq major-mode 'python-mode))
      (semantic-idle-summary-mode -1)
-     (lsp//try-enable python|setup-internal
+     (lsp//try-enable python|setup
        :fallback
        (progn
          (elpy-mode 1)

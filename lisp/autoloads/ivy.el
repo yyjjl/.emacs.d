@@ -208,12 +208,12 @@ for a file to visit if current buffer is not visiting a file."
 
 (defhydra swiper-hydra (:color blue :hint nil)
   "
-[_RET_/_C-s_/_m_/_a_] swiper/multi/all
+[_RET_/_C-s_/_m_/_a_] swiper-isearch/multi/all
 [_i_/_I_]   isearch-forward(regexp)
 [_r_/_R_]   isearch-backward(regexp)
 "
-  ("RET" swiper)
-  ("C-s" swiper)
+  ("RET" swiper-isearch)
+  ("C-s" swiper-isearch)
   ("i" isearch-forward)
   ("I" isearch-forward-regexp)
   ("r" isearch-backward)
@@ -225,10 +225,7 @@ for a file to visit if current buffer is not visiting a file."
 (defun swiper/dispatch (&optional -arg)
   "if -ARG is not nil, call swiper-hydra/body else call counsel-grep-or-swiper"
   (interactive "P")
-  (if -arg
-      (call-interactively #'swiper-hydra/body)
-    (cl-letf (((symbol-function 'swiper) #'swiper-isearch))
-      (call-interactively #'counsel-grep-or-swiper))))
+  (call-interactively (if -arg #'swiper-hydra/body #'counsel-grep-or-swiper)))
 
 (defvar ivy-occur-filter-prefix ">>> ")
 
@@ -336,7 +333,7 @@ for a file to visit if current buffer is not visiting a file."
 ;;;###autoload
 (defun counsel/rg-file-jump ()
   (interactive)
-  (let ((command "rg --glob '%s' --color never %s --files ."))
+  (let ((command "rg -L --glob '%s' --no-ignore --color never %s --files ."))
     (ivy-read "Find file (glob): "
               (lambda (string)
                 (let* ((command-args (counsel--split-command-args string))
@@ -367,8 +364,8 @@ for a file to visit if current buffer is not visiting a file."
                          directory))
           (default-directory directory)
           (backends (remove nil
-                            (list (and (counsel--git-root) "git")
-                                  "rg"
+                            (list "rg"
+                                  (and (counsel--git-root) "git")
                                   (and (projectile-project-root) "projectile"))))
           (backend (if (or (not current-prefix-arg) (= (length backends) 1))
                        (car backends)

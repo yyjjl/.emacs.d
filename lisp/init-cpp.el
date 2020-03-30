@@ -66,26 +66,25 @@
     (font-lock-add-keywords nil cpp--font-lock-keywords)))
 
 (defun cpp//main-setup ()
-  (lsp//try-enable
-   cpp|setup-internal
-   :enable
-   (or (and
-        cpp-use-cmake-p
-        (setq cpp-cmake-project-root (cpp-cmake//locate-cmakelists))
-        (file-exists-p (cpp-cmake//cdb-path)))
-       (file-exists-p (cpp-ccls//dot-ccls-path)))
-   :init
-   (progn
-     (ggtags-mode -1)
-     (electric-indent-local-mode -1))
-   :fallback
-   (progn
-     (when cpp-cmake-project-root
-       (message "Need to run `cpp/config-project' to setup ccls server"))
-     (when emacs-use-gtags-p
-       (ggtags-mode 1))
-     ;; (setq completion-at-point-functions nil)
-     (flycheck-mode -1))))
+  (lsp//try-enable cpp|setup
+    :enable
+    (or (and
+         cpp-use-cmake-p
+         (setq cpp-cmake-project-root (cpp-cmake//locate-cmakelists))
+         (file-exists-p (cpp-cmake//cdb-path)))
+        (file-exists-p (cpp-ccls//dot-ccls-path)))
+    :init
+    (progn
+      (ggtags-mode -1)
+      (electric-indent-local-mode -1))
+    :fallback
+    (progn
+      (when cpp-cmake-project-root
+        (message "Need to run `cpp/config-project' to setup ccls server"))
+      (when emacs-use-gtags-p
+        (ggtags-mode 1))
+      ;; (setq completion-at-point-functions nil)
+      (flycheck-mode -1))))
 
 (config! projectile
   :advice

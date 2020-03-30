@@ -56,7 +56,7 @@
    (haskell-decl-scan-mode 1)
 
    (when (buffer-enable-rich-feature-p)
-     (lsp//try-enable haskell|setup-internal
+     (lsp//try-enable haskell|setup
        :fallback
        (progn
          (haskell-doc-mode 1)

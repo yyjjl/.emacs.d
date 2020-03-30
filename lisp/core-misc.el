@@ -90,8 +90,9 @@
    ("M-6" . winum-select-window-6))
 
   :config
-  (setcdr (assoc 'winum-mode minor-mode-map-alist)
-          winum-keymap)
+  (add-to-list 'winum-ignored-buffers " *LV*")
+
+  (setcdr (assoc 'winum-mode minor-mode-map-alist) winum-keymap)
 
   (setq winum-auto-setup-mode-line nil)
   (setq winum-scope 'frame-local
@@ -439,6 +440,8 @@
   ("C-<up>" . text-scale-increase)
 
   ("C-." . symbol-overlay-put)
+
+  ("C-x G" . revert-buffer)
 
   ("C-c 4" . ispell-word)
   ("C-c q" . auto-fill-mode)

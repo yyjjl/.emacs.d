@@ -1,9 +1,6 @@
 ;; -*- lexical-binding:t -*-
 
-(require-packages!
- lsp-mode
- lsp-ui
- ivy)
+(require-packages! lsp-mode ivy)
 
 (defcustom lsp-enable-in-project-p t
   "Whether to setup project literally"
@@ -17,7 +14,7 @@
 
 (cl-defmacro lsp//try-enable (name &key (enable t) (init nil) (fallback nil))
   (declare (indent 1))
-  `(add-transient-hook! (hack-local-variables-hook :local t :name ,name)
+  `(add-transient-hook! (hack-local-variables-hook :local t :name ,(intern (format "%s-internal" name)))
      (if (and ,enable
               lsp-enable-in-project-p
               (ignore-errors (lsp))
@@ -26,7 +23,6 @@
        ,fallback)))
 
 (define-hook! lsp|after-open (lsp-after-open-hook)
-  (lsp-ui-mode 1)
   (lsp-flycheck-enable)
 
   ;; default to sort and filter by server
@@ -66,10 +62,8 @@
            (setq content
                  (concat (substring content 0 (min split-pos (- (frame-width) 30)))
                          (propertize
-                          (if-let (keys (where-is-internal 'lsp-describe-thing-at-point))
-                              (format " ... (%s to see more)"
-                                      (key-description (car keys)))
-                            " ...")
+                          (format " ... (%s to see more)"
+                                  (substitute-command-keys "\\[lsp-describe-thing-at-point]"))
                           'face 'font-lock-comment-face))))))
      content))
 
@@ -81,6 +75,7 @@
   (setq lsp-restart 'auto-restart)
   (setq lsp-session-file (expand-var! "lsp-sessions"))
 
+  (setq lsp-idle-delay 0.5)
   (setq lsp-enable-completion-at-point t)
   (setq lsp-symbol-highlighting-skip-current t)
 
@@ -95,36 +90,6 @@
       ("t t" lsp-toggle-on-type-formatting
        "on type formating" :toggle lsp-enable-on-type-formatting)
       ("t s" lsp-toggle-signature-auto-activate
-       "signature" :toggle lsp-signature-auto-activate))))) ()
-
-(config! lsp-ui
-  :config
-  (add-to-list
-   'hydra-local-toggles-heads-list
-   '(lsp-mode
-     "LSP Doc"
-     (("d e" (lsp-ui-doc-enable (not lsp-ui-doc-mode))
-       "enable" :toggle lsp-ui-doc-mode)
-      ("d s" (setq lsp-ui-doc-include-signature (not lsp-ui-doc-include-signature))
-       "signature" :toggle lsp-ui-doc-include-signature)
-      ("d t" (setq lsp-ui-doc-position 'top)
-       "top" :toggle (eq lsp-ui-doc-position 'top))
-      ("d b" (setq lsp-ui-doc-position 'bottom)
-       "bottom" :toggle (eq lsp-ui-doc-position 'bottom))
-      ("d p" (setq lsp-ui-doc-position 'at-point)
-       "at point" :toggle (eq lsp-ui-doc-position 'at-point))
-      ("d f" (setq lsp-ui-doc-alignment 'frame)
-       "align frame" :toggle (eq lsp-ui-doc-alignment 'frame))
-      ("d w" (setq lsp-ui-doc-alignment 'window)
-       "align window" :toggle (eq lsp-ui-doc-alignment 'window)))))
-
-  (setq lsp-ui-doc-enable nil)
-  (setq lsp-ui-peek-enable nil)
-  (setq lsp-ui-sideline-show-symbol nil)
-  (setq lsp-ui-sideline-show-hover nil)
-  (setq lsp-ui-sideline-show-diagnostics nil)
-  (setq lsp-ui-sideline-show-code-actions t)
-  (setq lsp-ui-sideline-ignore-duplicate t)
-  (setq lsp-ui-doc-delay 0.5))
+       "signature" :toggle lsp-signature-auto-activate)))))
 
 (provide 'init-lsp-mode)

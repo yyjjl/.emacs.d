@@ -52,9 +52,10 @@ _h_tml    _'_         ^ ^             _A_SCII:
 ;;;###autoload
 (defun org/publish-current-file ()
   (interactive)
-  (if org-master-file
-      (org//with-master-file! (call-interactively #'org-publish-current-file))
-    (call-interactively #'org-publish-current-file)))
+  (save-excursion
+    (if org-master-file
+        (org//with-master-file! (call-interactively #'org-publish-current-file))
+      (call-interactively #'org-publish-current-file))))
 
 ;;;###autoload
 (defun org/next-item (&optional -n)

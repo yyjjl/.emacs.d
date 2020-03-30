@@ -175,15 +175,38 @@
 (defun cpp/compile ()
   (interactive)
   (with-temp-env! (cpp-cmake//config-env)
-    (-if-let (command (and cpp-cmake-project-root
-                           (cpp//compile-command (cpp-cmake//config-build))))
+    (-if-let (command (when (and current-prefix-arg cpp-cmake-project-root)
+                        (cpp//compile-command (cpp-cmake//config-build))))
         (compile command)
-      (let ((compile-command
-             (or (-when-let (dir (cpp-cmake//locate-cmakelists nil nil "Makefile"))
+      (let ((commands
+             (cl-remove
+              nil
+              `(,(when cpp-cmake-project-root
+                   (cpp//compile-command (cpp-cmake//config-build)))
+                ,(-when-let (dir (cpp-cmake//locate-cmakelists nil nil "Makefile"))
                    (cpp//compile-command dir))
-                 (ignore-errors (cpp-ccls//buffer-compile-command))
-                 compile-command)))
-        (call-interactively 'compile)))))
+                ,(ignore-errors (cpp-ccls//buffer-compile-command))
+                ,@(-take 2 compile-history)
+                ,compile-command))))
+        (let ((max-mini-window-height 1))
+          (lv-message
+           "%s"
+           (concat
+            "[RET] => prompt\n"
+            (string-join (--map-indexed (format "[%d] => %s" it-index it) commands) "\n"))))
+        (set-transient-map
+         (let ((map (make-sparse-keymap)))
+           (define-key map (kbd "RET")
+             (lambda! (let ((compile-command (car commands)))
+                        (lv-delete-window)
+                        (call-interactively #'compile))))
+           (define-key map (kbd "C-g")
+             (lambda! (lv-delete-window) (call-interactively #'keyboard-quit)))
+           (--map-indexed
+            (define-key map (kbd (format "%d" it-index))
+              (lambda! (lv-delete-window) (compile it)))
+            commands)
+           map))))))
 
 ;;;###autoload
 (defun cpp/debug-current-file (&optional new-session)

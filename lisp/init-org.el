@@ -86,6 +86,7 @@
    ("C-M-i" . completion-at-point)
    ("C-c n" . org-next-block)
    ("C-c p" . org-previous-block)
+   ("C-c DEL" . org-cycle-list-bullet)
    ([f5] . org/open-pdf)
    ([C-f9] . org/create-latex-fragemnt-cache)
    ([f9] . org/publish-current-file)

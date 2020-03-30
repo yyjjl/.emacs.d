@@ -7,7 +7,7 @@
 
 (define-hook! sh|setup (sh-mode-hook)
   (when (buffer-enable-rich-feature-p)
-    (lsp//try-enable sh|setup-internal
+    (lsp//try-enable sh|setup
       :init (setq-local lsp-eldoc-render-all nil))
 
     (add-to-list 'flycheck-disabled-checkers 'sh-shellcheck)

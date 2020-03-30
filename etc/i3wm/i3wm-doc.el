@@ -29,7 +29,7 @@
                         (recentf-push file)
                         (call-process "gtk-launch" nil nil nil
                                       "evince.desktop"
-                                      file)))
+                                      (expand-file-name file))))
             :caller 'i3/open-document))
 
 (defun i3//open-document-transformer (-file)

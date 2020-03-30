@@ -34,7 +34,7 @@
    :define (rust-mode-hook)
    (cargo-minor-mode 1)
    (when (buffer-enable-rich-feature-p)
-     (lsp//try-enable rust|setup-internal)))
+     (lsp//try-enable rust|setup)))
 
   :config
   (require 'cc-mode)
