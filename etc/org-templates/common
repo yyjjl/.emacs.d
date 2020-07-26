@@ -5,7 +5,7 @@
 \definecolor{codeblockbg}{rgb}{0.95,0.95,0.95}
 \definecolor{linkcolor}{rgb}{0.1,0.3,0.5}
 
-\hypersetup{colorlinks=true,linkcolor=linkcolor}
+\hypersetup{colorlinks=true,linkcolor=linkcolor, citecolor=blue}
 
 \geometry{top=2.54cm,bottom=2.54cm,left=2.54cm,right=2.54cm}
 

@@ -188,6 +188,14 @@
   :bind (:map flycheck-command-map ("j" . counsel/flycheck))
   :init
   (setq flycheck-keymap-prefix (kbd "C-c f"))
+
+  :advice
+  (:around flycheck-add-overlay
+   :define (-fn &rest -args)
+   (let ((ov (apply -fn -args)))
+     (overlay-put ov 'priority -10)
+     ov))
+
   :config
   ;; Do not check during newline
   (setq-default flycheck-checker-error-threshold 400)
@@ -388,15 +396,17 @@
 
 (defvar core-auto-next-error-buffer-derived-modes
   '(occur-mode grep-mode ivy-occur-mode xref--xref-buffer-mode compilation-mode))
+(defun core//get-occur-buffer ()
+  (cl-loop
+   for window in (window-list)
+   for buffer = (window-buffer window)
+   when (with-current-buffer buffer
+          (apply 'derived-mode-p
+                 core-auto-next-error-buffer-derived-modes))
+   return buffer))
+
 (defun core*around-next-error (-fn &rest -args)
-  (let ((occur-buffer
-         (cl-loop
-          for window in (window-list)
-          for buffer = (window-buffer window)
-          when (with-current-buffer buffer
-                 (apply 'derived-mode-p
-                        core-auto-next-error-buffer-derived-modes))
-          return buffer)))
+  (let ((occur-buffer (core//get-occur-buffer)))
     (if-let (window (and occur-buffer (get-buffer-window occur-buffer)))
         (with-selected-window window
           (apply -fn -args))

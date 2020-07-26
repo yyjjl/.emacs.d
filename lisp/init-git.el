@@ -11,7 +11,8 @@
  magit)
 
 ;; This setup function must run before `semantic-mode' invoke to avoid a error
-(define-hook! git|generic-prog-mode-setup ((prog-mode-hook :append) org-mode-hook)
+(define-hook! git|generic-prog-mode-setup
+  ((prog-mode-hook :append) org-mode-hook LaTeX-mode-hook)
   (when (buffer-enable-rich-feature-p)
     (git-gutter-mode 1)))
 
@@ -25,7 +26,7 @@
     (set-face-foreground 'git-gutter-fr:modified "yellow")
     (set-face-foreground 'git-gutter-fr:added "green")
     (set-face-foreground 'git-gutter-fr:deleted "red")
-    (setq git-gutter-fr:side 'right-fringe))
+    (setq git-gutter-fr:side 'left-fringe))
   (setq git-gutter:update-hooks '(after-save-hook))
   (setq git-gutter:handled-backends '(svn hg git)))
 

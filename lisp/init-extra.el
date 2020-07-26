@@ -5,7 +5,6 @@
  octave
  calc
  whitespace
- markdown-mode
  csv-mode
  php-mode
  gnuplot-mode

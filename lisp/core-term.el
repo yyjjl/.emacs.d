@@ -56,13 +56,10 @@
    ("C-S-t" . term/pop-shell-current-directory))
 
   :hook
-  ((set-title title)
-   :define (vterm-set-title-functions)
-   (setq term-extra-name title))
-
   (set-name
    :define (vterm-mode-hook)
    (setq mode-line-show-root-p nil)
+   (setq-local vterm-buffer-name-string (concat (buffer-name) ": %s"))
    (setq term-extra-name nil)
    (setq mode-line-buffer-identification
          '("%b" (vterm-copy-mode (:propertize "[copy]" face font-lock-builtin-face))

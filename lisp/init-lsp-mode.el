@@ -26,7 +26,8 @@
   (lsp-flycheck-enable)
 
   ;; default to sort and filter by server
-  (setq-local company-transformers nil))
+  (setq-local company-transformers nil)
+  (setq-local yas-inhibit-overlay-modification-protection t))
 
 (config! lsp
   :bind
@@ -74,10 +75,17 @@
   (setq lsp-diagnostic-package :auto)
   (setq lsp-restart 'auto-restart)
   (setq lsp-session-file (expand-var! "lsp-sessions"))
-
+  (setq lsp-keep-workspace-alive nil)
+  (setq lsp-signature-doc-lines 2)
   (setq lsp-idle-delay 0.5)
+
+  (setq lsp-enable-snippet t)
   (setq lsp-enable-completion-at-point t)
+  (setq lsp-enable-on-type-formatting nil)
+  (setq lsp-enable-indentation nil)
+
   (setq lsp-symbol-highlighting-skip-current t)
+  (setq lsp-signature-auto-activate nil)
 
   (add-to-list
    'hydra-local-toggles-heads-list
