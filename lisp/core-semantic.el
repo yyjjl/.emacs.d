@@ -20,11 +20,12 @@
           global-semanticdb-minor-mode
           ;; global-semantic-idle-summary-mode
           ;; global-semantic-idle-local-symbol-highlight-mode
-          global-semantic-stickyfunc-mode
+          ;; global-semantic-stickyfunc-mode
           ;; Error occurs a lot
           ;; global-semantic-decoration-mode
           ;; global-semantic-highlight-func-mode
-          global-semantic-mru-bookmark-mode))
+          ;; global-semantic-mru-bookmark-mode
+          ))
   (setq semantic-idle-scheduler-idle-time 1)
 
   (when emacs-use-gtags-p

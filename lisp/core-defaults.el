@@ -182,8 +182,8 @@
 
 (defun core//skip-special-buffers (buffer)
   (or (buffer-file-name buffer)
-      (not (string-prefix-p "*" (buffer-name buffer)))
-      (equal (buffer-file-name buffer) "*scratch*")))
+      (not (= (aref (buffer-name buffer) 0) ?\*))
+      (equal (buffer-name buffer) "*scratch*")))
 
 (define-hook! (core|default-frame-setup frame) (after-make-frame-functions)
   (set-frame-parameter frame 'buffer-predicate #'core//skip-special-buffers))

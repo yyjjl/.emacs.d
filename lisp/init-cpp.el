@@ -75,7 +75,8 @@
         (file-exists-p (cpp-ccls//dot-ccls-path)))
     :init
     (progn
-      (ggtags-mode -1)
+      (when (fboundp 'ggtags-mode)
+        (ggtags-mode -1))
       (electric-indent-local-mode -1))
     :fallback
     (progn
