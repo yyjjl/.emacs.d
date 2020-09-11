@@ -9,8 +9,7 @@
   :safe #'booleanp)
 
 (ignore-errors
-  (require 'lsp)
-  (require 'lsp-clients))
+  (require 'lsp))
 
 (cl-defmacro lsp//try-enable (name &key (enable t) (init nil) (fallback nil))
   (declare (indent 1))
@@ -80,7 +79,7 @@
   (setq lsp-idle-delay 0.5)
 
   (setq lsp-enable-snippet t)
-  (setq lsp-enable-completion-at-point t)
+  (setq lsp-completion-enable t)
   (setq lsp-enable-on-type-formatting nil)
   (setq lsp-enable-indentation nil)
 

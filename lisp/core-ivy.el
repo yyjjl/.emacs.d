@@ -90,14 +90,11 @@
                     ivy-switch-buffer-other-window
                     counsel-projectile-switch-to-buffer
                     counsel-projectile))
-    (ivy-set-display-transformer caller
-                                 #'core//ivy-switch-buffer-transformer))
-  (ivy-set-display-transformer 'package-install
-                               #'core//package-install-transformer)
-  (ivy-set-display-transformer 'counsel-find-file
-                               #'core//counsel-find-file-transformer)
-  (ivy-set-display-transformer 'counsel-bookmark
-                               #'core//counsel-bookmark-transformer)
+    (ivy-configure caller :display-transformer-fn #'core//ivy-switch-buffer-transformer))
+
+  (ivy-configure 'package-install :display-transformer-fn #'core//package-install-transformer)
+  (ivy-configure 'counsel-find-file :display-transformer-fn #'core//counsel-find-file-transformer)
+  (ivy-configure 'counsel-bookmark :display-transformer-fn #'core//counsel-bookmark-transformer)
 
   (setq ivy-read-action-function #'ivy-hydra-read-action)
 
@@ -127,6 +124,8 @@
 
   (:before counsel--async-command
    :define (-cmd &rest _)
+   (unless (stringp -cmd)
+     (setq -cmd (string-join -cmd " ")))
    (lv-message "Command: (@%s) %s"
                (propertize default-directory 'face font-lock-constant-face)
                (propertize -cmd 'face font-lock-doc-face)))

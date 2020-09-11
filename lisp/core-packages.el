@@ -198,10 +198,10 @@ Archive with high priority will be used when install a package.")
   :config
   ;; The index of archive represents its priority
   (setq package-archives
-        '(("melpa-stable" . "https://elpa.emacs-china.org/melpa-stable/")
-          ("gnu" . "https://elpa.emacs-china.org/gnu/")
-          ("melpa" . "https://elpa.emacs-china.org/melpa/")
-          ("org" . "https://elpa.emacs-china.org/org/")))
+        '(("melpa-stable" . "http://elpa.emacs-china.org/melpa-stable/")
+          ("gnu" . "http://elpa.emacs-china.org/gnu/")
+          ("melpa" . "http://elpa.emacs-china.org/melpa/")
+          ("org" . "http://elpa.emacs-china.org/org/")))
   ;; Setup to select right archive
   (setq package--priority-alist (mapcar #'car package-archives))
 

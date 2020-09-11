@@ -86,7 +86,9 @@
             (meta (memq 'meta modifiers))
             (ctrl (memq 'control modifiers)))
        (when-let ((key (key-description (vector (event-basic-type last-input-event)))))
-         (vterm-send-key key shift meta ctrl))))))
+         (vterm-send-key key shift meta ctrl)))))
+  :config
+  (setq vterm-kill-buffer-on-exit nil))
 
 
 (config! comint
