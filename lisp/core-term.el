@@ -58,7 +58,6 @@
   :hook
   (set-name
    :define (vterm-mode-hook)
-   (setq mode-line-show-root-p nil)
    (setq-local vterm-buffer-name-string (concat (buffer-name) ": %s"))
    (setq term-extra-name nil)
    (setq mode-line-buffer-identification

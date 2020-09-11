@@ -21,13 +21,6 @@
          ,init
        ,fallback)))
 
-(define-hook! lsp|after-open (lsp-after-open-hook)
-  (lsp-flycheck-enable)
-
-  ;; default to sort and filter by server
-  (setq-local company-transformers nil)
-  (setq-local yas-inhibit-overlay-modification-protection t))
-
 (config! lsp
   :bind
   (:map lsp-mode-map
@@ -42,14 +35,21 @@
    ("C-c C-SPC" . lsp-execute-code-action)
    ("C-S-SPC" . lsp-signature-activate))
 
-  :advice
-  (:override lsp--auto-configure :name ignore)
+  :hook
+  (after-open
+   :define (lsp-after-open-hook)
+    ;; default to sort and filter by server
+   (setq-local company-transformers nil))
 
-  (:override lsp--lv-message
+  :advice
+  (:override lsp-lv-message
    :define (message)
-   (setq lsp--signature-last-buffer (current-buffer))
-   (let ((lv-force-update t))
-     (lv-message (replace-regexp-in-string "%" "%%" message))))
+   (if message
+       (progn
+         (setq lsp--signature-last-buffer (current-buffer))
+         (let ((lv-force-update t))
+           (lv-message (replace-regexp-in-string "%" "%%" message))))
+     (lv-delete-window)))
 
   (:around lsp--render-on-hover-content
    :define (-fn -contents -render-all)
@@ -71,7 +71,7 @@
   (setq lsp-auto-configure t)
   (setq lsp-auto-guess-root t)
   (setq lsp-eldoc-render-all t)
-  (setq lsp-diagnostic-package :auto)
+  (setq lsp-diagnostics-provider :auto)
   (setq lsp-restart 'auto-restart)
   (setq lsp-session-file (expand-var! "lsp-sessions"))
   (setq lsp-keep-workspace-alive nil)
@@ -79,12 +79,21 @@
   (setq lsp-idle-delay 0.5)
 
   (setq lsp-enable-snippet t)
-  (setq lsp-completion-enable t)
   (setq lsp-enable-on-type-formatting nil)
+  (setq lsp-enable-text-document-color nil)
   (setq lsp-enable-indentation nil)
 
+  (setq lsp-completion-enable t)
+
+  (setq lsp-enable-symbol-highlighting nil)
   (setq lsp-symbol-highlighting-skip-current t)
-  (setq lsp-signature-auto-activate nil)
+
+  (setq lsp-signature-auto-activate t)
+  (setq lsp-signature-doc-lines 2)
+
+  (setq lsp-modeline-diagnostics-enable nil)
+  (setq lsp-headerline-breadcrumb-enable nil)
+  (setq lsp-modeline-code-actions-enable t)
 
   (add-to-list
    'hydra-local-toggles-heads-list
