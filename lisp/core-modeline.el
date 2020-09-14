@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(require-packages! doom-modeline)
+
 (config! doom-modeline
   :init
   (advice-add
@@ -8,7 +10,8 @@
      (funcall -fn -name (append -lhs -rhs))))
 
   :config
-  (doom-modeline-def-segment buffer-info
+  (doom-modeline-def-segment
+    buffer-info
     "Combined information about the current buffer, including the current working
 directory, the file name, and its state (modified, read-only or non-existent)."
     (let ((name (concat

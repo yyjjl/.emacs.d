@@ -18,7 +18,8 @@
     (forward-line line)
     (forward-char character)))
 
-(ivy-set-display-transformer 'lsp/ivy-workspace-symbol #'lsp//ivy-format-symbol-match)
+(ivy-configure 'lsp/ivy-workspace-symbol
+  :display-transformer-fn #'lsp//ivy-format-symbol-match)
 
 ;;;###autoload
 (defun lsp/ivy-workspace-symbol (-arg)
@@ -42,8 +43,7 @@ When called with prefix -ARG, search for all symbols of the current workspaces."
              (when current-request-id
                (lsp--cancel-request current-request-id))
              (setq current-request-id (plist-get request :id))
-             (lsp-send-request-async request #'ivy-update-candidates
-                                     :mode 'detached)))
+             (lsp-request-async request #'ivy-update-candidates :mode 'detached)))
          nil)
        :dynamic-collection t
        :require-match t
@@ -73,3 +73,11 @@ When called with prefix -ARG, search for all symbols of the current workspaces."
       (let ((folder (completing-read "Folder to remove" valid-folders nil t)))
         (setf (lsp-session-folders (lsp-session)) (delete folder valid-folders))
         (lsp--persist-session (lsp-session))))))
+
+;;;###autoload
+(defun dap/go-to-log-buffer ()
+  (interactive)
+  (let ((session (dap--cur-session-or-die)))
+    (when-let* ((proc (dap--debug-session-program-proc session))
+                (buffer (process-buffer proc)))
+      (pop-to-buffer buffer))))

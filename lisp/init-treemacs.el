@@ -3,7 +3,7 @@
 (require-packages! treemacs)
 
 (config! winum
-  :bind (:map winum-keymap ("M-`" . treemacs)))
+  :bind (:map winum-keymap ("M-`" . treemacs/switch)))
 
 (config! treemacs
   :bind
