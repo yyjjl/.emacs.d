@@ -10,6 +10,10 @@
 ;; Do not load extra backends
 (setq org-export-backends '(html latex beamer))
 
+(defvar-local org-latex--ignore-internal-label nil)
+(put 'org-latex--ignore-internal-label 'safe-local-variable #'booleanp)
+
+
 (defvar org--remove-texfile t)
 (defvar org-block-key-bindings
   '(("p" . org-previous-block)
@@ -214,7 +218,7 @@
         org-edit-timestamp-down-means-later t
 
         ;; special ctrl-a/e behaviour
-        org-special-ctrl-a/e t
+        org-special-ctrl-a/e nil
         org-special-ctrl-k t
 
         org-catch-invisible-edits 'smart
@@ -315,6 +319,15 @@
 (config! ox-latex
   :advice
   (:around org-publish-file :name without-user-record!!)
+
+  (:around org-latex--label
+   :define (-fn -datum -info &optional -force -full)
+   (let ((label (funcall -fn -datum -info -force -full)))
+     (if (and org-latex--ignore-internal-label
+              (stringp label)
+              (string-prefix-p "\\label{sec:org" label))
+         ""
+       label)))
 
   (:after org-latex-compile
    :define (-texfile &optional _)

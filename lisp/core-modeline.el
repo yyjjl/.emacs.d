@@ -1,11 +1,11 @@
 ;;; -*- lexical-binding: t; -*-
 
 (config! doom-modeline
-  :init
-  (advice-add
-   'doom-modeline-def-modeline :around
-   (lambda (-fn -name -lhs &optional -rhs)
-     (funcall -fn -name (append -lhs -rhs))))
+  ;; :init
+  ;; (advice-add
+  ;;  'doom-modeline-def-modeline :around
+  ;;  (lambda (-fn -name -lhs &optional -rhs)
+  ;;    (funcall -fn -name (append -lhs -rhs))))
 
   :config
   (doom-modeline-def-segment buffer-info
@@ -13,7 +13,7 @@
 directory, the file name, and its state (modified, read-only or non-existent)."
     (let ((name (concat
                  ;; (doom-modeline-spc)
-                 ;; (doom-modeline--buffer-mode-icon)
+                 (doom-modeline--buffer-mode-icon)
                  (doom-modeline--buffer-state-icon)
                  (doom-modeline--buffer-name))))
       (if (and (listp mode-line-buffer-identification)
@@ -22,7 +22,7 @@ directory, the file name, and its state (modified, read-only or non-existent)."
         name)))
 
   (setq doom-modeline-project-detection 'projectile)
-  (setq doom-modeline-buffer-file-name-style 'truncate-upto-project)
+  (setq doom-modeline-buffer-file-name-style 'auto)
 
   (setq doom-modeline-checker-simple-format nil)
 
@@ -37,10 +37,18 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   (setq doom-modeline-irc nil)
   (setq doom-modeline-minor-modes nil)
 
-  (setq doom-modeline-icon nil)
+  (setq doom-modeline-icon (display-graphic-p))
   (setq doom-modeline-buffer-state-icon t)
   (setq doom-modeline-major-mode-icon t)
-  (setq doom-modeline-major-mode-color-icon t))
+  (setq doom-modeline-major-mode-color-icon t)
+
+  (doom-modeline-def-modeline 'main
+    '(bar window-number matches buffer-info remote-host checker lsp buffer-position word-count selection-info)
+    '(misc-info debug repl input-method indent-info buffer-encoding major-mode process vcs))
+
+  (doom-modeline-def-modeline 'org-src
+    '(bar window-number matches buffer-info-simple checker lsp buffer-position word-count selection-info)
+    '(misc-info debug input-method indent-info buffer-encoding major-mode process)))
 
 ;; Setup `mode-line-format'
 (define-hook! mode-line|after-init-hook (after-init-hook)
