@@ -1,6 +1,6 @@
 ;; -*- lexical-binding:t -*-
 
-(require-packages! lsp-mode ivy)
+(require-packages! lsp-mode ivy dap-mode)
 
 (defcustom lsp-enable-in-project-p t
   "Whether to setup project literally"
@@ -27,6 +27,7 @@
    ("M-s l" . lsp-lens-mode)
    ("M-s h h" . lsp-document-highlight)
    ("M-s '" . lsp-avy-lens)
+   ("M-s d" . dap-hydra)
    ("C-c R" . lsp-rename)
    ("C-c I" . lsp/ivy-workspace-symbol)
    ("C-c S" . lsp-describe-session)
@@ -107,5 +108,52 @@
        "on type formating" :toggle lsp-enable-on-type-formatting)
       ("t s" lsp-toggle-signature-auto-activate
        "signature" :toggle lsp-signature-auto-activate)))))
+
+(config! dap-mode
+  :hook
+  (load-debugger
+   :define (python-mode-hook)
+   (require 'dap-python))
+
+  :hook
+  ((show-dap-hydra _)
+   :define (dap-session-created-hook dap-stopped-hook)
+   (dap-hydra))
+
+  ((hide-dap-hydra _)
+   :define (dap-terminated-hook)
+   (dap-hydra/nil))
+
+  :config
+  (setq dap-auto-configure-features
+        '(sessions locals breakpoints expressions controls))
+
+  (setq dap-python-executable "python3"))
+
+(config! dap-ui
+  :bind
+  (:map dap-ui-repl-mode-map
+   ("M-s d" . dap-hydra))
+
+  :config
+  (config! winum
+    :config
+    (dolist (buffer (list dap-ui--locals-buffer
+                          dap-ui--sessions-buffer
+                          dap-ui--debug-window-buffer
+                          dap-ui--expressions-buffer
+                          dap-ui--breakpoints-buffer))
+      (add-to-list 'winum-ignored-buffers buffer))))
+
+(config! dap-hydra
+  :config
+  (defhydra++ dap-hydra ()
+    ("q" :delete)
+    ("ed" dap-ui-expressions-remove "Remove expr")
+    ("el" dap-ui-expressions "List expr")
+    ("so" dap-go-to-output-buffer "Output")
+    ("sL" dap/go-to-log-buffer "Log")
+    ("C-c C-z" dap-ui-repl "Repl")
+    ("M-s q" nil "quit" :exit t)))
 
 (provide 'init-lsp-mode)
