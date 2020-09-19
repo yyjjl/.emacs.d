@@ -208,12 +208,11 @@ for a file to visit if current buffer is not visiting a file."
 
 (defhydra swiper-hydra (:color blue :hint nil)
   "
-[_RET_/_C-s_/_m_/_a_] swiper-isearch/multi/all
+[_m_] swiper-multi
+[_a_] swiper-all
 [_i_/_I_]   isearch-forward(regexp)
 [_r_/_R_]   isearch-backward(regexp)
 "
-  ("RET" swiper-isearch)
-  ("C-s" swiper-isearch)
   ("i" isearch-forward)
   ("I" isearch-forward-regexp)
   ("r" isearch-backward)

@@ -1,13 +1,13 @@
 ;;; -*- lexical-binding: t; -*-
 
 (defhydra hydra-mc (:color blue :hint nil)
-  "
-_=_ next    _-_ previous    ___ skip-previous  _+_ skip-next _q_ quit
-"
-  ("=" mc/mark-next-like-this :exit nil)
-  ("-" mc/mark-previous-like-this :exit nil)
-  ("_" mc/skip-to-previous-like-this :exit nil)
-  ("+" mc/skip-to-next-like-this :exit nil)
+  ""
+  ("." mc/mark-next-like-this "next" :exit nil)
+  ("=" mc/mark-next-like-this "next" :exit nil)
+  ("," mc/mark-previous-like-this "prev" :exit nil)
+  ("-" mc/mark-previous-like-this "prev" :exit nil)
+  ("<" mc/skip-to-previous-like-this "skip prev" :exit nil)
+  (">" mc/skip-to-next-like-this "skip next" :exit nil)
   ("RET" nil)
   ("q" nil))
 

@@ -2,6 +2,28 @@
 
 (defvar ivy-views-persistent-file "ivy-views.el")
 
+;; @see https://emacs-china.org/t/swiper-swiper-isearch/9007/12
+(defun core//toggle-between-swiper-rg ()
+  "Toggle `counsel-rg', `swiper', `swiper-isearch' with the current input."
+  (interactive)
+  (ivy-quit-and-run
+    (cl-case (ivy-state-caller ivy-last)
+      (swiper
+       (swiper-isearch ivy-text))
+      (swiper-isearch
+       (if emacs-use-ripgrep-p
+           (counsel-rg ivy-text)
+         (counsel-grep ivy-text)))
+      (t
+       (swiper ivy-text)))))
+
+(defun core//swiper-prompt ()
+  (ivy-add-prompt-count
+   (cl-case (ivy-state-caller ivy-last)
+     (swiper "Search/I/rg: ")
+     (swiper-isearch "S/Isearch/rg: ")
+     (t "S/I/rg: "))))
+
 (defun core//package-install-transformer (-string)
   (let ((package (cadr (assoc-string -string package-archive-contents))))
     (format "%-30s %-16s %-7s %s"
@@ -67,6 +89,12 @@
    ("C-j" . ivy-immediate-done)
    ("C-M-j" . ivy-done)
    ("M-." . ignore))
+  (:map swiper-map
+   ("<C-return>" . core//toggle-between-swiper-rg))
+  (:map counsel-ag-map
+   ("<C-return>" . core//toggle-between-swiper-rg))
+  (:map counsel-grep-map
+   ("<C-return>" . core//toggle-between-swiper-rg))
 
   :advice
   (:around ivy--preselect-index :name ignore-errors!)
@@ -84,6 +112,10 @@
 
   :config
   (core//load-variable 'ivy-views ivy-views-persistent-file)
+
+  (dolist (caller '(counsel-rg counsel-ag counsel-grep swiper-isearch swiper counsel-rg))
+    (ivy-set-prompt caller #'core//swiper-prompt))
+
   (dolist (caller '(ivy-switch-buffer
                     counsel/kill-buffer
                     internal-complete-buffer
@@ -98,6 +130,8 @@
 
   (setq ivy-read-action-function #'ivy-hydra-read-action)
 
+  (setf (alist-get 't ivy-format-functions-alist) #'ivy-format-function-arrow)
+
   (setq ivy-action-wrap t)
   (setq ivy-count-format "(%d/%d) ")
   (setq ivy-extra-directories '("./"))
@@ -109,7 +143,8 @@
           (t . ivy--regex-plus)))
   (setq ivy-use-virtual-buffers t)
   (setq ivy-virtual-abbreviate 'full)
-  (setq ivy-use-selectable-prompt t))
+  (setq ivy-use-selectable-prompt t)
+  (setq ivy-on-del-error-function #'ignore))
 
 (config! swiper
   :config

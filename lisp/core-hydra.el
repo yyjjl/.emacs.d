@@ -38,7 +38,7 @@ Arguments are same as of `defhydra'."
   ("C-x ^" . hydra-resize-window/enlarge-window)
   ("C-x -" . hydra-resize-window/shrink-window)
 
-  ("C->" . hydra-move-invoker)
+  ;; ("C->" . hydra-move-invoker)
   ("M-N" . scroll-down-line-other-window)
   ("M-P" . scroll-up-line-other-window)
 

@@ -82,7 +82,8 @@ Archive with high priority will be used when install a package.")
     (:bind core//config-binds :order 1)
     (:hook core//config-hooks :order 2)
     (:advice core//config-advices :order 3)
-    (:config t :order 4)))
+    (:toggles core//config-toggles :order 4)
+    (:config t :order 5)))
 
 (defun core//config-binds (_prefix -binds)
   (cl-loop
@@ -126,6 +127,11 @@ Archive with high priority will be used when install a package.")
    else
    append (list form)))
 
+(defun core//config-toggles (_prefix -toggles)
+  (cl-loop
+   for form in -toggles
+   collect `(add-to-list 'hydra-local-toggles-heads-list ',form)))
+
 (defmacro config! (-package-name &rest -body)
   (declare (indent 1) (debug t))
   (let* ((args (let (element result)
@@ -160,8 +166,8 @@ Archive with high priority will be used when install a package.")
           (cl-remove nil (mapcan #'cdr (sort before-forms (lambda (x y) (< (car x) (car y)))))))
     `(progn
        (ignore-errors
-        (eval-when-compile
-          (require ',-package-name nil t)))
+         (eval-when-compile
+           (require ',-package-name nil t)))
        ,@before-forms
        (with-eval-after-load ',-package-name
          ,@after-forms))))

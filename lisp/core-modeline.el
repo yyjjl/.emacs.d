@@ -40,7 +40,7 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   (setq doom-modeline-irc nil)
   (setq doom-modeline-minor-modes nil)
 
-  (setq doom-modeline-icon (display-graphic-p))
+  (setq doom-modeline-icon nil)
   (setq doom-modeline-buffer-state-icon t)
   (setq doom-modeline-major-mode-icon t)
   (setq doom-modeline-major-mode-color-icon t)

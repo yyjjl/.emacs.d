@@ -12,14 +12,31 @@
 (pretty-hydra-define hydra-global-toggles
   (:title "Toggles" :color amaranth :quit-key "q")
   ("Global"
-   (("v" (core-view-code-mode (if core-view-code-mode -1 1))
-     "view code" :toggle core-view-code-mode)
-    ("E" toggle-debug-on-error "debug on error" :toggle (default-value 'debug-on-error))
-    ("Q" toggle-debug-on-quit "debug on quit" :toggle (default-value 'debug-on-quit))
-    ("W" (setq-default show-trailing-whitespace (not show-trailing-whitespace))
-     "whitespace" :toggle show-trailing-whitespace)
-    ("N" (display-line-numbers-mode (if display-line-numbers-mode -1 1))
-     "line number" :toggle display-line-numbers-mode))))
+   (("I"
+     (setq doom-modeline-icon (not doom-modeline-icon))
+     "display icons"
+     :toggle doom-modeline-icon)
+    ("V"
+     (core-view-code-mode (if core-view-code-mode -1 1))
+     "view code"
+     :toggle core-view-code-mode)
+    ("E"
+     toggle-debug-on-error
+     "debug on error"
+     :toggle (default-value 'debug-on-error))
+    ("Q"
+     toggle-debug-on-quit "debug on quit"
+     :toggle (default-value 'debug-on-quit))
+    ("W"
+     (setq show-trailing-whitespace (not show-trailing-whitespace))
+     "trailing whitespace"
+     :toggle show-trailing-whitespace)
+    ("N"
+     (display-line-numbers-mode (if display-line-numbers-mode -1 1))
+     "line number"
+     :toggle display-line-numbers-mode)
+    ("B" display-battery-mode "battery" :toggle t)
+    ("T" display-time-mode "time" :toggle t))))
 
 (defun hydra-global-toggles/update ()
   (eval
@@ -31,7 +48,8 @@
              (cl-loop for (key . value) in hydra-local-toggles-heads-list
                       when (eval key) append value)))))
   (define-key hydra-global-toggles/keymap
-    (where-is-internal 'hydra-global-toggles/body nil t) #'hydra-global-toggles/nil)
+    (where-is-internal 'hydra-global-toggles/body nil t)
+    #'hydra-global-toggles/nil)
   (prog1 (eval hydra-global-toggles/hint)
     (setq hydra-global-toggles/hint hydra-global-toggles/hint-cache)))
 
@@ -60,8 +78,8 @@
   ("RET" nil "quit"))
 
 (defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
-                                     :color pink
-                                     :post (deactivate-mark))
+                           :color pink
+                           :post (deactivate-mark))
   "
   ^_p_^         [_k_]kill      [_s_]string
 _b_   _f_       [_q_]quit      [_y_]yank
@@ -80,7 +98,7 @@ _b_   _f_       [_q_]quit      [_y_]yank
   ("m" (if (region-active-p)
            (deactivate-mark)
          (rectangle-mark-mode 1))
-   nil)
+       nil)
   ("y" yank-rectangle nil)
   ("/" undo nil)
   ("N" rectangle-number-lines nil :exit t)

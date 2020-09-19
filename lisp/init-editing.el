@@ -45,8 +45,11 @@
   ("C-M-f" . forward-sentence)
 
   ([remap move-beginning-of-line] . core/smart-move-begining-of-line)
+
   ("C-=" . hydra-mc/mc/mark-next-like-this)
-  ("C--" . hydra-mc/mc/mark-previous-like-this))
+  ("C--" . hydra-mc/mc/mark-previous-like-this)
+  ("C->" . hydra-mc/mc/mark-next-like-this)
+  ("C-<" . hydra-mc/mc/mark-previous-like-this))
 
 (define-key! :prefix "C-c m"
   ("P" . mc/mark-pop)
@@ -60,8 +63,8 @@
   ("s" . mc/sort-regions)
   ("v" . mc/vertical-align)
   ("r" . mc/reverse-regions)
-  ("=" . hydra-mc/mc/mark-next-like-this)
-  ("-" . hydra-mc/mc/mark-previous-like-this)
+  ("." . hydra-mc/mc/mark-next-like-this)
+  ("," . hydra-mc/mc/mark-previous-like-this)
   ([C-S-mouse-1] . mc/add-cursor-on-click))
 
 ;; `avy' jump commands

@@ -35,7 +35,6 @@
  page-break-lines
  evil-nerd-commenter
  shackle
- symbol-overlay
  hl-todo
  expand-region)
 

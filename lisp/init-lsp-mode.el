@@ -68,6 +68,18 @@
                           'face 'font-lock-comment-face))))))
      content))
 
+  :toggles
+  (lsp-mode
+   "LSP"
+   (("t i" lsp-toggle-trace-io
+     "trace io" :toggle lsp-print-io)
+    ("t h" lsp-toggle-symbol-highlight
+     "highlight" :toggle lsp-enable-symbol-highlighting)
+    ("t t" lsp-toggle-on-type-formatting
+     "on type formating" :toggle lsp-enable-on-type-formatting)
+    ("t s" lsp-toggle-signature-auto-activate
+     "signature" :toggle lsp-signature-auto-activate)))
+
   :config
   (setq lsp-auto-configure t)
   (setq lsp-auto-guess-root t)
@@ -93,21 +105,26 @@
   (setq lsp-signature-doc-lines 2)
 
   (setq lsp-modeline-diagnostics-enable nil)
-  (setq lsp-headerline-breadcrumb-enable nil)
-  (setq lsp-modeline-code-actions-enable t)
+  (setq lsp-headerline-breadcrumb-enable t)
+  (setq lsp-modeline-code-actions-enable t))
 
-  (add-to-list
-   'hydra-local-toggles-heads-list
-   '(lsp-mode
-     "LSP"
-     (("t i" lsp-toggle-trace-io
-       "trace io" :toggle lsp-print-io)
-      ("t h" lsp-toggle-symbol-highlight
-       "highlight" :toggle lsp-enable-symbol-highlighting)
-      ("t t" lsp-toggle-on-type-formatting
-       "on type formating" :toggle lsp-enable-on-type-formatting)
-      ("t s" lsp-toggle-signature-auto-activate
-       "signature" :toggle lsp-signature-auto-activate)))))
+(config! lsp-headerline
+  :config
+
+  (setq lsp-headerline-breadcrumb-segments '(project symbols))
+
+  (defun lsp*override-lsp-headerline--filename-with-icon (-file-path)
+    (f-filename -file-path))
+
+  (lsp-defun lsp*override-lsp-headerline--symbol-icon ((&DocumentSymbol :kind))
+    "Build the SYMBOL icon for headerline breadcrumb."
+    (when (require 'lsp-treemacs nil t)
+      (format "[%s] " (lsp-treemacs-symbol-kind->icon kind))))
+
+  (advice-add #'lsp-headerline--symbol-icon :override
+              #'lsp*override-lsp-headerline--symbol-icon)
+  (advice-add #'lsp-headerline--filename-with-icon :override
+              #'lsp*override-lsp-headerline--filename-with-icon))
 
 (config! dap-mode
   :hook
@@ -128,7 +145,9 @@
   (setq dap-auto-configure-features
         '(sessions locals breakpoints expressions controls))
 
-  (setq dap-python-executable "python3"))
+  (config! dap-python
+    :config
+    (setq dap-python-executable "python3")))
 
 (config! dap-ui
   :bind
@@ -147,6 +166,7 @@
 
 (config! dap-hydra
   :config
+
   (defhydra++ dap-hydra ()
     ("q" :delete)
     ("ed" dap-ui-expressions-remove "Remove expr")
