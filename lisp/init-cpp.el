@@ -3,6 +3,9 @@
 (defvar cpp-ccls-base-path (expand-var! "ccls"))
 (defvar cpp-ccls-path (expand-file-name "build/ccls" cpp-ccls-base-path))
 
+(defvar cpp-buffer-command-functions ())
+(defvar cpp-expand-macro-function nil)
+
 (define-variable! :pkg cpp cmake)
 
 (require-packages!

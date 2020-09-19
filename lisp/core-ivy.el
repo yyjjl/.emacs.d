@@ -89,12 +89,6 @@
    ("C-j" . ivy-immediate-done)
    ("C-M-j" . ivy-done)
    ("M-." . ignore))
-  (:map swiper-map
-   ("<C-return>" . core//toggle-between-swiper-rg))
-  (:map counsel-ag-map
-   ("<C-return>" . core//toggle-between-swiper-rg))
-  (:map counsel-grep-map
-   ("<C-return>" . core//toggle-between-swiper-rg))
 
   :advice
   (:around ivy--preselect-index :name ignore-errors!)
@@ -147,10 +141,20 @@
   (setq ivy-on-del-error-function #'ignore))
 
 (config! swiper
+  :bind
+  (:map swiper-map
+   ("<C-return>" . core//toggle-between-swiper-rg))
+
   :config
   (setq swiper-stay-on-quit t))
 
 (config! counsel
+  :bind
+  (:map counsel-ag-map
+   ("<C-return>" . core//toggle-between-swiper-rg))
+  (:map counsel-grep-map
+   ("<C-return>" . core//toggle-between-swiper-rg))
+
   :advice
   (:around counsel-cd
    :define (-fn)

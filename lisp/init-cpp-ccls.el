@@ -15,23 +15,20 @@
      (interactive)
      (lsp-find-custom ,command ,extra)))
 
-(cpp-ccls//define-find base "$ccls/base")
-;; (cpp-ccls//define-find bases "$ccls/inheritance" '(:level 3))
-;; (cpp-ccls//define-find derived "$ccls/inheritance" '(:level 3 :derived t))
-(cpp-ccls//define-find callers "$ccls/callers")
+(cpp-ccls//define-find bases "$ccls/inheritance" '(:level 3))
+(cpp-ccls//define-find derived "$ccls/inheritance" '(:level 3 :derived t))
+(cpp-ccls//define-find callers "$ccls/call")
 (cpp-ccls//define-find callee "$ccls/call" '(:callee t))
-;; (cpp-ccls//define-find vars "$ccls/vars")
 (cpp-ccls//define-find members "$ccls/member")
+
 (cpp-ccls//define-find references-write "textDocument/references"
-                       '(:context (:role 16)))
+                       (plist-put (lsp--text-document-position-params) :role 16))
 (cpp-ccls//define-find references-read "textDocument/references"
-                       '(:context (:role 8)))
-(cpp-ccls//define-find references-not-call "textDocument/references"
-                       '(:context (:excludeRole 32)))
+                       (plist-put (lsp--text-document-position-params) :role 8))
 (cpp-ccls//define-find references-macro "textDocument/references"
-                       '(:context (:role 64)))
+                       (plist-put (lsp--text-document-position-params) :role 64))
 (cpp-ccls//define-find references-address "textDocument/references"
-                       '(:context (:role 128)))
+                       (plist-put (lsp--text-document-position-params) :role 128))
 
 (defsubst cpp-ccls//dot-ccls-path (&optional -directory)
   (->> (or -directory default-directory)
@@ -40,28 +37,48 @@
 
 (defvar cpp-ccls-jump-map
   (define-key! :map (make-sparse-keymap)
-    ("b" . cpp/xref-find-base)
-    ;; ("B" . cpp/xref-find-bases)
-    ;; ("d" . cpp/xref-find-derived)
+    ("b" . cpp/xref-find-bases)
+    ("d" . cpp/xref-find-derived)
     ("c" . cpp/xref-find-callers)
     ("e" . cpp/xref-find-callee)
-    ;; ("v" . cpp/xref-find-vars)
     ("m" . cpp/xref-find-members)
     ("M" . cpp/xref-find-references-macro)
     ("w" . cpp/xref-find-references-write)
-    ("n" . cpp/xref-find-references-not-call)
     ("r" . cpp/xref-find-references-read)
     ("a" . cpp/xref-find-references-address)
     ("R" . ccls-reload)))
 
 (config! ccls
+  :toggles
+  ((and lsp-mode (derived-mode-p 'c-mode 'c++-mode))
+   "CCLS"
+   (("h n" (progn
+             (ccls--clear-sem-highlights)
+             (setq ccls-sem-highlight-method nil))
+     "no sem-highlight"
+     :toggle (not ccls-sem-highlight-method))
+    ("h o" (progn
+             (ccls--clear-sem-highlights)
+             (setq ccls-sem-highlight-method 'overlay))
+     "sem-highlight with overlays"
+     :toggle (eq ccls-sem-highlight-method 'overlay))
+    ("h f" (progn
+             (ccls--clear-sem-highlights)
+             (setq ccls-sem-highlight-method 'font-lock))
+     "sem-highlight with font-lock"
+     :toggle (eq ccls-sem-highlight-method 'font-lock))))
+
   :config
   (aset ccls-sem-macro-faces 0 'font-lock-builtin-face)
   (aset ccls-sem-variable-faces 0 'cpp-variable-face)
 
   (setq ccls-executable cpp-ccls-path)
-  (setq ccls-initialization-options '(:completion (:detailedLabel t)))
-  (setq ccls-sem-highlight-method nil))
+  (setq ccls-initialization-options '(:index (:comments 2) :completion (:detailedLabel t)))
+  (setq ccls-sem-highlight-method 'font-lock)
+
+  (setq cpp-expand-macro-function (lambda () (cpp-ccls//buffer-compile-command t)))
+
+  (add-to-list 'cpp-buffer-command-functions #'cpp-ccls//buffer-compile-command))
 
 (config! ccls-tree
   :bind
