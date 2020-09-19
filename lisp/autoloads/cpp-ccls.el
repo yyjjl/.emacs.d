@@ -58,22 +58,12 @@
             (when -preprocess-only-p " -"))))
 
 ;;;###autoload
-(defun cpp-ccls/install-or-upgrade-ccls (&optional -upgrade)
-  (interactive "P")
-  (let ((build-command "mkdir -p build && cd build && cmake --build .. --config Release && make")
-        (download-command "git clone --depth=1 --recursive https://github.com/MaskRay/ccls"))
-    (if (file-exists-p cpp-ccls-base-path)
-        (if -upgrade
-            (let ((default-directory cpp-ccls-base-path))
-              (run-command!
-               :name "update ccls"
-               :command (concat "git pull && git submodule update && " build-command)))
-          (message "ccls directory exists"))
-      (let ((default-directory emacs-var-direcotry))
-        (make-directory cpp-ccls-base-path t)
-        (run-command!
-         :name "install ccls"
-         :command (concat download-command " && " build-command))))))
+(defun cpp-ccls/install-or-upgrade-ccls ()
+  (interactive)
+  (let ((script (expand-etc! "setup/install_ccls.sh")))
+    (run-command!
+     :name "install or upgrade ccls"
+     :command script)))
 
 ;;;###autoload
 (defun cpp-ccls/create-dot-ccls (-directory)

@@ -2,13 +2,18 @@
 
 (require-packages! lsp-mode ccls)
 
+(add-to-list 'cpp-buffer-command-functions #'cpp-ccls//buffer-compile-command)
+
+(setq cpp-lsp-checker (lambda () (file-exists-p (cpp-ccls//dot-ccls-path))))
+(setq cpp-expand-macro-function (lambda () (cpp-ccls//buffer-compile-command t)))
+
 (defface cpp-variable-face
   `((t :foreground ,(face-attribute 'default :foreground)))
   "Face for variables"
   :group 'ccls-sem)
 
 (defconst cpp-ccls--default-template
-  "clang \n%c -std=gnu11\n%cpp -std=c++14\n\n")
+  "clang \n%c -std=gnu11\n%cpp -std=c++14\n-Wall\n")
 
 (defmacro cpp-ccls//define-find (symbol command &optional extra)
   `(defun ,(intern (format "cpp/xref-find-%s" symbol)) ()
@@ -49,6 +54,13 @@
     ("R" . ccls-reload)))
 
 (config! ccls
+  :bind
+  (:map c++-mode-map
+   ("M-s c" . ccls-call-hierarchy)
+   ("M-s m" . ccls-member-hierarchy)
+   ("M-s i" . ccls-inheritance-hierarchy)
+   ("C-c j" :map cpp-ccls-jump-map))
+
   :toggles
   ((and lsp-mode (derived-mode-p 'c-mode 'c++-mode))
    "CCLS"
@@ -74,11 +86,7 @@
 
   (setq ccls-executable cpp-ccls-path)
   (setq ccls-initialization-options '(:index (:comments 2) :completion (:detailedLabel t)))
-  (setq ccls-sem-highlight-method 'font-lock)
-
-  (setq cpp-expand-macro-function (lambda () (cpp-ccls//buffer-compile-command t)))
-
-  (add-to-list 'cpp-buffer-command-functions #'cpp-ccls//buffer-compile-command))
+  (setq ccls-sem-highlight-method 'font-lock))
 
 (config! ccls-tree
   :bind

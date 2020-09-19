@@ -132,6 +132,22 @@ _b_   _f_       [_q_]quit      [_y_]yank
     ("b" outline-backward-same-level)      ; Backward - same level
     )))
 
+(pretty-hydra-define hydra-ediff
+  (:title "Ediff" :color blue)
+  ("Buffers"
+   (("b" ediff-buffers)
+    ("B" ediff-buffers3))
+   "Files"
+   (("=" ediff-files)
+    ("f" ediff-files)
+    ("F" ediff-files3)
+    ("c" ediff-current-file))
+   "VC"
+   (("r" ediff-revision))
+   "Regions"
+   (("l" ediff-regions-linewise)
+    ("w" ediff-regions-wordwise))))
+
 (defhydra hydra-next-error (:color pink :hint nil)
   "Error"
   ("`" next-error "next")

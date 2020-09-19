@@ -1,6 +1,6 @@
 ;; -*- lexical-binding:t -*-
 
-(require-packages! lsp-mode ivy dap-mode)
+(require-packages! lsp-mode lsp-ivy ivy dap-mode)
 
 (defcustom lsp-enable-in-project-p t
   "Whether to setup project literally"
@@ -29,7 +29,8 @@
    ("M-s '" . lsp-avy-lens)
    ("M-s d" . dap-hydra)
    ("C-c R" . lsp-rename)
-   ("C-c I" . lsp/ivy-workspace-symbol)
+   ("C-c I" . lsp-ivy-workspace-symbol)
+   ("C-c G" . lsp-ivy-global-workspace-symbol)
    ("C-c S" . lsp-describe-session)
    ("C-c B" . lsp-format-buffer)
    ("C-c C-d" . lsp-describe-thing-at-point)
@@ -78,7 +79,10 @@
     ("t t" lsp-toggle-on-type-formatting
      "on type formating" :toggle lsp-enable-on-type-formatting)
     ("t s" lsp-toggle-signature-auto-activate
-     "signature" :toggle lsp-signature-auto-activate)))
+     "signature" :toggle lsp-signature-auto-activate)
+
+    ("w r" lsp-restart-workspace)
+    ("w s" lsp-shutdown-workspace)))
 
   :config
   (setq lsp-auto-configure t)
@@ -99,6 +103,7 @@
   (setq lsp-completion-enable t)
 
   (setq lsp-enable-symbol-highlighting nil)
+  (setq lsp-enable-semantic-highlighting t)
   (setq lsp-symbol-highlighting-skip-current t)
 
   (setq lsp-signature-auto-activate t)

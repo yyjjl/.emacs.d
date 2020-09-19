@@ -1,12 +1,16 @@
 ;; -*- lexical-binding:t -*-
 
 (defvar cpp-ccls-base-path (expand-var! "ccls"))
-(defvar cpp-ccls-path (expand-file-name "build/ccls" cpp-ccls-base-path))
+(defvar cpp-ccls-path (expand-var! "ccls/build/ccls"))
 
 (defvar cpp-buffer-command-functions ())
 (defvar cpp-expand-macro-function nil)
+(defvar cpp-lsp-checker nil)
 
-(define-variable! :pkg cpp cmake)
+(define-variable! :pkg cpp
+  cmake
+  (ccls :exe cpp-ccls-path)
+  (clangd :exe "clangd-10"))
 
 (require-packages!
  (ggtags :when emacs-use-gtags-p)
@@ -14,7 +18,6 @@
  google-c-style)
 
 (require 'init-cpp-cmake)
-(require 'init-cpp-ccls)
 
 (defconst cpp--font-lock-keywords
   (eval-when-compile
@@ -49,6 +52,12 @@
 
 
 
+(cond
+ (cpp-use-clangd-p
+  (require 'init-cpp-clangd))
+ (cpp-use-ccls-p
+  (require 'init-cpp-ccls)))
+
 ;; Setup
 (defun cpp//common-cc-setup ()
   "Setup shared by all languages (java/groovy/c++ ...)"
@@ -71,11 +80,8 @@
 (defun cpp//main-setup ()
   (lsp//try-enable cpp|setup
     :enable
-    (or (and
-         cpp-use-cmake-p
-         (setq cpp-cmake-project-root (cpp-cmake//locate-cmakelists))
-         (file-exists-p (cpp-cmake//cdb-path)))
-        (file-exists-p (cpp-ccls//dot-ccls-path)))
+    (or (cpp-cmake//check)
+        (and (functionp cpp-lsp-checker) (funcall cpp-lsp-checker)))
     :init
     (progn
       (when (fboundp 'ggtags-mode)
@@ -84,7 +90,7 @@
     :fallback
     (progn
       (when cpp-cmake-project-root
-        (message "Need to run `cpp/config-project' to setup ccls server"))
+        (message "Need to run `cpp/config-project' to setup lsp server"))
       (when emacs-use-gtags-p
         (ggtags-mode 1))
       ;; (setq completion-at-point-functions nil)
@@ -119,10 +125,6 @@
    ("C-c C" . cpp-cmake/change-config)
    ("C-c D" . cpp-cmake/config)
    ("C-c C-c" . cpp/config-project)
-   ("M-s c" . ccls-call-hierarchy)
-   ("M-s m" . ccls-member-hierarchy)
-   ("M-s i" . ccls-inheritance-hierarchy)
-   ("C-c j" :map cpp-ccls-jump-map)
    ([f9] . cpp/config-project)
    ([f10] . cpp/compile)
    ([f5] . cpp/debug-current-file))

@@ -83,6 +83,12 @@
       (cpp-cmake//locate-cmakelists (expand-file-name ".." new-dir) new-dir -filename)
     -last-found))
 
+(defun cpp-cmake//check ()
+  (and
+   cpp-use-cmake-p
+   (setq cpp-cmake-project-root (cpp-cmake//locate-cmakelists))
+   (file-exists-p (cpp-cmake//cdb-path))))
+
 (config! cmake-mode
   :bind (:map cmake-mode-map ([f10] . compile))
 

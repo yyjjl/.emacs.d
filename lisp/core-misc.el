@@ -100,6 +100,8 @@
   (which-key-add-key-based-replacements "C-x r" "register & rectangle")
   (which-key-add-key-based-replacements "C-x t" "tab & hide-show")
   (which-key-add-key-based-replacements "C-x w" "winner & buf-move & ivy-view")
+  (which-key-add-key-based-replacements "C-x g" "git")
+  (which-key-add-key-based-replacements "C-x ," "hydra & misc")
 
   (which-key-add-major-mode-key-based-replacements 'emacs-lisp-mode "C-c ?" "checkdoc")
   (which-key-add-major-mode-key-based-replacements 'python-mode "C-c C-t" "python-skeleton")

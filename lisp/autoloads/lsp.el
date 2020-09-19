@@ -1,56 +1,5 @@
 ;; -*- lexical-binding:t -*-
 
-(defun lsp//ivy-format-symbol-match (-match)
-  "Convert the (hash-valued) -MATCH returned by `lsp-mode` into a candidate string."
-  (let ((container-name (gethash "containerName" -match))
-        (name (gethash "name" -match)))
-    (if (or (null container-name)
-            (string-empty-p container-name))
-        name
-      (format "%s.%s" container-name name))))
-
-(defun lsp//ivy-workspace-symbol-action (-candidate)
-  "Jump to selected -CANDIDATE."
-  (-let* (((&hash "uri" "range" (&hash "start" (&hash "line" "character")))
-           (gethash "location" -candidate)))
-    (find-file (lsp--uri-to-path uri))
-    (goto-char (point-min))
-    (forward-line line)
-    (forward-char character)))
-
-(ivy-configure 'lsp/ivy-workspace-symbol
-  :display-transformer-fn #'lsp//ivy-format-symbol-match)
-
-;;;###autoload
-(defun lsp/ivy-workspace-symbol (-arg)
-  "`ivy' for lsp workspace/symbol.
-When called with prefix -ARG, search for all symbols of the current workspaces."
-  (interactive "P")
-    (let ((current-request-id nil)
-          (workspaces (if -arg
-                          (-> (lsp-session)
-                              lsp-session-folder->servers
-                              ht-values
-                              -flatten
-                              -uniq)
-                        (lsp-workspaces))))
-      (ivy-read
-       (concat (if -arg "Global " "")
-               "Workspace symbol: ")
-       (lambda (user-input)
-         (with-lsp-workspaces workspaces
-           (let ((request (lsp-make-request "workspace/symbol" (list :query user-input))))
-             (when current-request-id
-               (lsp--cancel-request current-request-id))
-             (setq current-request-id (plist-get request :id))
-             (lsp-request-async request #'ivy-update-candidates :mode 'detached)))
-         nil)
-       :dynamic-collection t
-       :require-match t
-       :initial-input nil
-       :action #'lsp//ivy-workspace-symbol-action
-       :caller 'lsp/ivy-workspace-symbol)))
-
 ;;;###autoload
 (defun lsp/remove-session-folder (-remove-invalid)
   (interactive "P")
