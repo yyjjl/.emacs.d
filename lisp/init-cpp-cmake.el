@@ -1,6 +1,6 @@
 ;; -*- lexical-binding:t -*-
 
-(require-packages! cmake-mode cmake-font-lock)
+(require-packages! cmake-mode cmake-font-lock lsp-mode)
 
 (defcustom cpp-cmake-config-list
   '(("Release"
@@ -99,10 +99,6 @@
    (cmake-font-lock-activate)
 
    (lsp//try-enable cmake|setup
-     :init
-     (progn
-       (setq-local lsp-signature-auto-activate nil)
-       (lsp--update-signature-help-hook :cleanup))
      :fallback
      (company//add-backend 'company-cmake))))
 

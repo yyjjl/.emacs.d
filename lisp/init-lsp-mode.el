@@ -21,6 +21,17 @@
          ,init
        ,fallback)))
 
+(defun lsp//set-simple-install-fn (client command)
+  (setf (lsp--client-download-server-fn (ht-get lsp-clients client))
+        (lambda (_client callback error-callback _update?)
+          (condition-case err
+              (run-command!
+               :name (format "Install %s" client)
+               :command command
+               :callback (lambda (&rest _) (funcall callback))
+               :error-callback (lambda (&rest _) (funcall error-callback "failed")))
+            (error (funcall error-callback (error-message-string err)))))))
+
 (config! lsp
   :bind
   (:map lsp-mode-map
@@ -55,18 +66,21 @@
 
   (:around lsp--render-on-hover-content
    :define (-fn -contents -render-all)
-   (let ((content (funcall -fn -contents -render-all)))
+   (let ((content (s-trim (or (funcall -fn -contents -render-all) ""))))
      (unless (core-popups//help-buffer-matcher (current-buffer))
-       (let ((content-length (length content))
-             (split-pos (string-match (rx line-end) content)))
-         (when (or (< split-pos content-length)
-                   (>= split-pos (frame-width)))
+       (let* ((content-length (length content))
+              (max-length (- (frame-width) 30)))
+         (when (> content-length max-length)
            (setq content
-                 (concat (substring content 0 (min split-pos (- (frame-width) 30)))
-                         (propertize
-                          (format " ... (%s to see more)"
-                                  (substitute-command-keys "\\[lsp-describe-thing-at-point]"))
-                          'face 'font-lock-comment-face))))))
+                 (-->
+                  content
+                  (s-replace "\n" " " it)
+                  (substring it 0 max-length)
+                  (concat it
+                          (propertize
+                           (format " ... (%s to see more)"
+                                   (substitute-command-keys "\\[lsp-describe-thing-at-point]"))
+                           'face 'font-lock-comment-face)))))))
      content))
 
   :toggles
@@ -103,7 +117,7 @@
   (setq lsp-completion-enable t)
 
   (setq lsp-enable-symbol-highlighting nil)
-  (setq lsp-enable-semantic-highlighting t)
+  (setq lsp-enable-semantic-highlighting nil)
   (setq lsp-symbol-highlighting-skip-current t)
 
   (setq lsp-signature-auto-activate t)
@@ -180,5 +194,39 @@
     ("sL" dap/go-to-log-buffer "Log")
     ("C-c C-z" dap-ui-repl "Repl")
     ("M-s q" nil "quit" :exit t)))
+
+(config! lsp-cmake
+  :config
+  (lsp//set-simple-install-fn
+   'cmakels
+   "pip3 install --user cmake-language-server"))
+
+(config! lsp-python
+  :config
+  (lsp//set-simple-install-fn
+   'pyls
+   "pip3 install --user 'python-language-server[all]"))
+
+(config! lsp-go
+  :config
+  (lsp//set-simple-install-fn
+   'gopls
+   "GO111MODULE=on go get golang.org/x/tools/gopls@latest && go get -u github.com/fatih/gomodifytags"))
+
+(config! ccls
+  :config
+  (lsp//set-simple-install-fn
+   'ccls
+   (expand-etc! "setup/install_ccls.sh")))
+
+(config! lsp-rust
+  :config
+  (let ((url "https://github.com/rust-analyzer/rust-analyzer/releases/latest/download/rust-analyzer-linux")
+        (path (expand-var! "rust-analyzer")))
+    (setq lsp-rust-analyzer-server-command (list path))
+
+    (lsp//set-simple-install-fn
+     'rust-analyzer
+     (format "curl -L %s -o %s && chmod +x %s" url path path))))
 
 (provide 'init-lsp-mode)

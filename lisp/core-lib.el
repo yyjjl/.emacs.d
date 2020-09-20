@@ -402,12 +402,18 @@ HTML file converted from org file, it returns t."
                          nil
                          (lambda (_) (format "run command: %s" name)))))
     (with-current-buffer command-buffer
-      (add-transient-hook!
-          (compilation-finish-functions
-           :name core//run-command-callback :arguments (buffer status))
-        (if (string-match-p "finished" status)
-            (and callback (funcall callback buffer status))
-          (and error-callback (funcall error-callback buffer status)))))))
+      (when-let ((current-proc (get-buffer-process command-buffer))
+                 (sentinel (process-sentinel (get-buffer-process command-buffer))))
+        (set-process-sentinel
+         current-proc
+         (lambda (-proc -msg)
+           (funcall sentinel -proc -msg)
+
+           (when (memq (process-status -proc) '(exit signal))
+             (let ((exit-status (process-exit-status -proc)))
+               (if (= exit-status 0)
+                   (and callback (funcall callback command-buffer -msg))
+                 (and error-callback (funcall error-callback command-buffer -msg)))))))))))
 
 (defun replace! (-value -keyword -transformer-fn)
   (if (and (not (null -value)) (listp -value))

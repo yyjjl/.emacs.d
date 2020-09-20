@@ -11,7 +11,6 @@
 (eval-when-compile
   (require 'lsp-pyls))
 
-
 (defvar python--elpy-multiedit-buffers nil)
 (defvar python--elpy-mutiedit-overlay-map
   (define-key! :map (make-sparse-keymap)

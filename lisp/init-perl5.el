@@ -1,3 +1,5 @@
+;; -*- lexical-binding:t -*-
+
 (defalias 'perl-mode 'cperl-mode)
 
 ;; perltidy

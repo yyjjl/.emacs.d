@@ -21,7 +21,7 @@ directory, the file name, and its state (modified, read-only or non-existent)."
                  (doom-modeline--buffer-name))))
       (if (and (listp mode-line-buffer-identification)
                (equal (car mode-line-buffer-identification) "%b"))
-          (list name (cdr mode-line-buffer-identification))
+          (cons name (cdr mode-line-buffer-identification))
         name)))
 
   (setq doom-modeline-project-detection 'projectile)

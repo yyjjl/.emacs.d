@@ -190,10 +190,3 @@
       (insert trace)
       (insert "\n")
       (python-indent-line))))
-
-;;;###autoload
-(defun python/install-tools ()
-  (interactive)
-  (run-command!
-   :name "install pyls"
-   :command "pip3 install --user 'python-language-server[all]'"))

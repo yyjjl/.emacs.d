@@ -199,13 +199,6 @@
     (goto-char (min old-point (point-max)))))
 
 ;;;###autoload
-(defun cmake/install-tools ()
-  (interactive)
-  (run-command!
-   :name "install pyls"
-   :command "pip3 install --user 'cmake-language-server'"))
-
-;;;###autoload
 (defun cpp-cmake/config ()
   (interactive)
   (let ((original-buffer (current-buffer))

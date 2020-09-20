@@ -35,6 +35,7 @@
 (config! lsp-mode
   :config
   (setq lsp-disabled-clients '(ccls))
+  (setq lsp-clients-clangd-executable cpp-clangd-path)
   (setq lsp-clients-clangd-args '("--all-scopes-completion" "--clang-tidy" "--suggest-missing-includes")))
 
 (provide 'init-cpp-clangd)

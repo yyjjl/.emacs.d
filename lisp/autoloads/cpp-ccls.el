@@ -58,14 +58,6 @@
             (when -preprocess-only-p " -"))))
 
 ;;;###autoload
-(defun cpp-ccls/install-or-upgrade-ccls ()
-  (interactive)
-  (let ((script (expand-etc! "setup/install_ccls.sh")))
-    (run-command!
-     :name "install or upgrade ccls"
-     :command script)))
-
-;;;###autoload
 (defun cpp-ccls/create-dot-ccls (-directory)
   (interactive (list (if current-prefix-arg
                          (read-directory-name "Directory: ")

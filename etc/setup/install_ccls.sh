@@ -1,10 +1,15 @@
 #!/bin/bash
 
+current_dir="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd)"
+
+# shellcheck source=./utils.sh
+. "${current_dir}/utils.sh"
+
 BUILD=
 
 mkdir -p ~/.emacs.d/var
 if cd ~/.emacs.d/var/ccls; then
-    echo "upgrade ccls"
+    log "upgrade ccls"
     if git pull && git submodule update; then
         BUILD=1
     fi

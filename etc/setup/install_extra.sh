@@ -2,8 +2,8 @@
 
 current_dir="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd)"
 
-# shellcheck source=./color.sh
-. "${current_dir}/color.sh"
+# shellcheck source=./utils.sh
+. "${current_dir}/utils.sh"
 
 if ! xargs cabal install < "${current_dir}/packages/cabal-packages"; then
     critical "Fail to install cabal packages"
@@ -19,13 +19,4 @@ fi
 if ! xargs sudo cpan install < "${current_dir}/packages/cpan-packages"; then
     critical "Fail to install cpan packages"
     exit 1
-fi
-
-if which rustup; then
-    log "Rust is installed"
-else
-    curl https://sh.rustup.rs -sSf | sh
-    rustup update
-    xargs rustup component add < "${current_dir}/packages/rust-packages"
-    cargo install ripgrep
 fi

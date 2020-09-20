@@ -2,6 +2,7 @@
 
 (defvar cpp-ccls-base-path (expand-var! "ccls"))
 (defvar cpp-ccls-path (expand-var! "ccls/build/ccls"))
+(defvar cpp-clangd-path (expand-var! "clangd/bin/clangd"))
 
 (defvar cpp-buffer-command-functions ())
 (defvar cpp-expand-macro-function nil)
@@ -10,7 +11,7 @@
 (define-variable! :pkg cpp
   cmake
   (ccls :exe cpp-ccls-path)
-  (clangd :exe "clangd-10"))
+  (clangd :exe cpp-clangd-path))
 
 (require-packages!
  (ggtags :when emacs-use-gtags-p)

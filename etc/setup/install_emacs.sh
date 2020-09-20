@@ -2,8 +2,8 @@
 
 current_dir="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd)"
 
-# shellcheck source=./color.sh
-. "${current_dir}/color.sh"
+# shellcheck source=./utils.sh
+. "${current_dir}/utils.sh"
 
 emacs_version=26.3
 readline_version=6.3

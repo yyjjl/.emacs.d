@@ -2,8 +2,8 @@
 
 current_dir="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd)"
 
-# shellcheck source=./color.sh
-. "${current_dir}/color.sh"
+# shellcheck source=./utils.sh
+. "${current_dir}/utils.sh"
 
 mkdir -p "${HOME}/.config/pip/"
 
