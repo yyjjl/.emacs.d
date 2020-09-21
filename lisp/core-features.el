@@ -2,7 +2,7 @@
 
 ;; Core packages
 (require-packages!
- cnfonts
+ ;; cnfonts
  helpful
  yasnippet
  yasnippet-snippets
@@ -47,7 +47,7 @@
 (require 'core-semantic)
 (require 'core-hideshow)
 
-(cnfonts-enable)
+;; (cnfonts-enable)
 
 (define-hook! package|idle-init-emacs (after-init-idle-hook)
   (when (and emacs-use-fcitx-p (display-graphic-p))

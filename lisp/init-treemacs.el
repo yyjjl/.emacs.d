@@ -48,7 +48,7 @@
         treemacs-recenter-after-tag-follow nil
         treemacs-recenter-after-project-jump 'always
         treemacs-recenter-after-project-expand 'on-distance
-        treemacs-show-cursor t
+        treemacs-show-cursor nil
         treemacs-show-hidden-files t
         treemacs-silent-filewatch nil
         treemacs-silent-refresh nil

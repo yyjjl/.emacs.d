@@ -85,6 +85,8 @@
         (and (functionp cpp-lsp-checker) (funcall cpp-lsp-checker)))
     :init
     (progn
+      (setq-local lsp-eldoc-render-all nil)
+
       (when (fboundp 'ggtags-mode)
         (ggtags-mode -1))
       (electric-indent-local-mode -1))

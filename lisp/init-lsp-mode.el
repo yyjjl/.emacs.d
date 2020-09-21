@@ -1,6 +1,6 @@
 ;; -*- lexical-binding:t -*-
 
-(require-packages! lsp-mode lsp-ivy ivy dap-mode)
+(require-packages! lsp-mode lsp-ivy dap-mode)
 
 (defcustom lsp-enable-in-project-p t
   "Whether to setup project literally"
@@ -66,21 +66,18 @@
 
   (:around lsp--render-on-hover-content
    :define (-fn -contents -render-all)
-   (let ((content (s-trim (or (funcall -fn -contents -render-all) ""))))
+   (let ((content (funcall -fn -contents -render-all)))
      (unless (core-popups//help-buffer-matcher (current-buffer))
-       (let* ((content-length (length content))
-              (max-length (- (frame-width) 30)))
-         (when (> content-length max-length)
+       (let ((content-length (length content))
+             (split-pos (string-match (rx line-end) content)))
+         (when (or (< split-pos content-length)
+                   (>= split-pos (frame-width)))
            (setq content
-                 (-->
-                  content
-                  (s-replace "\n" " " it)
-                  (substring it 0 max-length)
-                  (concat it
-                          (propertize
-                           (format " ... (%s to see more)"
-                                   (substitute-command-keys "\\[lsp-describe-thing-at-point]"))
-                           'face 'font-lock-comment-face)))))))
+                 (concat (substring content 0 (min split-pos (- (frame-width) 30)))
+                         (propertize
+                          (format " ... (%s to see more)"
+                                  (substitute-command-keys "\\[lsp-describe-thing-at-point]"))
+                          'face 'font-lock-comment-face))))))
      content))
 
   :toggles
@@ -98,6 +95,9 @@
     ("w r" lsp-restart-workspace)
     ("w s" lsp-shutdown-workspace)))
 
+  :init
+  (setq lsp-keymap-prefix nil)
+
   :config
   (setq lsp-auto-configure t)
   (setq lsp-auto-guess-root t)
@@ -113,12 +113,8 @@
   (setq lsp-enable-on-type-formatting nil)
   (setq lsp-enable-text-document-color nil)
   (setq lsp-enable-indentation nil)
-
-  (setq lsp-completion-enable t)
-
   (setq lsp-enable-symbol-highlighting nil)
   (setq lsp-enable-semantic-highlighting nil)
-  (setq lsp-symbol-highlighting-skip-current t)
 
   (setq lsp-signature-auto-activate t)
   (setq lsp-signature-doc-lines 2)
@@ -129,8 +125,6 @@
 
 (config! lsp-headerline
   :config
-
-  (setq lsp-headerline-breadcrumb-segments '(project symbols))
 
   (defun lsp*override-lsp-headerline--filename-with-icon (-file-path)
     (f-filename -file-path))
@@ -143,7 +137,9 @@
   (advice-add #'lsp-headerline--symbol-icon :override
               #'lsp*override-lsp-headerline--symbol-icon)
   (advice-add #'lsp-headerline--filename-with-icon :override
-              #'lsp*override-lsp-headerline--filename-with-icon))
+              #'lsp*override-lsp-headerline--filename-with-icon)
+
+  (setq lsp-headerline-breadcrumb-segments '(project symbols)))
 
 (config! dap-mode
   :hook

@@ -1,6 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
-(require-packages! doom-modeline)
+(require-packages! doom-modeline hide-mode-line)
 
 (config! doom-modeline
   ;; :init
@@ -15,7 +15,7 @@
     "Combined information about the current buffer, including the current working
 directory, the file name, and its state (modified, read-only or non-existent)."
     (let ((name (concat
-                 ;; (doom-modeline-spc)
+                 (doom-modeline-spc)
                  (doom-modeline--buffer-mode-icon)
                  (doom-modeline--buffer-state-icon)
                  (doom-modeline--buffer-name))))
@@ -23,6 +23,8 @@ directory, the file name, and its state (modified, read-only or non-existent)."
                (equal (car mode-line-buffer-identification) "%b"))
           (cons name (cdr mode-line-buffer-identification))
         name)))
+
+  (setq all-the-icons-scale-factor 1.0)
 
   (setq doom-modeline-project-detection 'projectile)
   (setq doom-modeline-buffer-file-name-style 'auto)
@@ -46,12 +48,12 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   (setq doom-modeline-major-mode-color-icon t)
 
   (doom-modeline-def-modeline 'main
-    '(bar window-number matches buffer-info remote-host checker lsp buffer-position word-count selection-info)
-    '(misc-info debug repl input-method indent-info buffer-encoding major-mode process vcs))
+    '(bar window-number matches buffer-info remote-host checker lsp buffer-position misc-info word-count selection-info)
+    '(debug repl input-method indent-info buffer-encoding major-mode process vcs))
 
   (doom-modeline-def-modeline 'org-src
-    '(bar window-number matches buffer-info-simple checker lsp buffer-position word-count selection-info)
-    '(misc-info debug input-method indent-info buffer-encoding major-mode process)))
+    '(bar window-number matches buffer-info-simple checker lsp buffer-position misc-info word-count selection-info)
+    '(debug input-method indent-info buffer-encoding major-mode process)))
 
 ;; Setup `mode-line-format'
 (define-hook! mode-line|after-init-hook (after-init-hook)
@@ -61,5 +63,12 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   (setq-default mode-line-misc-info
                 '((company-search-mode (" " company-search-lighter))
                   " " global-mode-string)))
+
+(define-hook! core|hide-modeline (completion-list-mode-hook
+                                  help-mode-hook
+                                  helpful-mode-hook
+                                  completion-in-region-mode-hook
+                                  flycheck-error-list-mode-hook)
+  (hide-mode-line-mode 1))
 
 (provide 'core-modeline)
