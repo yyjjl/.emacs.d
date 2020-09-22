@@ -329,111 +329,44 @@ for a file to visit if current buffer is not visiting a file."
     (let ((default-directory -directory))
       (counsel//rg))))
 
-;;;###autoload
-(defun counsel/rg-file-jump ()
-  (interactive)
-  (let ((command "rg -L --glob '%s' --no-ignore --color never %s --files ."))
-    (ivy-read "Find file (glob): "
-              (lambda (string)
-                (let* ((command-args (counsel--split-command-args string))
-                       (search-term (cdr command-args)))
-                  (or
-                   (let ((ivy-text search-term)) (ivy-more-chars))
-                   (progn (counsel--async-command
-                           (format command search-term (car command-args)))
-                          nil))))
-              :matcher #'counsel--find-file-matcher
-              :dynamic-collection t
-              :action #'find-file
-              :preselect (counsel--preselect-file)
-              :unwind (lambda ()
-                        (counsel-delete-process)
-                        (swiper--cleanup))
-              :require-match t
-              :history 'file-name-history
-              :keymap counsel-find-file-map
-              :caller 'counsel-file-jump)))
-
-;;;###autoload
-(defun counsel/file-jump (&optional -directory -backend)
-  (interactive
-   (let* ((directory (or (projectile-project-root) default-directory))
-          (directory (or (and current-prefix-arg
-                              (read-directory-name "Jump to file in directory: " directory))
-                         directory))
-          (default-directory directory)
-          (backends (remove nil
-                            (list "rg"
-                                  (and (counsel--git-root) "git")
-                                  (and (projectile-project-root) "projectile"))))
-          (backend (if (or (not current-prefix-arg) (= (length backends) 1))
-                       (car backends)
-                     (ivy-read "Select backends: " backends :require-match t))))
-     (list directory backend)))
-  (let ((default-directory -directory)
-        (backend-fn (cond
-                     ((equal -backend "git") #'counsel-git)
-                     ((equal -backend "projectile") #'counsel-projectile)
-                     (t #'counsel/rg-file-jump))))
-    (let ((ivy-count-format (format "[%s](%%d/%%d)" -backend)))
-      (funcall backend-fn))))
-
-(defun counsel/flycheck-action-goto-error (-candidate)
-  "Visit error of CANDIDATE."
-  (let* ((err (cdr -candidate))
-         (buffer (flycheck-error-buffer err))
-         (lineno (flycheck-error-line err))
-         (column (or (flycheck-error-column err) 1)))
-    (with-current-buffer buffer
-      (switch-to-buffer buffer)
-      (goto-char (point-min))
-      (forward-line (1- lineno))
-      (move-to-column (1- column))
-      (let ((recenter-redisplay nil))
-        (recenter)))))
-
 (defun counsel//flycheck-candidate-display-string (-err)
   "Return a string of message constructed from ERROR."
   (let ((face (-> -err
                   flycheck-error-level
                   flycheck-error-level-error-list-face)))
-    (format "%-8s L%-5s C%-3s %s"
-            (propertize (upcase (symbol-name (flycheck-error-level -err)))
-                        'font-lock-face face)
-            (propertize (number-to-string (flycheck-error-line -err))
-                        'face 'flycheck-error-list-line-number)
-            (propertize (-if-let (column (flycheck-error-column -err))
-                            (number-to-string column)
-                          "0")
-                        'face 'flycheck-error-list-column-number)
-            (or (flycheck-error-message -err) ""))))
+    (propertize
+     (format "%-8s L%-5s C%-3s %s"
+             (propertize (upcase (symbol-name (flycheck-error-level -err)))
+                         'font-lock-face face)
+             (propertize (number-to-string (flycheck-error-line -err))
+                         'face 'flycheck-error-list-line-number)
+             (propertize (-if-let (column (flycheck-error-column -err))
+                             (number-to-string column)
+                           "0")
+                         'face 'flycheck-error-list-column-number)
+             (or (flycheck-error-message -err) ""))
+     'error -err)))
 
 ;;;###autoload
-(defun counsel/flycheck (&optional -only-error)
+(defun counsel/flycheck (-only-error)
+  "Flycheck errors."
   (interactive "P")
-  (let ((errors (sort flycheck-current-errors #'flycheck-error-<))
+  (require 'flycheck)
+  (let ((current-point (point))
         (lineno (line-number-at-pos))
-        (current-point (point)))
-    (when -only-error
-      (setq errors
-            (seq-filter (lambda (err)
-                          (>=
-                           (flycheck-error-level-severity (flycheck-error-level err))
-                           (flycheck-error-level-severity 'error)))
-                        errors)))
-    (setq errors
-          (mapcar (lambda (err)
-                    (cons (counsel//flycheck-candidate-display-string err) err))
-                  errors))
+        (errors (counsel//flycheck-candidates -only-error)))
     (condition-case nil
-        (ivy-read "Goto: " errors
+        (ivy-read "flycheck errors: " errors
                   :preselect
-                  (car (cl-find-if
-                        (lambda (err)
-                          (ignore-errors (>= (flycheck-error-line (cdr err)) lineno)))
-                        errors))
+                  (--find
+                   (ignore-errors
+                     (>= (flycheck-error-line (get-text-property 0 'error it))
+                         lineno))
+                   errors)
                   :require-match t
-                  :action #'counsel/flycheck-action-goto-error
+                  :action #'counsel-flycheck-errors-action
+                  :history 'counsel-flycheck-errors-history
+                  :caller 'counsel-flycheck
                   :keymap (define-key! :map (make-sparse-keymap)
                             ("C-n" . ivy-next-line-and-call)
                             ("C-p" . ivy-previous-line-and-call)))

@@ -1,6 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
-(defhydra hydra-select-games (:color red :hint nil)
+(defhydra hydra-select-games (:color blue :hint nil)
   "
 [_5_] 5x5            [_a_] animate      [_g_] gomoku    [_h_] hanoi   [_l_] life
 [_m_] mpuz           [_p_] pong         [_t_] tetris    [_z_] zone    ^ ^

@@ -202,19 +202,9 @@
    :define (flymake-mode-hook)
    (if flymake-mode
        (progn
-         (put 'next-error-function
-              'flymake-old-next-error-function next-error-function)
-         (setq next-error-function 'flymake-goto-next-error)
-         (add-function :before-until (local 'eldoc-documentation-function)
-           #'core*flymake-eldoc-function))
-     (setq next-error-function
-           (get 'next-error-function 'flymake-old-next-error-function))
-     (remove-function (local 'eldoc-documentation-function)
-                      #'core*flymake-eldoc-function)))
-  :config
-  (defun core*flymake-eldoc-function ()
-    (when-let (diags (flymake-diagnostics (point)))
-      (eldoc-message (mapconcat #'flymake-diagnostic-text diags "\n")))))
+         (put 'next-error-function 'flymake-old-next-error-function next-error-function)
+         (setq next-error-function 'flymake-goto-next-error))
+     (setq next-error-function (get 'next-error-function 'flymake-old-next-error-function)))))
 
 (config! flycheck
   :bind (:map flycheck-command-map ("j" . counsel/flycheck))

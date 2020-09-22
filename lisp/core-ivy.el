@@ -2,27 +2,51 @@
 
 (defvar ivy-views-persistent-file "ivy-views.el")
 
-;; @see https://emacs-china.org/t/swiper-swiper-isearch/9007/12
-(defun core//toggle-between-swiper-rg ()
-  "Toggle `counsel-rg', `swiper', `swiper-isearch' with the current input."
-  (interactive)
-  (ivy-quit-and-run
-    (cl-case (ivy-state-caller ivy-last)
-      (swiper
-       (swiper-isearch ivy-text))
-      (swiper-isearch
-       (if emacs-use-ripgrep-p
-           (counsel-rg ivy-text)
-         (counsel-grep ivy-text)))
-      (t
-       (swiper ivy-text)))))
+(defvar ivy-switch-function-list nil)
 
-(defun core//swiper-prompt ()
-  (ivy-add-prompt-count
-   (cl-case (ivy-state-caller ivy-last)
-     (swiper "Search/I/rg: ")
-     (swiper-isearch "S/Isearch/rg: ")
-     (t "S/I/rg: "))))
+(defun core/ivy-switch ()
+  (interactive)
+  (let* ((caller (ivy-state-caller ivy-last))
+         (toggle-fn (cl-loop
+                     for (callers . toggle-fn) in ivy-switch-function-list
+                     when (memq caller callers)
+                     return toggle-fn)))
+    (unless toggle-fn
+      (user-error "No toggle-function defined"))
+    (funcall toggle-fn)))
+
+(defmacro core//ivy-define-switch (name &rest body)
+  (declare (indent 1))
+  (let ((commands (mapcar #'car body))
+        (toggle-fn (intern (format "core//toggle-between-%s" name)))
+        (prompt-fn (intern (format "core//toggle-between-%s-prompt" name))))
+    `(progn
+       (add-to-list 'ivy-switch-function-list '(,commands . ,toggle-fn))
+       (defun ,toggle-fn ()
+         ,(format "Toggle %s with the current input."
+                  (string-join (--map (format "`%s'" it) commands) ", "))
+         (ivy-quit-and-run
+           (cl-case (ivy-state-caller ivy-last)
+             ,@(--map
+                `(,it
+                  (,(or (cadr (memq it commands))
+                        (car commands))
+                   ivy-text))
+                commands))))
+       (defun ,prompt-fn ()
+         (ivy-add-prompt-count
+          (cl-case (ivy-state-caller ivy-last)
+            ,@(cl-loop
+               for command in commands
+               collect
+               (list
+                command
+                (concat
+                 (string-join (--map (nth (if (eq (nth 0 it) command) 1 2) it) body) "|")
+                 ": "))))))
+
+       (dolist (caller ',commands)
+         (ivy-set-prompt caller #',prompt-fn)))))
 
 (defun core//package-install-transformer (-string)
   (let ((package (cadr (assoc-string -string package-archive-contents))))
@@ -88,7 +112,8 @@
    ("C-r" . ivy-reverse-i-search)
    ("C-j" . ivy-immediate-done)
    ("C-M-j" . ivy-done)
-   ("M-." . ignore))
+   ("M-." . ignore)
+   ("<C-return>" . core/ivy-switch))
 
   :advice
   (:around ivy--preselect-index :name ignore-errors!)
@@ -107,8 +132,15 @@
   :config
   (core//load-variable 'ivy-views ivy-views-persistent-file)
 
-  (dolist (caller '(counsel-rg counsel-ag counsel-grep swiper-isearch swiper counsel-rg))
-    (ivy-set-prompt caller #'core//swiper-prompt))
+  (core//ivy-define-switch swiper
+    (swiper "Search" "S")
+    (swiper-isearch "Isearch" "I")
+    (counsel-rg "ripgreg" "rg"))
+
+  (core//ivy-define-switch file-jump
+    (counsel-fzf "fzf" "f")
+    (counsel-git "git" "g")
+    (counsel-projectile "projectile" "proj"))
 
   (dolist (caller '(ivy-switch-buffer
                     counsel/kill-buffer
@@ -143,7 +175,7 @@
 (config! swiper
   :bind
   (:map swiper-map
-   ("<C-return>" . core//toggle-between-swiper-rg))
+   ("<C-return>" . core//toggle-between-swiper))
 
   :config
   (setq swiper-stay-on-quit t))
@@ -151,9 +183,9 @@
 (config! counsel
   :bind
   (:map counsel-ag-map
-   ("<C-return>" . core//toggle-between-swiper-rg))
+   ("<C-return>" . core//toggle-between-swiper))
   (:map counsel-grep-map
-   ("<C-return>" . core//toggle-between-swiper-rg))
+   ("<C-return>" . core//toggle-between-swiper))
 
   :advice
   (:around counsel-cd
@@ -173,6 +205,11 @@
    :define (&optional _) (lv-delete-window))
 
   :config
+  (ivy-configure 'counsel-fzf
+    :unwind-fn
+    (lambda ()
+      (counsel-delete-process)
+      (lv-delete-window)))
 
   (setq counsel-linux-app-format-function
         #'counsel-linux-app-format-function-name-first)
@@ -196,6 +233,8 @@
    ("w" . projectile-switch-project))
 
   :config
+  (setq counsel-fzf-cmd (concat (expand-var! "fzf") " -f \"%s\""))
+
   (if emacs-use-ripgrep-p
       (progn
         (setq counsel-rg-base-command
@@ -204,6 +243,7 @@
         (global-set-key (kbd "C-c i a") 'counsel/rg))
     (define-key projectile-command-map "ss" 'counsel-projectile-grep)
     (global-set-key (kbd "C-c i a") 'counsel-grep)))
+
 
 (define-key!
   ("C-x j j" . counsel-bookmark)
@@ -226,8 +266,8 @@
   ("i" . counsel/semantic-or-imenu*)
   ("x" . counsel-linux-app)
   ("v" . counsel-set-variable)
-  ("j" . counsel/file-jump)
-  ("p" . counsel/file-jump)
+  ("j" . counsel-fzf)
+  ("p" . counsel-projectile)
   ("g" . counsel-git)
   ("s" . counsel-git-grep)
   ("S" . counsel-git-stash)

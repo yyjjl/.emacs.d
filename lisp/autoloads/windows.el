@@ -22,17 +22,17 @@
 ;;;###autoload
 (defun window/split-vertically (&optional -arg)
   (interactive "P")
-  (window//split-with-size (when -arg (string-to-number
-                                       (completing-read "Float or Integer: "
-                                                        window-size-list)))
-                           :vertial))
+  (window//split-with-size
+   (and -arg
+        (string-to-number (completing-read "Float or Integer: " window-size-list)))
+   :vertial))
 
 ;;;###autoload
 (defun window/split-horizontally (&optional -arg)
   (interactive "P")
-  (window//split-with-size (when -arg (string-to-number
-                                       (completing-read "Float or Integer: "
-                                                        window-size-list)))))
+  (window//split-with-size
+   (when -arg
+     (string-to-number (completing-read "Float or Integer: " window-size-list)))))
 
 ;; Rearrange split windows
 ;;;###autoload
@@ -77,17 +77,16 @@
                               (window-end window)
                               (window-buffer window)))
             buffer)
-        (overlay-put ol 'face `(
-                                :background ,(face-attribute 'default :foreground)
+        (overlay-put ol 'face `(:background ,(face-attribute 'default :foreground)
                                 :foreground ,(face-attribute 'default :background)))
         (overlay-put ol 'window window)
         (unwind-protect
             (with-selected-window window
-              (setq buffer (if (= (length buffers) 1)
-                               (car buffers)
-                             (completing-read (format "For window %s: "
-                                                      (window-numbering-get-number-string))
-                                              buffers nil :require-match)))
+              (setq buffer
+                    (if (= (length buffers) 1)
+                        (car buffers)
+                      (completing-read (format "For window %s: " (winum-get-number-string))
+                                       buffers nil :require-match)))
               (setq buffers (delete buffer buffers))
               (switch-to-buffer buffer))
           (delete-overlay ol))))))

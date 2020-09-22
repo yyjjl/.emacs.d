@@ -1,6 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
-(require-packages! realgud)
+(require-packages!
+ (realgud :archive "melpa-stable"))
 
 (defvar realgud--window-configuration nil)
 (defvar realgud--saved-breakpoints nil)

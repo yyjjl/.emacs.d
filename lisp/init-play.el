@@ -3,8 +3,7 @@
 (require-packages!
  zone-sl
  zone-nyan
- zone-rainbow
- fireplace)
+ zone-rainbow)
 
 (config! zone
   :advice
@@ -31,13 +30,6 @@
   :config
   (setq zone-programs
         (vconcat zone-programs [zone-pgm-sl zone-pgm-rainbow zone-nyan])))
-
-(config! life
-  :hook
-  (:anonymous
-   :define ()
-   (setq-local header-line-format nil)
-   (setq-local mode-line-format '(:eval (mode-line//buffer-id)))))
 
 (config! zone-nyan
   :config
