@@ -1,32 +1,29 @@
-(defvar emacs-config-directory
-  (expand-file-name "lisp" user-emacs-directory)
-  "All configuration in this directory")
+;; -*- lexical-binding:t -*-
 
-;; Add `emacs-config-directory' to `load-path'
-(add-to-list 'load-path emacs-config-directory)
+(load (expand-file-name "early-init" user-emacs-directory))
 
-;; All packages required in this section are defined in `init-packages'
 (require 'core-lib)
-;; Set some important variables
-(require 'core-vars)
-(require 'core-defaults)
-;; (package-initialize)
-;; Load core packages
-(require 'core-packages)
-(require 'core-ui)
 
-;; All packages required in this section are defined in their init files
-(setq core--buffer-useful nil)
-(require 'init-org)
-(require 'org)
-(require 'ox)
+(load-feature! default)
 
-;; Programming modes
-(require 'init-haskell)
-(require 'init-lisp)
-(require 'init-sh)
-(require 'init-rust)
-(require 'init-extra)
+(ymacs//try-load-file custom-file (expand-etc! "custom-template.el"))
 
-(remove-hook 'after-init-hook 'core|enable-modes-hook)
+(load-feature! package)
+(load-feature! ui)
+
+(load-feature! popup)
+(load-feature! completion_ivy)
+(load-feature! company)
+(load-feature! term)
+(load-feature! misc)
+(load-feature! hydra)
+(load-feature! semantic)
+(load-feature! hideshow)
+(load-feature! edit)
+(load-feature! dired)
+(load-feature! ibuffer)
+
+(ymacs//try-load-file features-file (expand-etc! "features-template.el"))
+
 (setq org-export-async-debug nil)
+(setq ymacs--buffer-useful-p nil)

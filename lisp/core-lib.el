@@ -14,7 +14,7 @@
 ;;   <module>/...   public functions
 ;;   <module>//...   private functions
 ;;   <module>|...   hook functions
-;;   <module>*...   advising functions
+;;   <module>@...   advising functions
 ;;   ...!       a macro or function defined in core-lib.el
 
 ;;; Code:
@@ -23,9 +23,22 @@
 (eval-when-compile
   (require 'cl-lib))
 
-(defvar core--recentf-enabled-p t)
-(defvar core--buffer-useful-p t
+(defvar ymacs--loaded-features ())
+
+(defvar ymacs--buffer-useful-p t
   "A flag to indicate if the buffer is not a temporary buffer")
+
+(defsubst expand-var! (-name &optional -make-p)
+  (let ((val (expand-file-name -name ymacs-var-direcotry)))
+    (when (and -make-p (not (file-exists-p val)))
+      (make-directory val))
+    val))
+
+(defsubst expand-etc! (-name)
+  (expand-file-name -name ymacs-etc-direcotry))
+
+(defsubst expand-tmp! (-name)
+  (expand-file-name -name temporary-file-directory))
 
 (defun keyword-get! (-plist -key)
   "Get values of keyword -KEY from -PLIST. This function is used
@@ -50,6 +63,19 @@ for defining functions."
               (setcdr last-pos (cddr -plist)))
             (setq -plist nil)))))
     result))
+
+(cl-defmacro executable! (name &key exe doc full-name)
+  (declare (indent 0))
+  `(defvar ,(if full-name name (intern (format "ymacs-%s-path" name)))
+     (eval-when-compile
+       (executable-find ,(or exe (symbol-name name))))
+     ,doc))
+
+(defmacro define-option! (name initvalue &optional docstring)
+  `(if (boundp ',name)
+       ,(when docstring
+          `(put ',name 'variable-documentation ,docstring))
+     (defvar ,name ,initvalue ,docstring)))
 
 (defmacro define-variable! (&rest -body)
   (declare (indent 0))
@@ -99,9 +125,9 @@ invoked, then it detaches itself."
          (local-p (plist-get args :local))
          (fn (or (plist-get args :name)
                  (cond ((functionp hook)
-                        (cl-gensym "core*transient-hook-"))
+                        (cl-gensym "ymacs@transient-hook-"))
                        ((symbolp hook)
-                        (cl-gensym "core|transient-hook-"))))))
+                        (cl-gensym "ymacs|transient-hook-"))))))
     `(progn
        (defun ,fn ,args-list
          ,@-forms
@@ -210,8 +236,7 @@ Example:
      ,@-body))
 
 (defmacro without-user-record! (&rest -body)
-  `(let (core--buffer-useful-p
-         core--recentf-enabled-p)
+  `(let (ymacs--buffer-useful-p)
      ,@-body))
 
 (defun without-user-record!! (-fn &rest -args)
@@ -284,7 +309,7 @@ string with the witdh of current frame width."
   "If function `buffer-file-name' return nil or a temp file or
 HTML file converted from org file, it returns t."
   (let ((filename (buffer-file-name)))
-    (or (not core--buffer-useful-p)
+    (or (not ymacs--buffer-useful-p)
         (not filename)
         (buffer-base-buffer)
         (string-match (concat "^" temporary-file-directory)
@@ -294,9 +319,9 @@ HTML file converted from org file, it returns t."
   (let ((filename (buffer-file-name)))
     (or (and filename
              (> (or (nth 7 (file-attributes filename)) 0)
-                core-large-buffer-size))
+                ymacs-large-buffer-limit))
         (> (buffer-size)
-           core-large-buffer-size))))
+           ymacs-large-buffer-limit))))
 
 (defsubst buffer-enable-rich-feature-p ()
   (not (or (buffer-temporary-p)
@@ -340,18 +365,6 @@ HTML file converted from org file, it returns t."
       (push frame frames)
       (cl-incf index))
     (cl-remove-if-not 'car frames)))
-
-(defsubst expand-var! (-name &optional -make-p)
-  (let ((val (expand-file-name -name emacs-var-direcotry)))
-    (when (and -make-p (not (file-exists-p val)))
-      (make-directory val))
-    val))
-
-(defsubst expand-etc! (-name)
-  (expand-file-name -name emacs-etc-direcotry))
-
-(defsubst expand-tmp! (-name)
-  (expand-file-name -name temporary-file-directory))
 
 (defsubst directory-equal-p (-d1 -d2)
   (equal (file-truename (concat -d1 "/"))
@@ -423,8 +436,64 @@ HTML file converted from org file, it returns t."
               (replace! (cdr -value) -keyword -transformer-fn)))
     -value))
 
-(unless (fboundp 'when-let*)
-  (defalias 'when-let* 'when-let))
+(defun locate-topmost! (-filename &optional -directory -topmost)
+  "Find the topmost -filename"
+  (let ((parent (locate-dominating-file
+                 (or -directory default-directory)
+                 -filename)))
+    (cond
+     ((equal parent "/") parent)
+     (parent (locate-topmost! -filename
+                              (expand-file-name ".." parent)
+                              parent))
+     (t -topmost))))
+
+(defmacro after! (file &rest body)
+  (declare (indent 1) (debug t))
+  `(progn
+     (eval-when-compile
+       (require ',file nil t))
+     (with-eval-after-load ',file
+       ,@body)))
+
+(defun load-feature//option-to-form (-name -option)
+  (let ((option (cond ((consp -option) -option)
+                      ((and (symbolp -option)
+                            (member (aref (symbol-name -option) 0) '(?- ?+)))
+                       (let ((option-name (symbol-name -option)))
+                         (cons (format "enable-%s-p" (substring option-name 1))
+                               (equal (aref option-name 0) ?+))))
+                      (t
+                       (error "-option should start with +/- or be a cons")))))
+    (list 'defvar (intern (format "ymacs-%s-%s" -name (car option))) (cdr option))))
+
+(defun load-feature//file-to-form (-name -path &optional -absolute-p)
+  (unless -absolute-p
+    (setq -path (expand-file-name
+                 (concat (symbol-name -name) "/" -path)
+                 ymacs-config-directory)))
+  (when (file-exists-p (concat -path ".el"))
+    `(load ,-path nil t)))
+
+(defmacro load-feature! (-name &rest -options)
+  `(unless (memq ',-name ymacs--loaded-features)
+     ,@(mapcar (lambda (x) (load-feature//option-to-form -name it))  -options)
+     ,(load-feature//file-to-form -name "package")
+     ,(load-feature//file-to-form -name "functions")
+     ,(load-feature//file-to-form -name "hooks")
+     ,(load-feature//file-to-form -name "config")
+     (add-to-list 'ymacs--loaded-features ',-name)
+
+     (dolist (func (get ',-name 'after-feature-functions))
+       (funcall func))))
+
+(defmacro after-feature! (-name &rest body)
+  (declare (indent 1) (debug t))
+  `(let ((func (lambda () ,@body)))
+     (if (memq ',-name ymacs--loaded-features)
+         (funcall func)
+       (put ',-name 'after-feature-functions
+            (cons func (get ',-name 'after-feature-functions))))))
 
 (provide 'core-lib)
 

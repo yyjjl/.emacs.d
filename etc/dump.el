@@ -17,4 +17,4 @@
 ;; pre-load themes
 (load-theme 'doom-molokai t t)
 ;; dump image
-(dump-emacs-portable (expand-file-name "emacs.pdmp" emacs-var-direcotry))
+(dump-emacs-portable (expand-file-name "emacs.pdmp" ymacs-var-direcotry))

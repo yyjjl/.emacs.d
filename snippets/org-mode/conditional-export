@@ -4,7 +4,7 @@
 # --
 #+attr_latex: :width \textwidth
 #+begin_src emacs-lisp :exports results :results raw
-(org/by-backend
+(ymacs-org/by-backend
   (latex "[[file:${1:$(concat (file-name-sans-extension yas-text)
   ".pdf")}]]")
   $0(t "[[file:${1:`(file-relative-name (read-file-name "test") default-directory)`}]]"))

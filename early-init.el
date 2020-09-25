@@ -1,39 +1,41 @@
 ;; -*- lexical-binding: t -*-
 
-(defvar emacs-config-directory
-  (expand-file-name "lisp" user-emacs-directory)
-  "All configuration in this directory")
+(defvar ymacs-dump-p nil)
+(defvar ymacs-dump-load-apth nil)
 
-(defvar emacs-var-direcotry
-  (expand-file-name "var" user-emacs-directory)
-  "All data and external executable file in this direcotry")
+(defvar ymacs-lite-setup-p (getenv "EMACS_LITE"))
 
-(defvar emacs-lite-setup-p (getenv "EMACS_LITE"))
+(defvar ymacs-use-gnutls-p (gnutls-available-p))
 
-(defvar emacs-gc-cons-threshold (* 100 1024 1024))
+(defvar ymacs-gc-cons-threshold (* 100 1024 1024))
 
-(defvar emacs-file-name-handler-alist file-name-handler-alist
+(defvar ymacs-large-buffer-limit (* 3 1024 1024)
+  "When buffer's size bigger than `ymacs-large-buffer-limit', it
+will close some features to speed up emacs performance")
+
+(defvar ymacs-file-name-handler-alist file-name-handler-alist
   "Save `file-name-handler-alist' temporarily and set it to nil
 which means on every .el and .elc file loaded during start up, it
 hasn't to runs those regexps against the filename.")
 
-(defvar emacs-private-directory
+(defvar ymacs-config-directory
+  (expand-file-name "lisp" user-emacs-directory)
+  "All configuration in this directory")
+
+(defvar ymacs-var-direcotry
+  (expand-file-name "var" user-emacs-directory)
+  "All data and external executable file in this direcotry")
+
+(defvar ymacs-private-directory
   (expand-file-name "private" user-emacs-directory)
   "Local packages in this directory")
 
-(defvar emacs-use-gnutls-p (gnutls-available-p)
-  "Use gnutls to download packages")
-
-(defvar emacs-etc-direcotry
+(defvar ymacs-etc-direcotry
   (expand-file-name "etc" user-emacs-directory)
   "Some configuration file in this directory")
 
-(defvar emacs-autoloads-directory
-  (expand-file-name "autoloads" emacs-config-directory)
-  "Autoloads files in this directory")
-
-;; Add `emacs-config-directory' to `load-path'
-(add-to-list 'load-path emacs-config-directory)
+;; Add `ymacs-config-directory' to `load-path'
+(add-to-list 'load-path ymacs-config-directory)
 
 ;; Package initialize occurs automatically, before `user-init-file' is
 ;; loaded, but after `early-init-file'. We handle package

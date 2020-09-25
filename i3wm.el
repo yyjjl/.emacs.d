@@ -1,13 +1,11 @@
+;; -*- lexical-binding:t -*-
+
 (load (expand-file-name "early-init" user-emacs-directory))
 
-(setq emacs-var-direcotry (expand-file-name "var/i3" user-emacs-directory))
+(setq ymacs-var-direcotry (expand-file-name "var/i3" user-emacs-directory))
 
-(defvar emacs-i3wm-config-directory
-  (expand-file-name "etc/i3wm" user-emacs-directory)
-  "All i3wm configuration in this directory")
-
-(add-to-list 'load-path emacs-config-directory)
-(add-to-list 'load-path emacs-i3wm-config-directory)
+(add-to-list 'load-path ymacs-config-directory)
+(add-to-list 'load-path (expand-file-name "etc/i3wm" user-emacs-directory))
 
 (require 'i3wm-init)
 (require 'i3wm-doc)

@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 
 (setq gnus-select-method '(nnnil))
 (setq gnus-startup-file (expand-var! "gnus/news"))
@@ -66,9 +67,3 @@
 (require 'gnus-demon)
 
 (gnus-demon-add-handler 'gnus-demon-scan-news 60 30)
-
-;; (add-to-list 'mode-line-misc-info
-;;              '(:eval
-;;                (when (> gnus--unread-news-count 0)
-;;                  (format " (%d)" gnus--unread-news-count))))
-

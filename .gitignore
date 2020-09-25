@@ -12,6 +12,8 @@ anaconda-mode/
 /var
 /session.*
 /custom.el
+/features.el
+/.cache/
 *.elc
 CVS
 .svn

@@ -1,3 +1,5 @@
+;; -*- lexical-binding:t -*-
+
 (require 'i3wm-lib)
 
 (defvar i3-document-regexp

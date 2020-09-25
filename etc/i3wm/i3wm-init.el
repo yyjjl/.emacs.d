@@ -1,18 +1,17 @@
-;; All packages required in this section are defined in `init-packages'
+;; -*- lexical-binding:t -*-
+
 (require 'core-lib)
-;; Set some important variables
-(require 'core-vars)
-(require 'core-defaults)
-(require 'core-packages)
+
+(load-feature! default)
+(ymacs//try-load-file custom-file (expand-etc! "custom-template.el"))
+(load-feature! package)
+(load-feature! ui)
 
 (advice-add 'request! :override #'ignore)
 
-(require 'core-ivy)
-(require 'core-misc)
-(require 'core-ui)
+(load-feature! completion_ivy)
+(load-feature! misc)
 
-(eval-when-compile
-  (require 'cl-lib))
 (require 'dash)
 (require 'json)
 
