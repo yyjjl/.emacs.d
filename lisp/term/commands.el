@@ -9,11 +9,11 @@
 
   (let ((buffers
          (--map
-          (let ((name (buffer-local-value 'ymacs-term-extra-name buffer)))
-            (cons (concat (buffer-name buffer)
+          (let ((name (buffer-local-value 'ymacs-term-extra-name it)))
+            (cons (concat (buffer-name it)
                           (when name
                             (concat ": " name)))
-                  buffer))
+                  it))
           (ymacs-term//buffers))))
     (if (<= (length buffers) 1)
         (user-error "There is only one term buffer")

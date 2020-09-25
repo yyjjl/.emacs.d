@@ -12,7 +12,7 @@
   (let* ((user (file-remote-p default-directory 'user))
          (host (file-remote-p default-directory 'host)))
     (completing-read
-     "[user[#port]@]host: " (ymacs-ssh//parse-sconfig)
+     "[user[#port]@]host: " (ymacs-term//parse-sconfig)
      nil                                ; predicate
      nil                                ; require-match
      (if user (concat user "@" host) host))))

@@ -41,7 +41,7 @@
     '(:title "Toggles" :color amaranth :quit-key "q")
     (pretty-hydra--normalize-heads-plist!
      (append `("Global" ,(lax-plist-get ymacs-hydra/global-toggles/heads-plist "Global"))
-             (cl-loop for (key . value) in ymacs-hydra/local-toggles-heads-list
+             (cl-loop for (key . value) in ymacs-hydra-local-toggles-heads-list
                       when (eval key) append value)))))
   (define-key ymacs-hydra/global-toggles/keymap
     (where-is-internal 'ymacs-hydra/global-toggles/body nil t)

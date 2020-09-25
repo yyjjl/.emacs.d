@@ -32,7 +32,7 @@ If region is active, operate on it, else operate on line."
       (ymacs-perl//format-region (point-min) (point-max))))))
 
 ;;;###autoload
-(defun ymacs-perl/repl (&optional -kill)
+(defun ymacs-perl/repl (&optional _kill)
   (interactive "P")
   (ymacs-term//exec-program-reuse-buffer
    "perl-repl"

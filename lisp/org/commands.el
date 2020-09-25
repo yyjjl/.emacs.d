@@ -36,7 +36,7 @@ _h_tml    _'_         ^ ^             _A_SCII:
 (defun ymacs-org/hot-expand ()
   (interactive)
   (if (looking-back "^\\s-*" (line-beginning-position))
-      (hydra-org-template/body)
+      (ymacs-hydra/org-template/body)
     (self-insert-command 1)))
 
 (defmacro ymacs-org//with-master-file! (&rest body)

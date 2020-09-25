@@ -26,7 +26,7 @@ If it doesn't exist, copy from the -TEMPLATE-FILE, then load it."
       (load real-file :noerror))))
 
 ;;* Handle External Files
-(defun ymacs//external-file-handler (-op &rest -args)
+(defun ymacs//external-file-handler (_op &rest -args)
   (let ((file (expand-file-name (car -args))))
     (cond ((eq system-type 'darwin)
            (shell-command (concat "open " (shell-quote-argument file))))

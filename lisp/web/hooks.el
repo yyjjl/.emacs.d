@@ -15,11 +15,11 @@
   (ymacs-company//add-backend 'company-web-html))
 
 (define-hook! ymacs-web|js-setup (js-mode-hook typescript-mode-hook)
-  (when (and buffer-file-namex
+  (when (and buffer-file-name
              (not (string-suffix-p ".json" (downcase buffer-file-name))))
     (add-transient-hook!
         (hack-local-variables-hook :local t :name ymacs-web|js-internal)
-      (web|setup-internal)))
+      (ymacs-web|common-setup)))
 
   (setq-local electric-layout-rules
               (delq (assoc ?\; electric-layout-rules) electric-layout-rules)))

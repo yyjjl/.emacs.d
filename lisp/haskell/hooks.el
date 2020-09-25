@@ -6,7 +6,7 @@
     (haskell-decl-scan-mode 1)
 
     (when (buffer-enable-rich-feature-p)
-      (lsp//try-enable haskell|setup
+      (ymacs-lsp//try-enable haskell
         :fallback
         (progn
           (haskell-doc-mode 1)

@@ -92,7 +92,7 @@ Else call with `read-file-name'.
                  (< current-point (match-end 0))
                  (>= current-point target-point))))
         (LaTeX-find-matching-end)
-      (forward-sentence-or-sexp -n))))
+      (ymacs-edit/forward-sentence-or-sexp -n))))
 
 ;;;###autoload
 (defun ymacs-latex/backward-sexp (&optional -n)
@@ -105,4 +105,4 @@ Else call with `read-file-name'.
                  (< current-point target-point)
                  (>= current-point (match-beginning 0)))))
         (LaTeX-find-matching-begin)
-      (backward-sentence-or-sexp -n))))
+      (ymacs-edit/backward-sentence-or-sexp -n))))

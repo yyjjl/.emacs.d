@@ -234,6 +234,16 @@ is not visiting a file."
              (or (flycheck-error-message -err) ""))
      'error -err)))
 
+(defun ymacs-counsel//flycheck-candidates (-only-error)
+  (mapcar
+   #'ymacs-counsel//flycheck-candidate-display-string
+   (--filter
+    (or (not -only-error)
+        (>=
+         (flycheck-error-level-severity (flycheck-error-level it))
+         (flycheck-error-level-severity 'error)))
+    flycheck-current-errors)))
+
 ;;;###autoload
 (defun ymacs-counsel/flycheck (-only-error)
   "Flycheck errors."

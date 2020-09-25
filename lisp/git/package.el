@@ -23,5 +23,3 @@
   ("c" . git-link-commit)
   ("m" . git-messenger:popup-message)
   ("b" . magit-checkout))
-
-(provide 'init-git)

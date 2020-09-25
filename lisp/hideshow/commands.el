@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(require 'hideshow)
+
 (defun ymacs-hideshow//get-overlays ()
   (cl-loop for overlay in (overlays-in (point-min) (point-max))
            when (overlay-get overlay 'hs)

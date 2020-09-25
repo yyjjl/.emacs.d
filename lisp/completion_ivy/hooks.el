@@ -5,8 +5,8 @@
 
 (after! ivy
   (define-hook! :anonymous (ivy-occur-mode-hook ivy-occur-grep-mode-hook)
-    (local-set-key "/" #'ivy-occur/filter-lines)
-    (local-set-key (kbd "C-/") #'ivy-occur/undo)
+    (local-set-key "/" #'ymacs-ivy/occur-filter-lines)
+    (local-set-key (kbd "C-/") #'ymacs-ivy/occur-undo)
 
     (toggle-truncate-lines 1))
 

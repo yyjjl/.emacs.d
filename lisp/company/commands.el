@@ -14,7 +14,7 @@
     (message "company-ispell enabled!"))))
 
 ;;;###autoload
-(defun ymacs-company/company-yasnippet ()
+(defun ymacs-company/yasnippet ()
   "Call `company-yasnippet'"
   (interactive)
   (company-abort)

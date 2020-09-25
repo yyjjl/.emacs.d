@@ -32,7 +32,7 @@
   (setq company-etags-ignore-case t)
   (setq company-minimum-prefix-length 3)
   (setq company-tooltip-align-annotations t)
-  (setq company-auto-complete nil)
+  (setq company-auto-commit nil)
   ;; Not to load company-mode for certain major modes.
   (setq company-global-modes
         '(not eshell-mode comint-mode erc-mode

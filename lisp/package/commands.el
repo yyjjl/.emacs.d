@@ -19,11 +19,13 @@
              (- (length files) failed-count)
              failed-count)))
 
+;;;###autoload
 (defun ymacs-package/compile-elpa-packages (&optional -no-message?)
   (interactive)
   (let ((inhibit-message -no-message?))
     (byte-recompile-directory package-user-dir nil :force)))
 
+;;;###autoload
 (defun ymacs-package/compile-config (&optional -no-message?)
   (interactive "P")
   (message "Compile configuration files ...")

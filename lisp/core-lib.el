@@ -477,7 +477,7 @@ HTML file converted from org file, it returns t."
 
 (defmacro load-feature! (-name &rest -options)
   `(unless (memq ',-name ymacs--loaded-features)
-     ,@(mapcar (lambda (x) (load-feature//option-to-form -name it))  -options)
+     ,@(mapcar (lambda (x) (load-feature//option-to-form -name x))  -options)
      ,(load-feature//file-to-form -name "package")
      ,(load-feature//file-to-form -name "functions")
      ,(load-feature//file-to-form -name "hooks")
