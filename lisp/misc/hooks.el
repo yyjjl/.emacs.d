@@ -1,13 +1,33 @@
 ;; -*- lexical-binding: t -*-
 
-(defun ymacs-misc//get-occur-buffer ()
-  (cl-loop
-   for window in (window-list)
-   for buffer = (window-buffer window)
-   when (with-current-buffer buffer
-          (apply 'derived-mode-p
-                 ymacs-misc-auto-next-error-buffer-derived-modes))
-   return buffer))
+(define-hook! ymacs-misc|after-init (after-init-hook)
+  (recentf-mode 1)
+  (winner-mode 1)
+
+  (session-initialize)
+
+  (yas-global-mode 1)
+
+  (which-key-mode 1)
+
+  (projectile-mode 1)
+
+  ;;`eldoc', show API doc in minibuffer echo area enabled by default
+  ;; (global-eldoc-mode 1)
+
+  (global-whitespace-mode 1)
+  (global-hl-todo-mode 1)
+  (electric-indent-mode 1))
+
+(define-hook! ymacs-misc|after-init-idle (ymacs-after-init-idle-hook)
+  (when (and ymacs-fcitx-path (display-graphic-p))
+    (fcitx-aggressive-setup))
+
+  (find-file-noselect (expand-var! "org/*note*"))
+  (find-file-noselect (expand-var! "org/*task*"))
+
+  (desktop-save-mode 1))
+
 
 (define-advice next-error (:around (-fn &rest -args) smart)
   (let ((occur-buffer (ymacs-misc//get-occur-buffer)))

@@ -1,10 +1,15 @@
 ;; -*- lexical-binding: t -*-
 
-(define-hook! :anonymous (kill-emacs-hook)
+(define-hook! ymacs-ivy|after-init (after-init-hook)
+  (ivy-mode 1)
+  (counsel-mode 1)
+  (counsel-projectile-mode 1))
+
+(define-hook! ymacs-ivy|save-ivy-views (kill-emacs-hook)
   (ignore-errors (ymacs//save-variable 'ivy-views ymacs-ivy-views-persistent-file)))
 
 (after! ivy
-  (define-hook! :anonymous (ivy-occur-mode-hook ivy-occur-grep-mode-hook)
+  (define-hook! ymacs-ivy|occur-setup (ivy-occur-mode-hook ivy-occur-grep-mode-hook)
     (local-set-key "/" #'ymacs-ivy/occur-filter-lines)
     (local-set-key (kbd "C-/") #'ymacs-ivy/occur-undo)
 

@@ -1,5 +1,15 @@
 ;; -*- lexical-binding: t; -*-
 
+(define-hook! ymacs-package|after-init (after-init-hook)
+  (setq package-selected-packages
+        (hash-table-keys ymacs-package--required-packages))
+
+  (unless (file-exists-p ymacs-autoloads-file)
+    (autoload 'ymacs-package/generate-autoloads "package/commands" nil t)
+    (ymacs-package/generate-autoloads))
+
+  (load ymacs-autoloads-file))
+
 (after! package
   (define-advice package--save-selected-packages (:override (-value) dont-save)
     (when -value

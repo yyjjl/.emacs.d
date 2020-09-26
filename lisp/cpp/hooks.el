@@ -2,7 +2,7 @@
 
 (after! projectile
   (define-advice projectile--run-project-cmd (:around (-fn &rest -args) set-env)
-    (with-temp-env! (ymacs-cpp-cmake//config-env)
+    (with-temp-env! (ymacs-cpp//env)
       (apply -fn -args))))
 
 (after! cc-mode

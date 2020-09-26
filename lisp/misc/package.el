@@ -1,6 +1,9 @@
 ;; -*- lexical-binding: t -*-
 
+(executable! fcitx)
+
 (require-packages!
+ (fcitx :when ymacs-fcitx-path)
  skeletor
  zeal-at-point
  buffer-move

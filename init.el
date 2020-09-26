@@ -12,8 +12,6 @@
 (load-feature! package)
 (load-feature! ui)
 
-(executable! fcitx)
-
 ;; Core packages
 (require-packages!
  yasnippet
@@ -33,7 +31,6 @@
  amx
  ;; Show key bindings when pressing
  which-key
- (fcitx :when ymacs-fcitx-path)
  ;; Highlight braces with their depth
  rainbow-delimiters
  ;; Highlight indentation
@@ -58,39 +55,3 @@
 (load-feature! ibuffer)
 
 (ymacs//try-load-file features-file (expand-etc! "features-template.el"))
-
-(define-hook! ymacs|idle-init-emacs (ymacs-after-init-idle-hook)
-  (when (and ymacs-fcitx-path (display-graphic-p))
-    (fcitx-aggressive-setup))
-
-  (find-file-noselect (expand-var! "org/*note*"))
-  (find-file-noselect (expand-var! "org/*task*"))
-
-  (desktop-save-mode 1))
-
-(define-hook! ymacs|init-emacs (after-init-hook)
-  (shackle-mode 1)
-  (recentf-mode 1)
-  (winner-mode 1)
-
-  (session-initialize)
-
-  (ivy-mode 1)
-  (counsel-mode 1)
-  (projectile-mode 1)
-  (counsel-projectile-mode 1)
-
-  (yas-global-mode 1)
-  (global-company-mode 1)
-  (semantic-mode 1)
-
-  (which-key-mode 1)
-
-  ;;`eldoc', show API doc in minibuffer echo area enabled by default
-  ;; (global-eldoc-mode 1)
-
-  (global-whitespace-mode 1)
-  (global-hl-todo-mode 1)
-  (electric-indent-mode 1)
-
-  (ymacs-pacakge//init))

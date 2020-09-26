@@ -24,16 +24,6 @@
     (when archive
       (setf (cdr -pkg) (list archive)))))
 
-(defun ymacs-pacakge//init ()
-  (setq package-selected-packages
-        (hash-table-keys ymacs-package--required-packages))
-
-  (unless (file-exists-p ymacs-autoloads-file)
-    (autoload 'ymacs-package/generate-autoloads "package/commands" nil t)
-    (ymacs-package/generate-autoloads))
-
-  (load ymacs-autoloads-file))
-
 (defun require! (-pkg-name &optional -archive -location)
   (cond ((eq -location 'built-in) t)
         (-location (add-to-list 'load-path -location))

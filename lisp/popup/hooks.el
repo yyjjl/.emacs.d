@@ -1,6 +1,8 @@
 ;;  -*- lexical-binding: t -*-
 
-(define-hook! shackle|autoclose-popup-window (kill-buffer-hook)
+(add-hook 'after-init-hook 'shackle-mode)
+
+(define-hook! ymacs-popup|autoclose-popup-window (kill-buffer-hook)
   "Auto quit popup window after buffer killed"
   (let ((window (get-buffer-window)))
     (when (and window
