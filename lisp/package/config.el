@@ -20,3 +20,33 @@
   ;; add load-path’s and load autoload files
   (package-initialize)
   (require 'dash))
+
+;; Core packages
+(require-packages!
+ yasnippet
+ yasnippet-snippets
+ flycheck
+ company
+ session
+ hydra
+ pretty-hydra
+ ivy
+ ivy-hydra
+ counsel
+ swiper
+ projectile
+ counsel-projectile
+ ;; `counsel-M-x' need amx to get history
+ amx
+ ;; Show key bindings when pressing
+ which-key
+ ;; Highlight braces with their depth
+ rainbow-delimiters
+ ;; Highlight indentation
+ highlight-indentation
+ ;; ^L beautifier
+ page-break-lines
+ evil-nerd-commenter
+ shackle
+ hl-todo
+ expand-region)
