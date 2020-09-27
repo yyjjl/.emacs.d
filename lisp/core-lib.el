@@ -25,7 +25,7 @@
 
 (defvar ymacs--loaded-features ())
 
-(defvar ymacs--buffer-useful-p t
+(defvar ymacs--buffer-visible-p t
   "A flag to indicate if the buffer is not a temporary buffer")
 
 (defsubst expand-var! (-name &optional -make-p)
@@ -236,7 +236,7 @@ Example:
      ,@-body))
 
 (defmacro without-user-record! (&rest -body)
-  `(let (ymacs--buffer-useful-p)
+  `(let (ymacs--buffer-visible-p)
      ,@-body))
 
 (defun without-user-record!! (-fn &rest -args)
@@ -309,7 +309,7 @@ string with the witdh of current frame width."
   "If function `buffer-file-name' return nil or a temp file or
 HTML file converted from org file, it returns t."
   (let ((filename (buffer-file-name)))
-    (or (not ymacs--buffer-useful-p)
+    (or (not ymacs--buffer-visible-p)
         (not filename)
         (buffer-base-buffer)
         (string-match (concat "^" temporary-file-directory)

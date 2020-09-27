@@ -32,7 +32,7 @@ t     => when process exits, kill buffer")
   "The program of term.
 If this is nil, setup to environment variable of `SHELL'.")
 
-(defvar ymacs-term-buffer-name "terminal"
+(defvar ymacs-term-buffer-name "term"
   "The buffer name of term buffer.")
 
 (defvar ymacs-term-unbind-key-list '("C-z" "C-x" "C-c" "C-h" "C-y" "<ESC>" "C-u")

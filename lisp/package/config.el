@@ -16,10 +16,12 @@
                            (string-trim-left (cdr item) "https://"))))))
 
 (if ymacs-dump-p
-    (setq load-path ymacs-dump-load-apth)
+    (setq load-path ymacs-dump-load-path)
   ;; add load-path’s and load autoload files
   (package-initialize)
-  (require 'dash))
+
+  (require 'dash)
+  (require 'dash-functional))
 
 ;; Core packages
 (require-packages!
@@ -49,4 +51,5 @@
  evil-nerd-commenter
  shackle
  hl-todo
+ hl-fill-column
  expand-region)

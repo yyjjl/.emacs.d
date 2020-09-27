@@ -17,7 +17,9 @@
 
   (global-whitespace-mode 1)
   (global-hl-todo-mode 1)
-  (electric-indent-mode 1))
+  (electric-indent-mode 1)
+
+  (ignore-errors (global-so-long-mode 1)))
 
 (define-hook! ymacs-misc|after-init-idle (ymacs-after-init-idle-hook)
   (when (and ymacs-fcitx-path (display-graphic-p))

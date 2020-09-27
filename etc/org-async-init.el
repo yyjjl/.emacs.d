@@ -26,4 +26,4 @@
 (ymacs//try-load-file features-file (expand-etc! "features-template.el"))
 
 (setq org-export-async-debug nil)
-(setq ymacs--buffer-useful-p nil)
+(setq ymacs--buffer-visible-p nil)

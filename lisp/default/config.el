@@ -113,7 +113,11 @@
 (setq display-time-24hr-format t)
 (setq display-time-day-and-date t)
 (setq initial-scratch-message
-      (format ";; Welcome to Emacs %s %s !!!" emacs-version (or user-login-name "anonymous")))
+      (format ";; Welcome to Emacs %s %s !!!"
+              emacs-version
+              (or user-login-name "anonymous")))
+
+(autoload 'hl-fill-column-mode "hl-fill-column")
 
 (put 'ymacs//external-file-handler 'safe-magic t)
 (put 'ymacs//external-file-handler 'operations '(insert-file-contents))

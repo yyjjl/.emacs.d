@@ -1,7 +1,7 @@
 ;; -*- lexical-binding: t -*-
 
 (defvar ymacs-dump-p nil)
-(defvar ymacs-dump-load-apth nil)
+(defvar ymacs-dump-load-path nil)
 
 (defvar ymacs-lite-setup-p (getenv "EMACS_LITE"))
 
@@ -50,3 +50,6 @@ hasn't to runs those regexps against the filename.")
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
 (push '(undecorated . t) default-frame-alist)
+
+;; disable native-compile during setup
+(setq comp-deferred-compilation nil)

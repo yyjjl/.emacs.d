@@ -1,4 +1,5 @@
-;; Setup Emacs environment
+;; -*- lexical-binding:t -*-
+
 (require 'cl-lib)
 
 (defvar ymacs-setup-directory
@@ -13,7 +14,7 @@
 
 (with-demoted-errors "%s"
   (setq load-prefer-newer t)
-  (setq ymacs--buffer-useful-p nil)
+  (setq ymacs--buffer-visible-p nil)
 
   (let ((early-init-file (expand-file-name "early-init.el" user-emacs-directory)))
     (when (file-exists-p early-init-file)
@@ -24,9 +25,8 @@
   (setq-default prog-mode-hook nil)
   (setq-default auto-mode-alist nil)
   (setq kill-emacs-hook nil)
+  (setq after-init-hook nil)
   (setq enable-local-variables :all)
-
-  (ymacs-pacakge//init)
 
   (message "Remove *.elc in %s ..." (abbreviate-file-name ymacs-config-directory))
 
@@ -35,6 +35,9 @@
                     (directory-files user-emacs-directory t "\\.elc$"))
     (delete-file elc-file))
 
-  ;; Compile all configurations
+  (ymacs-package|after-init)
+
   (ymacs-package/generate-autoloads)
-  (ymacs-package/compile-config :nomessage))
+  (ymacs-package/compile-config :no-message)
+  (ymacs-package/compile-elpa-packages :no-message)
+  (ymacs-package/native-compile-elpa-packages :no-message))

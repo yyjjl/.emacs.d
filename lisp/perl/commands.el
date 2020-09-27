@@ -37,4 +37,35 @@ If region is active, operate on it, else operate on line."
   (ymacs-term//exec-program-reuse-buffer
    "perl-repl"
    ymacs-perl-shell-path nil
-   :callback (lambda () (local-set-key (kbd "C-c C-z") 'ymacs-term/switch-back-no-quit))))
+   :callback
+   (lambda ()
+     (local-set-key (kbd "C-c C-z") 'ymacs-term/switch-back-no-quit))))
+
+;;;###autoload
+(defun ymacs-perl/generate-global-tags ()
+  (interactive)
+  (let ((default-directory (expand-var! "perl-modules"))
+        (lib-paths
+         (shell-command-to-string "perl -e 'for(@INC){print \"$_\n\";}'")))
+    (dolist (path (--filter
+                   (file-exists-p it)
+                   (split-string lib-paths "\n" :omit-nulls "\n\t ")))
+      (let ((link path))
+        (while (and link
+                    (not (string-match-p
+                          "perl"
+                          (file-name-base (directory-file-name link)))))
+          (setq link (file-name-directory (directory-file-name link))))
+
+        (unless (string-empty-p link)
+          (setq link (directory-file-name link))
+          (when (and (> (length link) 5)
+                     (member (substring link 0 5) '("/etc/" "/usr/")))
+            (setq link (substring link 5)))
+          (setq link (replace-regexp-in-string "/" "_" link))
+          (if (file-exists-p link)
+              (message "%s exists" link)
+            (make-symbolic-link path link)))))
+    (run-command!
+     :name "Generate perl tags"
+     :command "gtags -cv --statistics")))

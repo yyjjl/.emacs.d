@@ -20,24 +20,65 @@
              failed-count)))
 
 ;;;###autoload
-(defun ymacs-package/compile-elpa-packages (&optional -no-message?)
+(defun ymacs-package/compile-elpa-packages (&optional -no-message)
   (interactive)
-  (let ((inhibit-message -no-message?))
-    (byte-recompile-directory package-user-dir nil :force)))
+  (let ((inhibit-message -no-message))
+    (byte-recompile-directory package-user-dir nil t)))
 
 ;;;###autoload
-(defun ymacs-package/compile-config (&optional -no-message?)
+(defun ymacs-package/native-compile-elpa-packages (&optional -no-message)
+  (interactive)
+
+  (when (ignore-errors (native-comp-available-p))
+    (let* ((files
+            (cl-loop
+             for path in (list package-user-dir ymacs-private-directory)
+             append
+             (seq-filter
+              (lambda (file)
+                (not (or (string-suffix-p "-pkg.el" file)
+                         (string-suffix-p "-autoloads.el" file)
+                         (string-suffix-p "-theme.el" file)
+                         (string-suffix-p ".dir-locals.el" file))))
+              (directory-files-recursively path comp-valid-source-re))))
+           (count 1))
+      (dolist (file files)
+        (let* ((out-filename (comp-el-to-eln-filename file))
+               (out-dir (file-name-directory out-filename))
+               (prompt (format "[%4d/%4d]" count (length files))))
+
+          (cl-incf count)
+
+          (unless (file-exists-p out-dir)
+            (make-directory out-dir t))
+
+          (unless (file-exists-p out-filename)
+            (if (file-writable-p out-filename)
+                (condition-case err
+                    (progn
+                      (message "%s native compiling %s" prompt file)
+                      (let ((inhibit-message -no-message))
+                        (native-compile file 'late)))
+                  (error
+                   (message "%s error: %s" prompt (error-message-string err))))
+              (message "%s no write access for %s skipping." prompt out-filename))))))))
+
+;;;###autoload
+(defun ymacs-package/compile-config (&optional -no-message)
   (interactive "P")
   (message "Compile configuration files ...")
   (dolist (file (cl-remove-duplicates
                  (append
                   (directory-files-recursively ymacs-private-directory "\\.el$")
                   (directory-files-recursively ymacs-config-directory "\\.el$")
-                  (directory-files user-emacs-directory :full "\\.el$"))))
+                  (directory-files user-emacs-directory t "\\.el$"))))
     (when file
       (condition-case err
-          (let ((inhibit-message -no-message?))
-            (byte-compile-file file))
-        (error (message "Error: %s" err)
-               (backtrace)))))
+          (let ((inhibit-message -no-message))
+            (byte-compile-file file)
+            (when (fboundp 'native-compile)
+              (native-compile file 'late)))
+        (error
+         (when -no-message
+           (message "%s: Error %s" file err))))))
   (message "Compile finished"))

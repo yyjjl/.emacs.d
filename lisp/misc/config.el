@@ -35,7 +35,7 @@
 
 (after! recentf
   (defun ymacs-misc//recentf-keep-p (-fn)
-    (and ymacs--buffer-useful-p
+    (and ymacs--buffer-visible-p
          ;; The order must be kept
          (or (file-remote-p -fn)
              (and (file-readable-p -fn)
@@ -213,6 +213,24 @@
   (setq yas-prompt-functions '(yas-completing-prompt))
   (setq-default yas-indent-line 'fixed)
   (setq yas-triggers-in-field nil))
+
+(after! so-long
+  ;; reduce false positives w/ larger threshold
+  (setq so-long-threshold 1000)
+  ;; make sure that save-place not operate in large/long files
+  (add-to-list 'so-long-variable-overrides '(save-place-alist . nil))
+  ;; Text files could possibly be too long too
+  (add-to-list 'so-long-target-modes 'text-mode)
+  ;; But disable everything else that may be unnecessary/expensive for large
+  ;; or wide buffers.
+  (setq so-long-target-modes
+        (append so-long-target-modes
+                '(flycheck-mode
+                  flyspell-mode
+                  eldoc-mode
+                  auto-composition-mode
+                  hl-fill-column-mode)))
+  (setq so-long-predicate #'ymacs//buffer-has-long-lines-p))
 
 (after! skeletor
   (setq skeletor-completing-read-function 'ivy-completing-read)

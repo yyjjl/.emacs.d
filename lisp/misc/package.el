@@ -11,8 +11,7 @@
  csv-mode
  gnuplot-mode
  graphviz-dot-mode
- yaml-mode
- sly)
+ yaml-mode)
 
 (defcustom ymacs-misc-project-rsync-remote-path nil
   "."

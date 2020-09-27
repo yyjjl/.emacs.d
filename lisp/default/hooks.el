@@ -8,6 +8,16 @@
 ;; Turns on `auto-fill-mode', don't use `text-mode-hook'
 (add-hook 'change-log-mode-hook 'turn-on-auto-fill)
 
+(define-hook! ymacs|create-missing-directories-h (find-file-not-found-functions)
+  "Automatically create missing directories when creating new files."
+  (unless (file-remote-p (buffer-file-name))
+    (let ((parent-directory (file-name-directory (buffer-file-name))))
+      (and (not (file-directory-p parent-directory))
+           (y-or-n-p (format "Directory `%s' does not exist! Create it?"
+                             parent-directory))
+           (progn (make-directory parent-directory 'parents)
+                  t)))))
+
 (define-hook! ymacs|minibuffer-setup (minibuffer-setup-hook)
   (setq line-spacing 4)
   (setq gc-cons-threshold most-positive-fixnum))
@@ -52,6 +62,7 @@
     (user-error (message "%s" (error-message-string err))))
 
   (hl-line-mode 1)
+  (hl-fill-column-mode 1)
 
   ;; show trailing spaces in a programming mode
   (setq show-trailing-whitespace t)
@@ -61,6 +72,7 @@
   (local-set-key [remap completion-at-point] #'counsel-company)
 
   (hl-line-mode 1)
+  (hl-fill-column-mode 1)
 
   (setq indicate-empty-lines t))
 
@@ -121,10 +133,12 @@
   (run-with-idle-timer ymacs-autosave-interval t #'run-hooks 'ymacs-autosave-hook)
 
   ;; GC all sneaky breeky like
-  (if (boundp 'after-focus-change-function)
-      (add-function :after after-focus-change-function
-        (lambda ()
-          (unless (frame-focus-state)
-            (garbage-collect))))
-    (add-hook 'focus-out-hook 'garbage-collect))
+  (add-function :after after-focus-change-function
+    (lambda ()
+      (unless (frame-focus-state)
+        (garbage-collect))))
+
+  ;; enabel native-compile after initialization
+  (setq comp-deferred-compilation t)
+
   (message "Init Time: %s" (emacs-init-time)))

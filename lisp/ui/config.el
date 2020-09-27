@@ -54,7 +54,8 @@
 (setq-default cursor-in-non-selected-windows t)
 (setq-default display-line-numbers-width 3)
 (setq-default frame-inhibit-implied-resize t)
- ;; Remove continuation arrow on right fringe
+(setq-default frame-resize-pixelwise t)
+;; Remove continuation arrow on right fringe
 (setq-default highlight-nonselected-windows t)
 (setq-default image-animate-loop t)
 (setq-default indicate-buffer-boundaries nil)
@@ -91,7 +92,7 @@
  '(font-lock-doc-face ((t (:foreground "#777777" :weight bold))))
 
  '(eldoc-highlight-function-argument ((t (:foreground "#86DC2F" :weight bold))))
- '(hl-line ((t (:background "gray17"))))
+ '(hl-line ((t (:background "gray5"))))
 
  '(org-meta-line ((t :inherit font-lock-doc-face)))
  '(org-document-info-keyword ((t :inherit font-lock-builtin-face)))

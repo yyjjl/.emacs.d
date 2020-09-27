@@ -1,3 +1,3 @@
 ;;; -*- lexical-binding: t; -*-
 
-(require-packages! treemacs)
+(require-packages! telega)
