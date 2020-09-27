@@ -8,9 +8,3 @@
   (setq-default mode-line-misc-info
                 '((company-search-mode (" " company-search-lighter))
                   " " global-mode-string)))
-
-(define-hook! ymacs-ui|hide-modeline (completion-list-mode-hook
-                                      help-mode-hook
-                                      completion-in-region-mode-hook
-                                      flycheck-error-list-mode-hook)
-  (hide-mode-line-mode 1))

@@ -28,6 +28,9 @@
       ("t s" lsp-toggle-signature-auto-activate
        "signature" :toggle lsp-signature-auto-activate)
 
+      ("t m" ymacs-lsp/toggle-modern-ui
+       "modern UI" :toggle (bound-and-true-p lsp-ui-doc-mode))
+
       ("w r" lsp-restart-workspace)
       ("w s" lsp-shutdown-workspace))))
 
@@ -60,6 +63,22 @@
 (after! lsp-headerline
   (setq lsp-headerline-breadcrumb-segments '(project symbols)))
 
+(after! lsp-ui
+  (setq lsp-ui-peek-enable nil)
+  (setq lsp-ui-imenu-enabel nil)
+  (setq lsp-ui-sideline-enable nil)
+  (setq lsp-ui-doc-enable nil)
+
+  (setq lsp-ui-sideline-show-diagnostics nil)
+  (setq lsp-ui-sideline-show-hover nil)
+  (setq lsp-ui-sideline-show-symbol nil)
+
+  (setq lsp-ui-doc-delay 0.5)
+  (setq lsp-ui-doc-header t)
+  (setq lsp-ui-doc-position 'top)
+  (setq lsp-ui-doc-include-signature nil)
+  (setq lsp-ui-doc-alignment 'window))
+
 (after! dap-mode
   (setq dap-auto-configure-features
         '(sessions locals breakpoints expressions controls)))
@@ -87,7 +106,7 @@
     ("ed" dap-ui-expressions-remove "Remove expr")
     ("el" dap-ui-expressions "List expr")
     ("so" dap-go-to-output-buffer "Output")
-    ("sL" dap/go-to-log-buffer "Log")
+    ("sL" ymacs-dap/go-to-log-buffer "Log")
     ("C-c C-z" dap-ui-repl "Repl")
     ("M-s q" nil "quit" :exit t)))
 

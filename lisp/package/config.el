@@ -25,6 +25,7 @@
 
 ;; Core packages
 (require-packages!
+ paradox
  yasnippet
  yasnippet-snippets
  flycheck

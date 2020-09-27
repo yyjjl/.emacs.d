@@ -16,12 +16,3 @@
     ("C-c C-l" . ymacs-rust/cargo-run))
 
   (setq cargo-process--command-flags "--color never"))
-
-(after! lsp-rust
-  (let ((url "https://github.com/rust-analyzer/rust-analyzer/releases/latest/download/rust-analyzer-linux")
-        (path (expand-var! "rust-analyzer")))
-    (setq lsp-rust-analyzer-server-command (list path))
-
-    (ymacs-lsp//set-simple-install-fn
-     'rust-analyzer
-     (format "curl -L %s -o %s && chmod +x %s" url path path))))

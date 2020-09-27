@@ -18,7 +18,7 @@
       (1 'lisp-argument-face nil nil)))))
 
 (after! help
-  (define-key! :map help-mode-map ("R" . ymacs-lisp/remove-hook-at-point)))
+  (define-key! :map help-mode-map ("R" . ymacs-lisp/remove-at-point)))
 
 (after! elisp-mode
   (define-key! :map emacs-lisp-mode-map

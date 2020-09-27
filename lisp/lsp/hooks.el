@@ -1,8 +1,11 @@
 ;; -*- lexical-binding:t -*-
 
 (setq lsp-keymap-prefix nil)
+
 (after! lsp
   (define-hook! ymacs-lsp|after-open (lsp-after-open-hook)
+    (ymacs-lsp//modern-ui-enable ymacs-lsp-modern-ui)
+
     ;; default to sort and filter by server
     (setq-local company-transformers nil))
 
@@ -14,7 +17,8 @@
             (lv-message (replace-regexp-in-string "%" "%%" -message))))
       (lv-delete-window)))
 
-  (define-advice lsp--render-on-hover-content (:around (-fn -contents -render-all) truncate-doc)
+  (define-advice lsp--render-on-hover-content
+      (:around (-fn -contents -render-all) truncate-doc)
     (let ((content (funcall -fn -contents -render-all)))
       (unless (ymacs-popups//help-buffer-p (current-buffer))
         (let ((content-length (length content))
@@ -22,11 +26,13 @@
           (when (or (< split-pos content-length)
                     (>= split-pos (frame-width)))
             (setq content
-                  (concat (substring content 0 (min split-pos (- (frame-width) 30)))
-                          (propertize
-                           (format " ... (%s to see more)"
-                                   (substitute-command-keys "\\[lsp-describe-thing-at-point]"))
-                           'face 'font-lock-comment-face))))))
+                  (concat
+                   (substring content 0 (min split-pos (- (frame-width) 30)))
+                   (propertize
+                    (format " ... (%s to see more)"
+                            (substitute-command-keys
+                             "\\[lsp-describe-thing-at-point]"))
+                    'face 'font-lock-comment-face))))))
       content)))
 
 (after! lsp-headerline
@@ -41,6 +47,7 @@
   (advice-add
    #'lsp-headerline--symbol-icon
    :override #'lsp-headerline--symbol-icon@disable-icon)
+
   (advice-add
    #'lsp-headerline--filename-with-icon
    :override #'lsp-headerline--filename-with-icon@disable-icon))

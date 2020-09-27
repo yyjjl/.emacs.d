@@ -2,8 +2,9 @@
 
 (eval-when-compile
   (require 'rect)
-  (require 'hydra)
-  (require 'pretty-hydra))
+  (require 'hydra))
+
+(require 'pretty-hydra)
 
 (pretty-hydra-define ymacs-hydra/global-toggles
   (:title "Toggles" :color amaranth :quit-key "q")
