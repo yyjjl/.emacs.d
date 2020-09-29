@@ -51,6 +51,9 @@
 (setq-default idle-update-delay 2)
  ;; keep the point out of the minibuffer
 (setq-default mark-ring-max 128)
+(setq-default kill-ring-max 200)
+ ;; Save clipboard contents before replacement
+(setq-default save-interprogram-paste-before-kill t)
 (setq-default minibuffer-prompt-properties
               '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt))
 ;; History & backup settings

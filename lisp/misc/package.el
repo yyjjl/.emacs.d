@@ -131,7 +131,6 @@
   ("C-c 4" . ispell-word)
   ("C-c q" . auto-fill-mode)
 
-  ("M--" . er/expand-region)
   ("M-/" . hippie-expand)
   ("M-n" . next-error)
   ("M-p" . previous-error)

@@ -58,10 +58,12 @@
            (dedicated-p (plist-get -plist :dedicated))
            (old-window (get-buffer-window -buffer))
            (action 'delete)
-           (window (or (funcall -fn -buffer -alist -plist)
-                       (progn
-                         (setq action 'quit)
-                         (funcall -fn -buffer -alist (cl-list* :other t -plist))))))
+           (window
+            (or (funcall -fn -buffer -alist -plist)
+                (progn
+                  ;; try display in other window
+                  (setq action 'quit)
+                  (funcall -fn -buffer -alist (cl-list* :other t -plist))))))
       (unless (eq window old-window)
         (when dedicated-p
           (set-window-dedicated-p window t))

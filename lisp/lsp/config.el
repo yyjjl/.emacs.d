@@ -57,7 +57,7 @@
   (setq lsp-signature-doc-lines 2)
 
   (setq lsp-modeline-diagnostics-enable nil)
-  (setq lsp-headerline-breadcrumb-enable t)
+  (setq lsp-headerline-breadcrumb-enable nil)
   (setq lsp-modeline-code-actions-enable t))
 
 (after! lsp-headerline
@@ -73,11 +73,11 @@
   (setq lsp-ui-sideline-show-hover nil)
   (setq lsp-ui-sideline-show-symbol nil)
 
-  (setq lsp-ui-doc-delay 0.5)
-  (setq lsp-ui-doc-header t)
-  (setq lsp-ui-doc-position 'top)
+  (setq lsp-ui-doc-delay 0.2)
+  (setq lsp-ui-doc-position 'at-point)
+  (setq lsp-ui-doc-header nil)
   (setq lsp-ui-doc-include-signature nil)
-  (setq lsp-ui-doc-alignment 'window))
+  (setq lsp-ui-doc-max-width 80))
 
 (after! dap-mode
   (setq dap-auto-configure-features

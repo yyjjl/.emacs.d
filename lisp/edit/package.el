@@ -1,6 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
 (require-packages!
+ easy-kill
+ easy-kill-extras
  ;; Mark tools
  multiple-cursors
  ;; `wgrep' allows you to edit a grep buffer and apply those changes
@@ -85,3 +87,11 @@
   ("M-g w" . avy-goto-subword-1)
   ("M-g y" . avy-copy-line)
   ("M-'" . ymacs-edit/change-surround))
+
+(define-key!
+  ("M--" . easy-mark)
+  ([remap kill-ring-save] . easy-kill)
+  ([remap mark-sexp] . easy-mark-sexp)
+  ([remap mark-word] . easy-mark-word)
+  ([remap zap-to-char] . easy-mark-to-char)
+  ([remap zap-up-to-char] . easy-mark-up-to-char))

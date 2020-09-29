@@ -81,7 +81,7 @@
   ("F" . counsel-faces)
   ("W" . counsel-colors-web)
   ("E" . counsel-colors-emacs)
-  ("e" . ymacs-counsel/sudo-edit)
+  ("e" . sudo-edit)
   ("O" . counsel-outline)
   ("o" . counsel-org-goto-all)
   ("t" . counsel-tmm))

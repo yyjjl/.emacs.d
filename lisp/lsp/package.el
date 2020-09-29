@@ -4,7 +4,9 @@
 
 (define-option! ymacs-lsp-modern-ui nil)
 
-(defcustom lsp-enable-in-project-p t
+(defvar ymacs-lsp-ui-doc-search-distance 15)
+
+(defcustom ymacs-lsp-enable-in-project-p t
   "Whether to setup project literally"
   :group 'lsp
   :type 'directory

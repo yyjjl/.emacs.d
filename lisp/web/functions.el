@@ -5,7 +5,7 @@
     (imenu--generic-function '((nil "^ *\\([^ ]+\\) *{ *$" 1)))))
 
 (defun ymacs-web|common-setup ()
-  (when (bound-and-true-p lsp-enable-in-project-p)
+  (when (bound-and-true-p ymacs-lsp-enable-in-project-p)
     (electric-indent-local-mode -1)
     (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
     (flycheck-mode 1)
