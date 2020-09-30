@@ -28,6 +28,7 @@
         :fallback
         (progn
           (elpy-mode 1)
+          (flycheck-mode -1)
           (ymacs-company//add-backend 'elpy-company-backend)))))
 
   (define-hook! ymacs-python|inferior-setup (inferior-python-mode-hook)

@@ -7,6 +7,7 @@
 (after! python
   (define-key! :map inferior-python-mode-map
     ("C-c C-t" . ymacs-python/toggle-pdbtrack)
+    ("C-c C-z" . elpy-shell-switch-to-buffer)
     ([f5] . ymacs-python/toggle-pdbtrack))
 
   (define-key! :map python-mode-map
@@ -41,20 +42,7 @@
   (when ymacs-pylint-path
     (setq python-check-command ymacs-pylint-path))
 
-  ;; Setup elpy or pyls
-  (if ymacs-pyls-path
-      (progn
-        ;; only use some parts of elpy
-        (require 'elpy)
-
-        (add-hook 'inferior-python-mode-hook 'elpy-shell--enable-output-filter)
-        (let ((elpy-modules '(elpy-module-sane-defaults
-                              elpy-module-yasnippet
-                              elpy-module-pyvenv)))
-          (elpy-modules-global-init)))
-
-    (elpy-enable)
-    (remove-hook 'python-mode-hook 'elpy-mode)))
+  (ymacs-python//elpy-enable))
 
 (after! elpy
   (define-key! :map elpy-pdb-map

@@ -19,7 +19,7 @@
               (setf (lsp-session-folders (lsp-session)) valid-folders)
               (lsp--persist-session (lsp-session)))
           (message "Nothing to remove."))
-      (let ((folder (completing-read "Folder to remove" valid-folders nil t)))
+      (let ((folder (completing-read "Folder to remove: " valid-folders nil t)))
         (setf (lsp-session-folders (lsp-session)) (delete folder valid-folders))
         (lsp--persist-session (lsp-session))))))
 

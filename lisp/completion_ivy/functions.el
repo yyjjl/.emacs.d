@@ -74,19 +74,11 @@
 
 (defun ymacs-ivy//switch-buffer-transformer (-string)
   "Transform STR to more readable format."
-  (let ((buffer (get-buffer -string)))
-    (cond
-     (buffer
-      (format "%-60s %s"
-              -string
-              (buffer-local-value 'default-directory buffer)))
-     ((and (eq ivy-virtual-abbreviate 'full)
-           (file-name-directory -string))
-      (format "%-60s %s"
-              (propertize (file-name-nondirectory -string)
-                          'face 'ivy-virtual)
-              (file-name-directory -string)))
-     (t -string))))
+  (format "%-60s %s"
+          (ivy-switch-buffer-transformer -string)
+          (if-let (buffer (get-buffer -string))
+              (buffer-local-value 'default-directory buffer)
+            "")))
 
 (defun ymacs-ivy//bookmark-transformer (-string)
   "Transform STR to more readable format."

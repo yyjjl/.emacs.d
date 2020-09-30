@@ -14,7 +14,12 @@
     ("C-c B" . lsp-format-buffer)
     ("C-c C-d" . lsp-describe-thing-at-point)
     ("C-c C-SPC" . lsp-execute-code-action)
+
+    ("M-o" . lsp-signature-activate)
     ("C-S-SPC" . lsp-signature-activate))
+
+  (define-key! :map lsp-signature-mode-map
+    ("M-o" . lsp-signature-stop))
 
   (ymacs-hydra-add-toggle-column
    '(lsp-mode
@@ -35,13 +40,14 @@
       ("w s" lsp-shutdown-workspace))))
 
   (setq lsp-auto-configure t)
-  (setq lsp-auto-guess-root t)
+  ;; (setq lsp-auto-guess-root t)
   (setq lsp-eldoc-render-all t)
   (setq lsp-diagnostics-provider :auto)
-  (setq lsp-restart 'auto-restart)
+  ;; (setq lsp-restart 'auto-restart)
   (setq lsp-session-file (expand-var! "lsp-sessions"))
   (setq lsp-keep-workspace-alive nil)
   (setq lsp-signature-doc-lines 2)
+  (setq lsp-signature-auto-activate '(:on-trigger-char))
   (setq lsp-idle-delay 0.5)
 
   (setq lsp-completion-provider :none)
@@ -53,11 +59,10 @@
   (setq lsp-enable-symbol-highlighting nil)
   (setq lsp-enable-semantic-highlighting nil)
 
-  (setq lsp-signature-auto-activate t)
   (setq lsp-signature-doc-lines 2)
 
   (setq lsp-modeline-diagnostics-enable nil)
-  (setq lsp-headerline-breadcrumb-enable nil)
+  (setq lsp-headerline-breadcrumb-enable t)
   (setq lsp-modeline-code-actions-enable t))
 
 (after! lsp-headerline

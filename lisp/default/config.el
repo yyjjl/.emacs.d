@@ -41,7 +41,7 @@
 (setq-default apropos-do-all t)
  ;; kill compilation process before starting another
 (setq-default compilation-always-kill t)
-(setq-default compilation-skip-threshold 2)
+(setq-default compilation-skip-threshold 1)
 (setq-default compilation-scroll-output t)
 (setq-default compilation-environment '("TERM=xterm-256color"))
 (setq-default confirm-nonexistent-file-or-buffer t)

@@ -52,4 +52,4 @@
   (when ymacs-cpp-cmake-project-root
     (message
      (substitute-command-keys
-      "Run `ymacscpp/config-project'(\\[ymacscpp/config-project] to setup lsp"))))
+      "Run `ymacs-cpp-cmake/config-project'(\\[ymacs-cpp-cmake/config-project]) to setup lsp"))))

@@ -173,7 +173,7 @@
 
     (let ((available-options
            (buffer-local-value 'ymacs-cpp-cmake-available-options -buffer)))
-      (widget-insert "(run `C-u M-x cpp/run-cmake' to get available options)\n")
+      (widget-insert "(run `C-u M-x ymacs-cpp-cmake/run-cmake' to get available options)\n")
 
       (if (not available-options)
           (widget-insert "No Available Options ")

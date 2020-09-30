@@ -21,3 +21,13 @@
                            (python-shell-get-process))))
     (with-current-buffer (process-buffer process)
       (not comint-last-prompt))))
+
+(defun ymacs-python//elpy-enable ()
+  (require 'elpy)
+  (unless (bound-and-true-p elpy-enabled-p)
+    (setq elpy-enabled-p t)
+    (elpy-modules-global-init)
+    (add-hook 'pyvenv-post-activate-hooks 'elpy-rpc--disconnect)
+    (add-hook 'pyvenv-post-deactivate-hooks 'elpy-rpc--disconnect)
+    (add-hook 'inferior-python-mode-hook 'elpy-shell--enable-output-filter)
+    (add-hook 'python-shell-first-prompt-hook 'elpy-shell--send-setup-code t)))
