@@ -16,6 +16,9 @@
 (after! realgud-track-mode
   (define-key! :map realgud-track-mode-map
     ("C-c C-z" . ymacs-realgud/jump-to-srcbuf)
+    ("M-n" . comint-next-input)
+    ("M-p" . comint-previous-input)
+    ("M-h" . counsel-shell-history)
     ("`" :map realgud:shortkey-mode-map)))
 
 (after! realgud

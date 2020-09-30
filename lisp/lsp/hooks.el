@@ -2,7 +2,7 @@
 
 (setq lsp-keymap-prefix nil)
 
-(after! lsp
+(after! lsp-mode
   (define-hook! ymacs-lsp|after-open (lsp-after-open-hook)
     (ymacs-lsp//modern-ui-enable ymacs-lsp-modern-ui)
 
