@@ -53,4 +53,5 @@
  shackle
  hl-todo
  hl-fill-column
+ sudo-edit
  expand-region)

@@ -53,41 +53,6 @@
  #'ymacs-counsel/kill-buffer
  #'ymacs-counsel//kill-buffer-prompt)
 
-;;* sudo edit
-(defun ymacs-counsel//sudo-edit-file (-filename &optional -old-point)
-  (let ((buffer (find-file
-                 (if-let ((remote (file-remote-p -filename)))
-                     (format "%s|sudo:%s:%s"
-                             (substring remote 0 (1- (length remote)))
-                             (file-remote-p -filename 'host)
-                             (file-remote-p -filename 'localname))
-                   (concat "/sudo:root@localhost:" -filename)))))
-    (when (and (buffer-live-p buffer) -old-point)
-      (with-current-buffer buffer
-        (goto-char -old-point)))))
-
-;;;###autoload
-(defun ymacs-counsel/sudo-edit (&optional -file)
-  "Edit currently visited file as root.
-With a prefix argument, the function will prompt for a file to
-visit. It will also prompt for a file to visit if current buffer
-is not visiting a file."
-  (interactive
-   (list
-    (or
-     (when (or current-prefix-arg
-               (and (not (buffer-file-name))
-                    (not (eq major-mode 'dired-mode))))
-       (read-file-name "Find file(sudo): "))
-     (buffer-file-name)
-     default-directory)))
-
-  (ymacs-counsel//sudo-edit-file
-   -file
-   (when-let (buffer (get-file-buffer -file))
-     (with-current-buffer buffer
-       (point)))))
-
 ;;* swiper
 (defhydra ymacs-hydra/swiper (:color blue :hint nil)
   "

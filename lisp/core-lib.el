@@ -461,7 +461,7 @@ HTML file converted from org file, it returns t."
                       ((and (symbolp -option)
                             (member (aref (symbol-name -option) 0) '(?- ?+)))
                        (let ((option-name (symbol-name -option)))
-                         (cons (format "enable-%s-p" (substring option-name 1))
+                         (cons (substring option-name 1)
                                (equal (aref option-name 0) ?+))))
                       (t
                        (error "-option should start with +/- or be a cons")))))
