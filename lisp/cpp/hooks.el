@@ -1,7 +1,8 @@
 ;; -*- lexical-binding:t -*-
 
 (after! projectile
-  (define-advice projectile--run-project-cmd (:around (-fn &rest -args) set-env)
+  (define-advice projectile--run-project-cmd
+      (:around (-fn &rest -args) set-env)
     (with-temp-env! (ymacs-cpp//env)
       (apply -fn -args))))
 

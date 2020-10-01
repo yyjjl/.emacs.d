@@ -1,15 +1,5 @@
 ;; -*- lexical-binding: t; -*-
 
-(defun ymacs//try-load-file (-target-file -template-file)
-  "Load -TARGET-FILE file.
-If it doesn't exist, copy from the -TEMPLATE-FILE, then load it."
-  (if (and (file-exists-p -template-file)
-           (not (file-exists-p -target-file)))
-      (copy-file -template-file -target-file))
-  ;; Load private configuration
-  (when (file-exists-p -target-file)
-    (load (file-name-sans-extension -target-file))))
-
 (defsubst ymacs//save-variable (-symbol -file)
   (let ((real-file (expand-var! -file))
         (val (default-value -symbol)))
@@ -42,3 +32,14 @@ If it doesn't exist, copy from the -TEMPLATE-FILE, then load it."
   (or (buffer-file-name buffer)
       (not (string-prefix-p "*" (buffer-name buffer)))
       (equal (buffer-name buffer) "*scratch*")))
+
+(defun ymacs//show-process-memory (&optional pid)
+  (->
+   (format "ps up %s" (or pid (emacs-pid)))
+   shell-command-to-string
+   (split-string "\n" :omit-nulls)
+   (elt 1)
+   split-string
+   (elt 3)
+   string-to-number
+   ignore-errors))

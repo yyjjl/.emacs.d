@@ -109,6 +109,14 @@
  '(ivy-current-match ((t (:background "gray0")))))
 
 (after! doom-modeline
+  (doom-modeline-def-segment workspace-name
+    (when (bound-and-true-p ymacs-misc-current-desktop-name)
+      (propertize (format "[%s]" ymacs-misc-current-desktop-name)
+                  'face
+                  (if (doom-modeline--active)
+                      'doom-modeline-buffer-major-mode
+                    'mode-line-inactive))))
+
   (doom-modeline-def-segment
     buffer-info
     "Combined information about the current buffer, including the current working
@@ -148,7 +156,7 @@ directory, the file name, and its state (modified, read-only or non-existent)."
 
   (doom-modeline-def-modeline 'main
     '(bar window-number matches buffer-info remote-host checker lsp buffer-position misc-info word-count selection-info)
-    '(debug repl input-method indent-info buffer-encoding major-mode process vcs))
+    '(debug repl input-method indent-info buffer-encoding major-mode process vcs workspace-name))
 
   (doom-modeline-def-modeline 'org-src
     '(bar window-number matches buffer-info-simple checker lsp buffer-position misc-info word-count selection-info)

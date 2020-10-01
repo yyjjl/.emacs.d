@@ -233,3 +233,34 @@
                             ("C-n" . ivy-next-line-and-call)
                             ("C-p" . ivy-previous-line-and-call)))
       (quit (goto-char current-point)))))
+
+;;;###autoload
+(defun ymacs-ivy/select-rg-type-aliases ()
+  (interactive)
+  (counsel-delete-process)
+  (-let* ((input ivy-text)
+          (enable-recursive-minibuffers t)
+          (type (ivy-read "Type: " ymacs-ivy-rg-type-aliases
+                          :require-match t
+                          :preselect (car (ymacs-ivy//rg-default-alias))))
+          (regexp "--type=\\(\s*[^-\s]+\\)")
+          ((arguments . search-parts) (split-string input " -- ")))
+    (unless search-parts
+      (setq search-parts (list arguments))
+      (setq arguments ""))
+
+    (setq arguments
+          (string-trim
+           (cond
+            ((equal type "everything")
+             (replace-regexp-in-string regexp "" arguments))
+            ((string-match regexp arguments)
+             (replace-match type nil nil arguments 1))
+            (t
+             (format "%s --type=%s" arguments type)))))
+
+    (ivy-quit-and-run
+      (funcall (ivy-state-caller ivy-last)
+               (if (string-empty-p arguments)
+                   (apply #'concat search-parts)
+                 (apply #'concat arguments " -- " search-parts))))))

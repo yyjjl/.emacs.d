@@ -46,6 +46,29 @@
 
 (defvar ymacs-ivy-switch-function-list nil)
 
+(defvar ymacs-ivy-rg-type-aliases
+  (eval-when-compile
+    (ignore-errors
+      (append
+       (--map
+        (-let* (((type alias) (split-string it ":" :omit-nulls)))
+          (cons (string-trim type)
+                (mapcar #'string-trim (split-string alias "," :omit-nulls))))
+        (-> counsel-rg-base-command
+            split-string
+            car
+            (concat " --type-list")
+            shell-command-to-string
+            (split-string "\n" :omit-nulls)))
+       '(("all" "all defined type aliases") ;; rg --type=all
+         ("everything" "*"))))))            ;; rg without '--type'
+
+(defvar ymacs-ivy-grep-help-commands
+  '((counsel-git-grep-query-replace . "query-replace")
+    (swiper-avy . "avy-jump")
+    (counsel-cd . "cd")
+    (ymacs-ivy/select-rg-type-aliases . "select type")))
+
 (define-key!
   ("C-x j j" . counsel-bookmark)
   ("C-s" . ymacs/swiper)

@@ -139,6 +139,6 @@
         (garbage-collect))))
 
   ;; enabel native-compile after initialization
-  (setq comp-deferred-compilation t)
+  ;; (setq comp-deferred-compilation t)
 
   (message "Init Time: %s" (emacs-init-time)))

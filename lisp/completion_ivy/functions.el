@@ -91,3 +91,17 @@
      (when bm
        (file-name-nondirectory (cdr (assoc 'filename bm)))))))
 
+(defun ymacs-ivy//rg-default-alias ()
+  "Return the default alias by matching alias globs with the buffer file name."
+  (when-let* ((buffer-name
+               (or (buffer-file-name)
+                   (replace-regexp-in-string "<[0-9]+>\\'" "" (buffer-name))))
+              (filename
+               (and buffer-name
+                    (stringp buffer-name)
+                    (file-name-nondirectory buffer-name))))
+    (cl-find-if
+     (lambda (alias)
+       (string-match (mapconcat 'wildcard-to-regexp (cdr alias) "\\|")
+                     filename))
+     ymacs-ivy-rg-type-aliases)))

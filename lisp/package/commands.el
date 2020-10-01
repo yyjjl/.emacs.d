@@ -54,13 +54,20 @@
 
           (unless (file-exists-p out-filename)
             (if (file-writable-p out-filename)
-                (condition-case err
-                    (progn
-                      (message "%s native compiling %s" prompt file)
-                      (let ((inhibit-message -no-message))
-                        (native-compile file 'late)))
-                  (error
-                   (message "%s error: %s" prompt (error-message-string err))))
+                (progn
+                  (condition-case err
+                      (progn
+                        (message "%s native compiling %s" prompt file)
+                        (let ((inhibit-message -no-message))
+                          (native-compile file 'late))
+
+                        (garbage-collect))
+                    (error
+                     (message "%s error: %s" prompt (error-message-string err))))
+                  (when-let (memory (ymacs//show-process-memory))
+                    (message "%s info: use %s%% RAM" prompt memory)
+                    (when (> memory 70)
+                      (user-error "%s error: use too much RAM" prompt))))
               (message "%s no write access for %s skipping." prompt out-filename))))))))
 
 ;;;###autoload

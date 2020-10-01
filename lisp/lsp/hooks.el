@@ -21,18 +21,28 @@
       (:around (-fn -contents -render-all) truncate-doc)
     (let ((content (funcall -fn -contents -render-all)))
       (unless (ymacs-popups//help-buffer-p (current-buffer))
-        (let ((content-length (length content))
-              (split-pos (string-match (rx line-end) content)))
+        (setq content (string-trim-left (or content "")))
+        (let* ((content-length (length content))
+               (frame-width (frame-width))
+               (split-pos
+                (let ((start -1)
+                      (i 0))
+                  (while (and
+                          (<= (cl-incf i) 3)
+                          (< start content-length)
+                          (setq start (string-match "$" content (1+ start)))))
+                  start)))
           (when (or (< split-pos content-length)
-                    (>= split-pos (frame-width)))
+                    (>= split-pos frame-width))
             (setq content
                   (concat
-                   (substring content 0 (min split-pos (- (frame-width) 30)))
+                   (substring content 0 (min split-pos (- frame-width 30)))
                    (propertize
                     (format " ... (%s to see more)"
                             (substitute-command-keys
                              "\\[lsp-describe-thing-at-point]"))
-                    'face 'font-lock-comment-face))))))
+                    'face 'font-lock-comment-face)))))
+        (setq content (s-replace "\n" " " content)))
       content)))
 
 (after! lsp-headerline

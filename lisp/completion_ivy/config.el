@@ -56,6 +56,10 @@
   (setq swiper-stay-on-quit t))
 
 (after! counsel
+  (define-key! :map counsel-ag-map
+    ("M-." . ymacs-ivy/select-rg-type-aliases)
+    ("C-." . ymacs-ivy/select-rg-type-aliases))
+
   (ivy-configure 'counsel-fzf
     :unwind-fn
     (lambda ()

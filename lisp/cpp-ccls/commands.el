@@ -18,7 +18,7 @@
       '("cpp" "-v" "-E")))
 
 (defun ymacs-cpp-ccls//filter-include-lines (-lines)
-  (--map (expand-file-name (s-trim it))
+  (--map (expand-file-name (string-trim it))
          (--filter (string-prefix-p " " it)
                    (split-string -lines "\n" :omit-nulls))))
 

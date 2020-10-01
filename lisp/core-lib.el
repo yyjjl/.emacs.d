@@ -495,6 +495,22 @@ HTML file converted from org file, it returns t."
        (put ',-name 'after-feature-functions
             (cons func (get ',-name 'after-feature-functions))))))
 
+(defun load-file! (-target-file)
+  "Load -TARGET-FILE file.
+If it doesn't exist, copy from the -TEMPLATE-FILE, then load it."
+  (let ((target-file (expand-file-name (concat -target-file ".el")
+                                       user-emacs-directory)))
+    (unless (file-exists-p target-file)
+      (let ((template-file
+             (expand-etc!
+              (format "%s-template.el"
+                      (file-name-sans-extension (file-name-base target-file))))))
+        (unless (file-exists-p template-file)
+          (user-error "Template %s does't exist" template-file))
+        (copy-file template-file target-file)))
+    ;; Load private configuration
+    (load (file-name-sans-extension target-file))))
+
 (provide 'core-lib)
 
 ;;; core-lib.el ends here

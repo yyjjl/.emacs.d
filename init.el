@@ -7,14 +7,12 @@
 
 (load-feature! default)
 
-(ymacs//try-load-file custom-file (expand-etc! "custom-template.el"))
+(load-file! "custom")
 
 (load-feature! package)
 (load-feature! ui)
-
 (load-feature! popup)
 (load-feature! completion_ivy)
-(load-feature! company)
 (load-feature! term)
 (load-feature! misc)
 (load-feature! hydra)
@@ -24,4 +22,4 @@
 (load-feature! dired)
 (load-feature! ibuffer)
 
-(ymacs//try-load-file features-file (expand-etc! "features-template.el"))
+(load-file! "features")

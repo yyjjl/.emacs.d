@@ -24,8 +24,10 @@
     ("R" . ccls-reload)))
 
 (after-feature! cpp
-  (add-to-list 'ymacs-cpp-buffer-command-functions #'ymacs-cpp-ccls//buffer-compile-command)
+  (add-to-list 'ymacs-cpp-buffer-command-functions
+               #'ymacs-cpp-ccls//buffer-compile-command)
   (add-to-list 'ymacs-cpp-lsp-checkers
                (lambda () (file-exists-p (ymacs-cpp-ccls//dot-ccls-path))))
 
-  (setq ymacs-cpp-expand-macro-function (lambda () (ymacs-cpp-ccls//buffer-compile-command t))))
+  (setq ymacs-cpp-expand-macro-function
+        (lambda () (ymacs-cpp-ccls//buffer-compile-command t))))

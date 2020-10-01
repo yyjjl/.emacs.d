@@ -28,16 +28,19 @@
   (setq after-init-hook nil)
   (setq enable-local-variables :all)
 
-  (message "Remove *.elc in %s ..." (abbreviate-file-name ymacs-config-directory))
-
-  (delete-file (expand-var! "autoloads.el"))
-  (dolist (elc-file (directory-files-recursively ymacs-config-directory "\\.elc$")
-                    (directory-files user-emacs-directory t "\\.elc$"))
-    (delete-file elc-file))
-
   (ymacs-package|after-init)
 
   (ymacs-package/generate-autoloads)
-  (ymacs-package/compile-config :no-message)
-  (ymacs-package/compile-elpa-packages :no-message)
-  (ymacs-package/native-compile-elpa-packages :no-message))
+
+  (if (getenv "NATIVE_COMPILE_ELPA")
+      (ymacs-package/native-compile-elpa-packages :no-message)
+
+    (message "Remove *.elc in %s ..." (abbreviate-file-name ymacs-config-directory))
+
+    (delete-file (expand-var! "autoloads.el"))
+    (dolist (elc-file (directory-files-recursively ymacs-config-directory "\\.elc$")
+                      (directory-files user-emacs-directory t "\\.elc$"))
+      (delete-file elc-file))
+
+    (ymacs-package/compile-config :no-message)
+    (ymacs-package/compile-elpa-packages :no-message)))

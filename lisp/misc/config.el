@@ -200,10 +200,12 @@
 
   (setq projectile-require-project-root 'prompt)
   (setq projectile-globally-ignored-file-suffixes
-        '(".pyc" ".elc" ".jpg" ".png" ".svg" ".jpeg" ".pyg" ".pygtex" ".pygstyle"))
-  (setq projectile-project-root-files-bottom-up
-        (append '("compile_commands.json" ".ccls" ".ccls-root")
-                projectile-project-root-files-bottom-up))
+        '(".pyc" ".elc" ".jpg" ".png" ".svg" ".jpeg" ".pyg"
+          ".pygtex" ".pygstyle"))
+
+  (dolist (name '("compile_commands.json" ".ccls" "Cargo.toml"))
+    (add-to-list 'projectile-project-root-files-bottom-up name))
+
   (setq projectile-completion-system 'ivy)
   (setq projectile-ignored-projects '("~/" "/tmp"))
   (setq projectile-enable-caching (not noninteractive)))

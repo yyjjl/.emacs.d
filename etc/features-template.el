@@ -1,5 +1,7 @@
 ;; -*- lexical-binding:t -*-
 
+(load-feature! company +modern-ui)
+
 (load-feature! git)
 (load-feature! spell)
 
