@@ -6,7 +6,7 @@
 
 (load-feature! default)
 
-(ymacs//try-load-file custom-file (expand-etc! "custom-template.el"))
+(load-file! "custom")
 
 (load-feature! package)
 (load-feature! ui)
@@ -23,7 +23,7 @@
 (load-feature! dired)
 (load-feature! ibuffer)
 
-(ymacs//try-load-file features-file (expand-etc! "features-template.el"))
+(load-file! "features")
 
 (setq org-export-async-debug nil)
 (setq ymacs--buffer-visible-p nil)

@@ -4,7 +4,8 @@
   (recentf-mode 1)
   (winner-mode 1)
 
-  (session-initialize)
+  (savehist-mode 1)
+  (save-place-mode 1)
 
   (yas-global-mode 1)
 
@@ -67,6 +68,21 @@
               (when (ignore-errors (call-interactively func))
                 (throw 'done nil))))))))))
 
+(after! savehist
+  (define-advice savehist-save
+      (:around (-fn &optional -auto-save) set-additional-variables)
+    (let ((variables savehist-additional-variables))
+      (dolist (symbol (apropos-internal "-\\(ring\\|history\\)\\'" 'boundp))
+        (unless (or (memq symbol ymacs-savehist-exclude-variables)
+                    (memq symbol savehist-minibuffer-history-variables)
+                    (keywordp symbol))
+          (cl-pushnew symbol variables)))
+      (let ((savehist-additional-variables variables))
+        (funcall -fn -auto-save)))))
+
+(after! saveplace
+  (add-hook 'ymacs-autosave-hook #'save-place-kill-emacs-hook))
+
 (after! desktop
   (define-advice desktop-save (:around (-fn &rest -args) unless-loaded)
     (if (or (called-interactively-p 'interactive)
@@ -74,7 +90,7 @@
         (apply -fn -args)
       (message "Current desktop was not loaded from a file. Ignored")))
 
-  (define-advice desktop-read (:around (-fn &rest -args) disable-semantic)
+  (define-advice desktop-read (:around (-fn &rest -args) disable-semantic) ;
     "Temporarily disable semantic mode when load desktop"
     (let ((semantic-enable-p semantic-mode))
       (semantic-mode -1)
@@ -84,9 +100,6 @@
 
 (after! recentf
   (add-hook 'ymacs-autosave-hook #'recentf-save-list))
-
-(after! session
-  (add-hook 'ymacs-autosave-hook #'session-save-session))
 
 (after! bookmark
   (define-hook! ymacs-misc|bookmark-setup (find-file-hook)

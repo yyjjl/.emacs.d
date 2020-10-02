@@ -3,7 +3,9 @@
 (require 'core-lib)
 
 (load-feature! default)
-(ymacs//try-load-file custom-file (expand-etc! "custom-template.el"))
+
+(load-file! "custom")
+
 (load-feature! package)
 (load-feature! ui)
 
@@ -16,7 +18,7 @@
 (require 'json)
 
 (recentf-mode 1)
-(session-initialize)
+(savehist-mode 1)
 (winner-mode 1)
 (ivy-mode 1)
 (counsel-mode 1)

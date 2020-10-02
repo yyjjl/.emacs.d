@@ -50,6 +50,14 @@
        highlight-indentation-current-column-mode
        highlight-indentation-mode)))
 
+(defvar ymacs-savehist-exclude-variables
+  '(load-history
+    register-alist
+    vc-comment-ring
+    flyspell-auto-correct-ring
+    org-mark-ring
+    planner-browser-file-display-rule-ring))
+
 (defvar ymacs-misc-project-rsync-command
   "rsync -azh --progress --filter=':- .gitignore' %s . %s")
 
@@ -121,7 +129,8 @@
   ("w ]" . winner-redo))
 
 (define-key!
-  ("C-x C-_" . session-jump-to-last-change)
+  ("C-x C-_" . goto-last-change)
+  ("C-x C-/" . goto-last-change)
 
   ("C-<down>" . text-scale-decrease)
   ("C-<up>" . text-scale-increase)

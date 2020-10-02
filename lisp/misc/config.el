@@ -50,15 +50,6 @@
               ymacs-var-direcotry
               (expand-file-name package-user-dir))))
 
-(after! session
-  (setq session-globals-max-size 500)
-  (setq session-globals-include '((file-name-history 500)
-                                  (kill-ring 50)
-                                  (session-file-alist 500 t)
-                                  search-ring
-                                  regexp-search-ring))
-  (setq session-registers '(t (48 . 57) 45 61 92 96 (97 . 122))))
-
 (after! bookmark
   (bookmark-maybe-load-default-file)
 

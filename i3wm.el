@@ -23,8 +23,4 @@
 (add-hook 'midnight-hook 'i3//index-document-files)
 (i3//index-document-files)
 
-(run-with-idle-timer
- 10 t
- (lambda ()
-   (recentf-save-list)
-   (session-save-session)))
+(run-with-idle-timer 10 t #'recentf-save-list)

@@ -54,8 +54,6 @@
 (setq-default kill-ring-max 200)
  ;; Save clipboard contents before replacement
 (setq-default save-interprogram-paste-before-kill t)
-(setq-default minibuffer-prompt-properties
-              '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt))
 ;; History & backup settings
 (setq-default auto-save-default t)
 (setq-default auto-save-timeout 8)

@@ -17,7 +17,7 @@
      ("\\_<@?\\(-[a-zA-Z]\\(?:\\sw\\|\\s_\\)*\\)"
       (1 'lisp-argument-face nil nil)))))
 
-(after! help
+(after! help-mode
   (define-key! :map help-mode-map ("R" . ymacs-lisp/remove-at-point)))
 
 (after! elisp-mode

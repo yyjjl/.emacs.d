@@ -9,14 +9,18 @@
   '("pdf" "djvu" "dvi" "od[fgpst]" "docx?" "xlsx?"
     "pptx?" "mkv" "avi" "mp4" "rmvb"))
 
+(defun ymacs//make-external-file-extensions-regexp (-extentions)
+  (concat "\\.\\(?:"
+          (string-join
+           (append (mapcar #'upcase -extentions)
+                   -extentions)
+           "\\|")
+          "\\)\\'"))
+
 (defvar ymacs-external-file-regexp
   (eval-when-compile
-    (concat "\\.\\(?:"
-            (string-join
-             (append (mapcar #'upcase ymacs-external-file-extensions)
-                     ymacs-external-file-extensions)
-             "\\|")
-            "\\)\\'")))
+    (ymacs//make-external-file-extensions-regexp
+     ymacs-external-file-extensions)))
 
 (defvar ymacs-ignored-directories '("auto" "target" "node_modules"
                                     "bower_components" ".sass_cache" ".cache"

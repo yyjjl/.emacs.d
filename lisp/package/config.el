@@ -30,7 +30,6 @@
  yasnippet-snippets
  flycheck
  company
- session
  hydra
  pretty-hydra
  ivy
@@ -54,4 +53,5 @@
  hl-todo
  hl-fill-column
  sudo-edit
+ goto-chg
  expand-region)
