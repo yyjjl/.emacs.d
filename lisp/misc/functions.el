@@ -1,5 +1,10 @@
 ;;; -*- lexical-binding: t; -*-
 
+(defun ymacs-misc//filter-ring (ring)
+  (--filter
+   (< (length it) 1024)
+   (mapcar #'substring-no-properties ring)))
+
 (defun ymacs-misc//get-occur-buffer ()
   (cl-loop
    for window in (window-list)

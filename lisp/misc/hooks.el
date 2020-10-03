@@ -71,7 +71,9 @@
 (after! savehist
   (define-advice savehist-save
       (:around (-fn &optional -auto-save) set-additional-variables)
-    (let ((variables savehist-additional-variables))
+    (let ((variables savehist-additional-variables)
+          (kill-ring (ymacs-misc//filter-ring kill-ring))
+          (ivy-history (ignore-errors (ymacs-misc//filter-ring ivy-history))))
       (dolist (symbol (apropos-internal "-\\(ring\\|history\\)\\'" 'boundp))
         (unless (or (memq symbol ymacs-savehist-exclude-variables)
                     (memq symbol savehist-minibuffer-history-variables)
@@ -90,7 +92,7 @@
         (apply -fn -args)
       (message "Current desktop was not loaded from a file. Ignored")))
 
-  (define-advice desktop-read (:around (-fn &rest -args) disable-semantic) ;
+  (define-advice desktop-read (:around (-fn &rest -args) disable-semantic)
     "Temporarily disable semantic mode when load desktop"
     (let ((semantic-enable-p semantic-mode))
       (semantic-mode -1)

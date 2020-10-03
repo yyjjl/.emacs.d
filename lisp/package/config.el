@@ -1,6 +1,8 @@
 ;; -*- lexical-binding: t; -*-
 
 (after! package
+  (setq package-quickstart t)
+
   ;; The index of archive represents its priority
   (setq package-archives
         '(("melpa-stable" . "http://elpa.emacs-china.org/melpa-stable/")

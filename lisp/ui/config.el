@@ -122,9 +122,9 @@
     "Combined information about the current buffer, including the current working
 directory, the file name, and its state (modified, read-only or non-existent)."
     (let ((name (concat
-                 (doom-modeline-spc)
-                 (doom-modeline--buffer-mode-icon)
-                 (doom-modeline--buffer-state-icon)
+                 ;; (doom-modeline-spc)
+                 ;; (doom-modeline--buffer-mode-icon)
+                 ;; (doom-modeline--buffer-state-icon)
                  (doom-modeline--buffer-name))))
       (if (and (listp mode-line-buffer-identification)
                (equal (car mode-line-buffer-identification) "%b"))
@@ -155,11 +155,11 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   (setq doom-modeline-major-mode-color-icon t)
 
   (doom-modeline-def-modeline 'main
-    '(bar window-number matches buffer-info remote-host checker lsp buffer-position misc-info word-count selection-info)
+    '(bar window-number matches buffer-info remote-host checker lsp buffer-position misc-info word-count)
     '(debug repl input-method indent-info buffer-encoding major-mode process vcs workspace-name))
 
   (doom-modeline-def-modeline 'org-src
-    '(bar window-number matches buffer-info-simple checker lsp buffer-position misc-info word-count selection-info)
+    '(bar window-number matches buffer-info-simple checker lsp buffer-position misc-info word-count)
     '(debug input-method indent-info buffer-encoding major-mode process)))
 
 (after! winum

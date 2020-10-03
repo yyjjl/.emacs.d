@@ -105,7 +105,9 @@ _h_tml    _'_         ^ ^             _A_SCII:
                     (buffer-file-name))))
     (setq filename (concat (file-name-sans-extension filename) ".pdf"))
     (if (and filename (file-exists-p filename))
-        (find-file filename)
+        (if (fboundp #'ymacs-pdf//find-file-other-window)
+            (ymacs-pdf//find-file-other-window filename)
+          (find-file-other-window filename))
       (counsel-find-file (file-name-sans-extension filename)))))
 
 ;;;###autoload

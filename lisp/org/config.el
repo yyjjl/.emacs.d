@@ -8,6 +8,8 @@
     ("/" . ymacs-org/split-src-block)))
 
 (after! org
+  (require 'company-auctex nil t)
+
   (define-key! :map org-mode-map
     ("<" . ymacs-org/hot-expand)
     ("C-c t" :map ymacs-org-table-extra-map)
@@ -100,7 +102,7 @@
         ;; collapsed trees.
         org-cycle-separator-lines 2 ;; default = 2
         org-agenda-start-on-weekday nil
-        org-agenda-inhibit-startup t ;; ~50x speedup
+        org-agenda-inhibit-startup t       ;; ~50x speedup
         org-agenda-use-tag-inheritance nil ;; 3-4x speedup
         org-agenda-span 14
         org-agenda-include-diary t
