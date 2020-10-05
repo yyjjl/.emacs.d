@@ -3,8 +3,6 @@
 (defvar ymacs-dump-p nil)
 (defvar ymacs-dump-load-path nil)
 
-(defvar ymacs-lite-setup-p (getenv "EMACS_LITE"))
-
 (defvar ymacs-use-gnutls-p (gnutls-available-p))
 
 (defvar ymacs-gc-cons-threshold (* 100 1024 1024))
