@@ -5,7 +5,7 @@ current_dir="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd)"
 # shellcheck source=./utils.sh
 . "${current_dir}/utils.sh"
 
-emacs_version=26.3
+emacs_version=27.1
 readline_version=6.3
 ncurses_version=6.1
 

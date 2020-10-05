@@ -10,7 +10,7 @@
 (setq uniquify-after-kill-buffer-p t)
 (setq uniquify-ignore-buffers-re "^\\*")
 
-(when (fboundp 'define-fringe-bitmap)
+(ignore-errors
   (define-fringe-bitmap 'empty-line
     [#b00000000
      #b00000000

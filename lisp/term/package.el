@@ -3,7 +3,7 @@
 (eval-when-compile
   (require 'dash))
 
-(define-option! ymacs-term-type (if (not ymacs-lite-setup-p) 'vterm 'shell))
+(define-option! ymacs-term-type 'vterm)
 
 (executable! zsh)
 (executable! bash)
