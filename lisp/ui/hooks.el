@@ -1,5 +1,12 @@
 ;;; -*- lexical-binding: t; -*-
 
+(define-advice doom-modeline-def-modeline
+    (:override (-name -lhs &optional -rhs) left-align)
+  (let ((sym (intern (format "doom-modeline-format--%s" -name)))
+        (lhs-forms (doom-modeline--prepare-segments -lhs))
+        (rhs-forms (doom-modeline--prepare-segments -rhs)))
+    (defalias sym (lambda () (list lhs-forms rhs-forms)))))
+
 ;; Setup `mode-line-format'
 (define-hook! ymacs-ui|setup-modeline (after-init-hook)
   (winum-mode 1)

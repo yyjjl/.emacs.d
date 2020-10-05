@@ -42,8 +42,6 @@
 
 
 
-(defvar ymacs-ivy-views-persistent-file "ivy-views.el")
-
 (defvar ymacs-ivy-switch-function-list nil)
 
 (defvar ymacs-ivy-rg-type-aliases

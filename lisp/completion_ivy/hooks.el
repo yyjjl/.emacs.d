@@ -5,16 +5,12 @@
   (counsel-mode 1)
   (counsel-projectile-mode 1))
 
-(define-hook! ymacs-ivy|save-ivy-views (kill-emacs-hook)
-  (ignore-errors
-    (ymacs//save-variable 'ivy-views ymacs-ivy-views-persistent-file)))
-
 (after! ivy
   (define-hook! ymacs-ivy|occur-setup (ivy-occur-mode-hook ivy-occur-grep-mode-hook)
     (local-set-key "/" #'ymacs-ivy/occur-filter-lines)
     (local-set-key (kbd "C-/") #'ymacs-ivy/occur-undo)
 
-    (toggle-truncate-lines 1))
+    (setq truncate-lines t))
 
   (advice-add 'ivy--preselect-index :around #'ignore-errors!))
 

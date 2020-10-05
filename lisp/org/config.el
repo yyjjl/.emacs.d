@@ -88,7 +88,7 @@
   ;; Various preferences
   (setq org-mouse-1-follows-link nil)
 
-  (setq org-log-done t
+  (setq org-log-done 'time
         org-use-speed-commands t
         org-edit-src-content-indentation 0
         org-edit-timestamp-down-means-later t
@@ -122,7 +122,7 @@
         org-pretty-entities-include-sub-superscripts nil
         org-format-latex-options
         (plist-put org-format-latex-options :scale 1.6)
-        org-highlight-latex-and-related '(latex)
+        org-highlight-latex-and-related nil
         org-src-fontify-natively t
         org-preview-latex-default-process 'imagemagick)
 

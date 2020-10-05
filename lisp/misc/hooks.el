@@ -119,7 +119,7 @@
 
 (after! xref
   (define-hook! :anonymous (xref--xref-buffer-mode-hook)
-    (toggle-truncate-lines 1))
+    (setq truncate-lines t))
 
   (define-advice xref-find-definitions (:around (-fn -identifier) fallback-to-rg)
     (condition-case err

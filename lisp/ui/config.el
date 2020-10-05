@@ -109,14 +109,6 @@
  '(ivy-current-match ((t (:background "gray0")))))
 
 (after! doom-modeline
-  (doom-modeline-def-segment workspace-name
-    (when (bound-and-true-p ymacs-misc-current-desktop-name)
-      (propertize (format "[%s]" ymacs-misc-current-desktop-name)
-                  'face
-                  (if (doom-modeline--active)
-                      'doom-modeline-buffer-major-mode
-                    'mode-line-inactive))))
-
   (doom-modeline-def-segment
     buffer-info
     "Combined information about the current buffer, including the current working
@@ -134,29 +126,31 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   (setq all-the-icons-scale-factor 1.0)
 
   (setq doom-modeline-project-detection 'projectile)
-  (setq doom-modeline-buffer-file-name-style 'auto)
+  (setq doom-modeline-buffer-file-name-style 'truncate-except-project)
 
   (setq doom-modeline-checker-simple-format nil)
 
   (setq doom-modeline-indent-info nil)
   ;; Whether display the workspace name. Non-nil to display in the mode-line.
   (setq doom-modeline-workspace-name nil)
-  ;; Whether display the perspective name. Non-nil to display in the mode-line.
-  (setq doom-modeline-persp-name nil)
-  (setq doom-modeline-persp-icon nil)
-  (setq doom-modeline-modal-icon nil)
-  (setq doom-modeline-gnus nil)
-  (setq doom-modeline-irc nil)
-  (setq doom-modeline-minor-modes nil)
+  ;; Whether display the perspective name. Non-nil to display in the mode-lin.
 
-  (setq doom-modeline-icon nil)
+  (setq doom-modeline-buffer-modification-icon nil)
+  (setq doom-modeline-buffer-state-icon nil)
   (setq doom-modeline-buffer-state-icon t)
-  (setq doom-modeline-major-mode-icon t)
-  (setq doom-modeline-major-mode-color-icon t)
+  (setq doom-modeline-gnus nil)
+  (setq doom-modeline-icon nil)
+  (setq doom-modeline-irc nil)
+  (setq doom-modeline-major-mode-color-icon nil)
+  (setq doom-modeline-major-mode-icon nil)
+  (setq doom-modeline-minor-modes nil)
+  (setq doom-modeline-modal-icon nil)
+  (setq doom-modeline-persp-icon nil)
+  (setq doom-modeline-persp-name t)
 
   (doom-modeline-def-modeline 'main
     '(bar window-number matches buffer-info remote-host checker lsp buffer-position misc-info word-count)
-    '(debug repl input-method indent-info buffer-encoding major-mode process vcs workspace-name))
+    '(debug repl input-method indent-info buffer-encoding major-mode process vcs persp-name))
 
   (doom-modeline-def-modeline 'org-src
     '(bar window-number matches buffer-info-simple checker lsp buffer-position misc-info word-count)

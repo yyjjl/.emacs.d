@@ -1,6 +1,8 @@
 ;; -*- lexical-binding: t; -*-
 
 (define-hook! ymacs-pdf|after-init ((after-init-hook :append t))
+  (require 'pdf-tools)
+
   (pdf-tools-install-noverify)
 
   (require 'saveplace-pdf-view)

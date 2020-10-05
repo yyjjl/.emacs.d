@@ -3,8 +3,8 @@
 ;; Don't echo passwords when communicating with interactive programs:
 (add-hook 'comint-output-filter-functions 'comint-watch-for-password-prompt)
 ;; Display long lines in truncated style (end line with $)
-(add-hook 'grep-mode-hook (lambda () (toggle-truncate-lines 1)))
-(add-hook 'compilation-mode-hook (lambda () (toggle-truncate-lines 1)))
+(add-hook 'grep-mode-hook (lambda () (setq truncate-lines t)))
+(add-hook 'compilation-mode-hook (lambda () (setq truncate-lines t)))
 ;; Turns on `auto-fill-mode', don't use `text-mode-hook'
 (add-hook 'change-log-mode-hook 'turn-on-auto-fill)
 

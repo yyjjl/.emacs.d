@@ -1,8 +1,6 @@
 ;; -*- lexical-binding: t -*-
 
 (after! ivy
-  (ymacs//load-variable 'ivy-views ymacs-ivy-views-persistent-file)
-
   (define-key! :map ivy-minibuffer-map
     ("C-r" . ivy-reverse-i-search)
     ("C-j" . ivy-immediate-done)

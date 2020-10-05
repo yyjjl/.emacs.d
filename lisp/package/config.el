@@ -55,5 +55,5 @@
  hl-todo
  hl-fill-column
  sudo-edit
- goto-chg
+ goto-last-change
  expand-region)
