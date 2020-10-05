@@ -2,11 +2,7 @@
 
 (blink-cursor-mode -1)
 (tooltip-mode -1)
-
-(setq-default window-divider-default-places t)
-(setq-default window-divider-default-bottom-width 1)
-(setq-default window-divider-default-right-width 1)
-(window-divider-mode 1)
+(window-divider-mode -1)
 
 (setq show-paren-when-point-inside-paren t)
 
@@ -25,25 +21,7 @@
      #b00000000
      #b00000000]
     nil nil 'center)
-  (set-fringe-bitmap-face 'empty-line 'empty-line-face)
-  (define-fringe-bitmap 'right-curly-arrow
-    [#b11111111
-     #b11111111
-     #b00000011
-     #b00000011
-     #b00000011
-     #b00000011
-     #b00000011
-     #b00000011])
-  (define-fringe-bitmap 'left-curly-arrow
-    [#b11000000
-     #b11000000
-     #b11000000
-     #b11000000
-     #b11000000
-     #b11000000
-     #b11111111
-     #b11111111])
+
   (set-fringe-bitmap-face 'right-curly-arrow 'warning)
   (set-fringe-bitmap-face 'left-curly-arrow 'warning)
   (set-fringe-bitmap-face 'right-triangle 'error))
@@ -52,10 +30,7 @@
 (setq-default bidi-display-reordering nil)
 (setq-default blink-matching-paren nil)
 (setq-default cursor-in-non-selected-windows t)
-(setq-default display-line-numbers-width 3)
-(setq-default frame-inhibit-implied-resize t)
 (setq-default frame-resize-pixelwise t)
-;; Remove continuation arrow on right fringe
 (setq-default highlight-nonselected-windows t)
 (setq-default image-animate-loop t)
 (setq-default indicate-buffer-boundaries nil)
@@ -128,33 +103,50 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   (setq doom-modeline-project-detection 'projectile)
   (setq doom-modeline-buffer-file-name-style 'truncate-except-project)
 
-  (setq doom-modeline-checker-simple-format nil)
-
-  (setq doom-modeline-indent-info nil)
-  ;; Whether display the workspace name. Non-nil to display in the mode-line.
-  (setq doom-modeline-workspace-name nil)
-  ;; Whether display the perspective name. Non-nil to display in the mode-lin.
-
   (setq doom-modeline-buffer-modification-icon nil)
   (setq doom-modeline-buffer-state-icon nil)
   (setq doom-modeline-buffer-state-icon t)
+  (setq doom-modeline-checker-simple-format nil)
+  (setq doom-modeline-enable-word-count nil)
   (setq doom-modeline-gnus nil)
   (setq doom-modeline-icon nil)
+  (setq doom-modeline-indent-info nil)
   (setq doom-modeline-irc nil)
   (setq doom-modeline-major-mode-color-icon nil)
   (setq doom-modeline-major-mode-icon nil)
   (setq doom-modeline-minor-modes nil)
   (setq doom-modeline-modal-icon nil)
   (setq doom-modeline-persp-icon nil)
-  (setq doom-modeline-persp-name t)
+  (setq doom-modeline-persp-name nil)
+  (setq doom-modeline-workspace-name nil)
 
   (doom-modeline-def-modeline 'main
-    '(bar window-number matches buffer-info remote-host checker lsp buffer-position misc-info word-count)
-    '(debug repl input-method indent-info buffer-encoding major-mode process vcs persp-name))
+    '(bar window-number matches buffer-info remote-host checker lsp buffer-position misc-info)
+    '(debug input-method buffer-encoding major-mode process vcs))
+
+  (doom-modeline-def-modeline 'special
+    '(bar window-number matches buffer-info buffer-position misc-info)
+    '(debug input-method buffer-encoding major-mode process))
+
+  (doom-modeline-def-modeline 'vcs
+    '(bar window-number matches buffer-info buffer-position misc-info)
+    '(debug buffer-encoding major-mode process))
+
+  (doom-modeline-def-modeline 'info
+    '(bar window-number buffer-info info-nodes buffer-position misc-info)
+    '(buffer-encoding major-mode))
+
+  (doom-modeline-def-modeline 'message
+    '(bar window-number matches buffer-info-simple buffer-position misc-info)
+    '(debug input-method buffer-encoding major-mode))
+
+  (doom-modeline-def-modeline 'project
+    '(bar window-number matches buffer-default-directory misc-info)
+    '(debug input-method major-mode process))
 
   (doom-modeline-def-modeline 'org-src
-    '(bar window-number matches buffer-info-simple checker lsp buffer-position misc-info word-count)
-    '(debug input-method indent-info buffer-encoding major-mode process)))
+    '(bar window-number matches buffer-info-simple checker lsp buffer-position misc-info)
+    '(debug input-method buffer-encoding major-mode process)))
 
 (after! winum
   (define-key! :map winum-keymap

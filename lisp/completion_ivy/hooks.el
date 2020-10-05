@@ -5,6 +5,10 @@
   (counsel-mode 1)
   (counsel-projectile-mode 1))
 
+(after! ivy-overlay
+  (define-advice ivy-display-function-overlay (:before (_str) set-line-spacing)
+    (setq line-spacing nil)))
+
 (after! ivy
   (define-hook! ymacs-ivy|occur-setup (ivy-occur-mode-hook ivy-occur-grep-mode-hook)
     (local-set-key "/" #'ymacs-ivy/occur-filter-lines)

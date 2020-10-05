@@ -94,7 +94,6 @@
 (setq-default imenu-max-item-length 1024)
 (setq-default global-auto-revert-non-file-buffers t)
 (setq-default auto-revert-verbose nil)
-(setq-default backup-by-coping t)
 (setq-default delete-old-versions t)
 ;; Use versioned backups
 (setq-default version-control t)

@@ -5,40 +5,41 @@
   (require 'shackle))
 
 (defvar ymacs-popups-default-regexp
-  (rx line-start
-      "*" (*\? not-newline) "*" (? "<" (+ digit) ">")
-      line-end))
+  (rx string-start
+      "*" (*? not-newline) (?  "<" (+ digit) ">") "*" (?  "<" (+ digit) ">")
+      string-end))
 
 (defvar ymacs-popups-other-window-regexp
-  (rx line-start
-      "*" (or "Man" "TeX" "Shell Command Output") (*\? not-newline) "*"
-      line-end))
+  (rx string-start
+      "*" (or "Man" "TeX" "Shell Command Output") (*? not-newline) "*"
+      string-end))
 
 (defvar ymacs-popups-help-buffer-regexp
-  (rx line-start
+  (rx string-start
       "*"
       (or "Compile-Log"
-          (and "poporg: " (*\? not-newline))
+          (and "poporg: " (*? not-newline))
           "sdcv"
           "lispy-message"
-          (and (*\? not-newline) (in "Hh") "elp" (*\? not-newline))
-          (and (*\? not-newline) (in "Dd") "escribe" (*\? not-newline))
-          (and (*\? not-newline) (in "Dd") "ocumentation" (*\? not-newline)))
+          (and (*? not-newline) (in "Hh") "elp" (*? not-newline))
+          (and (*? not-newline) (in "Dd") "escribe" (*? not-newline))
+          (and (*? not-newline) (in "Dd") "ocumentation" (*? not-newline)))
       "*"
-      line-end))
+      string-end))
 
 (defvar ymacs-popups-comint-buffer-regexp
-  (rx line-start
+  (rx string-start
       "*"
       (or "shell"
           "prolog"
           "Sage"
-          (and (*\? not-newline) (in "Rr") "epl" (*\? not-newline))
-          ;; (and (*\? not-newline) (in "Ee") "rror" (*\? not-newline))
+          (and (*? not-newline) (in "Rr") "epl" (*? not-newline))
+          ;; (and (*? not-newline) (in "Ee") "rror" (*? not-newline))
           )
+      (?  "<" (+ digit) ">")
       "*"
       (?  "<" (+ digit) ">")
-      line-end))
+      string-end))
 
 (defvar ymacs-popups--window-list nil)
 

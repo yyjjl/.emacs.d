@@ -55,8 +55,6 @@
 
 ;; Default prog-mode setup
 (define-hook! ymacs|generic-prog-mode-setup (prog-mode-hook LaTeX-mode-hook)
-  (local-set-key [remap completion-at-point] #'counsel-company)
-
   (condition-case err
       (hs-minor-mode 1)
     (user-error (message "%s" (error-message-string err))))
@@ -69,16 +67,12 @@
   (setq indicate-empty-lines t))
 
 (define-hook! ymacs|generic-text-mode-setup (text-mode-hook)
-  (local-set-key [remap completion-at-point] #'counsel-company)
-
   (hl-line-mode 1)
   (ignore-errors (hl-fill-column-mode 1))
 
   (setq indicate-empty-lines t))
 
 (define-hook! ymacs|generic-comint-mode-setup (comint-mode-hook)
-  (local-set-key [remap completion-at-point] #'counsel-company)
-
   ;; But don't show trailing whitespace in SQLi, inf-ruby etc.
   (setq show-trailing-whitespace nil)
   (setq-local company-idle-delay nil))

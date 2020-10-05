@@ -3,12 +3,14 @@
 (eval-when-compile
   (require 'dash))
 
-(define-option! ymacs-term-prefer-vterm (not ymacs-lite-setup-p))
+(define-option! ymacs-term-type (if (not ymacs-lite-setup-p) 'vterm 'shell))
 
 (executable! zsh)
 (executable! bash)
 
-(require-packages! (vterm :when ymacs-term-prefer-vterm))
+(require-packages!
+ (vterm :when (eq ymacs-term-type 'vterm))
+ bash-completion)
 
 ;; kill the buffer when terminal is exited
 (defvar ymacs-term-directory-functions '(projectile-project-root))
@@ -18,30 +20,29 @@
 (defvar ymacs-term-program-arguments ())
 
 (defvar-local ymacs-term-extra-name nil)
-(defvar-local ymacs-term-autokill-p nil
+(defvar-local ymacs-term-exit-action 'kill
   "shell => when process exits, switch to other shell
-nil   => when process exits, make buffer readonly
-t     => when process exits, kill buffer")
+keep   => when process exits, make buffer readonly
+kill     => when process exits, kill buffer")
+(put 'ymacs-term-exit-action 'permanent-local t)
 
 (defvar ymacs-term-or-comint-process-exit-hook '(ymacs-term|shell-exit))
 
 (defvar-local ymacs-term--ssh-info nil)
 (defvar-local ymacs-term--parent-buffer nil)
 
-(defvar ymacs-term-shell-name (or ymacs-zsh-path ymacs-bash-path)
-  "The program of term.
-If this is nil, setup to environment variable of `SHELL'.")
-
-(defvar ymacs-term-buffer-name "term"
+(defvar ymacs-term-buffer-name "shell"
   "The buffer name of term buffer.")
 
 (defvar ymacs-term-unbind-key-list '("C-z" "C-x" "C-c" "C-h" "C-y" "<ESC>" "C-u")
   "The key list that will need to be unbind.")
 
 (defconst ymacs-term--setup-dir-tracking-alist
-  '((term-mode
+  '((term
+     term-send-raw-string
      ("zsh" . " chpwd() { printf '\\033AnSiTu %s\\n' \"$USER\"; print -P '\\033AnSiTc %d'; }; clear\n"))
-    (vterm-mode
+    (vterm
+     vterm-send-string
      ("zsh" . " chpwd() { print -Pn '\\e]51;A$(pwd)\\e\\\\'; }; clear\n")
      ("bash" . " cd() { builtin cd \"$@\" || return; [ \"$OLDPWD\" = \"$PWD\" ] || echo -e \"\\e]51;A$(pwd)\\e\\\\\"; }; clear\n"))))
 

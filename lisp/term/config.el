@@ -28,6 +28,8 @@
     ("C-S-t" . ymacs-term/pop-shell-here)))
 
 (after! comint
+  (setq comint-prompt-read-only t)
+
   (define-key! :map comint-mode-map
     ("M-h" . counsel-shell-history)))
 

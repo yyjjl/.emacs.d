@@ -51,12 +51,11 @@
           (vterm-send-key key shift meta ctrl))))))
 
 (after! comint
-  (add-hook 'comint-exec-hook #'ymacs-term//setup-sentinel)
-
-  (define-advice comint-delchar-or-maybe-eof (:after (_) autoclose)
-    (setq ymacs-term-autokill-p t)))
+  (add-hook 'comint-exec-hook #'ymacs-term//setup-sentinel))
 
 (after! shell
+  (bash-completion-setup)
+
   (define-hook! ymacs-term|set-shell-name (shell-mode-hook)
     (setq ymacs-term-extra-name nil)
     (setq mode-line-buffer-identification

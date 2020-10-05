@@ -57,7 +57,6 @@
   (when-let ((parent-buffer (or ymacs-term--parent-buffer (current-buffer)))
              (buffer (ymacs-term//create-buffer nil t)))
     (with-current-buffer buffer
-      (setq ymacs-term-autokill-p 'shell)
       (local-set-key [f8] #'ymacs-term/switch-back)
       (local-set-key (kbd "C-c C-z") (lambda! (ymacs-term/switch-back t)))
       (setq ymacs-term--parent-buffer parent-buffer))
@@ -72,15 +71,13 @@ else: try to find a old term buffer and pop to it"
   (interactive "p")
   (when-let* ((buffer (ymacs-term//pop-shell-get-buffer -arg))
               (parent-buffer (current-buffer)))
-    (with-current-buffer buffer
-      (setq ymacs-term-autokill-p 'shell))
     (if (= -arg 0)
         (switch-to-buffer buffer)
       (with-current-buffer buffer
         (local-set-key [f8] #'ymacs-term/switch-back)
         (local-set-key (kbd "C-c C-z") (lambda! (ymacs-term/switch-back t)))
-        (setq ymacs-term--parent-buffer parent-buffer))
-      (ymacs-term//display-buffer buffer))))
+        (setq ymacs-term--parent-buffer parent-buffer)))
+    (ymacs-term//display-buffer buffer)))
 
 ;;;###autoload
 (defun ymacs-term/conditional-send-raw ()
