@@ -1,9 +1,10 @@
 ;;; -*- lexical-binding: t; -*-
 
-;; This setup function must run before `semantic-mode' invoke to avoid a error
+(add-hook 'dired-mode-hook #'diff-hl-dired-mode)
+
 (define-hook! ymacs-git|generic-prog-mode-setup ((prog-mode-hook :append) org-mode-hook LaTeX-mode-hook)
   (when (buffer-enable-rich-feature-p)
-    (git-gutter-mode 1)))
+    (diff-hl-mode 1)))
 
 (after! git-messenger
   (define-hook! (kill-commit-id msg) (git-messenger:after-popup-hook)

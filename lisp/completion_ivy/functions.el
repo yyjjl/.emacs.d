@@ -14,7 +14,7 @@
            (cl-case (ivy-state-caller ivy-last)
              ,@(--map
                 `(,it
-                  (,(or (cadr (memq it commands))
+                  (,(or (cadr (memq it commands)) ; select next command
                         (car commands))
                    ivy-text))
                 commands))))

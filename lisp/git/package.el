@@ -1,23 +1,21 @@
 ;;; -*- lexical-binding: t; -*-
 
 (require-packages!
+ diff-hl
  gitignore-mode
  gitconfig-mode
- git-gutter
- git-gutter-fringe
  git-timemachine
  git-messenger
  git-link
  magit)
 
 (define-key! :prefix "C-x g"
-  ("h" . git-gutter:popup-hunk)
-  ("s" . git-gutter:stage-hunk)
-  ("r" . git-gutter:revert-hunk)
+  ("=" . diff-hl-diff-goto-hunk)
+  ("SPC" . diff-hl-mark-hunk)
   ("t" . ymacs-git/timemachine)
-  ("n" . git-gutter:next-hunk)
-  ("p" . git-gutter:previous-hunk)
-  ("j" . ymacs-git/goto-gutter)
+  ("n" . diff-hl-next-hunk)
+  ("p" . diff-hl-previous-hunk)
+  ("j" . ymacs-git/goto-hunk)
   ("g" . magit-status)
   ("l" . git-link)
   ("c" . git-link-commit)

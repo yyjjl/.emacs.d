@@ -28,6 +28,8 @@
   (setq after-init-hook nil)
   (setq enable-local-variables :all)
 
+  (delete-file ymacs-autoloads-file)
+
   (ymacs-package|after-init)
 
   (ymacs-package/generate-autoloads)

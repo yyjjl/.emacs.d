@@ -1,35 +1,35 @@
 ;;; -*- lexical-binding: t; -*-
 
-(defun ymacs-git//format-gutter (-gutter)
-  (let ((start-line (aref -gutter 3)))
+(defun ymacs-git//format-hunk (-ov)
+  (let ((start (overlay-start -ov)))
     (cons
-     (format "%s %d ~ %d: %s"
-             (pcase (aref -gutter 1)
-               (`added "+")
-               (`deleted "-")
-               (`modified "="))
-             start-line
-             (aref -gutter 4)
-             (ignore-errors
-               (let ((string (nth 1 (split-string (aref -gutter 2) "\n" t))))
-                 (if (string-match-p "^-\\|\\+\\|=" string)
-                     (substring string 1)
-                   string))))
-     start-line)))
+     (format "%6d ~ %-6d: %s"
+             start
+             (overlay-end -ov)
+             (save-excursion
+               (goto-char start)
+               (buffer-substring (line-beginning-position)
+                                 (line-end-position))))
+     -ov)))
 
 ;;;###autoload
-(defun ymacs-git/goto-gutter ()
+(defun ymacs-git/goto-hunk ()
   (interactive)
-  (unless git-gutter:diffinfos
-    (user-error "No git-gutters!"))
-  (let ((gutters (mapcar #'ymacs-git//format-gutter git-gutter:diffinfos)))
-    (ivy-read "git-gutters:" gutters
-              :require-match t
-              :action (lambda (x)
-                        (forward-line (- (cdr x) (line-number-at-pos))))
-              :keymap (define-key! :map (make-sparse-keymap)
-                        ("C-n" . ivy-next-line-and-call)
-                        ("C-p" . ivy-previous-line-and-call)))))
+  (let ((hunks
+         (-->
+          (overlays-in (point-min) (point-max))
+          (cl-remove-if-not (lambda (x) (overlay-get x 'diff-hl-hunk)) it)
+          (mapcar #'ymacs-git//format-hunk it)
+          (sort it (lambda (x y)
+                     (< (overlay-start (cdr x))
+                        (overlay-start (cdr y))))))))
+    (ivy-read
+     "hunks: " hunks
+     :require-match t
+     :action (lambda (x) (goto-char (overlay-start (cdr x))))
+     :keymap (define-key! :map (make-sparse-keymap)
+               ("C-n" . ivy-next-line-and-call)
+               ("C-p" . ivy-previous-line-and-call)))))
 
 ;;;###autoload
 (defun ymacs-git/timemachine-show-selected-revision ()

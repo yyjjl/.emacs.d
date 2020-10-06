@@ -5,6 +5,7 @@
 (window-divider-mode -1)
 
 (setq show-paren-when-point-inside-paren t)
+(setq show-paren-when-point-in-periphery t)
 
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
 (setq uniquify-after-kill-buffer-p t)
@@ -79,7 +80,9 @@
 
  '(diredp-dir-name ((t (:inherit font-lock-type-face :weight bold))))
 
- '(show-paren-match ((t (:background "#000000"))))
+ `(diff-hl-change ((t (:foreground ,(face-background 'highlight) :background nil))))
+ '(diff-hl-insert ((t (:background nil))))
+ '(diff-hl-delete ((t (:background nil))))
 
  '(ivy-current-match ((t (:background "gray0")))))
 

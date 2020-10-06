@@ -1,16 +1,18 @@
 ;;; -*- lexical-binding: t; -*-
 
-(after! git-gutter
-  (when (fboundp 'define-fringe-bitmap)
-    (require 'git-gutter-fringe))
+(after! diff-hl
+  (setq diff-hl-draw-borders nil)
 
-  (when (fboundp 'define-fringe-bitmap)
-    (set-face-foreground 'git-gutter-fr:modified "yellow")
-    (set-face-foreground 'git-gutter-fr:added "green")
-    (set-face-foreground 'git-gutter-fr:deleted "red")
-    (setq git-gutter-fr:side 'left-fringe))
-  (setq git-gutter:update-hooks '(after-save-hook))
-  (setq git-gutter:handled-backends '(svn hg git)))
+  ;; Highlight on-the-fly
+  (diff-hl-flydiff-mode 1)
+  (diff-hl-margin-mode 1)
+
+  ;; Set fringe style
+  (setq-default fringes-outside-margins t)
+
+  (after! magit
+    (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
+    (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)))
 
 (after! magit
   (setq magit-completing-read-function 'ivy-completing-read)
