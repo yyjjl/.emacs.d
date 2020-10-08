@@ -6,7 +6,7 @@
       (apply -fn -args))))
 
 (after! term
-  (define-hook! ymacs-term|set-name (term-mode-hook)
+  (define-hook! ymacs-term|term-setup (term-mode-hook)
     (setq term-goto-process-mark nil)
 
     (setq ymacs-term-extra-name nil)
@@ -19,7 +19,7 @@
 
 
 (after! vterm
-  (define-hook! ymacs-term|set-vterm-name (vterm-mode-hook)
+  (define-hook! ymacs-term|vterm-setup (vterm-mode-hook)
     (setq ymacs-term-extra-name nil)
     (setq mode-line-buffer-identification
           '("%b"
@@ -56,7 +56,7 @@
 (after! shell
   (bash-completion-setup)
 
-  (define-hook! ymacs-term|set-shell-name (shell-mode-hook)
+  (define-hook! ymacs-term|shell-setup (shell-mode-hook)
     (setq ymacs-term-extra-name nil)
     (setq mode-line-buffer-identification
           '("%b" (ymacs-term-extra-name (": " ymacs-term-extra-name))))))

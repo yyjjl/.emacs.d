@@ -163,8 +163,13 @@ Does not indent buffer, because it is used for a
 
 ;;;###autoload
 (defun ymacs-misc/rsync-project (-local-path -remote-path)
-  (interactive (list (read-directory-name "Local path: " ymacs-misc-project-rsync-local-path)
-                     (read-string "Remote path: " ymacs-misc-project-rsync-remote-path)))
+  (interactive
+   (list (read-directory-name
+          "Local path: "
+          ymacs-misc-project-rsync-local-path)
+         (read-string
+          "Remote path: "
+          ymacs-misc-project-rsync-remote-path)))
   (if (not (file-directory-p -local-path))
       (message "'%s' doesn't exist." -local-path)
     (let* ((default-directory -local-path)

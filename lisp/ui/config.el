@@ -97,10 +97,10 @@
     "Combined information about the current buffer, including the current working
 directory, the file name, and its state (modified, read-only or non-existent)."
     (let ((name (concat
-                 ;; (doom-modeline-spc)
-                 ;; (doom-modeline--buffer-mode-icon)
-                 ;; (doom-modeline--buffer-state-icon)
-                 (doom-modeline--buffer-name))))
+                 "%["
+                 (doom-modeline--buffer-state-icon)
+                 (doom-modeline--buffer-name)
+                 "%]")))
       (if (and (listp mode-line-buffer-identification)
                (equal (car mode-line-buffer-identification) "%b"))
           (cons name (cdr mode-line-buffer-identification))
@@ -109,11 +109,8 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   (setq all-the-icons-scale-factor 1.0)
 
   (setq doom-modeline-project-detection 'projectile)
-  (setq doom-modeline-buffer-file-name-style 'truncate-except-project)
+  (setq doom-modeline-buffer-file-name-style 'truncate-upto-project)
 
-  (setq doom-modeline-buffer-modification-icon nil)
-  (setq doom-modeline-buffer-state-icon nil)
-  (setq doom-modeline-buffer-state-icon t)
   (setq doom-modeline-checker-simple-format nil)
   (setq doom-modeline-enable-word-count nil)
   (setq doom-modeline-gnus nil)
@@ -131,6 +128,10 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   (doom-modeline-def-modeline 'main
     '(bar window-number matches buffer-info remote-host checker lsp buffer-position misc-info)
     '(debug input-method buffer-encoding major-mode process vcs))
+
+  (doom-modeline-def-modeline 'shell
+    '(bar window-number matches buffer-info remote-host misc-info)
+    '(debug input-method major-mode process vcs))
 
   (doom-modeline-def-modeline 'special
     '(bar window-number matches buffer-info buffer-position misc-info)
