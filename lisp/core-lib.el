@@ -476,16 +476,23 @@ HTML file converted from org file, it returns t."
     `(load ,-path nil t)))
 
 (defmacro load-feature! (-name &rest -options)
-  `(unless (memq ',-name ymacs--loaded-features)
-     ,@(mapcar (lambda (x) (load-feature//option-to-form -name x))  -options)
-     ,(load-feature//file-to-form -name "package")
-     ,(load-feature//file-to-form -name "functions")
-     ,(load-feature//file-to-form -name "hooks")
-     ,(load-feature//file-to-form -name "config")
-     (add-to-list 'ymacs--loaded-features ',-name)
+  (let ((forms
+         (cl-delete
+          nil
+          (list
+           (load-feature//file-to-form -name "package")
+           (load-feature//file-to-form -name "functions")
+           (load-feature//file-to-form -name "hooks")
+           (load-feature//file-to-form -name "config")))))
+    (unless forms
+      (user-error "empty feature %s" -name))
+    `(unless (memq ',-name ymacs--loaded-features)
+       ,@(mapcar (lambda (x) (load-feature//option-to-form -name x)) -options)
+       ,@forms
+       (add-to-list 'ymacs--loaded-features ',-name)
 
-     (dolist (func (get ',-name 'after-feature-functions))
-       (funcall func))))
+       (dolist (func (get ',-name 'after-feature-functions))
+         (funcall func)))))
 
 (defmacro after-feature! (-name &rest body)
   (declare (indent 1) (debug t))
