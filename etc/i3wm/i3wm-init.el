@@ -11,7 +11,7 @@
 
 (advice-add 'request! :override #'ignore)
 
-(load-feature! completion_ivy)
+(load-feature! completion-ivy)
 (load-feature! misc)
 
 (require 'dash)

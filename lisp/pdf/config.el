@@ -1,6 +1,10 @@
 ;; -*- lexical-binding: t; -*-
 
 (after! pdf-view
+  (after! hippie-exp
+    (add-to-list 'hippie-expand-ignore-buffers 'pdf-view-mode)
+    (add-to-list 'hippie-expand-ignore-buffers 'doc-view-mode))
+
   (define-key! :map pdf-view-mode-map
     ("C-s" . isearch-forward)
     ("C-r" . isearch-backward))

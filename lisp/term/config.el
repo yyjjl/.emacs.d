@@ -35,6 +35,7 @@
 
 (after! shell
   (define-key! :map shell-mode-map
+    ("C-r" . comint-history-isearch-backward-regexp)
     ("M-}" . ymacs-term/next)
     ("M-{" . ymacs-term/prev)
     ("M-o" . ymacs-term/switch)

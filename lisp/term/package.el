@@ -37,15 +37,6 @@ kill     => when process exits, kill buffer")
 (defvar ymacs-term-unbind-key-list '("C-z" "C-x" "C-c" "C-h" "C-y" "<ESC>" "C-u")
   "The key list that will need to be unbind.")
 
-(defconst ymacs-term--setup-dir-tracking-alist
-  '((term
-     term-send-raw-string
-     ("zsh" . " chpwd() { printf '\\033AnSiTu %s\\n' \"$USER\"; print -P '\\033AnSiTc %d'; }; clear\n"))
-    (vterm
-     vterm-send-string
-     ("zsh" . " chpwd() { print -Pn '\\e]51;A$(pwd)\\e\\\\'; }; clear\n")
-     ("bash" . " cd() { builtin cd \"$@\" || return; [ \"$OLDPWD\" = \"$PWD\" ] || echo -e \"\\e]51;A$(pwd)\\e\\\\\"; }; clear\n"))))
-
 (defvar ymacs-term-bind-key-alist
   `(("C-c C-c" . term-interrupt-subjob)
     ("C-c C-e" . ymacs-term/send-esc)

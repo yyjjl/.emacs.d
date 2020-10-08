@@ -52,7 +52,8 @@
                 (append completion-at-point-functions
                         (list (lambda () (ignore-errors (pcomplete-completions-at-point))))))
 
-    (remove-hook 'company-dabbrev company-backends)
+    ;; company-dabbrev too slow in org-mode
+    (remove-hook 'company-backends 'company-dabbrev)
     (ymacs-company//add-backend 'ymacs-org/company-symbols :main-backend-p nil))
 
   (define-hook! ymacs-org|src-setup (org-src-mode-hook)

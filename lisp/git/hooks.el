@@ -12,3 +12,20 @@
     (when (string-match "\\(commit *: *\\)\\([0-9a-z]+\\)" msg)
       (kill-new (match-string 2 msg))
       (message "commit hash %s => kill-ring" (match-string 2 msg)))))
+
+(after! diff-hl
+  (after! magit
+    (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
+    (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
+
+  (define-advice diff-hl-update (:around (-fn) async)
+  (unless ymacs-git--diff-hl-update-timer
+    (setq
+     ymacs-git--diff-hl-update-timer
+     (run-with-idle-timer
+      ymacs-git--diff-hl-update-delay
+      nil
+      (lambda ()
+        (with-demoted-errors "diff-hl error: %s"
+          (funcall -fn))
+        (setq ymacs-git--diff-hl-update-timer nil)))))))

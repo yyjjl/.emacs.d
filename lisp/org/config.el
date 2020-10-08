@@ -85,46 +85,56 @@
                              name
                              name
                              (char-to-string char)))))))
-  ;; Various preferences
+
   (setq org-mouse-1-follows-link nil)
 
-  (setq org-log-done 'time
-        org-use-speed-commands t
-        org-edit-src-content-indentation 0
-        org-edit-timestamp-down-means-later t
+  (setq org-edit-src-content-indentation 0)
+  (setq org-edit-timestamp-down-means-later t)
 
-        ;; special ctrl-a/e behaviour
-        org-special-ctrl-a/e nil
-        org-special-ctrl-k t
+  (setq org-use-speed-commands t)
+  (setq org-use-sub-superscripts nil)
 
-        org-catch-invisible-edits 'smart
-        ;; Number of empty lines needed to keep an empty line between
-        ;; collapsed trees.
-        org-cycle-separator-lines 2 ;; default = 2
-        org-agenda-start-on-weekday nil
-        org-agenda-inhibit-startup t       ;; ~50x speedup
-        org-agenda-use-tag-inheritance nil ;; 3-4x speedup
-        org-agenda-span 14
-        org-agenda-include-diary t
-        org-agenda-window-setup 'current-window
-        org-fast-tag-selection-single-key 'expert
-        org-export-will-product-buffer-when-displayed t
-        org-export-with-sub-superscripts t
-        org-tags-column -65
-        org-ellipsis "...#"
-        org-hide-emphasis-markers nil
-        org-hide-leading-stars nil
-        org-hide-block-startup nil
-        org-startup-indented nil
-        org-adapt-indentation nil
-        org-startup-folded 'content
-        org-pretty-entities t
-        org-pretty-entities-include-sub-superscripts nil
-        org-format-latex-options
-        (plist-put org-format-latex-options :scale 1.6)
-        org-highlight-latex-and-related nil
-        org-src-fontify-natively t
-        org-preview-latex-default-process 'imagemagick)
+  (setq org-special-ctrl-a/e nil)
+  (setq org-special-ctrl-k t)
+  (setq org-special-ctrl-o t)
+
+  (setq org-catch-invisible-edits 'smart)
+  ;; Number of empty lines needed to keep an empty line between collapsed
+  ;; trees.
+  (setq org-cycle-separator-lines 2)
+
+  (setq org-ellipsis "...#")
+  (setq org-log-done 'time)
+
+  (setq org-agenda-start-on-weekday nil)
+  (setq org-agenda-inhibit-startup t)
+  (setq org-agenda-use-tag-inheritance nil)
+  (setq org-agenda-span 14)
+  (setq org-agenda-include-diary t)
+  (setq org-agenda-window-setup 'current-window)
+
+  (setq org-export-with-sub-superscripts t)
+
+  (setq org-adapt-indentation nil)
+
+  (setq org-hide-emphasis-markers nil)
+  (setq org-hide-leading-stars nil)
+  (setq org-hide-block-startup nil)
+
+  (setq org-startup-indented nil)
+  (setq org-startup-folded nil)
+
+  (setq org-fontify-quote-and-verse-blocks nil)
+  (setq org-fontify-whole-heading-line nil)
+  (setq org-fontify-whole-block-delimiter-line t)
+
+  (setq org-pretty-entities t)
+  (setq org-pretty-entities-include-sub-superscripts nil)
+
+  (setq org-src-fontify-natively t)
+  (setq org-highlight-latex-and-related nil)
+  (setq org-preview-latex-default-process 'imagemagick)
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.6))
 
   (setcdr (assoc "dot" org-src-lang-modes) 'graphviz-dot)
   (setcdr (assoc 'file org-link-frame-setup) 'find-file)

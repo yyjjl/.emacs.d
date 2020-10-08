@@ -25,7 +25,9 @@
 
   (set-fringe-bitmap-face 'right-curly-arrow 'warning)
   (set-fringe-bitmap-face 'left-curly-arrow 'warning)
-  (set-fringe-bitmap-face 'right-triangle 'error))
+  (set-fringe-bitmap-face 'right-triangle 'error)
+  (dolist (bitmap '(right-arrow left-arrow up-arrow down-arrow))
+    (set-fringe-bitmap-face bitmap 'compilation-info)))
 
  ;; Disable bidirectional text for tiny performance boost
 (setq-default bidi-display-reordering nil)
@@ -64,10 +66,12 @@
 
  '(font-lock-builtin-face ((t (:foreground "#749e20"))))
  '(font-lock-constant-face ((t (:foreground "#AE81FF"))))
- '(font-lock-warning-face ((t (:background "black" :weight bold :underline t))))
+ '(font-lock-warning-face ((t (:background "black" :weight bold
+                               :underline t))))
  '(font-lock-doc-face ((t (:foreground "#777777" :weight bold))))
 
- '(eldoc-highlight-function-argument ((t (:foreground "#86DC2F" :weight bold))))
+ '(eldoc-highlight-function-argument ((t (:foreground "#86DC2F"
+                                          :weight bold))))
  '(hl-line ((t (:background "gray5"))))
 
  '(org-meta-line ((t :inherit font-lock-doc-face)))
@@ -80,7 +84,8 @@
 
  '(diredp-dir-name ((t (:inherit font-lock-type-face :weight bold))))
 
- `(diff-hl-change ((t (:foreground ,(face-background 'highlight) :background nil))))
+ `(diff-hl-change ((t (:foreground ,(face-foreground 'warning)
+                       :background nil))))
  '(diff-hl-insert ((t (:background nil))))
  '(diff-hl-delete ((t (:background nil))))
 

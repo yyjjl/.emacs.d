@@ -51,3 +51,5 @@ hasn't to runs those regexps against the filename.")
 
 ;; disable native-compile during setup
 (setq comp-deferred-compilation nil)
+
+(setq load-prefer-newer t)

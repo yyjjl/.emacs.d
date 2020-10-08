@@ -12,7 +12,7 @@
 (load-feature! ui)
 
 (load-feature! popup)
-(load-feature! completion_ivy)
+(load-feature! completion-ivy)
 (load-feature! company)
 (load-feature! term)
 (load-feature! misc)

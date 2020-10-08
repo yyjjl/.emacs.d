@@ -19,7 +19,7 @@
                   t)))))
 
 (define-hook! ymacs|minibuffer-setup (minibuffer-setup-hook)
-  (setq line-spacing 4)
+  (setq line-spacing 0.25)
   (setq gc-cons-threshold most-positive-fixnum))
 
 (define-hook! ymacs|minibuffer-exit (minibuffer-exit-hook)

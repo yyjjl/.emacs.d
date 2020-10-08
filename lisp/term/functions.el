@@ -216,19 +216,7 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
 
     (when (buffer-live-p buffer)
       (with-current-buffer buffer
-        (setq ymacs-term-exit-action (if -shell-buffer-p 'shell 'keep))
-        (when -shell-buffer-p
-          (-when-let*
-              (((send-string-fn . alist)
-                (-> ymacs-term-type
-                    (assoc ymacs-term--setup-dir-tracking-alist)
-                    cdr-safe))
-               (setup-code
-                (-> shell-name
-                    file-name-base
-                    (assoc alist)
-                    (cdr-safe))))
-            (funcall send-string-fn setup-code))))
+        (setq ymacs-term-exit-action (if -shell-buffer-p 'shell 'keep)))
       buffer)))
 
 (defun ymacs-term//after-prompt-p ()
