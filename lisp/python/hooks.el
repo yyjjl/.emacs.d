@@ -23,7 +23,6 @@
 
     (when (and (buffer-enable-rich-feature-p)
                (eq major-mode 'python-mode))
-      (semantic-idle-summary-mode -1)
       (ymacs-lsp//try-enable python
         :fallback
         (progn

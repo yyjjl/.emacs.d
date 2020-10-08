@@ -1,6 +1,11 @@
 ;; -*- lexical-binding:t -*-
 
-(load-feature! company +modern-ui)
+(load-feature! company)
+(load-feature! semantic)
+(load-feature! hideshow)
+(load-feature! edit)
+(load-feature! dired)
+(load-feature! ibuffer)
 
 (load-feature! git)
 (load-feature! spell)
@@ -35,3 +40,4 @@
 (load-feature! emms)
 (load-feature! tabnine)
 (load-feature! doctor)
+(load-feature! pdf)
