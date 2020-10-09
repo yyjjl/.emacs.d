@@ -129,7 +129,7 @@
     (let ((shell-file-name "/bin/sh"))
       (counsel-rg nil initial-directory -extra-args))))
 
-;;;###autoload (autoload 'ymacs-counsel/rg "../lisp/completion_ivy/commands.el" nil t)
+;;;###autoload (autoload 'ymacs-counsel/rg "../lisp/completion-ivy/commands.el" nil t)
 (define-transient-command ymacs-counsel/rg (&optional -directory)
   "Run ripgrep"
   ["Switches"

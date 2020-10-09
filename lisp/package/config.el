@@ -19,10 +19,7 @@
 (if ymacs-dump-p
     (setq load-path ymacs-dump-load-path)
   ;; add load-path’s and load autoload files
-  (package-initialize)
-
-  (require 'dash)
-  (require 'dash-functional))
+  (package-initialize))
 
 ;; Core packages
 (require-packages!
@@ -56,3 +53,6 @@
  sudo-edit
  goto-last-change
  expand-region)
+
+(require 'dash)
+(require 'dash-functional)
