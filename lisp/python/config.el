@@ -2,7 +2,11 @@
 
 (after! lsp-pyls
   (setq lsp-pyls-configuration-sources ["flake8"])
-  (setq lsp-pyls-plugins-rope-completion-enabled nil))
+  (setq lsp-pyls-plugins-rope-completion-enabled nil)
+
+  (ymacs-lsp//set-simple-install-fn
+   'pyls
+   "pip3 install --user 'python-language-server[all]"))
 
 (after! python
   (define-key! :map inferior-python-mode-map

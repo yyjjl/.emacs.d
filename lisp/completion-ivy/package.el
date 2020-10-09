@@ -89,7 +89,6 @@
   ("x" . counsel-linux-app)
   ("v" . counsel-set-variable)
   ("j" . counsel-fzf)
-  ("p" . counsel-projectile)
   ("g" . counsel-git)
   ("s" . counsel-git-grep)
   ("S" . counsel-git-stash)

@@ -4,7 +4,6 @@
 
 (require-packages!
  (fcitx :when ymacs-fcitx-path)
- skeletor
  zeal-at-point
  buffer-move
  whitespace
@@ -37,15 +36,12 @@
   :type 'directory
   :safe #'listp)
 
-(defvar ymacs-misc-current-desktop-name nil)
-
 (defvar ymacs-misc-after-rename-this-file-hook nil)
 (defvar ymacs-misc-after-delete-this-file-hook nil)
 (defvar ymacs-misc-after-search-hook nil)
 
 (defvar ymacs-misc-view-code-modes
-  '((lispy-mode ymacs-misc/rainbow-delimiters-count-mode)
-    (t display-line-numbers-mode
+  '((t display-line-numbers-mode
        view-mode
        highlight-indentation-current-column-mode
        highlight-indentation-mode)))
@@ -112,8 +108,6 @@
   (", a" . ymacs-misc/add-local-snippet)
   (", g" . ymacs-misc/search-in-chrome)
   (", -" . ymacs-misc/copy-file-name)
-  (", c" . ymacs-misc/change-or-new-desktop)
-  (", d" . ymacs-misc/delete-desktop)
   (", o" . recentf-open-files)
   ("C-b" . ibuffer)
   ("C-d" . find-name-dired)
@@ -172,10 +166,6 @@
   ("j" . buf-move-down)
   ("h" . buf-move-left)
   ("l" . buf-move-right))
-
-(define-key! :prefix "C-x p"
-  ("n" . skeletor-create-project)
-  ("N" . skeletor-create-project-at))
 
 (define-key! :prefix "C-h"
   ("z" . zeal-at-point)

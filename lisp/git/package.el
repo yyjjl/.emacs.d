@@ -5,8 +5,6 @@
  gitignore-mode
  gitconfig-mode
  git-timemachine
- git-messenger
- git-link
  magit)
 
 (defvar ymacs-git--diff-hl-update-timer nil)
@@ -21,7 +19,4 @@
   ("r" . diff-hl-revert-hunk)
   ("j" . ymacs-git/goto-hunk)
   ("g" . magit-status)
-  ("l" . git-link)
-  ("c" . git-link-commit)
-  ("m" . git-messenger:popup-message)
   ("b" . magit-checkout))

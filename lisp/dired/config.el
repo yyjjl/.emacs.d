@@ -4,8 +4,6 @@
   (define-key! :map dired-mode-map
     (")" . dired-omit-mode)
     ("E" . ymacs-dired/open-externally)
-    ("/" . dired-narrow-fuzzy)
-    ("\\" . dired-narrow)
     ("M-p" . dired-prev-subdir)
     ("M-n" . dired-next-subdir)
     (";" . dired-kill-subdir))

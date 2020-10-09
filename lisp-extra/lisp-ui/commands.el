@@ -1,4 +1,4 @@
-;;; -*- lexical-binding: t; -*-
+;; -*- lexical-binding:t -*-
 
 (defun ymacs-misc//rainbow-delimiters--number-to-subscript (-char -n)
   (cond ((< -n 0))

@@ -12,3 +12,8 @@
       ("C-c D" . ymacs-cpp-cmake/config)
       ("C-c C-c" . ymacs-cpp-cmake/config-project)
       ([f9] . ymacs-cpp-cmake/config-project))))
+
+(after! lsp-cmake
+  (ymacs-lsp//set-simple-install-fn
+   'cmakels
+   "pip3 install --user cmake-language-server"))

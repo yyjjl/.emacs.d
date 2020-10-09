@@ -19,7 +19,6 @@
                   t)))))
 
 (define-hook! ymacs|minibuffer-setup (minibuffer-setup-hook)
-  ;; (setq line-spacing 0.25)
   (setq gc-cons-threshold most-positive-fixnum))
 
 (define-hook! ymacs|minibuffer-exit (minibuffer-exit-hook)
@@ -60,7 +59,6 @@
     (user-error (message "%s" (error-message-string err))))
 
   (hl-line-mode 1)
-  (ignore-errors (hl-fill-column-mode 1))
 
   ;; show trailing spaces in a programming mode
   (setq show-trailing-whitespace t)
@@ -68,7 +66,6 @@
 
 (define-hook! ymacs|generic-text-mode-setup (text-mode-hook)
   (hl-line-mode 1)
-  (ignore-errors (hl-fill-column-mode 1))
 
   (setq indicate-empty-lines t))
 

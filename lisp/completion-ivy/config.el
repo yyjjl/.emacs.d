@@ -16,15 +16,12 @@
   (ymacs-ivy//define-switch file-jump
     (counsel-fzf "fzf" "f")
     (counsel-git "git" "g")
-    (counsel-projectile "projectile" "proj"))
+    (projectile-find-file "projectile" "proj"))
 
-  (dolist (caller
-           '(ivy-switch-buffer
-             internal-complete-buffer
-             ivy-switch-buffer-other-window
-             counsel-projectile-switch-to-buffer
-             counsel-projectile
-             ymacs-counsel/kill-buffer))
+  (dolist (caller '(ivy-switch-buffer
+                    internal-complete-buffer
+                    ivy-switch-buffer-other-window
+                    ymacs-counsel/kill-buffer))
     (ivy-configure
         caller
       :display-transformer-fn #'ymacs-ivy//switch-buffer-transformer))
@@ -75,22 +72,13 @@
          ;; file names beginning with # or .
          "\\(?:\\`[#]\\)"
          ;; file names ending with # or ~
-         "\\|\\(?:[#~]\\'\\)")))
-
-(after! counsel-projectile
-  (define-key! :map projectile-command-map
-    ("s a" . counsel-projectile-ag)
-    ("p" . counsel-projectile)
-    ("K" . projectile-kill-buffers)
-    ("w" . projectile-switch-project))
+         "\\|\\(?:[#~]\\'\\)"))
 
   (setq counsel-fzf-cmd (concat (expand-var! "fzf") " -f \"%s\""))
   (setq counsel-rg-base-command
         "rg -M 1000 -S --no-heading --line-number --color never %s .")
 
-  (if ymacs-ripgrep-path
-      (progn
-        (define-key projectile-command-map "ss" 'counsel-projectile-rg)
-        (global-set-key (kbd "C-c i a") 'ymacs-counsel/rg))
-    (define-key projectile-command-map "ss" 'counsel-projectile-grep)
-    (global-set-key (kbd "C-c i a") 'counsel-grep)))
+  (global-set-key (kbd "C-c i a")
+                  (if ymacs-ripgrep-path
+                      #'ymacs-counsel/rg
+                    #'counsel-grep)))

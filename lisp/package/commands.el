@@ -4,9 +4,13 @@
 (defun ymacs-package/generate-autoloads ()
   (interactive)
   (require 'autoload)
-  (let ((files (cl-remove-duplicates
-                (directory-files-recursively ymacs-config-directory "\\`commands\\(-[^\\.]*\\)?\\.el\\'")))
-        (failed-count 0))
+  (let* ((pattern "\\`commands\\(-[^\\.]*\\)?\\.el\\'")
+         (files
+          (cl-remove-duplicates
+           (append
+            (directory-files-recursively ymacs-config-directory pattern)
+            (directory-files-recursively ymacs-extra-config-directory pattern))))
+         (failed-count 0))
     (with-current-buffer (find-file-noselect ymacs-autoloads-file)
       (erase-buffer)
       (dolist (file files)

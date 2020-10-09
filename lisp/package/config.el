@@ -35,13 +35,8 @@
  counsel
  swiper
  projectile
- counsel-projectile
  ;; `counsel-M-x' need amx to get history
  amx
- ;; Show key bindings when pressing
- which-key
- ;; Highlight braces with their depth
- rainbow-delimiters
  ;; Highlight indentation
  highlight-indentation
  ;; ^L beautifier
@@ -49,7 +44,6 @@
  evil-nerd-commenter
  shackle
  hl-todo
- hl-fill-column
  sudo-edit
  goto-last-change
  expand-region)

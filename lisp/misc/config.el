@@ -16,22 +16,8 @@
   (define-key! :map isearch-mode-map
     ("C-o" . isearch-occur)))
 
-(after! desktop
-  ;; These minor modes are enabled by core
-  (dolist (mode '(git-gutter-mode
-                  ivy-mode
-                  counsel-mode
-                  projectile-mode
-                  yas-minor-mode
-                  company-mode
-                  which-key-mode
-                  subword-mode
-                  global-auto-revert-mode
-                  flycheck-mode
-                  hs-minor-mode
-                  auto-revert-mode
-                  lsp-mode))
-    (add-to-list 'desktop-minor-mode-table (cons mode nil))))
+(after! savehist
+  (setq savehist-autosave-interval 3000))
 
 (after! recentf
   (defun ymacs-misc//recentf-keep-p (-fn)
@@ -81,45 +67,6 @@
   ;; Init fcitx prefix keys
   (setq fcitx-use-dbus nil)
   (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c" "C-z"))
-
-(setq which-key-dont-use-unicode t)
-(after! which-key
-  (setq which-key-allow-imprecise-window-fit nil)
-  (setq which-key-show-remaining-keys t)
-
-  (which-key-add-key-based-replacements "C-c &" "yasnippet")
-  (which-key-add-key-based-replacements "C-c ," "semantic")
-  (which-key-add-key-based-replacements "C-c @" "hide-show")
-  (which-key-add-key-based-replacements "C-c f" "flycheck")
-  (which-key-add-key-based-replacements "C-c i" "counsel")
-  (which-key-add-key-based-replacements "C-c m" "mc")
-
-  (which-key-add-key-based-replacements "C-x 8" "unicode")
-  (which-key-add-key-based-replacements "C-x @" "modifior")
-  (which-key-add-key-based-replacements "C-x C-a" "edebug")
-  (which-key-add-key-based-replacements "C-x RET" "coding-system")
-  (which-key-add-key-based-replacements "C-x X" "edebug")
-  (which-key-add-key-based-replacements "C-x a" "abbrev")
-  (which-key-add-key-based-replacements "C-x j" "jump")
-  (which-key-add-key-based-replacements "C-x n" "narrow")
-  (which-key-add-key-based-replacements "C-x p" "project")
-  (which-key-add-key-based-replacements "C-x r" "register & rectangle")
-  (which-key-add-key-based-replacements "C-x t" "tab & hide-show")
-  (which-key-add-key-based-replacements "C-x w" "winner & buf-move & ivy-view")
-  (which-key-add-key-based-replacements "C-x g" "git")
-  (which-key-add-key-based-replacements "C-x ," "hydra & misc")
-
-  (which-key-add-major-mode-key-based-replacements 'emacs-lisp-mode "C-c ?" "checkdoc")
-  (which-key-add-major-mode-key-based-replacements 'python-mode "C-c C-t" "python-skeleton")
-
-  (which-key-add-major-mode-key-based-replacements 'org-mode "C-c C-v" "babel")
-  (which-key-add-major-mode-key-based-replacements 'org-mode "C-c t" "table")
-
-  (which-key-add-major-mode-key-based-replacements 'markdown-mode "C-c C-a" "markdown-link")
-  (which-key-add-major-mode-key-based-replacements 'markdown-mode "C-c C-c" "markdown-command")
-  (which-key-add-major-mode-key-based-replacements 'markdown-mode "C-c C-s" "markdown-style")
-  (which-key-add-major-mode-key-based-replacements 'markdown-mode "C-c C-t" "markdown-header")
-  (which-key-add-major-mode-key-based-replacements 'markdown-mode "C-c C-x" "markdown-toggle"))
 
 (after! display-line-numbers
   (setq display-line-numbers-type t)
@@ -183,6 +130,10 @@
   (define-key! :map projectile-mode-map
     ("C-x p" :map projectile-command-map))
 
+  (define-key! :map projectile-command-map
+    ("K" . projectile-kill-buffers)
+    ("w" . projectile-switch-project))
+
   (add-to-list 'projectile-globally-ignored-directories ".ccls-cache")
   (add-to-list 'projectile-globally-ignored-directories ".cache")
 
@@ -221,17 +172,8 @@
                 '(flycheck-mode
                   flyspell-mode
                   eldoc-mode
-                  auto-composition-mode
-                  hl-fill-column-mode)))
+                  auto-composition-mode)))
   (setq so-long-predicate #'ymacs//buffer-has-long-lines-p))
-
-(after! skeletor
-  (setq skeletor-completing-read-function 'ivy-completing-read)
-
-  (skeletor-define-template "cpp-cmake"
-    :title "C++ Project (CMake)"
-    :default-license "^gpl"
-    :after-creation (lambda (dir) (skeletor-async-shell-command "mkdir build"))))
 
 (after! zeal-at-point
   (setf (cdr (assoc 'c++-mode zeal-at-point-mode-alist)) "cpp"

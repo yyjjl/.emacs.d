@@ -9,8 +9,6 @@
 
   (yas-global-mode 1)
 
-  (which-key-mode 1)
-
   (projectile-mode 1)
 
   ;;`eldoc', show API doc in minibuffer echo area enabled by default
@@ -27,9 +25,7 @@
     (fcitx-aggressive-setup))
 
   (find-file-noselect (expand-var! "org/*note*"))
-  (find-file-noselect (expand-var! "org/*task*"))
-
-  (desktop-save-mode 1))
+  (find-file-noselect (expand-var! "org/*task*")))
 
 
 (define-advice next-error (:around (-fn &rest -args) smart)
@@ -84,21 +80,6 @@
 
 (after! saveplace
   (add-hook 'ymacs-autosave-hook #'save-place-kill-emacs-hook))
-
-(after! desktop
-  (define-advice desktop-save (:around (-fn &rest -args) unless-loaded)
-    (if (or (called-interactively-p 'interactive)
-            desktop-file-modtime)
-        (apply -fn -args)
-      (message "Current desktop was not loaded from a file. Ignored")))
-
-  (define-advice desktop-read (:around (-fn &rest -args) disable-semantic)
-    "Temporarily disable semantic mode when load desktop"
-    (let ((semantic-enable-p semantic-mode))
-      (semantic-mode -1)
-      (apply -fn -args)
-      (when semantic-enable-p
-        (semantic-mode 1)))))
 
 (after! recentf
   (add-hook 'ymacs-autosave-hook #'recentf-save-list))

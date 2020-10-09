@@ -40,3 +40,8 @@
     ("^" . ccls-tree-collapse-or-select-parent)
     ("j" . next-line)
     ("k" . previous-line)))
+
+(after! ccls
+  (ymacs-lsp//set-simple-install-fn
+   'ccls
+   (expand-etc! "setup/install_ccls.py")))

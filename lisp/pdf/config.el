@@ -32,3 +32,17 @@
   (setcdr (assoc 'file org-link-frame-setup) #'ymacs-pdf//open-file)
 
   (org-pdftools-setup-link))
+
+(after! org-noter
+  (setq org-noter-auto-save-last-location t)
+  (setq org-noter-always-create-frame t)
+
+  (dolist (map (list org-noter-doc-mode-map org-noter-notes-mode-map))
+    (define-key! :map map
+      ("C-." . org-noter-sync-current-page-or-chapter)
+      ("C-M-p" . org-noter-sync-prev-page-or-chapter)
+      ("C-M-." . org-noter-sync-current-page-or-chapter)
+      ("C-M-n" . org-noter-sync-next-page-or-chapter)
+      ("M-p" . org-noter-sync-prev-note)
+      ("M-." . org-noter-sync-current-note)
+      ("M-n" . org-noter-sync-next-note))))

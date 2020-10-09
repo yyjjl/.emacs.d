@@ -41,7 +41,3 @@
 
 (after! company-capf
   (advice-add 'company-capf :around #'ignore-errors!))
-
-(after! company-posframe
-  (setq company-posframe-show-indicator nil)
-  (setq company-posframe-show-metadata nil))

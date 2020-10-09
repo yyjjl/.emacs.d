@@ -1,13 +1,7 @@
 ;; -*- lexical-binding: t -*-
 
-(define-hook! ymacs-ivy|after-init (after-init-hook)
-  (ivy-mode 1)
-  (counsel-mode 1)
-  (counsel-projectile-mode 1))
-
-(after! ivy-overlay
-  (define-advice ivy-display-function-overlay (:before (_str) set-line-spacing)
-    (setq line-spacing nil)))
+(add-hook 'after-init-hook #'ivy-mode)
+(add-hook 'after-init-hook #'counsel-mode)
 
 (after! ivy
   (define-hook! ymacs-ivy|occur-setup (ivy-occur-mode-hook ivy-occur-grep-mode-hook)

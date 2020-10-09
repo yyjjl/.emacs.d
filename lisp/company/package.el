@@ -1,10 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
 
-(define-option! ymacs-company-modern-ui nil)
-
-(require-packages!
- (company-posframe :when ymacs-company-modern-ui))
-
 (make-variable-buffer-local 'company-backends)
 
 (define-key!

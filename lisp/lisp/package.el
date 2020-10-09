@@ -1,3 +1,4 @@
+;; -*- lexical-binding:t -*-
 
 (require-packages!
  ;; Auto compile after .el file load or save
@@ -5,12 +6,9 @@
  ;; pair edit
  lispy
  elisp-def
- macrostep
- racket-mode)
+ macrostep)
 
 (defface lisp-argument-face
   `((t :underline t))
   "Face for arguments"
   :group 'lisp)
-
-(provide 'init-lisp)

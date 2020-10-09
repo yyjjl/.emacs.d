@@ -20,6 +20,10 @@ hasn't to runs those regexps against the filename.")
   (expand-file-name "lisp" user-emacs-directory)
   "All configuration in this directory")
 
+(defvar ymacs-extra-config-directory
+  (expand-file-name "lisp-extra" user-emacs-directory)
+  "All configuration in this directory")
+
 (defvar ymacs-var-direcotry
   (expand-file-name "var" user-emacs-directory)
   "All data and external executable file in this direcotry")

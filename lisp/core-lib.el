@@ -462,33 +462,45 @@ HTML file converted from org file, it returns t."
        ,@body)))
 
 (defun load-feature//option-to-form (-name -option)
-  (let ((option (cond ((consp -option) -option)
-                      ((and (symbolp -option)
-                            (member (aref (symbol-name -option) 0) '(?- ?+)))
-                       (let ((option-name (symbol-name -option)))
-                         (cons (substring option-name 1)
-                               (equal (aref option-name 0) ?+))))
-                      (t
-                       (error "-option should start with +/- or be a cons")))))
-    (list 'defvar (intern (format "ymacs-%s-%s" -name (car option))) (cdr option))))
-
-(defun load-feature//file-to-form (-name -path &optional -absolute-p)
-  (unless -absolute-p
-    (setq -path (expand-file-name
-                 (concat (symbol-name -name) "/" -path)
-                 ymacs-config-directory)))
-  (when (file-exists-p (concat -path ".el"))
-    `(load ,-path nil t)))
+  (let ((option
+         (cond
+          ((consp -option) -option)
+          ((and (symbolp -option)
+                (member (aref (symbol-name -option) 0) '(?- ?+)))
+           (let ((option-name (symbol-name -option)))
+             (cons (substring option-name 1)
+                   (equal (aref option-name 0) ?+))))
+          (t
+           (error "-option should start with +/- or be a cons")))))
+    (list 'defvar
+          (intern (format "ymacs-%s-%s" -name (car option)))
+          (cdr option))))
 
 (defmacro load-feature! (-name &rest -options)
-  (let ((forms
-         (cl-delete
-          nil
-          (list
-           (load-feature//file-to-form -name "package")
-           (load-feature//file-to-form -name "functions")
-           (load-feature//file-to-form -name "hooks")
-           (load-feature//file-to-form -name "config")))))
+  (let ((feature-name (symbol-name -name))
+        directory
+        forms)
+    (setq directory
+          (expand-file-name feature-name ymacs-config-directory))
+
+    (unless (file-directory-p directory)
+      (setq directory
+            (expand-file-name feature-name ymacs-extra-config-directory)))
+
+    (unless (file-directory-p directory)
+      (user-error "no feature %s" -name))
+
+    (setq
+     forms
+     (cl-delete
+      nil
+      (mapcar
+       (lambda (path)
+         (let ((full-path (expand-file-name path directory)))
+           (when (file-exists-p (concat full-path ".el"))
+             `(load ,full-path nil t))))
+       '("package" "functions" "hooks" "config"))))
+
     (unless forms
       (user-error "empty feature %s" -name))
     `(unless (memq ',-name ymacs--loaded-features)

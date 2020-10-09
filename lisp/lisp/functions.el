@@ -78,24 +78,9 @@ Lisp function does not specify a special indentation."
               (append hippie-expand-try-functions-list '(try-complete-lisp-symbol)))
 
   (highlight-indentation-mode -1)
-  (rainbow-delimiters-mode 1)
-  ;; (rainbow-delimiters-count-mode 1)
+
   (lispy-mode 1)
   (local-set-key (kbd "M-,") 'xref-pop-marker-stack))
-
-(defun ymacs-lisp|racket-setup ()
-  (ymacs-lisp|common-setup)
-  ;; (setq eldoc-documentation-function 'racket-eldoc-function)
-  (unless (buffer-enable-rich-feature-p)
-    (setq completion-at-point-functions nil))
-  (flycheck-mode 1)
-
-  (setq-local flycheck-check-syntax-automatically
-              '(save mode-enabled))
-
-  (with-local-minor-mode-map! 'lispy-mode
-    (lispy-define-key it "e" #'ymacs-lisp/racket-eval-sexp)
-    (lispy-define-key it "i" #'ymacs-lisp/racket-indent-sexp)))
 
 (defun ymacs-lisp|elisp-setup ()
   (ymacs-lisp|common-setup)

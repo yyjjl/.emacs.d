@@ -1,4 +1,4 @@
-;;; -*- lexical-binding: t; -*-
+;; -*- lexical-binding:t -*-
 
 (autoload 'desktop-full-lock-name "desktop")
 (autoload 'desktop-kill "desktop")
