@@ -10,10 +10,6 @@
       (flycheck-mode 1))))
 
 (after! python
-  (define-advice python-ffap-module-path (:around (-fn &rest -args) safe)
-    (unless (ymacs-python//shell-running-p)
-      (apply -fn -args)))
-
   (define-hook! ymacs-python|setup (python-mode-hook)
     (setq electric-indent-chars (delq ?: electric-indent-chars))
 

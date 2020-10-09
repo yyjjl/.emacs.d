@@ -19,11 +19,20 @@
 
 (defsubst ymacs-term//get-window ()
   (when-let (window (frame-parameter nil 'ymacs-term-window))
-    (and (window-live-p window) window)))
+    (and (window-live-p window)
+         (ymacs-term//window-display-term-buffer-p window)
+         window)))
+
+(defsubst ymacs-term//get-buffer ()
+  (let ((buffer (frame-parameter nil 'ymacs-term-buffer)))
+    (and (buffer-live-p buffer)
+         (ymacs-term//term-buffer-p buffer)
+         buffer)))
 
 (defsubst ymacs-term//set-window (-popup-window)
   (set-window-dedicated-p -popup-window t)
-  (set-frame-parameter nil 'ymacs-term-window -popup-window))
+  (set-frame-parameter nil 'ymacs-term-window -popup-window)
+  (set-frame-parameter nil 'ymacs-term-buffer (window-buffer -popup-window)))
 
 (defsubst ymacs-term//get-buffer-name (-fmt)
   (let* ((index 1)
@@ -56,7 +65,11 @@
 
 (defsubst ymacs-term//term-buffer-p (-buffer)
   (and (buffer-live-p -buffer)
-       (not (string-prefix-p " " (buffer-name -buffer)))
+       (with-current-buffer -buffer
+         (derived-mode-p 'term-mode 'shell-mode 'eshell-mode 'vterm-mode 'comint-mode))))
+
+(defsubst ymacs-term//shell-buffer-p (-buffer)
+  (and (buffer-live-p -buffer)
        (with-current-buffer -buffer
          (derived-mode-p 'term-mode 'shell-mode 'eshell-mode 'vterm-mode))))
 
@@ -65,15 +78,13 @@
        (ymacs-term//term-buffer-p (window-buffer window))))
 
 (defun ymacs-term//display-buffer (-buffer)
-  (if-let (popup-window
-           (-first #'ymacs-term//window-display-term-buffer-p
-                   (cons (ymacs-term//get-window)
-                         (window-list))))
+  (if-let (popup-window (ymacs-term//get-window))
       ;; Reuse window
       (progn
         (select-window popup-window)
         (set-window-dedicated-p popup-window nil)
-        (set-window-buffer popup-window -buffer))
+        (set-window-buffer popup-window -buffer)
+        (set-window-dedicated-p popup-window t))
 
     (pop-to-buffer -buffer)
     (ymacs-term//set-window (get-buffer-window -buffer))))
@@ -96,7 +107,8 @@
         (unwind-protect
             (switch-to-buffer (nth (if index (mod (+ index -n) size) 0)
                                    buffers))
-          (set-window-dedicated-p window t))))))
+          (set-window-dedicated-p window t))
+        (ymacs-term//set-window window)))))
 
 (defun ymacs-term|shell-exit (-proc _msg)
   (when (and (eq ymacs-term-exit-action 'shell)
@@ -265,7 +277,7 @@ If -FORCE is non-nil create a new term buffer directly."
   (or (and (not -new)
            (car (--filter
                  (with-current-buffer it
-                   (and (ymacs-term//term-buffer-p it)
+                   (and (ymacs-term//shell-buffer-p it)
                         (directory-equal-p -directory default-directory)))
                  (buffer-list))))
       (let ((default-directory -directory))
@@ -273,7 +285,7 @@ If -FORCE is non-nil create a new term buffer directly."
           (ymacs-term//create-buffer nil t)))))
 
 (defun ymacs-term//pop-shell-get-buffer (&optional -arg)
-  (when (ymacs-term//term-buffer-p (current-buffer))
+  (when (ymacs-term//shell-buffer-p (current-buffer))
     (user-error "Current buffer is already a shell buffer"))
 
   (let ((new (or (= -arg 0) (>= -arg 16))))

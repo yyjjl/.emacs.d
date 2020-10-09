@@ -28,6 +28,10 @@
     ("M-p" . previous-error)
     ("M-n" . next-error))
 
+  (after! ffap
+    (setq ffap-alist
+          (delq (assoc 'python-mode ffap-alist) ffap-alist)))
+
   (add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
   (add-to-list 'python-shell-completion-native-disabled-interpreters "python3")
   (add-to-list 'python-shell-completion-native-disabled-interpreters "python")

@@ -138,6 +138,18 @@ else: try to find a old term buffer and pop to it"
   (call-interactively 'ymacs/swiper))
 
 ;;;###autoload
+(defun ymacs-term/toggle-term-window ()
+  (interactive)
+  (if-let (window (ymacs-term//get-window))
+      (if (eq window (selected-window))
+          (quit-window nil window)
+        (select-window window))
+    (if-let (buffer (or (ymacs-term//get-buffer)
+                        (car (ymacs-term//buffers))))
+        (ymacs-term//display-buffer buffer)
+      (call-interactively #'ymacs-term/pop-shell))))
+
+;;;###autoload
 (defun ymacs-term/set-extra-name ()
   (interactive)
   (unless (ymacs-term//term-buffer-p (current-buffer))

@@ -34,14 +34,3 @@
      'rainbow-delimiters--apply-color
      #'ymacs-misc//rainbow-delimiters--add-depth-number))
   (font-lock-flush))
-
-;;;###autoload
-(define-minor-mode ymacs-misc/view-code-mode
-  "View code"
-  :init-value nil
-  (let ((switch (if ymacs-misc/view-code-mode 1 -1)))
-    (cl-loop for (condition . modes) in ymacs-misc-view-code-modes
-             when (or (eq condition t)
-                      (and (symbolp condition) (symbol-value condition)))
-             do (dolist (mode modes)
-                  (funcall mode switch)))))

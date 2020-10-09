@@ -1,4 +1,5 @@
 !/private/sdcv/
+!/private/doom-modeline/
 *.elc
 *.log
 *.swp

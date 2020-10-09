@@ -25,7 +25,11 @@
     (fcitx-aggressive-setup))
 
   (find-file-noselect (expand-var! "org/*note*"))
-  (find-file-noselect (expand-var! "org/*task*")))
+  (find-file-noselect (expand-var! "org/*task*"))
+
+  (message "Init Time: %.3f (with %d packages activated)"
+           (float-time (time-subtract after-init-time before-init-time))
+           (length package-activated-list)))
 
 
 (define-advice next-error (:around (-fn &rest -args) smart)

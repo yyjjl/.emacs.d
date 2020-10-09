@@ -123,13 +123,11 @@
   (run-with-timer 1 nil #'run-hooks 'ymacs-after-init-idle-hook)
   (run-with-idle-timer ymacs-autosave-interval t #'run-hooks 'ymacs-autosave-hook)
 
+  ;; enabel native-compile after initialization
+  ;; (setq comp-deferred-compilation t)
+
   ;; GC all sneaky breeky like
   (add-function :after after-focus-change-function
     (lambda ()
       (unless (frame-focus-state)
-        (garbage-collect))))
-
-  ;; enabel native-compile after initialization
-  ;; (setq comp-deferred-compilation t)
-
-  (message "Init Time: %s" (emacs-init-time)))
+        (garbage-collect)))))

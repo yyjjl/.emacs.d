@@ -8,11 +8,14 @@
     ("C-c C-a" . artist-mode)))
 
 (after! easy-kill
+  (require 'expand-region)
   (require 'easy-kill-extras)
 
   (define-key! :map easy-kill-base-map
-    ("=" . easy-kill-er-expand)
-    ("-" . easy-kill-er-unexpand)
+    ("-" . easy-kill-er-expand)
+    ("M--" . easy-kill-er-expand)
+    ("=" . easy-kill-er-unexpand)
+    ("M-=" . easy-kill-er-unexpand)
     ("[" . easy-kill-shrink)
     ("]" . easy-kill-expand))
 

@@ -22,7 +22,7 @@
     ("M-o" . lsp-signature-stop))
 
   (setq lsp-auto-configure t)
-  ;; (setq lsp-auto-guess-root t)
+  (setq lsp-auto-guess-root t)
   (setq lsp-eldoc-render-all t)
   (setq lsp-diagnostics-provider :auto)
   ;; (setq lsp-restart 'auto-restart)
