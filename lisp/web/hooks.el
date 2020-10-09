@@ -7,18 +7,19 @@
 (add-hook 'css-mode-hook 'emmet-mode)
 
 (define-hook! ymacs-web|web-setup (web-mode-hook)
-  (ymacs-lsp//try-enable web
-    :enable (and buffer-file-name
-                 (string-match-p "\\.[jt]sx?\\'" (downcase buffer-file-name)))
-    :fallback (ymacs-company//add-backend 'company-web-html))
-
-  (electric-indent-local-mode -1))
+  (if (and buffer-file-name
+           (string-match-p "\\.[jt]sx?\\'" (downcase buffer-file-name)))
+      (add-transient-hook!
+          (hack-local-variables-hook :local t :name ymacs-web|web-internal)
+        (ymacs-web|common-setup)))
+  (ymacs-company//add-backend 'company-web-html))
 
 (define-hook! ymacs-web|js-setup (js-mode-hook typescript-mode-hook)
-  (ymacs-lsp//try-enable js
-    :enable (and buffer-file-name
-                 (not (string-suffix-p ".json" (downcase buffer-file-name)))))
+  (when (and buffer-file-name
+             (not (string-suffix-p ".json" (downcase buffer-file-name))))
+    (add-transient-hook!
+        (hack-local-variables-hook :local t :name ymacs-web|js-internal)
+      (ymacs-web|common-setup)))
 
-  (electric-indent-local-mode -1)
   (setq-local electric-layout-rules
               (delq (assoc ?\; electric-layout-rules) electric-layout-rules)))
