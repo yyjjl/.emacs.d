@@ -23,7 +23,7 @@
   "."
   :group 'projectile
   :type 'directory
-  :safe #'stringp)
+  :safe #'file-directory-p)
 
 (defcustom ymacs-misc-project-rsync-extra-options nil
   "."

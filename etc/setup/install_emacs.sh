@@ -15,7 +15,7 @@ if [ "$EUID" -ne 0 ]; then
     install_prefix=${HOME}/.local
 else
     install_prefix=/usr/local
-    apt build-dep -y emacs25
+    apt build-dep -y emacs
     apt install -y libwebkit2gtk-4.0-dev exuberant-ctags
 fi
 
@@ -66,10 +66,11 @@ if [ "$EUID" -ne 0 ]; then
     compile_gnu_source emacs ${emacs_version} tar.xz \
                        --prefix="${install_prefix}" \
                        --without-x --with-xpm=no --with-jpeg=no \
-                       --with-png=no --with-gif=no --with-tiff=no --with-gnutls=no
+                       --with-png=no --with-gif=no --with-tiff=no \
+                       --with-gnutls=no
 else
     compile_gnu_source emacs ${emacs_version} tar.xz \
                        --prefix="${install_prefix}" \
-                       --with-all --with-pop --with-modules \
+                       --with-all --with-x --with-pop --with-modules \
                        --with-xwidgets --with-gconf
 fi

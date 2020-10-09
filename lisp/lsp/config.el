@@ -128,4 +128,4 @@
 (after! ccls
   (ymacs-lsp//set-simple-install-fn
    'ccls
-   (expand-etc! "setup/install_ccls.sh")))
+   (expand-etc! "setup/install_ccls.py")))

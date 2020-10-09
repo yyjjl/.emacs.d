@@ -1,9 +1,4 @@
-ppa:alessandro-strada/ppa
-ppa:nilarimogard/webupd8
-ppa:noobslab/icons
 ppa:plt/racket
-ppa:ubuntu-elisp/ppa
 ppa:webupd8team/java
-deb http://debian.sur5r.net/i3/ xenial universe
 deb http://www.geogebra.net/linux/ stable main
 deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main

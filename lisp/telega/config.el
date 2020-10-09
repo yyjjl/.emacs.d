@@ -2,9 +2,7 @@
 
 (after! telega
   (setenv "LD_LIBRARY_PATH"
-          (format "%s:%s"
-                  (expand-var! "td-build/lib")
-                  (getenv "LIBRARY_PATH")))
+          (format "%s:%s" (expand-var! "td/build") (getenv "LIBRARY_PATH")))
 
   (setq telega-proxies
         '((:server "127.0.0.1"

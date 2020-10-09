@@ -38,6 +38,7 @@
 
   (setq ivy-read-action-function #'ivy-hydra-read-action)
   (setf (alist-get 't ivy-format-functions-alist) #'ivy-format-function-arrow)
+  (setq ivy-height 13)
   (setq ivy-action-wrap t)
   (setq ivy-count-format "(%d/%d) ")
   (setq ivy-extra-directories '("./"))

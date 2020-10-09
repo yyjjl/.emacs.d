@@ -39,7 +39,7 @@
   "master file for org"
   :group 'org
   :type 'file
-  :safe #'stringp)
+  :safe #'file-exists-p)
 
 (defcustom ymacs-org-latex-ignore-internal-label nil
   ""
