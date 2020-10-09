@@ -1,6 +1,6 @@
 ;; -*- lexical-binding:t -*-
 
-(executable! clangd :exe (expand-var! "clangd/bin/clangd"))
+(executable! clangd :exe [(expand-var! "clangd/bin/clangd") "clangd"])
 
 (after-feature! cpp
   (add-to-list 'ymacs-cpp-buffer-command-functions

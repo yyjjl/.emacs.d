@@ -1,11 +1,10 @@
-arc-theme
 aria2
 autoconf
 automake
 clang
 clang-format
-curl
 cmake
+curl
 dvipng
 exuberant-ctags
 fcitx-libpinyin
@@ -25,12 +24,12 @@ latexmk
 libboost-dev
 libboost-doc
 libclang-dev
+libvterm-dev
 lldb
 llvm-dev
 markdown
 mplayer
 mpv
-oracle-java9-installer
 p7zip
 pandoc
 pdf2svg

@@ -1,7 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
 (require-packages!
- tide
  emmet-mode
  web-mode
  company-web

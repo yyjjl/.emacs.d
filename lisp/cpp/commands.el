@@ -123,3 +123,12 @@
     (setq-local c-macro-preprocessor
                 (funcall ymacs-cpp-expand-macro-function)))
   (call-interactively 'c-macro-expand))
+
+;;;###autoload
+(defun ymacs-cpp/get-include-paths ()
+  (interactive)
+  (message "%s"
+           (shell-command-to-string
+            "cc -E -x c++ - -v < /dev/null 2>&1 | \\
+    awk '/End of search list./ { show=0 } { if (show) printf \"-I%s\\n\",$1 }; \\
+    /#include <...> search starts here:/ { show=1; }'")))

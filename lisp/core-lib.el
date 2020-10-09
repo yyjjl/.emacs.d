@@ -66,9 +66,14 @@ for defining functions."
 
 (cl-defmacro executable! (name &key exe doc full-name)
   (declare (indent 0))
+
+  (setq exe (or exe (symbol-name name)))
+  (unless (vectorp exe)
+    (setq exe (vector exe)))
+
   `(defvar ,(if full-name name (intern (format "ymacs-%s-path" name)))
      (eval-when-compile
-       (executable-find ,(or exe (symbol-name name))))
+       (or ,@(seq-map (lambda (x) `(executable-find ,x)) exe)))
      ,doc))
 
 (defmacro define-option! (name initvalue &optional docstring)
@@ -409,11 +414,11 @@ HTML file converted from org file, it returns t."
         (hack-dir-local-variables-non-file-buffer)))))
 
 (cl-defun run-command! (&key name callback error-callback command directory)
-  (let ((default-directory (or directory default-directory))
-        (command-buffer (compilation-start
-                         command
-                         nil
-                         (lambda (_) (format "run command: %s" name)))))
+  (let* ((default-directory (or directory default-directory))
+         (command-buffer (compilation-start
+                          command
+                          t
+                          (lambda (_) (format "run command: %s" name)))))
     (with-current-buffer command-buffer
       (when-let ((current-proc (get-buffer-process command-buffer))
                  (sentinel (process-sentinel (get-buffer-process command-buffer))))

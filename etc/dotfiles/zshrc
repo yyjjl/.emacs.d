@@ -60,6 +60,7 @@ export GTAGSLABEL=ctags
 export RUSTUP_DIST_SERVER=https://mirrors.tuna.tsinghua.edu.cn/rustup
 
 export LD_LIBRARY_PATH="$HOME/program/root/lib:$LD_LIBRARY_PATH"
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
 
 alias et='emacsclient -t -a ""'
 alias ec='emacsclient -c -a "" -n'

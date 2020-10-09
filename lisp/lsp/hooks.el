@@ -43,7 +43,10 @@
                              "\\[lsp-describe-thing-at-point]"))
                     'face 'font-lock-comment-face)))))
         (setq content (s-replace "\n" " " content)))
-      content)))
+      content))
+
+  (advice-add #'lsp-download-install :override #'lsp-download-install@pretty)
+  (advice-add #'lsp-async-start-process :override #'lsp-async-start-process@pretty))
 
 (after! lsp-headerline
   (defun lsp-headerline--filename-with-icon@disable-icon (-file-path)
