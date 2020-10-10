@@ -22,3 +22,11 @@
         (with-demoted-errors "diff-hl error: %s"
           (funcall -fn))
         (setq ymacs-git--diff-hl-update-timer nil)))))))
+
+(after! smerge-mode
+  (define-hook! ymacs-git|maybe-enable-smerge (magit-diff-visit-file-hook)
+    (save-excursion
+      (goto-char (point-min))
+      (when (re-search-forward "^<<<<<<< " nil t)
+        (smerge-mode 1)
+        (ymacs-hydra/smerge/body)))))

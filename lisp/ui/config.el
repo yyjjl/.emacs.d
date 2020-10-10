@@ -12,24 +12,13 @@
 (setq uniquify-ignore-buffers-re "^\\*")
 
 (ignore-errors
-  (define-fringe-bitmap 'empty-line
-    [#b00000000
-     #b00000000
-     #b01110001
-     #b11011011
-     #b10001110
-     #b00000000
-     #b00000000
-     #b00000000]
-    nil nil 'center)
-
   (set-fringe-bitmap-face 'right-curly-arrow 'warning)
   (set-fringe-bitmap-face 'left-curly-arrow 'warning)
   (set-fringe-bitmap-face 'right-triangle 'error)
   (dolist (bitmap '(right-arrow left-arrow up-arrow down-arrow))
     (set-fringe-bitmap-face bitmap 'compilation-info)))
 
- ;; Disable bidirectional text for tiny performance boost
+;; Disable bidirectional text for tiny performance boost
 (setq-default bidi-display-reordering nil)
 (setq-default blink-matching-paren nil)
 (setq-default cursor-in-non-selected-windows t)
@@ -41,9 +30,9 @@
 (setq-default max-mini-window-height 0.25)
 ;; Disable mode-line mouseovers
 (setq-default mode-line-default-help-echo nil)
- ;; Minibuffer resizing
+;; Minibuffer resizing
 (setq-default resize-mini-windows 'grow-only)
- ;; hide :help-echo text
+;; hide :help-echo text
 (setq-default show-help-function nil)
 (setq-default split-width-threshold 120)
 (setq-default visible-cursor nil)
@@ -56,9 +45,9 @@
 (setq-default jit-lock-stealth-nice 0.5)
 (setq-default jit-lock-stealth-time 5)
 (setq-default jit-lock-stealth-verbose nil)
- ;; No beeping or blinking please
+;; No beeping or blinking please
 (setq-default ring-bell-function #'ignore)
- ;; Visible-bell has some issue
+;; Visible-bell has some issue
 (setq-default visible-bell nil)
 
 (custom-theme-set-faces
@@ -90,72 +79,6 @@
  '(diff-hl-delete ((t (:background nil))))
 
  '(ivy-current-match ((t (:background "gray0")))))
-
-(after! doom-modeline
-  (doom-modeline-def-segment
-    buffer-info
-    "Combined information about the current buffer, including the current working
-directory, the file name, and its state (modified, read-only or non-existent)."
-    (let ((name (concat
-                 "%["
-                 (doom-modeline--buffer-state-icon)
-                 (doom-modeline--buffer-name)
-                 "%]")))
-      (if (and (listp mode-line-buffer-identification)
-               (equal (car mode-line-buffer-identification) "%b"))
-          (cons name (cdr mode-line-buffer-identification))
-        name)))
-
-  (setq all-the-icons-scale-factor 1.0)
-
-  (setq doom-modeline-project-detection 'projectile)
-  (setq doom-modeline-buffer-file-name-style 'truncate-upto-project)
-
-  (setq doom-modeline-checker-simple-format nil)
-  (setq doom-modeline-enable-word-count nil)
-  (setq doom-modeline-gnus nil)
-  (setq doom-modeline-icon nil)
-  (setq doom-modeline-indent-info nil)
-  (setq doom-modeline-irc nil)
-  (setq doom-modeline-major-mode-color-icon nil)
-  (setq doom-modeline-major-mode-icon nil)
-  (setq doom-modeline-minor-modes nil)
-  (setq doom-modeline-modal-icon nil)
-  (setq doom-modeline-persp-icon nil)
-  (setq doom-modeline-persp-name nil)
-  (setq doom-modeline-workspace-name nil)
-
-  (doom-modeline-def-modeline 'main
-    '(bar window-number matches buffer-info remote-host checker lsp buffer-position misc-info)
-    '(debug input-method buffer-encoding major-mode process vcs))
-
-  (doom-modeline-def-modeline 'shell
-    '(bar window-number matches buffer-info remote-host misc-info)
-    '(debug input-method major-mode process vcs))
-
-  (doom-modeline-def-modeline 'special
-    '(bar window-number matches buffer-info buffer-position misc-info)
-    '(debug input-method buffer-encoding major-mode process))
-
-  (doom-modeline-def-modeline 'vcs
-    '(bar window-number matches buffer-info buffer-position misc-info)
-    '(debug buffer-encoding major-mode process))
-
-  (doom-modeline-def-modeline 'info
-    '(bar window-number buffer-info info-nodes buffer-position misc-info)
-    '(buffer-encoding major-mode))
-
-  (doom-modeline-def-modeline 'message
-    '(bar window-number matches buffer-info-simple buffer-position misc-info)
-    '(debug input-method buffer-encoding major-mode))
-
-  (doom-modeline-def-modeline 'project
-    '(bar window-number matches buffer-default-directory misc-info)
-    '(debug input-method major-mode process))
-
-  (doom-modeline-def-modeline 'org-src
-    '(bar window-number matches buffer-info-simple checker lsp buffer-position misc-info)
-    '(debug input-method buffer-encoding major-mode process)))
 
 (after! winum
   (define-key! :map winum-keymap

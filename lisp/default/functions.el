@@ -17,13 +17,10 @@
 
 ;;* Handle External Files
 (defun ymacs//external-file-handler (_op &rest -args)
-  (let ((file (expand-file-name (car -args))))
-    (cond ((eq system-type 'darwin)
-           (shell-command (concat "open " (shell-quote-argument file))))
-          ((eq system-type 'gnu/linux)
-           (let ((process-connection-type nil))
-             (recentf-push file)
-             (start-process "external-process" nil "xdg-open" file))))
+  (let ((file (expand-file-name (car -args)))
+        (process-connection-type nil))
+    (recentf-push file)
+    (start-process "external-process" nil "evince" file)
     (kill-buffer)
     (let (debug-on-error)
       (user-error "Opened %s in external program" (file-name-nondirectory file)))))
