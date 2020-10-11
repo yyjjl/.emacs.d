@@ -162,23 +162,30 @@ Does not indent buffer, because it is used for a
           (t (message "Nothing to run")))))
 
 ;;;###autoload
-(defun ymacs-misc/rsync-project (-local-path -remote-path)
+(defun ymacs-misc/rsync-project (-local-path -remote-path -sync-to-remote)
   (interactive
    (list (read-directory-name
           "Local path: "
           ymacs-misc-project-rsync-local-path)
          (read-string
           "Remote path: "
-          ymacs-misc-project-rsync-remote-path)))
-  (if (not (file-directory-p -local-path))
-      (message "'%s' doesn't exist." -local-path)
-    (let* ((default-directory -local-path)
-           (options (if (not current-prefix-arg)
-                        (cl-list* "--dry-run" ymacs-misc-project-rsync-extra-options)
-                      ymacs-misc-project-rsync-extra-options)))
-      (compilation-start (format ymacs-misc-project-rsync-command
-                                 (string-join options " ")
-                                 -remote-path)))))
+          ymacs-misc-project-rsync-remote-path)
+         (completing-read
+          "direction:" '("local  -> remote" "remote -> local") nil t)))
+
+  (when (not (file-directory-p -local-path))
+    (user-error "'%s' doesn't exist." -local-path))
+
+  (let* ((default-directory -local-path)
+         (options (if (not current-prefix-arg)
+                      (cl-list* "--dry-run" ymacs-misc-project-rsync-extra-options)
+                    ymacs-misc-project-rsync-extra-options))
+         (compile-command
+          (format ymacs-misc-project-rsync-command
+                  (string-join options " ")
+                  (if -sync-to-remote -local-path -remote-path)
+                  (if -sync-to-remote -remote-path -local-path))))
+    (call-interactively #'compile)))
 
 ;;;###autoload
 (defun ymacs-misc/toggle-winum-scope ()

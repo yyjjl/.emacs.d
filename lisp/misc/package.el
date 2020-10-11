@@ -55,7 +55,7 @@
     planner-browser-file-display-rule-ring))
 
 (defvar ymacs-misc-project-rsync-command
-  "rsync -azh --progress --filter=':- .gitignore' %s . %s")
+  "rsync -azh --progress --filter=':- .gitignore' %s %s %s")
 
 (defvar ymacs-misc-search-engine-alist
   '(("g" "google" "http://www.google.com/search?q=%s")
