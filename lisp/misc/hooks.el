@@ -17,6 +17,7 @@
   (global-whitespace-mode 1)
   (global-hl-todo-mode 1)
   (electric-indent-mode 1)
+  (which-function-mode 1)
 
   (ignore-errors (global-so-long-mode 1)))
 
@@ -145,22 +146,6 @@
     (if (functionp -cmd)
         (funcall -cmd)
       (compile -cmd t)))
-
-  (define-advice projectile-edit-dir-locals (:override (&optional -directory) auto-save)
-    "Edit or create a .dir-locals.el file of the project."
-    (interactive
-     (list (let ((root (projectile-project-root)))
-             (or (and current-prefix-arg
-                      (read-directory-name "Select root" root))
-                 root))))
-    (let ((default-directory -directory))
-      (condition-case nil
-          (call-interactively #'add-dir-local-variable)
-        (quit
-         (when-let ((files (dir-locals--all-files -directory)))
-           (if (= (length files) 1)
-               (find-file (car files))
-             (find-file (ivy-read "Open file: " files :require-match t))))))))
 
   ;; Projectile root-searching functions can cause an infinite cl-loop on TRAMP
   ;; connections, so disable them.

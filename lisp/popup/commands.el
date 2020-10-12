@@ -6,7 +6,13 @@
   (interactive)
   (if (buffer-live-p (ymacs-popup//get-current-buffer))
       (display-buffer (ymacs-popup//get-current-buffer))
-    (message "Last buffer killed !!!")))
+    (let ((help-buffers
+           (mapcar #'buffer-name
+                   (cl-remove-if-not (lambda (buffer)
+                                       (and (ymacs-popup//help-buffer-p buffer)
+                                            (not (string-prefix-p " " (buffer-name buffer)))))
+                                     (buffer-list)))))
+      (display-buffer (completing-read "Popup buffer: " help-buffers nil t)))))
 
 ;;;###autoload
 (defun ymacs-popup/fix-popup-window ()
