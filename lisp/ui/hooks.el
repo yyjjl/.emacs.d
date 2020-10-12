@@ -8,4 +8,4 @@
   (setq-default mode-line-buffer-identification '("%b"))
   (setq-default mode-line-misc-info
                 '((company-search-mode (" " company-search-lighter))
-                  " " global-mode-string)))
+                  (global-mode-string (" " global-mode-string)))))

@@ -33,7 +33,6 @@
 (advice-add 'other-window :before #'keyboard-quit@autoclose)
 
 (define-advice window--try-to-split-window (:around (-fn -window &optional -alist) dont-split-popups)
-  (unless (and (window-live-p -window)
-               (or (memq -window ymacs-popup--window-list)
-                   (eq -window (ymacs-popup//get-term-window))))
+  (unless (or (memq -window ymacs-popup--window-list)
+              (eq -window (ymacs-popup//get-term-window)))
     (funcall -fn -window -alist)))

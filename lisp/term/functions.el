@@ -72,7 +72,7 @@
                (eq ymacs-term-exit-action 'shell)
                ;; try to switch to next shell  buffer
                (not (ymacs-term//switch-internal 1)))
-      (quit-window nil window)))
+      (delete-window window)))
 
   (let ((buffer (process-buffer -proc)))
     (when (and (memq (process-status -proc) '(signal exit))
