@@ -9,6 +9,6 @@
  macrostep)
 
 (defface lisp-argument-face
-  `((t :underline t))
+  `((t :weight bold :italic t))
   "Face for arguments"
   :group 'lisp)

@@ -18,7 +18,7 @@
   (define-advice lsp--render-on-hover-content
       (:around (-fn -contents -render-all) truncate-doc)
     (let ((content (funcall -fn -contents -render-all)))
-      (unless (ymacs-popups//help-buffer-p (current-buffer))
+      (unless (ymacs-popup//help-buffer-p (current-buffer))
         (setq content (string-trim-left (or content "")))
         (let* ((content-length (length content))
                (frame-width (frame-width))

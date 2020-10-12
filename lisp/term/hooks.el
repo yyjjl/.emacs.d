@@ -62,7 +62,13 @@
           (vterm-send-key key shift meta ctrl))))))
 
 (after! comint
-  (add-hook 'comint-exec-hook #'ymacs-term//setup-sentinel))
+  (add-hook 'comint-exec-hook #'ymacs-term//setup-sentinel)
+
+  (define-hook! ymacs-term|comint-setup (comint-mode-hook)
+    (when (string-match-p "inferior\\|interactive" (symbol-name major-mode))
+      (local-set-key (kbd "M-}") #'ymacs-term/next)
+      (local-set-key (kbd "M-{") #'ymacs-term/prev)
+      (setq ymacs-term-exit-action 'shell))))
 
 (after! shell
   (bash-completion-setup)

@@ -48,9 +48,7 @@
     (with-current-buffer -buffer
       (unless (eq major-mode 'compilation-mode)
         ;; Sometime it will open a comint buffer
-        (compilation-mode)
-        ;; Record window as popup window
-        (ymacs-popups//push-window (get-buffer-window -buffer) -buffer :autoclose)))))
+        (compilation-mode)))))
 
 ;; Default prog-mode setup
 (define-hook! ymacs|generic-prog-mode-setup (prog-mode-hook LaTeX-mode-hook)

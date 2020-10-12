@@ -21,12 +21,7 @@
            "Please use \\[pdf-annot-edit-contents-commit] to save content")))))
 
     (setq pdf-annot-edit-contents-setup-function
-          (lambda (_) (org-mode))))
-
-  (after! shackle
-    (add-to-list
-     'shackle-rules
-     '(pdf-outline-buffer-mode :align left :size 40 :select nil))))
+          (lambda (_) (org-mode)))))
 
 (after! org
   (setcdr (assoc 'file org-link-frame-setup) #'ymacs-pdf//open-file)

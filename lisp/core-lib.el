@@ -49,20 +49,25 @@ for defining functions."
       (push (pop -plist) forms))
     (nreverse forms)))
 
-(defun plist-delete! (-plist &rest -properties)
+(defun plist-pop! (-plist -prop)
   "Delete -PROPERTIES from -PLIST."
-  (let ((result -plist))
-    (dolist (property -properties)
-      (let ((-plist result) last-pos)
-        (while -plist
-          (if (not (eq property (car -plist)))
-              (setq last-pos (cdr -plist)
-                    -plist (cddr -plist))
-            (if (null last-pos)
-                (setq result (cddr -plist))
-              (setcdr last-pos (cddr -plist)))
-            (setq -plist nil)))))
-    result))
+  (let ((head -plist)
+        (plist -plist)
+        prev
+        value)
+    (catch 'done
+      (while plist
+        (if (not (eq -prop (car plist)))
+            (progn
+              (setq prev (cdr plist))
+              (setq plist (cddr plist)))
+
+          (setq value (cadr plist))
+          (if (null prev)
+              (setq head (cddr plist))
+            (setcdr prev (cddr plist)))
+          (throw 'done t))))
+    (cons value head)))
 
 (cl-defmacro executable! (name &key exe doc full-name)
   (declare (indent 0))
@@ -420,6 +425,7 @@ HTML file converted from org file, it returns t."
                           t
                           (lambda (_) (format "run command: %s" name)))))
     (with-current-buffer command-buffer
+      (setq ymacs-term-exit-action 'keep)
       (when-let ((current-proc (get-buffer-process command-buffer))
                  (sentinel (process-sentinel (get-buffer-process command-buffer))))
         (set-process-sentinel

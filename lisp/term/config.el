@@ -41,3 +41,10 @@
     ("M-o" . ymacs-term/switch)
     ("M-N" . ymacs-term/set-extra-name)
     ("C-S-t" . ymacs-term/pop-shell-here)))
+
+(after! compile
+  (define-key! :map compilation-mode-map
+    ("M-}" . ymacs-term/next)
+    ("M-{" . ymacs-term/prev)
+    ("M-o" . ymacs-term/switch)
+    ("q" . ymacs-term/quit-compilation)))

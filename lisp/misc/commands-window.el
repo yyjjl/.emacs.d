@@ -67,7 +67,7 @@
         (buffers (mapcar #'buffer-name
                          (--filter (with-current-buffer it
                                      (or buffer-file-name
-                                         (ymacs-popups//comint-buffer-p it)))
+                                         (ymacs-popup//comint-buffer-p it)))
                                    (buffer-list))))
         window)
     (while (and wnd-list buffers)
