@@ -1,6 +1,17 @@
 ;;; -*- lexical-binding: t; -*-
 
 (after! compile
+  (define-hook! ymacs-term|setup-compilation (compilation-mode-hook)
+    (setq mode-line-buffer-identification
+          '("%b"
+            (:eval
+             (propertize
+              (if next-error-follow-minor-mode
+                  "[follow]"
+                (substitute-command-keys
+                 "[\\[next-error-follow-minor-mode] to follow]"))
+              'face font-lock-comment-face)))))
+
   (define-advice compilation-start (:around (-fn &rest -args) setup-env)
     (with-temp-env! (ymacs-term//extra-env)
       (apply -fn -args))))

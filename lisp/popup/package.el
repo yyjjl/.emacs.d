@@ -50,13 +50,13 @@
 (defvar ymacs-popups-comint-modes
   '(term-mode
     vterm-mode
+    compilation-mode
     haskell-interactive-mode))
 
 (defvar ymacs-popups-help-modes
   '(help-mode
     messages-buffer-mode
     completion-list-mode
-    compilation-mode
     TeX-output-mode
     TeX-error-overview-mode
     flycheck-error-list-mode
