@@ -1,34 +1,22 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;;;###autoload
-(defun ymacs-popups/last-popup-window ()
+(defun ymacs-popup/last-popup-window ()
   "Display last popup window"
   (interactive)
-  (if (buffer-live-p shackle-last-buffer)
-      (display-buffer shackle-last-buffer)
-    (message "Last buffer killed !!!")
-    (ymacs-popups/display-buffer)))
+  (if (buffer-live-p (ymacs-popup//get-current-buffer))
+      (display-buffer (ymacs-popup//get-current-buffer))
+    (message "Last buffer killed !!!")))
 
 ;;;###autoload
-(defun ymacs-popups/display-buffer ()
-  (interactive)
-  (let ((ivy-use-virtual-buffers nil))
-    (display-buffer
-     (completing-read "Buffer: "
-                      #'internal-complete-buffer
-                      nil
-                      :require-match))))
-
-;;;###autoload
-(defun ymacs-popups/fix-popup-window ()
+(defun ymacs-popup/fix-popup-window ()
   "Make a popup window not to close when `C-g' pressed"
   (interactive)
-  (let ((window (selected-window)))
-    (setq ymacs-popups--window-list
-          (--filter (not (equal (car it) window)) ymacs-popups--window-list))))
+  (setq ymacs-popup--window-list
+        (delq (selected-window) ymacs-popup--window-list)))
 
 ;;;###autoload
-(defun ymacs-popups/popup-sdcv ()
+(defun ymacs-popup/popup-sdcv ()
   "Display *sdcv* buffer"
   (interactive)
   (let ((word (if (and transient-mark-mode mark-active)

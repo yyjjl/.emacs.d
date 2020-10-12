@@ -42,7 +42,6 @@
  ;; ^L beautifier
  page-break-lines
  evil-nerd-commenter
- shackle
  hl-todo
  sudo-edit
  goto-last-change

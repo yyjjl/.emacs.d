@@ -219,7 +219,7 @@ With a prefix BELOW move point to lower block."
            (buffer-substring-no-properties (car bounds) (cdr bounds))))
         (buffer (get-buffer-create "*latex-preview*")))
     ;; display buffer
-    (shackle-display-buffer buffer nil '(:align below :size 0.4 :autoclose t))
+    (ymacs-popup//display-buffer buffer nil '(:side below :size 0.3 :autoclose t))
 
     (with-current-buffer buffer
       (erase-buffer)

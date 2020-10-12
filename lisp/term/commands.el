@@ -4,28 +4,35 @@
 (defun ymacs-term/switch ()
   (interactive)
 
-  (unless (ymacs-term//term-buffer-p (current-buffer))
+  (unless (ymacs-popup//term-buffer-p (current-buffer))
     (user-error "Current buffer is not a term buffer"))
 
-  (let ((buffers
-         (--map
-          (let ((name (buffer-local-value 'ymacs-term-extra-name it)))
-            (cons (concat (buffer-name it)
-                          (when name
-                            (concat ": " name)))
-                  it))
-          (ymacs-term//buffers))))
-    (if (<= (length buffers) 1)
-        (user-error "There is only one term buffer")
+  (let ((buffers (mapcar
+                  (lambda (buffer)
+                    (cons
+                     (with-current-buffer buffer
+                       (concat (buffer-name)
+                               (when ymacs-term-extra-name
+                                 (concat ": " ymacs-term-extra-name))))
+                     buffer))
+                  (ymacs-popup//get-term-buffer-list))))
 
-      (ivy-read "Switch to term buffer: " buffers
-                :require-match t
-                :action (lambda (candidate)
-                          (let ((window (selected-window)))
-                            (set-window-dedicated-p window nil)
-                            (unwind-protect
-                                (switch-to-buffer (cdr candidate))
-                              (set-window-dedicated-p window t))))))))
+    (when (<= (length buffers) 1)
+      (user-error "There is only one term buffer"))
+
+    (ivy-read
+     "Switch to term buffer: " buffers
+     :require-match t
+     :action (lambda (candidate) (pop-to-buffer (cdr candidate))))))
+
+;;;###autoload
+(defun ymacs-term/quit-compilation (&optional _)
+  (interactive)
+  (if (eq (selected-window)
+          (ymacs-popup//get-term-window))
+      (when (not (ymacs-term//switch-internal 1))
+        (delete-window))
+    (call-interactively #'quit-window)))
 
 ;;;###autoload
 (defun ymacs-term/next (-create-new)
@@ -44,12 +51,16 @@
 ;;;###autoload
 (defun ymacs-term/switch-back (-no-quit-p)
   (interactive "P")
+
   (unless (buffer-live-p ymacs-term--parent-buffer)
     (user-error "No parent buffer or it was killed !!!"))
-  (when (eq (ymacs-term//get-window) (selected-window))
+
+  (when (eq (selected-window)
+            (ymacs-popup//get-term-window))
     (pop-to-buffer ymacs-term--parent-buffer)
+
     (unless -no-quit-p
-      (delete-window (ymacs-term//get-window)))))
+      (delete-window (ymacs-popup//get-term-window)))))
 
 ;;;###autoload
 (defun ymacs-term/pop-shell-here ()
@@ -60,7 +71,7 @@
       (local-set-key [f8] #'ymacs-term/switch-back)
       (local-set-key (kbd "C-c C-z") (lambda! (ymacs-term/switch-back t)))
       (setq ymacs-term--parent-buffer parent-buffer))
-    (ymacs-term//display-buffer buffer)))
+    (display-buffer buffer)))
 
 ;;;###autoload
 (defun ymacs-term/pop-shell (&optional -arg)
@@ -77,7 +88,7 @@ else: try to find a old term buffer and pop to it"
         (local-set-key [f8] #'ymacs-term/switch-back)
         (local-set-key (kbd "C-c C-z") (lambda! (ymacs-term/switch-back t)))
         (setq ymacs-term--parent-buffer parent-buffer)))
-    (ymacs-term//display-buffer buffer)))
+    (display-buffer buffer)))
 
 ;;;###autoload
 (defun ymacs-term/conditional-send-raw ()
@@ -128,7 +139,7 @@ else: try to find a old term buffer and pop to it"
 ;;;###autoload
 (defun ymacs-term/swiper ()
   (interactive)
-  (unless (ymacs-term//term-buffer-p (current-buffer))
+  (unless (ymacs-term//shell-buffer-p (current-buffer))
     (user-error "Not in `term-mode' buffer"))
 
   (if (eq major-mode 'term-mode)
@@ -138,22 +149,23 @@ else: try to find a old term buffer and pop to it"
   (call-interactively 'ymacs/swiper))
 
 ;;;###autoload
-(defun ymacs-term/toggle-term-window ()
+(defun ymacs-term/toggle-window ()
   (interactive)
-  (if-let (window (ymacs-term//get-window))
+  (if-let (window (ymacs-popup//get-term-window))
       (if (eq window (selected-window))
-          (quit-window nil window)
+          (delete-window window)
         (select-window window))
-    (if-let (buffer (or (ymacs-term//get-buffer)
-                        (car (ymacs-term//buffers))))
-        (ymacs-term//display-buffer buffer)
+    (if-let (buffer (cl-find-if #'ymacs-term//shell-buffer-p
+                                (ymacs-popup//get-term-buffer-list)))
+        (display-buffer buffer)
       (call-interactively #'ymacs-term/pop-shell))))
+
 
 ;;;###autoload
 (defun ymacs-term/set-extra-name ()
   (interactive)
-  (unless (ymacs-term//term-buffer-p (current-buffer))
-    (user-error "Not in a term buffer"))
+  (unless (ymacs-term//shell-buffer-p (current-buffer))
+    (user-error "Not in a shell buffer"))
 
   (let ((name (read-from-minibuffer "Extra name: " ymacs-term-extra-name
                                     nil nil
