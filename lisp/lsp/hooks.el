@@ -45,3 +45,6 @@
 
   (advice-add #'lsp-download-install :override #'lsp-download-install@pretty)
   (advice-add #'lsp-async-start-process :override #'lsp-async-start-process@pretty))
+
+(after! lsp-modeline
+  (setq lsp-modeline-code-actions-segments '(count name)))

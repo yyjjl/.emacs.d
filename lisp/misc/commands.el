@@ -1,6 +1,32 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;;;###autoload
+(defun ymacs-misc/edit-dir-locals (&optional -directory)
+  "Edit or create a .dir-locals.el file of the project."
+  (interactive
+   (list (let ((root (projectile-project-root)))
+           (or (and current-prefix-arg
+                    (read-directory-name "Select root" root))
+               root))))
+  (let ((default-directory -directory))
+    (condition-case nil
+        (call-interactively #'add-dir-local-variable)
+      (quit
+       (let ((files (dir-locals--all-files -directory)))
+         (cond ((null files)
+                (let ((file (expand-file-name ".dir-locals.el" -directory)))
+                  (when (yes-or-no-p (format "create file %s" file))
+                    (find-file file)
+                    (when (not (file-exists-p file))
+                      (unwind-protect
+                          (projectile-skel-dir-locals)
+                        (save-buffer))))))
+               ((= (length files) 1)
+                (find-file (car files)))
+               (t
+                (find-file (completing-read "Open file: " files nil t)))))))))
+
+;;;###autoload
 (defun ymacs-misc/create-scratch-buffer ()
   "Create a new scratch buffer to work in. (could be *scratch* - *scratchX*)."
   (interactive)
@@ -178,7 +204,7 @@ Does not indent buffer, because it is used for a
 
   (let* ((default-directory -local-path)
          (options (if (not current-prefix-arg)
-                      (cl-list* "--dry-run" ymacs-misc-project-rsync-extra-options)
+                      (cl-list* "--dry-run" "--update" ymacs-misc-project-rsync-extra-options)
                     ymacs-misc-project-rsync-extra-options))
          (compile-command
           (format ymacs-misc-project-rsync-command

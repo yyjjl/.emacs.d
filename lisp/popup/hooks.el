@@ -4,6 +4,16 @@
   (setq display-buffer-alist
         '((ymacs-popup//match ymacs-popup//display-buffer-action))))
 
+(define-hook! (ymacs-popup|compilation-finish-hook -buffer _)
+  (compilation-finish-functions)
+  (when (buffer-live-p -buffer)
+    (with-current-buffer -buffer
+      (unless (eq major-mode 'compilation-mode)
+        ;; Sometime it will open a comint buffer
+        (compilation-mode)
+        (when-let (window (get-buffer-window -buffer))
+          (ymacs-popup//push-window window -buffer t))))))
+
 (define-hook! ymacs-popup|autoclose-popup-window (kill-buffer-hook)
   "Auto quit popup window after buffer killed"
   (let ((window (get-buffer-window)))
@@ -27,7 +37,9 @@
             (winner-undo))
         (setq window (pop ymacs-popup--window-list))
         (when (window-live-p window)
-          (quit-window nil window))))))
+          (if (eq (window-parameter window 'ymacs-quit-action) 'delete)
+              (delete-window window)
+            (quit-window nil window)))))))
 
 (advice-add 'keyboard-quit :before #'keyboard-quit@autoclose)
 (advice-add 'other-window :before #'keyboard-quit@autoclose)

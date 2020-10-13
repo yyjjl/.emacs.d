@@ -50,8 +50,10 @@
 (defsubst ymacs-popup//term-buffer-p (-buffer)
   (let ((case-fold-search t))
     (with-current-buffer -buffer
-      (or (apply #'derived-mode-p ymacs-popup-term-modes)
-          (string-match-p ymacs-popup-term-buffer-regexp (buffer-name))))))
+      (and (not (string-prefix-p "ivy-occur" (symbol-name major-mode)))
+           (or
+            (apply #'derived-mode-p ymacs-popup-term-modes)
+            (string-match-p ymacs-popup-term-buffer-regexp (buffer-name)))))))
 
 (defsubst ymacs-popup//help-buffer-p (-buffer)
   (let ((case-fold-search t))
@@ -109,6 +111,7 @@ Displays -BUFFER according to -ALIST and -RULE."
       (display-buffer-in-direction
        -buffer
        `((window . main)
+         (window-parameters . ((ymacs-quit-action . delete)))
          (direction . ,side)
          (window-height . ,(or (plist-get -rule :size) ymacs-popup-default-size))
          ,@-alist)))

@@ -42,14 +42,6 @@
   (when (eq major-mode 'compilation-mode)
     (ansi-color-apply-on-region compilation-filter-start (point-max))))
 
-(define-hook! (ymacs|compilation-finish-hook -buffer _)
-  (compilation-finish-functions)
-  (when (buffer-live-p -buffer)
-    (with-current-buffer -buffer
-      (unless (eq major-mode 'compilation-mode)
-        ;; Sometime it will open a comint buffer
-        (compilation-mode)))))
-
 ;; Default prog-mode setup
 (define-hook! ymacs|generic-prog-mode-setup (prog-mode-hook LaTeX-mode-hook)
   (condition-case err

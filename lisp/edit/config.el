@@ -39,4 +39,4 @@
           (?T string-up-to-char-backward "")))
 
   (setq easy-kill-try-things '(url email word)
-        easy-mark-try-things '(url email sexp)))
+        easy-mark-try-things '(url email word)))

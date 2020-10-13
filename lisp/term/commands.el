@@ -26,15 +26,6 @@
      :action (lambda (candidate) (pop-to-buffer (cdr candidate))))))
 
 ;;;###autoload
-(defun ymacs-term/quit-compilation (&optional _)
-  (interactive)
-  (if (eq (selected-window)
-          (ymacs-popup//get-term-window))
-      (when (not (ymacs-term//switch-internal 1))
-        (delete-window))
-    (call-interactively #'quit-window)))
-
-;;;###autoload
 (defun ymacs-term/next (-create-new)
   (interactive "P")
   (if -create-new
@@ -155,8 +146,7 @@ else: try to find a old term buffer and pop to it"
       (if (eq window (selected-window))
           (delete-window window)
         (select-window window))
-    (if-let (buffer (cl-find-if #'ymacs-term//shell-buffer-p
-                                (ymacs-popup//get-term-buffer-list)))
+    (if-let (buffer (car (ymacs-popup//get-term-buffer-list)))
         (display-buffer buffer)
       (call-interactively #'ymacs-term/pop-shell))))
 

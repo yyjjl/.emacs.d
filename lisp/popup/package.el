@@ -48,11 +48,11 @@
     eshell-mode
     comint-mode
     vterm-mode
-    compilation-mode
     haskell-interactive-mode))
 
 (defvar ymacs-popup-help-modes
   '(help-mode
+    compilation-mode
     messages-buffer-mode
     completion-list-mode
     TeX-output-mode

@@ -44,7 +44,7 @@
  evil-nerd-commenter
  hl-todo
  sudo-edit
- goto-last-change
+ goto-chg
  expand-region)
 
 (require 'dash)
