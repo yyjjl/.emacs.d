@@ -31,15 +31,17 @@
 ;;;###autoload
 (defun ymacs-python/toggle-pdbtrack ()
   (interactive)
+  (require 'python)
+
   (if (memq 'python-pdbtrack-comint-output-filter-function
             comint-output-filter-functions)
       (progn
-        (remove-hook 'comint-output-filter-functions
-                     #'python-pdbtrack-comint-output-filter-function)
-        (message "pdbtrack disabled"))
-    (add-hook 'comint-output-filter-functions
-              #'python-pdbtrack-comint-output-filter-function)
-    (message "pdbtrack enabled")))
+        (ymacs-python//disable-pdbtrack)
+        (when (called-interactively-p 'interactive)
+          (message "pdbtrack disabled")))
+    (ymacs-python//enable-pdbtrack)
+    (when (called-interactively-p 'interactive)
+      (message "pdbtrack enabled"))))
 
 ;;;###autoload
 (defun ymacs-python/create-venv-in-workon-home (-name -python-exe &optional -args)

@@ -22,10 +22,15 @@
 ;;;###autoload
 (defun ymacs-window/split-vertically (&optional -arg)
   (interactive "P")
-  (ymacs-window//split-with-size
-   (and -arg
-        (string-to-number (completing-read "Float or Integer: " ymacs-window-size-list)))
-   :vertial))
+  (if -arg
+      (ymacs//completing-read
+       "Split Vertically"
+       ymacs-window-size-list
+       (lambda (-size) (ymacs-window//split-with-size -size :vertical))
+       :return-prompt "read number"
+       :return-action
+       (lambda () (ymacs-window//split-with-size (read-number "Float or Integer: ") :vertical)))
+    (ymacs-window//split-with-size nil :vertical)))
 
 ;;;###autoload
 (defun ymacs-window/split-horizontally (&optional -arg)
@@ -67,7 +72,7 @@
         (buffers (mapcar #'buffer-name
                          (--filter (with-current-buffer it
                                      (or buffer-file-name
-                                         (ymacs-popup//comint-buffer-p it)))
+                                         (ymacs-popup//term-buffer-p it)))
                                    (buffer-list))))
         window)
     (while (and wnd-list buffers)

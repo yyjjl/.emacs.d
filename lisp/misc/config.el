@@ -194,3 +194,12 @@
 
 (after! inf-lisp
   (setq inferior-lisp-program "sbcl"))
+
+(after! which-func
+  (setq which-func-format
+        '("[" (:propertize which-func-current face which-func) "]")))
+
+(setq which-key-dont-use-unicode t)
+(after! which-key
+  (setq which-key-allow-imprecise-window-fit nil)
+  (setq which-key-show-remaining-keys t))

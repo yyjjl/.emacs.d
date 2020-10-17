@@ -45,6 +45,7 @@
  hl-todo
  sudo-edit
  goto-chg
+ which-key
  expand-region)
 
 (require 'dash)

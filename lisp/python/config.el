@@ -9,10 +9,12 @@
    "pip3 install --user 'python-language-server[all]"))
 
 (after! python
+  (define-key! :map comint-mode-map
+    ([f5] . ymacs-python/toggle-pdbtrack))
+
   (define-key! :map inferior-python-mode-map
     ("C-c C-t" . ymacs-python/toggle-pdbtrack)
-    ("C-c C-z" . elpy-shell-switch-to-buffer)
-    ([f5] . ymacs-python/toggle-pdbtrack))
+    ("C-c C-z" . elpy-shell-switch-to-buffer))
 
   (define-key! :map python-mode-map
     ([f5] . ymacs-python/debug-current-file)

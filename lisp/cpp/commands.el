@@ -64,6 +64,7 @@
 
 ;;;###autoload
 (defun ymacs-cpp/compile (-no-prompt-p)
+  "Prompt to choose a command for compilation"
   (interactive "P")
   (with-temp-env! (ymacs-cpp//env)
     (let ((build-dir (ymacs-cpp//build-dir)))
@@ -82,28 +83,13 @@
                       ymacs-cpp-buffer-command-functions)
                    ,@(-take 2 compile-history)
                    ,compile-command)))))
-          (let ((max-mini-window-height 1))
-            (lv-message
-             "[RET] => prompt\n%s"
-             (string-join (--map-indexed (format "[%d] => %s" it-index it) commands) "\n")))
-          (set-transient-map
-           (let ((map (make-sparse-keymap)))
-             (define-key map (kbd "RET")
-               (lambda!
-                 (let ((compile-command (car commands)))
-                   (lv-delete-window)
-                   (call-interactively #'compile))))
-             (define-key map (kbd "C-g")
-               (lambda!
-                 (lv-delete-window)
-                 (call-interactively #'keyboard-quit)))
-             (--map-indexed
-              (define-key map (kbd (format "%d" it-index))
-                (lambda!
-                  (lv-delete-window)
-                  (compile it)))
-              commands)
-             map)))))))
+          (ymacs//completing-read
+           "Compile project" commands #'compile
+           :return-prompt "read compile command"
+           :return-action
+           (lambda ()
+             (let ((compile-command (car commands)))
+               (call-interactively #'compile)))))))))
 
 ;;;###autoload
 (defun ymacs-cpp/electric-star (-arg)

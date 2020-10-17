@@ -64,17 +64,6 @@
     ("d" "dictionary" "http://dictionary.reference.com/search?q=%s")
     ("cpp" "cpp" "https://www.google.com/search?q=cpp+%s")))
 
-(defvar ymacs-misc-run-current-file-executable
-  '(("pl" . "perl")
-    ("py" . "python3")
-    ("rb" . "ruby")
-    ("go" . "go run")
-    ("hs" . "runhaskell")
-    ("js" . "node")
-    ("sh" . "bash")
-    ("rkt" . "racket")
-    ("java" . "javac")))
-
 (defvar ymacs-misc-socks-server '("Default server" "127.0.0.1" 1080 5))
 
 ;; Smart tab
@@ -146,8 +135,7 @@
 
   ([C-f7] . ymacs-misc/rsync-project)
 
-  ([f10] . compile)
-  ([f9] . ymacs-misc/run-current-file))
+  ([f10] . compile))
 
 (define-key! :map indent-rigidly-map
   ("[" . indent-rigidly-left)

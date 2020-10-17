@@ -2,11 +2,23 @@
 
 (setq lsp-keymap-prefix nil)
 (after! lsp-mode
+  (setq lsp-command-map
+        (define-key! :map (make-sparse-keymap)
+          ("'" . lsp-avy-lens)
+          ("R" . lsp-workspace-folders-remove)
+          ("S" . lsp-describe-session)
+          ("b" . lsp-workspace-blacklist-remove)
+          ("d" . dap-hydra)
+          ("h" . lsp-document-highlight)
+          ("l" . lsp-lens-mode)
+          ("o" . lsp-organize-imports)
+          ("o" . lsp-workspace-folders-open)
+          ("r" . lsp-workspace-restart)
+          ("s" . lsp-workspace-shutdown)))
+
   (define-key! :map lsp-mode-map
     ("M-s l" . lsp-lens-mode)
     ("M-s h h" . lsp-document-highlight)
-    ("M-s '" . lsp-avy-lens)
-    ("M-s d" . dap-hydra)
     ("C-c R" . lsp-rename)
     ("C-c I" . lsp-ivy-workspace-symbol)
     ("C-c G" . lsp-ivy-global-workspace-symbol)
@@ -14,9 +26,8 @@
     ("C-c B" . lsp-format-buffer)
     ("C-c C-d" . lsp-describe-thing-at-point)
     ("C-c C-SPC" . lsp-execute-code-action)
-
-    ("M-o" . lsp-signature-activate)
-    ("C-S-SPC" . lsp-signature-activate))
+    ("C-c l" :map lsp-command-map)
+    ("M-o" . lsp-signature-activate))
 
   (define-key! :map lsp-signature-mode-map
     ("M-o" . lsp-signature-stop))

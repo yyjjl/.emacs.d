@@ -322,22 +322,13 @@ HTML file converted from org file, it returns t."
     (or (not ymacs--buffer-visible-p)
         (not filename)
         (buffer-base-buffer)
-        (string-match (concat "^" temporary-file-directory)
-                      filename))))
-
-(defsubst buffer-too-large-p ()
-  (let ((filename (buffer-file-name)))
-    (or (and filename
-             (> (or (nth 7 (file-attributes filename)) 0)
-                ymacs-large-buffer-limit))
-        (> (buffer-size)
-           ymacs-large-buffer-limit))))
+        (string-match-p (concat "^" temporary-file-directory) filename))))
 
 (defsubst buffer-enable-rich-feature-p ()
   (not (or (buffer-temporary-p)
-           (buffer-too-large-p)
-           (buffer-base-buffer)
-           (file-remote-p default-directory))))
+           (file-remote-p default-directory)
+           (> buffer-saved-size ymacs-large-buffer-limit)
+           (buffer-base-buffer))))
 
 (defun insert-after! (-after-value -new-value -lst)
   "Find -AFTER-VALUE and Add -NEW-VALUE to -LST after it."

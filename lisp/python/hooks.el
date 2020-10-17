@@ -10,6 +10,15 @@
       (flycheck-mode 1))))
 
 (after! python
+  (define-hook! ymacs-python|setup-compilation (comint-exec-hook)
+    (when (bound-and-true-p compilation-shell-minor-mode)
+      (when (cl-some (lambda (str)
+                       (let ((exe (car (split-string str))))
+                         (and (string-match-p "python" exe)
+                              (executable-find exe))))
+                     (process-command (get-buffer-process (current-buffer))))
+        (ymacs-python//enable-pdbtrack))))
+
   (define-hook! ymacs-python|setup (python-mode-hook)
     (setq electric-indent-chars (delq ?: electric-indent-chars))
 

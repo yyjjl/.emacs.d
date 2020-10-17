@@ -4,7 +4,9 @@
 (add-hook 'comint-output-filter-functions 'comint-watch-for-password-prompt)
 ;; Display long lines in truncated style (end line with $)
 (add-hook 'grep-mode-hook (lambda () (setq truncate-lines t)))
-(add-hook 'compilation-mode-hook (lambda () (setq truncate-lines t)))
+(add-hook 'compilation-mode-hook
+          (lambda ()
+            (setq truncate-lines (not (bound-and-true-p compilation-shell-minor-mode)))))
 ;; Turns on `auto-fill-mode', don't use `text-mode-hook'
 (add-hook 'change-log-mode-hook 'turn-on-auto-fill)
 

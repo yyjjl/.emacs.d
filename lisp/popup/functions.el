@@ -45,7 +45,11 @@
   (setq ymacs-popup--window-list
         (cl-remove-if-not #'window-live-p ymacs-popup--window-list))
   (setq ymacs-popup--term-buffer-list
-        (cl-remove-if-not #'buffer-live-p ymacs-popup--term-buffer-list)))
+        (cl-remove-if-not
+         (lambda (buffer)
+           (and (buffer-live-p buffer)
+                (ymacs-popup//term-buffer-p buffer)))
+         ymacs-popup--term-buffer-list)))
 
 (defsubst ymacs-popup//term-buffer-p (-buffer)
   (let ((case-fold-search t))

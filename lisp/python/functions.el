@@ -1,5 +1,26 @@
 ;;; -*- lexical-binding: t; -*-
 
+(defun ymacs-python//enable-pdbtrack ()
+  (unless (memq 'python-pdbtrack-comint-input-filter-function
+                comint-output-filter-functions)
+    (python-pdbtrack-setup-tracking))
+
+  (add-to-list 'mode-line-buffer-identification
+               (propertize "[pdbtrack]" 'face 'font-lock-builtin-face)
+               t)
+
+  (add-hook 'comint-output-filter-functions
+            #'python-pdbtrack-comint-output-filter-function)
+
+  (force-mode-line-update))
+
+(defun ymacs-python//disable-pdbtrack ()
+  (remove-hook 'mode-line-buffer-identification
+               "[pdbtrack]")
+  (remove-hook 'comint-output-filter-functions
+               #'python-pdbtrack-comint-output-filter-function)
+  (force-mode-line-update))
+
 (defun ymacs-python//generate-doc (-params -indent)
   (setq -indent (concat "\n" -indent))
   (string-join (mapcar (lambda (token)

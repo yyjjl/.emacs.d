@@ -1,5 +1,40 @@
 ;; -*- lexical-binding: t; -*-
 
+(cl-defun ymacs//completing-read
+    (-prompt -collection -action
+     &key
+       ((:return-action -return-action))
+       ((:return-prompt -return-prompt))
+       ((:history -history)))
+  (if (or (not (listp -collection))
+          (> (length -collection) 10))
+      (funcall -action (completing-read -prompt -collection nil t nil -history))
+
+    (let ((map (make-sparse-keymap)))
+
+      (when -return-action
+        (define-key map (kbd "RET") (lambda! (funcall -return-action))))
+
+      (--map-indexed
+       (define-key map (kbd (format "%d" it-index))
+         (lambda!
+             (funcall -action it)))
+       -collection)
+
+      (lv-message
+       "%s\n%s%s"
+       -prompt
+       (if -return-prompt
+           (concat "[RET] => " -return-prompt "\n")
+         "")
+       (string-join
+        (--map-indexed
+         (format "[%d] => %s" it-index (or (car-safe it) it))
+         -collection)
+        "\n"))
+
+      (set-transient-map map nil #'lv-delete-window))))
+
 (defsubst ymacs//save-variable (-symbol -file)
   (let ((real-file (expand-var! -file))
         (val (default-value -symbol)))

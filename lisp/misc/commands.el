@@ -164,30 +164,6 @@ Does not indent buffer, because it is used for a
         (kill-buffer buffer)))))
 
 ;;;###autoload
-(defun ymacs-misc/run-current-file (&optional directory)
-  "Execute the current file."
-  (interactive
-   (list (or (and (equal current-prefix-arg '(4))
-                  (ignore-errors (projectile-project-root)))
-             (and (equal current-prefix-arg '(16))
-                  (read-directory-name "Run in directory: " nil nil t))
-             default-directory)))
-  (let ((compilation-buffer (get-buffer "*compilation*")))
-    (cond ((equal (current-buffer) compilation-buffer)
-           (other-window 1))
-          ((process-live-p (get-buffer-process compilation-buffer))
-           (pop-to-buffer compilation-buffer))
-          ((buffer-file-name)
-           (let* ((exe (cdr-safe (assoc (file-name-extension (buffer-file-name))
-                                        ymacs-misc-run-current-file-executable)))
-                  (command (or (and (boundp 'executable-command) executable-command)
-                               (and exe (concat exe " " (buffer-file-name)))
-                               (buffer-file-name)))
-                  (default-directory directory))
-             (executable-interpret (read-shell-command "Run: " command))))
-          (t (message "Nothing to run")))))
-
-;;;###autoload
 (defun ymacs-misc/rsync-project (-local-path -remote-path -sync-to-remote)
   (interactive
    (list (read-directory-name

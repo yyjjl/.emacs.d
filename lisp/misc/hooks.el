@@ -17,7 +17,9 @@
   (global-whitespace-mode 1)
   (global-hl-todo-mode 1)
   (electric-indent-mode 1)
+
   (which-function-mode 1)
+  (which-key-mode 1)
 
   (ignore-errors (global-so-long-mode 1)))
 
@@ -146,6 +148,12 @@
     (if (functionp -cmd)
         (funcall -cmd)
       (compile -cmd t)))
+
+  (define-advice projectile-maybe-read-command (:around (-fn &rest -args) show-project-root)
+    (lv-message "Current directory: %s" default-directory)
+    (unwind-protect
+        (apply -fn -args)
+      (lv-delete-window)))
 
   ;; Projectile root-searching functions can cause an infinite cl-loop on TRAMP
   ;; connections, so disable them.

@@ -37,7 +37,10 @@
   (setq company-global-modes
         '(not eshell-mode comint-mode erc-mode
               gud-mode rcirc-mode shell-mode
-              minibuffer-inactive-mode)))
+              minibuffer-inactive-mode))
+
+  (setf (alist-get 'company-search-mode mode-line-misc-info)
+        '(("" company-search-lighter " "))))
 
 (after! company-capf
   (advice-add 'company-capf :around #'ignore-errors!))

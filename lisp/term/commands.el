@@ -20,10 +20,9 @@
     (when (<= (length buffers) 1)
       (user-error "There is only one term buffer"))
 
-    (ivy-read
+    (ymacs//completing-read
      "Switch to term buffer: " buffers
-     :require-match t
-     :action (lambda (candidate) (pop-to-buffer (cdr candidate))))))
+     (lambda (candidate) (pop-to-buffer (cdr candidate))))))
 
 ;;;###autoload
 (defun ymacs-term/next (-create-new)
