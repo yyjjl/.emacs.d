@@ -34,14 +34,6 @@
            (float-time (time-subtract after-init-time before-init-time))
            (length package-activated-list)))
 
-
-(define-advice next-error (:around (-fn &rest -args) smart)
-  (let ((occur-buffer (ymacs-misc//get-occur-buffer)))
-    (if-let (window (and occur-buffer (get-buffer-window occur-buffer)))
-        (with-selected-window window
-          (apply -fn -args))
-      (apply -fn -args))))
-
 (define-advice indent-for-tab-command (:around (-fn &rest -arg) smart)
   (if (save-excursion
         (forward-line 0)

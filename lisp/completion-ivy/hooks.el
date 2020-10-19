@@ -10,6 +10,13 @@
 
     (setq truncate-lines t))
 
+  (define-advice ivy-occur-next-error (:around (-fn &rest -args) ensure-visible)
+    (if-let (window (or (get-buffer-window (current-buffer))
+                        (display-buffer (current-buffer))))
+        (with-selected-window window
+          (apply -fn -args))
+      (apply -fn -args)))
+
   (advice-add 'ivy--preselect-index :around #'ignore-errors!))
 
 (after! counsel

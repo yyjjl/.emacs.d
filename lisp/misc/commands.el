@@ -1,5 +1,38 @@
 ;;; -*- lexical-binding: t; -*-
 
+(defun ymacs-misc/select-next-error-buffer ()
+  (interactive)
+  (let* ((error-buffer (next-error-find-buffer))
+         (buffers
+          (mapcar
+           (lambda (buffer)
+             (cons (format "%-50s => %s" (buffer-name buffer)
+                           (buffer-local-value 'next-error-function buffer))
+                   buffer))
+           (cl-remove-duplicates
+            (cl-remove-if-not
+             (lambda (buffer)
+               (and (not (eq error-buffer buffer))
+                    (next-error-buffer-p buffer)
+                    (or (eq buffer (current-buffer))
+                        (with-current-buffer buffer
+                          (apply 'derived-mode-p
+                                 ymacs-misc-auto-next-error-buffer-derived-modes)))))
+             (buffer-list)))))
+         (buffer
+          (cdr-safe
+           (if (> (length buffers) 1)
+               (ymacs//completing-read-simple
+                (format "buffer (default: %s): "
+                        (when error-buffer (buffer-name error-buffer)))
+                buffers)
+             (car buffers)))))
+    (if buffer
+        (progn
+          (message "Set `%s' as error buffer" buffer)
+          (setq next-error-last-buffer buffer))
+      (user-error "Nothing to do"))))
+
 ;;;###autoload
 (defun ymacs-misc/edit-dir-locals (&optional -directory)
   "Edit or create a .dir-locals.el file of the project."

@@ -125,6 +125,7 @@
 
   ("M-/" . hippie-expand)
   ("M-n" . next-error)
+  ("M-N" . ymacs-misc/select-next-error-buffer)
   ("M-p" . previous-error)
 
   ("M-`" . other-frame)

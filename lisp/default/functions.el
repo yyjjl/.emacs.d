@@ -9,31 +9,66 @@
   (if (or (not (listp -collection))
           (> (length -collection) 10))
       (funcall -action (completing-read -prompt -collection nil t nil -history))
-
-    (let ((map (make-sparse-keymap)))
-
-      (when -return-action
-        (define-key map (kbd "RET") (lambda! (funcall -return-action))))
-
+    (lv-message
+     "%s\n%s%s"
+     -prompt
+     (if -return-prompt
+         (concat "[RET] => " -return-prompt "\n")
+       "")
+     (string-join
       (--map-indexed
-       (define-key map (kbd (format "%d" it-index))
-         (lambda!
-             (funcall -action it)))
+       (format "[%d] => %s" it-index (or (car-safe it) it))
        -collection)
+      "\n"))
+    (let ((key (unwind-protect
+                    (read-key)
+                 (lv-delete-window))))
+      (cond
+        ((and (>= key ?0) (< key ?9))
+         (funcall -action (nth (- key ?0) -collection)))
 
-      (lv-message
-       "%s\n%s%s"
-       -prompt
-       (if -return-prompt
-           (concat "[RET] => " -return-prompt "\n")
-         "")
-       (string-join
-        (--map-indexed
-         (format "[%d] => %s" it-index (or (car-safe it) it))
-         -collection)
-        "\n"))
+        ((and -return-action (equal key 13))
+         (funcall -return-action))
 
-      (set-transient-map map nil #'lv-delete-window))))
+        (t (error "No action for key `%s'" (key-description `[,key])))))))
+
+(cl-defun ymacs//completing-read-simple
+    (-prompt -collection
+     &key
+       ((:return-value -return-value) 'unset)
+       ((:return-prompt -return-prompt))
+       ((:history -history)))
+  (if (or (not (listp -collection))
+          (> (length -collection) 10))
+      (let ((key (completing-read -prompt -collection nil t nil -history)))
+        (if (consp (car -collection))
+            (assoc-string key -collection)
+          key))
+    (lv-message
+     "%s\n%s%s"
+     -prompt
+     (if -return-prompt
+         (concat "[RET] => " -return-prompt "\n")
+       "")
+     (string-join
+      (--map-indexed
+       (format "[%d] => %s" it-index (or (car-safe it) it))
+       -collection)
+      "\n"))
+    (let ((key (unwind-protect
+                    (read-key)
+                 (lv-delete-window))))
+      (cond
+        ((and (>= key ?0) (< key ?9))
+         (nth (- key ?0) -collection))
+
+        ((and (not (eq -return-value 'unset)) (equal key 13))
+         -return-value)
+
+        ((equal key 7)
+         (signal 'quit nil))
+
+        (t (error "No action for key `%s'" (key-description `[,key])))))))
 
 (defsubst ymacs//save-variable (-symbol -file)
   (let ((real-file (expand-var! -file))

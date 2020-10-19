@@ -68,7 +68,7 @@
     (ymacs-ivy/select-rg-type-aliases . "select type")))
 
 (define-key!
-  ("C-x j j" . counsel-bookmark)
+  ("C-x j b" . counsel-bookmark)
   ("C-s" . ymacs/swiper)
   ("C-r" . swiper-isearch-backward)
   ("C-x C-f" . counsel-find-file)

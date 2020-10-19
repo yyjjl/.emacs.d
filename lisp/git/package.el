@@ -20,3 +20,6 @@
   ("j" . ymacs-git/goto-hunk)
   ("g" . magit-status)
   ("b" . magit-checkout))
+
+(define-key! :prefix "C-x j"
+  ("j" . ymacs-git/goto-hunk))
