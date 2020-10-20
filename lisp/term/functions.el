@@ -153,7 +153,10 @@
 (defun ymacs-term//create-buffer (&optional -program -shell-buffer-p -full-name)
   "Get term buffer.
 If option SPECIAL-SHELL is `non-nil', will use shell from user input."
-  (let* ((shell-name (or -program
+  (let* ((ymacs-term-type (if (and default-directory (file-remote-p default-directory))
+                              'shell
+                            ymacs-term-type))
+         (shell-name (or -program
                          (ymacs-term//get-shell-name)
                          (getenv "SHELL")
                          (getenv "ESHELL")
@@ -161,8 +164,6 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
          (term-name (or -full-name
                         (ymacs-term//get-buffer-name
                          (concat "*" ymacs-term-buffer-name "<%s>*"))))
-         (default-directory (or default-directory
-                                (expand-file-name ymacs-term-initial-directory)))
          (buffer (get-buffer-create term-name)))
 
     (cond

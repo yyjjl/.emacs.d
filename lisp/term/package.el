@@ -16,7 +16,6 @@
 (defvar ymacs-term-directory-functions '(projectile-project-root))
 (defvar ymacs-term-environment-functions ())
 
-(defvar ymacs-term-initial-directory "~/")
 (defvar ymacs-term-program-arguments ())
 
 (defvar-local ymacs-term-extra-name nil)

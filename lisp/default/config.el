@@ -108,7 +108,7 @@
 (setq-default scroll-conservatively 0)
 (setq-default scroll-preserve-screen-position t)
 
-(setq-default vc-make-backup-files nil)
+(setq vc-make-backup-files nil)
 ;; increase process buffer
 (setq read-process-output-max (* 2 1024 1024))
 

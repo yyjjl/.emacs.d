@@ -57,21 +57,6 @@
                (propertize (package-desc-summary package)
                            'face font-lock-doc-face))))))
 
-(defun ymacs-ivy//find-file-transformer (-string)
-  (concat
-   (ivy-read-file-transformer -string)
-   (propertize
-    (let* ((default-directory ivy--directory)
-           (type (-> -string
-                     expand-file-name
-                     directory-file-name
-                     file-attributes
-                     car)))
-      (if (stringp type)
-          (concat "-> " (expand-file-name type))
-        ""))
-    'face 'font-lock-doc-face)))
-
 (defun ymacs-ivy//switch-buffer-transformer (-string)
   "Transform STR to more readable format."
   (format "%-60s %s"

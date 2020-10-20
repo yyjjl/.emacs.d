@@ -28,8 +28,6 @@
 
   (ivy-configure 'package-install :display-transformer-fn
                  #'ymacs-ivy//package-install-transformer)
-  (ivy-configure 'counsel-find-file :display-transformer-fn
-                 #'ymacs-ivy//find-file-transformer)
   (ivy-configure 'counsel-bookmark :display-transformer-fn
                  #'ymacs-ivy//bookmark-transformer)
 
