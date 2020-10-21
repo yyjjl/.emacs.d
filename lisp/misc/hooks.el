@@ -18,7 +18,7 @@
   (global-hl-todo-mode 1)
   (electric-indent-mode 1)
 
-  (which-function-mode 1)
+  ;; (which-function-mode 1)
   (which-key-mode 1)
 
   (ignore-errors (global-so-long-mode 1)))
