@@ -1,10 +1,11 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;;;###autoload
-(defun ymacs-popup/last-popup-window ()
+(defun ymacs-popup/last-popup-window (&optional -arg)
   "Display last popup window"
-  (interactive)
-  (if (buffer-live-p (ymacs-popup//get-current-buffer))
+  (interactive "P")
+  (if (and (not -arg)
+           (buffer-live-p (ymacs-popup//get-current-buffer)))
       (display-buffer (ymacs-popup//get-current-buffer))
     (let ((help-buffers
            (mapcar #'buffer-name

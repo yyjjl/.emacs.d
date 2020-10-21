@@ -51,6 +51,11 @@
 (after! tramp
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
 
+  (setq vc-ignore-dir-regexp
+        (format "\\(?:%s\\)\\|\\(?:%s\\)"
+                locate-dominating-stop-dir-regexp
+                tramp-file-name-regexp))
+
   (setq tramp-terminal-type "tramp")
   (setq tramp-default-method "ssh")
   (setq backup-enable-predicate

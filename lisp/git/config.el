@@ -16,6 +16,9 @@
           (ignored . "."))))
 
 (after! magit
+  (define-key! :map magit-mode-map
+    ("C-x C-f" . magit-find-file))
+
   (setq magit-completing-read-function 'ivy-completing-read)
   (setq magit-auto-revert-mode nil))
 

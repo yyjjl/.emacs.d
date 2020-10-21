@@ -95,7 +95,7 @@
                        return name))))))
 
 (after! ffap
-  (advice-add #'ffap-guesser :around #'ignore-errors!))
+  (advice-add #'ffap-guesser :around #'ignore-remote!))
 
 (after! xref
   (define-hook! :anonymous (xref--xref-buffer-mode-hook)
@@ -149,7 +149,8 @@
 
   ;; Projectile root-searching functions can cause an infinite cl-loop on TRAMP
   ;; connections, so disable them.
-  (advice-add #'projectile-locate-dominating-file :around #'ignore-remote!))
+  (advice-add #'projectile-locate-dominating-file :around #'ignore-remote!)
+  (advice-add #'delete-file-projectile-remove-from-cache :around #'ignore-remote!))
 
 (after! yasnippet
   (define-advice yas-next-field-or-maybe-expand (:around (-fn &rest -args) expand-local)

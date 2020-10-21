@@ -15,6 +15,38 @@
         ibuffer-movement-cycle nil
         ibuffer-display-summary nil)
 
+  (setq ibuffer-saved-filter-groups
+        '(("default"
+           ("Dired" (or (mode . dired-mode)
+                        (mode . sr-mode)))
+           ("Planner" (or (name . "^\\*Calendar\\*$")
+                          (name . "^diary$")
+                          (mode . muse-mode)
+                          (mode . org-mode)
+                          (mode . org-agenda-mode)))
+           ("Text" (predicate . (derived-mode-p 'text-mode)))
+           ("Emacs" (or (name . "^\\*scratch\\*$")
+                        (name . "^\\*Messages\\*$")
+                        (name . "^\\*Help\\*$")
+                        (name . "^\\*info\\*$")
+                        (name . "^\\*Backtrace\\*$")
+                        (name . "^\\*Completions\\*$")
+                        (name . "^\\*Compile-Log\\*$")
+                        (name . "^\\*Man .*\\*$")))
+           ("Emacs-Var" (filename . ".emacs.d/var"))
+           ("Emacs-Config" (filename . ".emacs.d"))
+           ("Code" (predicate . (derived-mode-p 'prog-mode)))
+           ("Process" (or (predicate . (get-buffer-process (current-buffer)))
+                          (mode . eshell-mode)))
+           ("Gnus" (or (mode . message-mode)
+                       (mode . bbdb-mode)
+                       (mode . mail-mode)
+                       (mode . gnus-group-mode)
+                       (mode . gnus-summary-mode)
+                       (mode . gnus-article-mode)
+                       (name . "^\\.bbdb$")
+                       (name . "^\\.newsrc-dribble"))))))
+
   ;; Modify the default ibuffer-formats
   (setq ibuffer-formats
         '((mark modified read-only
