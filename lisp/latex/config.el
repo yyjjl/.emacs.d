@@ -109,6 +109,7 @@
         reftex-use-fonts t))
 
 (after! lsp-tex
-  (ymacs-lsp//set-simple-install-fn
-   'texlab
-   "cargo install --git https://github.com/latex-lsp/texlab.git"))
+  (after-feature! lsp
+    (ymacs-lsp//set-simple-install-fn
+     'texlab
+     "cargo install --git https://github.com/latex-lsp/texlab.git")))
