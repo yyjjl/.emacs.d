@@ -1,16 +1,21 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;;;###autoload
-(defun latex/next-error ()
+(defun ymacs-latex/next-error ()
   (interactive)
-  (let ((occur-buffer (ymacs-misc//get-occur-buffer)))
-    (call-interactively (if occur-buffer #'next-error #'TeX-next-error))))
+  (call-interactively
+   (if (eq next-error-last-buffer (TeX-active-buffer))
+       #'TeX-next-error
+     #'next-error)))
 
 ;;;###autoload
-(defun latex/previous-error ()
+(defun ymacs-latex/previous-error ()
   (interactive)
-  (let ((occur-buffer (ymacs-misc//get-occur-buffer)))
-    (call-interactively (if occur-buffer #'previous-error #'TeX-previous-error))))
+  (call-interactively
+   (if (eq next-error-last-buffer (TeX-active-buffer))
+       #'TeX-previous-error
+     #'previous-error)))
+
 
 ;;;###autoload
 (defun ymacs-latex/narrow-to-section (&optional -no-subsections)

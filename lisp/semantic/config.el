@@ -7,7 +7,7 @@
   ;; It's too slow, when file is large
   ;; (require 'stickyfunc-enhance)
   (setq semantic-default-submodes
-        '(global-semantic-idle-scheduler-mode
+        '(;; global-semantic-idle-scheduler-mode
           global-semanticdb-minor-mode
           ;; global-semantic-idle-summary-mode
           ;; global-semantic-idle-local-symbol-highlight-mode

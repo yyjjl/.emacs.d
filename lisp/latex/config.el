@@ -107,3 +107,8 @@
           (?b . "\\blockcquote[]{%l}{}"))
         reftex-plug-into-AUCTeX '(t t t t t)
         reftex-use-fonts t))
+
+(after! lsp-tex
+  (ymacs-lsp//set-simple-install-fn
+   'texlab
+   "cargo install --git https://github.com/latex-lsp/texlab.git"))

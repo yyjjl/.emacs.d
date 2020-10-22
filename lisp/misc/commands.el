@@ -1,5 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
+;;;###autoload
 (defun ymacs-misc/select-next-error-buffer ()
   (interactive)
   (let* ((error-buffer (next-error-find-buffer))
@@ -13,7 +14,8 @@
             (cl-remove-if-not
              (lambda (buffer)
                (and (not (eq error-buffer buffer))
-                    (next-error-buffer-p buffer)
+                    (or (next-error-buffer-p buffer)
+                        (eq 'TeX-output-mode (buffer-local-value 'major-mode buffer)))
                     (or (eq buffer (current-buffer))
                         (with-current-buffer buffer
                           (apply 'derived-mode-p
