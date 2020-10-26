@@ -23,7 +23,7 @@
     ("C-c I" . lsp-ivy-workspace-symbol)
     ("C-c G" . lsp-ivy-global-workspace-symbol)
     ("C-c S" . lsp-describe-session)
-    ("C-c B" . lsp-format-buffer)
+    ("C-c F" . lsp-format-buffer)
     ("C-c C-d" . lsp-describe-thing-at-point)
     ("C-c C-SPC" . lsp-execute-code-action)
     ("C-c l" :map lsp-command-map)

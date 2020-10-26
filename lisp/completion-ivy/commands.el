@@ -125,9 +125,9 @@
   (let* ((initial-directory (cl-loop for arg in -args if (string-prefix-p "@" arg)
                                      return (substring arg 1)))
          (args (--filter (not (string-prefix-p "@" it)) -args))
-         (counsel-rg-base-command (concat "rg " (string-join args " ") " %s .")))
-    (let ((shell-file-name "/bin/sh"))
-      (counsel-rg nil initial-directory -extra-args))))
+         (counsel-rg-base-command (concat "rg " (string-join args " ") " %s ."))
+         (shell-file-name "/bin/sh"))
+    (counsel-rg nil initial-directory -extra-args)))
 
 ;;;###autoload (autoload 'ymacs-counsel/rg "../lisp/completion-ivy/commands.el" nil t)
 (define-transient-command ymacs-counsel/rg (&optional -directory)
