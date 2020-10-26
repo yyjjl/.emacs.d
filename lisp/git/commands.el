@@ -1,5 +1,12 @@
 ;;; -*- lexical-binding: t; -*-
 
+;;;###autoload
+(defun ymacs-git//status ()
+  (interactive)
+  (when (file-remote-p default-directory)
+    (user-error "Magit is disabled on remote host"))
+  (call-interactively #'magit-status))
+
 (defun ymacs-git//format-hunk (-ov)
   (let ((start (overlay-start -ov)))
     (cons

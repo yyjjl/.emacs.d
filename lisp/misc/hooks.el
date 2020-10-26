@@ -147,9 +147,24 @@
         (apply -fn -args)
       (lv-delete-window)))
 
-  ;; Projectile root-searching functions can cause an infinite cl-loop on TRAMP
-  ;; connections, so disable them.
-  (advice-add #'projectile-locate-dominating-file :around #'ignore-remote!)
+  (define-advice projectile-project-root (:override (&optional -dir) light)
+    (let ((dir (or -dir default-directory)))
+      (if (file-remote-p dir)
+          (projectile-root-local dir)
+        (cl-subst
+         nil 'none
+         (or (cl-some
+              (lambda (func)
+                (let* ((cache-key (format "%s-%s" func dir))
+                       (cache-value (gethash cache-key projectile-project-root-cache)))
+                  (if (and cache-value (file-exists-p cache-value))
+                      cache-value
+                    (let ((value (funcall func (file-truename dir))))
+                      (puthash cache-key value projectile-project-root-cache)
+                      value))))
+              projectile-project-root-files-functions)
+             'none)))))
+
   (advice-add #'delete-file-projectile-remove-from-cache :around #'ignore-remote!))
 
 (after! yasnippet

@@ -6,6 +6,10 @@ export XMODIFIERS='@im=fcitx'
 export XIM=fcitx
 export XIM_PROGRAM=fcitx
 
+if [ -d "$HOME/.local/bin" ]; then
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+
 fcitx &
 
 xsetroot -solid "#2d2d2d"

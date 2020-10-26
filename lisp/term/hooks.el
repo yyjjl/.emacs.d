@@ -68,7 +68,20 @@
     (when (string-match-p "inferior\\|interactive" (symbol-name major-mode))
       (local-set-key (kbd "M-}") #'ymacs-term/next)
       (local-set-key (kbd "M-{") #'ymacs-term/prev)
-      (setq ymacs-term-exit-action 'shell))))
+      (setq ymacs-term-exit-action 'shell)))
+
+  (define-advice comint-delchar-or-maybe-eof (:override (-arg) maybe-toggle)
+    "If point is at the end of the buffer and there is no input,
+send an EOF if called in localhost, otherwise call `ymacs-term/toggle-window'.
+If not, delete -ARG characters forward."
+    (interactive "P")
+    (if-let (proc (get-buffer-process (current-buffer)))
+        (if (and (eobp)
+                 (= (point) (marker-position (process-mark proc))))
+            (if (not (file-remote-p default-directory))
+                (comint-send-eof)
+              (ymacs-term/toggle-window))
+          (delete-char -arg)))))
 
 (after! shell
   (bash-completion-setup)
