@@ -32,6 +32,7 @@
     (if buffer
         (progn
           (message "Set `%s' as error buffer" buffer)
+          (setq next-error-buffer buffer)
           (setq next-error-last-buffer buffer))
       (user-error "Nothing to do"))))
 

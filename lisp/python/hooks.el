@@ -17,6 +17,7 @@
                          (and (string-match-p "python" exe)
                               (executable-find exe))))
                      (process-command (get-buffer-process (current-buffer))))
+        (setq truncate-lines nil)
         (ymacs-python//enable-pdbtrack))))
 
   (define-hook! ymacs-python|setup (python-mode-hook)

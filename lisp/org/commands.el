@@ -51,11 +51,12 @@ _h_tml    _'_         ^ ^             _A_SCII:
 ;;;###autoload
 (defun ymacs-org/publish-current-file ()
   (interactive)
-  (save-excursion
-    (if ymacs-org-master-file
-        (ymacs-org//with-master-file!
-         (call-interactively #'org-publish-current-file))
-      (call-interactively #'org-publish-current-file))))
+  (without-user-record!
+   (save-excursion
+     (if ymacs-org-master-file
+         (ymacs-org//with-master-file!
+          (call-interactively #'org-publish-current-file))
+       (call-interactively #'org-publish-current-file)))))
 
 ;;;###autoload
 (defun ymacs-org/next-item (&optional -n)
@@ -208,35 +209,47 @@ With a prefix BELOW move point to lower block."
 ;;;###autoload
 (defun ymacs-org/display-latex-fragment-at-point ()
   (interactive)
-  (let ((latex-fragment
-         (when-let
-             ((bounds (if (region-active-p)
-                          (cons (region-beginning)
-                                (region-end))
-                        (when-let (element (org-element-at-point))
-                          (cons (org-element-property :begin element)
-                                (org-element-property :end element))))))
-           (buffer-substring-no-properties (car bounds) (cdr bounds))))
-        (buffer (get-buffer-create "*latex-preview*")))
-    ;; display buffer
-    (ymacs-popup//display-buffer buffer nil '(:side below :size 0.3 :autoclose t))
+  (if-let ((latex-fragment
+            (when-let ((bounds (if (region-active-p)
+                                   (cons (region-beginning)
+                                         (region-end))
+                                 (when-let (element (org-element-at-point))
+                                   (cons (org-element-property :begin element)
+                                         (org-element-property :end element))))))
+              (string-trim (buffer-substring-no-properties (car bounds) (cdr bounds))
+                           (rx (* (any blank "\n,.!?;:")))
+                           (rx (* (any blank "\n,.!?;:"))))))
+           (buffer (get-buffer-create "*latex-preview*")))
+      (progn
+        (unless (or (string-prefix-p "\\begin" latex-fragment)
+                    (string-prefix-p "$" latex-fragment))
+          (setq latex-fragment
+                (concat "\\begin{displaymath}"
+                        latex-fragment
+                        "\\end{displaymath}")))
 
-    (with-current-buffer buffer
-      (erase-buffer)
-      (insert (or (string-trim latex-fragment
-                               (rx (* (any blank "\n,.!?;:")))
-                               (rx (* (any blank "\n,.!?;:"))))
-                  ""))
-      (unless (eq major-mode 'org-mode)
-        (org-mode))
-      (org-clear-latex-preview)
-      (let ((org-format-latex-options
-             (plist-put (copy-sequence org-format-latex-options) :scale 2)))
-        (org-latex-preview '(16)))
-      (when-let (window (get-buffer-window buffer))
-        (fit-window-to-buffer window 15)
-        (special-mode))
-      (setq-local mode-line-format nil))))
+        (ymacs-popup//display-buffer buffer nil '(:side below :autoclose t :size 0.3))
+
+        (with-current-buffer buffer
+          (setq buffer-read-only nil)
+          (setq-local mode-line-format nil)
+
+          (erase-buffer)
+          (insert latex-fragment)
+
+          (unless (eq major-mode 'org-mode)
+            (org-mode))
+
+          (org-clear-latex-preview)
+          (let ((org-format-latex-options
+                 (plist-put (copy-sequence org-format-latex-options) :scale 2)))
+            (org-latex-preview '(16)))
+
+          (when-let (window (get-buffer-window buffer))
+            (fit-window-to-buffer window 15)
+            (ymacs-popup//push-window window buffer t)
+            (special-mode))))
+    (user-error "Unknown error")))
 
 ;;;###autoload
 (defun ymacs-org/project-open ()

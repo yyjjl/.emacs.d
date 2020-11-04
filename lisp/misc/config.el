@@ -136,6 +136,7 @@
     ("C-x p" :map projectile-command-map))
 
   (define-key! :map projectile-command-map
+    ("E" . ymacs-misc/edit-dir-locals)
     ("K" . projectile-kill-buffers)
     ("w" . projectile-switch-project))
 

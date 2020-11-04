@@ -43,25 +43,17 @@
     (let ((old-point (point))
           (old-tick (buffer-chars-modified-tick)))
       (apply -fn -arg)
-      (when (and (eq old-point (point))
-                 (eq old-tick (buffer-chars-modified-tick))
+      (when (and (equal old-point (point))
+                 (equal old-tick (buffer-chars-modified-tick))
                  (called-interactively-p 'interactive)
                  (not (eq tab-always-indent 'complete)))
-        (cond ;; Skip close paren
-         ((memq (char-after) ymacs-misc--indent-close-list)
-          (forward-char 1))
-         ;; Trigger completions
-         ((and (not (eq tab-always-indent 'complete))
-               (not (memq (get-text-property (max (point-min) (1- (point))) 'face)
-                          '(font-lock-string-face font-lock-doc-face)))
-               (looking-back "\\(?:\\s_\\|\\sw\\)\\(?:\\.\\|->\\|::?\\)?"
-                             (max (point-min) (- (point) 5))))
-          ;; If company-idle-delay is nil (which means company is not trigger
-          ;; automatically, <tab> will trigger it
-          (catch 'done
-            (dolist (func ymacs-misc--indent-compelte-functions)
-              (when (ignore-errors (call-interactively func))
-                (throw 'done nil))))))))))
+        ;; Trigger completions
+        (or (ignore-errors (ymacs-misc//try-expand-local-snippets))
+            (ignore-errors (call-interactively #'company-files))
+            (when (looking-back "\\(?:\\s_\\|\\sw\\)\\(?:\\.\\|->\\|::?\\)?"
+                                (max (point-min) (- (point) 5)))
+              (ignore-errors (call-interactively #'company-complete)))
+            (ignore-errors (call-interactively #'hippie-expand)))))))
 
 (after! savehist
   (define-advice savehist-save

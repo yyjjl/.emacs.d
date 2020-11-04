@@ -6,7 +6,9 @@
   (require 'semantic/fw)
   (condition-case nil
       (if (semantic-active-p)
-          (counsel-semantic)
+          (progn
+            (semantic-force-refresh)
+            (counsel-semantic))
         (counsel-imenu))
     (error
      (ignore-errors (counsel-imenu)))))

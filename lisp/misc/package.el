@@ -66,13 +66,6 @@
 
 (defvar ymacs-misc-socks-server '("Default server" "127.0.0.1" 1080 5))
 
-;; Smart tab
-(defvar ymacs-misc--indent-close-list '(?\} ?\$ ?\] ?\' ?\` ?\"))
-(defvar ymacs-misc--indent-compelte-functions
-  '(ymacs-misc//try-expand-local-snippets
-    company-complete
-    hippie-expand))
-
 (defvar ymacs-misc-projectile-invalidate-cache-empty-vars
   '(doom-modeline--vcs-text
     doom-modeline--project-detected-p
