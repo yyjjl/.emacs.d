@@ -27,7 +27,7 @@
 
 (after! magit-files
   (define-key! :map magit-file-mode-map
-    ("C-x g g" . magit-status)
+    ("C-x g g" . ymacs-git//status)
     ("C-x g")))
 
 ;; Resolve diff3 conflicts
