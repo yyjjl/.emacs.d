@@ -1,5 +1,6 @@
 !/private/sdcv/
 !/private/doom-modeline/
+!/private/org-html-themes/
 *.elc
 *.log
 *.swp
