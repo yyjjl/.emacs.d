@@ -3,20 +3,6 @@
 (eval-when-compile
   (require 'term))
 
-(autoload 'tramp-parse-sconfig "tramp" nil nil)
-
-(defsubst ymacs-term//parse-sconfig ()
-  (remove nil (mapcar #'cadr (tramp-parse-sconfig "~/.ssh/config"))))
-
-(defun ymacs-term//get-host ()
-  (let* ((user (file-remote-p default-directory 'user))
-         (host (file-remote-p default-directory 'host)))
-    (completing-read
-     "[user[#port]@]host: " (ymacs-term//parse-sconfig)
-     nil                                ; predicate
-     nil                                ; require-match
-     (if user (concat user "@" host) host))))
-
 (defsubst ymacs-term//get-buffer-name (-fmt)
   (let* ((index 1)
          (name (format -fmt index)))
@@ -85,12 +71,13 @@
                   (set-window-dedicated-p window nil)))
               (kill-buffer))
 
-          (let ((buffer-read-only nil))
-            (insert (propertize "Press `Ctrl-D' or `q' to kill this buffer. "
-                                'font-lock-face
-                                'font-lock-comment-face)))
-
-          (setq buffer-read-only t)
+          (let ((help-str (propertize "[Press `Ctrl-D' or `q' to kill this buffer. ]"
+                                      'font-lock-face
+                                      'font-lock-warning-face)))
+            (if (listp mode-line-buffer-identification)
+                (add-to-list 'mode-line-buffer-identification help-str t)
+              (setq mode-line-buffer-identification
+                    (list mode-line-buffer-identification help-str))))
 
           (when-let (map (current-local-map))
             (use-local-map (copy-keymap (current-local-map))))
@@ -191,10 +178,7 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
 
 (defun ymacs-term//exec-program (-program -args &optional -name -full-name)
   (let ((ymacs-term-program-arguments -args)
-        (ymacs-term-buffer-name -name)
-        (ymacs-term-type (if (eq ymacs-term-type 'vterm)
-                             'term
-                           ymacs-term-type)))
+        (ymacs-term-buffer-name -name))
     (ymacs-term//create-buffer -program nil -full-name)))
 
 (cl-defun ymacs-term//exec-program-reuse-buffer
@@ -249,8 +233,7 @@ If -FORCE is non-nil create a new term buffer directly."
              (cl-find-if
               (lambda (buffer)
                 (and (ymacs-term//shell-buffer-p buffer)
-                     (directory-equal-p directory
-                                        (buffer-local-value 'default-directory buffer))))
+                     (directory-equal-p directory (buffer-local-value 'default-directory buffer))))
               (buffer-list)))
 
         (let ((default-directory directory))

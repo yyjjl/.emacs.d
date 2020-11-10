@@ -41,12 +41,15 @@
       ;; Toggle outline
       (outline-toggle-children)
     (let ((old-point (point))
-          (old-tick (buffer-chars-modified-tick)))
-      (apply -fn -arg)
-      (when (and (equal old-point (point))
-                 (equal old-tick (buffer-chars-modified-tick))
-                 (called-interactively-p 'interactive)
-                 (not (eq tab-always-indent 'complete)))
+          (old-tick (buffer-chars-modified-tick))
+          (do-complete (equal current-prefix-arg '(16))))
+      (unless do-complete
+        (apply -fn -arg))
+      (when (or do-complete
+                (and (equal old-point (point))
+                     (equal old-tick (buffer-chars-modified-tick))
+                     (called-interactively-p 'interactive)
+                     (not (eq tab-always-indent 'complete))))
         ;; Trigger completions
         (or (ignore-errors (ymacs-misc//try-expand-local-snippets))
             (ignore-errors (call-interactively #'company-files))
