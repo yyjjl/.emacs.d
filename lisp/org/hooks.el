@@ -92,8 +92,7 @@
       (if (and project
                (string= type "file")
                (string= (file-name-extension raw-path) "org")
-               (equal (car (org-publish-get-project-from-filename
-                            (file-truename raw-path)))
+               (equal (car (org-publish-get-project-from-filename (file-truename raw-path)))
                       (car project)))
           (format "\\href{%s.pdf%s}{%s}"
                   (org-latex--protect-text
@@ -109,43 +108,3 @@
                                 "\\\\includegraphics"
                                 code
                                 nil nil 1))))
-
-(after! ox
-  (define-advice org-export-expand-include-keyword
-      (:around
-       (-fn &optional -included -directory &rest -args)
-       remove-relative-path)
-    "Remove relative file path when including files"
-
-    (if (not -included) ;; function called at top level
-        (clrhash ymacs-org--included-files)
-      (puthash (file-truename (caar -included)) t ymacs-org--included-files))
-
-    (let ((result (apply -fn -included -directory -args)))
-      (unless -included
-        (save-excursion
-          (goto-char (point-min))
-          (while (re-search-forward org-link-any-re nil t)
-            (let ((link-end (point))
-                  (link (save-excursion
-                          (forward-char -1)
-                          (save-match-data (org-element-context)))))
-              (when (eq 'link (org-element-type link))
-                (let ((link-begin (org-element-property :begin link)))
-                  (goto-char link-begin)
-                  (let* ((path (org-element-property :path link))
-                         (search-option (org-element-property :search-option link)))
-                    (if (not (and search-option
-                                  (eq 'bracket (org-element-property :format link))
-                                  (string= "file" (org-element-property :type link))
-                                  (gethash (file-truename (expand-file-name path -directory))
-                                           ymacs-org--included-files)))
-                        (goto-char link-end)
-                      (let* ((contents-begin (org-element-property :contents-begin link))
-                             (contents-end (org-element-property :contents-end link))
-                             (description (when (and contents-begin contents-end)
-                                            (buffer-substring-no-properties contents-begin contents-end))))
-                        (delete-region (org-element-property :begin link)
-                                       (org-element-property :end link))
-                        (insert (org-link-make-string search-option description) " "))))))))))
-      result)))

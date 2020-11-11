@@ -9,6 +9,7 @@
  whitespace
  csv-mode
  gnuplot-mode
+ bison-mode
  graphviz-dot-mode
  yaml-mode)
 

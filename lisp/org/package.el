@@ -26,8 +26,10 @@
     ("r" . org-table-show-reference)))
 
 ;; Config for publish site from org files
-(defvar ymacs-org-project-base-dir "~/project/org")
-(defvar ymacs-org-project-src-dir "~/project/org/src")
+(defvar ymacs-org-project-base-dir (expand-file-name "org-notes" ymacs-private-directory))
+(defvar ymacs-org-project-src-dir (expand-file-name "src" ymacs-org-project-base-dir))
+(defvar ymacs-org-project-dst-dir (expand-file-name "dst" ymacs-org-project-base-dir))
+(defvar ymacs-org-publish-last-project nil)
 
 (defcustom ymacs-org-project-sync-command nil
   "Command to sync org notes."
@@ -35,19 +37,11 @@
   :type 'directory
   :safe #'stringp)
 
-(defcustom ymacs-org-master-file nil
-  "master file for org"
-  :group 'org
-  :type 'file
-  :safe #'file-exists-p)
-
 (defcustom ymacs-org-latex-ignore-internal-label nil
   ""
   :group 'org
   :type 'file
   :safe #'booleanp)
-
-(defvar ymacs-org--included-files (make-hash-table :test #'equal))
 
 (define-key!
   ("C-c '" . poporg-dwim)

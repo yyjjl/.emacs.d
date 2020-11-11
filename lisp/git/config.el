@@ -2,7 +2,7 @@
 
 (after! diff-hl
   (setq diff-hl-draw-borders nil)
-  (setq diff-hl-side 'left)
+  (setq diff-hl-side 'right)
 
   ;; Highlight on-the-fly, too slow
   ;; (diff-hl-flydiff-mode 1)

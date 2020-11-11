@@ -39,24 +39,25 @@ _h_tml    _'_         ^ ^             _A_SCII:
       (ymacs-hydra/org-template/body)
     (self-insert-command 1)))
 
-(defmacro ymacs-org//with-master-file! (&rest body)
-  (declare (indent nil))
-  `(save-window-excursion
-     (unless (and (file-exists-p ymacs-org-master-file)
-                  (file-regular-p ymacs-org-master-file))
-       (user-error (format "Can not open %s" ymacs-org-master-file)))
-     (with-current-buffer (find-file ymacs-org-master-file)
-       ,@body)))
-
 ;;;###autoload
 (defun ymacs-org/publish-current-file ()
   (interactive)
+  (require 'ox)
   (without-user-record!
    (save-excursion
-     (if ymacs-org-master-file
-         (ymacs-org//with-master-file!
-          (call-interactively #'org-publish-current-file))
-       (call-interactively #'org-publish-current-file)))))
+     (let* ((force (equal current-prefix-arg '(16)))
+            (project
+             (or (when (not force)
+                   (assoc ymacs-org-publish-last-project org-publish-project-alist))
+                 (when current-prefix-arg
+                   (ymacs//completing-read-simple "Project: " org-publish-project-alist))
+                 (car org-publish-project-alist))))
+       (save-window-excursion
+         (let ((org-publish-use-timestamps-flag
+                (and (not force)
+                     org-publish-use-timestamps-flag)))
+           (org-publish-file (buffer-file-name (buffer-base-buffer)) project)
+           (setq ymacs-org-publish-last-project (car project))))))))
 
 ;;;###autoload
 (defun ymacs-org/next-item (&optional -n)
@@ -98,18 +99,37 @@ _h_tml    _'_         ^ ^             _A_SCII:
     (candidates (company-auctex-symbol-candidates -arg))
     (annotation (company-auctex-symbol-annotation -arg))))
 
+(defsubst ymacs-org//fn-to-extension (-fn)
+  (when (symbolp -fn)
+    (concat "." (car (last (split-string (symbol-name -fn) "-"))))))
+
 ;;;###autoload
 (defun ymacs-org/open-pdf ()
   (interactive)
-  (let ((filename (if (and ymacs-org-master-file (file-exists-p ymacs-org-master-file))
-                      (file-truename ymacs-org-master-file)
-                    (buffer-file-name))))
-    (setq filename (concat (file-name-sans-extension filename) ".pdf"))
-    (if (and filename (file-exists-p filename))
-        (if (fboundp #'ymacs-pdf//find-file-other-window)
-            (ymacs-pdf//find-file-other-window filename)
-          (find-file-other-window filename))
-      (counsel-find-file (file-name-sans-extension filename)))))
+  (let* ((filename (buffer-file-name))
+         (project (or (assoc ymacs-org-publish-last-project org-publish-project-alist)
+                      (org-publish-get-project-from-filename filename)))
+         (basename (file-name-sans-extension filename))
+         (files (list
+                 (when project
+                   (when-let ((src-dir (org-publish-property :base-directory project))
+                              (dst-dir (org-publish-property :publishing-directory project)))
+                     (concat (expand-file-name (file-relative-name basename src-dir) dst-dir)
+                             (or (ymacs-org//fn-to-extension
+                                  (org-publish-property :publishing-function project))
+                                 ".pdf"))))
+                 (concat basename
+                         (or (ymacs-org//fn-to-extension
+                              (car-safe org-export-dispatch-last-action))
+                             ".pdf")))))
+    (catch 'done
+      (dolist (file files)
+        (when (and file (file-exists-p file))
+          (if (fboundp #'ymacs-pdf//find-file-other-window)
+              (ymacs-pdf//find-file-other-window file)
+            (open! (list file)))
+          (throw 'done t)))
+      (counsel-find-file basename))))
 
 ;;;###autoload
 (defun ymacs-org/latexmk-start-watching (-arg)

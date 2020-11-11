@@ -1,3 +1,6 @@
 [submodule "private/doom-modeline"]
 	path = private/doom-modeline
 	url = https://github.com/yyjjl/doom-modeline
+[submodule "private/org-html-themes"]
+	path = private/org-html-themes
+	url = https://github.com/fniessen/org-html-themes

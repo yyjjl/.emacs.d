@@ -171,15 +171,30 @@
 (after! ox-html
   (setq org-html-head
         (eval-when-compile
-          (concat "<style type=\"text/css\">\n/*<![CDATA[*/\n"
-                  (read-file-content! (expand-etc! "org-manual.css"))
-                  "\n/*]]>*/\n</style>")))
+          (cl-loop
+           for (file type) in
+           `(("readtheorg/css/htmlize.css" "style")
+             (,(expand-etc! "org-manual.css") "style")
+             ("lib/js/jquery.min.js" "script")
+             ("lib/js/bootstrap.min.js" "script")
+             ("lib/js/jquery.stickytableheaders.min.js" "script")
+             ("readtheorg/js/readtheorg.js" "script"))
+           for directory = (expand-file-name "org-html-themes/styles" ymacs-private-directory)
+           for content = (read-file-content! (expand-file-name file directory))
+           concat
+           (if (string= type "style")
+               (concat "<style type=\"text/css\">\n/*<![CDATA[*/\n"
+                       content
+                       "\n/*]]>*/\n</style>")
+             (concat "<script type=\"text/javascript\">"
+                     content
+                     "</script>")))))
   (setq org-html-mathjax-template
         (eval-when-compile
           (read-file-content!
            (expand-etc! "org-mathjax-template"))))
 
-  (setcdr (assoc 'scale org-html-mathjax-options) '("90"))
+  (setcdr (assoc 'scale org-html-mathjax-options) '("100"))
   (setcdr (assoc 'align org-html-mathjax-options) '("center")))
 
 (after! ox-latex
@@ -251,10 +266,10 @@
 
 (after! ox-publish
   (setq org-publish-project-alist
-        `(("note-pdf"                   ; These are the main web files
+        `(("note-pdf"
            :base-directory ,ymacs-org-project-src-dir
            :base-extension "org"
-           :publishing-directory ,ymacs-org-project-src-dir
+           :publishing-directory ,ymacs-org-project-dst-dir
            :recursive t
            :publishing-function org-latex-publish-to-pdf
            :headline-levels 4           ; Just the default for this project.
@@ -265,9 +280,10 @@
            :auto-sitemap t
            :sitemap-filename "index.org")
           ("note-html"                  ; These are the main web files
+           :html-link-home "../index.html"
            :base-directory ,ymacs-org-project-src-dir
            :base-extension "org"
-           :publishing-directory ,ymacs-org-project-src-dir
+           :publishing-directory ,ymacs-org-project-dst-dir
            :recursive t
            :publishing-function org-html-publish-to-html
            :headline-levels 4           ; Just the default for this project.
@@ -278,10 +294,11 @@
            :auto-sitemap t
            :sitemap-filename "index.org")
           ("note-static"            ; These are static files (images, pdf, etc)
-           :base-directory ,ymacs-org-project-base-dir
+           :base-directory ,ymacs-org-project-src-dir
            :base-extension
            "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|svg\\|mp3\\|ogg\\|swf\\|txt\\|asc\\|json"
-           :publishing-directory ,ymacs-org-project-base-dir
+           :publishing-directory ,ymacs-org-project-dst-dir
            :recursive t
-           :publishing-function org-publish-attachment)
+           :publishing-function org-publish-attachment
+           :exclude "auto/cache/org-ltximg.*\\.png")
           ("note" :components ("note-pdf" "note-static")))))
