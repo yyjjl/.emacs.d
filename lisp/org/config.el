@@ -253,11 +253,12 @@
   (add-to-list
    'org-latex-classes
    `("cn-beamer"
-     ,(s-replace
-       "[ORG-TEMPLATE-DIR]"
+     ,(replace-regexp-in-string
+       (regexp-quote "[ORG-TEMPLATE-DIR]")
        org-templates-directory
        (read-file-content!
-        (expand-file-name "beamer" org-templates-directory)))
+        (expand-file-name "beamer" org-templates-directory))
+       t t)
      ("\\section{%s}" . "\\section*{%s}")
      ("\\subsection{%s}" . "\\subsection*{%s}")
      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")

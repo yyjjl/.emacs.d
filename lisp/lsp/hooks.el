@@ -40,7 +40,7 @@
                             (substitute-command-keys
                              "\\[lsp-describe-thing-at-point]"))
                     'face 'font-lock-comment-face)))))
-        (setq content (s-replace "\n" " " content)))
+        (setq content (replace-regexp-in-string "\n" " " content t t)))
       content))
 
   (advice-add #'lsp-download-install :override #'lsp-download-install@pretty)

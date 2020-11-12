@@ -20,7 +20,7 @@
 
           (when-let ((dot-clangd (ymacs-cpp-clangd//dot-clangd-path))
                      (flags (and (file-exists-p dot-clangd)
-                                 (s-replace "\n" " " (read-file-content! dot-clangd)))))
+                                 (replace-regexp-in-string "\n" " " (read-file-content! dot-clangd) t t))))
             (format "g++ %s %s" flags (buffer-file-name))))))
 
     (if -preprocess-only-p
