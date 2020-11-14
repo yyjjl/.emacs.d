@@ -10,7 +10,10 @@
 (defvar ymacs-git--diff-hl-update-timer nil)
 (defvar ymacs-git--diff-hl-update-delay 0.5)
 
+(define-key! ("C-x g"))
 (define-key! :prefix "C-x g"
+  ("G" . magit-dispatch)
+  ("f" . magit-file-dispatch)
   ("=" . diff-hl-diff-goto-hunk)
   ("SPC" . diff-hl-mark-hunk)
   ("t" . ymacs-git/timemachine)

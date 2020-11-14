@@ -25,11 +25,6 @@
 (after! transient
   (setq transient-mode-line-format nil))
 
-(after! magit-files
-  (define-key! :map magit-file-mode-map
-    ("C-x g g" . ymacs-git//status)
-    ("C-x g")))
-
 ;; Resolve diff3 conflicts
 (after! smerge-mode
   (define-key! :map smerge-mode-map

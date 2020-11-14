@@ -67,8 +67,7 @@
         (if (not (eq ymacs-term-exit-action 'keep))
             (progn
               (when (one-window-p)
-                (let ((window (get-buffer-window)))
-                  (set-window-dedicated-p window nil)))
+                (set-window-dedicated-p (get-buffer-window) nil))
               (kill-buffer))
 
           (let ((help-str (propertize "[Press `Ctrl-D' or `q' to kill this buffer. ]"

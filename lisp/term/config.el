@@ -31,6 +31,7 @@
   (setq comint-prompt-read-only t)
 
   (define-key! :map comint-mode-map
+    ("M-o" . ymacs-term/switch)
     ("M-h" . counsel-shell-history)))
 
 (after! shell

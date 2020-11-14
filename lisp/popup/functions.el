@@ -141,6 +141,10 @@ Displays -BUFFER according to -ALIST and -RULE."
                ,@-alist))))
     ;; move term buffer to the head of term-buffer-list
     (ymacs-popup//set-term-window window nil t)
+
+    (with-current-buffer -buffer
+      (tab-line-mode 1))
+
     window))
 
 (defun ymacs-popup//display-buffer-action (-buffer -alist)

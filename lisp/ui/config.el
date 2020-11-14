@@ -78,7 +78,24 @@
  '(diff-hl-insert ((t (:background nil))))
  '(diff-hl-delete ((t (:background nil))))
 
+ '(tab-line ((t (:background "#1b1d1e" :foreground "white"))))
+ '(tab-line-tab ((t (:inherit warning))))
+ '(tab-line-tab-current ((t (:inherit tab-line-tab :inverse-video t))))
+ '(tab-line-tab-inactive ((t (:inherit font-lock-comment-face :inverse-video t))))
+
  '(ivy-current-match ((t (:background "gray0")))))
+
+(with-eval-after-load 'tab-line
+  (setq tab-line-left-button "<")
+  (setq tab-line-right-button ">")
+  (setq tab-line-close-button-show nil)
+  (setq tab-line-new-button-show nil)
+  (setq tab-line-tab-name-function
+        (lambda (buffer &optional _buffers)
+          (format "[%s]" (buffer-name buffer))))
+  (setq tab-line-separator nil)
+  (setq tab-line-tabs-function
+        (lambda () (ymacs-popup//get-term-buffer-list))))
 
 (after! winum
   (define-key! :map winum-keymap

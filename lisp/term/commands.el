@@ -15,14 +15,19 @@
                                (when ymacs-term-extra-name
                                  (concat ": " ymacs-term-extra-name))))
                      buffer))
-                  (ymacs-popup//get-term-buffer-list))))
+                  (cl-remove
+                   (current-buffer)
+                   (ymacs-popup//get-term-buffer-list)))))
 
     (when (<= (length buffers) 1)
       (user-error "There is only one term buffer"))
 
     (ymacs//completing-read
      "Switch to term buffer: " buffers
-     (lambda (candidate) (pop-to-buffer (cdr candidate))))))
+     (lambda (candidate)
+       (unless candidate
+         (user-error "no buffer is selected"))
+       (pop-to-buffer (cdr candidate))))))
 
 ;;;###autoload
 (defun ymacs-term/next (-create-new)
