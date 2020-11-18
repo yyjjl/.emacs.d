@@ -93,7 +93,7 @@
   (setq tab-line-tab-name-function
         (lambda (buffer &optional _buffers)
           (format "[%s]" (buffer-name buffer))))
-  (setq tab-line-separator nil)
+  (setq tab-line-separator " ")
   (setq tab-line-tabs-function
         (lambda () (ymacs-popup//get-term-buffer-list))))
 
