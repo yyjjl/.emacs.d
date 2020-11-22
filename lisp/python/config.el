@@ -8,6 +8,9 @@
    'pyls
    "pip3 install --user 'python-language-server[all]"))
 
+(after! lsp-pyright
+  (setq lsp-pyright-python-executable-cmd "python3"))
+
 (after! python
   (define-key! :map comint-mode-map
     ([f5] . ymacs-python/toggle-pdbtrack))
@@ -20,7 +23,6 @@
     ([f5] . ymacs-python/debug-current-file)
     ("C-c v" . ymacs-python/create-venv)
     ("C-c V" . ymacs-python/create-venv-in-workon-home)
-    ("C-c P" . ymacs-python/profile-buffer)
     ("C-c C-z" . ymacs-python/pop-to-shell)
     ("C-c C-b" . py-isort-buffer)
     ("C-c b" . ymacs-python/autopep8)

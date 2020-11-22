@@ -29,6 +29,8 @@
 
     (when (and (buffer-enable-rich-feature-p)
                (eq major-mode 'python-mode))
+      (when (eq ymacs-python-lsp-server 'pyright)
+        (require 'lsp-pyright))
       (ymacs-lsp//try-enable python)))
 
   (define-hook! ymacs-python|inferior-setup (inferior-python-mode-hook)

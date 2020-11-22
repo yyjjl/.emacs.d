@@ -1,7 +1,10 @@
 ;;; -*- lexical-binding: t; -*-
 
+(define-option! ymacs-python-lsp-server 'pyright)
+
 (require-packages!
  lsp-mode
+ (lsp-pyright :when (eq ymacs-python-lsp-server 'pyright))
  py-autopep8
  py-isort
  pyvenv
@@ -10,7 +13,6 @@
 
 (executable! ipython3)
 (executable! pylint)
-(executable! pyls)
 
 (defvar-local ymacs-python--last-buffer nil
   "Help keep track of python buffer when changing to pyshell.")

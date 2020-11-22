@@ -1,4 +1,23 @@
-;;; -*- lexical-binding: t; -*-
+;;; -*- lexical-binding: t
+
+;;;###autoload
+(defun ymacs-python/change-lsp-server ()
+  (interactive)
+  (add-to-list 'lsp-disabled-clients ymacs-python-lsp-server)
+
+  (setq ymacs-python-lsp-server
+        (if (eq ymacs-python-lsp-server 'pyright) 'pyls 'pyright))
+
+  (setq lsp-disabled-clients (cl-delete ymacs-python-lsp-server lsp-disabled-clients))
+
+  (when-let ((workspaces (lsp-workspaces)))
+    (with-lsp-workspace
+        (lsp--completing-read "Select server: "
+                              workspaces
+                              'lsp--workspace-print nil t)
+      (lsp--shutdown-workspace)))
+
+  (call-interactively #'revert-buffer))
 
 ;;;###autoload
 (defun ymacs-python/autopep8 ()

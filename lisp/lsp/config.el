@@ -2,6 +2,8 @@
 
 (setq lsp-keymap-prefix nil)
 (after! lsp-mode
+  (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.cache\\'")
+
   (setq lsp-command-map
         (define-key! :map (make-sparse-keymap)
           ("'" . lsp-avy-lens)
