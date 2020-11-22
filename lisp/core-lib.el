@@ -20,8 +20,7 @@
 ;;; Code:
 
 (require 'subr-x)
-(eval-when-compile
-  (require 'cl-lib))
+(require 'cl-lib)
 
 (defvar ymacs--loaded-features ())
 

@@ -94,7 +94,7 @@
         (lambda (buffer &optional _buffers)
           (format "[%s]" (buffer-name buffer))))
   (setq tab-line-separator nil)
-  (setq tab-line-tabs-function #'ymacs-popup//get-active-term-buffer-list)))
+  (setq tab-line-tabs-function #'ymacs-popup//get-active-term-buffer-list))
 
 (after! winum
   (define-key! :map winum-keymap
