@@ -29,12 +29,7 @@
 
     (when (and (buffer-enable-rich-feature-p)
                (eq major-mode 'python-mode))
-      (ymacs-lsp//try-enable python
-        :fallback
-        (progn
-          (elpy-mode 1)
-          (flycheck-mode -1)
-          (ymacs-company//add-backend 'elpy-company-backend)))))
+      (ymacs-lsp//try-enable python)))
 
   (define-hook! ymacs-python|inferior-setup (inferior-python-mode-hook)
     (remove-hook 'comint-output-filter-functions

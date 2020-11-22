@@ -38,7 +38,11 @@
          (derived-mode-p 'term-mode 'shell-mode 'eshell-mode 'vterm-mode))))
 
 (defun ymacs-term//switch-internal (-n)
-  (let ((buffers (ymacs-popup//get-term-buffer-list)))
+  (let ((buffers (cl-remove-if-not
+                  (lambda (buffer)
+                    (or (eq buffer (current-buffer))
+                        (process-live-p (get-buffer-process buffer))))
+                  (ymacs-popup//get-term-buffer-list))))
     (when buffers
       (let* ((size (length buffers))
              (index (cl-position (current-buffer) buffers))

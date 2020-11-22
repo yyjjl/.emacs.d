@@ -17,17 +17,17 @@
                      buffer))
                   (cl-remove
                    (current-buffer)
-                   (ymacs-popup//get-term-buffer-list)))))
+                   (ymacs-popup//get-active-term-buffer-list)))))
 
-    (when (<= (length buffers) 1)
-      (user-error "There is only one term buffer"))
-
-    (ymacs//completing-read
-     "Switch to term buffer: " buffers
-     (lambda (candidate)
-       (unless candidate
-         (user-error "no buffer is selected"))
-       (pop-to-buffer (cdr candidate))))))
+    (cl-case (length buffers)
+      (0 (user-error "There is only one term buffer"))
+      (1 (display-buffer (cdar buffers)))
+      (t (ymacs//completing-read
+          "Switch to term buffer: " buffers
+          (lambda (candidate)
+            (unless candidate
+              (user-error "no buffer is selected"))
+            (pop-to-buffer (cdr candidate))))))))
 
 ;;;###autoload
 (defun ymacs-term/next (-create-new)
@@ -150,7 +150,7 @@ else: try to find a old term buffer and pop to it"
       (if (eq window (selected-window))
           (delete-window window)
         (select-window window))
-    (if-let (buffer (car (ymacs-popup//get-term-buffer-list)))
+    (if-let (buffer (car (ymacs-popup//get-active-term-buffer-list)))
         (display-buffer buffer)
       (call-interactively #'ymacs-term/pop-shell))))
 

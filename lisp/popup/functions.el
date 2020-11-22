@@ -70,6 +70,12 @@
   (ymacs-popup//cleanup)
   ymacs-popup--term-buffer-list)
 
+(defsubst ymacs-popup//get-active-term-buffer-list ()
+  (ymacs-popup//cleanup)
+  (cl-remove-if-not
+   (lambda (buffer) (process-live-p (get-buffer-process buffer)))
+   ymacs-popup--term-buffer-list))
+
 (defun ymacs-popup//rule-to-form (rule)
   (-let* (((macth-fn . rule) (plist-pop! (copy-sequence rule) :macth-fn))
           ((name . rule) (plist-pop! rule :name))

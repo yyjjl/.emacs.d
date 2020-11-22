@@ -74,7 +74,7 @@
     "If point is at the end of the buffer and there is no input,
 send an EOF if called in localhost, otherwise call `ymacs-term/toggle-window'.
 If not, delete -ARG characters forward."
-    (interactive "P")
+    (interactive "p")
     (if-let (proc (get-buffer-process (current-buffer)))
         (if (and (eobp)
                  (= (point) (marker-position (process-mark proc))))

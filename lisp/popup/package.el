@@ -87,9 +87,7 @@
      :size 0.3)
     (:name ("*Warnings*" "*Backtrace*")
      :side below
-     :autoclose t)
-    (:name-regexp ,ymacs-popup-default-regexp
-     :regexp t)))
+     :autoclose t)))
 
 
 (define-key!

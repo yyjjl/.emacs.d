@@ -101,9 +101,20 @@
      (list
       (cond ((= arg 0) default-directory)
             ((= arg 16) (read-directory-name "Directory: "))
-            (t (or (elpy-project-root) default-directory))))))
-  (let ((elpy-project-root -directory))
-    (elpy-shell-switch-to-shell)))
+            (t (or (projectile-project-root) default-directory))))))
+  (let ((source-buffer (current-buffer))
+        (buffer (process-buffer (ymacs-python//get-or-create-process -directory t))))
+    (with-current-buffer buffer
+      (setq ymacs-python--last-buffer source-buffer))
+    (pop-to-buffer buffer)))
+
+;;;###autoload
+(defun ymacs-python/pop-to-source-buffer ()
+  "Switch from inferior Python process buffer to recent Python buffer."
+  (interactive)
+  (unless (buffer-live-p ymacs-python--last-buffer)
+    (user-error "Source buffer is killed"))
+  (pop-to-buffer ymacs-python--last-buffer))
 
 ;;;###autoload
 (defun ymacs-python/send-buffer ()
@@ -112,20 +123,7 @@
     (call-interactively #'ymacs-python/pop-to-shell)
     (sit-for 0.1)
     (with-current-buffer buffer
-      (elpy-shell-send-region-or-buffer
-       (= (prefix-numeric-value current-prefix-arg) 4)))))
-
-;;;###autoload
-(defun ymacs-python/profile-buffer (&optional -directory)
-  (interactive
-   (let ((arg (prefix-numeric-value current-prefix-arg)))
-     (list
-      (cond ((= arg 0) default-directory)
-            ((>= arg 4) (read-directory-name "Directory: "))
-            (t (projectile-ensure-project (projectile-project-root)))))))
-  (let ((default-directory -directory)
-        (python-shell-interpreter "python3"))
-    (elpy-profile--file (buffer-file-name) t)))
+      (ymacs-python//send-region-or-buffer (= (prefix-numeric-value current-prefix-arg) 4)))))
 
 ;;;###autoload
 (defun ymacs-python/toggle-breakpoint ()

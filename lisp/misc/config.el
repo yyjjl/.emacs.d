@@ -1,5 +1,13 @@
 ;; -*- lexical-binding: t -*-
 
+(setq next-error-find-buffer-function
+      (lambda (&rest -args)
+        (or (apply #'next-error-buffer-unnavigated-current -args)
+            (let ((error-buffer (buffer-local-value 'next-error-buffer (current-buffer))))
+              (when (and (buffer-live-p error-buffer)
+                         (apply #'next-error-buffer-p error-buffer -args))
+                error-buffer)))))
+
 (setq he-dabbrev-chars "0-9a-zA-Z\\?!_")
 (setq-default hippie-expand-try-functions-list
               '(try-expand-dabbrev

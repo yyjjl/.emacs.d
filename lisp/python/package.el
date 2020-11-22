@@ -2,9 +2,9 @@
 
 (require-packages!
  lsp-mode
- elpy
  py-autopep8
  py-isort
+ pyvenv
  cython-mode
  flycheck-cython)
 
@@ -12,4 +12,5 @@
 (executable! pylint)
 (executable! pyls)
 
-(put 'elpy-shell-use-project-root 'safe-local-variable #'booleanp)
+(defvar-local ymacs-python--last-buffer nil
+  "Help keep track of python buffer when changing to pyshell.")

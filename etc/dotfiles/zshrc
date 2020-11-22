@@ -75,6 +75,7 @@ fi
 alias et='emacsclient -t -a ""'
 alias ec='emacsclient -c -a "" -n'
 alias ep='emacs --dump-file=$HOME/.emacs.d/var/emacs.pdmp'
+alias gnus='emacs --eval "(gnus)"'
 
 case "$INSIDE_EMACS" in
     vterm)

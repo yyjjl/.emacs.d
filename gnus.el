@@ -34,7 +34,7 @@
       (let* ((name (gnus-info-group group))
              (unread-count (gnus-group-unread name)))
         (when (numberp unread-count)
-          (incf totoal-unread-count unread-count))))
+          (cl-incf totoal-unread-count unread-count))))
     (setq gnus--unread-news-count totoal-unread-count)
     (force-mode-line-update)))
 

@@ -70,8 +70,7 @@
 (defvar ymacs-misc-projectile-invalidate-cache-empty-vars
   '(doom-modeline--vcs-text
     doom-modeline--project-detected-p
-    doom-modeline--project-root
-    elpy-project-root))
+    doom-modeline--project-root))
 
 (defvar ymacs-misc-auto-next-error-buffer-derived-modes
   '(occur-mode

@@ -14,7 +14,7 @@
 
   (define-key! :map inferior-python-mode-map
     ("C-c C-t" . ymacs-python/toggle-pdbtrack)
-    ("C-c C-z" . elpy-shell-switch-to-buffer))
+    ("C-c C-z" . ymacs-python/pop-to-source-buffer))
 
   (define-key! :map python-mode-map
     ([f5] . ymacs-python/debug-current-file)
@@ -50,30 +50,4 @@
           python-shell-interpreter-args "-i"))
 
   (when ymacs-pylint-path
-    (setq python-check-command ymacs-pylint-path))
-
-  (ymacs-python//elpy-enable))
-
-(after! elpy
-  (define-key! :map elpy-pdb-map
-    (";" . elpy-pdb-toggle-breakpoint-at-point))
-  (define-key! :map elpy-mode-map
-    ("C-c C-z" . ymacs-python/pop-to-shell)
-    ("C-c C-n")
-    ("C-c C-p")
-    ("C-c C-b")
-    ("C-c ;" :map elpy-pdb-map)
-    ("C-c C-c" . ymacs-python/send-buffer)
-    ("C-c I" . elpy-nav-expand-to-indentation)
-    ("C-c M-d" . ymacs-python/generate-doc-at-point)
-    ("M-i" . elpy-multiedit-python-symbol-at-point))
-
-  (remap! "C-c C-r" "C-c r" elpy-mode-map)
-  (setcar elpy-test-discover-runner-command "python3")
-  (setq elpy-rpc-python-command "python3"
-        elpy-rpc-virtualenv-path 'system
-        elpy-modules (delq 'elpy-module-django
-                           (delq 'elpy-module-highlight-indentation
-                                 elpy-modules))
-        elpy-test-runner 'elpy-test-pytest-runner
-        elpy-shell-echo-input nil))
+    (setq python-check-command ymacs-pylint-path)))
