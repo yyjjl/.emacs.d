@@ -6,7 +6,8 @@
 
 (defun ymacs-web|common-setup ()
   (when (bound-and-true-p ymacs-lsp-enable-in-project-p)
-    (electric-indent-local-mode -1)
+    ;; (electric-indent-local-mode -1)
+    ;; (electric-layout-local-mode -1)
     (setq-local flycheck-check-syntax-automatically '(save mode-enabled))
     (flycheck-mode 1)
     (tide-setup)

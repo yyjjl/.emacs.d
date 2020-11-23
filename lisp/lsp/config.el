@@ -3,6 +3,7 @@
 (setq lsp-keymap-prefix nil)
 (after! lsp-mode
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.cache\\'")
+  (add-to-list 'lsp-file-watch-ignored (concat "\\`" (expand-file-name "~/\\.local/lib")))
 
   (setq lsp-command-map
         (define-key! :map (make-sparse-keymap)
