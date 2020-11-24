@@ -34,14 +34,14 @@
   (interactive "P")
   (if -create-new
       (ymacs-term/pop-shell-here)
-    (ymacs-term//switch-internal 1)))
+    (ymacs-term//switch-internal -1)))
 
 ;;;###autoload
 (defun ymacs-term/prev (-create-new)
   (interactive "P")
   (if -create-new
       (ymacs-term/pop-shell-here)
-    (ymacs-term//switch-internal -1)))
+    (ymacs-term//switch-internal 1)))
 
 ;;;###autoload
 (defun ymacs-term/switch-back (-no-quit-p)
