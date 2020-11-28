@@ -30,7 +30,8 @@
        (concat "ROOT:" (buffer-name))
        "root" (list "-l" (or file ""))
        :callback
-       (lambda () (term-send-raw-string (format ".X %s\n" file))))))))
+       (lambda ()
+         (ymacs-term//send-string (format ".X %s\n" file))))))))
 
 ;;;###autoload
 (defun ymacs-cpp/debug-current-file (&optional -new-session)

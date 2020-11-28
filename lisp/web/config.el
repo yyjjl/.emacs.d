@@ -8,6 +8,7 @@
 
 (after! tide
   (define-key! :map tide-mode-map
+    ("C-c C-l" . ymacs-web/load-in-repl)
     ("C-c C-d" . tide-documentation-at-point)
     ("M-?" . tide-references)
     ("C-c r r" . tide-refactor)

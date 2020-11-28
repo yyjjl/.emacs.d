@@ -181,6 +181,16 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
 (defsubst ymacs-term//extra-env ()
   (run-hook-with-args-until-success 'ymacs-term-environment-functions))
 
+(defun ymacs-term//send-string (-string)
+  (cond
+   ((eq major-mode 'term-mode)
+    (term-send-raw-string -string))
+   ((eq major-mode 'vterm-mode)
+    (vterm-send-string -string))
+   ((derived-mode-p 'comint-mode)
+    (comint-send-string (get-buffer-process (current-buffer)) -string))
+   (t (user-error "%s is not supported" major-mode))))
+
 (defun ymacs-term//exec-program (-program -args &optional -name -full-name)
   (let ((ymacs-term-program-arguments -args)
         (ymacs-term-buffer-name -name))
