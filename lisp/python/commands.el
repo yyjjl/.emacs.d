@@ -8,7 +8,8 @@
   (setq ymacs-python-lsp-server
         (if (eq ymacs-python-lsp-server 'pyright) 'pyls 'pyright))
 
-  (setq lsp-disabled-clients (cl-delete ymacs-python-lsp-server lsp-disabled-clients))
+  (setq lsp-disabled-clients
+        (cl-delete ymacs-python-lsp-server lsp-disabled-clients))
 
   (when-let ((workspaces (lsp-workspaces)))
     (with-lsp-workspace

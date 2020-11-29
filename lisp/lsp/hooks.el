@@ -7,14 +7,6 @@
     ;; default to sort and filter by server
     (setq-local company-transformers nil))
 
-  (define-advice lsp-lv-message (:override (-message) escape)
-    (if -message
-        (progn
-          (setq lsp--signature-last-buffer (current-buffer))
-          (let ((lv-force-update t))
-            (lv-message (replace-regexp-in-string "%" "%%" -message))))
-      (lv-delete-window)))
-
   (define-advice lsp--render-on-hover-content
       (:around (-fn -contents -render-all) truncate-doc)
     (let ((content (funcall -fn -contents -render-all)))
