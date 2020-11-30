@@ -35,7 +35,7 @@
   (ymacs-package/generate-autoloads)
 
   (if (getenv "NATIVE_COMPILE_ELPA")
-      (ymacs-package/native-compile-elpa-packages :no-message)
+      (ymacs-package/native-compile-elpa-packages)
 
     (message "Remove *.elc in %s ..." (abbreviate-file-name ymacs-config-directory))
 
@@ -44,5 +44,5 @@
                       (directory-files user-emacs-directory t "\\.elc$"))
       (delete-file elc-file))
 
-    (ymacs-package/compile-config :no-message)
+    (ymacs-package/compile-config)
     (ymacs-package/compile-elpa-packages :no-message)))

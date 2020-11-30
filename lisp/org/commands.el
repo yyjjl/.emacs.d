@@ -226,50 +226,73 @@ With a prefix BELOW move point to lower block."
           (message "Deleted %d invalid cache files" count))
       (message "Invalid cache files were not checked"))))
 
+
+(defun ymacs-org//create-preview-overlay (-latex-fragment)
+  (unless (or (string-prefix-p "\\begin" -latex-fragment)
+              (string-prefix-p "$" -latex-fragment))
+    (setq -latex-fragment
+          (concat "\\begin{displaymath}"
+                  -latex-fragment
+                  "\\end{displaymath}")))
+
+  (with-current-buffer (get-buffer-create "*latex-preview*")
+    (setq buffer-read-only nil)
+    (setq-local mode-line-format nil)
+
+    (erase-buffer)
+    (insert -latex-fragment)
+
+    (unless (eq major-mode 'org-mode)
+      (org-mode))
+
+    (org-clear-latex-preview)
+
+    (let ((org-format-latex-options
+           (plist-put (copy-sequence org-format-latex-options) :scale 2)))
+      (org--latex-preview-region (point-min) (point-max)))
+
+    (let ((overlays (cl-remove-if-not
+                     (lambda (ov) (eq (overlay-get ov 'org-overlay-type) 'org-latex-overlay))
+                     (overlays-in (point-min) (point-max)))))
+      (cl-assert (= (length overlays) 1) nil "Too many/few overlays were created")
+      (car overlays))))
+
 ;;;###autoload
 (defun ymacs-org/display-latex-fragment-at-point ()
   (interactive)
-  (if-let ((latex-fragment
-            (when-let ((bounds (if (region-active-p)
-                                   (cons (region-beginning)
-                                         (region-end))
-                                 (when-let (element (org-element-at-point))
-                                   (cons (org-element-property :begin element)
-                                         (org-element-property :end element))))))
-              (string-trim (buffer-substring-no-properties (car bounds) (cdr bounds))
-                           (rx (* (any blank "\n,.!?;:")))
-                           (rx (* (any blank "\n,.!?;:"))))))
-           (buffer (get-buffer-create "*latex-preview*")))
-      (progn
-        (unless (or (string-prefix-p "\\begin" latex-fragment)
-                    (string-prefix-p "$" latex-fragment))
-          (setq latex-fragment
-                (concat "\\begin{displaymath}"
-                        latex-fragment
-                        "\\end{displaymath}")))
-
-        (ymacs-popup//display-buffer buffer nil '(:side below :autoclose t :size 0.3))
-
-        (with-current-buffer buffer
-          (setq buffer-read-only nil)
-          (setq-local mode-line-format nil)
-
-          (erase-buffer)
-          (insert latex-fragment)
-
-          (unless (eq major-mode 'org-mode)
-            (org-mode))
-
-          (org-clear-latex-preview)
-          (let ((org-format-latex-options
-                 (plist-put (copy-sequence org-format-latex-options) :scale 2)))
-            (org-latex-preview '(16)))
-
-          (when-let (window (get-buffer-window buffer))
-            (fit-window-to-buffer window 15)
-            (ymacs-popup//push-window window buffer t)
-            (special-mode))))
-    (user-error "Unknown error")))
+  (if (org-clear-latex-preview (point) (1+ (point)))
+      (message "LaTeX preview removed")
+    (when-let*
+        ((bounds
+          (or (and (region-active-p)
+                   (cons (region-beginning)
+                         (region-end)))
+              (when-let ((datum (org-element-context)))
+                (and (memq (org-element-type datum) '(latex-environment latex-fragment))
+                     (cons (org-element-property :begin datum)
+                           (org-element-property :end datum))))
+              (save-mark-and-excursion
+                (let ((current-point (point))
+                      beg end)
+                  (forward-paragraph -1)
+                  (setq beg (point))
+                  (when (re-search-forward
+                         (rx line-start ".." (* space) "math::" (* space))
+                         current-point t 1)
+                    (setq beg (point)))
+                  (forward-paragraph 1)
+                  (skip-chars-backward "\n\t ")
+                  (setq end (point))
+                  (cons beg end)))))
+         (latex-fragment
+          (string-trim (buffer-substring-no-properties (car bounds) (cdr bounds))
+                       (rx (* (any blank "\n,.!?;:")))
+                       (rx (* (any blank "\n,.!?;:")))))
+         (ov (ymacs-org//create-preview-overlay latex-fragment)))
+      (let ((new-ov (make-overlay (car bounds) (cdr bounds))))
+        (cl-loop
+         for (prop value) on (overlay-properties ov) by 'cddr
+         do (overlay-put new-ov prop value))))))
 
 ;;;###autoload
 (defun ymacs-org/project-open ()

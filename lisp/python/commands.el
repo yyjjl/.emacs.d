@@ -10,14 +10,18 @@
 
   (setq lsp-disabled-clients (cl-delete ymacs-python-lsp-server lsp-disabled-clients))
 
-  (when-let ((workspaces (lsp-workspaces)))
-    (with-lsp-workspace
-        (lsp--completing-read "Select server: "
-                              workspaces
-                              'lsp--workspace-print nil t)
-      (lsp--shutdown-workspace)))
+  (let (buffers)
+    (when-let ((workspaces (lsp-workspaces)))
+      (with-lsp-workspace
+          (lsp--completing-read "Select server: "
+                                workspaces
+                                'lsp--workspace-print nil t)
+        (setq buffers (lsp--workspace-buffers lsp--cur-workspace))
+        (lsp--shutdown-workspace)))
 
-  (call-interactively #'revert-buffer))
+    (dolist (buffer buffers)
+      (with-current-buffer buffer
+        (revert-buffer)))))
 
 ;;;###autoload
 (defun ymacs-python/autopep8 ()
