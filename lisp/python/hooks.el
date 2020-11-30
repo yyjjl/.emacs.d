@@ -1,5 +1,15 @@
 ;;; -*- lexical-binding: t; -*-
 
+(after! flycheck
+  (define-advice flycheck-get-next-checker-for-buffer (:around (-fn -checker) fix)
+    "When using pyright language server, python-flake8 should also be activated."
+    (if (and (bound-and-true-p lsp-mode)
+             (eq ymacs-python-lsp-server 'pyright)
+             (derived-mode-p 'python-mode))
+        (when (eq -checker 'lsp)
+          'python-flake8)
+      (funcall -fn -checker))))
+
 (after! cython-mode
   (define-hook! ymacs-cython|setup (cython-mode-hook)
     (setq electric-indent-chars (delq ?: electric-indent-chars))
