@@ -11,7 +11,7 @@ ncurses_version=6.1
 
 program_dir=${HOME}/program
 
-if [ "$EUID" -ne 0 ]; then
+if [[ "$EUID" -ne 0 ]] || [[ -n "$INSTALL_LOCAL" ]]; then
     install_prefix=${HOME}/.local
 else
     install_prefix=/usr/local
@@ -56,7 +56,7 @@ compile_gnu_source() {
     fi
 }
 
-if [ "$EUID" -ne 0 ]; then
+if [[ "$EUID" -ne 0 ]] || [[ -n "$INSTALL_LOCAL" ]]; then
     compile_gnu_source ncurses ${ncurses_version} tar.gz \
                        --prefix="${install_prefix}"
     compile_gnu_source readline ${readline_version} tar.gz \

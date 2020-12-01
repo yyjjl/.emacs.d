@@ -2,46 +2,6 @@
 
 (executable! ripgrep :exe "rg")
 
-(require 'transient)
-
-(defclass transient-option-with-default (transient-option)
-  ((value :initarg :value)))
-
-(defclass transient-option-path (transient-option-with-default) ())
-
-(cl-defmethod transient-init-value ((obj transient-option-with-default))
-  (oset obj value (format "%s" (oref obj value))))
-
-(cl-defmethod transient-format-value :around ((obj transient-option-with-default))
-  (let ((choices (oref obj choices))
-        (value (oref obj value)))
-    (if choices
-        (format
-         (propertize
-          (format "[%s]"
-                  (mapconcat (lambda (choice) (if (equal choice value) "%s" choice))
-                             choices
-                             "|"))
-          'face 'transient-inactive-value)
-         (propertize value 'face 'font-lock-warning-face))
-      (cl-call-next-method))))
-
-(cl-defmethod transient-infix-read ((obj transient-option-with-default))
-  (let ((choices (oref obj choices)))
-    (if choices
-        (or (when-let ((value (oref obj value)))
-              (cadr (member value choices)))
-            (car choices))
-      (cl-call-next-method))))
-
-(cl-defmethod transient-infix-read ((obj transient-option-path))
-  (let ((default-directory (oref obj value)))
-    (condition-case nil
-        (read-directory-name "Path=" nil nil :must-match)
-      (quit default-directory))))
-
-
-
 (defvar ymacs-ivy-switch-function-list nil)
 
 (defvar ymacs-ivy-rg-type-aliases

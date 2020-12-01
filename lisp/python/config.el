@@ -9,7 +9,8 @@
    "pip3 install --user 'python-language-server[all]"))
 
 (after! lsp-pyright
-  (setq lsp-pyright-python-executable-cmd "python3"))
+  (setq lsp-pyright-python-executable-cmd "python3")
+  (setq lsp-pyright-typechecking-mode "off"))
 
 (after! python
   (define-key! :map comint-mode-map

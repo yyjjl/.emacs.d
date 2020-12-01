@@ -26,7 +26,8 @@
     ("r" . org-table-show-reference)))
 
 ;; Config for publish site from org files
-(defvar ymacs-org-project-base-dir (expand-file-name "org-notes" ymacs-private-directory))
+(defvar ymacs-org-project-base-dir
+  (expand-file-name "org-notes" (expand-file-name "home" user-emacs-directory)))
 (defvar ymacs-org-project-src-dir (expand-file-name "src" ymacs-org-project-base-dir))
 (defvar ymacs-org-project-dst-dir (expand-file-name "dst" ymacs-org-project-base-dir))
 (defvar ymacs-org-publish-last-project nil)
