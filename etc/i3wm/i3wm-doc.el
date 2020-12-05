@@ -5,11 +5,12 @@
 (defvar i3-document-regexp
   (concat (regexp-opt '(".pdf" ".djvu" ".ps" ".dvi")) "\\'"))
 
-(defvar i3-document-directories '("~/documents/books"
-                                  "~/documents/paper"
-                                  "~/working/"
-                                  "~/project/org/src/"
-                                  "~/desktop"))
+(defvar i3-document-directories
+  '("~/documents/books"
+    "~/documents/paper"
+    "~/working/"
+    "~/.emacs.d/home/org-notes/"
+    "~/desktop"))
 
 (defun i3//index-document-files ()
   (let ((case-fold-search t))
@@ -29,9 +30,7 @@
             :action (lambda (file)
                       (with-ivy-window
                         (recentf-push file)
-                        (call-process "gtk-launch" nil nil nil
-                                      "evince.desktop"
-                                      (expand-file-name file))))
+                        (open! (list file))))
             :caller 'i3/open-document))
 
 (defun i3//open-document-transformer (-file)

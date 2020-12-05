@@ -90,7 +90,7 @@
   (let ((file (expand-file-name (car -args)))
         (process-connection-type nil))
     (recentf-push file)
-    (start-process "external-process" nil "evince" file)
+    (open! (list file))
     (kill-buffer)
     (let (debug-on-error)
       (user-error "Opened %s in external program" (file-name-nondirectory file)))))

@@ -1,5 +1,13 @@
 ;; -*- lexical-binding: t; -*-
 
+(defun ymacs-cpp-clangd//filter-arguments (-args)
+  (let (args arg)
+    (while (setq arg (pop -args))
+      (if (string= arg "-o")
+          (pop -args)
+        (push arg args)))
+    (nreverse args)))
+
 (defsubst ymacs-cpp-clangd//dot-clangd-path (&optional -directory)
   (->> (or -directory default-directory)
        (locate-dominating-file "compile_flags.txt")
@@ -14,9 +22,13 @@
                      (cdb (and (file-exists-p cdb-path)
                                (json-parse-string (read-file-content! cdb-path)))))
             (cl-assert (sequencep cdb) nil "Invalid compile_commands.json")
-            (cl-loop for opt across cdb
-                     when (equal (file-truename (gethash "file" opt)) (buffer-file-name))
-                     return (gethash "command" opt)))
+            (string-join
+             (ymacs-cpp-clangd//filter-arguments
+              (split-string
+               (cl-loop for opt across cdb
+                        when (equal (file-truename (gethash "file" opt)) (buffer-file-name))
+                        return (gethash "command" opt))))
+             " "))
 
           (when-let ((dot-clangd (ymacs-cpp-clangd//dot-clangd-path))
                      (flags (and (file-exists-p dot-clangd)

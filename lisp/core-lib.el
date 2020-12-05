@@ -266,8 +266,9 @@ Example:
             (shell-command (concat "open " (shell-quote-argument path))))
           -file-list))
    ((eq system-type 'gnu/linux)
-    (mapc (lambda (path) (let ((process-connection-type nil))
-                           (start-process "" nil "xdg-open" path)))
+    (mapc (lambda (path)
+            (let ((process-connection-type nil))
+              (start-process "external-process" nil "xdg-open" path)))
           -file-list))))
 
 (defun add-auto-mode! (-mode &rest -patterns)

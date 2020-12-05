@@ -30,8 +30,11 @@
   (aset ccls-sem-variable-faces 0 'cpp-variable-face)
 
   (setq ccls-executable ymacs-ccls-path)
-  (setq ccls-initialization-options '(:index (:comments 2) :completion (:detailedLabel t)))
-  (setq ccls-sem-highlight-method 'font-lock))
+  (setq ccls-initialization-options
+        '(:index (:comments 2)
+          :completion (:detailedLabel t)
+          :cache (:directory ".cache/ccls")))
+  (setq ccls-sem-highlight-method nil))
 
 (after! ccls-tree
   (define-key! :map ccls-tree-mode-map

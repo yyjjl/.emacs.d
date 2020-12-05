@@ -92,9 +92,11 @@ grab matched string and insert them into `kill-ring'"
   (let ((window (winum-get-window-by-number 0)))
     (if (and window (not (eq window (selected-window))))
         (select-window window)
-      (let ((char (read-char))
-            (func (if -backward-p 'search-backward 'search-forward)))
-        (funcall func (char-to-string char) nil)))))
+      (if -backward-p
+          (search-backward (char-to-string (read-char "backward to char:"))
+                           (line-beginning-position))
+        (search-forward (char-to-string (read-char "forward to char:"))
+                        (line-end-position))))))
 
 ;;;###autoload
 (defun ymacs-edit/forward-defun (&optional -n)
