@@ -15,7 +15,7 @@
   (setq dired-isearch-filenames 'dwim)
   (setq dired-recursive-copies 'always)
   (setq dired-recursive-deletes 'always)
-  (setq dired-listing-switches "-alh")
+  (setq dired-listing-switches "-alh --group-directories-first")
   (setq wdired-allow-to-change-permissions t)
 
   (setq dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$\\|^\\..*$"))
