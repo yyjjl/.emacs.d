@@ -71,8 +71,7 @@
          "\\(?:\\`[#]\\)"
          ;; file names ending with # or ~
          "\\|\\(?:[#~]\\'\\)"))
-
-  (setq counsel-fzf-cmd (concat (expand-var! "fzf") " -f \"%s\""))
+  
   (setq counsel-rg-base-command
         "rg -M 1000 -S --no-heading --line-number --color never %s .")
 

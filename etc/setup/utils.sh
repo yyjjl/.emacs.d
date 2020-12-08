@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Setup colors ################################################################
-if tty -s;then
+if tty -s; then
     export RED=${RED:-$(tput setaf 1)}
     export GREEN=${GREEN:-$(tput setaf 2)}
     export YLW=${YLW:-$(tput setaf 3)}

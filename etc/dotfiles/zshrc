@@ -59,6 +59,12 @@ export GTAGSLABEL=ctags
 
 export RUSTUP_DIST_SERVER=https://mirrors.tuna.tsinghua.edu.cn/rustup
 
+if [ "$(uname -s)" = "Linux" ]; then
+    export FZF_DEFAULT_COMMAND='fdfind --type file --exclude .git'
+else
+    export FZF_DEFAULT_COMMAND='fd --type file --exclude .git'
+fi
+
 if [ -d "$HOME/.local/bin" ]; then
     export PATH="$HOME/.local/bin:$PATH"
 fi
@@ -70,6 +76,10 @@ fi
 if [ -d "$HOME/program/root/bin" ]; then
     export LD_LIBRARY_PATH="$HOME/program/root/lib:$LD_LIBRARY_PATH"
     export PATH="$HOME/program/root/bin:$PATH"
+fi
+
+if [ -x "$HOME/.zshrc.local" ]; then
+    . "$HOME/.zshrc.local"
 fi
 
 alias et='emacsclient -t -a ""'
