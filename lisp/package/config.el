@@ -41,7 +41,6 @@
  highlight-indentation
  ;; ^L beautifier
  page-break-lines
- evil-nerd-commenter
  hl-todo
  sudo-edit
  goto-chg

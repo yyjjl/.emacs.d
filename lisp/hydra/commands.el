@@ -6,14 +6,13 @@
 
 (require 'pretty-hydra)
 
+(defvar ymacs-misc/view-code-mode)
+(defvar ymacs-hydra/global-toggles/hint-cache)
+
 (pretty-hydra-define ymacs-hydra/global-toggles
   (:title "Toggles" :color amaranth :quit-key "q")
   ("Global"
-   (("I"
-     (setq doom-modeline-icon (not doom-modeline-icon))
-     "display icons"
-     :toggle doom-modeline-icon)
-    ("V"
+   (("V"
      (ymacs-misc/view-code-mode (if ymacs-misc/view-code-mode -1 1))
      "view code"
      :toggle ymacs-misc/view-code-mode)

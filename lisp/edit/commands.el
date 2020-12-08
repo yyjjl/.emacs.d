@@ -177,6 +177,17 @@ grab matched string and insert them into `kill-ring'"
       (back-to-indentation)
     (move-beginning-of-line 1)))
 
+;;;###autoload
+(defun ymacs-edit/comment-dwim ()
+  (interactive)
+  (if (region-active-p)
+      (comment-or-uncomment-region (region-beginning) (region-end))
+    (if (save-excursion
+          (beginning-of-line)
+          (looking-at "\\s-*$"))
+        (call-interactively 'comment-dwim)
+      (comment-or-uncomment-region (line-beginning-position) (line-end-position)))))
+
 (defvar ymacs-edit--suround-origin-pos nil)
 
 (defun ymacs-edit//surround-get-pair (-char)

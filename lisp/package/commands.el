@@ -52,10 +52,10 @@
              append
              (seq-filter
               (lambda (file)
-                (not (or (string-suffix-p "-pkg.el" file)
-                         (string-suffix-p "-autoloads.el" file)
-                         (string-suffix-p "-theme.el" file)
-                         (string-suffix-p ".dir-locals.el" file))))
+                (not
+                 (string-match-p
+                  (rx "-" (or "pkg" "autoloads" "theme" ".dir-locals") "el" string-end)
+                  file)))
               (directory-files-recursively path comp-valid-source-re))))
            (count 1))
       (dolist (file files)
@@ -83,7 +83,7 @@
                   (when-let (memory (ymacs//show-process-memory))
                     (message "%s info: use %s%% RAM" prompt memory)
                     (when (> memory 70)
-                      (user-error "%s error: use too much RAM" prompt))))
+                      (user-error "%s error: use too much RAM, please restart" prompt))))
               (message "%s no write access for %s skipping." prompt out-filename))))))))
 
 ;;;###autoload
@@ -100,7 +100,7 @@
           (let ((inhibit-message -no-message))
             (byte-compile-file file)
             (when (fboundp 'native-compile)
-              (native-compile file 'late)))
+              (native-compile file)))
         (error
          (when -no-message
            (message "%s: Error %s" file err))))))

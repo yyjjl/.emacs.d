@@ -1,5 +1,8 @@
 ;; -*- lexical-binding: t -*-
 
+(declare-function winner-undo 'winner)
+(declare-function winner-redo 'winner)
+
 (define-hook! ymacs-misc|after-init (after-init-hook)
   (recentf-mode 1)
   (winner-mode 1)
@@ -176,6 +179,7 @@
 
   (advice-add #'delete-file-projectile-remove-from-cache :around #'ignore-remote!))
 
+
 (after! yasnippet
   (define-advice yas-next-field-or-maybe-expand (:around (-fn &rest -args) expand-local)
     (or (ymacs-misc//try-expand-local-snippets)
@@ -190,3 +194,6 @@
   (define-hook! ymacs-misc|dot-setup (graphviz-dot-mode-hook)
     (hs-minor-mode 1)
     (ymacs-company//add-backend 'company-graphviz-dot-backend)))
+
+(after! ediff
+  (add-hook 'ediff-quit-hook #'winner-undo))

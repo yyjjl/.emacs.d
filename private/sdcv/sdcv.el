@@ -37,9 +37,64 @@
 (eval-when-compile
   (require 'cl-lib))
 
+
+(defvar sdcv-wait-timeout 2
+  "The max time (in seconds) to wait for the sdcv process to
+produce some output.")
+(defvar sdcv-wait-interval 0.01
+  "The interval (in seconds) to sleep each time to wait for
+sdcv's output.")
+
+(defconst sdcv-process-name "%sdcv-mode-process%")
+(defconst sdcv-process-buffer-name " *sdcv-mode-process*")
+
+(defvar sdcv-word-prompts '("Enter word or phrase: "
+			    "请输入单词或短语："
+			    "請輸入單字或片語：")
+  "A list of prompts that sdcv use to prompt for word.")
+
+(defvar sdcv-choice-prompts '("Your choice[-1 to abort]: "
+			      "您的选择为："
+			      "您的選擇為：")
+  "A list of prompts that sdcv use to prompt for a choice
+of multiple candicates.")
+
+(defvar sdcv-result-patterns '("^Found [0-9]+ items, similar to [*?/|]*\\(.+?\\)[*?]*\\."
+			      "^发现 [0-9]+ 条记录和 [*?/|]*\\(.+?\\)[*?]* 相似。"
+			      )
+  "A list of patterns to extract result word of sdcv. Special
+characters are stripped.")
+
+;;;;##################################################################
+;;;;  User Options, Variables
+;;;;##################################################################
+
+(defvar sdcv-buffer-name "*sdcv*"
+  "The name of the buffer of sdcv.")
+(defvar sdcv-dictionary-list nil
+  "A list of dictionaries to use.
+Each entry is a string denoting the name of a dictionary, which
+is then passed to sdcv through the '-u' command line option. If
+this list is nil then all the dictionaries will be used.")
+(defvar sdcv-dictionary-alist nil
+  "An alist of dictionaries, used to interactively form
+ sdcv-dictionary-list. It has the form:
+   ((\"group1\" \"dict1\" \"dict2\" ...)
+    (\"group2\" \"dict2\" \"dict3\"))
+")
+
+(defvar sdcv-program-path "sdcv"
+  "The path of sdcv program.")
+
+(defvar sdcv-dictionary-path nil
+  "The path of dictionaries.")
+;;; sdcv-mode.el ends here
+
+
+
 ;;; ==================================================================
 ;;; Frontend, search word and display sdcv buffer
-(defun sdcv-search (select-dictionary-list)
+(defun sdcv-search (&optional select-dictionary-list)
   "Prompt for a word to search through sdcv.
 When provided with a prefix argument, select new
 `sdcv-dictionary-list' before search.
@@ -308,33 +363,6 @@ the beginning of the buffer."
 	(erase-buffer)
 	rlt))))
 
-(defvar sdcv-wait-timeout 2
-  "The max time (in seconds) to wait for the sdcv process to
-produce some output.")
-(defvar sdcv-wait-interval 0.01
-  "The interval (in seconds) to sleep each time to wait for
-sdcv's output.")
-
-(defconst sdcv-process-name "%sdcv-mode-process%")
-(defconst sdcv-process-buffer-name " *sdcv-mode-process*")
-
-(defvar sdcv-word-prompts '("Enter word or phrase: "
-			    "请输入单词或短语："
-			    "請輸入單字或片語：")
-  "A list of prompts that sdcv use to prompt for word.")
-
-(defvar sdcv-choice-prompts '("Your choice[-1 to abort]: "
-			      "您的选择为："
-			      "您的選擇為：")
-  "A list of prompts that sdcv use to prompt for a choice
-of multiple candicates.")
-
-(defvar sdcv-result-patterns '("^Found [0-9]+ items, similar to [*?/|]*\\(.+?\\)[*?]*\\."
-			      "^发现 [0-9]+ 条记录和 [*?/|]*\\(.+?\\)[*?]* 相似。"
-			      )
-  "A list of patterns to extract result word of sdcv. Special
-characters are stripped.")
-
 (defun sdcv-get-process ()
   "Get or create the sdcv process."
   (let ((process (get-process sdcv-process-name)))
@@ -384,29 +412,3 @@ current buffer."
                        (point-max))
         (setq done t)))
     done))
-
-
-;;;;##################################################################
-;;;;  User Options, Variables
-;;;;##################################################################
-
-(defvar sdcv-buffer-name "*sdcv*"
-  "The name of the buffer of sdcv.")
-(defvar sdcv-dictionary-list nil
-  "A list of dictionaries to use.
-Each entry is a string denoting the name of a dictionary, which
-is then passed to sdcv through the '-u' command line option. If
-this list is nil then all the dictionaries will be used.")
-(defvar sdcv-dictionary-alist nil
-  "An alist of dictionaries, used to interactively form
- sdcv-dictionary-list. It has the form:
-   ((\"group1\" \"dict1\" \"dict2\" ...)
-    (\"group2\" \"dict2\" \"dict3\"))
-")
-
-(defvar sdcv-program-path "sdcv"
-  "The path of sdcv program.")
-
-(defvar sdcv-dictionary-path nil
-  "The path of dictionaries.")
-;;; sdcv-mode.el ends here

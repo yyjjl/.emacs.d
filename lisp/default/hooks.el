@@ -58,6 +58,7 @@
 
 (define-hook! ymacs|generic-text-mode-setup (text-mode-hook)
   (hl-line-mode 1)
+  (display-fill-column-indicator-mode 1)
 
   (setq indicate-empty-lines t))
 
@@ -115,8 +116,8 @@
   (run-with-timer 1 nil #'run-hooks 'ymacs-after-init-idle-hook)
   (run-with-idle-timer ymacs-autosave-interval t #'run-hooks 'ymacs-autosave-hook)
 
-  ;; enabel native-compile after initialization
-  ;; (setq comp-deferred-compilation t)
+  ;; enable native-compile after initialization
+  (setq comp-deferred-compilation t)
 
   ;; GC all sneaky breeky like
   (add-function :after after-focus-change-function

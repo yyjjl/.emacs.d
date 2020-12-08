@@ -1,5 +1,7 @@
 ;; -*- lexical-binding:t -*-
 
+(defvar calculate-lisp-indent-last-sexp)
+
 ;; Align indent keywords
 ;; @see https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned
 (defun indent-function@fix (indent-point state)
@@ -36,8 +38,7 @@ Lisp function does not specify a special indentation."
                   calculate-lisp-indent-last-sexp))
           (progn (goto-char calculate-lisp-indent-last-sexp)
                  (beginning-of-line)
-                 (parse-partial-sexp (point)
-                                     calculate-lisp-indent-last-sexp 0 t)))
+                 (parse-partial-sexp (point) calculate-lisp-indent-last-sexp 0 t)))
       ;; Indent under the list or under the first sexp on the same
       ;; line as calculate-lisp-indent-last-sexp.  Note that first
       ;; thing on that line has to be complete sexp since we are

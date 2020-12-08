@@ -54,6 +54,6 @@ hasn't to runs those regexps against the filename.")
 (push '(undecorated . t) default-frame-alist)
 
 ;; disable native-compile during setup
-(setq comp-deferred-compilation nil)
+;; (setq comp-deferred-compilation nil)
 
 (setq load-prefer-newer t)

@@ -3,6 +3,8 @@
 (eval-when-compile
   (require 'cmacexp))
 
+(defvar gud-chdir-before-run)
+
 (defun ymacs-cpp//compile-command (-directory)
   "Return suitable compile command for current project"
   (cond

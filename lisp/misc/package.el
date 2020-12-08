@@ -79,6 +79,9 @@
     xref--xref-buffer-mode
     compilation-mode))
 
+(declare-function winner-undo 'winner)
+(declare-function winner-redo 'winner)
+
 (define-key! :prefix "C-x"
   ("2" . ymacs-window/split-vertically)
   ("3" . ymacs-window/split-horizontally)

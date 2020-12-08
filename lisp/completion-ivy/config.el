@@ -61,7 +61,7 @@
       (lv-delete-window)))
 
   (setq counsel-linux-app-format-function
-        #'counsel-linux-app-format-function-name-first)
+        #'counsel-linux-app-format-function-name-pretty)
   (setq counsel-yank-pop-separator
         "\n------------------------------------------------------------\n")
   (setq counsel-find-file-at-point t)
@@ -72,11 +72,10 @@
          ;; file names ending with # or ~
          "\\|\\(?:[#~]\\'\\)"))
 
+  (setq counsel-compile-make-args "-k -j4")
   (setq counsel-fzf-cmd (concat (expand-var! "fzf") " -f \"%s\""))
   (setq counsel-rg-base-command
         "rg -M 1000 -S --no-heading --line-number --color never %s .")
 
   (global-set-key (kbd "C-c i a")
-                  (if ymacs-ripgrep-path
-                      #'ymacs-counsel/rg
-                    #'counsel-grep)))
+                  (if ymacs-ripgrep-path #'ymacs-counsel/rg #'counsel-grep)))

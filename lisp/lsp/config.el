@@ -1,5 +1,7 @@
 ;; -*- lexical-binding:t -*-
 
+(declare-function dap-hydra 'dap-mode)
+
 (setq lsp-keymap-prefix nil)
 (after! lsp-mode
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.cache\\'")

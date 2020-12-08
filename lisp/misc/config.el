@@ -231,3 +231,5 @@
 (after! which-key
   (setq which-key-allow-imprecise-window-fit nil)
   (setq which-key-show-remaining-keys t))
+
+(setq winner-dont-bind-my-keys t)

@@ -38,6 +38,7 @@
   ("C-x w =" . ivy-push-view))
 
 (define-key! :prefix "C-c i"
+  ([remap compile] . counsel-compile)
   ("r" . ivy-resume)
   ("l l" . counsel-load-library)
   ("l t" . counsel-load-theme)
