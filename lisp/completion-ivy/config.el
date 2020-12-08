@@ -77,6 +77,4 @@
         "rg -M 1000 -S --no-heading --line-number --color never %s .")
 
   (global-set-key (kbd "C-c i a")
-                  (if ymacs-ripgrep-path
-                      #'ymacs-counsel/rg
-                    #'counsel-grep)))
+                  (if ymacs-ripgrep-path #'ymacs-counsel/rg #'counsel-grep)))

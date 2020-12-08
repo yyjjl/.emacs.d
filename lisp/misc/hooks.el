@@ -1,6 +1,9 @@
 ;; -*- lexical-binding: t -*-
 
 (define-hook! ymacs-misc|after-init (after-init-hook)
+  (when sys/macp
+    (exec-path-from-shell-initialize))
+
   (recentf-mode 1)
   (winner-mode 1)
 
@@ -171,7 +174,7 @@
                     (let ((value (funcall func (file-truename dir))))
                       (puthash cache-key value projectile-project-root-cache)
                       value))))
-              projectile-project-root-files-functions)
+              projectile-project-root-functions)
              'none)))))
 
   (advice-add #'delete-file-projectile-remove-from-cache :around #'ignore-remote!))

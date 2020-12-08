@@ -261,15 +261,17 @@ Example:
 (defun open! (-file-list)
   "Open All files in -FILE-LIST in external processes."
   (cond
-   ((eq system-type 'darwin)
+   (sys/mac-x-p
     (mapc (lambda (path)
             (shell-command (concat "open " (shell-quote-argument path))))
           -file-list))
-   ((eq system-type 'gnu/linux)
+   (sys/linux-x-p
     (mapc (lambda (path)
             (let ((process-connection-type nil))
               (start-process "external-process" nil "xdg-open" path)))
-          -file-list))))
+          -file-list))
+   (t
+    (user-error "Not supported yet"))))
 
 (defun add-auto-mode! (-mode &rest -patterns)
   "Add entries to `auto-mode-alist' to use -MODE for all given
