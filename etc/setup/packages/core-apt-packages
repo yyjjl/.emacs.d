@@ -8,8 +8,10 @@ curl
 dvipng
 exuberant-ctags
 fcitx-libpinyin
+fd-find
 ffmpeg
 figlet
+fzf
 gimp
 git
 global
@@ -36,8 +38,8 @@ pdf2svg
 perl-doc
 powerline
 proxychains
-racket
 rar
+ripgrep
 screenfetch
 sdcv
 smplayer

@@ -1,5 +1,7 @@
 ;; -*- lexical-binding: t; -*-
 
+(executable! gls)
+
 (defvar ymacs-autosave-interval 300)
 (defvar ymacs-autosave-hook nil)
 
@@ -38,7 +40,6 @@
   (setq backup-directory-alist (list (cons "." (expand-var! "backups/"))))
   (setq bookmark-default-file (expand-var! "bookmarks.el"))
   (setq calc-settings-file (expand-var! "calc.el"))
-  (setq cmake-ide-rdm-executable (expand-var! "rtags/bin/rdm"))
   (setq cnfonts-directory (expand-var! "cnfonts/"))
   (setq company-statistics-file (expand-var! "company-statistics-cache.el"))
   (setq custom-file (expand-file-name "custom.el" user-emacs-directory))

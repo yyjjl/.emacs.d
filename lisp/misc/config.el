@@ -52,6 +52,7 @@
   (setq recentf-max-saved-items 2048)
   (setq recentf-exclude
         (list "/tmp/" "^/sshx?:" "/sudo:" "\\.elc$"
+              "\\.?cache" ".cask"
               "/node_modules/"
               "\\.\\(gz\\|gif\\|svg\\|png\\|jpe?g\\)$" "/TAGS$"
               ymacs-var-direcotry

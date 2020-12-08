@@ -4,6 +4,7 @@
 
 (require-packages!
  (fcitx :when ymacs-fcitx-path)
+ (exec-path-from-shell :when sys/macp)
  zeal-at-point
  buffer-move
  whitespace
