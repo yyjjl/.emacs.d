@@ -2,5 +2,5 @@
 
 (after-feature! misc
   (add-to-list
-   'ymacs-misc-view-code-modes
-   '(lispy-mode ymacs-misc/rainbow-delimiters-count-mode)))
+   'ymacs-ui-view-code-modes
+   '(lispy-mode ymacs-tools/rainbow-delimiters-count-mode)))

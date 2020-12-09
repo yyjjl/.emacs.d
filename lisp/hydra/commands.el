@@ -2,20 +2,21 @@
 
 (eval-when-compile
   (require 'rect)
-  (require 'hydra))
+  (require 'hydra)
+  (require 'display-line-numbers))
 
 (require 'pretty-hydra)
 
-(defvar ymacs-misc/view-code-mode)
+(defvar ymacs-ui/view-code-mode)
 (defvar ymacs-hydra/global-toggles/hint-cache)
 
 (pretty-hydra-define ymacs-hydra/global-toggles
   (:title "Toggles" :color amaranth :quit-key "q")
   ("Global"
    (("V"
-     (ymacs-misc/view-code-mode (if ymacs-misc/view-code-mode -1 1))
+     (ymacs-ui/view-code-mode (if ymacs-ui/view-code-mode -1 1))
      "view code"
-     :toggle ymacs-misc/view-code-mode)
+     :toggle ymacs-ui/view-code-mode)
     ("E"
      toggle-debug-on-error
      "debug on error"

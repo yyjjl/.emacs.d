@@ -3,7 +3,7 @@
 (declare-function winner-undo 'winner)
 (declare-function winner-redo 'winner)
 
-(define-hook! ymacs-misc|after-init (after-init-hook)
+(define-hook! ymacs-tools|after-init (after-init-hook)
   (when sys/macp
     (exec-path-from-shell-initialize))
 
@@ -20,16 +20,9 @@
   ;;`eldoc', show API doc in minibuffer echo area enabled by default
   ;; (global-eldoc-mode 1)
 
-  (global-whitespace-mode 1)
-  (global-hl-todo-mode 1)
-  (electric-indent-mode 1)
+  (global-so-long-mode 1))
 
-  ;; (which-function-mode 1)
-  (which-key-mode 1)
-
-  (ignore-errors (global-so-long-mode 1)))
-
-(define-hook! ymacs-misc|after-init-idle (ymacs-after-init-idle-hook)
+(define-hook! ymacs-tools|after-init-idle (ymacs-after-init-idle-hook)
   (when (and ymacs-fcitx-path (display-graphic-p))
     (fcitx-aggressive-setup))
 
@@ -57,7 +50,7 @@
                      (called-interactively-p 'interactive)
                      (not (eq tab-always-indent 'complete))))
         ;; Trigger completions
-        (or (ignore-errors (ymacs-misc//try-expand-local-snippets))
+        (or (ignore-errors (ymacs-tools//try-expand-local-snippets))
             (ignore-errors (call-interactively #'company-files))
             (when (looking-back "\\(?:\\s_\\|\\sw\\)\\(?:\\.\\|->\\|::?\\)?"
                                 (max (point-min) (- (point) 5)))
@@ -68,8 +61,8 @@
   (define-advice savehist-save
       (:around (-fn &optional -auto-save) set-additional-variables)
     (let ((variables savehist-additional-variables)
-          (kill-ring (ymacs-misc//filter-ring kill-ring))
-          (ivy-history (ignore-errors (ymacs-misc//filter-ring ivy-history))))
+          (kill-ring (ymacs-tools//filter-ring kill-ring))
+          (ivy-history (ignore-errors (ymacs-tools//filter-ring ivy-history))))
       (dolist (symbol (apropos-internal "-\\(ring\\|history\\)\\'" 'boundp))
         (unless (or (memq symbol ymacs-savehist-exclude-variables)
                     (memq symbol savehist-minibuffer-history-variables)
@@ -85,7 +78,7 @@
   (add-hook 'ymacs-autosave-hook #'recentf-save-list))
 
 (after! bookmark
-  (define-hook! ymacs-misc|bookmark-setup (find-file-hook)
+  (define-hook! ymacs-tools|bookmark-setup (find-file-hook)
     (unless (file-remote-p default-directory)
       ;; Setup default bookmark
       (setq bookmark-current-bookmark
@@ -110,37 +103,6 @@
            (counsel-rg symbol)
          (message "%s" (error-message-string err)))))))
 
-(after! flymake
-  (define-hook! ymacs-misc|flymake-setup (flymake-mode-hook)
-    (if flymake-mode
-        (progn
-          (put 'next-error-function
-               'flymake-old-next-error-function
-               next-error-function)
-          (setq next-error-function 'flymake-goto-next-error))
-      (setq next-error-function (get 'next-error-function
-                                     'flymake-old-next-error-function)))))
-
-(after! flycheck
-  (define-advice flycheck-error-level-interesting-p (:override (err) smart)
-    (when (flycheck-error-p err)
-      (if-let ((min-level flycheck-navigation-minimum-level)
-               (min-severity (flycheck-error-level-severity min-level)))
-          (or (<= min-severity
-                  (flycheck-error-level-severity (flycheck-error-level err)))
-              ;; all errors have a severity smaller than min-severity
-              (not (seq-some
-                    (lambda (e)
-                      (>= (flycheck-error-level-severity (flycheck-error-level e))
-                          min-severity))
-                    flycheck-current-errors)))
-        t)))
-
-  (define-advice flycheck-add-overlay (:around (-fn &rest -args) set-priority)
-    (let ((ov (apply -fn -args)))
-      (overlay-put ov 'priority -10)
-      ov)))
-
 (after! projectile
   (add-hook 'kill-emacs-hook #'projectile-cleanup-known-projects)
 
@@ -148,7 +110,7 @@
     (dolist (buffer (ignore-errors (projectile-project-buffers)))
       (when (buffer-live-p buffer)
         (with-current-buffer buffer
-          (dolist (var ymacs-misc-projectile-invalidate-cache-empty-vars)
+          (dolist (var ymacs-tools-projectile-invalidate-cache-empty-vars)
             (set var nil))))))
 
   (define-advice projectile-run-compilation (:override (-cmd) show-compile-buffer)
@@ -185,7 +147,7 @@
 
 (after! yasnippet
   (define-advice yas-next-field-or-maybe-expand (:around (-fn &rest -args) expand-local)
-    (or (ymacs-misc//try-expand-local-snippets)
+    (or (ymacs-tools//try-expand-local-snippets)
         (apply -fn -args)))
 
   (after! org
@@ -194,7 +156,7 @@
      :around #'yas-next-field-or-maybe-expand@expand-local)))
 
 (after! graphviz-dot-mode
-  (define-hook! ymacs-misc|dot-setup (graphviz-dot-mode-hook)
+  (define-hook! ymacs-tools|dot-setup (graphviz-dot-mode-hook)
     (hs-minor-mode 1)
     (ymacs-company//add-backend 'company-graphviz-dot-backend)))
 

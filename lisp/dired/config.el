@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(autoload #'hydra-dired-quick-sort/body "dired-quick-sort" nil t)
+
 (after! dired
   (define-key! :map dired-mode-map
     (")" . dired-omit-mode)

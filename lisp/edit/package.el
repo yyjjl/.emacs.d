@@ -1,8 +1,9 @@
 ;;; -*- lexical-binding: t; -*-
 
 (require-packages!
+ expand-region
+ goto-chg
  easy-kill
- easy-kill-extras
  ;; Mark tools
  multiple-cursors
  ;; `wgrep' allows you to edit a grep buffer and apply those changes
@@ -39,6 +40,9 @@
                        (concat "\\end{" env "}"))))))))
 
 (define-key!
+  ("C-x C-_" . goto-last-change)
+  ("C-x C-/" . goto-last-change)
+
   ("C-x , SPC" . ymacs-edit/insert-space-around-chinese)
   ("M-Q" . ymacs-edit/insert-space-around-chinese)
   ("M-;" . ymacs-edit/comment-dwim)

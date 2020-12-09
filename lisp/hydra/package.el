@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(require-packages! hydra pretty-hydra)
+
 (defvar ymacs-hydra-local-toggles-heads-list nil)
 
 (autoload 'ymacs-hydra/ediff/body "hydra/commands" nil t)

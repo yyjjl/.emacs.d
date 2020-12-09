@@ -6,7 +6,7 @@
            (memq this-command
                  '(eval-expression
                    pp-eval-expression
-                   ymacs-misc/eval-and-replace
+                   ymacs-tools/eval-and-replace
                    eval-expression-with-eldoc
                    ibuffer-do-eval
                    ibuffer-do-view-and-eval)))

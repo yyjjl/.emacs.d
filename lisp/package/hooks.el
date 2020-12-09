@@ -8,9 +8,7 @@
     (autoload 'ymacs-package/generate-autoloads "package/commands" nil t)
     (ymacs-package/generate-autoloads))
 
-  (load ymacs-autoloads-file)
-
-  (paradox-enable))
+  (load ymacs-autoloads-file))
 
 (after! package
   (define-advice package--save-selected-packages (:override (-value) dont-save)

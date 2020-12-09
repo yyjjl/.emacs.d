@@ -2,6 +2,15 @@
 
 (executable! ripgrep :exe "rg")
 
+(require-packages!
+ ;; `counsel-M-x' need amx to get history
+ amx
+ ivy
+ ivy-hydra
+ counsel
+ swiper
+ sudo-edit)
+
 (defvar ymacs-ivy-switch-function-list nil)
 
 (defvar ymacs-ivy-rg-type-aliases

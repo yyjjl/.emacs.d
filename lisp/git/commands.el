@@ -1,5 +1,9 @@
 ;;; -*- lexical-binding: t; -*-
 
+(eval-when-compile
+  (require 'smerge-mode)
+  (require 'git-timemachine))
+
 ;;;###autoload
 (defun ymacs-git//status ()
   (interactive)

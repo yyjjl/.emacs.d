@@ -1,7 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;;;###autoload
-(defun ymacs-misc/select-next-error-buffer ()
+(defun ymacs-tools/select-next-error-buffer ()
   (interactive)
   (let* ((error-buffer (next-error-find-buffer))
          (buffers
@@ -18,7 +18,7 @@
                             (or (eq buffer (current-buffer))
                                 (with-current-buffer buffer
                                   (apply 'derived-mode-p
-                                         ymacs-misc-auto-next-error-buffer-derived-modes)))))))
+                                         ymacs-tools-auto-next-error-buffer-derived-modes)))))))
             (buffer-list))))
          (buffer
           (cdr-safe
@@ -36,7 +36,7 @@
       (user-error "Nothing to do"))))
 
 ;;;###autoload
-(defun ymacs-misc/edit-dir-locals (&optional -directory)
+(defun ymacs-tools/edit-dir-locals (&optional -directory)
   "Edit or create a .dir-locals.el file of the project."
   (interactive
    (list (let ((root (projectile-project-root)))
@@ -62,7 +62,7 @@
                 (find-file (completing-read "Open file: " files nil t)))))))))
 
 ;;;###autoload
-(defun ymacs-misc/create-scratch-buffer ()
+(defun ymacs-tools/create-scratch-buffer ()
   "Create a new scratch buffer to work in. (could be *scratch* - *scratchX*)."
   (interactive)
   (let ((n 0)
@@ -88,7 +88,7 @@
     (funcall mode)))
 
 ;;;###autoload
-(defun ymacs-misc/cleanup-buffer-safe ()
+(defun ymacs-tools/cleanup-buffer-safe ()
   "Perform a bunch of safe operations on the whitespace content of a buffer.
 Does not indent buffer, because it is used for a
 `before-save-hook', and that might be bad."
@@ -98,7 +98,7 @@ Does not indent buffer, because it is used for a
   (set-buffer-file-coding-system 'utf-8))
 
 ;;;###autoload
-(defun ymacs-misc/current-font-face ()
+(defun ymacs-tools/current-font-face ()
   "Get the font face under cursor."
   (interactive)
   (let* ((pos (point))
@@ -108,7 +108,7 @@ Does not indent buffer, because it is used for a
     (message "%s" faces)))
 
 ;;;###autoload
-(defun ymacs-misc/occur-dwim ()
+(defun ymacs-tools/occur-dwim ()
   (interactive)
   (if (region-active-p)
       (push (buffer-substring-no-properties
@@ -121,7 +121,7 @@ Does not indent buffer, because it is used for a
   (call-interactively 'occur))
 
 ;;;###autoload
-(defun ymacs-misc/eval-and-replace (-start -end)
+(defun ymacs-tools/eval-and-replace (-start -end)
   (interactive "r")
   (let* ((it (buffer-substring -start -end))
          (expr (if (bound-and-true-p mc--executing-command-for-fake-cursor)
@@ -137,7 +137,7 @@ Does not indent buffer, because it is used for a
 
 (declare-function browse-url-chrome "browse-url")
 
-(defun ymacs-misc//read-search-engine ()
+(defun ymacs-tools//read-search-engine ()
   (assoc-string
    (car (split-string-and-unquote
          (ivy-read
@@ -147,7 +147,7 @@ Does not indent buffer, because it is used for a
              (format "%-6s %s"
                      (nth 0 x)
                      (propertize (nth 2 x) 'face font-lock-comment-face)))
-           ymacs-misc-search-engine-alist)
+           ymacs-tools-search-engine-alist)
           :preselect "g"
           :matcher (lambda (re candidates)
                      (when (and (stringp re)
@@ -155,33 +155,33 @@ Does not indent buffer, because it is used for a
                        (setq re (concat "^" re)))
                      (ivy--re-filter re candidates))
           :require-match t)))
-   ymacs-misc-search-engine-alist))
+   ymacs-tools-search-engine-alist))
 
 ;;;###autoload
-(defun ymacs-misc/search-in-chrome (-engine -keyword)
+(defun ymacs-tools/search-in-chrome (-engine -keyword)
   (interactive
-   (let ((engine (ymacs-misc//read-search-engine)))
+   (let ((engine (ymacs-tools//read-search-engine)))
      (list (nth 2 engine)
            (read-from-minibuffer (concat (nth 1 engine) ": ")
                                  nil nil 'yamcs-misc-search-history))))
   (unless (featurep 'browse-url)
     (require 'browse-url))
   (browse-url-chrome (format -engine -keyword))
-  (run-hooks 'ymacs-misc-after-search-hook))
+  (run-hooks 'ymacs-tools-after-search-hook))
 
 ;;;###autoload
-(defun ymacs-misc/toggle-socket-proxy ()
+(defun ymacs-tools/toggle-socket-proxy ()
   (interactive)
   (if (eq url-gateway-method 'socks)
-      (let ((method (function-get #'ymacs-misc/toggle-socket-proxy 'method)))
+      (let ((method (function-get #'ymacs-tools/toggle-socket-proxy 'method)))
         (setq url-gateway-method (or method 'native))
         (message "Use method '%s" url-gateway-method))
-    (function-put #'ymacs-misc/toggle-socket-proxy 'method url-gateway-method)
+    (function-put #'ymacs-tools/toggle-socket-proxy 'method url-gateway-method)
     (setq url-gateway-method 'socks)
-    (message "Use socket proxy %s" ymacs-misc-socks-server)))
+    (message "Use socket proxy %s" ymacs-tools-socks-server)))
 
 ;;;###autoload
-(defun ymacs-misc/delete-http-buffers (-force)
+(defun ymacs-tools/delete-http-buffers (-force)
   (interactive "P")
   (require 'dired)
   (let ((buffers
@@ -199,14 +199,14 @@ Does not indent buffer, because it is used for a
         (kill-buffer buffer)))))
 
 ;;;###autoload
-(defun ymacs-misc/rsync-project (-local-path -remote-path -sync-to-remote)
+(defun ymacs-tools/rsync-project (-local-path -remote-path -sync-to-remote)
   (interactive
    (list (read-directory-name
           "Local path: "
-          ymacs-misc-project-rsync-local-path)
+          ymacs-tools-project-rsync-local-path)
          (read-string
           "Remote path: "
-          ymacs-misc-project-rsync-remote-path)
+          ymacs-tools-project-rsync-remote-path)
          (completing-read
           "direction:" '("local  -> remote" "remote -> local") nil t)))
 
@@ -215,34 +215,11 @@ Does not indent buffer, because it is used for a
 
   (let* ((default-directory -local-path)
          (options (if (not current-prefix-arg)
-                      (cl-list* "--dry-run" "--update" ymacs-misc-project-rsync-extra-options)
-                    ymacs-misc-project-rsync-extra-options))
+                      (cl-list* "--dry-run" "--update" ymacs-tools-project-rsync-extra-options)
+                    ymacs-tools-project-rsync-extra-options))
          (compile-command
-          (format ymacs-misc-project-rsync-command
+          (format ymacs-tools-project-rsync-command
                   (string-join options " ")
                   (if -sync-to-remote -local-path -remote-path)
                   (if -sync-to-remote -remote-path -local-path))))
     (call-interactively #'compile)))
-
-;;;###autoload
-(defun ymacs-misc/toggle-winum-scope ()
-  (interactive)
-  (setq winum-scope (if (eq winum-scope 'frame-local)
-                        'visible
-                      'frame-local))
-  (message "Current winum scope: %s" (upcase (symbol-name winum-scope)))
-  (dolist (frame (frame-list))
-    (select-frame frame)
-    (winum--update))
-  (force-mode-line-update))
-
-;;;###autoload
-(define-minor-mode ymacs-misc/view-code-mode
-  "View code"
-  :init-value nil
-  (let ((switch (if ymacs-misc/view-code-mode 1 -1)))
-    (cl-loop for (condition . modes) in ymacs-misc-view-code-modes
-             when (or (eq condition t)
-                      (and (symbolp condition) (symbol-value condition)))
-             do (dolist (mode modes)
-                  (funcall mode switch)))))

@@ -108,6 +108,8 @@ grab matched string and insert them into `kill-ring'"
   (interactive "^p")
   (forward-thing 'defun (- -n)))
 
+(autoload #'python-nav-forward-statement "python" nil t)
+
 ;;;###autoload
 (defun ymacs-edit/forward-sentence-or-sexp (&optional -n)
   (interactive "^p")

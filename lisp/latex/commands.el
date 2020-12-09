@@ -1,5 +1,11 @@
 ;;; -*- lexical-binding: t; -*-
 
+(defvar TeX-save-query)
+(declare-function TeX-active-buffer "tex-buf")
+(declare-function TeX-next-error "tex-buf")
+(declare-function TeX-previous-error "tex-buf")
+(declare-function reftex-parse-all "reftex-parse")
+
 ;;;###autoload
 (defun ymacs-latex/next-error ()
   (interactive)

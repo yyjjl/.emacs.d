@@ -3,50 +3,47 @@
 (executable! fcitx)
 
 (require-packages!
- (fcitx :when ymacs-fcitx-path)
  (exec-path-from-shell :when sys/macp)
- zeal-at-point
+ (fcitx :when ymacs-fcitx-path)
+ bison-mode
  buffer-move
- whitespace
  csv-mode
  gnuplot-mode
- bison-mode
  graphviz-dot-mode
- yaml-mode)
+ projectile
+ whitespace
+ yaml-mode
+ yasnippet
+ yasnippet-snippets
+ zeal-at-point)
 
-(defcustom ymacs-misc-project-rsync-remote-path nil
+(defcustom ymacs-tools-project-rsync-remote-path nil
   "."
   :group 'projectile
   :type 'directory
   :safe #'stringp)
 
-(defcustom ymacs-misc-project-rsync-local-path nil
+(defcustom ymacs-tools-project-rsync-local-path nil
   "."
   :group 'projectile
   :type 'directory
   :safe #'file-directory-p)
 
-(defcustom ymacs-misc-project-rsync-extra-options nil
+(defcustom ymacs-tools-project-rsync-extra-options nil
   "."
   :group 'projectile
   :type 'directory
   :safe (lambda (x) (and (listp x) (-all? #'stringp x))))
 
-(defcustom ymacs-misc-local-snippets-list nil
+(defcustom ymacs-tools-local-snippets-list nil
   "local snippets"
   :group 'editing
   :type 'directory
   :safe #'listp)
 
-(defvar ymacs-misc-after-rename-this-file-hook nil)
-(defvar ymacs-misc-after-delete-this-file-hook nil)
-(defvar ymacs-misc-after-search-hook nil)
-
-(defvar ymacs-misc-view-code-modes
-  '((t display-line-numbers-mode
-       view-mode
-       highlight-indentation-current-column-mode
-       highlight-indentation-mode)))
+(defvar ymacs-tools-after-rename-this-file-hook nil)
+(defvar ymacs-tools-after-delete-this-file-hook nil)
+(defvar ymacs-tools-after-search-hook nil)
 
 (defvar ymacs-savehist-exclude-variables
   '(load-history
@@ -56,29 +53,22 @@
     org-mark-ring
     planner-browser-file-display-rule-ring))
 
-(defvar ymacs-misc-project-rsync-command
+(defvar ymacs-tools-project-rsync-command
   "rsync -azh --progress --filter=':- .gitignore' %s %s %s")
 
-(defvar ymacs-misc-search-engine-alist
+(defvar ymacs-tools-search-engine-alist
   '(("g" "google" "http://www.google.com/search?q=%s")
     ("q" "stackoverflow" "http://www.google.com/search?q=%s+site:stackoverflow.com")
     ("w" "wikipedia" "http://en.wikipedia.org/wiki/Special:Search?search=%s")
     ("d" "dictionary" "http://dictionary.reference.com/search?q=%s")
     ("cpp" "cpp" "https://www.google.com/search?q=cpp+%s")))
 
-(defvar ymacs-misc-socks-server '("Default server" "127.0.0.1" 1080 5))
+(defvar ymacs-tools-socks-server '("Default server" "127.0.0.1" 1080 5))
 
-(defvar ymacs-misc-projectile-invalidate-cache-empty-vars
+(defvar ymacs-tools-projectile-invalidate-cache-empty-vars
   '(doom-modeline--vcs-text
     doom-modeline--project-detected-p
     doom-modeline--project-root))
-
-(defvar ymacs-misc-auto-next-error-buffer-derived-modes
-  '(occur-mode
-    grep-mode
-    ivy-occur-mode
-    xref--xref-buffer-mode
-    compilation-mode))
 
 (declare-function winner-undo 'winner)
 (declare-function winner-redo 'winner)
@@ -90,18 +80,17 @@
   ("_" . ymacs-window/force-split-vertically)
   ("?" . ymacs-window/split-window-to-grid)
 
-  (", ," . ymacs-misc/view-code-mode)
-  (", a" . ymacs-misc/add-local-snippet)
-  (", g" . ymacs-misc/search-in-chrome)
-  (", -" . ymacs-misc/copy-file-name)
+  (", a" . ymacs-tools/add-local-snippet)
+  (", g" . ymacs-tools/search-in-chrome)
+  (", -" . ymacs-tools/copy-file-name)
   (", o" . recentf-open-files)
   ("C-b" . ibuffer)
   ("C-d" . find-name-dired)
 
-  ("D" . ymacs-misc/delete-this-file)
-  ("R" . ymacs-misc/rename-this-file-and-buffer)
-  ("W" . ymacs-misc/copy-this-file-to-new-file)
-  ("c" . ymacs-misc/cleanup-buffer-safe)
+  ("D" . ymacs-tools/delete-this-file)
+  ("R" . ymacs-tools/rename-this-file-and-buffer)
+  ("W" . ymacs-tools/copy-this-file-to-new-file)
+  ("c" . ymacs-tools/cleanup-buffer-safe)
   ("o" . ace-window)
   ("m" . view-echo-area-messages)
 
@@ -109,9 +98,6 @@
   ("w ]" . winner-redo))
 
 (define-key!
-  ("C-x C-_" . goto-last-change)
-  ("C-x C-/" . goto-last-change)
-
   ("C-<down>" . text-scale-decrease)
   ("C-<up>" . text-scale-increase)
 
@@ -122,16 +108,16 @@
 
   ("M-/" . hippie-expand)
   ("M-n" . next-error)
-  ("M-N" . ymacs-misc/select-next-error-buffer)
+  ("M-N" . ymacs-tools/select-next-error-buffer)
   ("M-p" . previous-error)
 
   ("M-`" . other-frame)
   ("M-i" . iedit-mode)
-  ("M-s e" . ymacs-misc/eval-and-replace)
-  ("M-s o" . ymacs-misc/occur-dwim)
+  ("M-s e" . ymacs-tools/eval-and-replace)
+  ("M-s o" . ymacs-tools/occur-dwim)
   ("RET" . newline-and-indent)
 
-  ([C-f7] . ymacs-misc/rsync-project)
+  ([C-f7] . ymacs-tools/rsync-project)
 
   ([f10] . compile))
 

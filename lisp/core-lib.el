@@ -21,6 +21,8 @@
 
 (require 'subr-x)
 (require 'cl-lib)
+(eval-when-compile
+  (require 'seq))
 
 (defvar ymacs--loaded-features ())
 

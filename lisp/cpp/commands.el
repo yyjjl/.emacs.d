@@ -4,6 +4,7 @@
   (require 'cmacexp))
 
 (defvar gud-chdir-before-run)
+(declare-function realgud-short-key-mode "ext:shortkey")
 
 (defun ymacs-cpp//compile-command (-directory)
   "Return suitable compile command for current project"

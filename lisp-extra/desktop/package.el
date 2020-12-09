@@ -1,7 +1,7 @@
 ;; -*- lexical-binding:t -*-
 
-(defvar ymacs-misc-current-desktop-name nil)
+(defvar ymacs-tools-current-desktop-name nil)
 
 (define-key!
-  (", c" . ymacs-misc/change-or-new-desktop)
-  (", d" . ymacs-misc/delete-desktop))
+  (", c" . ymacs-tools/change-or-new-desktop)
+  (", d" . ymacs-tools/delete-desktop))

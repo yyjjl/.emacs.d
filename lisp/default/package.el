@@ -1,7 +1,5 @@
 ;; -*- lexical-binding: t; -*-
 
-(executable! gls)
-
 (defvar ymacs-autosave-interval 300)
 (defvar ymacs-autosave-hook nil)
 
@@ -27,6 +25,13 @@
 (defvar ymacs-ignored-directories '("auto" "target" "node_modules"
                                     "bower_components" ".sass_cache" ".cache"
                                     ".git" ".cvs" ".svn" ".hg" "elpa"))
+
+(defvar ymacs-auto-next-error-buffer-derived-modes
+  '(occur-mode
+    grep-mode
+    ivy-occur-mode
+    xref--xref-buffer-mode
+    compilation-mode))
 
 (autoload 'ansi-color-apply-on-region "ansi-color")
 

@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(require-packages! company)
+
 (make-variable-buffer-local 'company-backends)
 
 (define-key!

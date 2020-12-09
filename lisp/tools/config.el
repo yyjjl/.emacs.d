@@ -1,26 +1,5 @@
 ;; -*- lexical-binding: t -*-
 
-(setq next-error-find-buffer-function
-      (lambda (&rest -args)
-        (or (apply #'next-error-buffer-unnavigated-current -args)
-
-            (let ((buffers
-                   (cl-loop
-                    for window in (window-list)
-                    for buffer = (window-buffer window)
-                    if (and (next-error-buffer-p buffer)
-                            (with-current-buffer buffer
-                              (apply 'derived-mode-p
-                                     ymacs-misc-auto-next-error-buffer-derived-modes)))
-                    collect buffer)))
-              (when (= (length buffers) 1)
-                (car buffers)))
-
-            (let ((error-buffer (buffer-local-value 'next-error-buffer (current-buffer))))
-              (when (and (buffer-live-p error-buffer)
-                         (apply #'next-error-buffer-p error-buffer -args))
-                error-buffer)))))
-
 (setq he-dabbrev-chars "0-9a-zA-Z\\?!_")
 (setq-default hippie-expand-try-functions-list
               '(try-expand-dabbrev
@@ -41,14 +20,14 @@
   (setq savehist-autosave-interval 3000))
 
 (after! recentf
-  (defun ymacs-misc//recentf-keep-p (-fn)
+  (defun ymacs-tools//recentf-keep-p (-fn)
     (and ymacs--buffer-visible-p
          ;; The order must be kept
          (or (file-remote-p -fn)
              (and (file-readable-p -fn)
                   (file-writable-p -fn)))))
 
-  (setq recentf-keep '(ymacs-misc//recentf-keep-p))
+  (setq recentf-keep '(ymacs-tools//recentf-keep-p))
   (setq recentf-max-saved-items 2048)
   (setq recentf-exclude
         (list "/tmp/" "^/sshx?:" "/sudo:" "\\.elc$"
@@ -64,7 +43,7 @@
   ;; Setup for existing buffers
   (dolist (buffer (buffer-list))
     (with-current-buffer buffer
-      (ymacs-misc|bookmark-setup))))
+      (ymacs-tools|bookmark-setup))))
 
 (after! ffap
   ;; do not use ping, it's very slow
@@ -95,15 +74,6 @@
   (setq fcitx-use-dbus nil)
   (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c" "C-z"))
 
-(after! display-line-numbers
-  (setq display-line-numbers-type t)
-  (setq-default display-line-numbers-width 2))
-
-;; `whitespace-space' setup
-(after! whitespace
-  (setq whitespace-global-modes '(text-mode))
-  (setq whitespace-style '(face tabs tab-mark spaces space-mark empty)))
-
 (after! view
   (define-key! :map view-mode-map
     ("s" . ymacs/swiper)
@@ -130,10 +100,10 @@
     ("C-c f l" . flymake-show-diagnostics-buffer))
 
   (define-key! :map flymake-diagnostics-buffer-mode-map
-   ("n" . next-line)
-   ("j" . next-line)
-   ("p" . previous-line)
-   ("k" . previous-line)))
+    ("n" . next-line)
+    ("j" . next-line)
+    ("p" . previous-line)
+    ("k" . previous-line)))
 
 (after! graphviz-dot-mode
   (require 'company-graphviz-dot)
@@ -142,24 +112,12 @@
 
   (setq graphviz-dot-indent-width 4))
 
-(setq flycheck-keymap-prefix (kbd "C-c f"))
-(after! flycheck
-  (define-key! :map flycheck-command-map
-    ("j" . ymacs-counsel/flycheck))
-
-  ;; Do not check during newline
-  (setq-default flycheck-checker-error-threshold 400)
-  (setq-default flycheck-check-syntax-automatically '(idle-change save mode-enabled))
-  (setq flycheck-navigation-minimum-level 'warning)
-  (setq flycheck-mode-line-prefix "")
-  (setq flycheck-idle-change-delay 1))
-
 (after! projectile
   (define-key! :map projectile-mode-map
     ("C-x p" :map projectile-command-map))
 
   (define-key! :map projectile-command-map
-    ("E" . ymacs-misc/edit-dir-locals)
+    ("E" . ymacs-tools/edit-dir-locals)
     ("K" . projectile-kill-buffers)
     ("w" . projectile-switch-project))
 
@@ -223,14 +181,5 @@
 
 (after! inf-lisp
   (setq inferior-lisp-program "sbcl"))
-
-(after! which-func
-  (setq which-func-format
-        '("[" (:propertize which-func-current face which-func) "]")))
-
-(setq which-key-dont-use-unicode t)
-(after! which-key
-  (setq which-key-allow-imprecise-window-fit nil)
-  (setq which-key-show-remaining-keys t))
 
 (setq winner-dont-bind-my-keys t)

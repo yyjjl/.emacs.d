@@ -110,3 +110,23 @@
    (elt 3)
    string-to-number
    ignore-errors))
+
+(defun ymacs//next-error-find-buffer (&rest -args)
+  (or (apply #'next-error-buffer-unnavigated-current -args)
+
+      (let ((buffers
+             (cl-loop
+              for window in (window-list)
+              for buffer = (window-buffer window)
+              if (and (next-error-buffer-p buffer)
+                      (with-current-buffer buffer
+                        (apply 'derived-mode-p
+                               ymacs-auto-next-error-buffer-derived-modes)))
+              collect buffer)))
+        (when (= (length buffers) 1)
+          (car buffers)))
+
+      (let ((error-buffer (buffer-local-value 'next-error-buffer (current-buffer))))
+        (when (and (buffer-live-p error-buffer)
+                   (apply #'next-error-buffer-p error-buffer -args))
+          error-buffer))))

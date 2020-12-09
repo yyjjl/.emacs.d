@@ -122,3 +122,30 @@
   (setq winum-scope 'frame-local
         winum-reverse-frame-list nil
         winum-auto-assign-0-to-minibuffer t))
+
+(setq which-key-dont-use-unicode t)
+(after! which-key
+  (setq which-key-allow-imprecise-window-fit nil)
+  (setq which-key-show-remaining-keys t))
+
+(after! which-func
+  (setq which-func-format
+        '("[" (:propertize which-func-current face which-func) "]")))
+
+(after! display-line-numbers
+  (setq display-line-numbers-type t)
+  (setq-default display-line-numbers-width 2))
+
+;; `whitespace-space' setup
+(after! whitespace
+  (setq whitespace-global-modes '(text-mode))
+  (setq whitespace-style '(face tabs tab-mark spaces space-mark empty)))
+
+(after! highlight-indent-guides
+  (setq highlight-indent-guides-highlighter-function
+        (lambda (-level -responsive -display)
+          (unless (< -level 1)
+            (highlight-indent-guides--highlighter-default -level -responsive -display))))
+
+  (setq highlight-indent-guides-method 'character
+        highlight-indent-guides-responsive 'top))

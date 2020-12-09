@@ -78,8 +78,6 @@ Lisp function does not specify a special indentation."
   (setq-local hippie-expand-try-functions-list
               (append hippie-expand-try-functions-list '(try-complete-lisp-symbol)))
 
-  (highlight-indentation-mode -1)
-
   (lispy-mode 1)
   (local-set-key (kbd "M-,") 'xref-pop-marker-stack))
 

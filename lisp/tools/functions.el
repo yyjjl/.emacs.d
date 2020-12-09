@@ -1,26 +1,26 @@
 ;;; -*- lexical-binding: t; -*-
 
-(defun ymacs-misc//filter-ring (ring)
+(defun ymacs-tools//filter-ring (ring)
   (--filter
    (< (length it) 1024)
    (mapcar #'substring-no-properties ring)))
 
-(defun ymacs-misc//get-occur-buffer ()
+(defun ymacs-tools//get-occur-buffer ()
   (cl-loop
    for window in (window-list)
    for buffer = (window-buffer window)
    when (with-current-buffer buffer
           (apply 'derived-mode-p
-                 ymacs-misc-auto-next-error-buffer-derived-modes))
+                 ymacs-tools-auto-next-error-buffer-derived-modes))
    return buffer))
 
-(defun ymacs-misc//try-expand-local-snippets ()
+(defun ymacs-tools//try-expand-local-snippets ()
   (when-let*
       ((bounds (bounds-of-thing-at-point 'word))
        (template (cdr-safe (assoc-string
                             (buffer-substring-no-properties (car bounds)
                                                             (cdr bounds))
-                            ymacs-misc-local-snippets-list))))
+                            ymacs-tools-local-snippets-list))))
     (yas-expand-snippet template (car bounds) (cdr bounds))))
 
 (defun ymacs//buffer-has-long-lines-p ()

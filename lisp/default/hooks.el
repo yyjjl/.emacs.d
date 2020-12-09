@@ -83,17 +83,13 @@
 
 (define-hook! ymacs|after-init-hook (after-init-hook)
   ;; global-modes
-  (global-font-lock-mode 1)
   (global-subword-mode 1)
-  (global-page-break-lines-mode 1)
   (global-auto-revert-mode 1)
 
-  (column-number-mode 1)
-  (show-paren-mode 1)
   ;; Auto insert closing pair
   (electric-pair-mode 1)
   (electric-layout-mode 1)
-  (electric-indent-mode -1)
+  (electric-indent-mode 1)
 
   ;; Keep mouse at upper-right corner when typing
   ;; (mouse-avoidance-mode 'banish)
