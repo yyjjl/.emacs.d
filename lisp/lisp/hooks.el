@@ -29,9 +29,8 @@
       (funcall -fn -symbol))))
 
 (after! auto-compile
-  (when (fboundp 'native-compile)
-    (define-advice auto-compile-byte-compile
-        (:around (-fn &optional -file -start) native)
-      (when (funcall -fn -file -start)
-        (with-demoted-errors "%s"
-          (message "ELN: %s" (native-compile (or -file (buffer-file-name)))))))))
+  (define-advice auto-compile-byte-compile (:around (-fn &optional -file -start) native)
+    (when (and (funcall -fn -file -start)
+               (fboundp 'native-compile))
+      (with-demoted-errors "%s"
+        (message "ELN: %s" (native-compile (or -file (buffer-file-name))))))))

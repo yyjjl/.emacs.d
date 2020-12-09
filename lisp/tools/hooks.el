@@ -1,7 +1,8 @@
 ;; -*- lexical-binding: t -*-
 
-(declare-function winner-undo 'winner)
-(declare-function winner-redo 'winner)
+(declare-function winner-undo "winner")
+(declare-function winner-redo "winner")
+(declare-function exec-path-from-shell-initialize "ext:exec-path-from-shell")
 
 (define-hook! ymacs-tools|after-init (after-init-hook)
   (when sys/macp

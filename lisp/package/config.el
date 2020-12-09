@@ -20,4 +20,5 @@
   ;; add load-path’s and load autoload files
   (package-initialize))
 
+(require-packages! dash)
 (require 'dash)

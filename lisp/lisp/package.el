@@ -1,6 +1,8 @@
 ;; -*- lexical-binding:t -*-
 
 (require-packages!
+ ;; Highlight braces with their depth
+ rainbow-delimiters
  ;; Auto compile after .el file load or save
  auto-compile
  ;; pair edit

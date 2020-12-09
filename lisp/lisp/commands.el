@@ -1,6 +1,42 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;;;###autoload
+(define-minor-mode ymacs-lisp/rainbow-delimiters-count-mode
+  "Add count below parentheses."
+  :init-value nil
+  (unless (or (bound-and-true-p rainbow-delimiters-mode)
+              (display-graphic-p))
+    (setq ymacs-lisp/rainbow-delimiters-count-mode nil)
+    (user-error "rainbow-delimiters-mode is not enabled"))
+
+  (if ymacs-lisp/rainbow-delimiters-count-mode
+      (progn
+        (setq line-spacing 0.1)
+        (advice-add
+         'rainbow-delimiters--apply-color
+         :after #'ymacs-lisp//rainbow-delimiters--add-depth-number))
+    (decompose-region (point-min) (point-max))
+    (setq line-spacing (default-value 'line-spacing))
+    (advice-remove
+     'rainbow-delimiters--apply-color
+     #'ymacs-lisp//rainbow-delimiters--add-depth-number))
+  (font-lock-flush))
+
+(defun ymacs-lisp//rainbow-delimiters--number-to-subscript (-char -n)
+  (cond ((< -n 0))
+        ((< -n 10)
+         (list -char '(bc . tc) (+ ?0 -n)))
+        ((< -n 100)
+         (list -char '(bc . tc) (+ ?0 (/ -n 10)) '(bc . tc) (+ ?0 (mod -n 10))))))
+
+(defun ymacs-lisp//rainbow-delimiters--add-depth-number (-loc -depth _match)
+  (when ymacs-lisp/rainbow-delimiters-count-mode
+    (let* ((-char (char-after -loc)))
+      (when-let (components (ymacs-lisp//rainbow-delimiters--number-to-subscript -char -depth))
+        (compose-region -loc (1+ -loc) components)))))
+
+
+;;;###autoload
 (defun ymacs-lisp/edebug-remove-all-instrumentation ()
   "Remove all edebug instrumentation by visiting each function
 definition and running `eval-defun`."

@@ -16,6 +16,6 @@ xsetroot -solid "#2d2d2d"
 xset r rate 220 30
 
 emacs --daemon=i3wm -q
-emacsclient -s i3wm -e "(load \"~/.emacs.d/i3wm.el\")" &
+emacsclient -s i3wm -e "(load \"~/.emacs.d/etc/i3wm.el\")" &
 
 /usr/bin/i3

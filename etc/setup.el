@@ -16,9 +16,20 @@
   (setq load-prefer-newer t)
   (setq ymacs--buffer-visible-p nil)
 
-  (let ((early-init-file (expand-file-name "early-init.el" user-emacs-directory)))
-    (when (file-exists-p early-init-file)
-      (load early-init-file nil t)))
+  (setq early-init-file (expand-file-name "early-init.el" user-emacs-directory))
+  (when (file-exists-p early-init-file)
+    (load early-init-file nil t))
+
+  (setq package-quickstart-file (expand-file-name "var/quickstart.el" user-emacs-directory))
+  (when (file-exists-p package-quickstart-file)
+    (delete-file package-quickstart-file))
+
+  (let ((elc-files (append (directory-files-recursively ymacs-config-directory "\\.elc$")
+                           (directory-files user-emacs-directory t "\\.elc$"))))
+    (dolist-with-progress-reporter (elc-file elc-files)
+        (format "Remove *.elc in %s ..." (abbreviate-file-name ymacs-config-directory))
+      (delete-file elc-file)))
+
   (load (expand-file-name "init.el" user-emacs-directory) nil :no-message t)
 
   ;; Disable some features when load emacs
@@ -28,21 +39,13 @@
   (setq after-init-hook nil)
   (setq enable-local-variables :all)
 
-  (delete-file ymacs-autoloads-file)
+  (when (file-exists-p ymacs-autoloads-file)
+    (delete-file ymacs-autoloads-file))
 
   (ymacs-package|after-init)
 
-  (ymacs-package/generate-autoloads)
-
   (if (getenv "NATIVE_COMPILE_ELPA")
       (ymacs-package/native-compile-elpa-packages)
-
-    (message "Remove *.elc in %s ..." (abbreviate-file-name ymacs-config-directory))
-
-    (delete-file (expand-var! "autoloads.el"))
-    (dolist (elc-file (directory-files-recursively ymacs-config-directory "\\.elc$")
-                      (directory-files user-emacs-directory t "\\.elc$"))
-      (delete-file elc-file))
 
     (ymacs-package/compile-config)
     (ymacs-package/compile-elpa-packages :no-message)))

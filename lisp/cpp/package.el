@@ -1,7 +1,6 @@
 ;; -*- lexical-binding:t -*-
 
 (require-packages!
- ggtags
  clang-format
  google-c-style)
 

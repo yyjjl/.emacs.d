@@ -30,7 +30,7 @@
             :action (lambda (file)
                       (with-ivy-window
                         (recentf-push file)
-                        (open! (list file))))
+                        (open! file)))
             :caller 'i3/open-document))
 
 (defun i3//open-document-transformer (-file)

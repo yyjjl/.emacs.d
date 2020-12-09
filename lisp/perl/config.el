@@ -19,10 +19,6 @@
    ;; parentheses are indented with the block and not with scope
    cperl-indent-parens-as-block t)
 
-  (define-hook! ymacs-perl|setup (cperl-mode-hook)
-    (ggtags-mode 1)
-    (setq ymacs-ggtags-local-libpath (expand-var! "perl-modules")))
-
   (font-lock-add-keywords 'cperl-mode
                           '(("\\_<say\\_>" . cperl-nonoverridable-face)))
   ;; Use less horrible colors for cperl arrays and hashes

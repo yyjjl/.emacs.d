@@ -1,5 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
+(autoload #'haskell-indent-put-region-in-literate "haskell-indent" nil t)
+(autoload #'haskell-indent-insert-guard "haskell-indent" nil t)
+
 (after! haskell-mode
   (define-key! :map haskell-mode-map
     ([f5] . haskell-debug)

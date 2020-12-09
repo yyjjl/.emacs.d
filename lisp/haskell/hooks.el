@@ -3,6 +3,7 @@
 (after! haskell-mode
   (define-hook! ymacs-haskell|setup (haskell-mode-hook)
     (haskell-decl-scan-mode 1)
+    (rainbow-delimiters-mode 1)
 
     (when (buffer-enable-rich-feature-p)
       (ymacs-lsp//try-enable haskell

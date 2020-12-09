@@ -83,6 +83,7 @@
   ("M-7" . avy-goto-word-1-above)
   ("M-8" . avy-goto-word-1-below)
   ("M-9 9" . avy-goto-char-in-line)
+  ("M-9 M-9" . avy-goto-char-in-line)
   ("M-9 d" . ymacs-edit/avy-goto-symbol-1-in-defun)
   ("M-9 1" . avy-goto-char)
   ("M-9 2" . avy-goto-char-2)

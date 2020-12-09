@@ -177,7 +177,7 @@
     (counsel-rg nil initial-directory -extra-args)))
 
 ;;;###autoload (autoload 'ymacs-counsel/rg "../lisp/completion-ivy/commands.el" nil t)
-(define-transient-command ymacs-counsel/rg (&optional -directory)
+(transient-define-prefix ymacs-counsel/rg (&optional -directory)
   "Run ripgrep"
   ["Switches"
    (3 "-h" "Search hidden files" "--hidden")

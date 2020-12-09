@@ -1,7 +1,5 @@
 ;; -*- lexical-binding:t -*-
 
-(cl-assert (>= emacs-major-version 27))
-
 (require 'core-lib)
 
 (load-feature! default)

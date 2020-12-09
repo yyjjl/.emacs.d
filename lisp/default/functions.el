@@ -90,7 +90,7 @@
   (let ((file (expand-file-name (car -args)))
         (process-connection-type nil))
     (recentf-push file)
-    (open! (list file))
+    (open! file)
     (kill-buffer)
     (let (debug-on-error)
       (user-error "Opened %s in external program" (file-name-nondirectory file)))))
@@ -112,9 +112,7 @@
    ignore-errors))
 
 (defun ymacs//next-error-find-buffer (&rest -args)
-  (or (apply #'next-error-buffer-unnavigated-current -args)
-
-      (let ((buffers
+  (or (let ((buffers
              (cl-loop
               for window in (window-list)
               for buffer = (window-buffer window)
@@ -125,6 +123,8 @@
               collect buffer)))
         (when (= (length buffers) 1)
           (car buffers)))
+
+      (apply #'next-error-buffer-unnavigated-current -args)
 
       (let ((error-buffer (buffer-local-value 'next-error-buffer (current-buffer))))
         (when (and (buffer-live-p error-buffer)

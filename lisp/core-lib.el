@@ -260,7 +260,7 @@ Example:
      (insert-file-contents-literally -filename)
      (buffer-string))))
 
-(defun open! (-file-list)
+(defun open! (&rest -file-list)
   "Open All files in -FILE-LIST in external processes."
   (cond
    (sys/mac-x-p
@@ -485,22 +485,17 @@ HTML file converted from org file, it returns t."
           (expand-file-name feature-name ymacs-config-directory))
 
     (unless (file-directory-p directory)
-      (setq directory
-            (expand-file-name feature-name ymacs-extra-config-directory)))
-
-    (unless (file-directory-p directory)
       (user-error "no feature %s" -name))
 
-    (setq
-     forms
-     (cl-delete
-      nil
-      (mapcar
-       (lambda (path)
-         (let ((full-path (expand-file-name path directory)))
-           (when (file-exists-p (concat full-path ".el"))
-             `(load ,full-path nil t))))
-       '("package" "functions" "hooks" "config"))))
+    (setq forms
+          (cl-delete
+           nil
+           (mapcar
+            (lambda (path)
+              (let ((full-path (expand-file-name path directory)))
+                (when (file-exists-p (concat full-path ".el"))
+                  `(load ,full-path nil t))))
+            '("package" "functions" "hooks" "config"))))
 
     (unless forms
       (user-error "empty feature %s" -name))

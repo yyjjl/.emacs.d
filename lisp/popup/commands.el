@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(declare-function sdcv-search-word "sdcv")
+
 ;;;###autoload
 (defun ymacs-popup/last-popup-window (&optional -arg)
   "Display last popup window"

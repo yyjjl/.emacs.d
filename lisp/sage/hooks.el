@@ -24,9 +24,9 @@
                    (sage-shell-view-copy-latex -ov)
                    (message "LaTeX copied")))
           ("=" . (lambda! (sage-shell-view--when-overlay-active
-                              -ov (sage-shell-view-zoom-in -ov))))
+                           -ov (sage-shell-view-zoom-in -ov))))
           ("-" . (lambda! (sage-shell-view--when-overlay-active
-                              -ov (sage-shell-view-zoom-out -ov)))))
+                           -ov (sage-shell-view-zoom-out -ov)))))
         (overlay-put -ov 'extra-map t))))
 
   (define-hook! ymacs-sage|setup (sage-shell-after-prompt-hook)

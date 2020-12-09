@@ -11,4 +11,4 @@ The app is chosen from your OS's preference."
          (do-it-p (or (<= (length file-list) 5)
                       (y-or-n-p "Open more than 5 files? "))))
     (when do-it-p
-      (open! file-list))))
+      (apply #'open! file-list))))

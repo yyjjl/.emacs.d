@@ -60,8 +60,6 @@
       (counsel-delete-process)
       (lv-delete-window)))
 
-  (setq counsel-linux-app-format-function
-        #'counsel-linux-app-format-function-name-pretty)
   (setq counsel-yank-pop-separator
         "\n------------------------------------------------------------\n")
   (setq counsel-find-file-at-point t)

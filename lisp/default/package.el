@@ -56,7 +56,7 @@
   (setq eshell-directory-name (expand-var! "eshell/"))
   (setq features-file (expand-file-name "features.el" user-emacs-directory))
   (setq gnus-directory (expand-var! "gnus"))
-  (setq gnus-init-file (expand-file-name "gnus.el" user-emacs-directory))
+  (setq gnus-init-file (expand-etc! "gnus.el"))
   (setq irony-server-install-prefix (expand-var! "irony"))
   (setq irony-user-dir (expand-var! "irony/"))
   (setq ispell-personal-dictionary (expand-var! "aspell.pws"))

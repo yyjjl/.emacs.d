@@ -17,8 +17,7 @@
                        (and (next-error-buffer-p buffer)
                             (or (eq buffer (current-buffer))
                                 (with-current-buffer buffer
-                                  (apply 'derived-mode-p
-                                         ymacs-tools-auto-next-error-buffer-derived-modes)))))))
+                                  (apply 'derived-mode-p ymacs-auto-next-error-buffer-derived-modes)))))))
             (buffer-list))))
          (buffer
           (cdr-safe

@@ -1,5 +1,10 @@
 ;; -*- lexical-binding: t; -*-
 
+(defvar comp-valid-source-re)
+(declare-function comp-el-to-eln-filename "comp")
+(declare-function native-compile "comp")
+(declare-function native-comp-available-p "comp")
+
 ;;;###autoload
 (defun ymacs-package/generate-autoloads ()
   (interactive)
@@ -12,12 +17,9 @@
            (mapcar
             (lambda (feature)
               (let* ((name (symbol-name feature))
-                     (dir1 (expand-file-name name ymacs-config-directory))
-                     (dir2 (expand-file-name name ymacs-extra-config-directory)))
-                (or (when (file-directory-p dir1)
-                      dir1)
-                    (when (file-directory-p dir2)
-                      dir2)))))
+                     (directory (expand-file-name name ymacs-config-directory)))
+                (when (file-directory-p directory)
+                  directory))))
            (cl-delete nil)
            (seq-mapcat
             (lambda (dir)
@@ -25,15 +27,13 @@
          (failed-count 0))
     (with-current-buffer (find-file-noselect ymacs-autoloads-file)
       (erase-buffer)
-      (dolist (file files)
+      (dolist-with-progress-reporter (file files) "Generating autoloads ..."
         (condition-case err
             (generate-file-autoloads file)
           (user-error (message "Generating for %s failed: %s" file err)
                       (cl-incf failed-count))))
       (save-buffer))
-    (message "%d generated, %d failed"
-             (- (length files) failed-count)
-             failed-count)))
+    (message "%d generated, %d failed" (- (length files) failed-count) failed-count)))
 
 ;;;###autoload
 (defun ymacs-package/compile-elpa-packages (&optional -no-message)
@@ -56,14 +56,10 @@
                  (string-match-p
                   (rx "-" (or "pkg" "autoloads" "theme" ".dir-locals") "el" string-end)
                   file)))
-              (directory-files-recursively path comp-valid-source-re))))
-           (count 1))
-      (dolist (file files)
+              (directory-files-recursively path comp-valid-source-re)))))
+      (dolist-with-progress-reporter (file files) "Native compiling ..."
         (let* ((out-filename (comp-el-to-eln-filename file))
-               (out-dir (file-name-directory out-filename))
-               (prompt (format "[%4d/%4d]" count (length files))))
-
-          (cl-incf count)
+               (out-dir (file-name-directory out-filename)))
 
           (unless (file-exists-p out-dir)
             (make-directory out-dir t))
@@ -73,28 +69,35 @@
                 (progn
                   (condition-case err
                       (progn
-                        (message "%s native compiling %s" prompt file)
+                        (message "Native compiling %s" file)
                         (let ((inhibit-message -no-message))
                           (native-compile file 'late))
-
                         (garbage-collect))
                     (error
-                     (message "%s error: %s" prompt (error-message-string err))))
+                     (message "Error: %s" (error-message-string err))))
                   (when-let (memory (ymacs//show-process-memory))
-                    (message "%s info: use %s%% RAM" prompt memory)
+                    (message "Info: use %s%% RAM" memory)
                     (when (> memory 70)
-                      (user-error "%s error: use too much RAM, please restart" prompt))))
-              (message "%s no write access for %s skipping." prompt out-filename))))))))
+                      (user-error "error: use too much RAM, please restart"))))
+              (message "No write access for %s skipping." out-filename))))))))
 
 ;;;###autoload
 (defun ymacs-package/compile-config (&optional -no-message)
   (interactive "P")
-  (message "Compile configuration files ...")
-  (dolist (file (cl-remove-duplicates
-                 (append
-                  (directory-files-recursively ymacs-private-directory "\\.el$")
-                  (directory-files-recursively ymacs-config-directory "\\.el$")
-                  (directory-files user-emacs-directory t "\\.el$"))))
+  (dolist-with-progress-reporter
+      (file (cl-remove-duplicates
+             (append
+              (directory-files-recursively ymacs-private-directory "\\.el$")
+              (cl-loop
+               for feature in ymacs--loaded-features
+               append (directory-files-recursively
+                       (expand-file-name (symbol-name feature) ymacs-config-directory)
+                       "\\.el$"))
+              (list user-init-file
+                    early-init-file
+                    (expand-file-name "features.el" user-emacs-directory)
+                    (expand-file-name "custom.el" user-emacs-directory)))))
+      "Compiling configuration files ..."
     (when file
       (condition-case err
           (let ((inhibit-message -no-message))
@@ -103,5 +106,4 @@
               (native-compile file)))
         (error
          (when -no-message
-           (message "%s: Error %s" file err))))))
-  (message "Compile finished"))
+           (message "%s: Error %s" file err)))))))

@@ -113,7 +113,7 @@
   (run-with-idle-timer ymacs-autosave-interval t #'run-hooks 'ymacs-autosave-hook)
 
   ;; enable native-compile after initialization
-  (setq comp-deferred-compilation t)
+  ;; (setq comp-deferred-compilation t)
 
   ;; GC all sneaky breeky like
   (add-function :after after-focus-change-function

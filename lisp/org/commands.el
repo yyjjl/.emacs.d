@@ -125,9 +125,7 @@ _h_tml    _'_         ^ ^             _A_SCII:
     (catch 'done
       (dolist (file files)
         (when (and file (file-exists-p file))
-          (if (fboundp #'ymacs-pdf//find-file-other-window)
-              (ymacs-pdf//find-file-other-window file)
-            (open! (list file)))
+          (open! file)
           (throw 'done t)))
       (counsel-find-file basename))))
 

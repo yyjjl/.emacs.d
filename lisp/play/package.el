@@ -1,6 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 (require-packages!
+ pacmacs
  zone-sl
  zone-nyan
  zone-rainbow)

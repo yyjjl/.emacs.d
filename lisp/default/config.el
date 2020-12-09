@@ -126,5 +126,7 @@
               emacs-version
               (or user-login-name "anonymous")))
 
+(setq next-error-find-buffer-function #'ymacs//next-error-find-buffer)
+
 (put 'ymacs//external-file-handler 'safe-magic t)
 (put 'ymacs//external-file-handler 'operations '(insert-file-contents))

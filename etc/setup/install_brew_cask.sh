@@ -4,10 +4,10 @@ CURRENT_DIR=$(dirname "$0")
 
 # Cask applications
 CORE_APPS=(
+    cmake
     coreutils
     ripgrep
     p7zip
-    node
     fzf
     fd
 )
@@ -55,7 +55,6 @@ function main {
          --with-modern-black-variant-icon \
          --with-ctags \
          --with-no-frame-refocus \
-         --with-no-titlebar \
          --with-xwidgets
 
     for app in ${CORE_APPS[@]}; do

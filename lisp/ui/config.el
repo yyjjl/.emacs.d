@@ -92,7 +92,7 @@
 
  '(ivy-current-match ((t (:background "gray0")))))
 
-(with-eval-after-load 'tab-line
+(after! tab-line
   (setq tab-line-left-button "<")
   (setq tab-line-right-button ">")
   (setq tab-line-close-button-show nil)
@@ -142,10 +142,5 @@
   (setq whitespace-style '(face tabs tab-mark spaces space-mark empty)))
 
 (after! highlight-indent-guides
-  (setq highlight-indent-guides-highlighter-function
-        (lambda (-level -responsive -display)
-          (unless (< -level 1)
-            (highlight-indent-guides--highlighter-default -level -responsive -display))))
-
   (setq highlight-indent-guides-method 'character
         highlight-indent-guides-responsive 'top))

@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(declare-function semanticdb-cleanup-cache-files "ext:semantic")
+
 (defun ymacs-semantic//db-parse-directory (-dir &optional -regex -recursive-p)
   (without-user-record!
    (let ((dir (file-name-as-directory -dir)))

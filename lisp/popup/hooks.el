@@ -1,5 +1,8 @@
 ;;  -*- lexical-binding: t -*-
 
+(declare-function winner-ring "winner")
+(declare-function winner-undo "winner")
+
 (define-hook! ymacs-popup|after-init (after-init-hook)
   (setq display-buffer-alist
         '((ymacs-popup//match ymacs-popup//display-buffer-action))))

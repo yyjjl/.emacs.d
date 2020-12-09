@@ -6,7 +6,6 @@
   (setq c-basic-offset 4)
   ;; make DEL take all previous whitespace with it
   ;; (c-toggle-auto-newline 1)
-  (highlight-indentation-set-offset c-basic-offset)
   (c-toggle-hungry-state 1)
   (c-toggle-electric-state -1))
 
@@ -26,16 +25,10 @@
     :init
     (progn
       (setq-local lsp-eldoc-render-all nil)
-
-      (when (fboundp 'ggtags-mode)
-        (ggtags-mode -1))
       (electric-indent-local-mode -1))
     :fallback
     (progn
       (run-hooks 'ymacs-cpp-lsp-fallback-functions)
-
-      (when (fboundp 'ggtags-mode)
-        (ggtags-mode 1))
       ;; (setq completion-at-point-functions nil)
       (flycheck-mode -1))))
 
