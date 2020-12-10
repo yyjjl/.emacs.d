@@ -1,9 +1,9 @@
 ;;; -*- lexical-binding: t; -*-
 
-(after! winum
-  (define-key! :map winum-keymap
-    ("M-`" . ymacs-treemacs/switch)
-    ("M-1" . ymacs-treemacs/select-window-1)))
+;; (after! winum
+;;   (define-key! :map winum-keymap
+;;     ("M-`" . ymacs-treemacs/switch)
+;;     ("M-1" . ymacs-treemacs/select-window-1)))
 
 (after! treemacs
   (define-key! :map treemacs-mode-map

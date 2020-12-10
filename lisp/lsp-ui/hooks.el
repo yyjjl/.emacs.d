@@ -4,28 +4,27 @@
   (define-hook! ymacs-lsp-ui|after-open (lsp-after-open-hook)
     (ymacs-lsp-ui//enable (display-graphic-p))))
 
-(after! lsp-headerline
-  (defun lsp-headerline--filename-with-icon@disable-icon (-file-path)
-    (f-filename -file-path))
-
-  (lsp-defun lsp-headerline--symbol-icon@disable-icon ((&DocumentSymbol :kind))
-    "Build the SYMBOL icon for headerline breadcrumb."
-    (when (require 'lsp-treemacs nil t)
-      (format "[%s] " (lsp-treemacs-symbol-kind->icon kind))))
-
-  (advice-add
-   #'lsp-headerline--symbol-icon
-   :override #'lsp-headerline--symbol-icon@disable-icon)
-
-  (advice-add
-   #'lsp-headerline--filename-with-icon
-   :override #'lsp-headerline--filename-with-icon@disable-icon))
-
 (after! dap-mode
-  (add-hook 'python-mode-hook (lambda () (require 'dap-python)))
-  (add-hook 'dap-session-created-hook #'dap-hydra)
-  (add-hook 'dap-stopped-hook #'dap-hydra)
-  (add-hook 'dap-terminated-hook #'dap-hydra/nil))
+
+  ;; Activate this minor mode when dap is initialized
+  (define-hook! (ymacs-lsp|dap-session-created _session) (dap-session-created-hook)
+    (unless ymacs-lsp/dap-running-session-mode
+      (ymacs-lsp/dap-running-session-mode 1))
+    (dap-hydra))
+
+  (define-hook! (ymacs-lsp|dap-stopped _session) (dap-stopped-hook)
+    (unless ymacs-lsp/dap-running-session-mode
+      (ymacs-lsp/dap-running-session-mode 1))
+    (dap-hydra))
+
+  (define-hook! (ymacs-lsp|dap-terminated _session) (dap-terminated-hook)
+    (ymacs-lsp/dap-running-session-mode -1)
+    (dap-hydra/nil))
+
+  (define-hook! (ymacs-lsp|dap-stack-frame-changed -session) (dap-stack-frame-changed-hook)
+    (when (and (dap--session-running -session)
+               (not ymacs-lsp/dap-running-session-mode))
+      (ymacs-lsp/dap-running-session-mode 1))))
 
 (after! lsp-ui-doc
   (define-advice lsp-ui-doc--mv-at-point

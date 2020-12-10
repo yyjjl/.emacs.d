@@ -25,7 +25,8 @@
     :init
     (progn
       (setq-local lsp-eldoc-render-all nil)
-      (electric-indent-local-mode -1))
+      ;; (electric-indent-local-mode -1)
+      )
     :fallback
     (progn
       (run-hooks 'ymacs-cpp-lsp-fallback-functions)

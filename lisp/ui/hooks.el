@@ -20,4 +20,6 @@
   (setq-default mode-line-buffer-identification '("%b")))
 
 (define-hook! ymacs-ui|setup-headerline (prog-mode-hook text-mode-hook)
-  (setq header-line-format '(:eval (doom-modeline-segment--misc-info))))
+  (setq header-line-format '(:eval (list
+                                    (doom-modeline-segment--debug)
+                                    (doom-modeline-segment--misc-info)))))
