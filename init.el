@@ -14,6 +14,7 @@
 (load-feature! company)
 (load-feature! checker)
 (load-feature! tools)
+(load-feature! debug)
 (load-feature! term)
 (load-feature! semantic)
 (load-feature! hideshow)
@@ -21,7 +22,6 @@
 (load-feature! dired)
 (load-feature! ibuffer)
 (load-feature! lsp)
-(load-feature! realgud)
 
 ;; Programming modes
 (load-feature! lisp)

@@ -4,7 +4,6 @@
   (require 'cmacexp))
 
 (defvar gud-chdir-before-run)
-(declare-function realgud-short-key-mode "ext:shortkey")
 
 (defun ymacs-cpp//compile-command (-directory)
   "Return suitable compile command for current project"
@@ -39,32 +38,24 @@
 ;;;###autoload
 (defun ymacs-cpp/debug-current-file (&optional -new-session)
   (interactive "P")
-  (require 'realgud nil t)
-
-  (let ((cmd-bufs
-         (cl-remove-if-not
-          (lambda (x)
-            (and (realgud-cmdbuf? x)
-                 (process-live-p (get-buffer-process x))))
-          (buffer-list))))
-    (if (or -new-session (not cmd-bufs))
-        (let ((default-directory
-                (or (and -new-session default-directory)
+  (let* ((build-dir (ymacs-cpp//build-dir))
+         (default-directory
+           (or (and -new-session
                     (expand-file-name
                      (read-directory-name
                       "Directory: "
                       (file-name-as-directory
-                       (or (ymacs-cpp//build-dir)
-                           default-directory))
+                       (or build-dir default-directory))
                       nil
-                      :must-match))))
-              (gud-chdir-before-run nil))
-          (realgud:gdb
-           (or (ignore-errors (realgud:gdb-query-cmdline "gdb"))
-               (read-shell-command "Run like this: " nil
-                                   'realgud:gdb-minibuffer-history))))
-      (unless realgud-short-key-mode
-        (realgud-short-key-mode 1)))))
+                      :must-match)))
+               build-dir
+               default-directory))
+         (gud-chdir-before-run nil))
+    (unwind-protect
+        (progn
+          (lv-message "Current directory: %s" default-directory)
+          (call-interactively #'gdb))
+      (lv-delete-window))))
 
 ;;;###autoload
 (defun ymacs-cpp/compile (-no-prompt-p)

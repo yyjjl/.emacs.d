@@ -48,6 +48,7 @@
     eshell-mode
     comint-mode
     vterm-mode
+    gdb-parent-mode
     haskell-interactive-mode))
 
 (defvar ymacs-popup-help-modes
@@ -81,6 +82,9 @@
      :autoclose t)
     (:mode occur-mode
      :select t)
+    (:name-regexp (rx string-start "*gud" (*? not-newline) "*" string-end)
+     :side left
+     :size 60)
     (:name "*Flycheck error messages*"
      :side below
      :select nil
