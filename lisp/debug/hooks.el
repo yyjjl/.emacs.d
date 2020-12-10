@@ -1,8 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
 
-(defsubst ymacs-debug//gdb-running-p ()
-  (eq gud-minor-mode 'gdbmi))
-
 (defun ymacs-debug/quit ()
   (interactive)
   (and (yes-or-no-p "Quit debug session?")

@@ -2,9 +2,14 @@
 
 (declare-function gud-find-c-expr "gud")
 
+(defsubst ymacs-debug//gdb-running-p ()
+  (eq gud-minor-mode 'gdbmi))
+
 (defun ymacs-debug//find-expr (&rest _args)
-  (read-string "Print: "
-               (replace-regexp-in-string "\n" " " (gud-find-c-expr))))
+  (let ((data (save-match-data (gud-find-c-expr))))
+    (when (string-match-p "\n" data)
+      (setq data (thing-at-point 'symbol)))
+    (read-string "Print: " data)))
 
 (defun ymacs-debug//show-help (-message)
   (if (null -message)
