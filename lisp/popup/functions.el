@@ -137,7 +137,7 @@ Displays -BUFFER according to -ALIST and -RULE."
     (if window
         ;; Reuse window
         (progn
-          (select-window window)
+          ;; (select-window window)
           (set-window-dedicated-p window nil)
           (set-window-buffer window -buffer))
 
@@ -174,7 +174,9 @@ Displays -BUFFER according to -ALIST and -RULE."
       (when (plist-get rule :autoclose)
         (ymacs-popup//push-window window -buffer t))
 
-      (when (plist-get rule :select)
+      (when (and (plist-get rule :select)
+                 (not (memq (buffer-local-value 'major-mode -buffer)
+                            (plist-get rule :noselect))))
         (select-window window)))
     window))
 

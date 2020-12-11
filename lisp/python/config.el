@@ -17,6 +17,7 @@
     ([f5] . ymacs-python/toggle-pdbtrack))
 
   (define-key! :map inferior-python-mode-map
+    ("<tab>" . ymacs-python/shell-completion-complete-or-indent)
     ("C-c C-t" . ymacs-python/toggle-pdbtrack)
     ("C-c C-z" . ymacs-python/pop-to-source-buffer))
 

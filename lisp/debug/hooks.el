@@ -22,14 +22,29 @@
 
     (when-let (window (get-buffer-window gud-comint-buffer))
       (when (window-live-p window)
-        (set-window-parameter window 'no-delete-other-windows t)))))
+        (set-window-parameter window 'no-delete-other-windows t)
+        (set-window-dedicated-p window t)))))
 
 (after! gud
   (setq gud-find-expr-function #'ymacs-debug//find-expr)
 
+  (add-hook 'gdb-inferior-io-mode-hook #'ymacs-debug-command-buffer-mode)
+
   (define-advice gud-display-line (:around (-fn &rest -args) save-position)
     (unless (equal -args ymacs-debug--buffer-position)
-      (apply -fn -args))
+      (let ((display-buffer-alist
+             (cons
+              (list
+               (lambda (-buffer _alist)
+                 (buffer-local-value 'gud-minor-mode (get-buffer -buffer)))
+               ;; remove 'inhibit-same-window from alist
+               (lambda (-buffer -alist)
+                 (setf (alist-get 'inhibit-same-window -alist) nil)
+                 (or (display-buffer-use-some-window -buffer -alist)
+                     (display-buffer-pop-up-window -buffer -alist))))
+              display-buffer-alist)))
+        (apply -fn -args)))
+
     (setq ymacs-debug--buffer-position -args)
 
     (ymacs-debug//show-help
@@ -62,7 +77,8 @@
           (ymacs-debug-info-buffer-mode 1)))
       buffer))
 
-  (advice-add #'pdb :around #'gud-debug@restore))
+  (advice-add #'pdb :around #'gud-debug@restore)
+  (advice-add #'gud-gdb :around #'gud-debug@restore))
 
 (after! gdb-mi
   (advice-add #'gdb :around #'gud-debug@restore))

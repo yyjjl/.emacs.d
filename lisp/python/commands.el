@@ -1,5 +1,16 @@
 ;;; -*- lexical-binding: t
 
+(defun ymacs-python/shell-completion-complete-or-indent ()
+  "Complete or indent depending on the context.
+If content before pointer is all whitespace, indent.
+If not try to complete."
+  (interactive)
+  (if (string-match "^[[:space:]]*$"
+                    (buffer-substring (comint-line-beginning-position)
+                                      (point)))
+      (indent-for-tab-command)
+    (call-interactively #'company-capf)))
+
 ;;;###autoload
 (defun ymacs-python/change-lsp-server ()
   (interactive)

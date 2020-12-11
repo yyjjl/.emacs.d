@@ -65,7 +65,9 @@
 (define-hook! ymacs|generic-comint-mode-setup (comint-mode-hook)
   ;; But don't show trailing whitespace in SQLi, inf-ruby etc.
   (setq show-trailing-whitespace nil)
-  (setq-local company-idle-delay nil))
+  (setq-local company-idle-delay nil)
+
+  (local-set-key [remap completion-at-point] #'company-capf))
 
 (define-hook! ymacs|hack-local-variables (after-save-hook)
   (executable-make-buffer-file-executable-if-script-p)

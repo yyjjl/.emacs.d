@@ -35,8 +35,11 @@
   (setq company-auto-commit nil)
   ;; Not to load company-mode for certain major modes.
   (setq company-global-modes
-        '(not eshell-mode comint-mode erc-mode
-              gud-mode rcirc-mode shell-mode
+        '(not eshell-mode
+              ;; comint-mode
+              ;; gud-mode
+              erc-mode
+              rcirc-mode shell-mode
               minibuffer-inactive-mode))
 
   (setf (alist-get 'company-search-mode mode-line-misc-info)

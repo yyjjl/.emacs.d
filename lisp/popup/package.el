@@ -76,6 +76,7 @@
     (:macth-fn ymacs-popup//term-buffer-p
      :side below
      :select t
+     :noselect (gdb-inferior-io-mode)
      :terminal t)
     (:name-regexp ,ymacs-popup-other-window-regexp
      :select t
