@@ -3,7 +3,6 @@
 (require-packages!
  expand-region
  goto-chg
- easy-kill
  ;; Mark tools
  multiple-cursors
  ;; `wgrep' allows you to edit a grep buffer and apply those changes
@@ -42,6 +41,8 @@
 (define-key!
   ("C-x C-_" . goto-last-change)
   ("C-x C-/" . goto-last-change)
+
+  ("M--" . er/expand-region)
 
   ("C-x , SPC" . ymacs-edit/insert-space-around-chinese)
   ("M-Q" . ymacs-edit/insert-space-around-chinese)
@@ -82,6 +83,7 @@
 (define-key!
   ("M-7" . avy-goto-word-1-above)
   ("M-8" . avy-goto-word-1-below)
+  ("M-9")
   ("M-9 9" . avy-goto-char-in-line)
   ("M-9 M-9" . avy-goto-char-in-line)
   ("M-9 d" . ymacs-edit/avy-goto-symbol-1-in-defun)
@@ -91,13 +93,4 @@
   ("M-9 s" . avy-goto-symbol-1)
   ("M-9 w" . avy-goto-subword-1)
   ("M-9 y" . avy-copy-line)
-  ("M-'" . ymacs-edit/change-surround)
-  ("M-9"))
-
-(define-key!
-  ("M--" . easy-mark)
-  ([remap kill-ring-save] . easy-kill)
-  ([remap mark-sexp] . easy-mark-sexp)
-  ([remap mark-word] . easy-mark-word)
-  ([remap zap-to-char] . easy-mark-to-char)
-  ([remap zap-up-to-char] . easy-mark-up-to-char))
+  ("M-'" . ymacs-edit/change-surround))

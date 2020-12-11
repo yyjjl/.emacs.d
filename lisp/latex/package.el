@@ -1,9 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 (require-packages!
- (auctex :compile (latex tex preview reftex))
- company-reftex
- company-auctex)
+ (auctex :compile (latex tex preview reftex)))
 
 (autoload 'LaTeX-math-mode "latex" nil t)
 

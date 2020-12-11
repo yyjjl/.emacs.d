@@ -23,6 +23,9 @@
   (setq magit-auto-revert-mode nil))
 
 (after! transient
+  (define-key! :map transient-map
+    ("M-n" . transient-history-next)
+    ("M-p" . transient-history-prev))
   (setq transient-mode-line-format nil))
 
 ;; Resolve diff3 conflicts

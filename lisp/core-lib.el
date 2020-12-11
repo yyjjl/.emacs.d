@@ -79,7 +79,10 @@ for defining functions."
 
   `(defvar ,(if full-name name (intern (format "ymacs-%s-path" name)))
      (eval-when-compile
-       (or ,@(seq-map (lambda (x) `(executable-find ,x)) exe)))
+       (let ((value (or ,@(seq-map (lambda (x) `(executable-find ,x)) exe))))
+         (when (null value)
+           (warn "executable %s is missing" ,exe))
+         value))
      ,doc))
 
 (defmacro define-option! (name initvalue &optional docstring)
@@ -202,19 +205,21 @@ Optional argument -BODY is the function body."
     (dolist (arg -args)
       (let ((-key (car arg))
             (func (cdr arg)))
+        (when (symbolp func)
+          (push `(declare-function ,func "ext:unknown") forms))
         (push (list 'define-key sym
                     (if (stringp -key)
                         (kbd (concat prefix " " -key))
                       -key)
                     (cond ((eq func nil) nil)
-                          ((symbolp func) `(function ,func))
+                          ((symbolp func) `#',func)
                           ((and (listp func)
                                 (eq (car func) :map))
                            (cadr func))
                           (t func)))
               forms)))
     `(let ((,sym ,map))
-       ,@forms
+       ,@(reverse forms)
        ,sym)))
 
 (defmacro with-local-minor-mode-map! (-mode &rest -body)

@@ -2,10 +2,10 @@
 
 (require-packages!
  (org :compile (org ob ox-html org-table))
+ (auctex :compile (latex tex preview reftex))
  ;; Export colorful src block in `org-mode'
  htmlize
- poporg
- company-auctex)
+ poporg)
 
 (defvar ymacs-org-remove-texfile t)
 

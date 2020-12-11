@@ -10,7 +10,6 @@
 
 (load-feature! cpp)
 (load-feature! cpp-cmake)
-;; (load-feature! cpp-ccls)
 (load-feature! cpp-clangd)
 
 (load-feature! python (lsp-server . 'pyls))

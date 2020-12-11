@@ -10,17 +10,21 @@
 (defun ymacs-latex/next-error ()
   (interactive)
   (call-interactively
-   (if (eq next-error-last-buffer (TeX-active-buffer))
-       #'TeX-next-error
-     #'next-error)))
+   (let ((buffer (ymacs//occur-buffer)))
+     (if (and (buffer-live-p buffer)
+              (window-live-p (get-buffer-window buffer)))
+         #'next-error
+       #'TeX-next-error))))
 
 ;;;###autoload
 (defun ymacs-latex/previous-error ()
   (interactive)
   (call-interactively
-   (if (eq next-error-last-buffer (TeX-active-buffer))
-       #'TeX-previous-error
-     #'previous-error)))
+   (let ((buffer (ymacs//occur-buffer)))
+     (if (and (buffer-live-p buffer)
+              (window-live-p (get-buffer-window buffer)))
+         #'previous-error
+       #'TeX-previous-error))))
 
 
 ;;;###autoload

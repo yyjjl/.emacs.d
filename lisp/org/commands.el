@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(require 'latex)
+
 (defun ymacs-org//hot-expand (-type)
   "Expand org template."
   (org-insert-structure-template -type))
@@ -83,6 +85,31 @@ _h_tml    _'_         ^ ^             _A_SCII:
   (interactive "p")
   (ymacs-org/next-item (- -n)))
 
+(defun ymacs-org//auctex-math-all ()
+  (append LaTeX-math-list LaTeX-math-default))
+
+(defun ymacs-org//auctex-get-LaTeX-font-list (&optional mathp)
+  (delq nil (mapcar
+             (lambda (x)
+               (and (stringp x)
+                    (not (string= x ""))
+                    (not (string= x "}"))
+                    (list (substring x 1 -1) t)))
+             (delete-dups
+              (mapcar (if mathp
+                          (lambda (x) (nth 3 x))
+                        #'cadr)
+                      LaTeX-font-list)))))
+
+(defun ymacs-org//auctex-symbol-candidates (prefix)
+  (all-completions prefix (append (mapcar 'cadr (ymacs-org//auctex-math-all))
+                                  (mapcar 'car (ymacs-org//auctex-get-LaTeX-font-list t)))))
+
+(defun ymacs-org//auctex-symbol-annotation (-candidate)
+  (let ((char (nth 2 (assoc -candidate
+                            (mapcar 'cdr (ymacs-org//auctex-math-all))))))
+    (and char (concat " " (char-to-string (decode-char 'ucs char))))))
+
 ;;;###autoload
 (defun ymacs-org/company-symbols (-command &optional -arg &rest _)
   "Complete math symbol in LaTeX fragments, better than `pcomplete'"
@@ -96,8 +123,8 @@ _h_tml    _'_         ^ ^             _A_SCII:
                  (char-before
                   (- (point) (length word))))
               word))))
-    (candidates (company-auctex-symbol-candidates -arg))
-    (annotation (company-auctex-symbol-annotation -arg))))
+    (candidates (ymacs-org//auctex-symbol-candidates -arg))
+    (annotation (ymacs-org//auctex-symbol-annotation -arg))))
 
 (defsubst ymacs-org//fn-to-extension (-fn)
   (when (symbolp -fn)

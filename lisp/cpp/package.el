@@ -4,8 +4,6 @@
  clang-format
  google-c-style)
 
-(executable! ccls :exe (expand-var! "ccls/build/ccls"))
-
 (defvar ymacs-cpp-lsp-checkers ())
 (defvar ymacs-cpp-lsp-fallback-functions ())
 (defvar ymacs-cpp-buffer-command-functions ())

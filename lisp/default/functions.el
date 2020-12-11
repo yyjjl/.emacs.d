@@ -111,18 +111,21 @@
    string-to-number
    ignore-errors))
 
+(defun ymacs//occur-buffer ()
+  (let ((buffers
+         (cl-loop
+          for window in (window-list)
+          for buffer = (window-buffer window)
+          if (and (next-error-buffer-p buffer)
+                  (with-current-buffer buffer
+                    (apply 'derived-mode-p
+                           ymacs-auto-next-error-buffer-derived-modes)))
+          collect buffer)))
+    (when (= (length buffers) 1)
+      (car buffers))))
+
 (defun ymacs//next-error-find-buffer (&rest -args)
-  (or (let ((buffers
-             (cl-loop
-              for window in (window-list)
-              for buffer = (window-buffer window)
-              if (and (next-error-buffer-p buffer)
-                      (with-current-buffer buffer
-                        (apply 'derived-mode-p
-                               ymacs-auto-next-error-buffer-derived-modes)))
-              collect buffer)))
-        (when (= (length buffers) 1)
-          (car buffers)))
+  (or (ymacs//occur-buffer)
 
       (apply #'next-error-buffer-unnavigated-current -args)
 

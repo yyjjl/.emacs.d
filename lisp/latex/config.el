@@ -1,5 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
+(custom-set-variables
+ '(lsp-clients-texlab-executable (expand-var! "texlab")))
+
 (after! latex
   (define-key! :map LaTeX-mode-map
     ([f5] . TeX-interactive-mode)
@@ -107,9 +110,3 @@
           (?b . "\\blockcquote[]{%l}{}"))
         reftex-plug-into-AUCTeX '(t t t t t)
         reftex-use-fonts t))
-
-(after! lsp-tex
-  (after-feature! lsp
-    (ymacs-lsp//set-simple-install-fn
-     'texlab
-     "cargo install --git https://github.com/latex-lsp/texlab.git")))
