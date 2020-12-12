@@ -4,25 +4,6 @@
   (after! lsp-mode
     (setq lsp-headerline-breadcrumb-enable t)))
 
-(after! lsp-mode
-  (ymacs-hydra-add-toggle-column
-   '(lsp-mode
-     "LSP"
-     (("t i" lsp-toggle-trace-io
-       "trace io" :toggle lsp-print-io)
-      ("t h" lsp-toggle-symbol-highlight
-       "highlight" :toggle lsp-enable-symbol-highlighting)
-      ("t t" lsp-toggle-on-type-formatting
-       "on type formating" :toggle lsp-enable-on-type-formatting)
-      ("t s" lsp-toggle-signature-auto-activate
-       "signature" :toggle lsp-signature-auto-activate)
-
-      ("t m" ymacs-lsp-ui/toggle
-       "modern UI" :toggle (bound-and-true-p lsp-ui-doc-mode))
-
-      ("w r" lsp-restart-workspace)
-      ("w s" lsp-shutdown-workspace)))))
-
 (after! lsp-ui
   (setq lsp-ui-peek-enable nil)
   (setq lsp-ui-imenu-enabel nil)

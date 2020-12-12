@@ -1,15 +1,10 @@
 ;;; -*- lexical-binding: t; -*-
 
-(declare-function gud-find-c-expr "gud")
-
 (defsubst ymacs-debug//gdb-running-p ()
   (eq gud-minor-mode 'gdbmi))
 
 (defun ymacs-debug//find-expr (&rest _args)
-  (let ((data (save-match-data (gud-find-c-expr))))
-    (when (string-match-p "\n" data)
-      (setq data (thing-at-point 'symbol)))
-    (read-string "Print: " data)))
+  (read-string "Print: " (thing-at-point 'secp)))
 
 (defun ymacs-debug//show-help (-message)
   (if (null -message)
@@ -65,8 +60,11 @@
         (unless ymacs-debug--dap-cookie
           (setq ymacs-debug--dap-cookie
                 (face-remap-add-relative 'header-line 'doom-modeline-debug-visual)))
-        (setq buffer-read-only t))
+        (setq buffer-read-only t)
 
+        (display-line-numbers-mode 1))
+
+    (display-line-numbers-mode -1)
     (when buffer-read-only
       (setq buffer-read-only ymacs-debug--buffer-read-only))
     (setq ymacs-debug--buffer-read-only nil)

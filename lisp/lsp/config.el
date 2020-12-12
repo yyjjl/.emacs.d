@@ -7,6 +7,21 @@
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.cache\\'")
   (add-to-list 'lsp-file-watch-ignored (concat "\\`" (expand-file-name "~/\\.local/lib")))
 
+  (ymacs-hydra-add-toggle-column
+   '(lsp-mode
+     "LSP"
+     (("t i" lsp-toggle-trace-io
+       "trace io" :toggle lsp-print-io)
+      ("t h" lsp-toggle-symbol-highlight
+       "highlight" :toggle lsp-enable-symbol-highlighting)
+      ("t t" lsp-toggle-on-type-formatting
+       "on type formating" :toggle lsp-enable-on-type-formatting)
+      ("t s" lsp-toggle-signature-auto-activate
+       "signature" :toggle lsp-signature-auto-activate)
+
+      ("w r" lsp-workspace-restart)
+      ("w s" lsp-workspace-shutdown))))
+
   (setq lsp-command-map
         (define-key! :map (make-sparse-keymap)
           ("'" . lsp-avy-lens)
@@ -52,12 +67,14 @@
 
   (setq lsp-enable-snippet t)
   (setq lsp-enable-on-type-formatting nil)
-  (setq lsp-enable-text-document-color nil)
+  (setq lsp-enable-text-document-color t)
   (setq lsp-enable-indentation nil)
-  (setq lsp-enable-symbol-highlighting nil)
+  (setq lsp-enable-symbol-highlighting t)
+  (setq lsp-symbol-highlighting-skip-current t)
   (setq lsp-enable-semantic-highlighting nil)
 
   (setq lsp-signature-doc-lines 2)
+  (setq lsp-auto-execute-action nil)
 
   (setq lsp-modeline-diagnostics-enable nil)
   (setq lsp-headerline-breadcrumb-enable nil)

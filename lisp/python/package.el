@@ -4,7 +4,7 @@
 
 (require-packages!
  lsp-mode
- (lsp-pyright :when (eq ymacs-python-lsp-server 'pyright))
+ lsp-pyright
  py-autopep8
  py-isort
  pyvenv

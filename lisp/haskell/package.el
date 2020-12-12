@@ -3,8 +3,7 @@
 (require-packages!
  rainbow-delimiters
  haskell-mode
- lsp-haskell
- company-cabal)
+ lsp-haskell)
 
 (autoload 'haskell-debug "haskell-debug" nil t)
 

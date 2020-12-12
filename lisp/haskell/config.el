@@ -7,22 +7,22 @@
   (define-key! :map haskell-mode-map
     ([f5] . haskell-debug)
     ([f9] . haskell-compile)
-    ("C-c F" . haskell-mode-stylish-buffer)
+
+    ("C-c C-b" . lsp-format-buffer)
+    ("C-c b" . lsp-format-buffer)
+    ("C-c Q" . haskell-session-kill)
     ("C-c R" . haskell-mode-generate-tags)
-    ("C-c j i" . haskell-navigate-imports)
-    ("M-." . haskell-mode-tag-find)
+    ("C-c j" . haskell-navigate-imports)
+    ("C-." . haskell-mode-tag-find)
 
     ("C-c C-." . haskell-indent-put-region-in-literate)
     ("C-c C-\\" . haskell-indent-insert-guard)
     ("C-c C-z" . haskell-interactive-switch)
 
-    ("C-c L" . haskell-process-load-file)
+    ("C-c C-l" . haskell-process-load-file)
     ("C-c C-t" . haskell-process-do-type)
     ("C-c p b" . haskell-process-cabal-build)
-    ("C-c p a" . haskell-process-cabal)
-
-    ("M-n" . next-error)
-    ("M-p" . previous-error))
+    ("C-c p a" . haskell-process-cabal))
 
   (setq
    ;; Use notify.el (if you have it installed) at the end of running
@@ -52,7 +52,3 @@
     ("p" . haskell-debug/previous)
     ("r" . haskell-debug/start-step)
     ("N" . haskell-debug/breakpoint-numbers)))
-
-(after! haskell-font-lock
-  ;; do not use too much symbols
-  (setq haskell-font-lock-symbols-alist nil))

@@ -55,8 +55,11 @@ if is_mac; then
     log "Install Brew Cask..."
     . setup/install_brew_cask.sh
 else
-    . setup/install_core.sh
+    log "Install Apt packages..."
+    . setup/install_apt.sh
 fi
+
+. setup/install_nodejs.sh
 
 # Clean all configurations
 clean_dotfiles() {

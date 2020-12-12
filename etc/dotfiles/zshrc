@@ -48,6 +48,8 @@ antigen apply
 # Don't record an entry starting with a space.
 setopt HIST_IGNORE_SPACE
 
+typeset -U path
+
 export LC_CTYPE=zh_CN.UTF-8
 export XMODIFIERS='@im=fcitx'
 export XIM=fcitx
@@ -65,18 +67,11 @@ else
     export FZF_DEFAULT_COMMAND='fd --type file --exclude .git'
 fi
 
-if [ -d "$HOME/.local/bin" ]; then
-    export PATH="$HOME/.local/bin:$PATH"
-fi
-
-if [ -d "$HOME/.cargo/bin" ]; then
-    export PATH="$HOME/.cargo/bin:$PATH"
-fi
-
-if [ -d "$HOME/program/root/bin" ]; then
-    export LD_LIBRARY_PATH="$HOME/program/root/lib:$LD_LIBRARY_PATH"
-    export PATH="$HOME/program/root/bin:$PATH"
-fi
+for directory in ".local" ".cargo" ".cabal" ".ghcup" "program/root" "program/node";do
+    if [ -d "$HOME/${directory}/bin" ]; then
+        path=("$HOME/${directory}/bin" "$path[@]")
+    fi
+done
 
 if [ -x "$HOME/.zshrc.local" ]; then
     . "$HOME/.zshrc.local"
