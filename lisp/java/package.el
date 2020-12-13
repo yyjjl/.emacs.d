@@ -2,4 +2,4 @@
 
 (require-packages! lsp-mode lsp-java)
 
-(provide 'init-java)
+(ymacs-lsp//register-client 'jdtls :package 'lsp-java)

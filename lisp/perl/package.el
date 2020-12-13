@@ -7,4 +7,4 @@
 
 (defvar ymacs-perl-perltidy-path "perltidy")
 (defvar ymacs-perl-perltidy-options nil)
-(defvar ymacs-perl-shell-path (expand-etc! "bin/perli"))
+(defvar ymacs-perl-shell-path (expand-etc! "scripts/perli"))

@@ -5,6 +5,4 @@
     (ymacs-latex//common-setup)
 
     (when (buffer-enable-rich-feature-p)
-      (ymacs-lsp//try-enable latex
-        :init
-        (lsp-diagnostics-mode -1)))))
+      (ymacs-lsp//try-enable latex))))

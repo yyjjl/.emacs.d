@@ -34,7 +34,6 @@
               "\\.?cache" ".cask"
               "/node_modules/"
               "\\.\\(gz\\|gif\\|svg\\|png\\|jpe?g\\)$" "/TAGS$"
-              ymacs-var-direcotry
               (expand-file-name package-user-dir))))
 
 (after! bookmark

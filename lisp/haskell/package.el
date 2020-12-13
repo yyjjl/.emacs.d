@@ -7,3 +7,5 @@
 
 (autoload 'haskell-debug "haskell-debug" nil t)
 
+(ymacs-lsp//register-client 'lsp-haskell :package 'lsp-haskell)
+

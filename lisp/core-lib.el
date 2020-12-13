@@ -29,13 +29,16 @@
 (defvar ymacs--buffer-visible-p t
   "A flag to indicate if the buffer is not a temporary buffer")
 
-(defsubst expand-var! (-name &optional -make-p)
-  (let ((val (expand-file-name -name ymacs-var-direcotry)))
+(defsubst expand-cache! (-name &optional -make-p)
+  (let ((val (expand-file-name -name ymacs-cache-direcotry)))
     (when (and -make-p (not (file-exists-p val)))
       (make-directory val))
     val))
 
 (defsubst expand-etc! (-name)
+  (expand-file-name -name ymacs-etc-direcotry))
+
+(defsubst expand-bin! (-name)
   (expand-file-name -name ymacs-etc-direcotry))
 
 (defsubst expand-tmp! (-name)
@@ -418,12 +421,14 @@ HTML file converted from org file, it returns t."
       (with-current-buffer buffer
         (hack-dir-local-variables-non-file-buffer)))))
 
-(cl-defun run-command! (&key name callback error-callback command directory)
+(cl-defun run-command! (&key name callback error-callback command directory buffer-name)
   (let* ((default-directory (or directory default-directory))
          (command-buffer (compilation-start
                           command
                           t
-                          (lambda (_) (format "run command: %s" name)))))
+                          (if buffer-name
+                              (lambda (_) buffer-name)
+                            (lambda (_) (format "run command: %s" name))))))
     (with-current-buffer command-buffer
       (setq ymacs-term-exit-action 'keep)
       (when-let ((current-proc (get-buffer-process command-buffer))
@@ -511,6 +516,9 @@ HTML file converted from org file, it returns t."
 
        (dolist (func (get ',-name 'after-feature-functions))
          (funcall func)))))
+
+(defsubst has-feature! (-name)
+  (memq -name ymacs--loaded-features))
 
 (defmacro after-feature! (-name &rest body)
   (declare (indent 1) (debug t))

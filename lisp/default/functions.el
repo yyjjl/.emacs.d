@@ -71,7 +71,7 @@
         (t (error "No action for key `%s'" (key-description `[,key])))))))
 
 (defsubst ymacs//save-variable (-symbol -file)
-  (let ((real-file (expand-var! -file))
+  (let ((real-file (expand-cache! -file))
         (val (default-value -symbol)))
     (with-temp-buffer
       (insert (format "(setq-default %s " -symbol)
@@ -81,7 +81,7 @@
       (write-region (point-min) (point-max) real-file))))
 
 (defsubst ymacs//load-variable (_symbol -file)
-  (let ((real-file (expand-var! -file)))
+  (let ((real-file (expand-cache! -file)))
     (when (file-exists-p real-file)
       (load real-file :noerror))))
 

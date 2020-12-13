@@ -9,7 +9,7 @@
   (emms-playing-time-disable-display)
   (emms-lyrics-disable)
 
-  (setq emms-player-mpv-input-file (expand-var! "emms/mpv-input"))
+  (setq emms-player-mpv-input-file (expand-cache! "emms/mpv-input"))
   (setq emms-mode-line-format "%s")
   (setq emms-lyrics-display-p nil)
   (setq emms-source-file-default-directory "~/music/")

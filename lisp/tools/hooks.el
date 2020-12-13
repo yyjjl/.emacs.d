@@ -27,8 +27,8 @@
   (when (and ymacs-fcitx-path (display-graphic-p))
     (fcitx-aggressive-setup))
 
-  (find-file-noselect (expand-var! "org/*note*"))
-  (find-file-noselect (expand-var! "org/*task*"))
+  (find-file-noselect (expand-cache! "org/*note*"))
+  (find-file-noselect (expand-cache! "org/*task*"))
 
   (message "Init Time: %.3f (with %d packages activated)"
            (float-time (time-subtract after-init-time before-init-time))

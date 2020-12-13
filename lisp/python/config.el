@@ -6,7 +6,8 @@
 
   (ymacs-lsp//set-simple-install-fn
    'pyls
-   "pip3 install --user 'python-language-server[all]'"))
+   "pip3 install --user 'python-language-server[all]'"
+   "pip3 install --user -U 'python-language-server[all]'"))
 
 (after! lsp-pyright
   (setq lsp-pyright-python-executable-cmd "python3")

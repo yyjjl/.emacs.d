@@ -1,23 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
 
-(after! css-mode
-  (define-hook! ymacs-web|css-setup (css-mode-hook)
-    (rainbow-mode 1)
-    (setq-local eldoc-documentation-function #'css-eldoc-function)
-    (setq imenu-create-index-function 'ymacs-web//imenu-make-index)))
-
-(after! tide
-  (define-key! :map tide-mode-map
-    ("C-c C-l" . ymacs-web/load-in-repl)
-    ("C-c C-d" . tide-documentation-at-point)
-    ("M-?" . tide-references)
-    ("C-c r r" . tide-refactor)
-    ("C-c r n" . tide-rename-symbol)
-    ("C-c r f" . tide-rename-file)
-    ("C-c b" . tide-format)
-    ("C-c B" . tide-organize-imports)
-    ("C-c C-b" . tide-format)))
-
 (after! web-mode
   (define-key! :map web-mode-map
     ("M-e" . web-mode-element-next)
@@ -46,11 +28,3 @@
   (remap! "C-c C-d" "C-c d" web-mode-map)
   (remap! "C-c C-e" "C-c e" web-mode-map)
   (remap! "C-c C-t" "C-c t" web-mode-map))
-
-(after! projectile
-  (projectile-register-project-type 'npm '("package.json")
-                                    :configure "npm install"
-                                    :compile "npm run build"
-                                    :test "npm test"
-                                    :run "npm start"
-                                    :test-suffix ".test"))

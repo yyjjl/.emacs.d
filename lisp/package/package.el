@@ -1,6 +1,6 @@
 ;; -*- lexical-binding: t; -*-
 
-(defvar ymacs-autoloads-file (expand-var! "autoloads.el")
+(defvar ymacs-autoloads-file (expand-cache! "autoloads.el")
   "Autoloads file")
 
 (defvar ymacs-package--content-freshed-p nil)

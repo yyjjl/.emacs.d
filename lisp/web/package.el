@@ -1,12 +1,13 @@
 ;;; -*- lexical-binding: t; -*-
 
 (require-packages!
- tide
+ lsp-mode
  emmet-mode
- web-mode
- company-web
- rainbow-mode
- css-eldoc)
+ web-mode)
+
+(ymacs-lsp//register-client 'css-ls :package 'lsp-css)
+(ymacs-lsp//register-client 'ts-ls :package 'lsp-javascript)
+(ymacs-lsp//register-client 'html-ls :package 'lsp-html)
 
 (add-auto-mode! 'web-mode
   "\\.phtml\\'" "\\.cmp\\'" "\\.app\\'"

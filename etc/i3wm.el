@@ -2,7 +2,8 @@
 
 (load (expand-file-name "early-init" user-emacs-directory))
 
-(setq ymacs-var-direcotry (expand-file-name "var/i3" user-emacs-directory))
+(setq ymacs-cache-direcotry
+      (expand-file-name ".cache/i3" user-emacs-directory))
 
 (add-to-list 'load-path ymacs-config-directory)
 (add-to-list 'load-path (expand-file-name "etc/i3wm" user-emacs-directory))

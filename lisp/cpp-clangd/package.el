@@ -1,6 +1,13 @@
 ;; -*- lexical-binding:t -*-
 
-(executable! clangd :exe [(expand-var! "clangd/bin/clangd") "clangd"])
+(executable! clangd :exe [(expand-cache! "lsp/clangd/bin/clangd") "clangd"])
+
+(ymacs-lsp//register-client
+ 'clangd
+ :package 'lsp-clangd
+ :manual `(:title "Clangd"
+           :repo "clangd/clangd"
+           :exe ,ymacs-clangd-path))
 
 (after-feature! cpp
   (add-to-list 'ymacs-cpp-buffer-command-functions

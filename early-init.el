@@ -44,21 +44,25 @@ will close some features to speed up emacs performance")
 which means on every .el and .elc file loaded during start up, it
 hasn't to runs those regexps against the filename.")
 
-(defvar ymacs-config-directory
+(defconst ymacs-config-directory
   (expand-file-name "lisp" user-emacs-directory)
-  "All configuration in this directory")
+  "All configurations are in this directory")
 
-(defvar ymacs-var-direcotry
-  (expand-file-name "var" user-emacs-directory)
-  "All data and external executable file in this direcotry")
+(defvar ymacs-cache-direcotry
+  (expand-file-name ".cache" user-emacs-directory)
+  "All caches are in this direcotry")
 
-(defvar ymacs-private-directory
+(defconst ymacs-private-directory
   (expand-file-name "private" user-emacs-directory)
-  "Local packages in this directory")
+  "Local packages are in this directory")
 
-(defvar ymacs-etc-direcotry
+(defconst ymacs-etc-direcotry
   (expand-file-name "etc" user-emacs-directory)
-  "Some configuration file in this directory")
+  "Some configuration files are in this directory")
+
+(defconst ymacs-bin-direcotry
+  (expand-file-name "bin" user-emacs-directory)
+  "Some scripts are in this directory")
 
 ;; Add `ymacs-config-directory' to `load-path'
 (add-to-list 'load-path ymacs-config-directory)

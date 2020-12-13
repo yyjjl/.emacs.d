@@ -1,6 +1,7 @@
 ;; -*- lexical-binding:t -*-
 
 (require-packages!
+ lsp-mode
  clang-format
  google-c-style)
 

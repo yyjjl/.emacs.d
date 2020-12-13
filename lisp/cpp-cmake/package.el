@@ -34,6 +34,8 @@
 
 (add-auto-mode! 'cmake-mode "CMakeLists\\.txt\\'" "\\.cmake\\'")
 
+(ymacs-lsp//register-client 'cmakels :package 'lsp-cmake)
+
 (after-feature! cpp
   (add-to-list 'ymacs-cpp-lsp-checkers #'ymacs-cpp-cmake//check)
   (add-to-list 'ymacs-cpp-lsp-fallback-functions #'ymacs-cpp-cmake//lsp-fallback)

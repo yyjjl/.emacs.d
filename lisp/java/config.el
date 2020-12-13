@@ -10,7 +10,7 @@
     ("C-c C-d" . lsp-describe-thing-at-point)))
 
 (after! lsp-java
-  (setq lsp-java-server-install-dir (expand-var! "eclipse.jdt.ls/server/"))
-  (setq lsp-java-workspace-dir (expand-var! "lsp-java"))
-  (setq lsp-java-workspace-cache-dir (expand-var! "lsp-java/.cache"))
+  (setq lsp-java-server-install-dir (expand-cache! "lsp/eclipse.jdt.ls/server/"))
+  (setq lsp-java-workspace-dir (expand-cache! "lsp-java"))
+  (setq lsp-java-workspace-cache-dir (expand-cache! "lsp-java/.cache"))
   (setq lsp-java-save-action-organize-imports nil))

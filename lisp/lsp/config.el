@@ -57,7 +57,7 @@
   (setq lsp-eldoc-render-all t)
   (setq lsp-diagnostics-provider :auto)
   ;; (setq lsp-restart 'auto-restart)
-  (setq lsp-session-file (expand-var! "lsp-sessions"))
+  (setq lsp-session-file (expand-cache! "lsp-sessions"))
   (setq lsp-keep-workspace-alive nil)
   (setq lsp-signature-doc-lines 2)
   (setq lsp-signature-auto-activate '(:on-trigger-char))

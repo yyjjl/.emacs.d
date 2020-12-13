@@ -156,16 +156,16 @@
 
   (setq org-capture-templates
         `(("t" "Main task" entry
-           (file+headline ,(expand-var! "org/*task*") "Task")
+           (file+headline ,(expand-cache! "org/*task*") "Task")
            "\n* TODO %^{Task}\n  Captured: %t\n  %?")
           ("i" "Idea" entry
-           (file+headline ,(expand-var! "org/*note*") "Idea")
+           (file+headline ,(expand-cache! "org/*note*") "Idea")
            "\n* %^{Idea}\n  Captured: %U\n  %?")
           ("l" "Link" entry
-           (file+headline ,(expand-var! "org/*note*") "Link")
+           (file+headline ,(expand-cache! "org/*note*") "Link")
            "\n* %^{Link}\n  Captured: %U\n  %?")
           ("L" "Long term tasks" checkitem
-           (file+function ,(expand-var! "org/*task*") ymacs-org//generate-long-term-task)
+           (file+function ,(expand-cache! "org/*task*") ymacs-org//generate-long-term-task)
            "   - [ ] %^{Task} %?"))))
 
 (after! ox-html

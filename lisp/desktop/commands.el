@@ -8,7 +8,7 @@
    (member it '("." ".."))
    (--map (file-name-nondirectory it)
           (--filter (file-exists-p (file-name-as-directory it))
-                    (directory-files (expand-var! "desktop") :full)))))
+                    (directory-files (expand-cache! "desktop") :full)))))
 ;;;###autoload
 (defun ymacs-tools/change-or-new-desktop (-name)
   (interactive
@@ -17,7 +17,7 @@
   (let ((new-dir (expand-file-name (if (equal -name "default")
                                        ""
                                      -name)
-                                   (expand-var! "desktop"))))
+                                   (expand-cache! "desktop"))))
     (if (file-exists-p new-dir)
         (if (not (and desktop-dirname
                       (equal (file-name-as-directory new-dir)
@@ -41,7 +41,7 @@
                                       (ymacs-tools//desktop-files)
                                       nil
                                       :require-match)))
-  (let* ((default (expand-var! "desktop"))
+  (let* ((default (expand-cache! "desktop"))
          (dir (expand-file-name -name default)))
     (when (and (file-exists-p dir)
                (not (equal default dir))

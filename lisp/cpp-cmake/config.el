@@ -16,4 +16,5 @@
 (after! lsp-cmake
   (ymacs-lsp//set-simple-install-fn
    'cmakels
-   "pip3 install --user cmake-language-server"))
+   "pip3 install --user cmake-language-server"
+   "pip3 install --user -U cmake-language-server"))

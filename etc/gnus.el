@@ -1,7 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 (setq gnus-select-method '(nnnil))
-(setq gnus-startup-file (expand-var! "gnus/news"))
+(setq gnus-startup-file (expand-cache! "gnus/news"))
 
 ; NO 'passive
 (setq gnus-use-cache t)

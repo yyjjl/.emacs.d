@@ -8,9 +8,9 @@
         (list
          ymacs-telega-ld-library-path
          (format "LIBRARY_PATH=%s:%s"
-                 (expand-var! "td-build/lib")
+                 (expand-cache! "td-build/lib")
                  (getenv "LIBRARY_PATH"))
          (format "CPATH=%s:%s"
-                 (expand-var! "td-build/include")
+                 (expand-cache! "td-build/include")
                  (getenv "CPATH")))
       (apply -fn -args))))

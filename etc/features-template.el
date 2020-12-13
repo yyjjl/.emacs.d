@@ -17,16 +17,15 @@
 ;; Programming modes
 ;; (load-feature! haskell)
 ;; (load-feature! rust)
-;; (load-feature! java)
 (load-feature! web)
 ;; (load-feature! go)
+;; (load-feature! java)
+;; (load-feature! racket)
 (load-feature! perl)
-;; (load-feature! pdf)
 
 ;; (load-feature! play)
 ;; (load-feature! emms)
 
 ;; (load-feature! desktop)
 ;; (load-feature! completion-ivy-window)
-;; (load-feature! racket)
 ;; (load-feature! lsp-ui)

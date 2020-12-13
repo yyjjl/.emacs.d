@@ -44,7 +44,7 @@ If region is active, operate on it, else operate on line."
 ;;;###autoload
 (defun ymacs-perl/generate-global-tags ()
   (interactive)
-  (let ((default-directory (expand-var! "perl-modules"))
+  (let ((default-directory (expand-cache! "perl-modules"))
         (lib-paths
          (shell-command-to-string "perl -e 'for(@INC){print \"$_\n\";}'")))
     (dolist (path (--filter
