@@ -1,7 +1,5 @@
 ;; -*- lexical-binding:t -*-
 
-(require 'i3wm-lib)
-
 (defvar i3-document-regexp
   (concat (regexp-opt '(".pdf" ".djvu" ".ps" ".dvi")) "\\'"))
 
@@ -44,8 +42,6 @@
 
 
 
-(with-eval-after-load 'ivy
+(after! ivy
   (ivy-configure 'i3/open-document
     :display-transformer-fn #'i3//open-document-transformer))
-
-(provide 'i3wm-doc)

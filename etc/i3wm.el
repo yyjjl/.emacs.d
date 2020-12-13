@@ -5,15 +5,15 @@
 (setq ymacs-var-direcotry (expand-file-name "var/i3" user-emacs-directory))
 
 (add-to-list 'load-path ymacs-config-directory)
-(add-to-list 'load-path (expand-file-name "etc/i3wm" user-emacs-directory))
 
-(require 'i3wm-init)
-(require 'i3wm-doc)
+(load (expand-file-name "i3wm/i3wm-lib" ymacs-etc-direcotry))
+(load (expand-file-name "i3wm/i3wm-init" ymacs-etc-direcotry))
+(load (expand-file-name "i3wm/i3wm-doc" ymacs-etc-direcotry))
 
 (setq-default default-frame-alist
               `((name . "Minibuffer-i3wm")
                 (width . 100)
-                (height . ,(+ 3 ivy-height))
+                (height . ,(+ 2 ivy-height))
                 (menu-bar-lines . 0)
                 (tool-bar-lines . 0)
                 (vertical-scroll-bars . nil)
