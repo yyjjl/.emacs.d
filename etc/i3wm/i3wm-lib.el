@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(require 'json)
+
 (defun i3-msg//command (&rest -args)
   (let ((result (with-output-to-string
                   (with-current-buffer standard-output
@@ -93,5 +95,3 @@
     (while (not (memq frame frames))
       (setq frame (next-frame frame)))
     (select-frame-set-input-focus frame)))
-
-(provide 'i3wm-lib)

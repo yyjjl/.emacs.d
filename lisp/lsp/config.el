@@ -6,6 +6,7 @@
 (after! lsp-mode
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.cache\\'")
   (add-to-list 'lsp-file-watch-ignored (concat "\\`" (expand-file-name "~/\\.local/lib")))
+  (add-to-list 'lsp-file-watch-ignored (concat "\\`" (regexp-quote (file-truename user-emacs-directory))))
 
   (ymacs-hydra-add-toggle-column
    '(lsp-mode
@@ -65,6 +66,8 @@
 
   (setq lsp-completion-provider :none)
 
+  (setq lsp-enable-file-watchers nil)
+  (setq lsp-enable-folding t)
   (setq lsp-enable-snippet t)
   (setq lsp-enable-on-type-formatting nil)
   (setq lsp-enable-text-document-color t)

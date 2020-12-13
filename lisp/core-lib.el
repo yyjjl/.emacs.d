@@ -271,11 +271,11 @@ Example:
 (defun open! (&rest -file-list)
   "Open All files in -FILE-LIST in external processes."
   (cond
-   (sys/mac-x-p
+   ((and (display-graphic-p) sys/macp)
     (mapc (lambda (path)
             (shell-command (concat "open " (shell-quote-argument path))))
           -file-list))
-   (sys/linux-x-p
+   ((and (display-graphic-p) sys/linuxp)
     (mapc (lambda (path)
             (let ((process-connection-type nil))
               (start-process "external-process" nil "xdg-open" path)))

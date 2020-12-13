@@ -8,15 +8,12 @@
 (load-file! "custom")
 
 (load-feature! package)
-(load-feature! ui)
-
 (advice-add 'request! :override #'ignore)
 
+(load-feature! ui)
 (load-feature! completion-ivy)
-(load-feature! misc)
-
-(require 'dash)
-(require 'json)
+(load-feature! tools)
+(load-feature! hydra)
 
 (recentf-mode 1)
 (savehist-mode 1)
@@ -31,6 +28,8 @@
 (electric-layout-mode 1)
 (electric-indent-mode 1)
 
+(ymacs-package|after-init)
+
 (with-current-buffer (get-buffer-create "*scratch*")
   (erase-buffer)
   (insert (concat ";; Welcome to Emacs " (or user-login-name "") " !!!"))
@@ -41,5 +40,3 @@
 
 (setq-default mode-line-format nil)
 (setq-default window-min-height 1)
-
-(provide 'i3wm-init)
