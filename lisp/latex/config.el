@@ -3,9 +3,10 @@
 (custom-set-variables
  '(lsp-clients-texlab-executable ymacs-texlab-path))
 
-(after! lsp-diagnostics
-  (add-to-list 'lsp-diagnostics-disabled-modes 'latex-mode)
-  (add-to-list 'lsp-diagnostics-disabled-modes 'tex-mode))
+(eval-when-has-feature! lsp
+  (after! lsp-diagnostics
+    (add-to-list 'lsp-diagnostics-disabled-modes 'latex-mode)
+    (add-to-list 'lsp-diagnostics-disabled-modes 'tex-mode)))
 
 (after! latex
   (define-key! :map LaTeX-mode-map

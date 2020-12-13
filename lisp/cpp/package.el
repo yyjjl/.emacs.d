@@ -1,12 +1,12 @@
 ;; -*- lexical-binding:t -*-
 
 (require-packages!
- lsp-mode
  clang-format
  google-c-style)
 
 (defvar ymacs-cpp-lsp-checkers ())
 (defvar ymacs-cpp-lsp-fallback-functions ())
+
 (defvar ymacs-cpp-buffer-command-functions ())
 
 (defvar ymacs-cpp-expand-macro-function nil)

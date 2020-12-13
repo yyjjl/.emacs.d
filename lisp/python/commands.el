@@ -11,29 +11,29 @@ If not try to complete."
       (indent-for-tab-command)
     (call-interactively #'company-capf)))
 
-;;;###autoload
-(defun ymacs-python/change-lsp-server ()
-  (interactive)
-  (add-to-list 'lsp-disabled-clients ymacs-python-lsp-server)
+(eval-when-has-feature! lsp
+  (defun ymacs-python/change-lsp-server ()
+    (interactive)
+    (add-to-list 'lsp-disabled-clients ymacs-python-lsp-server)
 
-  (setq ymacs-python-lsp-server
-        (if (eq ymacs-python-lsp-server 'pyright) 'pyls 'pyright))
+    (setq ymacs-python-lsp-server
+          (if (eq ymacs-python-lsp-server 'pyright) 'pyls 'pyright))
 
-  (setq lsp-disabled-clients
-        (cl-delete ymacs-python-lsp-server lsp-disabled-clients))
+    (setq lsp-disabled-clients
+          (cl-delete ymacs-python-lsp-server lsp-disabled-clients))
 
-  (let (buffers)
-    (when-let ((workspaces (lsp-workspaces)))
-      (with-lsp-workspace
-          (lsp--completing-read "Select server: "
-                                workspaces
-                                'lsp--workspace-print nil t)
-        (setq buffers (lsp--workspace-buffers lsp--cur-workspace))
-        (lsp--shutdown-workspace)))
+    (let (buffers)
+      (when-let ((workspaces (lsp-workspaces)))
+        (with-lsp-workspace
+            (lsp--completing-read "Select server: "
+                                  workspaces
+                                  'lsp--workspace-print nil t)
+          (setq buffers (lsp--workspace-buffers lsp--cur-workspace))
+          (lsp--shutdown-workspace)))
 
-    (dolist (buffer buffers)
-      (with-current-buffer buffer
-        (revert-buffer)))))
+      (dolist (buffer buffers)
+        (with-current-buffer buffer
+          (revert-buffer))))))
 
 ;;;###autoload
 (defun ymacs-python/autopep8 ()

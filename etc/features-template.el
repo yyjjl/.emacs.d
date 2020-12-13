@@ -1,5 +1,7 @@
 ;; -*- lexical-binding:t -*-
 
+(load-feature! lsp)
+
 (load-feature! git)
 (load-feature! spell)
 
@@ -15,6 +17,7 @@
 (load-feature! python (lsp-server . 'pyls))
 
 ;; Programming modes
+(load-feature! sh)
 ;; (load-feature! haskell)
 ;; (load-feature! rust)
 (load-feature! web)

@@ -1,6 +1,10 @@
 ;; -*- lexical-binding:t -*-
 
-(require-packages! cmake-mode cmake-font-lock lsp-mode)
+(eval-when-compile
+  (unless (has-feature! 'cpp)
+    (user-error "cpp-cmake should be loaded after feature cpp")))
+
+(require-packages! cmake-mode cmake-font-lock)
 
 (executable! cmake)
 
@@ -32,16 +36,15 @@
 
 (defvar-local ymacs-cpp-cmake-project-root nil)
 
-(add-auto-mode! 'cmake-mode "CMakeLists\\.txt\\'" "\\.cmake\\'")
 
-(ymacs-lsp//register-client 'cmakels :package 'lsp-cmake)
+(eval-when-has-feature! lsp
+  (ymacs-lsp//register-client 'cmakels :package 'lsp-cmake))
 
-(after-feature! cpp
-  (add-to-list 'ymacs-cpp-lsp-checkers #'ymacs-cpp-cmake//check)
-  (add-to-list 'ymacs-cpp-lsp-fallback-functions #'ymacs-cpp-cmake//lsp-fallback)
+(add-to-list 'ymacs-cpp-lsp-checkers #'ymacs-cpp-cmake//check)
+(add-to-list 'ymacs-cpp-lsp-fallback-functions #'ymacs-cpp-cmake//lsp-fallback)
 
-  (setq ymacs-cpp-environment-function #'ymacs-cpp-cmake//config-env)
-  (setq ymacs-cpp-build-dir-function
-        (lambda ()
-          (and ymacs-cpp-cmake-project-root
-               (ymacs-cpp-cmake//config-build)))))
+(setq ymacs-cpp-environment-function #'ymacs-cpp-cmake//config-env)
+(setq ymacs-cpp-build-dir-function
+      (lambda ()
+        (and ymacs-cpp-cmake-project-root
+             (ymacs-cpp-cmake//config-build))))

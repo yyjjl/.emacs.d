@@ -21,10 +21,8 @@
 (load-feature! edit)
 (load-feature! dired)
 (load-feature! ibuffer)
-(load-feature! lsp)
 
 ;; Programming modes
 (load-feature! lisp)
-(load-feature! sh)
 
 (load-file! "features")

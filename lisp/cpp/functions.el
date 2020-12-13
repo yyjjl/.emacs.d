@@ -18,20 +18,17 @@
     (font-lock-add-keywords nil ymacs-cpp-font-lock-keywords)))
 
 (defun ymacs-cpp//cpp-setup ()
-  (ymacs-lsp//try-enable cpp
-    :enable
-    ;; NOTE: all checkers should be evaled
-    (--some it (--map (funcall it) ymacs-cpp-lsp-checkers))
-    :init
-    (progn
+  (when (buffer-enable-rich-feature-p)
+    (try-enable-lsp! cpp
+      :condition
+      ;; NOTE: all checkers should be evaled
+      (--some it (--map (funcall it) ymacs-cpp-lsp-checkers))
+      :init
       (setq-local lsp-eldoc-render-all nil)
-      ;; (electric-indent-local-mode -1)
-      )
-    :fallback
-    (progn
-      (run-hooks 'ymacs-cpp-lsp-fallback-functions)
-      ;; (setq completion-at-point-functions nil)
-      (flycheck-mode -1))))
+      :fallback
+      (progn
+        (run-hooks 'ymacs-cpp-lsp-fallback-functions)
+        (flycheck-mode -1)))))
 
 (defun ymacs-cpp//env ()
   (when (functionp ymacs-cpp-environment-function)

@@ -1,19 +1,17 @@
 ;;; -*- lexical-binding: t; -*-
 
-(require-packages! lsp-mode)
+(require-packages!
+ (auctex :compile (latex tex preview reftex)))
 
 (executable! texlab :exe [(expand-cache! "lsp/texlab") "texlab"])
 
-(ymacs-lsp//register-client
- 'texlab
- :package 'lsp-tex
- :manual `(:title "Texlab"
-           :repo "latex-lsp/texlab"
-           :exe ,ymacs-texlab-path))
-
-
-(require-packages!
- (auctex :compile (latex tex preview reftex)))
+(eval-when-has-feature! lsp
+  (ymacs-lsp//register-client
+   'texlab
+   :package 'lsp-tex
+   :manual `(:title "Texlab"
+             :repo "latex-lsp/texlab"
+             :exe ,ymacs-texlab-path)))
 
 (autoload 'LaTeX-math-mode "latex" nil t)
 

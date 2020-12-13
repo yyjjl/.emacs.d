@@ -5,20 +5,6 @@
   (setf (alist-get -client ymacs-lsp--enabled-clients)
         (cons -package -manual)))
 
-(cl-defmacro ymacs-lsp//try-enable
-    (name &key (enable t) (init nil) (fallback nil))
-  (declare (indent 1))
-  `(add-transient-hook!
-       (hack-local-variables-hook
-        :local t
-        :name ,(intern (format "ymacs-lsp//%s-internal" name)))
-     (if (and ,enable
-              ymacs-lsp-enable-in-project-p
-              (ignore-errors (lsp))
-              (bound-and-true-p lsp-mode))
-         ,init
-       ,fallback)))
-
 (defun ymacs-lsp//set-simple-install-fn (-client -command &optional -update-command)
   (unless -update-command
     (setq -update-command -command))

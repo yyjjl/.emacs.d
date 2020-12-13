@@ -14,4 +14,4 @@
 
   (when (and (buffer-enable-rich-feature-p)
              (not (string-suffix-p ".json" (downcase buffer-file-name))))
-    (ymacs-lsp//try-enable web)))
+    (try-enable-lsp! web)))

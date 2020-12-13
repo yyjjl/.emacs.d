@@ -16,8 +16,6 @@
       ;; Make a #define be left-aligned
       (setq c-electric-pound-behavior '(alignleft))
       (ymacs-cpp//font-lock-setup)
-
-      (when (buffer-enable-rich-feature-p)
-        (ymacs-cpp//cpp-setup))))
+      (ymacs-cpp//cpp-setup)))
 
   (advice-add 'c-indent-line-or-region :around #'indent-for-tab-command@smart))

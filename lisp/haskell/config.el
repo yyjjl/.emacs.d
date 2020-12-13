@@ -3,18 +3,24 @@
 (autoload #'haskell-indent-put-region-in-literate "haskell-indent" nil t)
 (autoload #'haskell-indent-insert-guard "haskell-indent" nil t)
 
-(after! lsp-haskell
-  (ymacs-lsp//set-simple-install-fn
-   'lsp-haskell
-   "ghcup install hls"))
+(eval-when-has-feature! lsp
+  (after! lsp-haskell
+    (ymacs-lsp//set-simple-install-fn
+     'lsp-haskell
+     "ghcup install hls")))
 
 (after! haskell-mode
   (define-key! :map haskell-mode-map
     ([f5] . haskell-debug)
     ([f9] . haskell-compile)
 
-    ("C-c C-b" . lsp-format-buffer)
-    ("C-c b" . lsp-format-buffer)
+    ("C-c C-b" . haskell-mode-stylish-buffer)
+    ("C-c b" . haskell-mode-stylish-buffer)
+
+    (:has-feature lsp
+     ("C-c C-b" . lsp-format-buffer)
+     ("C-c b" . lsp-format-buffer))
+
     ("C-c Q" . haskell-session-kill)
     ("C-c R" . haskell-mode-generate-tags)
     ("C-c j" . haskell-navigate-imports)

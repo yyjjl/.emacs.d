@@ -6,7 +6,7 @@
     (rainbow-delimiters-mode 1)
 
     (when (buffer-enable-rich-feature-p)
-      (ymacs-lsp//try-enable haskell
+      (try-enable-lsp! haskell
         :fallback
         (progn
           (haskell-doc-mode 1)

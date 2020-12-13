@@ -9,6 +9,7 @@
  buffer-move
  csv-mode
  gnuplot-mode
+ crontab-mode
  graphviz-dot-mode
  projectile
  whitespace
@@ -145,8 +146,6 @@
 
 (autoload 'sdcv-current-word "sdcv" nil t)
 (autoload 'sdcv-goto-sdcv "sdcv" nil t)
-
-(add-auto-mode! 'crontab-mode "\\.?cron\\(tab\\)?\\'")
 
 (put 'projectile-project-run-cmd 'safe-local-variable #'stringp)
 (put 'projectile-project-test-cmd 'safe-local-variable #'stringp)

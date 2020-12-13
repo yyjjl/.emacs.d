@@ -1,8 +1,4 @@
-;;; -*- lexical-binding: t; -*-
+;; -*- lexical-binding:t -*-
 
-(require-packages! lsp-mode)
-
-(add-auto-mode! 'sh-mode
-  "\\.basj_profile\\'" "\\.bash_history\\'"
-  "\\.sh\\'" "\\.bash\\'" "\\.bashrc.local\\'"
-  "\\.zsh\\'" "\\.bashrc\\'" "\\.zshrc\\'")
+(eval-when-has-feature! lsp
+  (ymacs-lsp//register-client 'bash-ls :package 'lsp-bash))
