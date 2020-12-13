@@ -2,10 +2,12 @@
 
 (require-packages!
  rainbow-delimiters
- haskell-mode
- lsp-haskell)
+ haskell-mode)
+
+(eval-when-has-feature! lsp
+  (require-packages! lsp-haskell)
+
+  (ymacs-lsp//register-client 'lsp-haskell :package 'lsp-haskell))
 
 (autoload 'haskell-debug "haskell-debug" nil t)
-
-(ymacs-lsp//register-client 'lsp-haskell :package 'lsp-haskell)
 

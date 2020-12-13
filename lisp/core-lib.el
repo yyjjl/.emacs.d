@@ -206,21 +206,41 @@ Optional argument -BODY is the function body."
         (:map (setq map (pop -args)))
         (:prefix (setq prefix (pop -args)))))
     (dolist (arg -args)
-      (let ((-key (car arg))
-            (func (cdr arg)))
-        (when (symbolp func)
-          (push `(declare-function ,func "ext:unknown") forms))
-        (push (list 'define-key sym
-                    (if (stringp -key)
-                        (kbd (concat prefix " " -key))
-                      -key)
-                    (cond ((eq func nil) nil)
-                          ((symbolp func) `#',func)
-                          ((and (listp func)
-                                (eq (car func) :map))
-                           (cadr func))
-                          (t func)))
-              forms)))
+      (let ((key (car arg))
+            (definition (cdr arg))
+            properties
+            form)
+        (if (eq key :has-feature)
+            (progn
+              (push `(eval-when-has-feature! ,(car definition)
+                       (define-key! :map ,sym :prefix ,prefix
+                         ,@(cdr definition)))
+                    forms))
+          (when (listp definition)
+            (if (not (keywordp (car definition)))
+                (progn
+                  (setq properties (cdr definition))
+                  (setq definition (car definition)))
+              (setq properties definition)
+              (setq definition nil)))
+
+          (when (and (not (null definition))
+                     (symbolp definition))
+            (push `(declare-function ,definition "ext:unknown") forms))
+
+          (setq definition (or (when (and (not (null definition))
+                                          (symbolp definition))
+                                 `#',definition)
+                               (plist-get properties :map)
+                               definition))
+
+          (dolist (k (if (listp key) key (list key)))
+            (push (list 'define-key sym
+                        (if (stringp k)
+                            (kbd (concat prefix " " k))
+                          k)
+                        definition)
+                  forms)))))
     `(let ((,sym ,map))
        ,@(reverse forms)
        ,sym)))
@@ -273,12 +293,12 @@ Example:
   (cond
    ((and (display-graphic-p) sys/macp)
     (mapc (lambda (path)
-            (shell-command (concat "open " (shell-quote-argument path))))
+            (shell-command (concat "open " (shell-quote-argument (file-truename path)))))
           -file-list))
    ((and (display-graphic-p) sys/linuxp)
     (mapc (lambda (path)
             (let ((process-connection-type nil))
-              (start-process "external-process" nil "xdg-open" path)))
+              (start-process "external-process" nil "xdg-open" (file-truename path))))
           -file-list))
    (t
     (user-error "Not supported yet"))))
@@ -482,7 +502,7 @@ HTML file converted from org file, it returns t."
              (cons (substring option-name 1)
                    (equal (aref option-name 0) ?+))))
           (t
-           (error "-option should start with +/- or be a cons")))))
+           (error "option should start with +/- or be a cons")))))
     (list 'defvar
           (intern (format "ymacs-%s-%s" -name (car option)))
           (cdr option))))
@@ -517,8 +537,19 @@ HTML file converted from org file, it returns t."
        (dolist (func (get ',-name 'after-feature-functions))
          (funcall func)))))
 
-(defsubst has-feature! (-name)
+(defun has-feature! (-name)
   (memq -name ymacs--loaded-features))
+
+(defmacro eval-when-has-feature! (-name &rest -body)
+  (declare (indent 1) (debug t))
+  (when (memq -name ymacs--loaded-features)
+    `(progn ,@-body)))
+
+(defmacro eval-if-has-feature! (-name -if-body &rest -else-body)
+  (declare (indent 2) (debug t))
+  (if (memq -name ymacs--loaded-features)
+      -if-body
+    `(progn ,@-else-body)))
 
 (defmacro after-feature! (-name &rest body)
   (declare (indent 1) (debug t))
@@ -543,6 +574,25 @@ If it doesn't exist, copy from the -TEMPLATE-FILE, then load it."
         (copy-file template-file target-file)))
     ;; Load private configuration
     (load (file-name-sans-extension target-file))))
+
+(cl-defmacro try-enable-lsp!
+    (name &key (condition t) (init nil) (fallback nil))
+  (declare (indent 1))
+  `(eval-if-has-feature! lsp
+       (add-transient-hook!
+           (hack-local-variables-hook
+            :local t
+            :name ,(intern (format "ymacs-lsp//%s-internal" name)))
+         (if (and ,condition
+                  ymacs-lsp-enable-in-project-p
+                  ,(let ((symbol (intern (format "ymacs-%s-lsp" name))))
+                     `(not (and (boundp ',symbol)
+                                (eq ,symbol 'disabled))))
+                  (ignore-errors (lsp))
+                  (bound-and-true-p lsp-mode))
+             ,init
+           ,fallback))
+     ,fallback))
 
 (provide 'core-lib)
 

@@ -10,7 +10,7 @@
 ;; Turns on `auto-fill-mode', don't use `text-mode-hook'
 (add-hook 'change-log-mode-hook 'turn-on-auto-fill)
 
-(define-hook! ymacs|create-missing-directories-h (find-file-not-found-functions)
+(define-hook! ymacs|create-missing-directories (find-file-not-found-functions)
   "Automatically create missing directories when creating new files."
   (unless (file-remote-p (buffer-file-name))
     (let ((parent-directory (file-name-directory (buffer-file-name))))
@@ -83,7 +83,7 @@
         (when buffer-file-name
           (hack-dir-local-variables-non-file-buffer))))))
 
-(define-hook! ymacs|after-init-hook (after-init-hook)
+(define-hook! ymacs|after-init (after-init-hook)
   ;; global-modes
   (global-subword-mode 1)
   (global-auto-revert-mode 1)
@@ -99,9 +99,12 @@
   (midnight-mode 1)
   ;; (display-time-mode 1)
   (transient-mark-mode 1)
-  ;; (delete-selection-mode 1)
+  (delete-selection-mode 1)
   ;; Auto save to files
   ;; (auto-save-visited-mode 1)
+
+  (line-number-mode -1)
+  (column-number-mode -1)
 
   ;; Restore `file-name-handler-alist'
   (setq file-name-handler-alist ymacs-file-name-handler-alist)

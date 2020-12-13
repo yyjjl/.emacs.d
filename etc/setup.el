@@ -2,6 +2,8 @@
 
 (require 'cl-lib)
 
+(setq comp-deferred-compilation nil)
+
 (defvar ymacs-setup-directory
   (expand-file-name "emacs" (file-name-directory load-file-name)))
 
@@ -20,7 +22,7 @@
   (when (file-exists-p early-init-file)
     (load early-init-file nil t))
 
-  (setq package-quickstart-file (expand-file-name "var/quickstart.el" user-emacs-directory))
+  (setq package-quickstart-file (expand-file-name ".cache/quickstart.el" user-emacs-directory))
   (when (file-exists-p package-quickstart-file)
     (delete-file package-quickstart-file))
 
@@ -43,9 +45,5 @@
     (delete-file ymacs-autoloads-file))
 
   (ymacs-package|after-init)
-
-  (if (getenv "NATIVE_COMPILE_ELPA")
-      (ymacs-package/native-compile-elpa-packages)
-
-    (ymacs-package/compile-config)
-    (ymacs-package/compile-elpa-packages :no-message)))
+  (ymacs-package/compile-config)
+  (ymacs-package/compile-elpa-packages :no-message))

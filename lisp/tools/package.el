@@ -9,6 +9,7 @@
  buffer-move
  csv-mode
  gnuplot-mode
+ crontab-mode
  graphviz-dot-mode
  projectile
  whitespace
@@ -78,7 +79,6 @@
   ("3" . ymacs-window/split-horizontally)
   ("|" . ymacs-window/force-split-horizontally)
   ("_" . ymacs-window/force-split-vertically)
-  ("?" . ymacs-window/split-window-to-grid)
 
   (", a" . ymacs-tools/add-local-snippet)
   (", g" . ymacs-tools/search-in-chrome)
@@ -145,8 +145,6 @@
 
 (autoload 'sdcv-current-word "sdcv" nil t)
 (autoload 'sdcv-goto-sdcv "sdcv" nil t)
-
-(add-auto-mode! 'crontab-mode "\\.?cron\\(tab\\)?\\'")
 
 (put 'projectile-project-run-cmd 'safe-local-variable #'stringp)
 (put 'projectile-project-test-cmd 'safe-local-variable #'stringp)

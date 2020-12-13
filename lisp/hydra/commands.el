@@ -67,14 +67,28 @@
   ("RET" nil "quit")
   ("q" nil "quit"))
 
-(defhydra ymacs-hydra/resize-window (:color pink)
-  "Window Size"
-  ("{" shrink-window-horizontally "-><-")
-  ("}" enlarge-window-horizontally "<-->")
-  ("^" enlarge-window "enlarge")
-  ("-" shrink-window "shrink")
-  ("RET" nil "quit")
-  ("q" nil "quit"))
+(pretty-hydra-define ymacs-hydra/window
+  (:title "Window Management" :foreign-keys warn :quit-key "q")
+  ("Resize"
+   (("{" shrink-window-horizontally "->| |<-")
+    ("}" enlarge-window-horizontally "<-| |->")
+    ("^" enlarge-window "enlarge")
+    ("v" shrink-window "shrink")
+    ("n" balance-windows "balance"))
+   "Split"
+   (("H" ymacs-window/split-horizontally "horizontally")
+    ("V" ymacs-window/split-vertically "vertically")
+    ("|" ymacs-window/force-split-horizontally "force horizontally ")
+    ("_" ymacs-window/force-split-vertically "force vertically ")
+    ("G" ymacs-window/split-window-to-grid " grid "))
+   "Zoom"
+   (("+" text-scale-increase "in")
+    ("=" text-scale-increase "in")
+    ("-" text-scale-decrease "out")
+    ("0" (text-scale-increase 0) "reset"))
+   "Appearance"
+   (("F" set-frame-font "font")
+    ("T" load-theme "theme"))))
 
 (defhydra ymacs-hydra/rectangle (:body-pre (rectangle-mark-mode 1)
                            :color pink
@@ -153,3 +167,28 @@ _b_   _f_       [_q_]quit      [_y_]yank
   ("p" previous-error "prev")
   ("<" first-error "first")
   ("q" nil "quit" :exit t))
+
+(defhydra ymacs-hydra/games (:color blue :hint nil)
+  "
+[_5_] 5x5            [_a_] animate      [_g_] gomoku    [_h_] hanoi   [_l_] life
+[_m_] mpuz           [_p_] pong         [_t_] tetris    [_z_] zone    ^ ^
+[_b 1_] blackbox     [_b 2_] bubbles    ^ ^             ^ ^           ^ ^
+[_s 1_] snake        [_s 2_] solitaire  ^ ^             ^ ^           ^ ^
+[_d 1_] dissociated  [_d 2_] doctor     [_d 3_] dunnet  ^ ^           ^ ^
+"
+  ("5" 5x5)
+  ("a" animate-birthday-present)
+  ("b 1" blackbox)
+  ("b 2" bubbles)
+  ("d 1" dissociated-press)
+  ("d 2" doctor)
+  ("d 3" dunnet)
+  ("g" gomoku)
+  ("h" hanoi)
+  ("l" life)
+  ("m" mpuz)
+  ("p" pong)
+  ("s 1" snake)
+  ("s 2" solitaire)
+  ("t" tetris)
+  ("z" zone))

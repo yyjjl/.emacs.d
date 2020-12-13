@@ -1,6 +1,6 @@
 # -*- mode: sh -*-
-# Antigen: https://github.com/zsh-users/antigen
-ANTIGEN="$HOME/.local/bin/antigen.zsh"
+
+ANTIGEN="$HOME/.antigen/antigen.zsh"
 
 # Install antigen.zsh if not exist
 if [ ! -f "$ANTIGEN" ]; then
@@ -11,19 +11,21 @@ if [ ! -f "$ANTIGEN" ]; then
     [ ! -f "$HOME/.z" ] && touch "$HOME/.z"
 
     URL="http://git.io/antigen"
-    TMPFILE="/tmp/antigen.zsh"
+    TMPFILE="/tmp/antigen.zsh.$$"
+
+    trap "rm -f $TMPFILE" EXIT
+
     if [ -x "$(which curl)" ]; then
         curl -L "$URL" -o "$TMPFILE"
     elif [ -x "$(which wget)" ]; then
         wget "$URL" -O "$TMPFILE"
     else
         echo "ERROR: please install curl or wget before installation !!"
-        exit
+        exit 1
     fi
     if [ ! $? -eq 0 ]; then
-        echo ""
         echo "ERROR: downloading antigen.zsh ($URL) failed !!"
-        exit
+        exit 1
     fi;
 
     echo "move $TMPFILE to $ANTIGEN"
@@ -33,11 +35,9 @@ fi
 # Initialize antigen
 source "$ANTIGEN"
 
-# Initialize oh-my-zsh
 antigen use oh-my-zsh
 
 antigen bundle extract
-antigen bundle sudo
 antigen bundle jsontools
 antigen bundle zsh-users/zsh-completions
 
@@ -49,6 +49,8 @@ antigen apply
 setopt HIST_IGNORE_SPACE
 
 typeset -U path
+
+export AGKOZAK_LEFT_PROMPT_ONLY=1
 
 export LC_CTYPE=zh_CN.UTF-8
 export XMODIFIERS='@im=fcitx'
@@ -79,7 +81,7 @@ fi
 
 alias et='emacsclient -t -a ""'
 alias ec='emacsclient -c -a "" -n'
-alias ep='emacs --dump-file=$HOME/.emacs.d/var/emacs.pdmp'
+alias ep='emacs --dump-file=$HOME/.emacs.d/.cache/emacs.pdmp'
 alias gnus='emacs --eval "(gnus)"'
 
 case "$INSIDE_EMACS" in

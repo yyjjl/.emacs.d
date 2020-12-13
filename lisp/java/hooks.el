@@ -6,4 +6,6 @@
       (require 'lsp-java)
 
       (setq-local c-basic-offset 8)
-      (ymacs-lsp//try-enable java))))
+      (try-enable-lsp! java
+        :init
+        (setq ymacs-lsp-format-buffer-function #'lsp-java-organize-imports)))))

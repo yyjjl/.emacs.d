@@ -1,5 +1,7 @@
 ;; -*- lexical-binding: t -*-
 
+(defalias 'top 'proced)
+
 (setq he-dabbrev-chars "0-9a-zA-Z\\?!_")
 (setq-default hippie-expand-try-functions-list
               '(try-expand-dabbrev

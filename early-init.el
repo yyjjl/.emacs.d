@@ -20,7 +20,6 @@
   (featurep 'cocoa)
   "Are we running with Cocoa on a Mac system?")
 
-(defvar ymacs-dump-p nil)
 (defvar ymacs-dump-load-path nil)
 
 (defvar ymacs-use-gnutls-p (gnutls-available-p))

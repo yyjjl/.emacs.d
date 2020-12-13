@@ -1,12 +1,12 @@
 ;;; -*- lexical-binding: t; -*-
 
-(defvar ymacs-window-size-list '("0.25" "0.382" "0.5" "0.618" "0.7"))
-(defun ymacs-window//split-with-size (-size &optional -vertical?)
+(defvar ymacs-window-size-list '(0.25 0.382 0.5 0.618 0.7))
+(defun ymacs-window//split-with-size (-size &optional -vertical)
   "Set new window size to -SIZE"
-  (let ((window-size (if -vertical?
+  (let ((window-size (if -vertical
                          (window-body-height)
                        (window-body-width))))
-    (funcall (if -vertical?
+    (funcall (if -vertical
                  #'split-window-vertically
                #'split-window-horizontally)
              (cond ((integerp -size) (- window-size (abs -size)))
@@ -15,29 +15,28 @@
     (set-window-buffer (next-window) (other-buffer))
     (when (or (and (floatp -size) (> -size 0.5))
               (and (integerp -size) (> -size (* 0.5 window-size))))
-      (if -vertical?
+      (if -vertical
           (windmove-down)
         (windmove-right)))))
 
 ;;;###autoload
 (defun ymacs-window/split-vertically (&optional -arg)
   (interactive "P")
+  (ymacs-window/split-horizontally -arg t))
+
+;;;###autoload
+(defun ymacs-window/split-horizontally (&optional -arg -vertical)
+  (interactive "P")
   (if -arg
       (ymacs//completing-read
        "Split Vertically"
        ymacs-window-size-list
-       (lambda (-size) (ymacs-window//split-with-size -size :vertical))
+       (lambda (-size)
+         (ymacs-window//split-with-size -size -vertical))
        :return-prompt "read number"
        :return-action
-       (lambda () (ymacs-window//split-with-size (read-number "Float or Integer: ") :vertical)))
-    (ymacs-window//split-with-size nil :vertical)))
-
-;;;###autoload
-(defun ymacs-window/split-horizontally (&optional -arg)
-  (interactive "P")
-  (ymacs-window//split-with-size
-   (when -arg
-     (string-to-number (completing-read "Float or Integer: " ymacs-window-size-list)))))
+       (lambda () (ymacs-window//split-with-size (read-number "Float or Integer: ") -vertical)))
+    (ymacs-window//split-with-size nil -vertical)))
 
 ;; Rearrange split windows
 ;;;###autoload

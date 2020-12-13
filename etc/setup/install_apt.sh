@@ -22,4 +22,6 @@ else
     if ! xargs apt install -y < "${current_dir}/packages/apt-packages"; then
         critical "Fail to install core apt packages !!!"
     fi
+
+    apt build-dep -y emacs
 fi

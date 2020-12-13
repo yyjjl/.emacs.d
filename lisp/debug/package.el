@@ -5,8 +5,10 @@
 
 (defvar-local ymacs-debug--buffer-read-only nil)
 (defvar-local ymacs-debug--dap-cookie nil)
-(defvar-local ymacs-debug--buffer-position nil)
+(defvar ymacs-debug--buffer-position nil)
+(defvar ymacs-debug--breakpoints (make-hash-table :test #'equal))
 
+;; In Emacs 28.1, restoring window configuration is a built-in feature
 (defvar ymacs-debug--window-configuration nil)
 (defvar ymacs-debug--buffers nil)
 (defvar ymacs-debug-info-mode-map

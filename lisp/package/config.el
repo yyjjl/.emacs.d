@@ -15,10 +15,7 @@
   (dolist (item package-archives)
     (setcdr item (replace-regexp-in-string "https:" "http:" (cdr item)))))
 
-(if ymacs-dump-p
-    (setq load-path ymacs-dump-load-path)
-  ;; add load-path’s and load autoload files
-  (package-initialize))
+(package-initialize)
 
 (require-packages! dash)
 (require 'dash)

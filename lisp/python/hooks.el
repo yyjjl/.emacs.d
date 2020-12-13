@@ -1,14 +1,15 @@
 ;;; -*- lexical-binding: t; -*-
 
-(after! flycheck
-  (define-advice flycheck-get-next-checker-for-buffer (:around (-fn -checker) fix)
-    "When using pyright language server, python-flake8 should also be activated."
-    (if (and (bound-and-true-p lsp-mode)
-             (eq ymacs-python-lsp-server 'pyright)
-             (derived-mode-p 'python-mode))
-        (when (eq -checker 'lsp)
-          'python-flake8)
-      (funcall -fn -checker))))
+(eval-when-has-feature! lsp
+  (after! flycheck
+    (define-advice flycheck-get-next-checker-for-buffer (:around (-fn -checker) fix)
+      "When using pyright language server, python-flake8 should also be activated."
+      (if (and (bound-and-true-p lsp-mode)
+               (eq ymacs-python-lsp-server 'pyright)
+               (derived-mode-p 'python-mode))
+          (when (eq -checker 'lsp)
+            'python-flake8)
+        (funcall -fn -checker)))))
 
 (after! cython-mode
   (define-hook! ymacs-cython|setup (cython-mode-hook)
@@ -39,9 +40,16 @@
 
     (when (and (buffer-enable-rich-feature-p)
                (eq major-mode 'python-mode))
-      (when (eq ymacs-python-lsp-server 'pyright)
-        (require 'lsp-pyright))
-      (ymacs-lsp//try-enable python)))
+
+      (eval-when-has-feature! lsp
+        (when (eq ymacs-python-lsp-server 'pyright)
+          (require 'lsp-pyright)))
+
+      (try-enable-lsp! python
+        :init
+        (progn
+          (setq ymacs-lsp-format-buffer-function #'ymacs-python/autopep8)
+          (setq ymacs-lsp-organize-import-function #'py-isort-buffer)))))
 
   (define-hook! ymacs-python|inferior-setup (inferior-python-mode-hook)
     (remove-hook 'comint-output-filter-functions

@@ -3,7 +3,8 @@
 (after! web-mode
   (define-key! :map web-mode-map
     ("M-e" . web-mode-element-next)
-    ("M-a" . web-mode-element-previous))
+    ("M-a" . web-mode-element-previous)
+    (("C-c C-b" "C-c b") . web-mode-buffer-indent))
 
   (setq web-mode-enable-auto-closing t) ;; Enable auto close tag in `web-mode'
   (setq web-mode-enable-auto-pairing t)

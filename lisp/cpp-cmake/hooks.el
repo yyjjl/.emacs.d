@@ -5,6 +5,6 @@
     (font-lock-mode 1)
     (cmake-font-lock-activate)
 
-    (ymacs-lsp//try-enable cmake
-      :fallback
-      (ymacs-company//add-backend 'company-cmake))))
+    (when (buffer-enable-rich-feature-p)
+      (try-enable-lsp! cmake
+        :fallback (ymacs-company//add-backend 'company-cmake)))))

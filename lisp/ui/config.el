@@ -7,7 +7,7 @@
 (setq show-paren-when-point-inside-paren t)
 (setq show-paren-when-point-in-periphery t)
 
-(setq uniquify-buffer-name-style 'post-forward-angle-brackets)
+(setq uniquify-buffer-name-style 'forward)
 (setq uniquify-after-kill-buffer-p t)
 (setq uniquify-ignore-buffers-re "^\\*")
 

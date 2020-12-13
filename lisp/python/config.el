@@ -1,17 +1,18 @@
 ;;; -*- lexical-binding: t; -*-
 
-(after! lsp-pyls
-  (setq lsp-pyls-configuration-sources ["flake8"])
-  (setq lsp-pyls-plugins-rope-completion-enabled nil)
+(eval-when-has-feature! lsp
+  (after! lsp-pyls
+    (setq lsp-pyls-configuration-sources ["flake8"])
+    (setq lsp-pyls-plugins-rope-completion-enabled nil)
 
-  (ymacs-lsp//set-simple-install-fn
-   'pyls
-   "pip3 install --user 'python-language-server[all]'"
-   "pip3 install --user -U 'python-language-server[all]'"))
+    (ymacs-lsp//set-simple-install-fn
+     'pyls
+     "pip3 install --user 'python-language-server[all]'"
+     "pip3 install --user -U 'python-language-server[all]'"))
 
-(after! lsp-pyright
-  (setq lsp-pyright-python-executable-cmd "python3")
-  (setq lsp-pyright-typechecking-mode "off"))
+  (after! lsp-pyright
+    (setq lsp-pyright-python-executable-cmd "python3")
+    (setq lsp-pyright-typechecking-mode "off")))
 
 (after! python
   (define-key! :map comint-mode-map
@@ -27,8 +28,8 @@
     ("C-c v" . ymacs-python/create-venv)
     ("C-c V" . ymacs-python/create-venv-in-workon-home)
     ("C-c C-z" . ymacs-python/pop-to-shell)
-    ("C-c C-b" . py-isort-buffer)
-    ("C-c b" . ymacs-python/autopep8)
+    ("C-c B" . py-isort-buffer)
+    (("C-c C-b" "C-c b") . ymacs-python/autopep8)
     ("C-c C-c" . ymacs-python/send-buffer)
     ("C-c M-d" . ymacs-python/generate-doc-at-point)
     ("C-c T" . ymacs-python/toggle-breakpoint)
