@@ -290,12 +290,12 @@ Example:
   (cond
    ((and (display-graphic-p) sys/macp)
     (mapc (lambda (path)
-            (shell-command (concat "open " (shell-quote-argument path))))
+            (shell-command (concat "open " (shell-quote-argument (file-truename path)))))
           -file-list))
    ((and (display-graphic-p) sys/linuxp)
     (mapc (lambda (path)
             (let ((process-connection-type nil))
-              (start-process "external-process" nil "xdg-open" path)))
+              (start-process "external-process" nil "xdg-open" (file-truename path))))
           -file-list))
    (t
     (user-error "Not supported yet"))))

@@ -67,14 +67,28 @@
   ("RET" nil "quit")
   ("q" nil "quit"))
 
-(defhydra ymacs-hydra/resize-window (:color pink)
-  "Window Size"
-  ("{" shrink-window-horizontally "-><-")
-  ("}" enlarge-window-horizontally "<-->")
-  ("^" enlarge-window "enlarge")
-  ("-" shrink-window "shrink")
-  ("RET" nil "quit")
-  ("q" nil "quit"))
+(pretty-hydra-define ymacs-hydra/window
+  (:title "Window Management" :foreign-keys warn :quit-key "q")
+  ("Resize"
+   (("{" shrink-window-horizontally "->| |<-")
+    ("}" enlarge-window-horizontally "<-| |->")
+    ("^" enlarge-window "enlarge")
+    ("v" shrink-window "shrink")
+    ("n" balance-windows "balance"))
+   "Split"
+   (("H" ymacs-window/split-horizontally "horizontally")
+    ("V" ymacs-window/split-vertically "vertically")
+    ("|" ymacs-window/force-split-horizontally "force horizontally ")
+    ("_" ymacs-window/force-split-vertically "force vertically ")
+    ("G" ymacs-window/split-window-to-grid " grid "))
+   "Zoom"
+   (("+" text-scale-increase "in")
+    ("=" text-scale-increase "in")
+    ("-" text-scale-decrease "out")
+    ("0" (text-scale-increase 0) "reset"))
+   "Appearance"
+   (("F" set-frame-font "font")
+    ("T" load-theme "theme"))))
 
 (defhydra ymacs-hydra/rectangle (:body-pre (rectangle-mark-mode 1)
                            :color pink

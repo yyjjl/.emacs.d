@@ -79,7 +79,6 @@
   ("3" . ymacs-window/split-horizontally)
   ("|" . ymacs-window/force-split-horizontally)
   ("_" . ymacs-window/force-split-vertically)
-  ("?" . ymacs-window/split-window-to-grid)
 
   (", a" . ymacs-tools/add-local-snippet)
   (", g" . ymacs-tools/search-in-chrome)

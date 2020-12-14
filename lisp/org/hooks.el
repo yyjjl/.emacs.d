@@ -1,5 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
+(after! ox
+  (advice-add #'org-export-dispatch :around #'without-user-record!!))
+
 (after! ob
   (add-hook 'org-babel-after-execute-hook #'org-redisplay-inline-images))
 
