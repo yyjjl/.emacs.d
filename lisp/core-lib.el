@@ -216,9 +216,6 @@ Optional argument -BODY is the function body."
                        (define-key! :map ,sym :prefix ,prefix
                          ,@(cdr definition)))
                     forms))
-          (when (stringp key)
-            (setq key (kbd (concat prefix " " key))))
-
           (when (listp definition)
             (if (not (keywordp (car definition)))
                 (progn
@@ -237,7 +234,13 @@ Optional argument -BODY is the function body."
                                (plist-get properties :map)
                                definition))
 
-          (push `(define-key ,sym ,key ,definition) forms))))
+          (dolist (k (if (listp key) key (list key)))
+            (push (list 'define-key sym
+                        (if (stringp k)
+                            (kbd (concat prefix " " k))
+                          k)
+                        definition)
+                  forms)))))
     `(let ((,sym ,map))
        ,@(reverse forms)
        ,sym)))

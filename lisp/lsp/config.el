@@ -32,10 +32,17 @@
           ("d" . dap-hydra)
           ("h" . lsp-document-highlight)
           ("l" . lsp-lens-mode)
-          ("o" . lsp-organize-imports)
           ("o" . lsp-workspace-folders-open)
           ("r" . lsp-workspace-restart)
           ("s" . lsp-workspace-shutdown)))
+
+  (defun ymacs-lsp/format-buffer ()
+    (interactive "*")
+    (call-interactively ymacs-lsp-format-buffer-function))
+
+  (defun ymacs-lsp/organize-imports ()
+    (interactive "*")
+    (call-interactively ymacs-lsp-organize-import-function))
 
   (define-key! :map lsp-mode-map
     ("M-s l" . lsp-lens-mode)
@@ -44,7 +51,8 @@
     ("C-c I" . lsp-ivy-workspace-symbol)
     ("C-c G" . lsp-ivy-global-workspace-symbol)
     ("C-c S" . lsp-describe-session)
-    ("C-c F" . lsp-format-buffer)
+    ("C-c B" . ymacs-lsp/organize-imports)
+    (("C-c b" "C-c C-b") . ymacs-lsp/format-buffer)
     ("C-c C-d" . lsp-describe-thing-at-point)
     ("C-c C-SPC" . lsp-execute-code-action)
     ("C-c l" :map lsp-command-map)

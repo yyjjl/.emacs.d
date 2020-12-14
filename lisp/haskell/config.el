@@ -17,10 +17,6 @@
     ("C-c C-b" . haskell-mode-stylish-buffer)
     ("C-c b" . haskell-mode-stylish-buffer)
 
-    (:has-feature lsp
-     ("C-c C-b" . lsp-format-buffer)
-     ("C-c b" . lsp-format-buffer))
-
     ("C-c Q" . haskell-session-kill)
     ("C-c R" . haskell-mode-generate-tags)
     ("C-c j" . haskell-navigate-imports)

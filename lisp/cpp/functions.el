@@ -24,7 +24,9 @@
       ;; NOTE: all checkers should be evaled
       (--some it (--map (funcall it) ymacs-cpp-lsp-checkers))
       :init
-      (setq-local lsp-eldoc-render-all nil)
+      (progn
+        (setq-local lsp-eldoc-render-all nil)
+        (setq ymacs-lsp-format-buffer-function #'clang-format-buffer))
       :fallback
       (progn
         (run-hooks 'ymacs-cpp-lsp-fallback-functions)

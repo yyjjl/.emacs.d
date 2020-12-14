@@ -3,7 +3,14 @@
 (eval-when-compile
   (require 'dash))
 
-(define-option! ymacs-term-type 'vterm)
+(define-option! ymacs-term-type
+  (eval-when-compile
+    (if (and (bound-and-true-p module-file-suffix) ; dynamic module
+             (executable-find "cmake")
+             (executable-find "libtool")
+             (executable-find "make"))
+        'vterm
+      'term)))
 
 (executable! zsh)
 (executable! bash)

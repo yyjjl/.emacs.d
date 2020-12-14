@@ -45,7 +45,11 @@
         (when (eq ymacs-python-lsp-server 'pyright)
           (require 'lsp-pyright)))
 
-      (try-enable-lsp! python)))
+      (try-enable-lsp! python
+        :init
+        (progn
+          (setq ymacs-lsp-format-buffer-function #'ymacs-python/autopep8)
+          (setq ymacs-lsp-organize-import-function #'py-isort-buffer)))))
 
   (define-hook! ymacs-python|inferior-setup (inferior-python-mode-hook)
     (remove-hook 'comint-output-filter-functions

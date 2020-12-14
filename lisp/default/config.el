@@ -128,5 +128,8 @@
 
 (setq next-error-find-buffer-function #'ymacs//next-error-find-buffer)
 
+(unless (or noninteractive (daemonp) (server-running-p))
+  (server-start))
+
 (put 'ymacs//external-file-handler 'safe-magic t)
 (put 'ymacs//external-file-handler 'operations '(insert-file-contents))

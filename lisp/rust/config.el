@@ -5,13 +5,8 @@
     ("C-c C-f")
     ([remap delete-char] . c-hungry-delete-forward)
     ([remap delete-backward-char] . c-hungry-delete-backwards)
-
     ("C-c b" . rust-format-buffer)
-    ("C-c C-b" . rust-format-buffer)
-
-    (:has-feature lsp
-     ("C-c b" lsp-format-buffer)
-     ("C-c C-b" lsp-format-buffer)))
+    ("C-c C-b" . rust-format-buffer))
 
   (require 'cc-mode))
 
