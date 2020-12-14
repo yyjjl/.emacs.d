@@ -14,6 +14,7 @@
 (autoload 'ymacs-hydra/window/shrink-window "hydra/commands" nil t)
 (autoload 'ymacs-hydra/window/shrink-window-horizontally "hydra/commands" nil t)
 (autoload 'ymacs-hydra/sort/body "hydra/commands" nil t)
+(autoload 'ymacs-hydra/games/body "hydra/commands" nil t)
 
 (define-key!
   ("C-x {" . ymacs-hydra/window/shrink-window-horizontally)
@@ -21,6 +22,7 @@
   ("C-x ^" . ymacs-hydra/window/enlarge-window)
   ("C-x -" . ymacs-hydra/window/shrink-window)
   ("C-x ?" . ymacs-hydra/window/body)
+  ("C-x , z" . ymacs-hydra/games/body)
 
   ([M-f11] . scroll-other-window-down)
   ([M-f12] . scroll-other-window)
