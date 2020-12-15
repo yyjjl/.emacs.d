@@ -26,9 +26,7 @@
 ;; (load-feature! racket)
 (load-feature! perl)
 
-;; (load-feature! play)
 ;; (load-feature! emms)
-
 ;; (load-feature! desktop)
 ;; (load-feature! completion-ivy-window)
 ;; (load-feature! lsp-ui)

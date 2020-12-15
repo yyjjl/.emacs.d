@@ -14,4 +14,7 @@
 
   (when (and (buffer-enable-rich-feature-p)
              (not (string-suffix-p ".json" (downcase buffer-file-name))))
-    (try-enable-lsp! web)))
+    (try-enable-lsp! web))
+
+  (setq-local electric-layout-rules
+              (delq (assoc ?\; electric-layout-rules) electric-layout-rules)))
