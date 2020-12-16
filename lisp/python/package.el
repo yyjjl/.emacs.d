@@ -11,7 +11,7 @@
 (executable! pylint)
 
 (eval-when-has-feature! lsp
-  (define-option! ymacs-python-lsp-server 'pyright)
+  (define-option! ymacs-python-lsp-server 'pyls)
 
   (require-packages! lsp-pyright)
 
