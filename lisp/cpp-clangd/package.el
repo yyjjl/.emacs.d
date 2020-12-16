@@ -18,6 +18,3 @@
              #'ymacs-cpp-clangd//buffer-compile-command)
 (add-to-list 'ymacs-cpp-lsp-checkers
              (lambda () (file-exists-p (ymacs-cpp-clangd//dot-clangd-path))))
-
-(setq ymacs-cpp-expand-macro-function
-      (lambda () (ymacs-cpp-clangd//buffer-compile-command t)))

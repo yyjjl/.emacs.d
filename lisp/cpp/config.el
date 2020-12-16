@@ -25,7 +25,6 @@
       (">")
       ("C-c C-d")
       (("C-c C-b" "C-C b") . clang-format-buffer)
-      ("C-c C-e" . ymacs-cpp/macro-expand)
       ("C-c C-l" . ymacs-cpp/load-in-repl)
       ([f10] . ymacs-cpp/compile)
       ([f5] . ymacs-cpp/debug-current-file)))

@@ -9,7 +9,6 @@
 
 (defvar ymacs-cpp-buffer-command-functions ())
 
-(defvar ymacs-cpp-expand-macro-function nil)
 (defvar ymacs-cpp-environment-function nil)
 (defvar ymacs-cpp-build-dir-function nil)
 

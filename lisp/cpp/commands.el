@@ -98,14 +98,6 @@
     (call-interactively 'self-insert-command)))
 
 ;;;###autoload
-(defun ymacs-cpp/macro-expand ()
-  (interactive)
-  (when ymacs-cpp-expand-macro-function
-    (setq-local c-macro-preprocessor
-                (funcall ymacs-cpp-expand-macro-function)))
-  (call-interactively 'c-macro-expand))
-
-;;;###autoload
 (defun ymacs-cpp/get-include-paths ()
   (interactive)
   (message "%s"

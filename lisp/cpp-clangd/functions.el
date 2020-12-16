@@ -9,9 +9,10 @@
     (nreverse args)))
 
 (defsubst ymacs-cpp-clangd//dot-clangd-path (&optional -directory)
-  (->> (or -directory default-directory)
-       (locate-dominating-file "compile_flags.txt")
-       (expand-file-name "compile_flags.txt")))
+  (cl-loop for name in '("compile_flags.txt" ".clangd")
+           for dir = (locate-dominating-file name (or -directory default-directory))
+           when dir
+           return (expand-file-name name dir)))
 
 (defun ymacs-cpp-clangd//buffer-compile-command (&optional -preprocess-only-p)
   (cl-assert (buffer-file-name) nil "non-file buffer")
@@ -26,7 +27,9 @@
              (ymacs-cpp-clangd//filter-arguments
               (split-string
                (cl-loop for opt across cdb
-                        when (equal (file-truename (gethash "file" opt)) (buffer-file-name))
+                        for entry-file = (file-name-sans-extension (or (file-truename (gethash "file" opt)) ""))
+                        for buffer-file = (file-name-sans-extension (or (buffer-file-name) ""))
+                        when (equal entry-file buffer-file)
                         return (gethash "command" opt))))
              " "))
 
