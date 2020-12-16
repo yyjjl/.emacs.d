@@ -5,7 +5,7 @@
 
 (defvar-local ymacs-debug--buffer-read-only nil)
 (defvar-local ymacs-debug--dap-cookie nil)
-(defvar-local ymacs-debug--buffer-position nil)
+(defvar ymacs-debug--buffer-position nil)
 
 (defvar ymacs-debug--window-configuration nil)
 (defvar ymacs-debug--buffers nil)

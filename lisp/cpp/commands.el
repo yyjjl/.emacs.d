@@ -38,24 +38,25 @@
 ;;;###autoload
 (defun ymacs-cpp/debug-current-file (&optional -new-session)
   (interactive "P")
-  (let* ((build-dir (ymacs-cpp//build-dir))
-         (default-directory
-           (or (and -new-session
-                    (expand-file-name
-                     (read-directory-name
-                      "Directory: "
-                      (file-name-as-directory
-                       (or build-dir default-directory))
-                      nil
-                      :must-match)))
-               build-dir
-               default-directory))
-         (gud-chdir-before-run nil))
-    (unwind-protect
-        (progn
-          (lv-message "Current directory: %s" default-directory)
-          (call-interactively #'gdb))
-      (lv-delete-window))))
+  (unless (ymacs-debug//resuse-session)
+    (let* ((build-dir (ymacs-cpp//build-dir))
+           (default-directory
+             (or (and -new-session
+                      (expand-file-name
+                       (read-directory-name
+                        "Directory: "
+                        (file-name-as-directory
+                         (or build-dir default-directory))
+                        nil
+                        :must-match)))
+                 build-dir
+                 default-directory))
+           (gud-chdir-before-run nil))
+      (unwind-protect
+          (progn
+            (lv-message "Current directory: %s" default-directory)
+            (call-interactively #'gdb))
+        (lv-delete-window)))))
 
 ;;;###autoload
 (defun ymacs-cpp/compile (-no-prompt-p)

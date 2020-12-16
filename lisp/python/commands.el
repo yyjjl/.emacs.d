@@ -46,16 +46,17 @@ If not try to complete."
 ;;;###autoload
 (defun ymacs-python/debug-current-file (&optional new-session)
   (interactive "P")
-  (let ((default-directory
-          (or (and current-prefix-arg
-                   (read-directory-name "Directory: " nil nil :must-match))
-              default-directory))
-        (gud-chdir-before-run nil))
-    (unwind-protect
-        (progn
-          (lv-message "Current directory: %s" default-directory)
-          (call-interactively #'pdb))
-      (lv-delete-window))))
+  (unless (ymacs-debug//resuse-session)
+    (let ((default-directory
+            (or (and current-prefix-arg
+                     (read-directory-name "Directory: " nil nil :must-match))
+                default-directory))
+          (gud-chdir-before-run nil))
+      (unwind-protect
+          (progn
+            (lv-message "Current directory: %s" default-directory)
+            (call-interactively #'pdb))
+        (lv-delete-window)))))
 
 ;;;###autoload
 (defun ymacs-python/toggle-pdbtrack ()
