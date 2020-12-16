@@ -36,6 +36,7 @@
              (cons
               (list
                (lambda (-buffer _alist)
+                 (print -buffer)
                  (buffer-local-value 'gud-minor-mode (get-buffer -buffer)))
                ;; remove 'inhibit-same-window from alist
                (lambda (-buffer -alist)
@@ -43,9 +44,11 @@
                  (or (display-buffer-use-some-window -buffer -alist)
                      (display-buffer-pop-up-window -buffer -alist))))
               display-buffer-alist)))
-        (apply -fn -args)))
+        (apply -fn -args)
+        ;; make sure the position is visible
+        (redisplay t))
 
-    (setq ymacs-debug--buffer-position -args)
+      (setq ymacs-debug--buffer-position -args))
 
     (ymacs-debug//show-help
      (concat ymacs-debug--help-format

@@ -1,7 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 (defun ymacs-debug//resuse-session ()
-  (when (and (buffer-live-p gud-comint-buffer)
+  (when (and (buffer-live-p (bound-and-true-p gud-comint-buffer))
              (buffer-file-name))
     (gud-find-file (buffer-file-name))
     (message "Reuse gud session")))
