@@ -17,6 +17,7 @@
   (rx string-start
       "*"
       (or "Compile-Log"
+          "trace-output"
           (and "poporg: " (*? not-newline))
           "sdcv"
           "lispy-message"
@@ -48,7 +49,6 @@
     eshell-mode
     comint-mode
     vterm-mode
-    gdb-parent-mode
     haskell-interactive-mode))
 
 (defvar ymacs-popup-help-modes
@@ -76,16 +76,12 @@
     (:macth-fn ymacs-popup//term-buffer-p
      :side below
      :select t
-     :noselect (gdb-inferior-io-mode)
      :terminal t)
     (:name-regexp ,ymacs-popup-other-window-regexp
      :select t
      :autoclose t)
     (:mode occur-mode
      :select t)
-    (:name-regexp (rx string-start "*gud" (*? not-newline) "*" string-end)
-     :side left
-     :size 60)
     (:name "*Flycheck error messages*"
      :side below
      :select nil

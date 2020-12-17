@@ -174,9 +174,7 @@ Displays -BUFFER according to -ALIST and -RULE."
       (when (plist-get rule :autoclose)
         (ymacs-popup//push-window window -buffer t))
 
-      (when (and (plist-get rule :select)
-                 (not (memq (buffer-local-value 'major-mode -buffer)
-                            (plist-get rule :noselect))))
+      (when (plist-get rule :select)
         (select-window window)))
     window))
 

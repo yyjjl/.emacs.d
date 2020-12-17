@@ -5,25 +5,42 @@
   (and (yes-or-no-p "Quit debug session?")
        (gud-call "quit")))
 
+(defun ymacs-term/toggle-window@hack ()
+  (interactive)
+  (if-let ((buffer (gdb-get-buffer-create 'gdb-inferior-io))
+           (window (get-buffer-window buffer)))
+      (if (eq window (selected-window))
+          (delete-window window)
+        (select-window window))
+    (display-buffer buffer)))
+
 (defun gud-debug@restore (-fn &rest -args)
   (ymacs-debug//show-help nil)
   (lv-delete-window)
   (setq ymacs-debug--window-configuration (current-window-configuration))
+
   (delete-other-windows)
+
+  (add-to-list 'display-buffer-alist
+               '(ymacs-debug//gud-source-buffer-p ymacs-debug//display-buffer))
+  (advice-add #'ymacs-term/toggle-window :override #'ymacs-term/toggle-window@hack)
+
   (apply -fn -args)
+
   (when (buffer-live-p gud-comint-buffer)
     (with-current-buffer gud-comint-buffer
+      (when (ymacs-debug//gdb-running-p)
+        (display-buffer (gdb-get-buffer-create 'gdb-inferior-io))
+        (display-buffer (gdb-get-buffer-create 'gdb-locals-buffer)))
       ;; make print command works
       (setq-local comint-prompt-read-only nil)
       (when (not (ymacs-debug//gdb-running-p))
         (local-unset-key [remap comint-delchar-or-maybe-eof]))
 
-      (ymacs-debug-command-buffer-mode 1))
+      (ymacs-debug-command-buffer-mode 1)
 
-    (when-let (window (get-buffer-window gud-comint-buffer))
-      (when (window-live-p window)
-        (set-window-parameter window 'no-delete-other-windows t)
-        (set-window-dedicated-p window t)))))
+      (when-let (window (get-buffer-window))
+        (select-window window 'norecord)))))
 
 (after! gud
   (setq gud-find-expr-function #'ymacs-debug//find-expr)
@@ -32,21 +49,9 @@
 
   (define-advice gud-display-line (:around (-fn &rest -args) save-position)
     (unless (equal -args ymacs-debug--buffer-position)
-      (let ((display-buffer-alist
-             (cons
-              (list
-               (lambda (-buffer _alist)
-                 (print -buffer)
-                 (buffer-local-value 'gud-minor-mode (get-buffer -buffer)))
-               ;; remove 'inhibit-same-window from alist
-               (lambda (-buffer -alist)
-                 (setf (alist-get 'inhibit-same-window -alist) nil)
-                 (or (display-buffer-use-some-window -buffer -alist)
-                     (display-buffer-pop-up-window -buffer -alist))))
-              display-buffer-alist)))
-        (apply -fn -args)
-        ;; make sure the position is visible
-        (redisplay t))
+      (apply -fn -args)
+      ;; make sure the position is visible
+      (redisplay t)
 
       (setq ymacs-debug--buffer-position -args))
 
@@ -56,6 +61,10 @@
                (concat "\n" ymacs-debug--gdb-help-format)))))
 
   (define-advice gud-sentinel (:after (-proc _) cleanup)
+    (advice-remove #'ymacs-term/toggle-window #'ymacs-term/toggle-window@hack)
+    (setq display-buffer-alist
+          (assq-delete-all 'ymacs-debug//gud-source-buffer-p display-buffer-alist))
+
     (when (memq (process-status -proc) '(exit signal))
       (dolist (buffer ymacs-debug--buffers)
         (when (buffer-live-p buffer)
