@@ -20,5 +20,3 @@
   "\\.html?\\'" "\\.xul?\\'" "\\.eex?\\'")
 
 (setq auto-mode-alist (cl-subst 'web-mode 'js-jsx-mode auto-mode-alist))
-
-(provide 'init-web)

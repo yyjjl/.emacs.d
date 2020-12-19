@@ -1,3 +1,5 @@
+all: config dump
+
 config:
 	emacs --batch -l ~/.emacs.d/etc/setup.el
 

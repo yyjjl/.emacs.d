@@ -20,7 +20,7 @@
   (when (file-exists-p early-init-file)
     (load early-init-file nil t))
 
-  (setq package-quickstart-file (expand-file-name "var/quickstart.el" user-emacs-directory))
+  (setq package-quickstart-file (expand-file-name ".cache/quickstart.el" user-emacs-directory))
   (when (file-exists-p package-quickstart-file)
     (delete-file package-quickstart-file))
 

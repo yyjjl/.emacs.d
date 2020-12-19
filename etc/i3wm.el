@@ -8,7 +8,7 @@
 (add-to-list 'load-path ymacs-config-directory)
 
 (load (expand-file-name "i3wm/i3wm-lib" ymacs-etc-direcotry))
-(load (expand-file-name "i3wm/i3wm-init" ymacs-etc-direcotry))
+(load (expandl-file-name "i3wm/i3wm-init" ymacs-etc-direcotry))
 (load (expand-file-name "i3wm/i3wm-doc" ymacs-etc-direcotry))
 
 (setq-default default-frame-alist

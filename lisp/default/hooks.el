@@ -83,7 +83,7 @@
         (when buffer-file-name
           (hack-dir-local-variables-non-file-buffer))))))
 
-(define-hook! ymacs|after-init-hook (after-init-hook)
+(define-hook! ymacs|after-init (after-init-hook)
   ;; global-modes
   (global-subword-mode 1)
   (global-auto-revert-mode 1)
