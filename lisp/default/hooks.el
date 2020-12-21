@@ -10,7 +10,7 @@
 ;; Turns on `auto-fill-mode', don't use `text-mode-hook'
 (add-hook 'change-log-mode-hook 'turn-on-auto-fill)
 
-(define-hook! ymacs|create-missing-directories-h (find-file-not-found-functions)
+(define-hook! ymacs|create-missing-directories (find-file-not-found-functions)
   "Automatically create missing directories when creating new files."
   (unless (file-remote-p (buffer-file-name))
     (let ((parent-directory (file-name-directory (buffer-file-name))))

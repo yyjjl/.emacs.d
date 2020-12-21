@@ -1,15 +1,19 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd)"
 
 . "${CURRENT_DIR}/utils.sh"
 
-EMACS_VERSION=27.1
+if [ -z "$1" ]; then
+    emacs_VERSION=27.1
+else
+    emacs_VERSION="$1"
+fi
+
 READLINE_VERSION=6.3
 NCURSES_VERSION=6.1
-PROGRAM_DIR=${HOME}/program
-
 INSTALL_PREFIX=${HOME}/.local
+PROGRAM_DIR=${HOME}/program
 
 mkdir -p "${PROGRAM_DIR}/" && cd "${PROGRAM_DIR}/" || exit 1
 
@@ -47,6 +51,15 @@ compile_gnu_source() {
     fi
 }
 
-compile_gnu_source emacs ${EMACS_VERSION} tar.xz \
-                       --prefix="${INSTALL_PREFIX}" \
-                       --with-all --with-x --with-pop --with-modules --with-gconf
+
+compile_gnu_source ncurses ${NCURSES_VERSION} tar.gz \
+                   --prefix="${INSTALL_PREFIX}"
+compile_gnu_source readline ${READLINE_VERSION} tar.gz \
+                   --prefix="${INSTALL_PREFIX}"
+
+export LDFLAGS="-L${INSTALL_PREFIX}/lib"
+compile_gnu_source emacs ${emacs_VERSION} tar.xz \
+                   --prefix="${INSTALL_PREFIX}" \
+                   --without-x --with-xpm=no --with-jpeg=no \
+                   --with-png=no --with-gif=no --with-tiff=no \
+                   --with-gnutls=no
