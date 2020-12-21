@@ -115,5 +115,17 @@
           "\n  "))
 (message "PreLoaded %d packages" (length features))
 
+(when (ignore-errors (native-comp-available-p))
+  (let ((time (current-time))
+        (total-count (length comp-files-queue))
+        new-count)
+    (while comp-files-queue
+      (sleep-for 2)
+      (let ((rest-count (length comp-files-queue)))
+        (message "estimated %.2fs (%d remaining)"
+                 (* rest-count (/ (float-time (time-since time))
+                                  (max (- total-count rest-count) 1)))
+                 rest-count)))))
+
 ;; dump image
 (dump-emacs-portable (expand-cache! "emacs.pdmp"))

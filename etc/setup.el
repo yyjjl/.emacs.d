@@ -2,6 +2,8 @@
 
 (require 'cl-lib)
 
+(setq comp-deferred-compilation nil)
+
 (defvar ymacs-setup-directory
   (expand-file-name "emacs" (file-name-directory load-file-name)))
 
@@ -43,9 +45,5 @@
     (delete-file ymacs-autoloads-file))
 
   (ymacs-package|after-init)
-
-  (if (getenv "NATIVE_COMPILE_ELPA")
-      (ymacs-package/native-compile-elpa-packages)
-
-    (ymacs-package/compile-config)
-    (ymacs-package/compile-elpa-packages :no-message)))
+  (ymacs-package/compile-config)
+  (ymacs-package/compile-elpa-packages :no-message))

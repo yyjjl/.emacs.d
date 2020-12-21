@@ -42,46 +42,6 @@
     (byte-recompile-directory package-user-dir nil t)))
 
 ;;;###autoload
-(defun ymacs-package/native-compile-elpa-packages (&optional -no-message)
-  (interactive)
-
-  (when (ignore-errors (native-comp-available-p))
-    (let* ((files
-            (cl-loop
-             for path in (list package-user-dir ymacs-private-directory)
-             append
-             (seq-filter
-              (lambda (file)
-                (not
-                 (string-match-p
-                  (rx "-" (or "pkg" "autoloads" "theme" ".dir-locals") "el" string-end)
-                  file)))
-              (directory-files-recursively path comp-valid-source-re)))))
-      (dolist-with-progress-reporter (file files) "Native compiling ..."
-        (let* ((out-filename (comp-el-to-eln-filename file))
-               (out-dir (file-name-directory out-filename)))
-
-          (unless (file-exists-p out-dir)
-            (make-directory out-dir t))
-
-          (unless (file-exists-p out-filename)
-            (if (file-writable-p out-filename)
-                (progn
-                  (condition-case err
-                      (progn
-                        (message "Native compiling %s" file)
-                        (let ((inhibit-message -no-message))
-                          (native-compile file 'late))
-                        (garbage-collect))
-                    (error
-                     (message "Error: %s" (error-message-string err))))
-                  (when-let (memory (ymacs//show-process-memory))
-                    (message "Info: use %s%% RAM" memory)
-                    (when (> memory 70)
-                      (user-error "error: use too much RAM, please restart"))))
-              (message "No write access for %s skipping." out-filename))))))))
-
-;;;###autoload
 (defun ymacs-package/compile-config (&optional -no-message)
   (interactive "P")
   (dolist-with-progress-reporter
