@@ -113,6 +113,9 @@
   (setq org-agenda-include-diary t)
   (setq org-agenda-window-setup 'current-window)
 
+  (setq org-image-actual-width nil)
+  (setq org-imenu-depth 8)
+
   (setq org-export-with-sub-superscripts t)
 
   (setq org-adapt-indentation nil)
@@ -124,8 +127,8 @@
   (setq org-startup-indented nil)
   (setq org-startup-folded nil)
 
-  (setq org-fontify-quote-and-verse-blocks nil)
-  (setq org-fontify-whole-heading-line nil)
+  (setq org-fontify-quote-and-verse-blocks t)
+  (setq org-fontify-whole-heading-line t)
   (setq org-fontify-whole-block-delimiter-line t)
 
   (setq org-pretty-entities t)
@@ -134,7 +137,7 @@
   (setq org-src-fontify-natively t)
   (setq org-highlight-latex-and-related nil)
   (setq org-preview-latex-default-process 'imagemagick)
-  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.6))
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
 
   (setcdr (assoc "dot" org-src-lang-modes) 'graphviz-dot)
   (setcdr (assoc 'file org-link-frame-setup) 'find-file)
@@ -152,7 +155,6 @@
         '((sequence "TODO(t)" "STARTED(s)" "|" "DONE(d!/!)")
           (sequence "WAITING(w@/!)" "SOMEDAY(S)"
                     "PROJECT(P@)" "|" "CANCELLED(c@/!)")))
-  (setq org-imenu-depth 9)
 
   (setq org-capture-templates
         `(("t" "Main task" entry
@@ -171,24 +173,14 @@
 (after! ox-html
   (setq org-html-head
         (eval-when-compile
-          (cl-loop
-           for (file type) in
-           `(("readtheorg/css/htmlize.css" "style")
-             (,(expand-etc! "org-manual.css") "style")
-             ("lib/js/jquery.min.js" "script")
-             ("lib/js/bootstrap.min.js" "script")
-             ("lib/js/jquery.stickytableheaders.min.js" "script")
-             ("readtheorg/js/readtheorg.js" "script"))
-           for directory = (expand-file-name "org-html-themes/styles" ymacs-private-directory)
-           for content = (read-file-content! (expand-file-name file directory))
-           concat
-           (if (string= type "style")
-               (concat "<style type=\"text/css\">\n/*<![CDATA[*/\n"
-                       content
-                       "\n/*]]>*/\n</style>")
-             (concat "<script type=\"text/javascript\">"
-                     content
-                     "</script>")))))
+          (concat "<style type=\"text/css\">\n/*<![CDATA[*/\n"
+                  (with-demoted-errors "Error %s"
+                    (with-temp-buffer
+                      (erase-buffer)
+                      (url-insert-file-contents "https://gongzhitaao.org/orgcss/org.css")
+                      (buffer-string)))
+                  (read-file-content! (expand-etc! "org-common.css"))
+                  "\n/*]]>*/\n</style>")))
   (setq org-html-mathjax-template
         (eval-when-compile
           (read-file-content!

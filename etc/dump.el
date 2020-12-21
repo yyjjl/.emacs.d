@@ -117,7 +117,7 @@
 
 (when (ignore-errors (native-comp-available-p))
   (let ((time (current-time))
-        (total-count (length comp-files-queue))
+        (total-count (length comp-files-lqueue))
         new-count)
     (while comp-files-queue
       (sleep-for 2)
@@ -128,4 +128,5 @@
                  rest-count)))))
 
 ;; dump image
-(dump-emacs-portable (expand-cache! "emacs.pdmp"))
+(when noninteractive
+  (dump-emacs-portable (expand-cache! "emacs.pdmp")))
