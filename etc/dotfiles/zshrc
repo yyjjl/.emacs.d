@@ -16,7 +16,7 @@ if [ ! -f "$ANTIGEN" ]; then
     trap "rm -f $TMPFILE" EXIT
 
     if [ -x "$(which curl)" ]; then
-        proxychains curl -L "$URL" -o "$TMPFILE"
+        curl -L "$URL" -o "$TMPFILE"
     elif [ -x "$(which wget)" ]; then
         wget "$URL" -O "$TMPFILE"
     else
