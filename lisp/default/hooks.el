@@ -103,6 +103,9 @@
   ;; Auto save to files
   ;; (auto-save-visited-mode 1)
 
+  (line-number-mode -1)
+  (column-number-mode -1)
+
   ;; Restore `file-name-handler-alist'
   (setq file-name-handler-alist ymacs-file-name-handler-alist)
   (setq gc-cons-threshold ymacs-gc-cons-threshold)

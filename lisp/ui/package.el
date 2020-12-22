@@ -16,6 +16,9 @@
 (defvar ymacs-ui-view-code-modes
   '((t display-line-numbers-mode
        view-mode
+       line-number-mode
+       column-number-mode
+       size-indication-mode
        highlight-indent-guides-mode)))
 
 (define-key!

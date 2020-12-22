@@ -208,8 +208,7 @@ Optional argument -BODY is the function body."
     (dolist (arg -args)
       (let ((key (car arg))
             (definition (cdr arg))
-            properties
-            form)
+            properties)
         (if (eq key :has-feature)
             (progn
               (push `(eval-when-has-feature! ,(car definition)
@@ -507,6 +506,11 @@ HTML file converted from org file, it returns t."
           (intern (format "ymacs-%s-%s" -name (car option)))
           (cdr option))))
 
+(defun load-feature//file-to-form (-path)
+  (let ((full-path (concat (expand-file-name -path) ".el")))
+    (when (file-exists-p full-path)
+      `((load ,(expand-file-name -path) nil t)))))
+
 (defmacro load-feature! (-name &rest -options)
   (let ((feature-name (symbol-name -name))
         directory
@@ -517,15 +521,11 @@ HTML file converted from org file, it returns t."
     (unless (file-directory-p directory)
       (user-error "no feature %s" -name))
 
-    (setq forms
-          (cl-delete
-           nil
-           (mapcar
-            (lambda (path)
-              (let ((full-path (expand-file-name path directory)))
-                (when (file-exists-p (concat full-path ".el"))
-                  `(load ,full-path nil t))))
-            '("package" "functions" "hooks" "config"))))
+    (let ((default-directory directory))
+      (setq forms
+            (apply #'append
+                   (mapcar #'load-feature//file-to-form
+                           '("package" "functions" "hooks" "config")))))
 
     (unless forms
       (user-error "empty feature %s" -name))

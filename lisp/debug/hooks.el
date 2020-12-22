@@ -1,5 +1,23 @@
 ;;; -*- lexical-binding: t; -*-
 
+(defun ymacs-debug/load-breakpoints ()
+  (interactive)
+  (let ((file (expand-cache! ".gdb-breakpoints")))
+    (when (and (buffer-live-p gud-comint-buffer)
+               (eq (buffer-local-value 'gud-minor-mode gud-comint-buffer)
+                   'gdbmi)
+               (file-readable-p file))
+      (without-user-record!
+       (unwind-protect
+           (when-let (buffer (find-file-noselect file))
+             (fit-window-to-buffer
+              (display-buffer-in-side-window buffer '((side . left))))
+             (when (yes-or-no-p "Load breakpoints ?")
+               (with-current-buffer gud-comint-buffer
+                 (gud-call (format "source %s" file)))))
+         (when-let (buffer (get-file-buffer file))
+           (kill-buffer buffer)))))))
+
 (defun ymacs-debug/quit ()
   (interactive)
   (and (yes-or-no-p "Quit debug session?")
@@ -66,11 +84,20 @@
           (assq-delete-all 'ymacs-debug//gud-source-buffer-p display-buffer-alist))
 
     (when (memq (process-status -proc) '(exit signal))
+      (when (ymacs-debug//gdb-running-p)
+        ;; cleanup
+        (setq gdb-source-file-list nil)
+
+        (puthash (buffer-name (process-buffer -proc))
+                 gdb-breakpoints-list
+                 ymacs-debug--breakpoints))
+
       (dolist (buffer ymacs-debug--buffers)
         (when (buffer-live-p buffer)
           (with-current-buffer buffer
             (ymacs-debug-running-session-mode -1)
             (ymacs-debug-info-buffer-mode -1))))
+
       (setq ymacs-debug--buffers nil)
       ;; restore windows
       (when (window-configuration-p ymacs-debug--window-configuration)
@@ -93,4 +120,11 @@
   (advice-add #'gud-gdb :around #'gud-debug@restore))
 
 (after! gdb-mi
-  (advice-add #'gdb :around #'gud-debug@restore))
+  (advice-add #'gdb :around #'gud-debug@restore)
+
+  (define-advice gud-break (:after (&rest _args) save)
+    (when (and (buffer-live-p gud-comint-buffer)
+               (eq (buffer-local-value 'gud-minor-mode gud-comint-buffer)
+                   'gdbmi))
+      (with-current-buffer gud-comint-buffer
+        (gud-call (format "save breakpoints %s" (expand-cache! ".gdb-breakpoints")))))))

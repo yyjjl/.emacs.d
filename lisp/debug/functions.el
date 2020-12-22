@@ -116,9 +116,13 @@
                 (face-remap-add-relative 'header-line 'doom-modeline-debug-visual)))
         (setq buffer-read-only t)
 
-        (display-line-numbers-mode 1))
+        (display-line-numbers-mode 1)
+        (line-number-mode 1)
+        (column-number-mode 1))
 
     (display-line-numbers-mode -1)
+    (line-number-mode -1)
+    (column-number-mode -1)
     (when buffer-read-only
       (setq buffer-read-only ymacs-debug--buffer-read-only))
     (setq ymacs-debug--buffer-read-only nil)
