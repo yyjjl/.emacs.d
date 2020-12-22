@@ -20,7 +20,7 @@
 
   (setq early-init-file (expand-file-name "early-init.el" user-emacs-directory))
   (when (file-exists-p early-init-file)
-    (load early-init-file nil t))
+    (load early-init-file))
 
   (setq package-quickstart-file (expand-file-name ".cache/quickstart.el" user-emacs-directory))
   (when (file-exists-p package-quickstart-file)
@@ -32,7 +32,7 @@
         (format "Remove *.elc in %s ..." (abbreviate-file-name ymacs-config-directory))
       (delete-file elc-file)))
 
-  (load (expand-file-name "init.el" user-emacs-directory) nil :no-message t)
+  (load (expand-file-name "init.el" user-emacs-directory))
 
   ;; Disable some features when load emacs
   (setq-default prog-mode-hook nil)

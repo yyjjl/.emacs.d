@@ -48,20 +48,13 @@
       (file (cl-remove-duplicates
              (append
               (directory-files-recursively ymacs-private-directory "\\.el$")
-              (cl-loop
-               for file in  (directory-files ymacs-config-directory)
-               when (and (not (file-directory-p file))
-                         (string-suffix-p ".el" file))
-               collect file)
+              (directory-files ymacs-config-directory t "\\.el$")
+              (directory-files user-emacs-directory t "\\.el$")
               (cl-loop
                for feature in ymacs--loaded-features
                append (directory-files-recursively
                        (expand-file-name (symbol-name feature) ymacs-config-directory)
-                       "\\.el$"))
-              (list user-init-file
-                    early-init-file
-                    (expand-file-name "features.el" user-emacs-directory)
-                    (expand-file-name "custom.el" user-emacs-directory)))))
+                       "\\.el$")))))
       "Compiling configuration files ..."
     (when file
       (condition-case err
