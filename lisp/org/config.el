@@ -113,7 +113,7 @@
   (setq org-agenda-include-diary t)
   (setq org-agenda-window-setup 'current-window)
 
-  (setq org-image-actual-width nil)
+  (setq org-image-actual-width t)
   (setq org-imenu-depth 8)
 
   (setq org-export-with-sub-superscripts t)
@@ -171,6 +171,13 @@
            "   - [ ] %^{Task} %?"))))
 
 (after! ox-html
+  (setq org-html-style-default
+        (eval-when-compile
+          (when (string-match
+                 (rx ".org-svg" (+ (not "{")) (+ (not digit)) (group (+ digit) "%"))
+                 org-html-style-default)
+            (replace-match "auto" nil nil org-html-style-default 1))))
+
   (setq org-html-head
         (eval-when-compile
           (concat "<style type=\"text/css\">\n/*<![CDATA[*/\n"
@@ -258,40 +265,43 @@
      ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
 
 (after! ox-publish
-  (setq org-publish-project-alist
-        `(("note-pdf"
-           :base-directory ,ymacs-org-project-src-dir
-           :base-extension "org"
-           :publishing-directory ,ymacs-org-project-dst-dir
-           :recursive t
-           :publishing-function org-latex-publish-to-pdf
-           :headline-levels 4           ; Just the default for this project.
-           :auto-preamble nil
-           :section-numbers t
-           :table-of-contents t
-           :with-sub-superscript nil
-           :auto-sitemap t
-           :sitemap-filename "index.org")
-          ("note-html"                  ; These are the main web files
-           :html-link-home "../index.html"
-           :base-directory ,ymacs-org-project-src-dir
-           :base-extension "org"
-           :publishing-directory ,ymacs-org-project-dst-dir
-           :recursive t
-           :publishing-function org-html-publish-to-html
-           :headline-levels 4           ; Just the default for this project.
-           :auto-preamble nil
-           :section-numbers t
-           :table-of-contents t
-           :with-sub-superscript nil
-           :auto-sitemap t
-           :sitemap-filename "index.org")
-          ("note-static"            ; These are static files (images, pdf, etc)
-           :base-directory ,ymacs-org-project-src-dir
-           :base-extension
-           "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|svg\\|mp3\\|ogg\\|swf\\|txt\\|asc\\|json"
-           :publishing-directory ,ymacs-org-project-dst-dir
-           :recursive t
-           :publishing-function org-publish-attachment
-           :exclude "auto/cache/org-ltximg.*\\.png")
-          ("note" :components ("note-pdf" "note-static")))))
+  (setq
+   org-publish-project-alist
+   `(("note-pdf"
+      :base-directory ,ymacs-org-project-src-dir
+      :base-extension "org"
+      :publishing-directory ,ymacs-org-project-dst-dir
+      :recursive t
+      :publishing-function org-latex-publish-to-pdf
+      :headline-levels 4                ; Just the default for this project.
+      :auto-preamble nil
+      :section-numbers t
+      :table-of-contents t
+      :with-sub-superscript nil
+      :auto-sitemap nil
+      :sitemap-filename "index.org")
+     ("note-html"                       ; These are the main web files
+      :html-link-home "../index.html"
+      :base-directory ,ymacs-org-project-src-dir
+      :base-extension "org"
+      :publishing-directory ,ymacs-org-project-dst-dir
+      :recursive t
+      :publishing-function org-html-publish-to-html
+      :headline-levels 4                ; Just the default for this project.
+      :auto-preamble nil
+      :section-numbers t
+      :table-of-contents t
+      :with-date t
+      :with-sub-superscript nil
+      :auto-sitemap t
+      :sitemap-title "Notes"
+      :sitemap-filename "index.org")
+     ("note-static"                 ; These are static files (images, pdf, etc)
+      :base-directory ,ymacs-org-project-src-dir
+      :base-extension
+      "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|svg\\|mp3\\|ogg\\|swf\\|txt\\|asc\\|json"
+      :publishing-directory ,ymacs-org-project-dst-dir
+      :recursive t
+      :publishing-function org-publish-attachment
+      :exclude "auto/cache/org-ltximg.*\\.png")
+     ("note" :components ("note-pdf" "note-static")))))

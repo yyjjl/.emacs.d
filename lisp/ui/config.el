@@ -123,7 +123,9 @@
         winum-reverse-frame-list nil
         winum-auto-assign-0-to-minibuffer t))
 
-(setq which-key-dont-use-unicode t)
+(custom-set-variables
+ '(which-key-dont-use-unicode t))
+
 (after! which-key
   (setq which-key-allow-imprecise-window-fit nil)
   (setq which-key-show-remaining-keys t))

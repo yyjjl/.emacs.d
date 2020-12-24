@@ -13,6 +13,9 @@
       "*" (or "Man" "TeX" "Shell Command Output") (*? not-newline) "*"
       string-end))
 
+(defvar ymacs-popup-org-src-buffer-regexp
+  (rx string-start "*Org Src" (*? not-newline) "*" string-end))
+
 (defvar ymacs-popup-help-buffer-regexp
   (rx string-start
       "*"
@@ -80,6 +83,10 @@
     (:name-regexp ,ymacs-popup-other-window-regexp
      :select t
      :autoclose t)
+    (:name-regexp ,ymacs-popup-org-src-buffer-regexp
+     :select t
+     :side below
+     :dedicated t)
     (:mode occur-mode
      :select t)
     (:name "*Flycheck error messages*"

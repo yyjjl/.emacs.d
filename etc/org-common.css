@@ -22,3 +22,75 @@
 ::-webkit-scrollbar-resizer {
     background: #040404;
 }
+
+pre.src {
+    background: #1b1d1e;
+    color: white;
+}
+
+@media screen and (min-width: 1250px){
+    #table-of-contents {
+        position: fixed;
+        height: 100vh;
+        top: 0;
+        left: 0;
+        width: 300px;
+    }
+
+    #postamble {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 300px;
+        height: 100px;
+        margin: 0;
+    }
+
+    #table-of-contents>h2 {
+        padding-left: 15px;
+        height: 40px;
+        max-height: 40px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    #text-table-of-contents {
+        /* border: 1px dashed gray; */
+        overflow-y: auto;
+        height: calc(100% - 200px);
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+
+    body {
+        margin-left: 320px;
+    }
+}
+
+@media screen and (min-width: 1350px){
+    #table-of-contents {
+        width: 400px;
+    }
+
+    #postamble {
+        width: 400px;
+    }
+
+    body {
+        margin-left: 420px;
+    }
+}
+
+@media screen and (min-width: 1450px){
+    #table-of-contents {
+        width: 500px;
+    }
+
+    #postamble {
+        width: 500px;
+    }
+
+    body {
+        margin-left: 520px;
+    }
+}

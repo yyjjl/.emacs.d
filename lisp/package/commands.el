@@ -39,7 +39,7 @@
 (defun ymacs-package/compile-elpa-packages (&optional -no-message)
   (interactive)
   (let ((inhibit-message -no-message))
-    (byte-recompile-directory package-user-dir nil t)))
+    (byte-recompile-directory package-user-dir 0 t)))
 
 ;;;###autoload
 (defun ymacs-package/compile-config (&optional -no-message)

@@ -4,11 +4,8 @@
 (defun ymacs-tools/add-local-snippet (&optional -save-snippets)
   (interactive "P")
   (let ((template (read-string "Snippet template: "
-                               (if (region-active-p)
-                                   (buffer-substring (region-beginning)
-                                                     (region-end))
-                                 (buffer-substring (line-beginning-position)
-                                                   (line-end-position)))))
+                               (when (region-active-p)
+                                 (buffer-substring (region-beginning) (region-end)))))
         (key (read-string "Snippet key: "))
         (local-snippets-list (copy-alist ymacs-tools-local-snippets-list)))
     (-if-let (item (assoc-string key local-snippets-list))

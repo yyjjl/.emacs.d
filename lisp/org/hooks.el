@@ -65,7 +65,12 @@
   (add-hook 'org-speed-command-hook #'ymacs-org/block-speed-command-activate))
 
 (after! ox-html
-  (advice-add #'org-html-publish-to-html :around #'ymacs-org@wrap-publish-fn))
+  (advice-add #'org-html-publish-to-html :around #'ymacs-org@wrap-publish-fn)
+
+  (define-advice org-html--svg-image (:around (-fn -source -attributes -info) fix)
+    (unless (plist-get -attributes :fallback)
+      (setq -attributes (plist-put -attributes :fallback -source)))
+    (funcall -fn -source -attributes -info)))
 
 (after! ox-latex
   (advice-add #'org-publish-file :around #'without-user-record!!)

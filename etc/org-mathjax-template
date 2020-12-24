@@ -11,6 +11,7 @@
            font: "%FONT"},
      NativeMML: {scale: %SCALE},
      TeX: { equationNumbers: {autoNumber: "%AUTONUMBER"},
+            extensions: ["color.js"],
             MultLineWidth: "%MULTLINEWIDTH",
             TagSide: "%TAGSIDE",
             TagIndent: "%TAGINDENT",
