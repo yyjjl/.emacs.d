@@ -277,6 +277,7 @@
       :auto-preamble nil
       :section-numbers t
       :table-of-contents t
+      :preserve-breaks t
       :with-sub-superscript nil
       :auto-sitemap nil
       :sitemap-filename "index.org")
@@ -291,6 +292,7 @@
       :auto-preamble nil
       :section-numbers t
       :table-of-contents t
+      :preserve-breaks t
       :with-date t
       :with-sub-superscript nil
       :auto-sitemap t
