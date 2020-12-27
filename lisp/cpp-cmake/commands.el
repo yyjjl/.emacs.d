@@ -82,7 +82,8 @@
              (make-symbolic-link cdb-path
                                  "compile_commands.json"
                                  :ok-if-already-exists)))
-         (ymacs-cpp//cpp-setup))))
+         (ymacs-cpp//cpp-setup)
+         (hack-dir-local-variables-non-file-buffer))))
 
     (when -set-options
       (ymacs-cpp-cmake//set-cmake-options

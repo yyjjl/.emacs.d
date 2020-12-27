@@ -40,11 +40,6 @@
 
     (when (and (buffer-enable-rich-feature-p)
                (eq major-mode 'python-mode))
-
-      (eval-when-has-feature! lsp
-        (when (eq ymacs-python-lsp-server 'pyright)
-          (require 'lsp-pyright)))
-
       (try-enable-lsp! python
         :init
         (progn

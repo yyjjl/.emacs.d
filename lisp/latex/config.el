@@ -20,7 +20,7 @@
     ("}" . ymacs-latex/skip-close-pair)
     (")" . ymacs-latex/skip-close-pair)
     ("]" . ymacs-latex/skip-close-pair)
-    ("C-c B" . ymacs-latex/build)
+    ([f10] . ymacs-latex/build)
     ("C-c h" . TeX-doc)
     ("C-c C-u" . ymacs-latex/force-update-style)
     ("C-c s" . LaTeX-section)

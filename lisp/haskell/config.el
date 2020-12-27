@@ -13,6 +13,8 @@
   (define-key! :map haskell-mode-map
     ([f5] . haskell-debug)
     ([f9] . haskell-compile)
+    ("C-c V" . haskell-cabal-visit-file)
+    ("C-c D" . haskell-cabal-add-dependency)
 
     ("C-c C-b" . haskell-mode-stylish-buffer)
     ("C-c b" . haskell-mode-stylish-buffer)

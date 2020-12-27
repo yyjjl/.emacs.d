@@ -108,11 +108,4 @@
                     (file-name-sans-extension raw-path)))
                   search-option
                   (or -desc ""))
-        (funcall -fn -link -desc -info))))
-
-  (define-advice org-latex--inline-image (:around (-fn -link -info) handle-svg)
-    (let ((code (funcall -fn -link -info)))
-      (replace-regexp-in-string "\\(\\\\includesvg\\)\\(?:[^{]\\)?*{.*}"
-                                "\\\\includegraphics"
-                                code
-                                nil nil 1))))
+        (funcall -fn -link -desc -info)))))
