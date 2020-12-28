@@ -139,6 +139,8 @@
   (setq org-preview-latex-default-process 'imagemagick)
   (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
 
+  (setq org-src-window-setup 'other-window)
+
   (setcdr (assoc "dot" org-src-lang-modes) 'graphviz-dot)
   (setcdr (assoc 'file org-link-frame-setup) 'find-file)
 

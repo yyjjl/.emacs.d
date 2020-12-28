@@ -51,6 +51,7 @@
     (user-error (message "%s" (error-message-string err))))
 
   (hl-line-mode 1)
+  (display-fill-column-indicator-mode 1)
 
   ;; show trailing spaces in a programming mode
   (setq show-trailing-whitespace t)
