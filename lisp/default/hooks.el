@@ -61,6 +61,7 @@
   (hl-line-mode 1)
   (display-fill-column-indicator-mode 1)
 
+  (setq show-trailing-whitespace t)
   (setq indicate-empty-lines t))
 
 (define-hook! ymacs|generic-comint-mode-setup (comint-mode-hook)

@@ -175,10 +175,11 @@
 (after! ox-html
   (setq org-html-style-default
         (eval-when-compile
-          (when (string-match
-                 (rx ".org-svg" (+ (not "{")) (+ (not digit)) (group (+ digit) "%"))
-                 org-html-style-default)
-            (replace-match "auto" nil nil org-html-style-default 1))))
+          (if (string-match
+               (rx ".org-svg" (+ (not "{")) (+ (not digit)) (group (+ digit) "%"))
+               org-html-style-default)
+              (replace-match "auto" nil nil org-html-style-default 1)
+            org-html-style-default)))
 
   (setq org-html-head
         (eval-when-compile
@@ -214,6 +215,7 @@
   (setq org-latex-default-class "cn-article")
   (setq org-latex-packages-alist
         '(("" "xeCJK" t)
+          ("" "svg" nil)
           ("" "setspace, dcolumn" t)
           ("" "booktabs, wasysym, marvosym" nil)
           ("" "subfig" nil)

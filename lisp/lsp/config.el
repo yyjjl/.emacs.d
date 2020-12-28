@@ -82,7 +82,7 @@
   (setq lsp-enable-indentation nil)
   (setq lsp-enable-symbol-highlighting t)
   (setq lsp-symbol-highlighting-skip-current t)
-  (setq lsp-enable-semantic-highlighting nil)
+  (setq lsp-enable-semantic-tokens-enable nil)
 
   (setq lsp-signature-doc-lines 2)
   (setq lsp-auto-execute-action nil)

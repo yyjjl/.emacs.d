@@ -5,9 +5,6 @@
 (declare-function exec-path-from-shell-initialize "ext:exec-path-from-shell")
 
 (define-hook! ymacs-tools|after-init (after-init-hook)
-  (when sys/macp
-    (exec-path-from-shell-initialize))
-
   (recentf-mode 1)
   (winner-mode 1)
 
@@ -24,8 +21,20 @@
   (global-so-long-mode 1))
 
 (define-hook! ymacs-tools|after-init-idle (ymacs-after-init-idle-hook)
-  (when (and ymacs-fcitx-path (display-graphic-p))
-    (fcitx-aggressive-setup))
+  (when sys/macp
+    (exec-path-from-shell-initialize))
+
+  (when (and (display-graphic-p)
+             (or (not sys/linuxp) ymacs-fcitx-path))
+    (cond
+     (sys/macp
+      ;; Need to set sis-english-source/sis-other-source in custom.el
+      (sis-ism-lazyman-config nil nil))
+     (sys/linuxp
+      (sis-ism-lazyman-config "1" "2" 'fcitx)))
+
+    (sis-global-cursor-color-mode 1)
+    (sis-global-respect-mode 1))
 
   (find-file-noselect (expand-cache! "org/*note*"))
   (find-file-noselect (expand-cache! "org/*task*"))

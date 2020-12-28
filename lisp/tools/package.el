@@ -4,7 +4,7 @@
 
 (require-packages!
  (exec-path-from-shell :when sys/macp)
- (fcitx :when ymacs-fcitx-path)
+ (sis :when (or (not sys/linuxp) ymacs-fcitx-path))
  bison-mode
  buffer-move
  csv-mode
