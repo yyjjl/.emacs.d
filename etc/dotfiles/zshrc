@@ -64,9 +64,9 @@ export GTAGSLABEL=ctags
 export RUSTUP_DIST_SERVER=https://mirrors.tuna.tsinghua.edu.cn/rustup
 
 if [ "$(uname -s)" = "Linux" ]; then
-    export FZF_DEFAULT_COMMAND='fdfind --type file --exclude .git'
+    export FZF_DEFAULT_COMMAND='fdfind --type=file'
 else
-    export FZF_DEFAULT_COMMAND='fd --type file --exclude .git'
+    export FZF_DEFAULT_COMMAND='fd --type=file'
 fi
 
 for directory in ".local" ".cargo" ".cabal" ".ghcup" "program/root" "program/node";do

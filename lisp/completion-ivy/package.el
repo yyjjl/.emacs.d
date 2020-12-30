@@ -1,6 +1,7 @@
 ;; -*- lexical-binding: t -*-
 
 (executable! ripgrep :exe "rg")
+(executable! fdfind :exe ["fdfind" "fd"])
 
 (require-packages!
  ;; `counsel-M-x' need amx to get history
@@ -12,6 +13,7 @@
  sudo-edit)
 
 (defvar ymacs-ivy-switch-function-list nil)
+(defvar ymacs-ivy-additional-environment nil)
 
 (defvar ymacs-ivy-rg-type-aliases
   (eval-when-compile
@@ -34,14 +36,14 @@
   '((counsel-git-grep-query-replace . "query-replace")
     (swiper-avy . "avy-jump")
     (counsel-cd . "cd")
-    (ymacs-ivy/select-rg-type-aliases . "select type")))
+    (ymacs-ivy/meta-dot . "change options")))
 
 (define-key!
   ("C-x j b" . counsel-bookmark)
   ("C-s" . ymacs/swiper)
   ("C-r" . swiper-isearch-backward)
   ("C-x C-f" . counsel-find-file)
-  ("C-x k" . ymacs-counsel/kill-buffer)
+  ("C-x k" . ymacs-ivy/kill-buffer)
   ("C-x b" . ivy-switch-buffer)
   ("C-x w -" . ivy-pop-view)
   ("C-x w =" . ivy-push-view))
@@ -55,10 +57,10 @@
   ("l f" . counsel-find-library)
   ("u" . counsel-unicode-char)
   ("d" . counsel-dired-jump)
-  ("i" . ymacs-counsel/semantic-or-imenu)
+  ("i" . ymacs-ivy/semantic-or-imenu)
   ("x" . counsel-linux-app)
   ("v" . counsel-set-variable)
-  ("j" . counsel-fzf)
+  ("j" . ymacs-ivy/fzf)
   ("g" . counsel-git)
   ("s" . counsel-git-grep)
   ("S" . counsel-git-stash)

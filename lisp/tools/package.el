@@ -102,6 +102,7 @@
   ("C-<up>" . text-scale-increase)
 
   ("C-x G" . revert-buffer)
+  ("C-x I" . clone-indirect-buffer)
 
   ("C-c 4" . ispell-word)
   ("C-c q" . auto-fill-mode)
@@ -111,8 +112,6 @@
   ("M-N" . ymacs-tools/select-next-error-buffer)
   ("M-p" . previous-error)
 
-  ("M-`" . other-frame)
-  ("M-i" . iedit-mode)
   ("M-s e" . ymacs-tools/eval-and-replace)
   ("M-s o" . ymacs-tools/occur-dwim)
   ("RET" . newline-and-indent)

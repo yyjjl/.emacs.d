@@ -55,7 +55,7 @@
 (setq-default compilation-environment '("TERM=xterm-256color"))
 (setq-default confirm-nonexistent-file-or-buffer t)
 (setq-default delete-by-moving-to-trash t)
-(setq-default enable-recursive-minibuffers nil)
+(setq-default enable-recursive-minibuffers t)
 ;; Update ui less often
 (setq-default idle-update-delay 2)
  ;; keep the point out of the minibuffer

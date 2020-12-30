@@ -7,8 +7,7 @@
   (add-hook 'org-babel-after-execute-hook #'org-redisplay-inline-images))
 
 (after! org
-  (define-advice org-archive-subtree (:override (&rest _) ignore)
-    (message "Archive command is disabled"))
+  (put #'org-archive-subtree 'disabled t)
 
   (define-advice org-fill-paragraph (:around (-fn &optional -justify -region) add-space)
     (let* ((element (org-element-context))

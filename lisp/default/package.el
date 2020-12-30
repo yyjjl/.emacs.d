@@ -84,5 +84,7 @@
   (setq srecode-map-save-file (expand-cache! "srecode-map.el"))
   (setq tramp-persistency-file-name (expand-cache! "tramp.el"))
   (setq transient-history-file (expand-cache! "transient/history.el"))
+  (setq transient-values-file (expand-cache! "transient/values.el"))
+  (setq transient-levels-file (expand-cache! "transient/levels.el"))
   (setq treemacs-persist-file (expand-cache! "treemacs-persist"))
   (setq url-configuration-directory (expand-cache! "url/")))

@@ -273,3 +273,11 @@ Use `scan-lists', otherwise use simple algorithm."
       ;; Restore original point
       (when ymacs-edit--suround-origin-pos
         (goto-char ymacs-edit--suround-origin-pos)))))
+
+;;;###autoload
+(defun ymacs-edit/iedit-mode (-arg)
+  (interactive "P")
+  (if (and (equal -arg '(4))
+           (bound-and-true-p lsp-mode))
+      (lsp-iedit-highlights)
+    (call-interactively #'iedit-mode)))

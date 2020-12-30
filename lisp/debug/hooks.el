@@ -35,7 +35,8 @@
 (defun gud-debug@restore (-fn &rest -args)
   (ymacs-debug//show-help nil)
   (lv-delete-window)
-  (setq ymacs-debug--window-configuration (current-window-configuration))
+  ;; FIXME: In Emacs 28.1, restoring window configuration is a built-in feature
+  (window-configuration-to-register :debug-windows)
 
   (delete-other-windows)
 
@@ -100,10 +101,7 @@
 
       (setq ymacs-debug--buffers nil)
       ;; restore windows
-      (when (window-configuration-p ymacs-debug--window-configuration)
-        (set-window-configuration ymacs-debug--window-configuration)
-        (setq ymacs-debug--window-configuration nil)
-        (message "Windows restored."))))
+      (jump-to-register :debug-windows)))
 
   (define-advice gud-find-file (:around (-fn -file) track-files)
     (let ((buffer (funcall -fn -file)))

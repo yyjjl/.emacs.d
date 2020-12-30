@@ -138,6 +138,7 @@ invoked, then it detaches itself."
          (args (and (consp -hook) (cdr -hook)))
          (append-p (plist-get args :after))
          (override-p (plist-get args :override))
+         (around-p (plist-get args :around))
          (args-list (or (plist-get args :arguments) '(&rest _)))
          (local-p (plist-get args :local))
          (fn (or (plist-get args :name)
@@ -147,13 +148,14 @@ invoked, then it detaches itself."
                         (cl-gensym "ymacs|transient-hook-"))))))
     `(progn
        (defun ,fn ,args-list
-         ,@-forms
-         ,(cond ((functionp hook) `(advice-remove ',hook ',fn))
-                ((symbolp hook) `(remove-hook ',hook ',fn ,local-p))))
+         (prog1 (progn ,@-forms)
+           ,(cond ((functionp hook) `(advice-remove ',hook ',fn))
+                  ((symbolp hook) `(remove-hook ',hook ',fn ,local-p)))))
        ,(cond ((functionp hook)
-               `(advice-add ',hook ,(if override-p
-                                        :override
-                                      (if append-p :after :before))
+               `(advice-add ',hook ,(cond (override-p :override)
+                                          (around-p :around)
+                                          (append-p :after)
+                                          (t :before))
                             ',fn))
               ((symbolp hook)
                `(add-hook ',hook ',fn ,append-p ,local-p))))))
@@ -358,8 +360,7 @@ HTML file converted from org file, it returns t."
 (defsubst buffer-enable-rich-feature-p ()
   (not (or (buffer-temporary-p)
            (file-remote-p default-directory)
-           (> buffer-saved-size ymacs-large-buffer-limit)
-           (buffer-base-buffer))))
+           (> buffer-saved-size ymacs-large-buffer-limit))))
 
 (defun insert-after! (-after-value -new-value -lst)
   "Find -AFTER-VALUE and Add -NEW-VALUE to -LST after it."

@@ -1,5 +1,31 @@
 ;; -*- lexical-binding: t -*-
 
+(defsubst ymacs-ivy//display-help-show-keys ()
+  (mapconcat
+   (lambda (item)
+     (when-let (keys (where-is-internal (car item)))
+       (format "[%s to %s] "
+               (mapconcat
+                (lambda (key) (propertize (key-description key) 'face 'hl-line))
+                keys
+                "/")
+               (cdr item))))
+   ymacs-ivy-grep-help-commands
+   ""))
+
+(defun ymacs-ivy//display-help (-cmd &optional -directory)
+  (unless (stringp -cmd)
+    (setq -cmd (string-join -cmd " ")))
+
+  (let ((env-string (string-join ymacs-ivy-additional-environment "\n"))
+        (key-string (ymacs-ivy//display-help-show-keys)))
+    (lv-message
+     (format "%s%s(@%s) %s"
+             (if (string-empty-p env-string) "" (concat env-string "\n"))
+             (if (string-empty-p key-string) "" (concat key-string "\n"))
+             (propertize (or -directory default-directory) 'face font-lock-constant-face)
+             (propertize -cmd 'face font-lock-doc-face)))))
+
 (defmacro ymacs-ivy//define-switch (name &rest body)
   (declare (indent 1))
   (let ((commands (mapcar #'car body))

@@ -44,6 +44,10 @@
   (when (eq major-mode 'compilation-mode)
     (ansi-color-apply-on-region compilation-filter-start (point-max))))
 
+(define-hook! ymacs|indirect-buffer-setup (clone-indirect-buffer-hook)
+  (when (derived-mode-p 'prog-mode 'text-mode)
+    (ymacs-ui/view-code-mode 1)))
+
 ;; Default prog-mode setup
 (define-hook! ymacs|generic-prog-mode-setup (prog-mode-hook LaTeX-mode-hook)
   (condition-case err

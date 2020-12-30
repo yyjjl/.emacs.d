@@ -5,7 +5,8 @@
     ("C-r" . ivy-reverse-i-search)
     ("C-j" . ivy-immediate-done)
     ("C-M-j" . ivy-done)
-    ("M-." . ignore)
+    ("M-." . ymacs-ivy/meta-dot)
+    ("C-." . ymacs-ivy/meta-dot)
     ("<C-return>" . ymacs-ivy/switch))
 
   (ymacs-ivy//define-switch swiper
@@ -21,7 +22,7 @@
   (dolist (caller '(ivy-switch-buffer
                     internal-complete-buffer
                     ivy-switch-buffer-other-window
-                    ymacs-counsel/kill-buffer))
+                    ymacs-ivy/kill-buffer))
     (ivy-configure
         caller
       :display-transformer-fn #'ymacs-ivy//switch-buffer-transformer))
@@ -51,10 +52,6 @@
   (setq swiper-stay-on-quit t))
 
 (after! counsel
-  (define-key! :map counsel-ag-map
-    ("M-." . ymacs-ivy/select-rg-type-aliases)
-    ("C-." . ymacs-ivy/select-rg-type-aliases))
-
   (ivy-configure 'counsel-fzf
     :unwind-fn
     (lambda ()
@@ -76,4 +73,4 @@
         "rg -M 1000 -S --no-heading --line-number --color never %s .")
 
   (global-set-key (kbd "C-c i a")
-                  (if ymacs-ripgrep-path #'ymacs-counsel/rg #'counsel-grep)))
+                  (if ymacs-ripgrep-path #'ymacs-ivy/rg #'counsel-grep)))

@@ -43,6 +43,7 @@
   ("C-x C-/" . goto-last-change)
 
   ("M--" . er/expand-region)
+  ("M-i" . ymacs-edit/iedit-mode)
 
   ("C-x , SPC" . ymacs-edit/insert-space-around-chinese)
   ("M-Q" . ymacs-edit/insert-space-around-chinese)

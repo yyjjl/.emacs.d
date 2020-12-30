@@ -8,9 +8,10 @@
                       'frame-local))
   (message "Current winum scope: %s" (upcase (symbol-name winum-scope)))
   (dolist (frame (frame-list))
-    (select-frame frame)
-    (winum--update))
-  (force-mode-line-update))
+    (with-selected-frame frame
+      (winum--update)))
+  (force-mode-line-update)
+  (redisplay t))
 
 ;;;###autoload
 (define-minor-mode ymacs-ui/view-code-mode
