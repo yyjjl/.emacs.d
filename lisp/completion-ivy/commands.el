@@ -143,6 +143,8 @@
       (user-error "Filter stack is empty"))))
 
 ;;* ripgrep
+(defvar ymacs-ivy--last-text nil)
+
 (defun ymacs-ivy//rg-in-directory (&optional -args -directory -extra-args)
   (interactive (list (transient-args 'ymacs-ivy/rg) nil nil))
 
@@ -159,7 +161,7 @@
          (counsel-rg-base-command (concat "rg " (string-join -args " ") " %s ."))
          (shell-file-name "/bin/sh"))
     (ymacs-ivy//display-help "<empty>" initial-directory)
-    (counsel-rg nil initial-directory -extra-args)))
+    (counsel-rg ymacs-ivy--last-text initial-directory -extra-args)))
 
 (defun ymacs-ivy//rg (&optional -args)
   (interactive (list (transient-args 'ymacs-ivy/rg)))
@@ -205,6 +207,7 @@
    [("RET" "Search" ymacs-ivy//rg)]]
   (interactive)
 
+  (setq ymacs-ivy--last-text nil)
   (let ((default-directory (or (projectile-project-root) default-directory)))
     (ymacs-ivy//rg)))
 
@@ -212,6 +215,7 @@
 (defun ymacs-ivy/meta-dot-for-counsel-rg ()
   (interactive)
   (counsel-delete-process)
+  (setq ymacs-ivy--last-text ivy-text)
   (ivy-quit-and-run
     (transient-setup 'ymacs-ivy/rg)))
 
@@ -228,7 +232,7 @@
   (let ((ymacs-ivy-additional-environment
          (list (format "FZF_DEFAULT_COMMAND=%s %s" ymacs-fdfind-path (string-join -args " ")))))
     (with-temp-env! ymacs-ivy-additional-environment
-      (counsel-fzf))))
+      (counsel-fzf ymacs-ivy--last-text))))
 
 (transient-define-argument ymacs-ivy/fzf-file-type ()
   :description "Filter search by type"
@@ -255,11 +259,13 @@
    [("RET" "Search" ymacs-ivy//fzf)]]
   (interactive)
 
+  (setq ymacs-ivy--last-text nil)
   (ymacs-ivy//fzf))
 
 ;;;###autoload
 (defun ymacs-ivy/meta-dot-for-counsel-fzf ()
   (interactive)
   (counsel-delete-process)
+  (setq ymacs-ivy--last-text ivy-text)
   (ivy-quit-and-run
     (transient-setup 'ymacs-ivy/fzf)))
