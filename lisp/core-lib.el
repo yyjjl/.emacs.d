@@ -88,11 +88,21 @@ for defining functions."
          value))
      ,doc))
 
-(defmacro define-option! (name initvalue &optional docstring)
-  `(if (boundp ',name)
-       ,(when docstring
-          `(put ',name 'variable-documentation ,docstring))
-     (defvar ,name ,initvalue ,docstring)))
+(defmacro set-option! (name value)
+  `(progn
+     (put ',name 'ymacs-option t)
+     (put ',name 'ymacs-option-value ,value)))
+
+(defmacro define-option! (name initvalue &rest body)
+  (let (docstring)
+    (when (stringp (car body))
+      (setq docstring (pop body)))
+    `(progn
+       (defvar ,name ,initvalue ,docstring)
+       ,@body
+       (when-let (value (and (get ',name 'ymacs-option)
+                             (get ',name 'ymacs-option-value)))
+         (setq ,name value)))))
 
 (defmacro define-variable! (&rest -body)
   (declare (indent 0))
@@ -503,9 +513,7 @@ HTML file converted from org file, it returns t."
                    (equal (aref option-name 0) ?+))))
           (t
            (error "option should start with +/- or be a cons")))))
-    (list 'defvar
-          (intern (format "ymacs-%s-%s" -name (car option)))
-          (cdr option))))
+    `(set-option! ,(intern (format "ymacs-%s-%s" -name (car option))) ,(cdr option))))
 
 (defun load-feature//file-to-form (-path)
   (let ((full-path (concat (expand-file-name -path) ".el")))

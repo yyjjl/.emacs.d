@@ -10,18 +10,10 @@
 
   (global-whitespace-mode 1)
 
-  ;; (which-function-mode 1)
   (which-key-mode 1)
 
   (column-number-mode 1)
-  (show-paren-mode 1)
-
-  (setq-default mode-line-buffer-identification '("%b")))
-
-(add-hook 'window-configuration-change-hook #'ymacs-modeline//set-selected-window)
-(add-hook 'buffer-list-update-hook #'ymacs-modeline//set-selected-window)
-(add-hook 'after-make-frame-functions #'ymacs-modeline//set-selected-window)
-(add-hook 'delete-frame-functions #'ymacs-modeline//set-selected-window)
+  (show-paren-mode 1))
 
 (add-function :after after-focus-change-function #'ymacs-modeline//focus-change)
 (advice-add #'handle-switch-frame :after #'ymacs-modeline//focus-change)

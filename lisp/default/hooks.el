@@ -109,6 +109,7 @@
   ;; Auto save to files
   ;; (auto-save-visited-mode 1)
 
+  (size-indication-mode -1)
   (line-number-mode -1)
   (column-number-mode -1)
 

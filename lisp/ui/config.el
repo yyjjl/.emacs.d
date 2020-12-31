@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(setq-default mode-line-buffer-identification '("%b"))
+
 (blink-cursor-mode -1)
 (tooltip-mode -1)
 (window-divider-mode -1)

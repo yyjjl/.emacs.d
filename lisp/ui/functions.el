@@ -1,30 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
-(defsubst ymacs-modeline//get-current-window (&optional frame)
-  "Get the current window but should exclude the child windows."
-  (if (and (fboundp 'frame-parent) (frame-parent frame))
-      (frame-selected-window (frame-parent frame))
-    (frame-selected-window frame)))
-
-(defsubst ymacs-modeline//active ()
-  "Whether is an active window."
-  (eq (ymacs-modeline//get-current-window) ymacs-modeline-current-window))
-
-(defsubst ymacs-modeline//set-selected-window (&rest _)
-  "Set `ymacs-modeline-current-window' appropriately."
-  (when-let ((win (ymacs-modeline//get-current-window)))
-    (unless (or (minibuffer-window-active-p win)
-                (and (bound-and-true-p lv-wnd) (eq lv-wnd win)))
-      (setq ymacs-modeline-current-window win))))
-
 (defsubst ymacs-modeline//focus-change (&rest _)
-  (setq ymacs-modeline-current-window nil)
-  ;; Set active window
-  (cl-loop for frame in (frame-list)
-           if (eq (frame-focus-state frame) t) ; => t, nil, 'unknown
-           return (setq ymacs-modeline-current-window
-                        (ymacs-modeline//get-current-window frame)))
-
   (if (frame-focus-state)
       (when ymacs-modeline-remap-face-cookie
         (face-remap-remove-relative ymacs-modeline-remap-face-cookie))
@@ -171,7 +147,7 @@ Return nil if no project was found."
   (setq ymacs-modeline--buffer-file-name
         (if buffer-file-name
             (ymacs-modeline//make-buffer-file-name)
-          (propertize "%b" 'face 'ymacs-modeline-buffer-file))))
+          '(:propertize "%b" face ymacs-modeline-buffer-file))))
 
 (defsubst ymacs-modeline//buffer-state ()
   "current buffer state."
@@ -213,7 +189,7 @@ like the scratch buffer where knowing the current project directory is important
 
 (defsubst ymacs-modeline//update-buffer-encoding (-coding-system)
   "Update buffer file name in mode-line."
-  (setq ymacs-modeline-buffer-encoding
+  (setq ymacs-modeline--buffer-encoding
         (concat
          ;; eol type
          (pcase (coding-system-eol-type -coding-system)
@@ -231,7 +207,7 @@ like the scratch buffer where knowing the current project directory is important
 
 (ymacs-modeline//def-segment buffer-encoding
   "Displays the eol and the encoding style of the buffer the same way Atom does."
-  (or ymacs-modeline-buffer-encoding
+  (or ymacs-modeline--buffer-encoding
       (ymacs-modeline//update-buffer-encoding buffer-file-coding-system)))
 
 
@@ -317,6 +293,7 @@ like the scratch buffer where knowing the current project directory is important
 
 (defvar flycheck-current-errors)
 (declare-function lsp-workspaces 'lsp-mode)
+(declare-function lsp--workspace-status-string 'lsp-mode)
 
 (defsubst ymacs-modeline//update-checker-state (&optional status)
   "Update flycheck state via STATUS."
@@ -355,17 +332,7 @@ like the scratch buffer where knowing the current project directory is important
 
 (ymacs-modeline//def-segment checker
   "Displays color-coded error status in the current buffer with pretty icons."
-  (concat
-   (when (bound-and-true-p lsp-managed-mode)
-     (let* ((workspaces (lsp-workspaces))
-            (str (mapconcat #'lsp--workspace-status-string (lsp-workspaces) ",")))
-       (propertize (concat " LSP"
-                           (if (string-empty-p str)
-                               str
-                             (concat "[" str "]"))) 'face (if workspaces
-                           'ymacs-modeline-lsp-success
-                           'ymacs-modeline-lsp-warning))))
-   ymacs-modeline--checker-state))
+  ymacs-modeline--checker-state)
 
 ;;
 ;;* Matches (macro, iedit and multi-cursors)
@@ -484,11 +451,10 @@ By default, this shows the information specified by `global-mode-string'."
         (edebug (bound-and-true-p edebug-mode)))
     (propertize
      (concat dap
-             (when (or edebug debug-on-error debug-on-quit) " ")
-             (when edebug "Edebug")
-             (when debug-on-error "On-Error")
-             (when debug-on-quit "On-Quit")
-             " ")
+             (when (and dap (or edebug debug-on-error debug-on-quit)) " ")
+             (when edebug "Edebug ")
+             (when debug-on-error "On-Error ")
+             (when debug-on-quit "On-Quit "))
      'face 'ymacs-modeline-urgent)))
 
 ;;
@@ -509,8 +475,18 @@ By default, this shows the information specified by `global-mode-string'."
 
 (ymacs-modeline//def-segment input-method
   (when (bound-and-true-p current-input-method-title)
-    (propertize (format " IM:%s " current-input-method-title)
+    (propertize (format "IM:%s " current-input-method-title)
                 'face 'ymacs-modeline-input-method)))
+
+;;
+;;* LSP
+;;
+
+(ymacs-modeline//def-segment lsp
+  (eval-when-compile
+    (when (require 'lsp-mode nil t)
+      `(,(assoc 'lsp-mode minor-mode-alist)
+        (lsp-signature-mode (:propertize "[Signature]" face ymacs-modeline-lsp-success))))))
 
 
 
@@ -549,5 +525,5 @@ By default, this shows the information specified by `global-mode-string'."
   (window-number matches git-timemachine buffer-position buffer-encoding major-mode))
 
 (ymacs-modeline//def-modeline header
-  (debug input-method misc-info)
+  (debug input-method lsp misc-info)
   :header)

@@ -22,7 +22,6 @@
 (define-key!
   ("C-x , ," . ymacs-ui/view-code-mode))
 
-(defvar ymacs-modeline-current-window nil)
 (defvar ymacs-modeline-segment-alist ())
 (defvar ymacs-modeline-vcs-max-length 12
   "The maximum displayed length of the branch name of version control.")
@@ -42,7 +41,7 @@
 (defvar-local ymacs-modeline--buffer-file-name nil)
 
 ;;* Buffer encoding
-(defvar-local ymacs-modeline-buffer-encoding nil)
+(defvar-local ymacs-modeline--buffer-encoding nil)
 
 ;;* VCS
 (defvar-local ymacs-modeline--vcs-state nil)
@@ -59,7 +58,7 @@
   :group 'mode-line-faces)
 
 (defface ymacs-modeline-buffer-file
-  '((t (:inherit (mode-line-buffer-id bold))))
+  '((t (:inherit mode-line-buffer-id)))
   "Face used for the filename part of the mode-line buffer path."
   :group 'mode-line-faces)
 

@@ -11,18 +11,17 @@
 (executable! pylint)
 
 (eval-when-has-feature! lsp
-  (define-option! ymacs-python-lsp-server 'pyls)
-
-  (add-variable-watcher
-   'ymacs-python-lsp-server
-   (lambda (symbol new-value op _where)
-     (let ((old-value (symbol-value symbol)))
-       (when (and (eq op 'set)
-                  (not (eq new-value old-value))
-                  (memq new-value '(pyls pyright)))
-         (require (intern (format "lsp-%s" new-value)) nil t)
-         (setq lsp-disabled-clients (cl-delete new-value lsp-disabled-clients))
-         (add-to-list 'lsp-disabled-clients old-value)))))
+  (define-option! ymacs-python-lsp-server 'pyls
+    (add-variable-watcher
+     'ymacs-python-lsp-server
+     (lambda (symbol new-value op _where)
+       (let ((old-value (symbol-value symbol)))
+         (when (and (eq op 'set)
+                    (not (eq new-value old-value))
+                    (memq new-value '(pyls pyright)))
+           (require (intern (format "lsp-%s" new-value)) nil t)
+           (setq lsp-disabled-clients (cl-delete new-value lsp-disabled-clients))
+           (add-to-list 'lsp-disabled-clients old-value))))))
 
   (put 'ymacs-python-lsp-server 'safe-local-variable
        (lambda (x) (memq x '(pyls pyright))))
