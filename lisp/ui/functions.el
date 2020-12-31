@@ -37,7 +37,7 @@
              (error "%s is not a defined segment" segment))
    else do (error "%s is not a valid segment" segment)))
 
-(defmacro ymacs-modeline//def-modeline (-name -segments &optional -header-line-p)
+(defmacro ymacs-modeline//def-modeline (-name -segments)
   "Defines a modeline format and byte-compiles it.
 NAME is a symbol to identify it (used by `ymacs-modeline' for retrieval).
 LHS and RHS are lists of symbols of modeline -segments defined with
@@ -47,11 +47,7 @@ LHS and RHS are lists of symbols of modeline -segments defined with
     `(progn
        (defsubst ,sym ()
          ,(concat "Modeline: " (prin1-to-string -segments))
-         ,(cl-list* 'list
-                    (if -header-line-p
-                        ""
-                      (ymacs-modeline//bar))
-                    (ymacs-modeline//prepare-segments -segments)))
+         ,(cl-list* 'list (ymacs-modeline//prepare-segments -segments)))
        ,(unless (bound-and-true-p byte-compile-current-file)
           `(let (byte-compile-warnings)
              (byte-compile #',sym))))))
@@ -151,7 +147,7 @@ Return nil if no project was found."
 
 (defsubst ymacs-modeline//buffer-state ()
   "current buffer state."
-  (propertize " %1*%n " 'face '(:inherit ymacs-modeline-warning :weight bold)))
+  (propertize " %1*%n " 'face '(:inherit ymacs-modeline-info :weight bold)))
 
 (ymacs-modeline//def-segment buffer-info
   "Combined information about the current buffer, including the current working
@@ -413,8 +409,10 @@ like the scratch buffer where knowing the current project directory is important
 (declare-function winum-get-number-string 'winum)
 
 (ymacs-modeline//def-segment window-number
-  (when-let (num (ignore-errors (winum-get-number-string)))
-    (propertize (format " %s" num) 'face 'ymacs-modeline-buffer-major-mode)))
+  (concat
+   (when (display-graphic-p) (propertize "\u200b" 'display '((height 1.3) (raise -0.15))))
+   (when-let (num (ignore-errors (winum-get-number-string)))
+     (propertize (format " %s" num) 'face 'ymacs-modeline-buffer-file))))
 
 
 ;;
@@ -525,5 +523,4 @@ By default, this shows the information specified by `global-mode-string'."
   (window-number matches git-timemachine buffer-position buffer-encoding major-mode))
 
 (ymacs-modeline//def-modeline header
-  (debug input-method lsp misc-info)
-  :header)
+  (debug input-method lsp misc-info))

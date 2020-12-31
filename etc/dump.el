@@ -116,7 +116,7 @@
 
 (when (ignore-errors (native-comp-available-p))
   (let ((time (current-time))
-        (total-count (length comp-files-lqueue))
+        (total-count (length comp-files-queue))
         new-count)
     (while comp-files-queue
       (sleep-for 2)
