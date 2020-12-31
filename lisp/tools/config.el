@@ -70,11 +70,6 @@
   (setq tramp-ssh-controlmaster-options
         "-o ControlMaster=auto -o ControlPath='tramp.%%C' -o ControlPersist=no"))
 
-(after! fcitx
-  ;; Init fcitx prefix keys
-  (setq fcitx-use-dbus nil)
-  (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c" "C-z"))
-
 (after! view
   (define-key! :map view-mode-map
     ("s" . ymacs/swiper)

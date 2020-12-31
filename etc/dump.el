@@ -53,7 +53,6 @@
     company-files
 
     ;; ui
-    doom-modeline
     tab-line
     subword
     paren

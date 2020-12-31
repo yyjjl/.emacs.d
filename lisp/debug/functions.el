@@ -113,7 +113,7 @@
         (setq ymacs-debug--buffer-read-only buffer-read-only)
         (unless ymacs-debug--dap-cookie
           (setq ymacs-debug--dap-cookie
-                (face-remap-add-relative 'header-line 'doom-modeline-debug-visual)))
+                (face-remap-add-relative 'header-line 'ymacs-modeline-debug-visual)))
         (setq buffer-read-only t)
 
         (display-line-numbers-mode 1)

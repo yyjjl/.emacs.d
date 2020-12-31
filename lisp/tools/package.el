@@ -67,9 +67,10 @@
 (defvar ymacs-tools-socks-server '("Default server" "127.0.0.1" 1080 5))
 
 (defvar ymacs-tools-projectile-invalidate-cache-empty-vars
-  '(doom-modeline--vcs-text
-    doom-modeline--project-detected-p
-    doom-modeline--project-root))
+  '(ymacs-modeline--buffer-file-name
+    ymacs-modeline--vcs-state
+    ymacs-modeline--project-detected-p
+    ymacs-modeline--project-root))
 
 (declare-function winner-undo 'winner)
 (declare-function winner-redo 'winner)

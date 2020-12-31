@@ -62,9 +62,3 @@
   (setq dap-lldb-debugged-program-function
         (lambda ()
           (read-file-name "Directory: " (ymacs-cpp//build-dir) nil :must-match))))
-
-(after! treemacs
-  (doom-modeline-def-modeline treemacs
-    (bar major-mode))
-
-  (setq treemacs-user-mode-line-format (doom-modeline 'treemacs)))
