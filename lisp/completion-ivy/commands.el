@@ -150,10 +150,19 @@
 
   (cl-pushnew "--no-heading" -args)
   (cl-pushnew "--color=never" -args)
+
+  (when (and (not (or (member "-z" -args)
+                      (member "--search-zip" -args)))
+             (stringp (buffer-file-name))
+             (or (string-suffix-p ".gz" (buffer-file-name))
+                 (string-suffix-p ".zip" (buffer-file-name))))
+    (push "--search-zip" -args))
+
   (unless (--some (or (string-prefix-p "-M" it)
                       (string-prefix-p "--max-columns" it))
                   -args)
     (push "--max-columns=1000" -args))
+
   (unless (member "--no-line-number" -args)
     (cl-pushnew "--line-number" -args))
 

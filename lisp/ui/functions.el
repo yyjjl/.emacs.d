@@ -98,7 +98,7 @@ Return nil if no project was found."
   (unless (and ymacs-modeline--project-detected-p
                (equal ymacs-modeline--project-detected-p buffer-file-name))
 
-    (setq ymacs-modeline--project-root (projectile-project-root)
+    (setq ymacs-modeline--project-root (ignore-errors (projectile-project-root))
           ymacs-modeline--project-detected-p buffer-file-name)
 
     (when ymacs-modeline--project-root
@@ -480,11 +480,18 @@ By default, this shows the information specified by `global-mode-string'."
 ;;* LSP
 ;;
 
+(defsubst ymacs-modeline//update-lsp-state (&optional -buffer)
+  (let ((buffer (or -buffer (current-buffer))))
+    (when (buffer-live-p buffer)
+      (with-current-buffer buffer
+        (setq ymacs-modeline--lsp-state
+              (format-mode-line (assoc 'lsp-mode minor-mode-alist)))))))
+
 (ymacs-modeline//def-segment lsp
-  (eval-when-compile
-    (when (require 'lsp-mode nil t)
-      `(,(assoc 'lsp-mode minor-mode-alist)
-        (lsp-signature-mode (:propertize "[Signature]" face ymacs-modeline-lsp-success))))))
+  '(""
+    ymacs-modeline--lsp-state
+    (lsp-signature-mode
+     (:propertize "[Signature]" face ymacs-modeline-lsp-success))))
 
 
 

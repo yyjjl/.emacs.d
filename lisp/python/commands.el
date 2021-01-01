@@ -14,8 +14,12 @@ If not try to complete."
 (eval-when-has-feature! lsp
   (defun ymacs-python/change-lsp-server ()
     (interactive)
-    (setq ymacs-python-lsp-server
-          (if (eq ymacs-python-lsp-server 'pyright) 'pyls 'pyright))
+    (ymacs-python//set-lsp-server
+     (intern
+      (ymacs//completing-read-simple
+       "Server: "
+       (mapcar #'symbol-name
+               (cl-remove ymacs-python-lsp-server ymacs-python-lsp-servers)))))
 
     (let (buffers)
       (when-let ((workspaces (lsp-workspaces)))

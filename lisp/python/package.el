@@ -10,28 +10,39 @@
 (executable! ipython3)
 (executable! pylint)
 
+(defvar ymacs-python-lsp-servers '(pyls pyright))
+
+(defun ymacs-python//set-lsp-server (-server)
+  (cl-assert (memq -server ymacs-python-lsp-servers)
+             "Not in %s"
+             ymacs-python-lsp-servers)
+
+  (require 'lsp-mode nil t)
+  (let ((old-server ymacs-python-lsp-server))
+    (unless (eq old-server -server)
+      (add-to-list 'lsp-client-packages (intern (format "lsp-%s" -server)))
+
+      (setq ymacs-python-lsp-server -server)
+      (setq lsp-disabled-clients (cl-delete -server lsp-disabled-clients))
+      (dolist (server ymacs-python-lsp-servers)
+        (unless (eq server -server)
+          (add-to-list 'lsp-disabled-clients server))))))
+
 (eval-when-has-feature! lsp
+  (require-packages! lsp-pyright)
+
   (define-option! ymacs-python-lsp-server 'pyls
-    (add-variable-watcher
-     'ymacs-python-lsp-server
-     (lambda (symbol new-value op _where)
-       (let ((old-value (symbol-value symbol)))
-         (when (and (eq op 'set)
-                    (not (eq new-value old-value))
-                    (memq new-value '(pyls pyright)))
-           (require (intern (format "lsp-%s" new-value)) nil t)
-           (setq lsp-disabled-clients (cl-delete new-value lsp-disabled-clients))
-           (add-to-list 'lsp-disabled-clients old-value))))))
+    (after! lsp-mode
+      (ymacs-python//set-lsp-server -the-value)))
 
   (put 'ymacs-python-lsp-server 'safe-local-variable
-       (lambda (x) (memq x '(pyls pyright))))
-
-  (require-packages! lsp-pyright)
+       (lambda (x) (memq x ymacs-python-lsp-servers)))
 
   (autoload #'ymacs-python/change-lsp-server "../lisp/python/commands.el" nil t)
 
+  (after! lsp-mode
   (ymacs-lsp//register-client 'pyls :package 'lsp-pyls)
-  (ymacs-lsp//register-client 'pyright :package 'lsp-pyright))
+  (ymacs-lsp//register-client 'pyright :package 'lsp-pyright)))
 
 (defvar-local ymacs-python--last-buffer nil
   "Help keep track of python buffer when changing to pyshell.")

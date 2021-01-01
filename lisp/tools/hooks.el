@@ -24,17 +24,8 @@
   (when sys/macp
     (exec-path-from-shell-initialize))
 
-  (when (and (display-graphic-p)
-             (or (not sys/linuxp) ymacs-fcitx-path))
-    (cond
-     (sys/macp
-      ;; Need to set sis-english-source/sis-other-source in custom.el
-      (sis-ism-lazyman-config nil nil))
-     (sys/linuxp
-      (sis-ism-lazyman-config "1" "2" 'fcitx)))
-
-    (sis-global-cursor-color-mode 1)
-    (sis-global-respect-mode 1))
+  (when (and ymacs-fcitx-path (display-graphic-p))
+    (fcitx-aggressive-setup))
 
   (find-file-noselect (expand-cache! "org/*note*"))
   (find-file-noselect (expand-cache! "org/*task*"))

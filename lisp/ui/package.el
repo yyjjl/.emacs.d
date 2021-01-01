@@ -49,6 +49,8 @@
 ;;* Checker
 (defvar-local ymacs-modeline--checker-state nil)
 
+;;* LSP
+(defvar-local ymacs-modeline--lsp-state nil)
 
 
 

@@ -88,21 +88,20 @@ for defining functions."
          value))
      ,doc))
 
-(defmacro set-option! (name value)
+(defmacro set-option! (-name -value)
   `(progn
-     (put ',name 'ymacs-option t)
-     (put ',name 'ymacs-option-value ,value)))
+     (put ',-name 'ymacs-option t)
+     (put ',-name 'ymacs-option-value ,-value)))
 
-(defmacro define-option! (name initvalue &rest body)
+(defmacro define-option! (-name -default-value &rest -body)
   (let (docstring)
-    (when (stringp (car body))
-      (setq docstring (pop body)))
+    (when (stringp (car -body))
+      (setq docstring (pop -body)))
     `(progn
-       (defvar ,name ,initvalue ,docstring)
-       ,@body
-       (when-let (value (and (get ',name 'ymacs-option)
-                             (get ',name 'ymacs-option-value)))
-         (setq ,name value)))))
+       (defvar ,-name ,-default-value ,docstring)
+       (when-let (-the-value (and (get ',-name 'ymacs-option)
+                                  (get ',-name 'ymacs-option-value)))
+         ,@-body))))
 
 (defmacro define-variable! (&rest -body)
   (declare (indent 0))

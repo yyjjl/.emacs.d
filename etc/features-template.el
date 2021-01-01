@@ -22,27 +22,27 @@
 (load-feature! lsp)
 
 (load-feature! git)
-(load-feature! spell)
+;; (load-feature! spell)
 
 (load-feature! latex)
 (load-feature! org)
 ;; (load-feature! sage)
 ;; (load-feature! treemacs)
 
-(load-feature! cpp)
-(load-feature! cpp-cmake)
-(load-feature! cpp-clangd)
+;; (load-feature! cpp)
+;; (load-feature! cpp-cmake)
+;; (load-feature! cpp-clangd)
 
-(load-feature! python (lsp-server . 'pyright))
+;; (load-feature! python (lsp-server . 'pyright))
 
 ;; Programming modes
-(load-feature! sh)
+;; (load-feature! sh)
 ;; (load-feature! haskell)
 ;; (load-feature! rust)
 ;; (load-feature! java)
-(load-feature! web)
+;; (load-feature! web)
 ;; (load-feature! go)
-(load-feature! perl)
+;; (load-feature! perl)
 ;; (load-feature! racket)
 
 ;; (load-feature! emms)

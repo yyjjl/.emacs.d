@@ -169,17 +169,6 @@ Does not indent buffer, because it is used for a
   (run-hooks 'ymacs-tools-after-search-hook))
 
 ;;;###autoload
-(defun ymacs-tools/toggle-socket-proxy ()
-  (interactive)
-  (if (eq url-gateway-method 'socks)
-      (let ((method (function-get #'ymacs-tools/toggle-socket-proxy 'method)))
-        (setq url-gateway-method (or method 'native))
-        (message "Use method '%s" url-gateway-method))
-    (function-put #'ymacs-tools/toggle-socket-proxy 'method url-gateway-method)
-    (setq url-gateway-method 'socks)
-    (message "Use socket proxy %s" ymacs-tools-socks-server)))
-
-;;;###autoload
 (defun ymacs-tools/delete-http-buffers (-force)
   (interactive "P")
   (require 'dired)

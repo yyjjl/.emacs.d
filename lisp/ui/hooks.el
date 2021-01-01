@@ -45,6 +45,10 @@
 (add-hook 'flycheck-status-changed-functions #'ymacs-modeline//update-checker-state)
 (add-hook 'flycheck-mode-hook #'ymacs-modeline//update-checker-state)
 
+(add-hook 'lsp-configure-hook
+          (lambda ()
+            (run-with-idle-timer 0 nil #'ymacs-modeline//update-lsp-state (current-buffer))))
+(add-hook 'lsp-unconfigure-hook #'ymacs-modeline//update-lsp-state)
 
 (ymacs-modeline-set! default main)
 (ymacs-modeline-set! (comint term vterm compilation) shell)

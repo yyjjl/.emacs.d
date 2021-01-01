@@ -1,10 +1,13 @@
 ;; -*- lexical-binding: t -*-
 
-(executable! fcitx)
+(executable! fcitx :exe "fcitx-remote")
+
+(when (and byte-compile-current-file sys/macp)
+  (message "You need go `https://github.com/xcodebuild/fcitx-remote-for-osx' to get fcitx support"))
 
 (require-packages!
  (exec-path-from-shell :when sys/macp)
- (sis :when (or (not sys/linuxp) ymacs-fcitx-path))
+ (fcitx :when (and sys/linuxp ymacs-fcitx-path))
  bison-mode
  buffer-move
  csv-mode
@@ -63,8 +66,6 @@
     ("w" "wikipedia" "http://en.wikipedia.org/wiki/Special:Search?search=%s")
     ("d" "dictionary" "http://dictionary.reference.com/search?q=%s")
     ("cpp" "cpp" "https://www.google.com/search?q=cpp+%s")))
-
-(defvar ymacs-tools-socks-server '("Default server" "127.0.0.1" 1080 5))
 
 (defvar ymacs-tools-projectile-invalidate-cache-empty-vars
   '(ymacs-modeline--buffer-file-name

@@ -5,9 +5,7 @@
              '((c++-mode . 1) (c-mode . 1) (t . t))))
       ((listp font-lock-maximum-decoration)
        (dolist (mode '(c++-mode c-mode))
-         (if-let (cell (assoc mode font-lock-maximum-decoration))
-             (setcdr cell 1)
-           (push (cons mode 1) font-lock-maximum-decoration)))))
+         (setf (alist-get mode font-lock-maximum-decoration) 1))))
 
 (after! cc-mode
   (define-key! :map c-mode-base-map

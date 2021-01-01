@@ -94,3 +94,14 @@
 
        (org-mode)
        (pop-to-buffer (current-buffer))))))
+
+;;;###autoload
+(defun ymacs-lsp/toggle-semantic-tokens ()
+  (interactive)
+  (setq lsp-semantic-tokens-enable (not lsp-semantic-tokens-enable))
+  (if lsp-semantic-tokens-enable
+      (lsp-semantic-tokens--enable)
+    (lsp-semantic-tokens--disable)
+    (font-lock-flush))
+  (lsp--info "Semantic Tokens %s. "
+             (if lsp-semantic-tokens-enable "enabled" "disabled")))

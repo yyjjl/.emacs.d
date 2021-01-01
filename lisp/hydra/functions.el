@@ -21,4 +21,5 @@ Arguments are same as of `defhydra'."
           :test #'equal))))
 
 (defun ymacs-hydra-add-toggle-column (column)
-  (add-to-list 'ymacs-hydra-local-toggles-heads-list column))
+  (setf (alist-get (car column) ymacs-hydra-local-toggles-heads-list)
+        (cdr column)))
