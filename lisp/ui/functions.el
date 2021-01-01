@@ -489,6 +489,7 @@ By default, this shows the information specified by `global-mode-string'."
 
 (ymacs-modeline//def-segment lsp
   '(""
+    (tree-sitter-hl-mode " TreeHL" (tree-sitter-mode " Tree"))
     ymacs-modeline--lsp-state
     (lsp-signature-mode
      (:propertize "[Signature]" face ymacs-modeline-lsp-success))))
@@ -530,4 +531,4 @@ By default, this shows the information specified by `global-mode-string'."
   (window-number matches git-timemachine buffer-position buffer-encoding major-mode))
 
 (ymacs-modeline//def-modeline header
-  (debug input-method lsp misc-info))
+  (debug input-method misc-info lsp))

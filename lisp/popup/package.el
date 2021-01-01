@@ -3,18 +3,19 @@
 (eval-when-compile
   (require 'dash))
 
-(defvar ymacs-popup-default-regexp
-  (rx string-start
-      "*" (*? not-newline) (?  "<" (+ digit) ">") "*" (?  "<" (+ digit) ">")
-      string-end))
+(defvar ymacs-popup-below-dedicated-buffer-regexp
+  (rx string-start "*"
+      (or (and "Org Src" (*? not-newline))
+          "Backtrace")
+      "*" string-end))
 
-(defvar ymacs-popup-other-window-regexp
-  (rx string-start
-      "*" (or "Man" "TeX" "Shell Command Output") (*? not-newline) "*"
-      string-end))
+(defvar ymacs-popup-below-autoclose-buffer-regexp
+  (rx string-start "*" "Warnings" "*" string-end))
 
-(defvar ymacs-popup-org-src-buffer-regexp
-  (rx string-start "*Org Src" (*? not-newline) "*" string-end))
+(defvar ymacs-popup-occur-buffer-regexp
+  (rx string-start
+      "*" (or "xref" "Man" "TeX" "Shell Command Output") (*? not-newline) "*"
+      string-end))
 
 (defvar ymacs-popup-help-buffer-regexp
   (rx string-start
@@ -70,33 +71,6 @@
 
 (defvar ymacs-popup-default-size 0.4)
 (defvar ymacs-popup-default-side 'below)
-
-(defvar ymacs-popup-rules
-  `((:macth-fn ymacs-popup//help-buffer-p
-     :side below
-     :select t
-     :autoclose t)
-    (:macth-fn ymacs-popup//term-buffer-p
-     :side below
-     :select t
-     :terminal t)
-    (:name-regexp ,ymacs-popup-other-window-regexp
-     :select t
-     :autoclose t)
-    (:name-regexp ,ymacs-popup-org-src-buffer-regexp
-     :select t
-     :side below
-     :dedicated t)
-    (:mode occur-mode
-     :select t)
-    (:name "*Flycheck error messages*"
-     :side below
-     :select nil
-     :size 0.3)
-    (:name ("*Warnings*" "*Backtrace*")
-     :side below
-     :autoclose t)))
-
 
 (define-key!
   ("C-z" :map

@@ -67,6 +67,13 @@
            (or (apply #'derived-mode-p ymacs-popup-help-modes)
                (string-match-p ymacs-popup-help-buffer-regexp (buffer-name)))))))
 
+(defsubst ymacs-popup//occur-buffer-p (-buffer)
+  (let ((case-fold-search t))
+    (with-current-buffer -buffer
+      (or (string-prefix-p "ivy-occur" (symbol-name major-mode))
+          (derived-mode-p 'occur-mode 'ivy-occur-mode)
+          (string-match-p ymacs-popup-occur-buffer-regexp (buffer-name))))))
+
 (defsubst ymacs-popup//get-term-buffer-list ()
   (ymacs-popup//cleanup)
   ymacs-popup--term-buffer-list)
@@ -77,32 +84,7 @@
    (lambda (buffer) (process-live-p (get-buffer-process buffer)))
    ymacs-popup--term-buffer-list))
 
-(defun ymacs-popup//rule-to-form (rule)
-  (-let* (((macth-fn . rule) (plist-pop! (copy-sequence rule) :macth-fn))
-          ((name . rule) (plist-pop! rule :name))
-          ((mode . rule) (plist-pop! rule :mode))
-          ((name-regexp . rule) (plist-pop! rule :name-regexp)))
-    (list (cond
-           (macth-fn `(,macth-fn buffer))
-           (name (if (stringp name)
-                     `(string= ,name buffer-name)
-                   `(member buffer-name ',name)))
-           (mode (if (symbolp mode)
-                     `(eq ',mode buffer-major-mode)
-                   `(memq buffer-major-mode ',mode)))
-           (name-regexp `(string-match-p ,name-regexp buffer-name)))
-          `(with-current-buffer buffer
-             (setq ymacs-popup--matched-rule ',rule)))))
-
-(defmacro ymacs-popup//compile-matcher ()
-  "transform `ymacs-popup-rules' into a matcher function"
-  `(defun ymacs-popup//match (-buffer-or-name _alist)
-     (let* ((buffer (get-buffer -buffer-or-name))
-            (buffer-major-mode (buffer-local-value 'major-mode buffer))
-            (buffer-name (buffer-name buffer)))
-       (cond ,@(mapcar #'ymacs-popup//rule-to-form ymacs-popup-rules)))))
-
-(defun ymacs-popup//display-buffer (-buffer -alist -rule)
+(defsubst ymacs-popup//display-buffer (-buffer -alist -rule)
   "Internal function for `ymacs-popup/display-buffer-action'.
 Displays -BUFFER according to -ALIST and -RULE."
   (let ((display-fn (plist-get -rule :display-fn))
@@ -125,14 +107,16 @@ Displays -BUFFER according to -ALIST and -RULE."
          (window-parameters . ((ymacs-quit-action . delete)))
          (direction . ,side)
          ,(let ((size (or (plist-get -rule :size) ymacs-popup-default-size)))
-            (cons (if (memq side '(below above up down)) 'window-height 'window-width)
+            (cons (if (memq side '(below above up down))
+                      'window-height
+                    'window-width)
                   size))
          ,@-alist)))
      ;; fallback
      ((display-buffer-pop-up-window -buffer -alist))
      ((display-buffer-use-some-window -buffer -alist)))))
 
-(defun ymacs-popup//display-term-buffer (-buffer -alist -rule)
+(defsubst ymacs-popup//display-term-buffer (-buffer -alist -rule)
   (let ((window (ymacs-popup//get-term-window)))
     (if window
         ;; Reuse window
@@ -156,17 +140,17 @@ Displays -BUFFER according to -ALIST and -RULE."
 
     window))
 
-(defun ymacs-popup//display-buffer-action (-buffer -alist)
+(defsubst ymacs-popup//display-buffer-action (-buffer -alist)
   "Display -BUFFER-OR-NAME according to the result of `ymacs-popup//match'"
   (ymacs-popup//cleanup)
 
   (let* ((ignore-window-parameters t)
          (rule (buffer-local-value 'ymacs-popup--matched-rule -buffer))
          (window
-          (funcall (if (plist-get rule :terminal)
-                       #'ymacs-popup//display-term-buffer
-                     #'ymacs-popup//display-buffer)
-                   -buffer -alist rule)))
+          (if (plist-get rule :terminal)
+              (ymacs-popup//display-term-buffer -buffer -alist rule)
+            (ymacs-popup//display-buffer -buffer -alist rule))))
+
     (when (window-live-p window)
       (when (plist-get rule :dedicated)
         (set-window-dedicated-p window t))
@@ -178,4 +162,63 @@ Displays -BUFFER according to -ALIST and -RULE."
         (select-window window)))
     window))
 
-(ymacs-popup//compile-matcher)
+
+
+(defsubst ymacs-popup//rule-to-form (rule)
+  (-let* (((macth-fn . rule) (plist-pop! (copy-sequence rule) :macth-fn))
+          ((name . rule) (plist-pop! rule :name))
+          ((mode . rule) (plist-pop! rule :mode))
+          ((name-regexp . rule) (plist-pop! rule :name-regexp)))
+    (list (cond
+           (macth-fn `(,macth-fn buffer))
+           (name (if (stringp name)
+                     `(string= ,name buffer-name)
+                   `(member buffer-name ',name)))
+           (mode (if (symbolp mode)
+                     `(eq ',mode buffer-major-mode)
+                   `(memq buffer-major-mode ',mode)))
+           (name-regexp `(string-match-p ,name-regexp buffer-name)))
+          `',rule)))
+
+(defmacro ymacs-popup//compile-matcher (&rest -popup-rules)
+  "transform `-popup-rules' into a matcher function"
+  `(progn
+     (defsubst ymacs-popup//match (-buffer-or-name _alist)
+       (let* ((buffer (get-buffer -buffer-or-name))
+              ,@(when (cl-some
+                       (lambda (rule)
+                         (plist-get rule :mode))
+                       -popup-rules)
+                  '((buffer-major-mode (buffer-local-value 'major-mode buffer))))
+              ,@(when (cl-some
+                       (lambda (rule)
+                         (or (plist-get rule :name)
+                             (plist-get rule :name-regexp)))
+                       -popup-rules)
+                  '((buffer-name (buffer-name buffer)))))
+         (with-current-buffer buffer
+           (setq ymacs-popup--matched-rule
+                 (cond ,@(mapcar #'ymacs-popup//rule-to-form -popup-rules))))))
+     ,(unless (bound-and-true-p byte-compile-current-file)
+        `(let (byte-compile-warnings)
+           (byte-compile #'ymacs-popup//match)))))
+
+(ymacs-popup//compile-matcher
+ (:macth-fn ymacs-popup//help-buffer-p
+  :side below
+  :select t
+  :autoclose t)
+ (:macth-fn ymacs-popup//term-buffer-p
+  :side below
+  :select t
+  :terminal t)
+ (:macth-fn ymacs-popup//occur-buffer-p
+  :select t
+  :dedicated t)
+ (:name-regexp ymacs-popup-below-dedicated-buffer-regexp
+  :select t
+  :side below
+  :dedicated t)
+ (:name-regexp ymacs-popup-below-autoclose-buffer-regexp
+  :side below
+  :autoclose t))

@@ -66,7 +66,7 @@
 
   ;; (setq lsp-auto-configure t)
   (setq lsp-auto-guess-root t)
-  (setq lsp-eldoc-render-all t)
+  (setq lsp-eldoc-render-all nil)
   ;; (setq lsp-diagnostics-provider :auto)
   ;; (setq lsp-restart 'interactive)
   (setq lsp-keep-workspace-alive nil)

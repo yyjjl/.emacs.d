@@ -23,7 +23,6 @@
       (--some it (--map (funcall it) ymacs-cpp-lsp-checkers))
       :init
       (progn
-        (setq-local lsp-eldoc-render-all nil)
         (setq ymacs-lsp-format-buffer-function #'clang-format-buffer))
       :fallback
       (progn

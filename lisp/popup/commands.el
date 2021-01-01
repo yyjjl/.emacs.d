@@ -11,10 +11,11 @@
       (display-buffer (ymacs-popup//get-current-buffer))
     (let ((help-buffers
            (mapcar #'buffer-name
-                   (cl-remove-if-not (lambda (buffer)
-                                       (and (ymacs-popup//help-buffer-p buffer)
-                                            (not (string-prefix-p " " (buffer-name buffer)))))
-                                     (buffer-list)))))
+                   (cl-remove-if-not
+                    (lambda (buffer)
+                      (with-current-buffer buffer
+                        (plist-get ymacs-popup--matched-rule :autoclose)))
+                    (buffer-list)))))
       (display-buffer (completing-read "Popup buffer: " help-buffers nil t)))))
 
 ;;;###autoload
