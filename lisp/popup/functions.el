@@ -158,6 +158,10 @@ Displays -BUFFER according to -ALIST and -RULE."
       (when (plist-get rule :autoclose)
         (ymacs-popup//push-window window -buffer t))
 
+      (when (plist-get rule :no-modeline)
+        (with-current-buffer -buffer
+          (setq-local mode-line-format nil)))
+
       (when (plist-get rule :select)
         (select-window window)))
     window))
@@ -220,5 +224,7 @@ Displays -BUFFER according to -ALIST and -RULE."
   :side below
   :dedicated t)
  (:name-regexp ymacs-popup-below-autoclose-buffer-regexp
+  :size 0.3
   :side below
+  :no-modeline t
   :autoclose t))

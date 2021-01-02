@@ -1,25 +1,5 @@
 ;; -*- lexical-binding:t -*-
 
-(after-feature! lsp
-  (after! lsp-mode
-    (setq lsp-headerline-breadcrumb-enable t)))
-
-(after! lsp-ui
-  (setq lsp-ui-peek-enable nil)
-  (setq lsp-ui-imenu-enabel nil)
-  (setq lsp-ui-sideline-enable nil)
-  (setq lsp-ui-doc-enable nil)
-
-  (setq lsp-ui-sideline-show-diagnostics nil)
-  (setq lsp-ui-sideline-show-hover nil)
-  (setq lsp-ui-sideline-show-symbol nil)
-
-  (setq lsp-ui-doc-delay 0.2)
-  (setq lsp-ui-doc-position 'at-point)
-  (setq lsp-ui-doc-header nil)
-  (setq lsp-ui-doc-include-signature nil)
-  (setq lsp-ui-doc-max-width 80))
-
 (after! dap-hydra
   (defhydra++ dap-hydra ()
     ("q" :delete)

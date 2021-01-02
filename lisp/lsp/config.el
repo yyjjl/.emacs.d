@@ -48,7 +48,7 @@
     (call-interactively ymacs-lsp-organize-import-function))
 
   (define-key! :map lsp-mode-map
-    ("M-s l" . lsp-lens-mode)
+    ;; ("M-s l" . lsp-lens-mode)
     ("M-s h h" . lsp-document-highlight)
     ("C-c R" . lsp-rename)
     ("C-c I" . lsp-ivy-workspace-symbol)

@@ -493,13 +493,17 @@ HTML file converted from org file, it returns t."
                               parent))
      (t -topmost))))
 
-(defmacro after! (file &rest body)
+(defmacro after! (-files &rest -body)
   (declare (indent 1) (debug t))
-  `(progn
-     (eval-when-compile
-       (require ',file nil t))
-     (with-eval-after-load ',file
-       ,@body)))
+  (let ((file (or (car-safe -files) -files))
+        (rest (cdr-safe -files)))
+    `(progn
+       (eval-when-compile
+         (require ',file nil t))
+       (with-eval-after-load ',file
+         ,@(if rest
+               `((after! ,rest ,@-body))
+             -body)))))
 
 (defun load-feature//option-to-form (-name -option)
   (let ((option

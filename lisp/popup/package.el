@@ -10,7 +10,10 @@
       "*" string-end))
 
 (defvar ymacs-popup-below-autoclose-buffer-regexp
-  (rx string-start "*" "Warnings" "*" string-end))
+  (rx string-start
+      (or "*Warnings*"
+          " *LanguageTool Errors* ")
+      string-end))
 
 (defvar ymacs-popup-occur-buffer-regexp
   (rx string-start

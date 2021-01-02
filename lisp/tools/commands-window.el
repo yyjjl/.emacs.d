@@ -27,6 +27,9 @@
 ;;;###autoload
 (defun ymacs-window/split-horizontally (&optional -arg -vertical)
   (interactive "P")
+  (when (eq (selected-window)
+            (ymacs-popup//get-term-window))
+    (user-error "Terminal window can not split"))
   (if -arg
       (ymacs//completing-read
        "Split Vertically"
