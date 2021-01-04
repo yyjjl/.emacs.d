@@ -1,6 +1,14 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;;;###autoload
+(defun ymacs-editor/find-file-as-root (-filename)
+  (interactive
+   (list (or (and (not current-prefix-arg)
+                  (buffer-file-name))
+             (read-file-name "Find file as root: " nil nil :must-match))))
+  (counsel-find-file-as-root -filename))
+
+;;;###autoload
 (defun ymacs-editor/edit-dir-locals (&optional -directory)
   "Edit or create a .dir-locals.el file of the project."
   (interactive

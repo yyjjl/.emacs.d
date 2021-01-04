@@ -4,26 +4,15 @@
 
 (require 'core-lib)
 
-(load-feature! default)
+(defun load-core! ()
+  (load-feature! core/default)
+  (load-feature! core/ui)
+  (load-feature! core/popup)
+  (load-feature! core/editor)
+  (load-feature! core/term)
+  (load-feature! core/debug))
 
-(load-file! "custom")
-
-(load-feature! package)
-(load-feature! ui)
-
-(load-feature! popup)
-(load-feature! completion-ivy)
-(load-feature! company)
-(load-feature! term)
-(load-feature! misc)
-(load-feature! hydra)
-(load-feature! semantic)
-(load-feature! hideshow)
-(load-feature! edit)
-(load-feature! dired)
-(load-feature! ibuffer)
-
-(load-file! "features")
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(load (file-name-sans-extension custom-file))
 
 (setq org-export-async-debug nil)
-(setq ymacs--buffer-visible-p nil)

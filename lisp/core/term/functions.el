@@ -92,7 +92,7 @@
 
 (defsubst ymacs-term//setup-sentinel ()
   (let* ((proc (get-buffer-process (current-buffer)))
-        (sentinel (and proc (process-sentinel proc))))
+         (sentinel (and proc (process-sentinel proc))))
     (when proc
       (set-process-sentinel
        proc

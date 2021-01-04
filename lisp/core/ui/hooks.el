@@ -15,6 +15,10 @@
   (column-number-mode 1)
   (show-paren-mode 1))
 
+(define-hook! ymacs-ui|indirect-buffer-setup (clone-indirect-buffer-hook)
+  (when (derived-mode-p 'prog-mode 'text-mode)
+    (ymacs-ui/view-code-mode 1)))
+
 (add-function :after after-focus-change-function #'ymacs-modeline//focus-change)
 (advice-add #'handle-switch-frame :after #'ymacs-modeline//focus-change)
 

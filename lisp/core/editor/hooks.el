@@ -2,6 +2,16 @@
 
 (declare-function exec-path-from-shell-initialize "ext:exec-path-from-shell")
 
+(define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
+  (let ((fetcher (apply -fn -args))
+        (dumb-jump-fetcher
+         (let ((xref-backend-functions '(dumb-jump-xref-activate t)))
+           (apply -fn -args))))
+    (lambda ()
+      (or (with-demoted-errors "Error: %s, fallback to dumb-jump"
+            (funcall fetcher))
+          (funcall dumb-jump-fetcher)))))
+
 (define-advice indent-for-tab-command (:around (-fn &rest -arg) smart)
   (if (save-excursion
         (forward-line 0)
@@ -25,18 +35,18 @@
             (ignore-errors (call-interactively #'hippie-expand)))))))
 
 (define-advice compilation-start (:around (-fn &rest -args) set-env)
-  (let* ((compilation-environment
-          (append (ymacs-editor//get-environment) compilation-environment))
-         (buffer (apply -fn -args)))
+  (let* ((env (ymacs-editor//get-environment))
+         (buffer (with-temp-env! env
+                   (apply -fn -args))))
     (with-current-buffer buffer
-      (when compilation-environment
+      (when (or env compilation-environment)
         (save-excursion
           (goto-char (point-min))
-          (when (re-search-forward "^Compilation started" nil t)
+          (when (re-search-forward "^\\(Compilation\\|Comint\\) started" nil t)
             (forward-line 1)
             (let ((inhibit-read-only t))
               (insert "\nEnvironments:\n  ")
-              (insert (string-join compilation-environment "\n  "))
+              (insert (string-join (append env compilation-environment) "\n  "))
               (insert "\n"))))))
     buffer))
 
@@ -56,6 +66,8 @@
 
 
 (define-hook! ymacs-editor|after-init (after-init-hook)
+  (require 'lv)
+
   (ivy-mode 1)
   (counsel-mode 1)
   (semantic-mode 1)

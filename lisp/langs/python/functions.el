@@ -15,7 +15,7 @@
 
   (when (and (not (eq -server ymacs-python-lsp-server))
              (require 'lsp-mode nil t))
-    (add-to-list 'lsp-client-packages (intern (format "lsp-%s" -server)))
+    (require (intern (format "lsp-%s" -server)) nil t)
 
     (setq ymacs-python-lsp-server -server)
     (setq lsp-disabled-clients (cl-delete -server lsp-disabled-clients))

@@ -336,38 +336,46 @@ HTML file converted from org file, it returns t."
       (with-current-buffer buffer
         (hack-dir-local-variables-non-file-buffer)))))
 
+(defun make-process-sentinel! (-callback -error-callback &optional -sentinel)
+  (lambda (-proc -msg)
+    (when -sentinel
+      (funcall -sentinel -proc -msg))
+
+    (when (memq (process-status -proc) '(exit signal))
+      (let ((exit-status (process-exit-status -proc)))
+        (with-current-buffer (process-buffer -proc)
+          (if (= exit-status 0)
+              (when -callback
+                (funcall -callback -msg))
+            (when -error-callback
+              (funcall -error-callback exit-status -msg))))))))
+
 (cl-defun run-compilation!
     (&key -name -callback -error-callback -command -buffer-name)
-  (let* ((buffer-name (if -buffer-name
-                          (lambda (_) -buffer-name)
-                        (lambda (_) (format "run command: %s" -name))))
+  (let* ((buffer-name (cond (-buffer-name
+                             (lambda (_) -buffer-name))
+                            (-name
+                             (lambda (_) (format "run command: %s" -name)))))
          (command-buffer (compilation-start -command t buffer-name)))
     (with-current-buffer command-buffer
       (setq ymacs-term-exit-action 'keep)
-      (add-function :after (local 'compilation-exit-message-function)
-        (lambda (_process-status -exit-status -msg)
-          (with-current-buffer command-buffer
-            (if (= -exit-status 0)
-                (when -callback
-                  (funcall -callback -msg))
-              (when -error-callback
-                (funcall -error-callback -exit-status -msg)))))))))
+      ;; NOTE: don't use `compilation-finish-functions' or `compilation-exit-message-function'
+      ;; We should make ensure the callbacks are called in the end
+      (let* ((proc (get-buffer-process command-buffer))
+             (sentinel (process-sentinel proc)))
+        (set-process-sentinel
+         proc
+         (make-process-sentinel! -callback -error-callback sentinel))))))
 
 (cl-defun run-process!
     (&key -name -program -program-args -callback -error-callback)
   (set-process-sentinel
-
-   (apply #'start-process -name (format " *%s*" -name) (or -program -name) -program-args)
-
-   (lambda (-proc -msg)
-     (when (memq (process-status -proc) '(exit signal))
-       (let ((exit-status (process-exit-status -proc)))
-         (with-current-buffer (process-buffer -proc)
-           (if (= exit-status 0)
-               (when -callback
-                 (funcall -callback -msg))
-             (when -error-callback
-               (funcall -error-callback exit-status -msg)))))))))
+   (apply #'start-process
+          -name                         ; name
+          (format " *%s*" -name)        ; buffer
+          (or -program -name)           ; program
+          -program-args)
+   (make-process-sentinel! -callback -error-callback)))
 
 (defun remap! (-old -new &optional -map)
   "Remap keybindings whose prefix is -OLD-KEY to -NEW-KEY in

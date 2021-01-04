@@ -6,6 +6,13 @@
 (tooltip-mode -1)
 (window-divider-mode -1)
 
+;; `line-spacing' make inline-image flickering a lot
+(setq-default line-spacing 0.25)
+
+(setq echo-keystrokes 0.25)
+
+;; paren
+(setq blink-matching-paren nil)
 (setq show-paren-when-point-inside-paren t)
 (setq show-paren-when-point-in-periphery t)
 
@@ -27,37 +34,42 @@
   (dolist (bitmap '(right-arrow left-arrow up-arrow down-arrow))
     (set-fringe-bitmap-face bitmap 'compilation-info)))
 
+(setq widget-image-enable nil)
+
+;; Don't display line number in mode line when buffer is too large
+(setq line-number-display-limit ymacs-large-buffer-limit)
+
+;; Update ui less often
+(setq idle-update-delay 2)
+;; Suppress GUI features
+(setq use-file-dialog nil)
+(setq use-dialog-box nil)
 ;; Disable bidirectional text for tiny performance boost
-(setq-default bidi-display-reordering nil)
-(setq-default blink-matching-paren nil)
-(setq-default cursor-in-non-selected-windows t)
-(setq-default frame-resize-pixelwise t)
-(setq-default highlight-nonselected-windows t)
-(setq-default image-animate-loop t)
+(setq bidi-display-reordering nil)
+(setq frame-resize-pixelwise t)
+
+(setq cursor-in-non-selected-windows t)
+(setq highlight-nonselected-windows t)
+
 (setq-default indicate-buffer-boundaries nil)
 (setq-default indicate-empty-lines nil)
-(setq-default max-mini-window-height 0.25)
-;; Disable mode-line mouseovers
-(setq-default mode-line-default-help-echo nil)
+
 ;; Minibuffer resizing
+(setq-default max-mini-window-height 0.25)
 (setq-default resize-mini-windows 'grow-only)
-;; hide :help-echo text
-(setq-default show-help-function nil)
-(setq-default split-width-threshold 120)
-(setq-default visible-cursor nil)
-(setq-default x-stretch-cursor nil)
-(setq-default widget-image-enable nil)
-(setq-default use-default-font-for-symbols t)
+
+(setq split-width-threshold 120)
+
 ;; Defer jit font locking slightly to [try to] improve Emacs performance
 ;; (setq-default jit-lock-defer-time 0.3)
-(setq-default jit-lock-defer-time nil)
-(setq-default jit-lock-stealth-nice 0.5)
-(setq-default jit-lock-stealth-time 5)
-(setq-default jit-lock-stealth-verbose nil)
-;; No beeping or blinking please
-(setq-default ring-bell-function #'ignore)
-;; Visible-bell has some issue
-(setq-default visible-bell nil)
+(setq jit-lock-defer-time nil)
+(setq jit-lock-stealth-nice 0.5)
+(setq jit-lock-stealth-time 5)
+(setq jit-lock-stealth-verbose nil)
+
+;; flash the frame to represent a bell.
+(setq ring-bell-function #'ignore)
+(setq visible-bell t)
 
 (after! tab-line
   (setq tab-line-left-button "<")

@@ -43,34 +43,42 @@
   (insert "\n\n")
   (redisplay t))
 
-(defun ymacs-lsp//install-clients (-clients -callback)
-  (let (output-strings
-        (output-buffer (get-buffer-create ymacs-lsp-process-buffer-name)))
-    (cl-labels
-        ((callback-fn
-          (&optional _message)
-          (with-current-buffer output-buffer
-            (push (buffer-substring (point-min) (point-max)) output-strings))
-          (funcall #'install-fn))
-         (install-fn
-          ()
-          (let ((client (pop -clients)))
-            (if client
-                (progn
-                  (push (format "* Install %s" client) output-strings)
-                  (funcall
-                   (lsp--client-download-server-fn (ht-get lsp-clients client))
-                   client
-                   #'callback-fn
-                   #'callback-fn
-                   t))
-              (with-current-buffer output-buffer
-                (let ((inhibit-read-only t))
-                  (erase-buffer)
-                  (insert (string-join (reverse output-strings) "\n\n") "\n\n")
-                  (funcall -callback)
-                  (set-buffer-modified-p nil)))))))
-      (funcall #'install-fn))))
+(defun ymacs-lsp//install-clients--loop (-clients -manual-clients &optional -outputs)
+  (if-let (client (car -clients))
+      (progn
+        (push (format "* Install %s" client) -outputs)
+
+        (let ((install-fn (lsp--client-download-server-fn (ht-get lsp-clients client)))
+              (callback-fn
+               (lambda (&rest _)
+                 (ymacs-lsp//install-clients--callback -clients -manual-clients -outputs))))
+          (funcall install-fn client callback-fn callback-fn t)))
+
+    (ymacs-lsp//install-clients--finish -manual-clients -outputs)))
+
+(defun ymacs-lsp//install-clients--callback (-clients -manual-clients -outputs)
+  (ymacs-lsp//install-clients--loop
+   (cdr -clients)
+   -manual-clients
+   (let ((buffer (get-buffer-create ymacs-lsp-process-buffer-name)))
+     (when (buffer-live-p buffer)
+       (with-current-buffer buffer
+         (push (buffer-substring (point-min) (point-max)) -outputs)))
+     -outputs)))
+
+(defun ymacs-lsp//install-clients--finish (-manual-clients -outputs)
+  (with-current-buffer (get-buffer-create ymacs-lsp-process-buffer-name)
+    (let ((inhibit-read-only t))
+      (erase-buffer)
+      (insert (string-join (reverse -outputs) "\n\n") "\n\n")
+      (goto-char (point-max))
+
+      (dolist (client -manual-clients)
+        (apply #'ymacs-lsp//check-software-from-github client))
+
+      (org-mode)
+      (pop-to-buffer (current-buffer))
+      (set-buffer-modified-p nil))))
 
 ;;;###autoload
 (defun ymacs-lsp/check-for-updates ()
@@ -86,16 +94,7 @@
               (require package nil t))
             (push client clients))))
 
-    (ymacs-lsp//install-clients
-     clients
-     (lambda ()
-       (goto-char (point-max))
-
-       (dolist (client manual-clients)
-         (apply #'ymacs-lsp//check-software-from-github client))
-
-       (org-mode)
-       (pop-to-buffer (current-buffer))))))
+    (ymacs-lsp//install-clients--loop clients manual-clients)))
 
 ;;;###autoload
 (defun ymacs-lsp/toggle-semantic-tokens ()

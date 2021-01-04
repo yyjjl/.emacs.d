@@ -12,6 +12,8 @@
 (setq gc-cons-threshold most-positive-fixnum)
 (setq gc-cons-percentage 0.5)
 
+(fset 'yes-or-no-p 'y-or-n-p)
+
 ;;* Default Values
 ;; No tool bar or scroll bar
 (when (fboundp 'tool-bar-mode)
@@ -20,10 +22,11 @@
   (set-scroll-bar-mode nil))
 (when (fboundp 'menu-bar-mode)
   (menu-bar-mode -1))
+
 ;; Do not show mode-line until setup finished
 (setq-default mode-line-format nil)
 
-(fset 'yes-or-no-p 'y-or-n-p)
+(setq system-time-locale "C")
 
 ;; UTF-8 as the default coding system
 (when (fboundp 'set-charset-priority)
@@ -44,94 +47,58 @@
 (set-selection-coding-system 'utf-8)
 (modify-coding-system-alist 'process "*" 'utf-8)
 
-;; Silence advised function warnings
-(setq-default ad-redefinition-action 'accept)
- ;; Make `apropos' more useful
-(setq-default apropos-do-all t)
- ;; kill compilation process before starting another
-(setq-default compilation-always-kill t)
-(setq-default compilation-skip-threshold 1)
-(setq-default compilation-scroll-output t)
-(setq-default compilation-environment '("TERM=xterm-256color"))
-(setq-default confirm-nonexistent-file-or-buffer t)
-(setq-default delete-by-moving-to-trash t)
-(setq-default enable-recursive-minibuffers t)
-;; Update ui less often
-(setq-default idle-update-delay 2)
- ;; keep the point out of the minibuffer
-(setq-default mark-ring-max 128)
-(setq-default kill-ring-max 200)
- ;; Save clipboard contents before replacement
-(setq-default save-interprogram-paste-before-kill t)
-;; History & backup settings
-(setq-default auto-save-default t)
-(setq-default auto-save-timeout 8)
-(setq-default create-lockfiles nil)
-(setq-default history-length 500)
-(setq-default history-delete-duplicates t)
-(setq-default make-backup-files nil)
- ;; No automatic new line when scrolling down at buffer bottom
-(setq-default next-line-add-newlines nil)
-(setq-default buffers-menu-max-size 30)
-(setq-default case-fold-search t)
-(setq-default compilation-scroll-output t)
-(setq-default ediff-split-window-function 'split-window-horizontally)
-(setq-default ediff-window-setup-function 'ediff-setup-windows-plain)
-(setq-default save-interprogram-paste-before-kill t)
-(setq-default indent-tabs-mode nil)
- ;; `line-spacing' make inline-image flickering a lot
-(setq-default line-spacing 0.25)
-(setq-default mouse-yank-at-point t)
-(setq-default set-mark-command-repeat-pop t)
-(setq-default echo-keystrokes 0.25)
-(setq-default tooltip-delay 0.5)
-(setq-default truncate-lines nil)
-(setq-default truncate-partial-width-windows 50)
-(setq-default speedbar-use-images nil)
-(setq-default large-file-warning-threshold (* 512 1024 1024))
-(setq-default line-number-display-limit ymacs-large-buffer-limit)
-(setq-default system-time-locale "C")
-(setq-default imenu-max-item-length 1024)
-(setq-default global-auto-revert-non-file-buffers t)
-(setq-default auto-revert-verbose nil)
-(setq-default delete-old-versions t)
-;; Use versioned backups
-(setq-default version-control t)
-(setq-default kept-new-versions 6)
-(setq-default kept-old-versions 2)
-(setq-default select-enable-clipboard t)
-(setq-default select-enable-primary t)
-(setq-default fill-column 79)
-(setq-default desktop-save 'ask-if-new)
-;; Scrolling
-(setq-default auto-window-vscroll nil)
-(setq-default scroll-conservatively 0)
-(setq-default scroll-preserve-screen-position t)
+;; Make `apropos' more useful
+(setq apropos-do-all t)
 
-(setq vc-make-backup-files nil)
-;; increase process buffer
+ ;; keep the point out of the minibuffer
+(setq mark-ring-max 128)
+(setq kill-ring-max 200)
+
+ ;; Save clipboard contents before replacement
+(setq save-interprogram-paste-before-kill t)
+
+;; History & backup settings
+(setq auto-save-default t)
+(setq make-backup-files nil)
+(setq history-length 500)
+(setq history-delete-duplicates t)
+
+;; Don’t compact font caches during GC.
+(setq inhibit-compacting-font-caches t)
+
+;; Whether confirmation is requested before visiting a new file or buffer.
+(setq confirm-nonexistent-file-or-buffer t)
+;; Use the system's trash can
+(setq delete-by-moving-to-trash t)
+(setq enable-recursive-minibuffers t)
+
+;; Vertical motion starting at end of line keeps to ends of lines
+(setq track-eol t)
+
+;; No automatic new line when scrolling down at buffer bottom
+(setq next-line-add-newlines nil)
+
+(setq-default indent-tabs-mode nil)
+
+(setq set-mark-command-repeat-pop t)
+
+;; Keeps  screen position if the scroll command moved  vertically out of the window
+(setq scroll-preserve-screen-position t)
+
+;; Increase process buffer
 (setq read-process-output-max (* 2 1024 1024))
+(setq large-file-warning-threshold (* 512 1024 1024))
+
+(setq next-error-find-buffer-function #'ymacs-default//next-error-find-buffer)
 
 ;; be quiet at startup; don't load or display anything unnecessary
-;; (advice-add #'display-startup-echo-area-message :override #'ignore)
-;; Suppress GUI features
-(setq use-file-dialog nil)
-(setq use-dialog-box nil)
 (setq inhibit-startup-screen t)
 (setq inhibit-startup-echo-area-message t)
-(setq display-time-24hr-format t)
-(setq display-time-day-and-date t)
+(setq initial-major-mode 'fundamental-mode)
 (setq initial-scratch-message
       (format ";; Welcome to Emacs %s %s !!!"
               emacs-version
               (or user-login-name "anonymous")))
-
-(unless (or noninteractive (daemonp))
-  (require 'server)
-  (unless (server-running-p)
-    (server-start)))
-
-(setq next-error-find-buffer-function #'ymacs-default//next-error-find-buffer)
 
 (put 'ymacs-default//external-file-handler 'safe-magic t)
 (put 'ymacs-default//external-file-handler 'operations '(insert-file-contents))
@@ -169,12 +136,25 @@
                 try-complete-file-name-partially
                 try-complete-file-name))
 
+(after! autorevert
+  (setq auto-revert-verbose nil)
+  (setq global-auto-revert-non-file-buffers t))
+
 (after! calc
   (add-to-list 'calc-language-alist '(org-mode . latex)))
+
+(after! compile
+  ;; kill compilation process before starting another
+  (setq compilation-always-kill t)
+  (setq compilation-scroll-output t)
+  (setq-default compilation-environment '("TERM=xterm-256color")))
 
 (after! isearch
   (define-key! :map isearch-mode-map
     ("C-o" . isearch-occur)))
+
+(after! speedbar
+  (setq speedbar-use-images nil))
 
 (after! savehist
   (setq savehist-autosave-interval 3000))
@@ -188,6 +168,10 @@
           "^/tmp/" "^/var/folders/.+$"
           (lambda (file)
             (file-in-directory-p file package-user-dir)))))
+
+(after! ediff
+  (setq ediff-split-window-function 'split-window-horizontally)
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain))
 
 (after! bookmark
   (bookmark-maybe-load-default-file)
@@ -278,5 +262,8 @@
 
 (after! inf-lisp
   (setq inferior-lisp-program "sbcl"))
+
+(after! image-mode
+  (setq image-animate-loop t))
 
 (setq winner-dont-bind-my-keys t)

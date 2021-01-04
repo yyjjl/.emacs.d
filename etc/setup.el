@@ -50,4 +50,4 @@
   (setq ymacs--compile-config-in-progress t)
 
   (ymacs-default/compile-config)
-  (ymacs-default/compile-elpa-packages :no-message))
+  (ymacs-default/compile-elpa-packages))

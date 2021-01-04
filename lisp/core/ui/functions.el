@@ -232,14 +232,14 @@ like the scratch buffer where knowing the current project directory is important
    " %["
    '(:propertize mode-name face ymacs-modeline-buffer-major-mode)
    mode-line-process
+   "%]"
    (and (boundp 'text-scale-mode-amount)
         (/= text-scale-mode-amount 0)
         (format
          (if (> text-scale-mode-amount 0)
              " (%+d)"
            " (%-d)")
-         text-scale-mode-amount))
-   "%]"))
+         text-scale-mode-amount))))
 
 
 ;;
@@ -487,8 +487,10 @@ By default, this shows the information specified by `global-mode-string'."
         (setq ymacs-modeline--lsp-state
               (format-mode-line (assoc 'lsp-mode minor-mode-alist)))))))
 
-(ymacs-modeline//def-segment lsp
+(ymacs-modeline//def-segment misc-header
   '(""
+    (compilation-in-progress
+     (:propertize "[Compiling]" face ymacs-modeline-warning))
     (tree-sitter-hl-mode " TreeHL" (tree-sitter-mode " Tree"))
     ymacs-modeline--lsp-state
     (lsp-signature-mode
@@ -531,4 +533,4 @@ By default, this shows the information specified by `global-mode-string'."
   (window-number matches git-timemachine buffer-position buffer-encoding major-mode))
 
 (ymacs-modeline//def-modeline header
-  (debug input-method misc-info lsp))
+  (debug input-method misc-header misc-info))

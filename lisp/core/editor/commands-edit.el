@@ -266,7 +266,9 @@ Use `scan-lists', otherwise use simple algorithm."
 ;;;###autoload
 (defun ymacs-editor/iedit-mode (-arg)
   (interactive "P")
-  (if (and (equal -arg '(4))
-           (bound-and-true-p lsp-mode))
-      (lsp-iedit-highlights)
-    (call-interactively #'iedit-mode)))
+  (if iedit-rectangle-mode
+      (iedit-rectangle-mode -1)
+    (if (and (equal -arg '(4))
+             (bound-and-true-p lsp-mode))
+        (lsp-iedit-highlights)
+      (call-interactively #'iedit-mode))))

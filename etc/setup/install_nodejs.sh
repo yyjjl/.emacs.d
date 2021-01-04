@@ -3,7 +3,6 @@
 OS=$(uname -s)
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd)"
 
-# shellcheck source=./utils.sh
 . "${CURRENT_DIR}/utils.sh"
 
 if which node; then

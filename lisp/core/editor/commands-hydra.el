@@ -90,14 +90,14 @@
     ("T" load-theme "theme"))))
 
 (defhydra ymacs-hydra/rectangle (:body-pre (rectangle-mark-mode 1)
-                           :color pink
-                           :post (deactivate-mark))
+                                 :color pink
+                                 :post (deactivate-mark))
   "
   ^_p_^         [_k_]kill      [_s_]string
 _b_   _f_       [_q_]quit      [_y_]yank
   ^_n_^         [_m_]mark      [_w_]copy
-^^^^            [_x_]exchange  [_/_]undo
-^^^^            [_a_]line beg  [_e_]line end [_N_]umber
+^^^^            [_x_]exchange  [_/_]undo     [_i_]iedit
+^^^^            [_a_]line beg  [_e_]line end [_N_]number
 "
   ("b" backward-char nil)
   ("f" forward-char nil)
@@ -111,6 +111,7 @@ _b_   _f_       [_q_]quit      [_y_]yank
            (deactivate-mark)
          (rectangle-mark-mode 1))
        nil)
+  ("i" iedit-rectangle-mode nil)
   ("y" yank-rectangle nil)
   ("/" undo nil)
   ("N" rectangle-number-lines nil :exit t)

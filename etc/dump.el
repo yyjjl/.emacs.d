@@ -97,7 +97,7 @@
     lsp-diagnostics
     lsp-modeline
 
-    ,@(hash-table-keys ymacs-package--required-packages)))
+    ,@ymacs--required-packages))
 
 (dolist (package ymacs-preload-packages)
   (when (not (memq package ymacs-ignored-packages))

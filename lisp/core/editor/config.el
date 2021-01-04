@@ -1,5 +1,8 @@
 ;; -*- lexical-binding: t -*-
 
+(after! dumb-jump
+  (setq dumb-jump-prefer-searcher 'rg))
+
 (after! fcitx
   ;; Init fcitx prefix keys
   (setq fcitx-use-dbus nil)

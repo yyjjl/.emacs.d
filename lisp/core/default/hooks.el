@@ -41,6 +41,11 @@
 (add-hook 'ediff-quit-hook
           (lambda () (jump-to-register :ediff-windows)))
 
+;; ANSI-escape coloring in compilation-mode
+(define-hook! ymacs-default|colorize-compilation-buffer (compilation-filter-hook)
+  (when (eq major-mode 'compilation-mode)
+    (ansi-color-apply-on-region compilation-filter-start (point-max))))
+
 ;; Display long lines in truncated style (end line with $)
 (define-hook! ymacs-default|truncate-line
   (grep-mode-hook
@@ -77,15 +82,6 @@
           ((equal bn "*task*") nil)
           ((equal bn "*scratch*") (delete-region (point-min) (point-max)) nil)
           (t t))))
-
-;; ANSI-escape coloring in compilation-mode
-(define-hook! ymacs-default|colorize-compilation-buffer (compilation-filter-hook)
-  (when (eq major-mode 'compilation-mode)
-    (ansi-color-apply-on-region compilation-filter-start (point-max))))
-
-(define-hook! ymacs-default|indirect-buffer-setup (clone-indirect-buffer-hook)
-  (when (derived-mode-p 'prog-mode 'text-mode)
-    (ymacs-ui/view-code-mode 1)))
 
 ;; Default prog-mode setup
 (define-hook! ymacs-default|generic-prog-mode-setup (prog-mode-hook LaTeX-mode-hook)
@@ -181,6 +177,11 @@
   (run-with-idle-timer
    ymacs-default-autosave-interval t
    #'run-hooks 'ymacs-default-autosave-hook)
+
+  (unless (or noninteractive (daemonp))
+    (require 'server)
+    (unless (server-running-p)
+      (server-start)))
 
   ;; collect garbage after focus changes
   (add-function :after after-focus-change-function

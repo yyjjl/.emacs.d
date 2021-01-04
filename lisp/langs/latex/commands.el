@@ -57,15 +57,9 @@ Else call with `read-file-name'.
                 (read-file-name "TeX file: ")))
            (default-directory (TeX-master-directory))
            (command (format "texcount %s %s" options (shell-quote-argument file))))
-      (with-current-buffer (compilation-start command)
-        (add-transient-hook! (compilation-finish-functions
-                              :local t
-                              :name ymacs-latex|after-count-words
-                              :arguments (buffer _))
-          (with-current-buffer buffer
-            (goto-char (point-min))
-            (re-search-forward "^texcount" nil :noerror)
-            (forward-line 0)))))))
+      (run-compilation!
+       :-command command
+       :-callback (lambda (&rest _) (goto-char (point-min)))))))
 
 ;;;###autoload
 (defun ymacs-latex/build ()

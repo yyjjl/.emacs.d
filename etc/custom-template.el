@@ -48,7 +48,7 @@
 
 (load-feature! IDE/lsp)
 ;; (load-feature! IDE/dap)
-(load-feature! IDE/tree-sitter)
+;; (load-feature! IDE/tree-sitter)
 
 (load-feature! tools/git)
 (load-feature! tools/spell)

@@ -221,6 +221,7 @@ Displays -BUFFER according to -ALIST and -RULE."
   :terminal t)
  (:macth-fn ymacs-popup//occur-buffer-p
   :select t
+  :side below
   :dedicated t)
  (:name-regexp ymacs-popup-below-dedicated-buffer-regexp
   :select t

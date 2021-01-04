@@ -23,9 +23,9 @@
  flycheck
  projectile
  swiper
- sudo-edit
  yasnippet
  yasnippet-snippets
+ dumb-jump
  expand-region
  goto-chg
  ;; Mark tools
@@ -38,6 +38,7 @@
  csv-mode
  gnuplot-mode
  crontab-mode
+ dockerfile-mode
  graphviz-dot-mode
  yaml-mode
  zeal-at-point)
@@ -212,6 +213,7 @@
 
   ("M--" . er/expand-region)
   ("M-i" . ymacs-editor/iedit-mode)
+  ("M-I" . iedit-rectangle-mode)
 
   ("M-k" . kill-sexp)
   ("C-M-k" . kill-sentence)
@@ -271,7 +273,7 @@
 
 (define-key! :prefix "C-c i"
   ("r" . ivy-resume)
-  ("e" . sudo-edit)
+  ("e" . ymacs-editor/find-file-as-root)
 
   ([remap compile] . counsel-compile)
   ([remap insert-char] . counsel-unicode-char)
