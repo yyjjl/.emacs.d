@@ -71,7 +71,9 @@
     profiler-report-mode))
 
 (defvar-local ymacs-popup--matched-rule nil)
+(defvar-local ymacs-popup--nosplit-window nil)
 (put 'ymacs-popup--matched-rule 'permanent-local t)
+(put 'ymacs-popup--nosplit-window 'permanent-local t)
 
 (defvar ymacs-popup-default-size 0.4)
 (defvar ymacs-popup-default-side 'below)

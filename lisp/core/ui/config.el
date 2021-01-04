@@ -82,25 +82,20 @@
   (setq tab-line-separator nil)
   (setq tab-line-tabs-function #'ymacs-popup//get-active-term-buffer-list))
 
-(after! winum
-  (define-key! :map winum-keymap
-    ("C-x w")
+(after! ace-window
+  (define-key!
     ("M-0" . ymacs-editor/goto-next-char-or-minibuffer)
-    ("M-1" . winum-select-window-1)
-    ("M-2" . winum-select-window-2)
-    ("M-3" . winum-select-window-3)
-    ("M-4" . winum-select-window-4)
-    ("M-5" . winum-select-window-5)
-    ("M-6" . winum-select-window-6))
+    ("M-1" . ymacs-ui/aw-select-window)
+    ("M-2" . ymacs-ui/aw-select-window)
+    ("M-3" . ymacs-ui/aw-select-window)
+    ("M-4" . ymacs-ui/aw-select-window)
+    ("M-5" . ymacs-ui/aw-select-window)
+    ("M-6" . ymacs-ui/aw-select-window))
 
-  (add-to-list 'winum-ignored-buffers " *LV*")
-
-  (setcdr (assoc 'winum-mode minor-mode-map-alist) winum-keymap)
-
-  (setq winum-auto-setup-mode-line nil)
-  (setq winum-scope 'frame-local
-        winum-reverse-frame-list nil
-        winum-auto-assign-0-to-minibuffer t))
+  (setq aw-scope 'frame
+        aw-display-mode-overlay nil
+        aw-reverse-frame-list nil
+        aw-dispatch-always nil))
 
 (setq which-key-dont-use-unicode t)
 (after! which-key

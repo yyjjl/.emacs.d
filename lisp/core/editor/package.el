@@ -12,7 +12,6 @@
  (exec-path-from-shell :when sys/macp)
  (fcitx :when (and sys/linuxp ymacs-fcitx-path))
  ;; `counsel-M-x' need amx to get history
- ace-window
  amx
  company
  ivy
@@ -52,6 +51,7 @@
 (defvar ymacs-editor-ivy-display-help-max-width 160)
 (defvar ymacs-editor-ivy-display-help-extra-commands
   '(ymacs-editor/ivy-meta-dot
+    delete-blank-lines
     (counsel-find-file . ivy-magic-read-file-env)))
 
 (defvar ymacs-editor-rg-type-aliases

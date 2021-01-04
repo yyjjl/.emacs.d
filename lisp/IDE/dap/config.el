@@ -26,7 +26,7 @@
   (define-key! :map dap-ui-repl-mode-map
     ("M-s d" . dap-hydra))
 
-  (after! winum
+  (after! ace-window
     (dolist (buffer
              (list
               dap-ui--locals-buffer
@@ -34,7 +34,7 @@
               dap-ui--debug-window-buffer
               dap-ui--expressions-buffer
               dap-ui--breakpoints-buffer))
-      (add-to-list 'winum-ignored-buffers buffer))))
+      (add-to-list 'aw-ignored-buffers buffer))))
 
 (after! dap-lldb
   (setq dap-lldb-debug-program '("lldb-vscode-10"))

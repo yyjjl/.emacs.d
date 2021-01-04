@@ -1,7 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
-(after! winum
-  (add-to-list 'winum-ignored-buffers ymacs-debug--help-buffer-name))
+(after! ace-window
+  (add-to-list 'aw-ignored-buffers ymacs-debug--help-buffer-name))
 
 (after! gdb-mi
   (setq gdb-show-main t)

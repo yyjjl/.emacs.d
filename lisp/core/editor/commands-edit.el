@@ -78,7 +78,7 @@ grab matched string and insert them into `kill-ring'"
 ;;;###autoload
 (defun ymacs-editor/goto-next-char-or-minibuffer (-backward-p)
   (interactive "P")
-  (let ((window (winum-get-window-by-number 0)))
+  (let ((window (active-minibuffer-window)))
     (if (and window (not (eq window (selected-window))))
         (select-window window)
       (if -backward-p
@@ -266,7 +266,7 @@ Use `scan-lists', otherwise use simple algorithm."
 ;;;###autoload
 (defun ymacs-editor/iedit-mode (-arg)
   (interactive "P")
-  (if iedit-rectangle-mode
+  (if (bound-and-true-p iedit-rectangle-mode)
       (iedit-rectangle-mode -1)
     (if (and (equal -arg '(4))
              (bound-and-true-p lsp-mode))

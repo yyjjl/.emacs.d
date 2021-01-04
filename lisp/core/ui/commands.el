@@ -1,17 +1,30 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;;;###autoload
-(defun ymacs-ui/toggle-winum-scope ()
+(defun ymacs-ui/aw-select-window ()
+  "Select the specified window."
   (interactive)
-  (setq winum-scope (if (eq winum-scope 'frame-local)
-                        'visible
-                      'frame-local))
-  (message "Current winum scope: %s" (upcase (symbol-name winum-scope)))
-  (dolist (frame (frame-list))
-    (with-selected-frame frame
-      (winum--update)))
-  (force-mode-line-update)
-  (redisplay t))
+  (let ((path (-> (this-command-keys-vector)
+                  key-description
+                  (split-string "-")
+                  (elt 1))))
+    (unless (cl-loop
+             for window in (aw-window-list)
+             when (and (window-live-p window)
+                       (equal path (window-parameter window 'ace-window-path)))
+             return (aw-switch-to-window window))
+      (message "No specified window: %d" path))))
+
+;;;###autoload
+(defun ymacs-ui/toggle-aw-scope ()
+  (interactive)
+  (setq aw-scope
+        (completing-read-simple!
+         :-prompt "Scope: "
+         :-collection (delete aw-scope '(visible global frame))))
+  (aw-update)
+  (force-mode-line-update t)
+  (message "Current AW scope: %s" (upcase (symbol-name aw-scope))))
 
 ;;;###autoload
 (define-minor-mode ymacs-ui/view-code-mode

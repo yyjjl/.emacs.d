@@ -63,7 +63,8 @@
                t)
 
   (add-hook 'comint-output-filter-functions
-            #'python-pdbtrack-comint-output-filter-function)
+            #'python-pdbtrack-comint-output-filter-function
+            nil t)
 
   (force-mode-line-update))
 
@@ -71,7 +72,8 @@
   (remove-hook 'mode-line-buffer-identification
                "[pdbtrack]")
   (remove-hook 'comint-output-filter-functions
-               #'python-pdbtrack-comint-output-filter-function)
+               #'python-pdbtrack-comint-output-filter-function
+               t)
   (force-mode-line-update))
 
 (defun ymacs-python//generate-doc (-params -indent)

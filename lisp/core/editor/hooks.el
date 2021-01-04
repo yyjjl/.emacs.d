@@ -120,6 +120,11 @@
         (apply -fn -args)
       (lv-delete-window)))
 
+  (define-advice projectile-run-compilation (:override (-cmd) use-comint)
+    (if (functionp -cmd)
+      (funcall -cmd)
+      (compile -cmd t)))
+
   (define-advice projectile-project-root (:override (&optional -dir) fast)
     (let ((dir (or -dir default-directory)))
       (if (file-remote-p dir)

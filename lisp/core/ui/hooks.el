@@ -2,7 +2,8 @@
 
 ;; Setup `mode-line-format'
 (define-hook! ymacs-ui|setup-modeline (after-init-hook)
-  (winum-mode 1)
+  (ace-window-display-mode 1)
+  (ymacs-modeline-set! default main)
 
   (global-font-lock-mode 1)
   (global-page-break-lines-mode 1)
@@ -54,7 +55,6 @@
             (run-with-idle-timer 0 nil #'ymacs-modeline//update-lsp-state (current-buffer))))
 (add-hook 'lsp-unconfigure-hook #'ymacs-modeline//update-lsp-state)
 
-(ymacs-modeline-set! default main)
 (ymacs-modeline-set! (comint term vterm compilation) shell)
 (ymacs-modeline-set! dired project)
 (ymacs-modeline-set! image media)

@@ -406,13 +406,17 @@ like the scratch buffer where knowing the current project directory is important
 ;;* Window number
 ;;
 
-(declare-function winum-get-number-string 'winum)
+(defvar ace-window-mode)
 
 (ymacs-modeline//def-segment window-number
   (concat
-   (when (display-graphic-p) (propertize "\u200b" 'display '((height 1.3) (raise -0.15))))
-   (when-let (num (ignore-errors (winum-get-number-string)))
-     (propertize (format " %s" num) 'face 'ymacs-modeline-buffer-file))))
+   (when (display-graphic-p)
+     (propertize "\u200b" 'display '((height 1.3) (raise -0.15))))
+   " "
+   (when-let (number (window-parameter (selected-window) 'ace-window-path))
+     (if ace-window-mode
+         (propertize (concat number " " ace-window-mode) 'face 'aw-leading-char-face)
+       number))))
 
 
 ;;

@@ -1,11 +1,11 @@
 ;;; -*- lexical-binding: t; -*-
 
 (require-packages!
+ ace-window
  hl-todo
  page-break-lines
  doom-themes
  which-key
- winum
  highlight-indent-guides)
 
 (load-theme 'doom-molokai t)

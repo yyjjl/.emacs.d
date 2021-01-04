@@ -498,7 +498,7 @@ HTML file converted from org file, it returns t."
 (defmacro after-feature! (-name &rest -body)
   (declare (indent 1) (debug t))
   `(let ((func (lambda () ,@-body)))
-     (if (has-feature! '-name)
+     (if (has-feature! ',-name)
          (funcall func)
        (put ',-name 'after-feature-functions
             (cons func (get ',-name 'after-feature-functions))))))

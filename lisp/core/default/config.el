@@ -146,8 +146,7 @@
 (after! compile
   ;; kill compilation process before starting another
   (setq compilation-always-kill t)
-  (setq compilation-scroll-output t)
-  (setq-default compilation-environment '("TERM=xterm-256color")))
+  (setq compilation-scroll-output t))
 
 (after! isearch
   (define-key! :map isearch-mode-map

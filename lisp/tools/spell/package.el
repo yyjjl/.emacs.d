@@ -19,5 +19,5 @@
     (message "LanguageTool is not found, please run %s"
              (expand-etc! "setup/install_languagetool.sh"))))
 
-(after! (langtool wunum)
-  (add-to-list 'winum-ignored-buffers 'langtool-error-buffer-name))
+(after! (langtool ace-window)
+  (add-to-list 'aw-ignored-buffers langtool-error-buffer-name))

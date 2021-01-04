@@ -195,6 +195,8 @@
   (setq swiper-stay-on-quit t))
 
 (after! counsel
+  (setq-default counsel-compile-env '("TERM=xterm-256color"))
+
   (add-to-list 'counsel-compile-local-builds #'ymacs-editor//default-compile-command t)
 
   (setq counsel-yank-pop-separator "\n------------------------------------------------------------\n")
