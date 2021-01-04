@@ -1,0 +1,282 @@
+;; -*- lexical-binding: t; -*-
+
+;; Add site-package's path to `load-path'
+(when (fboundp 'normal-top-level-add-to-load-path)
+  (dolist (dir (directory-files ymacs-private-directory))
+    (unless (string-match "^\\." dir)
+      (add-to-list 'load-path (expand-file-name dir ymacs-private-directory))))
+  (add-to-list 'load-path ymacs-private-directory))
+
+(setq file-name-handler-alist nil)
+;; Don't GC during startup to save time
+(setq gc-cons-threshold most-positive-fixnum)
+(setq gc-cons-percentage 0.5)
+
+;;* Default Values
+;; No tool bar or scroll bar
+(when (fboundp 'tool-bar-mode)
+  (tool-bar-mode -1))
+(when (fboundp 'set-scroll-bar-mode)
+  (set-scroll-bar-mode nil))
+(when (fboundp 'menu-bar-mode)
+  (menu-bar-mode -1))
+;; Do not show mode-line until setup finished
+(setq-default mode-line-format nil)
+
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;; UTF-8 as the default coding system
+(when (fboundp 'set-charset-priority)
+  (set-charset-priority 'unicode))
+
+;; Explicitly set the prefered coding systems to avoid annoying prompt
+;; from emacs (especially on Microsoft Windows)
+(prefer-coding-system 'utf-8)
+(setq locale-coding-system 'utf-8)
+
+(set-language-environment 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-buffer-file-coding-system 'utf-8)
+(set-clipboard-coding-system 'utf-8)
+(set-file-name-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(modify-coding-system-alist 'process "*" 'utf-8)
+
+;; Silence advised function warnings
+(setq-default ad-redefinition-action 'accept)
+ ;; Make `apropos' more useful
+(setq-default apropos-do-all t)
+ ;; kill compilation process before starting another
+(setq-default compilation-always-kill t)
+(setq-default compilation-skip-threshold 1)
+(setq-default compilation-scroll-output t)
+(setq-default compilation-environment '("TERM=xterm-256color"))
+(setq-default confirm-nonexistent-file-or-buffer t)
+(setq-default delete-by-moving-to-trash t)
+(setq-default enable-recursive-minibuffers t)
+;; Update ui less often
+(setq-default idle-update-delay 2)
+ ;; keep the point out of the minibuffer
+(setq-default mark-ring-max 128)
+(setq-default kill-ring-max 200)
+ ;; Save clipboard contents before replacement
+(setq-default save-interprogram-paste-before-kill t)
+;; History & backup settings
+(setq-default auto-save-default t)
+(setq-default auto-save-timeout 8)
+(setq-default create-lockfiles nil)
+(setq-default history-length 500)
+(setq-default history-delete-duplicates t)
+(setq-default make-backup-files nil)
+ ;; No automatic new line when scrolling down at buffer bottom
+(setq-default next-line-add-newlines nil)
+(setq-default buffers-menu-max-size 30)
+(setq-default case-fold-search t)
+(setq-default compilation-scroll-output t)
+(setq-default ediff-split-window-function 'split-window-horizontally)
+(setq-default ediff-window-setup-function 'ediff-setup-windows-plain)
+(setq-default save-interprogram-paste-before-kill t)
+(setq-default indent-tabs-mode nil)
+ ;; `line-spacing' make inline-image flickering a lot
+(setq-default line-spacing 0.25)
+(setq-default mouse-yank-at-point t)
+(setq-default set-mark-command-repeat-pop t)
+(setq-default echo-keystrokes 0.25)
+(setq-default tooltip-delay 0.5)
+(setq-default truncate-lines nil)
+(setq-default truncate-partial-width-windows 50)
+(setq-default speedbar-use-images nil)
+(setq-default large-file-warning-threshold (* 512 1024 1024))
+(setq-default line-number-display-limit ymacs-large-buffer-limit)
+(setq-default system-time-locale "C")
+(setq-default imenu-max-item-length 1024)
+(setq-default global-auto-revert-non-file-buffers t)
+(setq-default auto-revert-verbose nil)
+(setq-default delete-old-versions t)
+;; Use versioned backups
+(setq-default version-control t)
+(setq-default kept-new-versions 6)
+(setq-default kept-old-versions 2)
+(setq-default select-enable-clipboard t)
+(setq-default select-enable-primary t)
+(setq-default fill-column 79)
+(setq-default desktop-save 'ask-if-new)
+;; Scrolling
+(setq-default auto-window-vscroll nil)
+(setq-default scroll-conservatively 0)
+(setq-default scroll-preserve-screen-position t)
+
+(setq vc-make-backup-files nil)
+;; increase process buffer
+(setq read-process-output-max (* 2 1024 1024))
+
+;; be quiet at startup; don't load or display anything unnecessary
+;; (advice-add #'display-startup-echo-area-message :override #'ignore)
+;; Suppress GUI features
+(setq use-file-dialog nil)
+(setq use-dialog-box nil)
+(setq inhibit-startup-screen t)
+(setq inhibit-startup-echo-area-message t)
+(setq display-time-24hr-format t)
+(setq display-time-day-and-date t)
+(setq initial-scratch-message
+      (format ";; Welcome to Emacs %s %s !!!"
+              emacs-version
+              (or user-login-name "anonymous")))
+
+(unless (or noninteractive (daemonp))
+  (require 'server)
+  (unless (server-running-p)
+    (server-start)))
+
+(setq next-error-find-buffer-function #'ymacs-default//next-error-find-buffer)
+
+(put 'ymacs-default//external-file-handler 'safe-magic t)
+(put 'ymacs-default//external-file-handler 'operations '(insert-file-contents))
+
+
+
+(setq package-quickstart t)
+
+;; The index of archive represents its priority
+(setq package-archives
+      '(("melpa-stable" . "https://elpa.emacs-china.org/melpa-stable/")
+        ("gnu" . "https://elpa.emacs-china.org/gnu/")
+        ("melpa" . "https://elpa.emacs-china.org/melpa/")
+        ("org" . "https://elpa.emacs-china.org/org/")))
+
+(unless ymacs-use-gnutls-p
+  (dolist (item package-archives)
+    (setcdr item (replace-regexp-in-string "https:" "http:" (cdr item)))))
+
+(package-initialize)
+
+(require-packages! dash)
+(require 'dash)
+
+
+
+(defalias 'top 'proced)
+
+(setq he-dabbrev-chars "0-9a-zA-Z\\?!_")
+(setq-default hippie-expand-try-functions-list
+              '(try-expand-dabbrev
+                try-expand-all-abbrevs
+                try-expand-dabbrev-all-buffers
+                try-expand-dabbrev-from-kill
+                try-complete-file-name-partially
+                try-complete-file-name))
+
+(after! calc
+  (add-to-list 'calc-language-alist '(org-mode . latex)))
+
+(after! isearch
+  (define-key! :map isearch-mode-map
+    ("C-o" . isearch-occur)))
+
+(after! savehist
+  (setq savehist-autosave-interval 3000))
+
+(after! recentf
+  (setq recentf-max-saved-items 2048)
+  (setq recentf-exclude
+        '("\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
+          "\\.\\(?:gz\\|gif\\|svg\\|png\\|jpe?g\\|bmp\\|xpm\\)$"
+          "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
+          "^/tmp/" "^/var/folders/.+$"
+          (lambda (file)
+            (file-in-directory-p file package-user-dir)))))
+
+(after! bookmark
+  (bookmark-maybe-load-default-file)
+
+  ;; Setup for existing buffers
+  (dolist (buffer (buffer-list))
+    (with-current-buffer buffer
+      (ymacs-default//bookmark-setup))))
+
+(after! ffap
+  ;; do not use ping, it's very slow
+  (setq ffap-machine-p-known 'reject))
+
+(after! tramp
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+
+  (setq vc-ignore-dir-regexp
+        (format "\\(?:%s\\)\\|\\(?:%s\\)"
+                locate-dominating-stop-dir-regexp
+                tramp-file-name-regexp))
+
+  (setq tramp-terminal-type "tramp")
+  (setq tramp-default-method "ssh")
+  (setq backup-enable-predicate
+        (lambda (name)
+          (and (normal-backup-enable-predicate name)
+               (not (file-remote-p name 'method)))))
+  (setq tramp-chunksize 8192)
+  (setq tramp-verbose 1)
+  ;; @see https://github.com/syl20bnr/spacemacs/issues/1921
+  (setq tramp-ssh-controlmaster-options
+        "-o ControlMaster=auto -o ControlPath='tramp.%%C' -o ControlPersist=no"))
+
+(after! view
+  (define-key! :map view-mode-map
+    ("s" . ymacs-editor/swiper)
+    ("q" . View-exit)
+    ("Q" . View-quit)))
+
+(after! xref
+  (define-key! :map xref--xref-buffer-mode-map
+    ("M-n" . next-error)
+    ("M-p" . previous-error)
+    ("j" . (lambda! () (xref--search-property 'xref-item)))
+    ("k" . (lambda! () (xref--search-property 'xref-item t))))
+
+  (add-to-list 'xref-prompt-for-identifier 'xref-find-references :append))
+
+(after! grep
+  (setq grep-highlight-matches t)
+  (setq grep-scroll-output t))
+
+(after! flymake
+  (define-key! :map flymake-mode-map
+    ("C-c f l" . flymake-show-diagnostics-buffer))
+
+  (define-key! :map flymake-diagnostics-buffer-mode-map
+    ("n" . next-line)
+    ("j" . next-line)
+    ("p" . previous-line)
+    ("k" . previous-line)))
+
+(after! so-long
+  ;; reduce false positives w/ larger threshold
+  (setq so-long-threshold 1000)
+  ;; make sure that save-place not operate in large/long files
+  (add-to-list 'so-long-variable-overrides '(save-place-alist . nil))
+  ;; Text files could possibly be too long too
+  (add-to-list 'so-long-target-modes 'text-mode)
+  ;; But disable everything else that may be unnecessary/expensive for large
+  ;; or wide buffers.
+  (setq so-long-target-modes
+        (append so-long-target-modes
+                '(flycheck-mode
+                  flyspell-mode
+                  eldoc-mode
+                  auto-composition-mode)))
+  (setq so-long-predicate #'ymacs-default//buffer-has-long-lines-p))
+
+(after! prolog
+  (setq prolog-system 'swi))
+
+(after! erc-track
+  (setq erc-track-enable-keybindings nil)) ;; erc
+
+(after! pulse
+  (setq pulse-delay 0.01))
+
+(after! inf-lisp
+  (setq inferior-lisp-program "sbcl"))
+
+(setq winner-dont-bind-my-keys t)

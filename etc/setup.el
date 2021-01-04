@@ -27,7 +27,8 @@
     (delete-file package-quickstart-file))
 
   (let ((elc-files (append (directory-files-recursively ymacs-config-directory "\\.elc$")
-                           (directory-files user-emacs-directory t "\\.elc$"))))
+                           (directory-files user-emacs-directory t "\\.elc$")
+                           (directory-files ymacs-cache-direcotry t "\\.elc$"))))
     (dolist-with-progress-reporter (elc-file elc-files)
         (format "Remove *.elc in %s ..." (abbreviate-file-name ymacs-config-directory))
       (delete-file elc-file)))
@@ -41,9 +42,12 @@
   (setq after-init-hook nil)
   (setq enable-local-variables :all)
 
-  (when (file-exists-p ymacs-autoloads-file)
-    (delete-file ymacs-autoloads-file))
+  (when (file-exists-p ymacs-default-autoloads-file)
+    (delete-file ymacs-default-autoloads-file))
 
-  (ymacs-package|after-init)
-  (ymacs-package/compile-config)
-  (ymacs-package/compile-elpa-packages :no-message))
+  (ymacs-default|after-init)
+
+  (setq ymacs--compile-config-in-progress t)
+
+  (ymacs-default/compile-config)
+  (ymacs-default/compile-elpa-packages :no-message))

@@ -4,30 +4,25 @@
 
 ;; Author: yyj <yeyajie1229@gmail.com>
 
-;;; Commentary:
-
-;; This module contains some useful macros and functions
-;; Naming conventions:
-;;
-;;   <module>-...   public variables
-;;   <module>--...  private varibales
-;;   <module>/...   public functions
-;;   <module>//...   private functions
-;;   <module>|...   hook functions
-;;   <module>@...   advising functions
-;;   ...!       a macro or function defined in core-lib.el
-
-;;; Code:
-
 (require 'subr-x)
 (require 'cl-lib)
 (eval-when-compile
   (require 'seq))
 
+(defvar ymacs--compile-config-in-progress nil)
 (defvar ymacs--loaded-features ())
+(defvar ymacs--required-packages () "All required packages")
+(defvar ymacs--package-content-freshed-p nil)
 
 (defvar ymacs--buffer-visible-p t
   "A flag to indicate if the buffer is not a temporary buffer")
+
+(defmacro expand! (-name)
+  `(eval-when-compile
+     (if-let ((filename (or byte-compile-current-file
+                            load-file-name)))
+         (expand-file-name ,-name (file-name-directory filename))
+       ,-name)))
 
 (defsubst expand-cache! (-name &optional -make-p)
   (let ((val (expand-file-name -name ymacs-cache-direcotry)))
@@ -44,14 +39,9 @@
 (defsubst expand-tmp! (-name)
   (expand-file-name -name temporary-file-directory))
 
-(defun keyword-get! (-plist -key)
-  "Get values of keyword -KEY from -PLIST. This function is used
-for defining functions."
-  (let (forms)
-    (while (and -plist (not (eq -key (pop -plist)))))
-    (while (and -plist (not (keywordp (car -plist))))
-      (push (pop -plist) forms))
-    (nreverse forms)))
+(defsubst barf-if-not-visiting-file! ()
+  (unless (buffer-file-name)
+    (user-error "No file is associated with current buffer")))
 
 (defun plist-pop! (-plist -prop)
   "Delete -PROPERTIES from -PLIST."
@@ -73,59 +63,20 @@ for defining functions."
           (throw 'done t))))
     (cons value head)))
 
-(cl-defmacro executable! (name &key exe doc full-name)
+(cl-defmacro executable! (-name &key -exe -docstring -full-name)
   (declare (indent 0))
 
-  (setq exe (or exe (symbol-name name)))
-  (unless (vectorp exe)
-    (setq exe (vector exe)))
+  (setq -exe (or -exe (symbol-name -name)))
+  (unless (vectorp -exe)
+    (setq -exe (vector -exe)))
 
-  `(defvar ,(if full-name name (intern (format "ymacs-%s-path" name)))
+  `(defvar ,(if -full-name -name (intern (format "ymacs-%s-path" -name)))
      (eval-when-compile
-       (let ((value (or ,@(seq-map (lambda (x) `(executable-find ,x)) exe))))
+       (let ((value (or ,@(seq-map (lambda (x) `(executable-find ,x)) -exe))))
          (when (null value)
-           (warn "executable %s is missing" ,exe))
+           (warn "executable %s is missing" ,-exe))
          value))
-     ,doc))
-
-(defmacro set-option! (-name -value)
-  `(progn
-     (put ',-name 'ymacs-option t)
-     (put ',-name 'ymacs-option-value ,-value)))
-
-(defmacro define-option! (-name -default-value &rest -body)
-  (let (docstring)
-    (when (stringp (car -body))
-      (setq docstring (pop -body)))
-    `(progn
-       (defvar ,-name ,-default-value ,docstring)
-       (when-let (-the-value (and (get ',-name 'ymacs-option)
-                                  (get ',-name 'ymacs-option-value)))
-         ,@-body))))
-
-(defmacro define-variable! (&rest -body)
-  (declare (indent 0))
-
-  (let ((fmt "emacs-use-%s-p"))
-    (while (keywordp (car -body))
-      (pcase (pop -body)
-        (:format (setq fmt (pop -body)))
-        (:pkg (setq fmt (concat (symbol-name (pop -body)) "-use-%s-p")))))
-    `(progn
-       ,@(cl-loop
-          for variable in -body
-          collect
-          (let* ((args (when (listp variable)
-                         (prog1 (cdr variable)
-                           (setq variable (car variable)))))
-                 (name (or (plist-get args :name)
-                           (intern (format fmt (symbol-name variable)))))
-                 (value (if-let ((value (plist-get args :value)))
-                            `(eval-when-compile ,value)
-                          `(eval-when-compile
-                             (executable-find ,(or (plist-get args :exe)
-                                                   (symbol-name variable)))))))
-            `(defvar ,name ,value ,(or (plist-get args :doc) "")))))))
+     ,-docstring))
 
 (defmacro lambda! (&rest -body)
   "A shortcut for inline interactive lambdas.
@@ -320,35 +271,6 @@ file -PATTERNS."
   (dolist (pattern -patterns)
     (add-to-list 'auto-mode-alist (cons pattern -mode))))
 
-(defun format-line! (-left-string -right-string)
-  "Add space between -LEFT-STRING and -RIGHT-STRING to generate a
-string with the witdh of current frame width."
-  (concat -left-string
-          (make-string (max 2 (- (frame-width)
-                                 (+ (string-width -left-string)
-                                    (string-width -right-string)
-                                    (if window-system 0 1))))
-                       ?\s)
-          -right-string))
-
-(defun remap! (-old -new &optional -map)
-  "Remap keybindings whose prefix is -OLD-KEY to -NEW-KEY in
--MAP (default `global-map')."
-  (let ((map (or -map global-map))
-        (-key (string-to-list (kbd -old))))
-    (while (and map -key)
-      (setq map (assoc (pop -key) map)))
-    (when map
-      (define-key -map (kbd -new) (cdr map))
-      (define-key -map (kbd -old) nil))))
-
-(defun symbol-orignal-function! (-symbol)
-  "Return original function definition of -SYMBOL"
-  (let ((function-def (advice--symbol-function -symbol)))
-    (while (advice--p function-def)
-      (setq function-def (advice--cdr function-def)))
-    function-def))
-
 (defun ignore-errors! (-fn &rest -args)
   "Use for advice."
   (ignore-errors (apply -fn -args)))
@@ -388,26 +310,6 @@ HTML file converted from org file, it returns t."
         (setq x (cdr x)))
       (setcdr x (cons -new-value (cdr x))))))
 
-(defun get-caller-name! ()
-  "Get the current function' caller function name"
-  (let* ((index 5)
-         (frame (backtrace-frame index))
-         (found 0))
-    (while (not (equal found 2))
-      (setq frame (backtrace-frame (cl-incf index)))
-      (when (equal t (cl-first frame)) (cl-incf found)))
-    (cl-second frame)))
-
-(defun get-call-stack! ()
-  "Return the current call stack frames."
-  (let ((frames)
-        (frame)
-        (index 5))
-    (while (setq frame (backtrace-frame index))
-      (push frame frames)
-      (cl-incf index))
-    (cl-remove-if-not 'car frames)))
-
 (defsubst directory-equal-p (-d1 -d2)
   (equal (file-truename (concat -d1 "/"))
          (file-truename (concat -d2 "/"))))
@@ -415,30 +317,14 @@ HTML file converted from org file, it returns t."
 (defsubst file-modification-time! (file)
   (nth 5 (file-attributes file)))
 
-(defun find-library-in-directory! (-name -dir)
-  (setq -dir (expand-file-name -dir))
-  (let ((files (directory-files -dir))
-        (default-directory -dir)
-        file
-        lib-path)
-    (while (and (not lib-path) files)
-      (setq file (pop files))
-      (unless (member file '("." ".."))
-        (setq lib-path
-              (if (file-directory-p file)
-                  (ignore-errors (find-library-in-directory! -name file))
-                (and (string= file -name)
-                     (expand-file-name file -dir))))))
-    lib-path))
-
-(defun change-file-encodeing! (file &optional encoding)
-  (unless encoding
-    (setq encoding 'utf-8-unix))
-  (unless (file-directory-p file)
+(defun change-file-encodeing! (-file &optional -encoding)
+  (unless -encoding
+    (setq -encoding 'utf-8-unix))
+  (unless (file-directory-p -file)
     (with-temp-buffer
-      (insert-file-contents file)
+      (insert-file-contents -file)
       (set-buffer-file-coding-system 'utf-8-unix)
-      (write-file file))))
+      (write-file -file))))
 
 (defun save-dir-local-variables! (&rest -variables)
   (save-window-excursion
@@ -450,28 +336,49 @@ HTML file converted from org file, it returns t."
       (with-current-buffer buffer
         (hack-dir-local-variables-non-file-buffer)))))
 
-(cl-defun run-command! (&key name callback error-callback command directory buffer-name)
-  (let* ((default-directory (or directory default-directory))
-         (command-buffer (compilation-start
-                          command
-                          t
-                          (if buffer-name
-                              (lambda (_) buffer-name)
-                            (lambda (_) (format "run command: %s" name))))))
+(cl-defun run-compilation!
+    (&key -name -callback -error-callback -command -buffer-name)
+  (let* ((buffer-name (if -buffer-name
+                          (lambda (_) -buffer-name)
+                        (lambda (_) (format "run command: %s" -name))))
+         (command-buffer (compilation-start -command t buffer-name)))
     (with-current-buffer command-buffer
       (setq ymacs-term-exit-action 'keep)
-      (when-let ((current-proc (get-buffer-process command-buffer))
-                 (sentinel (process-sentinel (get-buffer-process command-buffer))))
-        (set-process-sentinel
-         current-proc
-         (lambda (-proc -msg)
-           (funcall sentinel -proc -msg)
+      (add-function :after (local 'compilation-exit-message-function)
+        (lambda (_process-status -exit-status -msg)
+          (with-current-buffer command-buffer
+            (if (= -exit-status 0)
+                (when -callback
+                  (funcall -callback -msg))
+              (when -error-callback
+                (funcall -error-callback -exit-status -msg)))))))))
 
-           (when (memq (process-status -proc) '(exit signal))
-             (let ((exit-status (process-exit-status -proc)))
-               (if (= exit-status 0)
-                   (and callback (funcall callback command-buffer -msg))
-                 (and error-callback (funcall error-callback command-buffer -msg)))))))))))
+(cl-defun run-process!
+    (&key -name -program -program-args -callback -error-callback)
+  (set-process-sentinel
+
+   (apply #'start-process -name (format " *%s*" -name) (or -program -name) -program-args)
+
+   (lambda (-proc -msg)
+     (when (memq (process-status -proc) '(exit signal))
+       (let ((exit-status (process-exit-status -proc)))
+         (with-current-buffer (process-buffer -proc)
+           (if (= exit-status 0)
+               (when -callback
+                 (funcall -callback -msg))
+             (when -error-callback
+               (funcall -error-callback exit-status -msg)))))))))
+
+(defun remap! (-old -new &optional -map)
+  "Remap keybindings whose prefix is -OLD-KEY to -NEW-KEY in
+-MAP (default `global-map')."
+  (let ((map (or -map global-map))
+        (-key (string-to-list (kbd -old))))
+    (while (and map -key)
+      (setq map (assoc (pop -key) map)))
+    (when map
+      (define-key -map (kbd -new) (cdr map))
+      (define-key -map (kbd -old) nil))))
 
 (defun replace! (-value -keyword -transformer-fn)
   (if (and (not (null -value)) (listp -value))
@@ -493,6 +400,43 @@ HTML file converted from org file, it returns t."
                               parent))
      (t -topmost))))
 
+(defun require! (-pkg-name)
+  (add-to-list 'ymacs--required-packages -pkg-name)
+  (unless (package-installed-p -pkg-name)
+    (unless ymacs--package-content-freshed-p
+      (package-refresh-contents)
+      (setq ymacs--package-content-freshed-p t))
+    (message "Installing package `%s' ..." -pkg-name)
+    (let ((inhibit-message t))
+      (package-install -pkg-name))))
+
+(defmacro require-packages! (&rest -pkg-list)
+  (declare (indent nil))
+  (let (forms compile-forms)
+    (dolist (pkg -pkg-list)
+      (if (atom pkg)
+          (progn (push `(require! ',pkg) forms)
+                 (push `(require ',pkg) compile-forms))
+        (let* ((when-form (plist-get (cdr pkg) :when))
+               (form `(require! ',(car pkg)))
+               (pkgs-required-when-compile (or (plist-get (cdr pkg) :compile)
+                                               (list (car pkg))))
+               (compile-form (mapcar (lambda (x)
+                                       `(require ',x))
+                                     pkgs-required-when-compile)))
+          (if when-form
+              (progn
+                (push `(when ,when-form ,form) forms)
+                (push `(when ,when-form ,@compile-form) compile-forms))
+            (push form forms)
+            (setq compile-forms
+                  (nconc (nreverse compile-form) compile-forms))))))
+    `(progn
+       ,@(nreverse forms)
+       (ignore-errors
+         (eval-when-compile
+           ,@(nreverse compile-forms))))))
+
 (defmacro after! (-files &rest -body)
   (declare (indent 1) (debug t))
   (let ((file (or (car-safe -files) -files))
@@ -505,106 +449,122 @@ HTML file converted from org file, it returns t."
                `((after! ,rest ,@-body))
              -body)))))
 
-(defun load-feature//option-to-form (-name -option)
-  (let ((option
-         (cond
-          ((consp -option) -option)
-          ((and (symbolp -option)
-                (member (aref (symbol-name -option) 0) '(?- ?+)))
-           (let ((option-name (symbol-name -option)))
-             (cons (substring option-name 1)
-                   (equal (aref option-name 0) ?+))))
-          (t
-           (error "option should start with +/- or be a cons")))))
-    `(set-option! ,(intern (format "ymacs-%s-%s" -name (car option))) ,(cdr option))))
-
-(defun load-feature//file-to-form (-path)
-  (let ((full-path (concat (expand-file-name -path) ".el")))
-    (when (file-exists-p full-path)
-      `((load ,(expand-file-name -path) nil t)))))
-
-(defmacro load-feature! (-name &rest -options)
-  (let ((feature-name (symbol-name -name))
-        directory
-        forms)
-    (setq directory
-          (expand-file-name feature-name ymacs-config-directory))
-
+(defmacro load-feature! (-name)
+  (let* ((feature-name (symbol-name -name))
+         (directory (expand-file-name feature-name ymacs-config-directory)))
     (unless (file-directory-p directory)
       (user-error "no feature %s" -name))
 
-    (let ((default-directory directory))
-      (setq forms
-            (apply #'append
-                   (mapcar #'load-feature//file-to-form
-                           '("package" "functions" "hooks" "config")))))
+    (if-let ((feature-name (intern (file-name-base feature-name)))
+             (forms (cl-loop
+                     for name in '("package" "functions" "hooks" "config")
+                     for path = (expand-file-name name directory)
+                     for full-path = (concat path ".el")
+                     when (file-exists-p full-path)
+                     collect `(load ,path nil t))))
+        `(unless (has-feature! ',feature-name)
+           ,@forms
+           (add-to-list 'ymacs--loaded-features (cons ',feature-name ',-name))
+           (mapc #'funcall (get ',feature-name 'after-feature-functions)))
+      (user-error "empty feature %s" -name))))
 
-    (unless forms
-      (user-error "empty feature %s" -name))
-    `(unless (memq ',-name ymacs--loaded-features)
-       ,@(mapcar (lambda (x) (load-feature//option-to-form -name x)) -options)
-       ,@forms
-       (add-to-list 'ymacs--loaded-features ',-name)
+(defsubst has-feature! (-name)
+  (assq -name ymacs--loaded-features))
 
-       (dolist (func (get ',-name 'after-feature-functions))
-         (funcall func)))))
-
-(defun has-feature! (-name)
-  (memq -name ymacs--loaded-features))
+(defmacro eval-when-compile-config! (&rest -body)
+  `(eval-when-compile
+     (when (bound-and-true-p ymacs--compile-config-in-progress)
+       ,@-body)))
 
 (defmacro eval-when-has-feature! (-name &rest -body)
   (declare (indent 1) (debug t))
-  (when (memq -name ymacs--loaded-features)
+  (when (has-feature! -name)
     `(progn ,@-body)))
 
 (defmacro eval-if-has-feature! (-name -if-body &rest -else-body)
   (declare (indent 2) (debug t))
-  (if (memq -name ymacs--loaded-features)
+  (if (has-feature! -name)
       -if-body
     `(progn ,@-else-body)))
 
-(defmacro after-feature! (-name &rest body)
+(defmacro after-feature! (-name &rest -body)
   (declare (indent 1) (debug t))
-  `(let ((func (lambda () ,@body)))
-     (if (memq ',-name ymacs--loaded-features)
+  `(let ((func (lambda () ,@-body)))
+     (if (has-feature! '-name)
          (funcall func)
        (put ',-name 'after-feature-functions
             (cons func (get ',-name 'after-feature-functions))))))
 
-(defun load-file! (-target-file)
-  "Load -TARGET-FILE file.
-If it doesn't exist, copy from the -TEMPLATE-FILE, then load it."
-  (let ((target-file (expand-file-name (concat -target-file ".el")
-                                       user-emacs-directory)))
-    (unless (file-exists-p target-file)
-      (let ((template-file
-             (expand-etc!
-              (format "%s-template.el"
-                      (file-name-sans-extension (file-name-base target-file))))))
-        (unless (file-exists-p template-file)
-          (user-error "Template %s does't exist" template-file))
-        (copy-file template-file target-file)))
-    ;; Load private configuration
-    (load (file-name-sans-extension target-file))))
+(defun completing-read--prompt (-prompt -return-prompt -collection)
+  (let ((return-prompt (if -return-prompt
+                           (format "[RET] => %s \n" -return-prompt)
+                         ""))
+        (keys-prompt (string-join
+                      (--map-indexed
+                       (format "[%d] => %s" it-index (or (car-safe it) it))
+                       -collection)
+                      "\n")))
+    (format "%s\n%s%s" -prompt return-prompt keys-prompt)))
+
+(cl-defun completing-read!
+    (&key -prompt -collection -action -return-action -return-prompt -history)
+  (if (or (not (listp -collection))
+          (> (length -collection) 10))
+      (funcall -action (completing-read -prompt -collection nil t nil -history))
+
+    (let* ((max-mini-window-height 1.0)
+           (key (read-key (completing-read--prompt -prompt -return-prompt -collection))))
+      (cond
+        ((and (>= key ?0) (< key ?9))
+         (funcall -action (nth (- key ?0) -collection)))
+
+        ((and -return-action (equal key 13))
+         (funcall -return-action))
+
+        (t (user-error "No action for key `%s'" (key-description `[,key])))))))
+
+(cl-defun completing-read-simple!
+    (&key -prompt -collection (-return-value 'unset) -return-prompt -history)
+  (completing-read!
+   :-prompt -prompt
+   :-collection -collection
+   :-action #'identity
+   :-return-action (if (eq -return-value 'unset)
+                       (lambda () (car -collection))
+                     (lambda () -return-value))
+   :-return-prompt (if (eq -return-value 'unset)
+                       "[0]"
+                     -return-prompt)
+   :-history -history))
+
+(defcustom ymacs-lsp-project-state :enabled
+  "Whether to enable lsp in current project"
+  :group 'ymacs
+  :type '(choice
+          (const :tag "Enable LSP in current file" :enabled)
+          (const :tag "Disable LSP in current file" :disabled))
+  :safe #'(lambda (x) (memq x '(:enabled :disabled))))
 
 (cl-defmacro try-enable-lsp!
-    (name &key (condition t) (init nil) (fallback nil))
+    (-name &key (-pre-init nil) (-condition t) (-init nil) (-fallback nil))
   (declare (indent 1))
   `(eval-if-has-feature! lsp
-       (add-transient-hook!
-           (hack-local-variables-hook
-            :local t
-            :name ,(intern (format "ymacs-lsp//%s-internal" name)))
-         (if (and ,condition
-                  ymacs-lsp-enable-in-project-p
-                  ,(let ((symbol (intern (format "ymacs-%s-lsp" name))))
-                     `(not (and (boundp ',symbol)
-                                (eq ,symbol 'disabled))))
-                  (ignore-errors (lsp))
-                  (bound-and-true-p lsp-mode))
-             ,init
-           ,fallback))
-     ,fallback))
+       (progn
+         ,-pre-init
+         (add-transient-hook!
+             (hack-local-variables-hook
+              :local t
+              :name ,(intern (format "ymacs-lsp//%s-internal" -name)))
+           (if (and ,-condition
+                    (eq ymacs-lsp-project-state :enabled)
+                    ,(let ((symbol (intern (format "ymacs-%s-lsp" -name))))
+                       `(not (and (boundp ',symbol)
+                                  (eq ,symbol :disabled))))
+                    (ignore-errors (lsp))
+                    (bound-and-true-p lsp-mode))
+               ,-init
+             ,-fallback)))
+     ,-fallback))
 
 (provide 'core-lib)
 
