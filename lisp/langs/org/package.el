@@ -51,3 +51,4 @@
 
 (put 'org-preview-latex-image-directory 'safe-local-variable #'stringp)
 (put 'org-download-image-dir 'safe-local-variable #'stringp)
+(put 'org-download-heading-lvl 'safe-local-variable (lambda (-x) (or (null -x) (integerp -x))))

@@ -11,4 +11,5 @@ else
     curl https://sh.rustup.rs -sSf | sh
     rustup update
     xargs rustup component add < "${CURRENT_DIR}/packages/rust-packages"
+    cargo install ripgrep --features 'pcre2'
 fi

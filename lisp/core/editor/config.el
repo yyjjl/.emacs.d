@@ -5,7 +5,7 @@
 
 (after! fcitx
   ;; Init fcitx prefix keys
-  (setq fcitx-use-dbus nil)
+  (setq fcitx-use-dbus t)
   (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c" "C-z"))
 
 (after! semantic

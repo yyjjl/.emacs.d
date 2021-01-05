@@ -1,6 +1,8 @@
 ;; -*- lexical-binding:t -*-
 
 (after! lisp-mode
+  (setq emacs-lisp-docstring-fill-column t)
+
   ;; Add keyword `define-hook!'
   (font-lock-add-keywords
    'emacs-lisp-mode

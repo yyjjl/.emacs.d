@@ -5,8 +5,13 @@
 (executable! fdfind :-exe ["fdfind" "fd"])
 (executable! fcitx :-exe "fcitx-remote")
 
-(when (and byte-compile-current-file sys/macp)
-  (message "You need go `https://github.com/xcodebuild/fcitx-remote-for-osx' to get fcitx support"))
+(eval-when-compile-config!
+ (when sys/macp
+   (message "You need go `https://github.com/xcodebuild/fcitx-remote-for-osx' to get fcitx support"))
+
+ (when (and ymacs-ripgrep-path
+            (not (eq (shell-command (concat ymacs-ripgrep-path " --pcre2-version")) 0)))
+   (message "You need install ripgrep with pcre2 support (@see %s)" (expand-etc! "setup/install_rust.sh"))))
 
 (require-packages!
  (exec-path-from-shell :when sys/macp)
@@ -166,9 +171,6 @@
 (autoload 'ymacs-hydra/window/shrink-window-horizontally (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/sort/body (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/games/body (expand! "commands-hydra") nil t)
-
-(autoload 'sdcv-current-word "sdcv" nil t)
-(autoload 'sdcv-goto-sdcv "sdcv" nil t)
 
 (put 'projectile-project-run-cmd 'safe-local-variable #'stringp)
 (put 'projectile-project-test-cmd 'safe-local-variable #'stringp)

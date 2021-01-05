@@ -1,7 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
 
-(declare-function sdcv-search-word "sdcv")
-
 ;;;###autoload
 (defun ymacs-popup/last-popup-window (&optional -arg)
   "Display last popup window"
@@ -24,16 +22,3 @@
   (interactive)
   (setq ymacs-popup--window-list
         (delq (selected-window) ymacs-popup--window-list)))
-
-;;;###autoload
-(defun ymacs-popup/popup-sdcv ()
-  "Display *sdcv* buffer"
-  (interactive)
-  (let ((word (if (and transient-mark-mode mark-active)
-                  (buffer-substring-no-properties (region-beginning) (region-end))
-                (sdcv-current-word))))
-    (sdcv-goto-sdcv)
-    (setq word (read-string
-                (format "Word (default %s): " word)
-                nil nil word))
-    (sdcv-search-word word)))

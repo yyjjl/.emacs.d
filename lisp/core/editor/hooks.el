@@ -8,7 +8,7 @@
          (let ((xref-backend-functions '(dumb-jump-xref-activate t)))
            (apply -fn -args))))
     (lambda ()
-      (or (with-demoted-errors "Error: %s, fallback to dumb-jump"
+      (or (with-demoted-errors "%s, fallback to dumb-jump"
             (funcall fetcher))
           (funcall dumb-jump-fetcher)))))
 
@@ -76,7 +76,7 @@
   (global-company-mode 1)
   (yas-global-mode 1)
 
-  (run-with-idle-timer 0 nil #'ymacs-editor|after-init-deferred))
+  (run-with-timer 1 nil #'ymacs-editor|after-init-deferred))
 
 (after! semantic
   (advice-add #'semantic-analyze-completion-at-point-function :override #'ignore)

@@ -82,7 +82,7 @@
   ("C-z" :map
    (define-key! :map (make-sparse-keymap)
      ("l" . ymacs-popup/last-popup-window)
-     ("d" . ymacs-popup/popup-sdcv)
+     ("d" . sdcv-search-word)
      ("RET" . ymacs-popup/fix-popup-window))))
 
 

@@ -1,7 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
+(require 'org-download)
+
 (eval-when-compile
-  (require 'org-download)
   (require 'org)
   (require 'ox-publish))
 
