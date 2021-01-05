@@ -49,10 +49,14 @@
 (defvar ymacs-editor-ivy-switch-function-list nil)
 (defvar ymacs-editor-ivy-extra-environment nil)
 (defvar ymacs-editor-ivy-display-help-max-width 160)
+
 (defvar ymacs-editor-ivy-display-help-extra-commands
-  '(ymacs-editor/ivy-meta-dot
-    delete-blank-lines
+  '(delete-blank-lines
+    just-one-space
     (counsel-find-file . ivy-magic-read-file-env)))
+
+(defvar ymacs-editor-ivy-display-help-ignore-commands
+  '(ymacs-editor/ivy-meta-dot))
 
 (defvar ymacs-editor-rg-type-aliases
   (eval-when-compile
@@ -134,6 +138,17 @@
                (when env
                  (cons (concat "\\begin{" env "}")
                        (concat "\\end{" env "}"))))))))
+
+(defvar ymacs-editor-avy-copy-key-alist
+  '((?s . symbol)
+    (?e . sexp)
+    (?l . list)
+    (?f . filename)
+    (?d . defun)
+    (?w . word)
+    (?u . url)
+    (?U . uuid)
+    (?n . number)))
 
 (autoload 'ymacs-editor/rg (expand! "commands-ivy.el") nil t)
 (autoload 'ymacs-editor/fzf (expand! "commands-ivy.el") nil t)
@@ -237,13 +252,15 @@
   ("M-9")
   ("M-9 9" . avy-goto-char-in-line)
   ("M-9 M-9" . avy-goto-char-in-line)
+  ("M-9 w" . ymacs-editor/avy-copy)
+  ("M-9 y" . ymacs-editor/avy-copy-and-yank)
   ("M-9 d" . ymacs-editor/avy-goto-symbol-1-in-defun)
   ("M-9 1" . avy-goto-char)
   ("M-9 2" . avy-goto-char-2)
   ("M-9 l" . avy-goto-line)
   ("M-9 s" . avy-goto-symbol-1)
-  ("M-9 w" . avy-goto-subword-1)
-  ("M-9 y" . avy-copy-line)
+  ("M-9 L" . avy-copy-line)
+
   ("M-'" . ymacs-editor/change-surround)
 
   ([remap move-beginning-of-line] . ymacs-editor/smart-move-begining-of-line)

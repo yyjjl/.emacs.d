@@ -9,7 +9,7 @@
 ;; `line-spacing' make inline-image flickering a lot
 (setq-default line-spacing 0.25)
 
-(setq echo-keystrokes 0.25)
+(setq echo-keystrokes 1)
 
 ;; paren
 (setq blink-matching-paren nil)

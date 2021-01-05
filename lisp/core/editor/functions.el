@@ -92,7 +92,8 @@ Arguments are same as of `defhydra'."
     (when -keymap
       (cl--map-keymap-recursively
        (lambda (key definition)
-         (unless (eq (aref key 0) 'remap) ; skip remap
+         (unless (or (eq (aref key 0) 'remap)  ; skip remap
+                     (memq definition ymacs-editor-ivy-display-help-ignore-commands))
            (push (cons (key-description key) definition) keys)))
        -keymap))
     keys))
