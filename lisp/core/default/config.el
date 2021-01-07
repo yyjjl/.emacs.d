@@ -94,7 +94,7 @@
 ;; be quiet at startup; don't load or display anything unnecessary
 (setq inhibit-startup-screen t)
 (setq inhibit-startup-echo-area-message t)
-(setq initial-major-mode 'fundamental-mode)
+;; (setq initial-major-mode 'fundamental-mode)
 (setq initial-scratch-message
       (format ";; Welcome to Emacs %s %s !!!"
               emacs-version

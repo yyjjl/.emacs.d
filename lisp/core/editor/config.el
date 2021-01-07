@@ -254,6 +254,10 @@
   (setf (alist-get 'company-search-mode mode-line-misc-info)
         '(("" company-search-lighter " "))))
 
+(after! company-box
+  (setq company-box-enable-icon nil)
+  (setq company-box-doc-delay 0.5))
+
 (after! iedit
   (setq iedit-auto-narrow t))
 

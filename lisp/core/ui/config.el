@@ -6,9 +6,6 @@
 (tooltip-mode -1)
 (window-divider-mode -1)
 
-;; `line-spacing' make inline-image flickering a lot
-(setq-default line-spacing 0.25)
-
 (setq echo-keystrokes 1)
 
 ;; paren

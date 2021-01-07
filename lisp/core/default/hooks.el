@@ -83,25 +83,21 @@
           ((equal bn "*scratch*") (delete-region (point-min) (point-max)) nil)
           (t t))))
 
-;; Default prog-mode setup
-(define-hook! ymacs-default|generic-prog-mode-setup (prog-mode-hook LaTeX-mode-hook)
-  (condition-case err
-      (hs-minor-mode 1)
-    (user-error (message "%s" (error-message-string err))))
-
-  (hl-line-mode 1)
-  (display-fill-column-indicator-mode 1)
-
-  ;; show trailing spaces in a programming mode
-  (setq show-trailing-whitespace t)
-  (setq indicate-empty-lines t))
-
 (define-hook! ymacs-default|generic-text-mode-setup (text-mode-hook)
   (hl-line-mode 1)
   (display-fill-column-indicator-mode 1)
 
   (setq show-trailing-whitespace t)
+  ;; (setq-local line-spacing 0.25)
   (setq indicate-empty-lines t))
+
+;; Default prog-mode setup
+(define-hook! ymacs-default|generic-prog-mode-setup (prog-mode-hook)
+  (condition-case err
+      (hs-minor-mode 1)
+    (user-error (message "%s" (error-message-string err))))
+
+  (ymacs-default|generic-text-mode-setup))
 
 (define-hook! ymacs-default|generic-comint-mode-setup (comint-mode-hook)
   ;; But don't show trailing whitespace in SQLi, inf-ruby etc.
