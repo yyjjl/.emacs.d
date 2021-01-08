@@ -1,5 +1,7 @@
 ;; -*- lexical-binding:t -*-
 
+(declare-function lsp--render-element 'lsp-mode)
+
 (setq lsp-keymap-prefix nil)
 
 (after! lsp-mode
@@ -27,9 +29,9 @@
                          (concat it suffix)))))))
       content))
 
-  (cl-defmethod lsp-clients-extract-signature-on-hover (contents _server-id)
+  (cl-defmethod lsp-clients-extract-signature-on-hover (-contents _server-id)
     "Extract a representative line from CONTENTS, to show in the echo area."
-    (lsp--render-element contents))
+    (lsp--render-element -contents))
 
   (advice-add #'lsp-download-install :override #'lsp-download-install@pretty)
   (advice-add #'lsp-async-start-process :override #'lsp-async-start-process@pretty))

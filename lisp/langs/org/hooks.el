@@ -93,9 +93,10 @@
       (delete-file -texfile)))
 
   (define-advice org-latex-link (:around (-fn -link -desc -info) handle-pdf)
+    "When exporting to pdf, a link to .org file will be change to corresponding .pdf file."
     (let* ((type (org-element-property :type -link))
            (raw-path (org-element-property :path -link))
-           (search-option (org-element-property :search-option -link))
+           ;; (search-option (org-element-property :search-option -link))
            (project (ignore-errors
                       (org-publish-get-project-from-filename
                        (buffer-file-name)))))
@@ -104,10 +105,11 @@
                (string= (file-name-extension raw-path) "org")
                (equal (car (org-publish-get-project-from-filename (file-truename raw-path)))
                       (car project)))
-          (format "\\href{%s.pdf%s}{%s}"
+          ;; Search options is not used by PDF
+          (format "\\href{%s.pdf}{%s}"
                   (org-latex--protect-text
                    (org-export-file-uri
                     (file-name-sans-extension raw-path)))
-                  search-option
+                  ;; search-option
                   (or -desc ""))
         (funcall -fn -link -desc -info)))))

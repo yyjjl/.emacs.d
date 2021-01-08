@@ -1,23 +1,32 @@
 ;;; core-lib.el --- Libraries for configuration  -*- lexical-binding: t -*-
-
+;;
 ;; Copyright (C) 2015-2017 Free Software Foundation, Inc.
-
+;;
 ;; Author: yyj <yeyajie1229@gmail.com>
+;;; Commentary:
+;;
+;;; Code:
 
 (require 'subr-x)
 (require 'cl-lib)
+
 (eval-when-compile
   (require 'seq))
 
-(defvar ymacs--compile-config-in-progress nil)
-(defvar ymacs--loaded-features ())
-(defvar ymacs--required-packages () "All required packages")
-(defvar ymacs--package-content-freshed-p nil)
+(defvar ymacs--compile-config-in-progress nil
+  "When loading ~/.emacs.d/etc/setup.el, it is set to t.")
+(defvar ymacs--loaded-features ()
+  "All loaded features.")
+(defvar ymacs--required-packages ()
+  "All required packages.")
+(defvar ymacs--package-content-freshed-p nil
+  "A flag to indicate whether the package contents have been freshed.")
 
 (defvar ymacs--buffer-visible-p t
-  "A flag to indicate if the buffer is not a temporary buffer")
+  "A flag to indicate whether the buffer is not a temporary buffer.")
 
 (defmacro expand! (-name)
+  "Expand -NAME relative to current file while loading or byte-compiling."
   `(eval-when-compile
      (if-let ((filename (or byte-compile-current-file
                             load-file-name)))
@@ -44,7 +53,7 @@
     (user-error "No file is associated with current buffer")))
 
 (defun plist-pop! (-plist -prop)
-  "Delete -PROPERTIES from -PLIST."
+  "Delete -PROP from -PLIST."
   (let ((head -plist)
         (plist -plist)
         prev
@@ -64,6 +73,14 @@
     (cons value head)))
 
 (cl-defmacro executable! (-name &key -exe -docstring -full-name)
+  "Define a variable which points to a executable named -EXE.
+
+Argument -EXE can also be a vector.
+
+Argument -DOCSTRING is the docstring of the variable.
+
+If argument -FULL-NAME is non-nil, it is used as the name of the variable,
+Otherwise `(format \"ymacs-%s-path\" -NAME)' will be used."
   (declare (indent 0))
 
   (setq -exe (or -exe (symbol-name -name)))
@@ -86,13 +103,14 @@ Optional argument -BODY is the lambda body."
   `(lambda () (interactive) ,@-body))
 
 (defmacro add-transient-hook! (-hook &rest -forms)
-  "Attaches transient forms to a -HOOK.
+  "Add transient forms to a -HOOK.
 
-Argument -HOOK can be a quoted hook or a sharp-quoted function
-(which will be advised).
+Argument -HOOK can be one of these forms:
+1. a symbol
+2. a symbol which points to a function
+3. (symbol . plist)
 
--FORMS will be evaluated once when that function/hook is first
-invoked, then it detaches itself."
+Argument -FORMS will be evaluated once when that function/hook is first invoked, then it detaches itself."
   (declare (indent 1))
   (let* ((hook (if (consp -hook) (car -hook) -hook))
          (args (and (consp -hook) (cdr -hook)))
@@ -121,32 +139,30 @@ invoked, then it detaches itself."
                `(add-hook ',hook ',fn ,append-p ,local-p))))))
 
 (defmacro define-hook! (-name -hooks &rest -body)
-  "Add or define a hook function.
+  "Define and Add a hook function.
 
-Argument -NAME is the name of hook function. If -NAME is of the
-form (name . args), then args will become the parameter list of
-the lambda function to be added. Else if -NAME is :anonymous,
-a lambda function will be add to -hooks
+Argument -NAME is the name of the hook function, it should be one of these forms:
+1. a symbol
+2. (symbol . args), where args is the parameter list of newly defined function
+3. :anonymous, which means to use a lambda function
 
-Argument -HOOKS are hook list to add fucntion to. Every hook in
--HOOKS should either be a hook-symbol or the form of (hook-symbol . args).
-The args of the second form will be passed to `add-hook'
+Argument -HOOKS are a list of hooks where the newly defined function will be added to.
+Each hook should either be a hook-symbol or the form of (hook-symbol . plist).
 
 Optional argument -BODY is the function body."
   (declare (indent defun) (debug t) (doc-string 3))
   (let* ((anonymous-p (eq -name :anonymous))
          (-symbol (cond (anonymous-p (cl-gensym "g"))
-                       ((consp -name) `',(car -name))
-                       ((symbolp -name) `',-name)
-                       (t (user-error "Invalid hook name: %s" -name))))
+                        ((consp -name) `',(car -name))
+                        ((symbolp -name) `',-name)
+                        (t (user-error "Invalid hook name: %s" -name))))
          (args (when (consp -name) (cdr -name)))
          (hooks (if (listp -hooks) -hooks (list -hooks)))
          (forms (cl-loop for hook in hooks
                          for hook-name = (if (consp hook) (car hook) hook)
                          for append-p = (plist-get (cdr-safe hook) :append)
                          for local-p = (plist-get (cdr-safe hook) :local)
-                         collect `(add-hook ',hook-name
-                                            ,-symbol ,append-p ,local-p))))
+                         collect `(add-hook ',hook-name ,-symbol ,append-p ,local-p))))
     (if anonymous-p
         `(let ((,-symbol (lambda ,args ,@-body)))
            ,@forms)
@@ -206,28 +222,27 @@ Optional argument -BODY is the function body."
        ,@(reverse forms)
        ,sym)))
 
-(defmacro with-local-minor-mode-map! (-mode &rest -body)
-  "Overrides a minor mode keybinding for the local buffer, by
-creating or altering keymaps stored in buffer-local
-`minor-mode-overriding-map-alist'.
+(defmacro set-local-minor-mode-map! (-mode &rest -body)
+  "Overrides a minor mode keybinding for the local buffer by creating or altering keymaps stored in
+buffer-local `minor-mode-overriding-map-alist'.
 
--MODE is the minor mode -symbol whose map should be overrided.
+Argument -MODE is the minor mode -symbol whose map should be overrided.
 
--BODY is a group of sexps for defining -key bindings
+Argument -BODY is a group of sexps for defining -key bindings
 
 Example:
 
     (with-local-minor-mode-map! 'abc-mode
-      (define-key abc-mode-map ...)
+      (define-key the-map ...)
       ...)"
   (declare (indent 1))
-  `(let* ((oldmap (cdr (assoc ,-mode minor-mode-map-alist)))
-          (it (or (cdr (assoc ,-mode minor-mode-overriding-map-alist))
-                  (let ((map (make-sparse-keymap)))
-                    (set-keymap-parent map oldmap)
-                    (push (cons ,-mode map)
-                          minor-mode-overriding-map-alist)
-                    map))))
+  `(let* ((old-map (cdr (assoc ,-mode minor-mode-map-alist)))
+          (the-map (or (cdr (assoc ,-mode minor-mode-overriding-map-alist))
+                       (let ((map (make-sparse-keymap)))
+                         (set-keymap-parent map old-map)
+                         (push (cons ,-mode map)
+                               minor-mode-overriding-map-alist)
+                         map))))
      ,@-body))
 
 (defmacro with-temp-env! (-env &rest -body)

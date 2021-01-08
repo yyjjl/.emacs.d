@@ -8,11 +8,10 @@
               (append hippie-expand-try-functions-list '(try-complete-lisp-symbol)))
 
   (lispy-mode 1)
-  (local-set-key (kbd "M-,") 'xref-pop-marker-stack))
+  (local-set-key (kbd "M-,") #'xref-pop-marker-stack))
 
 (defun ymacs-lisp|elisp-setup ()
   (ymacs-lisp|common-setup)
-  (flycheck-mode -1)
 
   (when (buffer-enable-rich-feature-p)
     (auto-compile-on-save-mode 1)

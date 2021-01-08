@@ -130,7 +130,7 @@
           (define-key map (kbd "DEL") #'View-scroll-page-backward)
           (define-key map "n" #'next-line)
           (define-key map "p" #'previous-line)
-          (define-key map "d" #'sdcv-search)
+          (define-key map "d" #'sdcv-search-word)
           (define-key map "?" #'describe-mode)
           (dotimes (i 10)
             (define-key map (number-to-string i) #'sdcv-goto-number))

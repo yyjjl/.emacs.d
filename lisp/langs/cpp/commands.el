@@ -1,8 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
 
-(eval-when-compile
-  (require 'cmacexp))
-
 (defvar gud-chdir-before-run)
 
 ;;;###autoload

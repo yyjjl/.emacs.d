@@ -19,6 +19,9 @@
 (dolist (hook '(lisp-mode-hook scheme-mode-hook))
   (add-hook hook #'ymacs-lisp|common-setup))
 
+(after! macrostep
+  (define-hook! ymacs-lisp|macrostep-setup (macrostep-mode-hook)
+    (add-to-list 'minor-mode-overriding-map-alist (cons 'macrostep-mode macrostep-keymap))))
 
 (after! lispy
   (define-advice lispy-goto-symbol (:around (-fn -symbol) try-elisp-def)

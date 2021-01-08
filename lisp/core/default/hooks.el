@@ -184,7 +184,8 @@
       (server-start)))
 
   ;; collect garbage after focus changes
-  (add-function :after after-focus-change-function
-    (lambda ()
-      (unless (frame-focus-state)
-        (garbage-collect)))))
+  (add-function
+   :after after-focus-change-function
+   (lambda ()
+     (unless (frame-focus-state)
+       (garbage-collect)))))
