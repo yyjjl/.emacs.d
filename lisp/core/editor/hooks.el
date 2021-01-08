@@ -50,22 +50,10 @@
               (insert "\n"))))))
     buffer))
 
-(defun ymacs-editor|after-init-deferred ()
-  (when sys/macp
-    (exec-path-from-shell-initialize))
+(defun ymacs-editor|after-init (&optional -frame)
+  (when (daemonp)
+    (remove-hook 'after-make-frame-functions #'ymacs-editor|after-init))
 
-  (when (and ymacs-fcitx-path (display-graphic-p))
-    (fcitx-aggressive-setup))
-
-  (find-file-noselect (expand-cache! "org/*note*"))
-  (find-file-noselect (expand-cache! "org/*task*"))
-
-  (message "Init Time: %.3f (with %d packages activated)"
-           (float-time (time-subtract after-init-time before-init-time))
-           (length package-activated-list)))
-
-
-(define-hook! ymacs-editor|after-init (after-init-hook)
   (require 'lv)
 
   (ivy-mode 1)
@@ -76,7 +64,27 @@
   (global-company-mode 1)
   (yas-global-mode 1)
 
-  (run-with-timer 1 nil #'ymacs-editor|after-init-deferred))
+  (when sys/macp
+    (exec-path-from-shell-initialize))
+
+  (when (display-graphic-p -frame)
+    (when ymacs-fcitx-path
+      (fcitx-aggressive-setup))
+
+    (when ymacs-editor-use-childframe
+      (add-hook 'company-mode-hook #'company-box-mode)))
+
+  (find-file-noselect (expand-cache! "org/*note*"))
+  (find-file-noselect (expand-cache! "org/*task*"))
+
+  (message "Init Time: %.3f (with %d packages activated)"
+           (float-time (time-subtract after-init-time before-init-time))
+           (length package-activated-list)))
+
+(add-hook (if (daemonp)
+              'after-make-frame-functions
+            'after-init-hook)
+          #'ymacs-editor|after-init)
 
 (after! semantic
   (advice-add #'semantic-analyze-completion-at-point-function :override #'ignore)
@@ -163,6 +171,10 @@
 
 (after! company-capf
   (advice-add 'company-capf :around #'ignore-errors!))
+
+(when ymacs-editor-use-childframe
+  (after! company-box-mode
+    (advice-add 'company-box--with-icons-p :override #'ignore)))
 
 (after! flycheck
   (define-advice flycheck-error-level-interesting-p (:override (err) smart)

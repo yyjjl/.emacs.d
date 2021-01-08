@@ -69,7 +69,7 @@ hasn't to runs those regexps against the filename.")
 ;; Faster to disable these here (before they've been initialized)
 (push '(menu-bar-lines . 0) default-frame-alist)
 (push '(tool-bar-lines . 0) default-frame-alist)
-(push '(vertical-scroll-bars) default-frame-alist)
+(push '(vertical-scroll-bars . nil) default-frame-alist)
 (push '(undecorated . t) default-frame-alist)
 
 ;; disable native-compile during setup

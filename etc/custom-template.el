@@ -12,6 +12,7 @@
  '(org-download-screenshot-method "gnome-screenshot -a -f %s")
  '(warning-suppress-log-types '((comp)))
  '(which-key-dont-use-unicode t)
+ '(ymacs-editor-use-childframe t)
  '(ymacs-term-type 'vterm)
  '(ymacs-python-lsp-server 'pyright))
 

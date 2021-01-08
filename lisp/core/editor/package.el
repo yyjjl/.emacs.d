@@ -5,6 +5,11 @@
 (executable! fdfind :-exe ["fdfind" "fd"])
 (executable! fcitx :-exe "fcitx-remote")
 
+(defcustom ymacs-editor-use-childframe nil
+  "Whether to use childframe"
+  :group 'ymacs
+  :type 'boolean)
+
 (eval-when-compile-config!
  (when sys/macp
    (message "You need go `https://github.com/xcodebuild/fcitx-remote-for-osx' to get fcitx support"))
@@ -19,6 +24,7 @@
  ;; `counsel-M-x' need amx to get history
  amx
  company
+ (company-box :when ymacs-editor-use-childframe)
  ivy
  ivy-hydra
  hydra

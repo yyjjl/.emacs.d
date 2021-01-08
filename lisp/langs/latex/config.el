@@ -52,12 +52,12 @@
 
   (setq TeX-debug-bad-boxes nil
         TeX-debug-warnings t
-        TeX-auto-save t
-        TeX-parse-self t
+        TeX-auto-save t                 ; parse on save
+        TeX-parse-self t                ; parse on load
         TeX-syntactic-comment t
         TeX-electric-math '("$" . "$")
-        LaTeX-electric-left-right-brace t
         TeX-complete-expert-commands t
+        LaTeX-electric-left-right-brace t
         TeX-electric-sub-and-superscript nil
         ;; Synctex support
         TeX-source-correlate-start-server nil

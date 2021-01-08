@@ -20,9 +20,9 @@
     ;; conflict with latex-mode
     (electric-pair-local-mode -1)
     (electric-indent-local-mode -1)
-    (TeX-fold-mode 1)
-    ;; (turn-off-auto-fill)
     (LaTeX-math-mode 1)
+    (TeX-fold-mode 1)
+    (TeX-interactive-mode 1)
     (TeX-source-correlate-mode 1)
     (TeX-PDF-mode 1)
 
