@@ -8,23 +8,23 @@
   (add-to-list 'lsp-file-watch-ignored (concat "\\`" (expand-file-name "~/\\.local/lib")))
   (add-to-list 'lsp-file-watch-ignored (concat "\\`" (regexp-quote (file-truename user-emacs-directory))))
 
-  (ymacs-editor/add-toggle-column
-   '(lsp-mode
-     "LSP"
-     (("t i" lsp-toggle-trace-io
-       "trace io" :toggle lsp-print-io)
-      ("t h" lsp-toggle-symbol-highlight
-       "highlight" :toggle lsp-enable-symbol-highlighting)
-      ("t t" lsp-toggle-on-type-formatting
-       "on type formating" :toggle lsp-enable-on-type-formatting)
-      ("t s" lsp-toggle-signature-auto-activate
-       "signature" :toggle lsp-signature-auto-activate)
-      ;; TODO: maybe change in the future
-      ("t S" ymacs-lsp/toggle-semantic-tokens
-       "semantic" :toggle lsp-semantic-tokens-enable)
+  (ymacs-editor//add-toggles
+   "LSP" 'lsp-mode
+   '("l i" lsp-toggle-trace-io
+     "Trace IO" :toggle lsp-print-io)
+   '("l h" lsp-toggle-symbol-highlight
+     "Highlight Symbol" :toggle lsp-enable-symbol-highlighting)
+   '("l t" lsp-toggle-on-type-formatting
+     "On Type Formating" :toggle lsp-enable-on-type-formatting)
+   '("l s" lsp-toggle-signature-auto-activate
+     "Signature" :toggle lsp-signature-auto-activate)
+   '("l S" ymacs-lsp/toggle-semantic-tokens
+     "Semantic" :toggle lsp-semantic-tokens-enable)
 
-      ("w r" lsp-workspace-restart)
-      ("w s" lsp-workspace-shutdown))))
+   '("l r" lsp-workspace-restart "Restart" :exit t)
+   '("l K" lsp-workspace-shutdown "Shutdown" :exit t)
+   '("l U" ymacs-lsp/check-for-updates "Update All Servers" :exit t)
+   '("l I" lsp-install-server "Install Server" :exit t))
 
   (setq lsp-command-map
         (define-key! :map (make-sparse-keymap)

@@ -7,53 +7,28 @@
 
 (require 'pretty-hydra)
 
-(defvar ymacs-ui/view-code-mode)
-(defvar ymacs-hydra/global-toggles/hint-cache)
+;;;###autoload
+(defun ymacs-hydra/toggles ()
+  (interactive)
+  (let ((extra-keys (where-is-internal #'ymacs-hydra/toggles)))
+    (eval
+     `(pretty-hydra-define ymacs-hydra/global-toggles
+        (:title "Hydra Menu" :color amaranth :quit-key "q")
+        ,(cl-loop
+          for (name . groups) in ymacs-editor-toggles-alist
+          for rows = (cl-loop
+                      for (condition . rows) in groups
+                      when (eval condition)
+                      append rows)
+          when rows
+          append (list name rows))))
 
-(pretty-hydra-define ymacs-hydra/global-toggles
-  (:title "Toggles" :color amaranth :quit-key "q")
-  ("Global"
-   (("V"
-     (ymacs-ui/view-code-mode (if ymacs-ui/view-code-mode -1 1))
-     "view code"
-     :toggle ymacs-ui/view-code-mode)
-    ("E"
-     toggle-debug-on-error
-     "debug on error"
-     :toggle (default-value 'debug-on-error))
-    ("Q"
-     toggle-debug-on-quit "debug on quit"
-     :toggle (default-value 'debug-on-quit))
-    ("W"
-     (setq show-trailing-whitespace (not show-trailing-whitespace))
-     "trailing whitespace"
-     :toggle show-trailing-whitespace)
-    ("N"
-     (display-line-numbers-mode (if display-line-numbers-mode -1 1))
-     "line number"
-     :toggle display-line-numbers-mode)
-    ("B" display-battery-mode "battery" :toggle t)
-    ("T" display-time-mode "time" :toggle t))))
+    (dolist (key extra-keys)
+      (define-key ymacs-hydra/global-toggles/keymap
+        key
+        #'ymacs-hydra/global-toggles/nil))
 
-(defun ymacs-hydra/global-toggles/update ()
-  (eval
-   (pretty-hydra--generate
-    'ymacs-hydra/global-toggles
-    '(:title "Toggles" :color amaranth :quit-key "q")
-    (pretty-hydra--normalize-heads-plist!
-     (append `("Global" ,(lax-plist-get ymacs-hydra/global-toggles/heads-plist "Global"))
-             (cl-loop for (key . value) in ymacs-editor-local-toggles-heads-list
-                      when (eval key) append value)))))
-  (define-key ymacs-hydra/global-toggles/keymap
-    (where-is-internal 'ymacs-hydra/global-toggles/body nil t)
-    #'ymacs-hydra/global-toggles/nil)
-
-  (prog1 (eval ymacs-hydra/global-toggles/hint)
-    (setq ymacs-hydra/global-toggles/hint ymacs-hydra/global-toggles/hint-cache)))
-
-;; add additional columns dynamicly
-(setq ymacs-hydra/global-toggles/hint-cache '(ymacs-hydra/global-toggles/update))
-(setq ymacs-hydra/global-toggles/hint ymacs-hydra/global-toggles/hint-cache)
+    (ymacs-hydra/global-toggles/body)))
 
 (defhydra ymacs-hydra/sort (:color red)
   "Sort"

@@ -1,6 +1,7 @@
 ;; -*- lexical-binding: t -*-
 
 (after! dumb-jump
+  (setq dumb-jump-default-project (or user-emacs-directory "~/.emacs.d"))
   (setq dumb-jump-prefer-searcher 'rg))
 
 (after! fcitx
@@ -255,6 +256,7 @@
         '(("" company-search-lighter " "))))
 
 (after! company-box
+  (setq company-box-backends-colors nil)
   (setq company-box-enable-icon nil)
   (setq company-box-doc-delay 0.5))
 

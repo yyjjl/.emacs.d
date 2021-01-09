@@ -77,6 +77,7 @@ If not try to complete."
          (read-shell-command "Python executable: ")
          (when current-prefix-arg
            (read-from-minibuffer "Arguments: "))))
+  (require 'pyvenv)
   (when (and -name -python-exe (> (length -name) 0))
     (let* ((dir (expand-file-name -name (pyvenv-workon-home)))
            (command (format "virtualenv --python=%s %s %s\n"
@@ -92,34 +93,12 @@ If not try to complete."
          (read-shell-command "Python executable: ")
          (when current-prefix-arg
            (read-from-minibuffer "Arguments: "))))
+  (require 'pyvenv)
   (when (and -dir -python-exe)
     (let* ((dir (expand-file-name ".venv" -dir))
            (command (format "virtualenv --python=%s %s %s\n"
                             -python-exe dir (or -args ""))))
       (compile command))))
-
-;;;###autoload
-(defun ymacs-python/generate-doc-at-point ()
-  (interactive)
-  (let (params indent insert-point)
-    (save-excursion
-      (if (re-search-backward
-           "^\\( *\\)def[^(]+(\\([^\n]*\\))[^:]*: *$" nil t)
-          (progn
-            (setq params (match-string-no-properties 2))
-            (setq indent (concat (match-string-no-properties 1)
-                                 (make-string python-indent-offset
-                                              (string-to-char " "))))
-            (setq insert-point (point)))
-        (message "Can not find `def'")))
-    (when params
-      (goto-char insert-point)
-      (forward-line)
-      (insert indent "\"\"\""
-              "\n" indent
-              (ymacs-python//generate-doc params indent)
-              "\n" indent
-              "\"\"\""))))
 
 ;;;###autoload
 (defun ymacs-python/pop-to-shell (&optional -directory)
@@ -148,23 +127,47 @@ If not try to complete."
   (interactive)
   (let ((buffer (current-buffer)))
     (call-interactively #'ymacs-python/pop-to-shell)
-    (sit-for 0.1)
+    (sit-for 0.01)
     (with-current-buffer buffer
       (ymacs-python//send-region-or-buffer (= (prefix-numeric-value current-prefix-arg) 4)))))
+
+(defsubst ymacs-python//line-startswith-p (-string)
+  (back-to-indentation)
+  (string-prefix-p -string (buffer-substring-no-properties
+                            (point)
+                            (line-end-position))))
 
 ;;;###autoload
 (defun ymacs-python/toggle-breakpoint ()
   "Add a break point, highlight it."
   (interactive)
-  (let ((trace (cond ((executable-find "ipdb") "import ipdb; ipdb.set_trace()")
-                     ((executable-find "ipdb3") "import ipdb; ipdb.set_trace()")
-                     ((executable-find "python3.7") "breakpoint()")
-                     ((executable-find "python3.8") "breakpoint()")
-                     (t "import pdb; pdb.set_trace()")))
-        (line (thing-at-point 'line)))
-    (if (and line (string-match trace line))
-        (kill-whole-line)
-      (back-to-indentation)
-      (insert trace)
-      (insert "\n")
-      (python-indent-line))))
+  (let* ((version
+          (--> "python3 --version"
+               (shell-command-to-string it)
+               (split-string it)
+               (nth 1 it)
+               (split-string it "\\.")
+               (mapcar #'string-to-number it)))
+         (trace (cond ((and version (>= (or (nth 1 version) 0) 7))
+                       "breakpoint()")
+                      ((executable-find "ipdb")
+                       "import ipdb; ipdb.set_trace()")
+                      (t "import pdb; pdb.set_trace()"))))
+    (or (save-excursion
+          (when (ymacs-python//line-startswith-p trace)
+            (kill-whole-line)
+            t))
+        (save-excursion
+          (forward-line -1)
+          (when (ymacs-python//line-startswith-p trace)
+            (kill-whole-line)
+            t))
+        (save-excursion
+          (forward-line 1)
+          (when (ymacs-python//line-startswith-p trace)
+            (kill-whole-line)
+            t))
+        (save-excursion
+          (back-to-indentation)
+          (insert trace "\n")
+          (python-indent-line)))))

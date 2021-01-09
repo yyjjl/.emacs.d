@@ -15,7 +15,9 @@
    (message "You need go `https://github.com/xcodebuild/fcitx-remote-for-osx' to get fcitx support"))
 
  (when (and ymacs-ripgrep-path
-            (not (eq (shell-command (concat ymacs-ripgrep-path " --pcre2-version")) 0)))
+            (not (eq (shell-command
+                      (concat ymacs-ripgrep-path " --pcre2-version"))
+                     0)))
    (message "You need install ripgrep with pcre2 support (@see %s)" (expand-etc! "setup/install_rust.sh"))))
 
 (require-packages!
@@ -53,9 +55,36 @@
  yaml-mode
  zeal-at-point)
 
-(defvar ymacs-editor-narrow-dwim-alist nil)
+(defvar ymacs-ui/view-code-mode)
 
-(defvar ymacs-editor-local-toggles-heads-list nil)
+(defvar ymacs-editor-toggles-alist
+  '(("Global"
+     (t
+      ("V"
+       (ymacs-ui/view-code-mode (if ymacs-ui/view-code-mode -1 1))
+       "View Code"
+       :toggle ymacs-ui/view-code-mode)
+      ("E"
+       toggle-debug-on-error
+       "Debug on Error"
+       :toggle (default-value 'debug-on-error))
+      ("Q"
+       toggle-debug-on-quit
+       "Debug on Quit"
+       :toggle (default-value 'debug-on-quit))
+      ("W"
+       (setq show-trailing-whitespace (not show-trailing-whitespace))
+       "Trailing Whitespace"
+       :toggle show-trailing-whitespace)
+      ("N"
+       (display-line-numbers-mode (if display-line-numbers-mode -1 1))
+       "Line Number"
+       :toggle display-line-numbers-mode)
+      ("B" display-battery-mode "Battery" :toggle t)
+      ("T" display-time-mode "Time" :toggle t)
+      ("P" prettify-symbols-mode "Pretty Symbol" :toggle t)))))
+
+(defvar ymacs-editor-narrow-dwim-alist nil)
 
 (defvar ymacs-editor-ivy-switch-function-list nil)
 (defvar ymacs-editor-ivy-extra-environment nil)
@@ -167,7 +196,6 @@
 (autoload 'ymacs-hydra/mc/mc/mark-next-like-this (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/mc/mc/mark-previous-like-this (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/ediff/body (expand! "commands-hydra") nil t)
-(autoload 'ymacs-hydra/global-toggles/body (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/next-error/body (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/outline/body (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/rectangle/body (expand! "commands-hydra") nil t)
@@ -275,7 +303,7 @@
   ([M-f12] . scroll-other-window)
   ([f6] . ymacs-editor/toggle-company-ispell)
   ([C-f7] . ymacs-editor/rsync-project)
-  ([f7] . ymacs-hydra/global-toggles/body)
+  ([f7] . ymacs-hydra/toggles)
   ([f10] . counsel-compile))
 
 (define-key! :prefix "C-c m"

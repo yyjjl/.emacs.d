@@ -8,8 +8,21 @@
     (add-to-list 'lsp-diagnostics-disabled-modes 'tex-mode)))
 
 (after! latex
+  (ymacs-editor//add-toggles
+   "LaTeX"
+   '(derived-mode-p 'latex-mode)
+   '("u" ymacs-latex/force-update-style "Update Style" :exit t)
+   '("=" ymacs-latex/count-words "Count Words" :exit t)
+   '("i" TeX-interactive-mode "Interactive" :toggle t)
+   '("p" TeX-PDF-mode "PDF" :toggle t)
+   '("f" TeX-fold-mode "Fold" :toggle t)
+   '("s" TeX-source-correlate-mode "Source Correlate" :toggle t)
+   '("d w" TeX-toggle-debug-warnings "Debug Warning" :toggle TeX-debug-warnings)
+   '("d b" TeX-toggle-debug-bad-boxes "Debug Bad Boxes" :toggle TeX-debug-bad-boxes))
+
   (define-key! :map LaTeX-mode-map
     ([f5] . TeX-interactive-mode)
+    ([f10] . ymacs-latex/build)
     ("M-a" . ymacs-latex/backward-sexp)
     ("M-e" . ymacs-latex/forward-sexp)
     ("M-=" . ymacs-latex/count-words)
@@ -19,7 +32,6 @@
     ("}" . ymacs-latex/skip-close-pair)
     (")" . ymacs-latex/skip-close-pair)
     ("]" . ymacs-latex/skip-close-pair)
-    ([f10] . ymacs-latex/build)
     ("C-c h" . TeX-doc)
     ("C-c C-u" . ymacs-latex/force-update-style)
     ("C-c s" . LaTeX-section)

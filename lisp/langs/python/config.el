@@ -15,6 +15,14 @@
     (setq lsp-pyright-typechecking-mode "off")))
 
 (after! python
+  (ymacs-editor//add-toggles
+   "Python"
+   '(derived-mode-p 'python-mode)
+   '("v" ymacs-python/create-venv "Create Venv" :exit t)
+   '("w" ymacs-python/create-venv-in-workon-home "Create Venv $WORKON-HOME" :exit t)
+   '("c" ymacs-python/change-lsp-server "Change LSP Server" :exit t)
+   '("t" ymacs-python/toggle-breakpoint "Toggle Breakpoint" :exit t))
+
   (define-key! :map comint-mode-map
     ([f5] . ymacs-python/toggle-pdbtrack))
 
@@ -31,7 +39,6 @@
     ("C-c B" . py-isort-buffer)
     (("C-c C-b" "C-c b") . ymacs-python/autopep8)
     ("C-c C-c" . ymacs-python/send-buffer)
-    ("C-c M-d" . ymacs-python/generate-doc-at-point)
     ("C-c T" . ymacs-python/toggle-breakpoint)
     ("M-p" . previous-error)
     ("M-n" . next-error))
@@ -44,7 +51,7 @@
   (add-to-list 'python-shell-completion-native-disabled-interpreters "python3")
   (add-to-list 'python-shell-completion-native-disabled-interpreters "python")
 
-  (setq python-shell-prompt-detect-failure-warning nil)
+  (setq python-shell-prompt-detect-failure-warning t)
   (setq python-pdbtrack-activate t)
   (setq flycheck-python-flake8-executable "python3")
   (setq flycheck-python-pycompile-executable "python3")

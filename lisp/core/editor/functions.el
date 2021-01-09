@@ -58,9 +58,20 @@ Arguments are same as of `defhydra'."
           :key #'car
           :test #'equal))))
 
-(defun ymacs-editor/add-toggle-column (column)
-  (setf (alist-get (car column) ymacs-editor-local-toggles-heads-list)
-        (cdr column)))
+(defun ymacs-editor//add-toggles (-column-name -condition &rest -toggles)
+  (let* ((column (assoc-string -column-name ymacs-editor-toggles-alist))
+         (group (assoc -condition column))
+         (toggles (cdr group)))
+    (dolist (toggle (reverse -toggles))
+      (setf (alist-get (car toggle) toggles nil nil #'equal)
+            (cdr toggle)))
+    (if group
+        (setcdr group toggles)
+      (setq group (cons -condition toggles))
+      (if column
+          (setcdr (last column) (list group))
+        (setq column (list -column-name group))
+        (setcdr (last ymacs-editor-toggles-alist) (list column))))))
 
 
 ;;

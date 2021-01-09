@@ -10,6 +10,12 @@
 (after! org
   (require 'company-auctex nil t)
 
+  (ymacs-editor//add-toggles
+   "Org"
+   '(eq major-mode 'org-mode)
+   '("w" ymacs-org/latexmk-start-watching "Start LaTeXMK watching" :exit t)
+   '("d" ymacs-org/delete-latex-fragement-cache "Delete LaTeX Preview" :exit t))
+
   (define-key! :map org-mode-map
     ("<" . ymacs-org/hot-expand)
     ("C-c t" :map ymacs-org-table-extra-map)
