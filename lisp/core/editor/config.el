@@ -258,7 +258,7 @@
 (after! company-box
   (setq company-box-backends-colors nil)
   (setq company-box-enable-icon nil)
-  (setq company-box-doc-delay 0.5))
+  (setq company-box-doc-enable nil))
 
 (after! iedit
   (setq iedit-auto-narrow t))
