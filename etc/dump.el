@@ -1,16 +1,12 @@
 ;; -*- lexical-binding:t -*-
 
 (load (expand-file-name "early-init.el" user-emacs-directory))
-;; (load (expand-file-name "core-lib" ymacs-config-directory))
-
 (load (expand-file-name "init.el" user-emacs-directory))
-
-;; (package-initialize)
 
 ;; store load-path
 (setq ymacs-dump-load-path load-path)
 
-(defvar ymacs-ignored-packages '(vterm auctex))
+(defvar ymacs-ignored-packages '(vterm auctex tree-sitter tree-sitter-langs tsc))
 (defvar ymacs-preload-packages
   `(so-long
     edmacro

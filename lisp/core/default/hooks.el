@@ -88,7 +88,6 @@
   (display-fill-column-indicator-mode 1)
 
   (setq show-trailing-whitespace t)
-  ;; (setq-local line-spacing 0.25)
   (setq indicate-empty-lines t))
 
 ;; Default prog-mode setup

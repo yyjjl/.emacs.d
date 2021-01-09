@@ -173,8 +173,11 @@
   (advice-add 'company-capf :around #'ignore-errors!))
 
 (when ymacs-editor-use-childframe
-  (after! company-box-mode
-    (advice-add 'company-box--with-icons-p :override #'ignore)))
+  (after! company-box
+    (define-advice company-box--render-buffer (:after (_ -on-update) set-line-spacing)
+      (unless -on-update
+        (with-current-buffer (company-box--get-buffer)
+          (setq line-spacing nil))))))
 
 (after! flycheck
   (define-advice flycheck-error-level-interesting-p (:override (err) smart)

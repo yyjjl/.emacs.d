@@ -56,6 +56,7 @@
 (setq-default resize-mini-windows 'grow-only)
 
 (setq split-width-threshold 120)
+(setq-default line-spacing 0.25)
 
 ;; Defer jit font locking slightly to [try to] improve Emacs performance
 ;; (setq-default jit-lock-defer-time 0.3)
