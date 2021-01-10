@@ -255,10 +255,11 @@
   (setf (alist-get 'company-search-mode mode-line-misc-info)
         '(("" company-search-lighter " "))))
 
-(after! company-box
-  (setq company-box-backends-colors nil)
-  (setq company-box-enable-icon nil)
-  (setq company-box-doc-enable nil))
+(when ymacs-editor-use-childframe
+  (after! company-box
+    (setq company-box-backends-colors nil)
+    (setq company-box-enable-icon nil)
+    (setq company-box-doc-enable nil)))
 
 (after! iedit
   (setq iedit-auto-narrow t))
