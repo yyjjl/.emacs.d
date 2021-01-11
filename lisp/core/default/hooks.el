@@ -135,7 +135,7 @@
   (midnight-mode 1)
   ;; (display-time-mode 1)
   (transient-mark-mode 1)
-  (delete-selection-mode 1)
+  ;; (delete-selection-mode 1)
   ;; Auto save to files
   ;; (auto-save-visited-mode 1)
   (size-indication-mode -1)

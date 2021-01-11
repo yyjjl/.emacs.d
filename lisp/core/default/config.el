@@ -62,6 +62,7 @@
 (setq make-backup-files nil)
 (setq history-length 500)
 (setq history-delete-duplicates t)
+(setq kill-do-not-save-duplicates t)
 
 ;; Don’t compact font caches during GC.
 (setq inhibit-compacting-font-caches t)

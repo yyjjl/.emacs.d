@@ -39,6 +39,7 @@
  yasnippet-snippets
  dumb-jump
  expand-region
+ paredit
  goto-chg
  ;; Mark tools
  multiple-cursors
@@ -206,6 +207,12 @@
 (autoload 'ymacs-hydra/sort/body (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/games/body (expand! "commands-hydra") nil t)
 
+(autoload 'paredit-kill "paredit" nil t)
+(autoload 'paredit-backward-delete "paredit" nil t)
+(autoload 'paredit-forward-delete "paredit" nil t)
+(autoload 'paredit-backward-kill-word "paredit" nil t)
+(autoload 'paredit-forward-kill-word "paredit" nil t)
+
 (put 'projectile-project-run-cmd 'safe-local-variable #'stringp)
 (put 'projectile-project-test-cmd 'safe-local-variable #'stringp)
 (put 'projectile-project-compilation-cmd 'safe-local-variable #'stringp)
@@ -252,6 +259,11 @@
   (", d" . ymacs-editor/delete-local-snippet))
 
 (define-key!
+  ([remap kill-line] . paredit-kill)
+  ([remap delete-char] . paredit-forward-delete)
+  ([remap kill-word] . paredit-forward-kill-word)
+  ([remap backward-kill-word] . paredit-backward-kill-word)
+
   ("C-c O" . ymacs-hydra/outline/body)
 
   ("C-c <tab>" . company-complete)

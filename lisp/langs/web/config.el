@@ -2,6 +2,7 @@
 
 (after! web-mode
   (define-key! :map web-mode-map
+    ([remap kill-line] . ymacs-web/smart-kill)
     ("M-e" . web-mode-element-next)
     ("M-a" . web-mode-element-previous)
     (("C-c C-b" "C-c b") . web-mode-buffer-indent))
