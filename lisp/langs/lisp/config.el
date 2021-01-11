@@ -33,4 +33,6 @@
   (require 'semantic/bovine/el))
 
 (after! lispy
-  (define-key! :map lispy-mode-map ("M-n")))
+  (define-key! :map lispy-mode-map ("M-n"))
+
+  (setq lispy-x-default-verbosity 1))

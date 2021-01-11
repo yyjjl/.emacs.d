@@ -288,10 +288,9 @@ With a prefix BELOW move point to lower block."
                        (rx (* (any blank "\n,.!?;:")))
                        (rx (* (any blank "\n,.!?;:")))))
          (ov (ymacs-org//create-preview-overlay latex-fragment)))
-      (let ((new-ov (make-overlay (car bounds) (cdr bounds))))
-        (cl-loop
-         for (prop value) on (overlay-properties ov) by 'cddr
-         do (overlay-put new-ov prop value))))))
+      (move-overlay ov
+                    (car bounds) (cdr bounds)
+                    (current-buffer)))))
 
 ;;;###autoload
 (defun ymacs-org/project-open ()

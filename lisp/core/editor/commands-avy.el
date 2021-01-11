@@ -2,8 +2,9 @@
 
 (defun ymacs-editor//avy-action-copy--prompt ()
   (format
-   "%s to kill, %s/%s to copy: %s"
+   "%s to kill, %s/%s/%s to copy: %s"
    (propertize "k" 'face 'font-lock-major-mode)
+   (propertize "w" 'face 'font-lock-major-mode)
    (propertize "RET" 'face 'font-lock-major-mode)
    (propertize "SPC" 'face 'font-lock-major-mode)
    (mapconcat
@@ -30,7 +31,7 @@
             (cond
              ((or (eq char ?k) (eq char ?K))
               (setq done 'kill))
-             ((or (eq char 13) (eq char 32))
+             ((or (eq char 13) (eq char 32) (eq char ?w))
               (setq done 'copy))
              ((when-let (thing (alist-get char ymacs-editor-avy-copy-key-alist))
                 (if-let (bounds (bounds-of-thing-at-point thing))

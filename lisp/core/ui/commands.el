@@ -29,6 +29,7 @@
 ;;;###autoload
 (define-minor-mode ymacs-ui/view-code-mode
   "View code"
+  :group 'ymacs
   :init-value nil
   (let ((switch (if ymacs-ui/view-code-mode 1 -1)))
     (highlight-indent-guides-auto-set-faces)

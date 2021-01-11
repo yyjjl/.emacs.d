@@ -185,7 +185,7 @@
     (?l . list)
     (?f . filename)
     (?d . defun)
-    (?w . word)
+    (?W . word)
     (?u . url)
     (?U . uuid)
     (?n . number)))
