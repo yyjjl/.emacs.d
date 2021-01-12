@@ -134,16 +134,6 @@ grab matched string and insert them into `kill-ring'"
     (forward-paragraph -n)))
 
 ;;;###autoload
-(defun ymacs-editor/backward-defun-or-paragraph (&optional -n)
-  (interactive "^p")
-  (ymacs-editor/forward-defun-or-paragraph (- -n)))
-
-;;;###autoload
-(defun ymacs-editor/avy-goto-word-0-in-line-backward (-backward-p)
-  (interactive "P")
-  (avy-goto-word-0 -backward-p (point-at-bol) (point)))
-
-;;;###autoload
 (defun ymacs-editor/avy-goto-word-0-in-line-forward (-backward-p)
   (interactive "P")
   (avy-goto-word-0 -backward-p (1+ (point)) (point-at-eol)))

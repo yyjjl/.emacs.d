@@ -74,7 +74,10 @@
 (setq enable-recursive-minibuffers t)
 
 ;; Vertical motion starting at end of line keeps to ends of lines
-(setq track-eol t)
+;; (setq track-eol t)
+
+;; Don't moves point by visual lines (performace)
+(setq-default line-move-visual nil)
 
 ;; No automatic new line when scrolling down at buffer bottom
 (setq next-line-add-newlines nil)

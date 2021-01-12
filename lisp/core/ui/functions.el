@@ -427,7 +427,8 @@ like the scratch buffer where knowing the current project directory is important
   "Mode line construct for miscellaneous information.
 By default, this shows the information specified by `global-mode-string'."
   (list
-   '(t mode-line-misc-info)
+   " "
+   mode-line-misc-info
    (propertize (or ymacs-modeline--project-parent-path default-directory)
                'face 'font-lock-doc-face)))
 

@@ -64,27 +64,27 @@
   (define-key! :map lsp-signature-mode-map
     ("M-o" . lsp-signature-stop))
 
-  ;; (setq lsp-auto-configure t)
+  (setq lsp-auto-configure t)
   (setq lsp-auto-guess-root t)
   (setq lsp-eldoc-render-all nil)
-  ;; (setq lsp-diagnostics-provider :auto)
-  ;; (setq lsp-restart 'interactive)
+  (setq lsp-diagnostics-provider :auto)
+  (setq lsp-restart 'interactive)
   (setq lsp-keep-workspace-alive nil)
   (setq lsp-signature-doc-lines 2)
-  ;; (setq lsp-signature-auto-activate '(:on-trigger-char))
-  ;; (setq lsp-idle-delay 0.5)
+  (setq lsp-signature-auto-activate '(:on-trigger-char))
+  (setq lsp-idle-delay 0.5)
 
   (setq lsp-completion-provider :none)
 
   (setq lsp-enable-file-watchers nil)
-  ;; (setq lsp-enable-folding t)
-  ;; (setq lsp-enable-snippet t)
-  ;; (setq lsp-enable-on-type-formatting nil)
-  ;; (setq lsp-enable-text-document-color t)
+  (setq lsp-enable-folding t)
+  (setq lsp-enable-snippet t)
+  (setq lsp-enable-on-type-formatting nil)
+  (setq lsp-enable-text-document-color t)
   (setq lsp-enable-indentation nil)
-  ;; (setq lsp-enable-symbol-highlighting t)
+  (setq lsp-enable-symbol-highlighting t)
   (setq lsp-symbol-highlighting-skip-current t)
-  ;; (setq lsp-semantic-tokens-enable nil)
+  (setq lsp-semantic-tokens-enable nil)
 
   (setq lsp-auto-execute-action nil)
 

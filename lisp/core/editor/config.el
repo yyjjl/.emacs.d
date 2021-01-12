@@ -136,6 +136,15 @@
     (setq projectile-generic-command
           (concat ymacs-fdfind-path " . -0 --type f --color=never")))
 
+  (when ymacs-ctags-path
+    (setq projectile-tags-command
+          (eval-when-compile
+            (string-join
+             (cons ymacs-ctags-path (cdr (split-string projectile-tags-command)))
+             " "))))
+
+  (add-to-list 'projectile-globally-ignored-directories "__pycache__")
+
   (setq projectile-use-git-grep t)
   (setq projectile-completion-system 'ivy)
   (setq projectile-ignored-projects '("~/" "/tmp")))
