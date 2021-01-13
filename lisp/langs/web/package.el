@@ -2,6 +2,7 @@
 
 (require-packages!
  emmet-mode
+ typescript-mode
  web-mode)
 
 (eval-when-has-feature! lsp

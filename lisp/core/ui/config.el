@@ -42,7 +42,8 @@
 (setq use-file-dialog nil)
 (setq use-dialog-box nil)
 ;; Disable bidirectional text for tiny performance boost
-(setq bidi-display-reordering nil)
+(setq-default bidi-display-reordering nil)
+(setq bidi-inhibit-bpa t)
 (setq frame-resize-pixelwise t)
 
 (setq cursor-in-non-selected-windows t)

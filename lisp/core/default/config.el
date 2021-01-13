@@ -25,8 +25,11 @@
 
 ;; Do not show mode-line until setup finished
 (setq-default mode-line-format nil)
+(setq-default frame-title-format '("" invocation-name "@" system-name " : %b"))
 
 (setq system-time-locale "C")
+;; Set window title in xterm
+(setq xterm-set-window-title t)
 
 ;; UTF-8 as the default coding system
 (when (fboundp 'set-charset-priority)
@@ -54,7 +57,7 @@
 (setq mark-ring-max 128)
 (setq kill-ring-max 200)
 
- ;; Save clipboard contents before replacement
+;; Save clipboard contents before replacement
 (setq save-interprogram-paste-before-kill t)
 
 ;; History & backup settings
