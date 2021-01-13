@@ -4,6 +4,7 @@
 (executable! ripgrep :-exe "rg")
 (executable! fdfind :-exe ["fdfind" "fd"])
 (executable! fcitx :-exe "fcitx-remote")
+(executable! ctags :-exe "ctags-exuberant")
 
 (defcustom ymacs-editor-use-childframe nil
   "Whether to use childframe"
@@ -39,6 +40,7 @@
  yasnippet-snippets
  dumb-jump
  expand-region
+ easy-kill
  paredit
  goto-chg
  ;; Mark tools
@@ -55,8 +57,6 @@
  graphviz-dot-mode
  yaml-mode
  zeal-at-point)
-
-(defvar ymacs-ui/view-code-mode)
 
 (defvar ymacs-editor-toggles-alist
   '(("Global"
@@ -92,7 +92,8 @@
 (defvar ymacs-editor-ivy-display-help-max-width 160)
 
 (defvar ymacs-editor-ivy-display-help-extra-commands
-  '(delete-blank-lines
+  '(ivy-restrict-to-matches
+    delete-blank-lines
     just-one-space
     (counsel-find-file . ivy-magic-read-file-env)))
 
@@ -191,6 +192,15 @@
     (?U . uuid)
     (?n . number)))
 
+(put 'ymacs-editor//fzf 'no-counsel-M-x t)
+(put 'ymacs-editor//rg 'no-counsel-M-x t)
+(put 'ymacs-editor//rg-in-directory 'no-counsel-M-x t)
+(put 'ymacs-editor/fzf-file-type 'no-counsel-M-x t)
+(put 'ymacs-editor/ivy-meta-dot 'no-counsel-M-x t)
+(put 'ymacs-editor/ivy-meta-dot-for-counsel-fzf 'no-counsel-M-x t)
+(put 'ymacs-editor/ivy-meta-dot-for-counsel-rg 'no-counsel-M-x t)
+(put 'ymacs-editor/switch-ivy-backend 'no-counsel-M-x t)
+
 (autoload 'ymacs-editor/rg (expand! "commands-ivy.el") nil t)
 (autoload 'ymacs-editor/fzf (expand! "commands-ivy.el") nil t)
 
@@ -212,6 +222,9 @@
 (autoload 'paredit-forward-delete "paredit" nil t)
 (autoload 'paredit-backward-kill-word "paredit" nil t)
 (autoload 'paredit-forward-kill-word "paredit" nil t)
+(autoload 'paredit-close-round "paredit" nil t)
+(autoload 'paredit-close-square "paredit" nil t)
+(autoload 'paredit-close-curly "paredit" nil t)
 
 (put 'projectile-project-run-cmd 'safe-local-variable #'stringp)
 (put 'projectile-project-test-cmd 'safe-local-variable #'stringp)
@@ -253,16 +266,24 @@
   (", s" . ymacs-hydra/sort/body)
   (", e" . ymacs-hydra/ediff/body)
   (", z" . ymacs-hydra/games/body)
+  ;; Minor mode to make xref use etags again.
+  (", E" . xref-etags-mode)
 
   (", SPC" . ymacs-editor/insert-space-around-chinese)
   (", a" . ymacs-editor/add-local-snippet)
   (", d" . ymacs-editor/delete-local-snippet))
 
 (define-key!
+  ([remap kill-ring-save] . easy-kill)
   ([remap kill-line] . paredit-kill)
   ([remap delete-char] . paredit-forward-delete)
+  ([remap delete-backward-char] . paredit-backward-delete)
   ([remap kill-word] . paredit-forward-kill-word)
   ([remap backward-kill-word] . paredit-backward-kill-word)
+
+  ("]" . paredit-close-square)
+  (")" . paredit-close-round)
+  ("}" . paredit-close-curly)
 
   ("C-c O" . ymacs-hydra/outline/body)
 

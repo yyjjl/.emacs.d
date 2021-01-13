@@ -28,6 +28,9 @@
    '("C" ymacs-cpp-cmake/change-config :exit t)
    '("L" ymacs-cpp/load-in-repl :exit t))
 
+  (setq c-backspace-function #'paredit-backward-delete)
+  (setq c-delete-function #'paredit-forward-delete)
+
   (define-key! :map c-mode-base-map
     ("*" . ymacs-cpp/electric-star)
     ("C-c o" . ff-find-other-file)

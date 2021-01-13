@@ -5,6 +5,7 @@ CURRENT_DIR=$(dirname "$0")
 # Cask applications
 CORE_APPS=(
     cmake
+    ctags
     coreutils
     ripgrep
     p7zip

@@ -2,16 +2,6 @@
 
 (declare-function exec-path-from-shell-initialize "ext:exec-path-from-shell")
 
-(define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
-  (let ((fetcher (apply -fn -args))
-        (dumb-jump-fetcher
-         (let ((xref-backend-functions '(dumb-jump-xref-activate t)))
-           (apply -fn -args))))
-    (lambda ()
-      (or (with-demoted-errors "%s, fallback to dumb-jump"
-            (funcall fetcher))
-          (funcall dumb-jump-fetcher)))))
-
 (define-advice indent-for-tab-command (:around (-fn &rest -arg) smart)
   (if (save-excursion
         (forward-line 0)

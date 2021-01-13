@@ -131,6 +131,14 @@ If not try to complete."
     (with-current-buffer buffer
       (ymacs-python//send-region-or-buffer (= (prefix-numeric-value current-prefix-arg) 4)))))
 
+;;;###autoload
+(defun ymacs-python/backspace (-arg)
+  (interactive "*p")
+  (unless (python-indent-dedent-line)
+    (paredit-backward-delete -arg)))
+
+(put 'ymacs-python/backspace 'delete-selection 'supersede)
+
 (defsubst ymacs-python//line-startswith-p (-string)
   (back-to-indentation)
   (string-prefix-p -string (buffer-substring-no-properties

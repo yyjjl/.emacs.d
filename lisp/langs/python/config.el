@@ -32,6 +32,7 @@
     ("C-c C-z" . ymacs-python/pop-to-source-buffer))
 
   (define-key! :map python-mode-map
+    ([remap python-indent-dedent-line-backspace] . ymacs-python/backspace)
     ([f5] . ymacs-python/debug-current-file)
     ("C-c v" . ymacs-python/create-venv)
     ("C-c V" . ymacs-python/create-venv-in-workon-home)

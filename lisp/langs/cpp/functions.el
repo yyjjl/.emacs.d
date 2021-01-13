@@ -41,8 +41,8 @@
   (setq c-basic-offset 4)
   ;; make DEL take all previous whitespace with it
   (c-toggle-hungry-state 1)
-  ;; (c-toggle-auto-newline 1)
-  (c-toggle-electric-state -1))
+  (c-toggle-electric-state 1)
+  (c-toggle-auto-newline -1))
 
 (defun ymacs-cpp//font-lock-setup ()
   (when (or (eq font-lock-maximum-decoration 1)

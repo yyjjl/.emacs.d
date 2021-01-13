@@ -351,7 +351,7 @@ HTML file converted from org file, it returns t."
       (with-current-buffer buffer
         (hack-dir-local-variables-non-file-buffer)))))
 
-(defun make-process-sentinel! (-callback -error-callback &optional -sentinel)
+(defun make-process-sentinel! (-callback -error-callback -unwind &optional -sentinel)
   (lambda (-proc -msg)
     (when -sentinel
       (funcall -sentinel -proc -msg))
@@ -359,19 +359,22 @@ HTML file converted from org file, it returns t."
     (when (memq (process-status -proc) '(exit signal))
       (let ((exit-status (process-exit-status -proc)))
         (with-current-buffer (process-buffer -proc)
-          (if (= exit-status 0)
-              (when -callback
-                (funcall -callback -msg))
-            (when -error-callback
-              (funcall -error-callback exit-status -msg))))))))
+          (unwind-protect
+              (if (= exit-status 0)
+                  (when -callback
+                    (funcall -callback -msg))
+                (when -error-callback
+                  (funcall -error-callback exit-status -msg)))
+            (when -unwind
+              (funcall -unwind))))))))
 
 (cl-defun run-compilation!
-    (&key -name -callback -error-callback -command -buffer-name)
+    (&key -name -callback -error-callback -unwind -command -buffer-name (-comint t))
   (let* ((buffer-name (cond (-buffer-name
                              (lambda (_) -buffer-name))
                             (-name
                              (lambda (_) (format "run command: %s" -name)))))
-         (command-buffer (compilation-start -command t buffer-name)))
+         (command-buffer (compilation-start -command -comint buffer-name)))
     (with-current-buffer command-buffer
       (setq ymacs-term-exit-action 'keep)
       ;; NOTE: don't use `compilation-finish-functions' or `compilation-exit-message-function'
@@ -380,17 +383,17 @@ HTML file converted from org file, it returns t."
              (sentinel (process-sentinel proc)))
         (set-process-sentinel
          proc
-         (make-process-sentinel! -callback -error-callback sentinel))))))
+         (make-process-sentinel! -callback -error-callback -unwind sentinel))))))
 
 (cl-defun run-process!
-    (&key -name -program -program-args -callback -error-callback)
+    (&key -name -program -program-args -callback -error-callback -unwind)
   (set-process-sentinel
    (apply #'start-process
           -name                         ; name
           (format " *%s*" -name)        ; buffer
           (or -program -name)           ; program
           -program-args)
-   (make-process-sentinel! -callback -error-callback)))
+   (make-process-sentinel! -callback -error-callback -unwind)))
 
 (defun remap! (-old -new &optional -map)
   "Remap keybindings whose prefix is -OLD-KEY to -NEW-KEY in

@@ -77,15 +77,6 @@ Else call with `read-file-name'.
     (TeX-command command 'TeX-master-file -1)))
 
 ;;;###autoload
-(defun ymacs-latex/skip-close-pair ()
-  (interactive)
-  (let ((char (char-after)))
-    (if (and (equal char (string-to-char (this-command-keys)))
-             (member char '(?\) ?\} ?\])))
-        (forward-char)
-      (self-insert-command 1))))
-
-;;;###autoload
 (defun ymacs-latex/force-update-style ()
   (interactive)
   (TeX-update-style t))
