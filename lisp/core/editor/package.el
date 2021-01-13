@@ -275,15 +275,6 @@
 
 (define-key!
   ([remap kill-ring-save] . easy-kill)
-  ([remap kill-line] . paredit-kill)
-  ([remap delete-char] . paredit-forward-delete)
-  ([remap delete-backward-char] . paredit-backward-delete)
-  ([remap kill-word] . paredit-forward-kill-word)
-  ([remap backward-kill-word] . paredit-backward-kill-word)
-
-  ("]" . paredit-close-square)
-  (")" . paredit-close-round)
-  ("}" . paredit-close-curly)
 
   ("C-c O" . ymacs-hydra/outline/body)
 
@@ -389,6 +380,17 @@
   ("O" . counsel-outline)
   ("o" . counsel-org-goto-all)
   ("t" . counsel-tmm))
+
+(define-key! :map prog-mode-map
+  ([remap kill-line] . paredit-kill)
+  ([remap delete-char] . paredit-forward-delete)
+  ([remap delete-backward-char] . paredit-backward-delete)
+  ([remap kill-word] . paredit-forward-kill-word)
+  ([remap backward-kill-word] . paredit-backward-kill-word)
+
+  ("]" . paredit-close-square)
+  (")" . paredit-close-round)
+  ("}" . paredit-close-curly))
 
 (define-key! :prefix "C-h"
   ("z" . zeal-at-point)
