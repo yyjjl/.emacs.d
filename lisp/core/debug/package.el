@@ -4,9 +4,8 @@
 (defvar ymacs-debug--help-buffer-name " *DEBUG-HELP*")
 
 (defvar-local ymacs-debug--buffer-read-only nil)
-(defvar-local ymacs-debug--dap-cookie nil)
+(defvar-local ymacs-debug--cookie nil)
 (defvar ymacs-debug--buffer-position nil)
-(defvar ymacs-debug--breakpoints (make-hash-table :test #'equal))
 
 (defvar ymacs-debug--buffers nil)
 (defvar ymacs-debug-info-mode-map

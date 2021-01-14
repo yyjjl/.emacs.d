@@ -92,6 +92,31 @@
           (set-window-dedicated-p window t)
           (set-window-parameter window 'no-other-window t))))))
 
+
+(defun ymacs-debug//before-debug ()
+  (ymacs-debug//show-help nil)
+  (lv-delete-window)
+  ;; FIXME: In Emacs 28.1, restoring window configuration is a built-in feature
+  (window-configuration-to-register :debug-windows)
+
+  (delete-other-windows))
+
+(defun ymacs-debug//after-debug (&rest -modes)
+  (dolist (buffer ymacs-debug--buffers)
+    (when (buffer-live-p buffer)
+      (with-current-buffer buffer
+        (dolist (mode -modes)
+          (funcall mode -1))
+
+        (dolist (window (get-buffer-window-list))
+          (when (window-parameter window 'no-delete-other-windows)
+            (set-window-parameter window 'no-delete-other-windows nil))))))
+
+  (setq ymacs-debug--buffers nil)
+  ;; restore windows
+  (with-demoted-errors "%s"
+    (jump-to-register :debug-windows)))
+
 (define-minor-mode ymacs-debug-command-buffer-mode
   "A mode for adding keybindings to comamnd buffer"
   nil nil
@@ -104,31 +129,40 @@
   nil nil
   ymacs-debug-info-mode-map)
 
+(defun ymacs-debug//enable ()
+  (cl-pushnew (current-buffer) ymacs-debug--buffers)
+
+  (setq ymacs-debug--buffer-read-only buffer-read-only)
+  (unless ymacs-debug--cookie
+    (setq ymacs-debug--cookie
+          (face-remap-add-relative 'header-line 'ymacs-modeline-debug-visual)))
+  (setq buffer-read-only t)
+
+  (tooltip-mode 1)
+  (display-line-numbers-mode 1)
+  (line-number-mode 1)
+  (column-number-mode 1))
+
+(defun ymacs-debug//disable ()
+  (tooltip-mode -1)
+  (display-line-numbers-mode -1)
+  (line-number-mode -1)
+  (column-number-mode -1)
+  (when buffer-read-only
+    (setq buffer-read-only ymacs-debug--buffer-read-only))
+  (setq ymacs-debug--buffer-read-only nil)
+
+  (when ymacs-debug--cookie
+    (face-remap-remove-relative ymacs-debug--cookie))
+  (setq ymacs-debug--cookie nil))
+
 (define-minor-mode ymacs-debug-running-session-mode
   "A mode for adding keybindings to running sessions"
   nil nil
   ymacs-debug-running-session-mode-map
+
   (if ymacs-debug-running-session-mode
-      (progn
-        (setq ymacs-debug--buffer-read-only buffer-read-only)
-        (unless ymacs-debug--dap-cookie
-          (setq ymacs-debug--dap-cookie
-                (face-remap-add-relative 'header-line 'ymacs-modeline-debug-visual)))
-        (setq buffer-read-only t)
-
-        (display-line-numbers-mode 1)
-        (line-number-mode 1)
-        (column-number-mode 1))
-
-    (display-line-numbers-mode -1)
-    (line-number-mode -1)
-    (column-number-mode -1)
-    (when buffer-read-only
-      (setq buffer-read-only ymacs-debug--buffer-read-only))
-    (setq ymacs-debug--buffer-read-only nil)
-
-    (when ymacs-debug--dap-cookie
-      (face-remap-remove-relative ymacs-debug--dap-cookie))
-    (setq ymacs-debug--dap-cookie nil))
+      (ymacs-debug//enable)
+    (ymacs-debug//disable))
 
   (force-mode-line-update))

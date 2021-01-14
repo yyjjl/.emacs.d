@@ -76,3 +76,6 @@ hasn't to runs those regexps against the filename.")
 ;; (setq comp-deferred-compilation nil)
 
 (setq load-prefer-newer t)
+
+(unless (file-exists-p ymacs-cache-direcotry)
+  (make-directory ymacs-cache-direcotry))

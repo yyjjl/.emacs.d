@@ -2,7 +2,7 @@
 
 (require-packages! langtool)
 
-(define-key! :prefix "M-s"
+(define-key! :prefix "M-s l"
   ("l" . ymacs-spell/langtool-correct-at-point)
   ("L" . langtool-check)
   ("c" . langtool-correct-buffer)

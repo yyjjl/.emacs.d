@@ -27,7 +27,7 @@
  ;; `counsel-M-x' need amx to get history
  amx
  company
- (company-box :when ymacs-editor-use-childframe)
+ (company-posframe :when ymacs-editor-use-childframe)
  ivy
  ivy-hydra
  hydra
@@ -48,15 +48,8 @@
  ;; `wgrep' allows you to edit a grep buffer and apply those changes
  ;; to the file buffer.
  wgrep
- bison-mode
  buffer-move
- csv-mode
- gnuplot-mode
- crontab-mode
- dockerfile-mode
- graphviz-dot-mode
- yaml-mode
- zeal-at-point)
+ graphviz-dot-mode)
 
 (defvar ymacs-editor-toggles-alist
   '(("Global"
@@ -165,7 +158,11 @@
   '(("()" . ("(" . ")"))
     ("{}" . ("{" . "}"))
     ("[]" . ("[" . "]"))
-    ("`" . ("`" . "'"))
+    ("`" . (lambda (_)
+             (cons "`"
+                   (if (memq major-mode '(emacs-lisp-mode lisp-interaction-mode))
+                       "'"
+                     "`"))))
     ("<>,." . (lambda (_)
                 (let ((tag (read-string "Tag: ")))
                   (cons (concat "<" tag ">")
@@ -295,8 +292,8 @@
 
   ("M-Q" . ymacs-editor/insert-space-around-chinese)
   ("M-;" . ymacs-editor/comment-dwim)
-  ("M-}" . ymacs-editor/forward-defun-or-paragraph)
-  ("M-{" . ymacs-editor/backward-defun-or-paragraph)
+  ("M-}" . ymacs-editor/forward-defun)
+  ("M-{" . ymacs-editor/backward-defun)
   ("M-e" . ymacs-editor/forward-sentence-or-sexp)
   ("M-a" . ymacs-editor/backward-sentence-or-sexp)
   ("C-M-b" . backward-sentence)
@@ -391,10 +388,6 @@
   ("]" . paredit-close-square)
   (")" . paredit-close-round)
   ("}" . paredit-close-curly))
-
-(define-key! :prefix "C-h"
-  ("z" . zeal-at-point)
-  ("Z" . zeal-at-point-search))
 
 (define-key! :map read-expression-map
   ("C-r" . counsel-minibuffer-history))

@@ -53,6 +53,7 @@
 
 (load-feature! tools/git)
 (load-feature! tools/spell)
+(load-feature! tools/extra-modes)
 
 (load-feature! langs/lisp)
 (load-feature! langs/latex)

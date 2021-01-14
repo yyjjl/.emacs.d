@@ -265,10 +265,16 @@
         '(("" company-search-lighter " "))))
 
 (when ymacs-editor-use-childframe
-  (after! company-box
-    (setq company-box-backends-colors nil)
-    (setq company-box-enable-icon nil)
-    (setq company-box-doc-enable nil)))
+  (after! company-posframe
+    (setq company-posframe-show-indicator nil)
+    (setq company-posframe-show-metadata nil)
+    (setq company-posframe-quickhelp-delay nil)
+
+    (define-key! :map company-posframe-active-map
+      ("C-c C-d" . company-posframe-quickhelp-toggle)
+      ("C-h" . company-posframe-quickhelp-toggle)
+      ("C-v" . company-posframe-quickhelp-scroll-down)
+      ("M-v" . company-posframe-quickhelp-scroll-up))))
 
 (after! iedit
   (setq iedit-auto-narrow t))
@@ -311,11 +317,3 @@
   (remove-hook 'company-backends 'company-graphviz-dot-backend)
 
   (setq graphviz-dot-indent-width 4))
-
-(after! csv-mode
-  (setq csv-separators '("," ";" "|" " ")))
-
-(after! zeal-at-point
-  (setf (cdr (assoc 'c++-mode zeal-at-point-mode-alist)) "cpp"
-        (cdr (assoc 'python-mode zeal-at-point-mode-alist)) "python")
-  (add-to-list 'zeal-at-point-mode-alist '(cmake-mode . "cmake")))

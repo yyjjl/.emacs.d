@@ -42,9 +42,6 @@
 (declare-function winner-undo 'winner)
 (declare-function winner-redo 'winner)
 
-(unless (file-exists-p ymacs-cache-direcotry)
-  (make-directory ymacs-cache-direcotry))
-
 (define-key! :prefix "C-x"
   ("2" . ymacs-window/split-vertically)
   ("3" . ymacs-window/split-horizontally)
@@ -104,6 +101,7 @@
 (put 'narrow-to-defun 'disabled nil)
 (put 'erase-buffer 'disabled nil)
 (put 'list-timers 'disabled nil)
+(put 'list-threads 'disabled nil)
 
 (with-no-warnings
   (setq TeX-auto-global (expand-cache! "auctex/"))

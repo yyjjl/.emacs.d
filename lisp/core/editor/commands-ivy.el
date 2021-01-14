@@ -69,8 +69,8 @@
   "
 [_m_] swiper-multi
 [_a_] swiper-all
-[_i_/_I_]   isearch-forward(regexp)
-[_r_/_R_]   isearch-backward(regexp)
+[_i_/_I_] isearch-forward(regexp)
+[_r_/_R_] isearch-backward(regexp)
 "
   ("i" isearch-forward)
   ("I" isearch-forward-regexp)

@@ -450,7 +450,8 @@ By default, this shows the information specified by `global-mode-string'."
 
 (ymacs-modeline//def-segment debug
   "The current debug state."
-  (let ((dap (ignore-errors (dap-mode-line)))
+  (let ((dap (or (ignore-errors (dap-mode-line))
+                 (when compilation-in-progress "[Compiling]")))
         (edebug (bound-and-true-p edebug-mode)))
     (propertize
      (concat dap
@@ -494,8 +495,6 @@ By default, this shows the information specified by `global-mode-string'."
 
 (ymacs-modeline//def-segment misc-header
   '(""
-    (compilation-in-progress
-     (:propertize "[Compiling]" face ymacs-modeline-warning))
     (tree-sitter-hl-mode " TreeHL" (tree-sitter-mode " Tree"))
     ymacs-modeline--lsp-state
     (lsp-signature-mode

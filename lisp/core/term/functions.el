@@ -229,6 +229,9 @@ If -FORCE is non-nil create a new term buffer directly."
       (let ((default-directory -directory))
         (ymacs-term//create-buffer nil t))))
 
+(defsubst ymacs-term//get-directory ()
+  (run-hook-with-args-until-success 'ymacs-term-directory-functions))
+
 (defun ymacs-term//pop-shell-get-buffer (&optional -arg)
   (when (ymacs-term//shell-buffer-p (current-buffer))
     (user-error "Current buffer is already a shell buffer"))
@@ -236,7 +239,7 @@ If -FORCE is non-nil create a new term buffer directly."
   (let* ((new (or (= -arg 0) (>= -arg 16)))
          (directory
           (or (when (= -arg 4)
-                (run-hook-with-args-until-success 'ymacs-term-directory-functions))
+                (ymacs-term//get-directory))
               (when new
                 (read-directory-name "Shell in: " nil nil :mustmatch))
               default-directory)))

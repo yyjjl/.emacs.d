@@ -7,6 +7,10 @@
 
 (require 'pretty-hydra)
 
+(defvar ymacs-hydra/global-toggles/keymap)
+(declare-function ymacs-hydra/global-toggles/body 'hydra)
+(declare-function ymacs-hydra/global-toggles/nil 'hydra)
+
 ;;;###autoload
 (defun ymacs-hydra/toggles ()
   (interactive)
@@ -24,9 +28,7 @@
           append (list name rows))))
 
     (dolist (key extra-keys)
-      (define-key ymacs-hydra/global-toggles/keymap
-        key
-        #'ymacs-hydra/global-toggles/nil))
+      (define-key ymacs-hydra/global-toggles/keymap key #'ymacs-hydra/global-toggles/nil))
 
     (ymacs-hydra/global-toggles/body)))
 
@@ -97,19 +99,19 @@ _b_   _f_       [_q_]quit      [_y_]yank
 (pretty-hydra-define ymacs-hydra/outline
   (:title "Outline [`z' to quit]" :color amaranth :quit-key "z")
   ("Hide"
-   (("q" outline-hide-sublevels)   ; Hide everything but the top-level headings
-    ("t" outline-hide-body)     ; Hide everything but headings (all body lines)
-    ("o" outline-hide-other)    ; Hide other branches
-    ("c" outline-hide-entry)    ; Hide this entry's body
-    ("l" outline-hide-leaves)   ; Hide body lines in this entry and sub-entries
-    ("d" outline-hide-subtree)  ; Hide everything in this entry and sub-entries
+   (("q" outline-hide-sublevels)        ; Hide everything but the top-level headings
+    ("t" outline-hide-body)             ; Hide everything but headings (all body lines)
+    ("o" outline-hide-other)            ; Hide other branches
+    ("c" outline-hide-entry)            ; Hide this entry's body
+    ("l" outline-hide-leaves)           ; Hide body lines in this entry and sub-entries
+    ("d" outline-hide-subtree)          ; Hide everything in this entry and sub-entries
     )
    "Show"
-   (("a" outline-show-all)   ; Show (expand) everything
-    ("e" outline-show-entry) ; Show this heading's body
-    ("i" outline-show-children) ; Show this heading's immediate child sub-headings
-    ("k" outline-show-branches) ; Show all sub-headings under this heading
-    ("s" outline-show-subtree) ; Show (expand) everything in this heading & below
+   (("a" outline-show-all)              ; Show (expand) everything
+    ("e" outline-show-entry)            ; Show this heading's body
+    ("i" outline-show-children)         ; Show this heading's immediate child sub-headings
+    ("k" outline-show-branches)         ; Show all sub-headings under this heading
+    ("s" outline-show-subtree)          ; Show (expand) everything in this heading & below
     )
    "Move"
    (("u" outline-up-heading)            ; Up

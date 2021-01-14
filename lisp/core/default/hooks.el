@@ -65,6 +65,7 @@
                   t)))))
 
 (define-hook! ymacs-default|minibuffer-setup (minibuffer-setup-hook)
+  (setq line-spacing nil)
   (setq gc-cons-threshold most-positive-fixnum))
 
 (define-hook! ymacs-default|minibuffer-exit (minibuffer-exit-hook)
@@ -138,7 +139,7 @@
   (midnight-mode 1)
   ;; (display-time-mode 1)
   (transient-mark-mode 1)
-  ;; (delete-selection-mode 1)
+  (delete-selection-mode 1)
   ;; Auto save to files
   ;; (auto-save-visited-mode 1)
   (size-indication-mode -1)
