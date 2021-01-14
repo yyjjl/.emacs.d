@@ -156,6 +156,10 @@
   ;; (global-eldoc-mode 1)
   (global-so-long-mode 1)
 
+  ;; (file-name-shadow-mode 1)
+  ;; Show the recursion depth in the minibuffer prompt
+  (minibuffer-depth-indicate-mode 1)
+
   ;; Restore `file-name-handler-alist' and `gc-cons-threshold'
   (setq file-name-handler-alist
         (cons

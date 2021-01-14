@@ -82,3 +82,19 @@
                            (python-shell-get-process))))
     (with-current-buffer (process-buffer process)
       (not comint-last-prompt))))
+
+(defsubst ymacs-python//triple-quotes-p (-start -end)
+  (let ((str (buffer-substring-no-properties
+              (max -start (point-min))
+              (min -end (point-max)))))
+    (and (or (string= str "'''")
+             (string= str "\"\"\""))
+         str)))
+
+(defun ymacs-python//around-string-start+end-points (-fn &optional -state)
+  (when-let ((start+end (funcall -fn -state))
+             (start (car start+end))
+             (end (cdr start+end)))
+    (if (ymacs-python//triple-quotes-p (- end 2) (+ end 1))
+        (cons (+ start 2) (- end 2))
+      start+end)))

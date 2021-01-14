@@ -76,16 +76,26 @@ grab matched string and insert them into `kill-ring'"
       (replace-match "\\1 \\2" nil nil))))
 
 ;;;###autoload
-(defun ymacs-editor/goto-next-char-or-minibuffer (-backward-p)
-  (interactive "P")
+(defun ymacs-editor/goto-char-or-minibuffer ()
+  "If minibuffer-window is active and not selected, select it.
+If current-prefix-arg == (16), jump to first char before (point) in current line.
+If current-prefix-arg is non-nol, jump to first char after (point) in current line.
+Otherwise call `avy-goto-char-in-line'
+"
+  (interactive)
   (let ((window (active-minibuffer-window)))
-    (if (and window (not (eq window (selected-window))))
-        (select-window window)
-      (if -backward-p
+    (cond
+     ((and window (not (eq window (selected-window))))
+      (select-window window))
+     (current-prefix-arg
+      (if (equal current-prefix-arg '(16))
           (search-backward (char-to-string (read-char "backward to char:"))
                            (line-beginning-position))
         (search-forward (char-to-string (read-char "forward to char:"))
-                        (line-end-position))))))
+                        (line-end-position))))
+     ((let ((avy-single-candidate-jump t)
+            (avy-all-windows nil))
+        (call-interactively #'avy-goto-char-in-line))))))
 
 ;;;###autoload
 (defun ymacs-editor/forward-defun (&optional -n)
@@ -134,22 +144,20 @@ grab matched string and insert them into `kill-ring'"
     (forward-paragraph -n)))
 
 ;;;###autoload
-(defun ymacs-editor/avy-goto-word-0-in-line-forward (-backward-p)
-  (interactive "P")
-  (avy-goto-word-0 -backward-p (1+ (point)) (point-at-eol)))
-
-;;;###autoload
-(defun ymacs-editor/avy-goto-symbol-1-in-defun (-char &optional -backward-p)
-  (interactive (list (read-char "char: " t)
-                     current-prefix-arg))
+(defun ymacs-editor/avy-goto-subword-1-in-defun (-char)
+  (interactive (list (read-char "char in defun: " t)))
   (let (beg end)
     (save-excursion
-      (beginning-of-defun-comments)
-      (setq beg (point))
       (end-of-defun)
-      (setq end (point)))
-    (avy-with avy-goto-symbol-1
-      (avy-goto-word-1 -char -backward-p beg end t))))
+      (setq end (min (point) (window-end nil t)))
+      (beginning-of-defun-comments)
+      (setq beg (max (point) (window-start))))
+    (let ((avy-all-windows nil))
+      (avy-with avy-goto-subword-1
+        (avy-goto-subword-0
+         nil
+         (lambda () (and (char-after) (eq (downcase (char-after)) -char)))
+         beg end)))))
 
 ;;;###autoload
 (defun ymacs-editor/smart-move-begining-of-line ()

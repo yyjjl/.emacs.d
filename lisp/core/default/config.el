@@ -2,10 +2,10 @@
 
 ;; Add site-package's path to `load-path'
 (when (fboundp 'normal-top-level-add-to-load-path)
-  (dolist (dir (directory-files ymacs-private-directory))
+  (dolist (dir (directory-files ymacs-site-lisp-directory))
     (unless (string-match "^\\." dir)
-      (add-to-list 'load-path (expand-file-name dir ymacs-private-directory))))
-  (add-to-list 'load-path ymacs-private-directory))
+      (add-to-list 'load-path (expand-file-name dir ymacs-site-lisp-directory))))
+  (add-to-list 'load-path ymacs-site-lisp-directory))
 
 (setq file-name-handler-alist nil)
 ;; Don't GC during startup to save time
@@ -80,7 +80,7 @@
 ;; (setq track-eol t)
 
 ;; Don't moves point by visual lines (performace)
-(setq-default line-move-visual nil)
+;; (setq-default line-move-visual nil)
 
 ;; No automatic new line when scrolling down at buffer bottom
 (setq next-line-add-newlines nil)

@@ -43,8 +43,8 @@ hasn't to runs those regexps against the filename.")
   (expand-file-name ".cache" user-emacs-directory)
   "All caches are in this direcotry")
 
-(defconst ymacs-private-directory
-  (expand-file-name "private" user-emacs-directory)
+(defconst ymacs-site-lisp-directory
+  (expand-file-name "site-lisp" user-emacs-directory)
   "Local packages are in this directory")
 
 (defconst ymacs-etc-direcotry

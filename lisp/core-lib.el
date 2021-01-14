@@ -250,6 +250,18 @@ Example:
   `(let ((process-environment (append ,-env process-environment)))
      ,@-body))
 
+(defmacro with-temp-advice! (-symbol -where -function &rest -body)
+  (declare (indent 3))
+  `(progn
+     (advice-add ',-symbol ,-where
+                 ,(if (symbolp -function)
+                      `#',-function
+                    -function)
+                 '((name . ymacs-temp-advice)))
+     (unwind-protect
+         (progn ,@-body)
+       (advice-remove ',-symbol 'ymacs-temp-advice))))
+
 (defmacro without-user-record! (&rest -body)
   `(let (ymacs--buffer-visible-p)
      ,@-body))

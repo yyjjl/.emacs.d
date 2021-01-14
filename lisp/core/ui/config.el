@@ -82,8 +82,9 @@
   (setq tab-line-tabs-function #'ymacs-popup//get-active-term-buffer-list))
 
 (after! ace-window
+  (setq aw-keys '(?1 ?2 ?3 ?4 ?5 ?6))
+
   (define-key!
-    ("M-0" . ymacs-editor/goto-next-char-or-minibuffer)
     ("M-1" . ymacs-ui/aw-select-window)
     ("M-2" . ymacs-ui/aw-select-window)
     ("M-3" . ymacs-ui/aw-select-window)
