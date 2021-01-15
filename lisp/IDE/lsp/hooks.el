@@ -5,7 +5,7 @@
 (setq lsp-keymap-prefix nil)
 
 (after! lsp-mode
-  (define-hook! ymacs-lsp|after-open (lsp-after-open-hook)
+  (define-hook! ymacs-lsp//after-open (lsp-after-open-hook)
     ;; default to sort and filter by server
     (setq-local company-transformers nil))
 
@@ -24,9 +24,10 @@
                            'face 'font-lock-comment-face)))
               (setq content
                     (--> content
-                         (substring it 0 (- max-width 30))
-                         (replace-regexp-in-string "\n+" "｜" it t t)
-                         (concat it suffix)))))))
+                      (substring it 0 (- max-width 30))
+                      (replace-regexp-in-string "\n+" "｜" it t t)
+                      (concat it suffix)))
+              (remove-text-properties 0 (length content) '(display) content)))))
       content))
 
   (cl-defmethod lsp-clients-extract-signature-on-hover (-contents _server-id)

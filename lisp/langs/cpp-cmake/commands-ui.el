@@ -228,9 +228,9 @@
     (widget-setup)
 
     (local-set-key (kbd "C-x C-s")
-                   (lambda! (widget-apply ymacs-cpp-cmake--apply-button :notify)))
+                   (interactive! (widget-apply ymacs-cpp-cmake--apply-button :notify)))
     (local-set-key (kbd "q")
-                   (lambda! (quit-window 'kill)))
+                   (interactive! (quit-window 'kill)))
 
     (goto-char (min old-point (point-max)))))
 

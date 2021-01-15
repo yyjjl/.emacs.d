@@ -81,7 +81,7 @@
 (defvar ymacs-editor-narrow-dwim-alist nil)
 
 (defvar ymacs-editor-ivy-switch-function-list nil)
-(defvar ymacs-editor-ivy-extra-environment nil)
+(defvar ymacs-editor-ivy-extra-help-lines nil)
 (defvar ymacs-editor-ivy-display-help-max-width 160)
 
 (defvar ymacs-editor-ivy-display-help-extra-commands

@@ -1,7 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;; Setup `mode-line-format'
-(define-hook! ymacs-ui|setup-modeline (after-init-hook)
+(define-hook! ymacs-ui//modeline-setup (after-init-hook)
   (ace-window-display-mode 1)
   (ymacs-modeline-set! default main)
 
@@ -16,7 +16,7 @@
   (column-number-mode 1)
   (show-paren-mode 1))
 
-(define-hook! ymacs-ui|indirect-buffer-setup (clone-indirect-buffer-hook)
+(define-hook! ymacs-ui//indirect-buffer-setup (clone-indirect-buffer-hook)
   (when (derived-mode-p 'prog-mode 'text-mode)
     (ymacs-ui/view-code-mode 1)))
 

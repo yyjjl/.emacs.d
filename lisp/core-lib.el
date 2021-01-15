@@ -95,48 +95,14 @@ Otherwise `(format \"ymacs-%s-path\" -NAME)' will be used."
          value))
      ,-docstring))
 
-(defmacro lambda! (&rest -body)
+(defmacro interactive! (&rest -body)
   "A shortcut for inline interactive lambdas.
 
 Optional argument -BODY is the lambda body."
   (declare (doc-string 1) (indent defun))
-  `(lambda () (interactive) ,@-body))
-
-(defmacro add-transient-hook! (-hook &rest -forms)
-  "Add transient forms to a -HOOK.
-
-Argument -HOOK can be one of these forms:
-1. a symbol
-2. a symbol which points to a function
-3. (symbol . plist)
-
-Argument -FORMS will be evaluated once when that function/hook is first invoked, then it detaches itself."
-  (declare (indent 1))
-  (let* ((hook (if (consp -hook) (car -hook) -hook))
-         (args (and (consp -hook) (cdr -hook)))
-         (append-p (plist-get args :after))
-         (override-p (plist-get args :override))
-         (around-p (plist-get args :around))
-         (args-list (or (plist-get args :arguments) '(&rest _)))
-         (local-p (plist-get args :local))
-         (fn (or (plist-get args :name)
-                 (cond ((functionp hook)
-                        (cl-gensym "ymacs@transient-hook-"))
-                       ((symbolp hook)
-                        (cl-gensym "ymacs|transient-hook-"))))))
-    `(progn
-       (defun ,fn ,args-list
-         (prog1 (progn ,@-forms)
-           ,(cond ((functionp hook) `(advice-remove ',hook ',fn))
-                  ((symbolp hook) `(remove-hook ',hook ',fn ,local-p)))))
-       ,(cond ((functionp hook)
-               `(advice-add ',hook ,(cond (override-p :override)
-                                          (around-p :around)
-                                          (append-p :after)
-                                          (t :before))
-                            ',fn))
-              ((symbolp hook)
-               `(add-hook ',hook ',fn ,append-p ,local-p))))))
+  `(lambda ()
+     (interactive)
+     ,@-body))
 
 (defmacro define-hook! (-name -hooks &rest -body)
   "Define and Add a hook function.
@@ -262,6 +228,64 @@ Example:
          (progn ,@-body)
        (advice-remove ',-symbol 'ymacs-temp-advice))))
 
+(defmacro with-temp-lv-message! (-fmt &rest -body)
+  (declare (indent 1))
+  `(unwind-protect
+       (progn
+         (lv-message ,@-fmt)
+         ,@-body)
+     (lv-delete-window)))
+
+(defmacro with-transient-hook! (-hook &rest -body)
+  "Add transient forms to a -HOOK.
+
+Argument -HOOK can be one of these forms:
+1. a symbol
+2. (symbol . plist)
+
+Argument -BODY will be evaluated once when that hook is first invoked, then it detaches itself."
+  (declare (indent 1))
+  (let* ((hook (or (car-safe -hook) -hook))
+         (args (cdr-safe -hook))
+         (args-list (or (plist-get args :arguments)
+                        '(&rest _)))
+         (local-p (plist-get args :local))
+         (append-p (plist-get args :append)))
+    `(let ((--ymacs-transient-buffer (current-buffer))
+           (--ymacs-transient-hook))
+       (setq --ymacs-transient-hook
+             (lambda ,args-list
+               ,(if local-p
+                    `(with-current-buffer --ymacs-transient-buffer
+                       (remove-hook ',hook --ymacs-transient-hook t))
+                  `(remove-hook ',hook --ymacs-transient-hook))
+               ,@-body))
+       (add-hook ',hook --ymacs-transient-hook ,append-p ,local-p))))
+
+(defmacro with-transient-advice! (-symbol &rest -body)
+  "Add transient forms as advice to a -SYMBOL.
+
+Argument -HOOK can be one of these forms:
+1. a symbol
+3. (symbol . plist)
+
+Argument -BODY will be evaluated once when -SYMBOL is first invoked, then it detaches itself."
+  (declare (indent 1))
+  (let* ((symbol (or (car-safe -symbol) -symbol))
+         (args (cdr-safe -symbol))
+         (where (or (plist-get args :where) :before))
+         (props (plist-get args :props))
+         (args-list (or (plist-get args :arguments) '(&rest _))))
+    `(progn
+       (when (advice-function-member-p 'ymacs-transient-advice (symbol-function ',symbol))
+         (user-error "Nested transient advice is not supported"))
+       (advice-add
+        ',symbol ,where
+        (lambda ,args-list
+          (advice-remove ',symbol 'ymacs-transient-advice)
+          ,@-body)
+        '((name . ymacs-transient-advice) ,@props)))))
+
 (defmacro without-user-record! (&rest -body)
   `(let (ymacs--buffer-visible-p)
      ,@-body))
@@ -275,21 +299,6 @@ Example:
    (with-temp-buffer
      (insert-file-contents-literally -filename)
      (buffer-string))))
-
-(defun open! (&rest -file-list)
-  "Open All files in -FILE-LIST in external processes."
-  (cond
-   ((and (display-graphic-p) sys/macp)
-    (mapc (lambda (path)
-            (shell-command (concat "open " (shell-quote-argument (file-truename path)))))
-          -file-list))
-   ((and (display-graphic-p) sys/linuxp)
-    (mapc (lambda (path)
-            (let ((process-connection-type nil))
-              (start-process "external-process" nil "xdg-open" (file-truename path))))
-          -file-list))
-   (t
-    (user-error "Not supported yet"))))
 
 (defun add-auto-mode! (-mode &rest -patterns)
   "Add entries to `auto-mode-alist' to use -MODE for all given
@@ -306,7 +315,7 @@ file -PATTERNS."
   (unless (and default-directory (file-remote-p default-directory))
     (ignore-errors (apply -fn -args))))
 
-(defsubst buffer-temporary-p ()
+(defsubst is-buffer-temporary! ()
   "If function `buffer-file-name' return nil or a temp file or
 HTML file converted from org file, it returns t."
   (let ((filename (buffer-file-name)))
@@ -315,8 +324,8 @@ HTML file converted from org file, it returns t."
         (buffer-base-buffer)
         (string-match-p (concat "^" temporary-file-directory) filename))))
 
-(defsubst buffer-enable-rich-feature-p ()
-  (not (or (buffer-temporary-p)
+(defsubst is-buffer-suitable-for-coding! ()
+  (not (or (is-buffer-temporary!)
            (file-remote-p default-directory)
            (> buffer-saved-size ymacs-large-buffer-limit))))
 
@@ -337,9 +346,9 @@ HTML file converted from org file, it returns t."
         (setq x (cdr x)))
       (setcdr x (cons -new-value (cdr x))))))
 
-(defsubst directory-equal-p (-d1 -d2)
-  (equal (file-truename (concat -d1 "/"))
-         (file-truename (concat -d2 "/"))))
+(defsubst equal-directory! (-d1 -d2)
+  (string= (file-name-as-directory -d1)
+           (file-name-as-directory -d2)))
 
 (defsubst file-modification-time! (file)
   (nth 5 (file-attributes file)))
@@ -533,47 +542,46 @@ HTML file converted from org file, it returns t."
        (put ',-name 'after-feature-functions
             (cons func (get ',-name 'after-feature-functions))))))
 
-(defun completing-read--prompt (-prompt -return-prompt -collection)
-  (let ((return-prompt (if -return-prompt
-                           (format "[RET] => %s \n" -return-prompt)
-                         ""))
-        (keys-prompt (string-join
-                      (--map-indexed
-                       (format "[%d] => %s" it-index (or (car-safe it) it))
-                       -collection)
-                      "\n")))
-    (format "%s\n%s%s" -prompt return-prompt keys-prompt)))
+(defun completing-read!--prompt (-return-prompt -collection)
+  (format "[RET] => %s\n%s"
+          (or -return-prompt "[0]")
+          (let ((index -1))
+            (mapconcat
+             (lambda (item)
+               (cl-incf index)
+               (format "[%d] => %s" index (or (car-safe item) item)))
+             -collection
+             "\n"))))
 
-(cl-defun completing-read!
-    (&key -prompt -collection -action -return-action -return-prompt -history)
-  (if (or (not (listp -collection))
-          (> (length -collection) 10))
-      (funcall -action (completing-read -prompt -collection nil t nil -history))
+(defun completing-read!--get-value (-prompt -collection -return-prompt)
+  (cl-assert (listp -collection) nil "Only list is supported")
 
-    (let* ((max-mini-window-height 1.0)
-           (key (read-key (completing-read--prompt -prompt -return-prompt -collection))))
-      (cond
-        ((and (>= key ?0) (< key ?9))
-         (funcall -action (nth (- key ?0) -collection)))
+  (if (> (length -collection) 10)
+      (let ((value (completing-read -prompt -collection nil :require-match)))
+        (if (consp (car -collection))   ; alist
+            (assoc-string value -collection)
+          value))
+    (let ((prompt (completing-read!--prompt -return-prompt -collection)))
+      (with-temp-lv-message! ("%s" prompt)
+        (let ((key (read-key -prompt)))
+          (cond
+           ((and (>= key ?0) (<= key ?9)) (nth (- key ?0) -collection))
 
-        ((and -return-action (equal key 13))
-         (funcall -return-action))
+           ((equal key 13) 'return)
 
-        (t (user-error "No action for key `%s'" (key-description `[,key])))))))
+           (t (user-error "No action for key `%s'" (key-description `[,key])))))))))
 
-(cl-defun completing-read-simple!
-    (&key -prompt -collection (-return-value 'unset) -return-prompt -history)
-  (completing-read!
-   :-prompt -prompt
-   :-collection -collection
-   :-action #'identity
-   :-return-action (if (eq -return-value 'unset)
-                       (lambda () (car -collection))
-                     (lambda () -return-value))
-   :-return-prompt (if (eq -return-value 'unset)
-                       "[0]"
-                     -return-prompt)
-   :-history -history))
+(defun completing-read! (-prompt -collection &optional -return -return-prompt)
+  (if (null -collection)
+      nil
+    (let ((value (completing-read!--get-value -prompt -collection -return-prompt)))
+      (if (eq value 'return)
+          (if -return
+              (if (functionp -return)
+                  (funcall -return)
+                -return)
+            (car -collection))
+        value))))
 
 (defcustom ymacs-lsp-project-state :enabled
   "Whether to enable lsp in current project"
@@ -589,10 +597,7 @@ HTML file converted from org file, it returns t."
   `(eval-if-has-feature! lsp
        (progn
          ,-pre-init
-         (add-transient-hook!
-             (hack-local-variables-hook
-              :local t
-              :name ,(intern (format "ymacs-lsp//%s-internal" -name)))
+         (with-transient-hook! (hack-local-variables-hook :local t)
            (if (and ,-condition
                     (eq ymacs-lsp-project-state :enabled)
                     ,(let ((symbol (intern (format "ymacs-%s-lsp" -name))))

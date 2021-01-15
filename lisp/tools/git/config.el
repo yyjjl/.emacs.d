@@ -20,10 +20,7 @@
     ("C-x C-f" . magit-find-file))
 
   (define-key! :map magit-section-mode-map
-    ("M-1")
-    ("M-2")
-    ("M-3")
-    ("M-4")
+    (("M-1" "M-2" "M-3" "M-4"))
     ("` 1" . magit-section-show-level-1-all)
     ("` 2" . magit-section-show-level-2-all)
     ("` 3" . magit-section-show-level-3-all)

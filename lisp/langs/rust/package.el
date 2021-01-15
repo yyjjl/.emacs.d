@@ -12,8 +12,7 @@
                   (let ((name (symbol-name symbol)))
                     (when (and (string-prefix-p "cargo-process" name)
                                (commandp symbol)
-                               (not (memq symbol '(cargo-process-mode
-                                                   cargo-process-run))))
+                               (not (memq symbol '(cargo-process-mode cargo-process-run))))
                       (push (cons (string-join (cddr (split-string name "-")) "-")
                                   symbol)
                             commands)))))

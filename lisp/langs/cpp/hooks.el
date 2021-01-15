@@ -1,7 +1,9 @@
 ;; -*- lexical-binding:t -*-
 
 (after! cc-mode
-  (define-hook! ymacs-cpp|common-setup (c-mode-common-hook)
+  (advice-add 'c-indent-line-or-region :around #'indent-for-tab-command@smart)
+
+  (define-hook! ymacs-cpp//c-mode-common-setup (c-mode-common-hook)
     (ymacs-cpp//common-setup)
 
     (unless (or (derived-mode-p 'java-mode)
@@ -10,6 +12,4 @@
       ;; Make a #define be left-aligned
       (setq c-electric-pound-behavior '(alignleft))
       (ymacs-cpp//font-lock-setup)
-      (ymacs-cpp//cpp-setup)))
-
-  (advice-add 'c-indent-line-or-region :around #'indent-for-tab-command@smart))
+      (ymacs-cpp//cpp-setup))))

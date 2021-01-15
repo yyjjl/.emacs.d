@@ -1,12 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
-(defun ymacs-debug/quit ()
-  (interactive)
-  (and (yes-or-no-p "Quit debug session?")
-       (gud-call "quit")))
-
-(defun ymacs-term/toggle-window@hack ()
-  (interactive)
+(defun ymacs-term//toggle-window@hack ()
   (if-let ((buffer (gdb-get-buffer-create 'gdb-inferior-io))
            (window (get-buffer-window buffer)))
       (if (eq window (selected-window))
@@ -19,7 +13,7 @@
 
   (add-to-list 'display-buffer-alist
                '(ymacs-debug//gud-source-buffer-p ymacs-debug//display-buffer))
-  (advice-add #'ymacs-term/toggle-window :override #'ymacs-term/toggle-window@hack)
+  (advice-add #'ymacs-term/toggle-window :override #'ymacs-term//toggle-window@hack)
 
   (apply -fn -args)
 
@@ -57,7 +51,7 @@
                (concat "\n" ymacs-debug--gdb-help-format)))))
 
   (define-advice gud-sentinel (:after (-proc _) cleanup)
-    (advice-remove #'ymacs-term/toggle-window #'ymacs-term/toggle-window@hack)
+    (advice-remove #'ymacs-term/toggle-window #'ymacs-term//toggle-window@hack)
     (setq display-buffer-alist
           (assq-delete-all 'ymacs-debug//gud-source-buffer-p display-buffer-alist))
 

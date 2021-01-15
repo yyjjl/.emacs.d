@@ -3,9 +3,8 @@
 (eval-when-has-feature! lsp
   (after! cc-mode
     (define-key! :map java-mode-map
-      ([f5] . dap-hydra)
-      ([f10] . lsp-java-build-project)
-      ("C-c C-d" . lsp-describe-thing-at-point)))
+      ("C-c C-d")
+      ([f9] . lsp-java-build-project)))
 
   (after! lsp-java
     (setq lsp-java-server-install-dir (expand-cache! "lsp/eclipse.jdt.ls/server/"))

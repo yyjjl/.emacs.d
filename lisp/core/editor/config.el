@@ -6,12 +6,17 @@
 
 (after! fcitx
   ;; Init fcitx prefix keys
-  (setq fcitx-use-dbus t)
+  (setq fcitx-use-dbus nil)
   (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c" "C-z"))
 
 (after! semantic
   (semantic-add-system-include "/usr/include/" 'c++-mode)
   (semantic-add-system-include "/usr/include/" 'c-mode)
+
+  (define-key! :map semantic-mode-map :prefix "C-c ,"
+    ("." . semantic-ia-fast-jump)
+    ("v" . semantic-ia-show-variants)
+    (("TAB" "<tab>") . semantic-ia-complete-symbol))
 
   ;; It's too slow, when file is large
   ;; (require 'stickyfunc-enhance)
@@ -34,7 +39,7 @@
 (after! dired
   (define-key! :map dired-mode-map
     (")" . dired-omit-mode)
-    ("E" . ymacs-default/open-externally)
+    ("E" . ymacs-editor/find-file-externally)
     ("M-p" . dired-prev-subdir)
     ("M-n" . dired-next-subdir)
     (";" . dired-kill-subdir))
@@ -205,7 +210,7 @@
   (setq swiper-stay-on-quit t))
 
 (after! counsel
-  (setq-default counsel-compile-env nil)
+  (setq-default counsel-compile-env '("TERM=xterm-256color"))
 
   (add-to-list 'counsel-compile-local-builds #'ymacs-editor//default-compile-command t)
 
@@ -292,12 +297,12 @@
 
 (after! hideshow
   (define-key! :map hs-minor-mode-map
-    ("C-x t h" (lambda! (save-excursion (call-interactively #'hs-hide-block))))
-    ("C-x t s" (lambda! (save-excursion (call-interactively #'hs-show-block))))
-    ("C-x t H" (lambda! (save-excursion (call-interactively #'hs-hide-all))))
-    ("C-x t S" (lambda! (save-excursion (call-interactively #'hs-show-all))))
-    ("C-x t l" (lambda! (save-excursion (call-interactively #'hs-hide-level))))
-    ("C-x t t" (lambda! (save-excursion (call-interactively #'hs-toggle-hiding)))))
+    ("C-x t h" (interactive! (save-excursion (call-interactively #'hs-hide-block))))
+    ("C-x t s" (interactive! (save-excursion (call-interactively #'hs-show-block))))
+    ("C-x t H" (interactive! (save-excursion (call-interactively #'hs-hide-all))))
+    ("C-x t S" (interactive! (save-excursion (call-interactively #'hs-show-all))))
+    ("C-x t l" (interactive! (save-excursion (call-interactively #'hs-hide-level))))
+    ("C-x t t" (interactive! (save-excursion (call-interactively #'hs-toggle-hiding)))))
 
   (define-key! :map ymacs-editor-hs-overlay-map
     ("RET" . hs-show-block))

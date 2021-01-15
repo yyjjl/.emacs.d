@@ -1,13 +1,13 @@
 ;; -*- lexical-binding:t -*-
 
-(define-hook! ymacs-lisp|racket-setup (racket-mode-hook)
-  (ymacs-lisp|common-setup)
+(define-hook! ymacs-lisp//racket-setup (racket-mode-hook)
+  (ymacs-lisp//common-setup)
 
   ;; (setq eldoc-documentation-function 'racket-eldoc-function)
 
   (racket-xp-mode 1)
 
-  (unless (buffer-enable-rich-feature-p)
+  (unless (is-buffer-suitable-for-coding!)
     (setq completion-at-point-functions nil))
 
   ;; (flycheck-mode 1)

@@ -6,15 +6,15 @@
   (interactive)
   (let ((path (or (buffer-file-name) default-directory)))
     (kill-new
-     (completing-read-simple!
-      :-prompt "Copy"
-      :-collection (list
-                    (buffer-name)
-                    path
-                    (abbreviate-file-name path)
-                    default-directory
-                    (file-name-nondirectory path)
-                    (file-name-base path))))))
+     (completing-read!
+      "Copy"
+      (list (buffer-name)
+            path
+            (abbreviate-file-name path)
+            default-directory
+            (file-name-nondirectory path)
+            (file-name-base path))))
+    (message "Copied %s" (current-kill 0))))
 
 
 ;;;###autoload

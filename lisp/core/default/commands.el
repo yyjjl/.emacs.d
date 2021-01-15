@@ -23,10 +23,9 @@
          (buffer
           (cdr-safe
            (if (> (length buffers) 1)
-               (completing-read-simple!
-                :-prompt (format "buffer (default: %s): "
-                                 (when error-buffer (buffer-name error-buffer)))
-                :-collection buffers)
+               (completing-read! (format "(current: %s): "
+                                         (when error-buffer (buffer-name error-buffer)))
+                                 buffers)
              (car buffers)))))
     (unless buffer
       (user-error "Nothing to do"))
@@ -90,16 +89,3 @@ Does not indent buffer, because it is used for a
          (faces (-uniq  (-flatten (list (get-char-property pos 'face)
                                         (get-char-property 0 'face text))))))
     (message "%s" faces)))
-
-;;;###autoload
-(defun ymacs-default/open-externally ()
-  "Open the current file or dired marked files in external app.
-The app is chosen from your OS's preference."
-  (interactive)
-  (let* ((file-list (if (eq major-mode 'dired-mode)
-                        (dired-get-marked-files)
-                      (list (buffer-file-name))))
-         (do-it-p (or (<= (length file-list) 5)
-                      (y-or-n-p "Open more than 5 files? "))))
-    (when do-it-p
-      (apply #'open! file-list))))

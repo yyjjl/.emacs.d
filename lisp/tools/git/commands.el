@@ -5,7 +5,7 @@
   (require 'git-timemachine))
 
 ;;;###autoload
-(defun ymacs-git//status ()
+(defun ymacs-git/status ()
   (interactive)
   (when (file-remote-p default-directory)
     (user-error "Magit is disabled on remote host"))

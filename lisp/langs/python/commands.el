@@ -1,24 +1,12 @@
 ;;; -*- lexical-binding: t
 
-(defun ymacs-python/shell-completion-complete-or-indent ()
-  "Complete or indent depending on the context.
-If content before pointer is all whitespace, indent.
-If not try to complete."
-  (interactive)
-  (if (string-match "^[[:space:]]*$"
-                    (buffer-substring (comint-line-beginning-position)
-                                      (point)))
-      (indent-for-tab-command)
-    (call-interactively #'company-capf)))
+(declare-function pyvenv-workon-home 'pyvenv)
 
 (eval-when-has-feature! lsp
   (defun ymacs-python/change-lsp-server ()
     (interactive)
     (let* ((servers (cl-remove ymacs-python-lsp-server ymacs-python-lsp-servers))
-           (server (intern
-                    (completing-read-simple!
-                     :-prompt "Server: "
-                     :-collection (mapcar #'symbol-name servers)))))
+           (server (intern (completing-read! "Server: " (mapcar #'symbol-name servers)))))
       (ymacs-python//set-lsp-server server))
 
     (let (buffers)
@@ -33,27 +21,24 @@ If not try to complete."
           (revert-buffer))))))
 
 ;;;###autoload
+(defun ymacs-python/shell-completion-complete-or-indent ()
+  "Complete or indent depending on the context.
+If content before pointer is all whitespace, indent.
+If not try to complete."
+  (interactive)
+  (if (string-match "^[[:space:]]*$"
+                    (buffer-substring (comint-line-beginning-position)
+                                      (point)))
+      (indent-for-tab-command)
+    (call-interactively #'company-complete)))
+
+;;;###autoload
 (defun ymacs-python/autopep8 ()
   (interactive)
   (let ((temporary-file-directory default-directory))
     (save-restriction
       (widen)
       (py-autopep8-buffer))))
-
-;;;###autoload
-(defun ymacs-python/debug-current-file (&optional new-session)
-  (interactive "P")
-  (unless (ymacs-debug//resuse-session)
-    (let ((default-directory
-            (or (and current-prefix-arg
-                     (read-directory-name "Directory: " nil nil :must-match))
-                default-directory))
-          (gud-chdir-before-run nil))
-      (unwind-protect
-          (progn
-            (lv-message "Current directory: %s" default-directory)
-            (call-interactively #'pdb))
-        (lv-delete-window)))))
 
 ;;;###autoload
 (defun ymacs-python/toggle-pdbtrack ()
@@ -71,34 +56,37 @@ If not try to complete."
       (message "pdbtrack enabled"))))
 
 ;;;###autoload
-(defun ymacs-python/create-venv-in-workon-home (-name -python-exe &optional -args)
-  (interactive
-   (list (read-from-minibuffer "Name: ")
-         (read-shell-command "Python executable: ")
-         (when current-prefix-arg
-           (read-from-minibuffer "Arguments: "))))
-  (require 'pyvenv)
-  (when (and -name -python-exe (> (length -name) 0))
-    (let* ((dir (expand-file-name -name (pyvenv-workon-home)))
-           (command (format "virtualenv --python=%s %s %s\n"
-                            -python-exe dir (or -args ""))))
-      (compile command))))
+(defun ymacs-python/create-venv-in-workon-home ()
+  (interactive)
+  (let ((directory (pyvenv-workon-home)))
+    (ymacs-python/create-venv
+     (expand-file-name (read-from-minibuffer (format "Directory: %s/" directory)) directory)
+     (read-shell-command "Python executable: " "python")
+     (when current-prefix-arg
+       (read-from-minibuffer "Arguments: ")))))
 
 ;;;###autoload
-(defun ymacs-python/create-venv (-dir -python-exe &optional -args)
+(defun ymacs-python/create-venv (-directory -python-exe &optional -args)
   (interactive
-   (list (read-directory-name "Directory: "
-                              (ignore-errors (projectile-project-root))
-                              nil :mustmatch)
-         (read-shell-command "Python executable: ")
-         (when current-prefix-arg
-           (read-from-minibuffer "Arguments: "))))
-  (require 'pyvenv)
-  (when (and -dir -python-exe)
-    (let* ((dir (expand-file-name ".venv" -dir))
-           (command (format "virtualenv --python=%s %s %s\n"
-                            -python-exe dir (or -args ""))))
-      (compile command))))
+   (list
+    (read-directory-name "Create .venv in: "
+                         (ignore-errors (projectile-project-root))
+                         nil :mustmatch)
+    (read-shell-command "Python executable: " "python")
+    (when current-prefix-arg
+      (read-from-minibuffer "Arguments: "))))
+
+  (unless (require 'pyvenv)
+    (user-error "Can not load pyvenv"))
+
+  (unless (executable-find "virtualenv")
+    (user-error "Can not find virtualenv"))
+
+  (let ((default-directory -directory))
+    (compile (format "virtualenv --python=%s %s %s\n"
+                     -python-exe
+                     (expand-file-name ".venv")
+                     (or -args "")))))
 
 ;;;###autoload
 (defun ymacs-python/pop-to-shell (&optional -directory)
@@ -190,12 +178,6 @@ If not try to complete."
           (t (paredit-forward-delete -arg)))))
 
 (put 'ymacs-python/backspace 'delete-selection 'supersede)
-
-(defsubst ymacs-python//line-startswith-p (-string)
-  (back-to-indentation)
-  (string-prefix-p -string (buffer-substring-no-properties
-                            (point)
-                            (line-end-position))))
 
 ;;;###autoload
 (defun ymacs-python/toggle-breakpoint ()

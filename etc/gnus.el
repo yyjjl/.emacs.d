@@ -27,8 +27,8 @@
          (count (car (last range))))
     (or (cdr-safe count) count)))
 
-(define-hook! gnus|count-unread-news (gnus-started-hook
-                                      gnus-after-getting-new-news-hook)
+(define-hook! gnus//count-unread-news (gnus-started-hook
+                                       gnus-after-getting-new-news-hook)
   (let ((totoal-unread-count 0))
     (dolist (group gnus-newsrc-alist)
       (let* ((name (gnus-info-group group))

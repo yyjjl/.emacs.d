@@ -1,7 +1,7 @@
 ;; -*- lexical-binding: t; -*-
 
 ;; Add site-package's path to `load-path'
-(when (fboundp 'normal-top-level-add-to-load-path)
+(when (file-exists-p ymacs-site-lisp-directory)
   (dolist (dir (directory-files ymacs-site-lisp-directory))
     (unless (string-match "^\\." dir)
       (add-to-list 'load-path (expand-file-name dir ymacs-site-lisp-directory))))
@@ -221,8 +221,8 @@
   (define-key! :map xref--xref-buffer-mode-map
     ("M-n" . next-error)
     ("M-p" . previous-error)
-    ("j" . (lambda! () (xref--search-property 'xref-item)))
-    ("k" . (lambda! () (xref--search-property 'xref-item t))))
+    ("j" . (interactive! () (xref--search-property 'xref-item)))
+    ("k" . (interactive! () (xref--search-property 'xref-item t))))
 
   (add-to-list 'xref-prompt-for-identifier 'xref-find-references :append))
 

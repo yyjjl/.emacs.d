@@ -6,8 +6,8 @@
 (add-hook 'nxml-mode-hook 'emmet-mode)
 (add-hook 'css-mode-hook 'emmet-mode)
 
-(define-hook! ymacs-web|web-setup (web-mode-hook js-mode-hook typescript-mode-hook css-mode-hook)
-  (when (and (buffer-enable-rich-feature-p)
+(define-hook! ymacs-web//web-setup (web-mode-hook js-mode-hook typescript-mode-hook css-mode-hook)
+  (when (and (is-buffer-suitable-for-coding!)
              (not (string-suffix-p ".json" (downcase buffer-file-name))))
     (try-enable-lsp! web))
 

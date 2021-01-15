@@ -88,10 +88,10 @@
   (interactive)
 
   (setq ymacs-cpp-cmake-current-config-name
-        (completing-read-simple!
-         :-prompt "Change to: "
-         :-collection (remove ymacs-cpp-cmake-current-config-name
-                              (mapcar #'car ymacs-cpp-cmake-config-list))))
+        (completing-read!
+         "Change to: "
+         (remove ymacs-cpp-cmake-current-config-name
+                 (mapcar #'car ymacs-cpp-cmake-config-list))))
   (save-dir-local-variables! 'ymacs-cpp-cmake-current-config-name)
   (ymacs-cpp-cmake//run-cmake))
 
@@ -103,9 +103,7 @@
                        when (member value '("Release" "Debug" "ON" "OFF"))
                        collect (ymacs-cpp-cmake//option-to-string (cons key value))))
 
-             (option (completing-read-simple!
-                      :-prompt "Options: "
-                      :-collection options))
+             (option (completing-read! "Options: " options))
 
              (nv (split-string (substring option 2) "="))
              (option-name (car nv))

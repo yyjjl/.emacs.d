@@ -25,9 +25,7 @@
   (interactive)
   (if (not ymacs-editor-local-snippets-list)
       (message "No local snippets")
-    (let* ((key (completing-read-simple!
-                 :-prompt "Snippet key: "
-                 :-collection (mapcar #'car ymacs-editor-local-snippets-list)))
+    (let* ((key (completing-read! "Snippet key: " (mapcar #'car ymacs-editor-local-snippets-list)))
            (local-snippets-list (copy-alist ymacs-editor-local-snippets-list))
            (item (assoc-string key local-snippets-list)))
       (when (yes-or-no-p (format "Delete %s => %s? " (car item) (cdr item)))

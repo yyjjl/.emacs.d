@@ -51,7 +51,7 @@
     (font-lock-add-keywords nil ymacs-cpp-font-lock-keywords)))
 
 (defun ymacs-cpp//cpp-setup ()
-  (when (buffer-enable-rich-feature-p)
+  (when (is-buffer-suitable-for-coding!)
     (try-enable-lsp! cpp
       :-condition
       (catch 'done

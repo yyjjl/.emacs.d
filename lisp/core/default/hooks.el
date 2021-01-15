@@ -42,19 +42,19 @@
           (lambda () (jump-to-register :ediff-windows)))
 
 ;; ANSI-escape coloring in compilation-mode
-(define-hook! ymacs-default|colorize-compilation-buffer (compilation-filter-hook)
-  (when (eq major-mode 'compilation-mode)
+(define-hook! ymacs-default//colorize-compilation-buffer (compilation-filter-hook)
+  (when (derived-mode-p 'compilation-mode)
     (ansi-color-apply-on-region compilation-filter-start (point-max))))
 
 ;; Display long lines in truncated style (end line with $)
-(define-hook! ymacs-default|truncate-line
+(define-hook! ymacs-default//truncate-line
   (grep-mode-hook
    compilation-mode-hook
    xref--xref-buffer-mode-hook)
   (setq truncate-lines
         (not (bound-and-true-p compilation-shell-minor-mode))))
 
-(define-hook! ymacs-default|create-missing-directories (find-file-not-found-functions)
+(define-hook! ymacs-default//create-missing-directories (find-file-not-found-functions)
   "Automatically create missing directories when creating new files."
   (unless (file-remote-p (buffer-file-name))
     (let ((parent-directory (file-name-directory (buffer-file-name))))
@@ -64,27 +64,27 @@
            (progn (make-directory parent-directory 'parents)
                   t)))))
 
-(define-hook! ymacs-default|minibuffer-setup (minibuffer-setup-hook)
+(define-hook! ymacs-default//minibuffer-setup (minibuffer-setup-hook)
   (setq line-spacing nil)
   (setq gc-cons-threshold most-positive-fixnum))
 
-(define-hook! ymacs-default|minibuffer-exit (minibuffer-exit-hook)
+(define-hook! ymacs-default//minibuffer-exit (minibuffer-exit-hook)
   (setq gc-cons-threshold ymacs-gc-cons-threshold))
 
-(define-hook! (ymacs-default|default-frame-setup &optional frame)
+(define-hook! (ymacs-default//default-frame-setup &optional frame)
   (window-setup-hook ;; when setup
    after-make-frame-functions)
   (set-frame-parameter frame 'buffer-predicate #'ymacs-default//buffer-predicate))
 
 ;; Make scratch buffer un-killable
-(define-hook! ymacs-default|unkillable-buffer (kill-buffer-query-functions)
+(define-hook! ymacs-default//unkillable-buffer (kill-buffer-query-functions)
   (let ((bn (buffer-name)))
     (cond ((equal bn "*note*") nil)
           ((equal bn "*task*") nil)
           ((equal bn "*scratch*") (delete-region (point-min) (point-max)) nil)
           (t t))))
 
-(define-hook! ymacs-default|generic-text-mode-setup (text-mode-hook)
+(define-hook! ymacs-default//generic-text-mode-setup (text-mode-hook)
   (hl-line-mode 1)
   (display-fill-column-indicator-mode 1)
 
@@ -92,7 +92,7 @@
   (setq indicate-empty-lines t))
 
 ;; Default prog-mode setup
-(define-hook! ymacs-default|generic-prog-mode-setup (prog-mode-hook)
+(define-hook! ymacs-default//generic-prog-mode-setup (prog-mode-hook)
   (condition-case err
       (progn
         (hs-minor-mode 1)
@@ -100,16 +100,16 @@
           (add-hook 'xref-backend-functions 'dumb-jump-xref-activate nil t)))
     (user-error (message "%s" (error-message-string err))))
 
-  (ymacs-default|generic-text-mode-setup))
+  (ymacs-default//generic-text-mode-setup))
 
-(define-hook! ymacs-default|generic-comint-mode-setup (comint-mode-hook)
+(define-hook! ymacs-default//generic-comint-mode-setup (comint-mode-hook)
   ;; But don't show trailing whitespace in SQLi, inf-ruby etc.
   (setq show-trailing-whitespace nil)
   (setq-local company-idle-delay nil)
 
-  (local-set-key [remap completion-at-point] #'company-capf))
+  (local-set-key [remap completion-at-point] #'company-complete))
 
-(define-hook! ymacs-default|hack-local-variables (after-save-hook)
+(define-hook! ymacs-default//hack-local-variables (after-save-hook)
   (executable-make-buffer-file-executable-if-script-p)
 
   (when (and buffer-file-name
@@ -123,7 +123,7 @@
         (when buffer-file-name
           (hack-dir-local-variables-non-file-buffer))))))
 
-(define-hook! ymacs-default|after-init (after-init-hook)
+(define-hook! ymacs-default//after-init (after-init-hook)
   ;; global-modes
   (global-subword-mode 1)
   (global-auto-revert-mode 1)

@@ -4,7 +4,7 @@
 (declare-function tex--prettify-symbols-compose-p "tex")
 
 (after! latex
-  (define-hook! ymacs-latex|setup (LaTeX-mode-hook)
+  (define-hook! ymacs-latex//setup (LaTeX-mode-hook)
     (setq-local prettify-symbols-alist tex--prettify-symbols-alist)
 
     (add-function
@@ -28,5 +28,5 @@
 
     (outline-minor-mode 1)
 
-    (when (buffer-enable-rich-feature-p)
+    (when (is-buffer-suitable-for-coding!)
       (try-enable-lsp! latex))))

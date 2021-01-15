@@ -1,7 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
-(define-hook! ymacs-git|generic-prog-mode-setup ((prog-mode-hook :append) org-mode-hook LaTeX-mode-hook)
-  (when (buffer-enable-rich-feature-p)
+(define-hook! ymacs-git//generic-prog-mode-setup ((prog-mode-hook :append) org-mode-hook LaTeX-mode-hook)
+  (when (is-buffer-suitable-for-coding!)
     (diff-hl-mode 1)))
 
 (after! diff-hl
@@ -22,7 +22,7 @@
           (setq ymacs-git--diff-hl-update-timer nil)))))))
 
 (after! smerge-mode
-  (define-hook! ymacs-git|maybe-enable-smerge (magit-diff-visit-file-hook)
+  (define-hook! ymacs-git//maybe-enable-smerge (magit-diff-visit-file-hook)
     (save-excursion
       (goto-char (point-min))
       (when (re-search-forward "^<<<<<<< " nil t)

@@ -19,3 +19,6 @@
        (if-let (buffer (get-buffer "*Shell Command Output*"))
            (with-current-buffer buffer
              (message "%s" (buffer-string))))))))
+
+(eval-when-has-feature! debug
+  (add-to-list 'ymacs-debugger-alist '(racket-mode racket-run-with-debugging)))

@@ -70,9 +70,7 @@ _h_tml    _'_         ^ ^             _A_SCII:
              (or (when (not force)
                    (assoc ymacs-org-publish-last-project org-publish-project-alist))
                  (when current-prefix-arg
-                   (completing-read-simple!
-                    :-prompt "Project: "
-                    :-collection org-publish-project-alist))
+                   (completing-read! "Project: " org-publish-project-alist))
                  (car org-publish-project-alist))))
        (save-window-excursion
          (let ((org-publish-use-timestamps-flag
@@ -172,7 +170,7 @@ _h_tml    _'_         ^ ^             _A_SCII:
     (catch 'done
       (dolist (file files)
         (when (and file (file-exists-p file))
-          (open! file)
+          (ymacs-editor/find-file-externally (list file))
           (throw 'done t)))
       (counsel-find-file basename))))
 

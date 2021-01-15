@@ -14,12 +14,3 @@
                 :preselect last-action
                 :action (lambda (command) (call-interactively (cdr command)))
                 :history 'ymacs-rust-cargo-history))))
-;;;###autoload
-(defun ymacs-rust/cargo-run ()
-  (interactive)
-  (ymacs-term//exec-program-reuse-buffer
-   (format "Cargo: %s"
-           (or (cargo-process--project-root)
-               default-directory))
-   "cargo" '("run")
-   :-before-exec-fn (lambda () (set-rust-backtrace "cargo run"))))

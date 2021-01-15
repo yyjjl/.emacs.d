@@ -1,8 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
 (after! sh-script
-  (define-hook! ymacs-sh|setup (sh-mode-hook)
-    (when (buffer-enable-rich-feature-p)
+  (define-hook! ymacs-sh//setup (sh-mode-hook)
+    (when (is-buffer-suitable-for-coding!)
       (try-enable-lsp! sh))))
 
 (after! make-mode

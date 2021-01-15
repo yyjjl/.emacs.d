@@ -1,5 +1,27 @@
 ;;; -*- lexical-binding: t; -*-
 
+(defun ymacs-term//load-file-in-repl--default (-args)
+  (barf-if-not-visiting-file!)
+
+  (let ((program (plist-get -args :program))
+        (program-args (cl-subst (buffer-file-name)
+                                'the-file
+                                (plist-get -args :program-args)))
+        (cmd (format (plist-get -args :cmd-fmt) (buffer-file-name))))
+    (ymacs-term//exec-program-in-buffer (concat "Repl: " (buffer-name))
+      :-program program
+      :-program-args program-args
+      :-callback (lambda () (ymacs-term//send-string cmd)))))
+
+;;;###autoload
+(defun ymacs-term/load-file-in-repl ()
+  (interactive)
+  (let ((repl (or (alist-get major-mode ymacs-term-repl-alist)
+                  (user-error "No entry in `ymacs-term-repl-alist' for %s" major-mode))))
+    (if (commandp repl)
+        (call-interactively repl)
+      (ymacs-term//load-file-in-repl--default repl))))
+
 ;;;###autoload
 (defun ymacs-term/switch ()
   (interactive)
@@ -23,13 +45,7 @@
       (0 (user-error "There is only one term buffer"))
       (1 (display-buffer (cdar buffers)))
       (t (pop-to-buffer
-          (completing-read!
-           :-prompt "Switch to term buffer: "
-           :-collection buffers
-           :-action (lambda (candidate)
-                      (unless candidate
-                        (user-error "no buffer is selected"))
-                      (pop-to-buffer (cdr candidate)))))))))
+          (cdr (completing-read! "Switch to term buffer: " buffers)))))))
 
 ;;;###autoload
 (defun ymacs-term/next (-create-new)
@@ -66,7 +82,7 @@
              (buffer (ymacs-term//create-buffer nil t)))
     (with-current-buffer buffer
       (local-set-key [f8] #'ymacs-term/switch-back)
-      (local-set-key (kbd "C-c C-z") (lambda! (ymacs-term/switch-back t)))
+      (local-set-key (kbd "C-c C-z") (interactive! (ymacs-term/switch-back t)))
       (setq ymacs-term--parent-buffer parent-buffer))
     (display-buffer buffer)))
 
@@ -83,7 +99,7 @@ else: try to find a old term buffer and pop to it"
         (switch-to-buffer buffer)
       (with-current-buffer buffer
         (local-set-key [f8] #'ymacs-term/switch-back)
-        (local-set-key (kbd "C-c C-z") (lambda! (ymacs-term/switch-back t)))
+        (local-set-key (kbd "C-c C-z") (interactive! (ymacs-term/switch-back t)))
         (setq ymacs-term--parent-buffer parent-buffer)))
     (display-buffer buffer)))
 
@@ -155,7 +171,6 @@ else: try to find a old term buffer and pop to it"
     (if-let (buffer (car (ymacs-popup//get-active-term-buffer-list)))
         (display-buffer buffer)
       (call-interactively #'ymacs-term/pop-shell))))
-
 
 ;;;###autoload
 (defun ymacs-term/set-extra-name ()

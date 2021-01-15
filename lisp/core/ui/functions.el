@@ -64,7 +64,7 @@ LHS and RHS are lists of symbols of modeline -segments defined with
 
       (unless (listp -modes)
         (setq -modes (list -modes)))
-      (let ((hook-fn (intern (format "ymacs-modeline|setup-%s"
+      (let ((hook-fn (intern (format "ymacs-modeline//%s-setup"
                                      (mapconcat #'symbol-name -modes "/")))))
         `(progn
            (defun ,hook-fn ()

@@ -25,6 +25,8 @@
  (vterm :when (eq ymacs-term-type 'vterm))
  bash-completion)
 
+(defvar ymacs-term-repl-alist nil)
+
 ;; kill the buffer when terminal is exited
 (defvar ymacs-term-directory-functions '(projectile-project-root))
 
@@ -37,7 +39,7 @@ keep   => when process exits, make buffer readonly
 kill     => when process exits, kill buffer")
 (put 'ymacs-term-exit-action 'permanent-local t)
 
-(defvar ymacs-term-or-comint-process-exit-hook '(ymacs-term|shell-exit))
+(defvar ymacs-term-process-exit-hook '(ymacs-term//shell-exit))
 
 (defvar-local ymacs-term--ssh-info nil)
 (defvar-local ymacs-term--parent-buffer nil)
@@ -85,3 +87,6 @@ If you do not like default setup, modify it, with (KEY . COMMAND) format.")
 (define-key!
   ([f8] . ymacs-term/pop-shell)
   ("M-`" . ymacs-term/toggle-window))
+
+(define-key! :map prog-mode-map
+  ("C-c C-l" . ymacs-term/load-file-in-repl))

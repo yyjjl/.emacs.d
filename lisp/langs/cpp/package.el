@@ -4,9 +4,6 @@
 
 (require-packages! clang-format google-c-style)
 
-(defvar-local ymacs-cpp-current-build-system nil)
-(defvar ymacs-cpp-build-systems nil)
-
 (cl-defstruct ymacs-cpp-build-system
   (system-id nil)
 
@@ -50,14 +47,26 @@
       (,(concat "\\<" (regexp-opt '("NULL" "nullptr" "false" "true")) "\\>")
        . font-lock-constant-face))))
 
-(after-feature! term
+(defvar-local ymacs-cpp-current-build-system nil)
+(defvar ymacs-cpp-build-systems
+  (list
+   (make-ymacs-cpp-build-system
+    :system-id 'default
+    :lsp-enable-fn #'ymacs-cpp//get-dot-clangd-path
+    :command-fn #'ymacs-cpp//get-compile-command-from-dot-clangd)))
+
+(eval-when-has-feature! term
   ;; set term default directory
-  (add-to-list 'ymacs-term-directory-functions #'ymacs-cpp//build-dir))
+  (add-to-list 'ymacs-term-directory-functions #'ymacs-cpp//build-dir)
+  (add-to-list 'ymacs-term-repl-alist
+               '(c++-mode :program "root" :program-args ("-l" the-file) :cmd-fmt ".X %s\n")))
+
+(eval-when-has-feature! debug
+  (add-to-list 'ymacs-debugger-alist '(c-mode gdb :gud t))
+  (add-to-list 'ymacs-debugger-alist '(c++-mode gdb :gud t)))
 
 (eval-when-has-feature! lsp
   (ymacs-lsp//register-client
    'clangd
    :package 'lsp-clangd
-   :manual `(:title "Clangd"
-             :repo "clangd/clangd"
-             :exe ,ymacs-clangd-path)))
+   :manual `(:title "Clangd" :repo "clangd/clangd" :exe ,ymacs-clangd-path)))

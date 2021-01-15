@@ -45,7 +45,7 @@
   (when (file-exists-p ymacs-default-autoloads-file)
     (delete-file ymacs-default-autoloads-file))
 
-  (ymacs-default|after-init)
+  (ymacs-default//after-init)
 
   (setq ymacs--compile-config-in-progress t)
 

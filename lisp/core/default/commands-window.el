@@ -31,15 +31,13 @@
             (ymacs-popup//get-term-window))
     (user-error "Terminal window can not split"))
   (if -arg
-      (completing-read!
-       :-prompt "Split Vertically"
-       :-collection ymacs-window-size-list
-       :-action (lambda (-size)
-                  (ymacs-window//split-with-size -size -vertical))
-       :-return-prompt "read number"
-       :-return-action
-       (lambda ()
-         (ymacs-window//split-with-size (read-number "Float or Integer: ") -vertical)))
+      (ymacs-window//split-with-size
+       (completing-read! (concat "Split " (if -vertical "Vertically" "Horizontally"))
+                         ymacs-window-size-list
+                         (lambda ()
+                           (ymacs-window//split-with-size (read-number "Float or Integer: ") -vertical))
+                         "Read number")
+       -vertical)
     (ymacs-window//split-with-size nil -vertical)))
 
 ;; Rearrange split windows

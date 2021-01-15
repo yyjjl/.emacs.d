@@ -27,7 +27,7 @@
     ([f5] . ymacs-python/toggle-pdbtrack))
 
   (define-key! :map inferior-python-mode-map
-    ("<tab>" . ymacs-python/shell-completion-complete-or-indent)
+    ([remap python-shell-completion-complete-or-indent] . ymacs-python/shell-completion-complete-or-indent)
     ("C-c C-t" . ymacs-python/toggle-pdbtrack)
     ("C-c C-z" . ymacs-python/pop-to-source-buffer))
 
@@ -38,7 +38,6 @@
     ([remap kill-word] . ymacs-python/forward-kill-word)
     ([remap backward-kill-word] . ymacs-python/backward-kill-word)
 
-    ([f5] . ymacs-python/debug-current-file)
     ("C-c v" . ymacs-python/create-venv)
     ("C-c V" . ymacs-python/create-venv-in-workon-home)
     ("C-c C-z" . ymacs-python/pop-to-shell)

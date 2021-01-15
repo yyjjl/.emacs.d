@@ -22,3 +22,16 @@
   (interactive)
   (setq ymacs-popup--window-list
         (delq (selected-window) ymacs-popup--window-list)))
+
+;;;###autoload
+(defun ymacs-popup/display-popup-window ()
+  (interactive)
+  (let ((help-buffers
+         (mapcar #'buffer-name
+                 (cl-remove-if-not
+                  (lambda (buffer)
+                    (with-current-buffer buffer
+                      (or (plist-get ymacs-popup--matched-rule :autoclose)
+                          (plist-get ymacs-popup--matched-rule :dedicated))))
+                  (buffer-list)))))
+    (display-buffer (completing-read "Popup buffer: " help-buffers nil t))))

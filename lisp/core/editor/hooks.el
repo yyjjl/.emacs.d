@@ -32,7 +32,8 @@
       (when (or env compilation-environment)
         (save-excursion
           (goto-char (point-min))
-          (when (re-search-forward "^\\(Compilation\\|Comint\\) started" nil t)
+          (when (let ((case-fold-search nil))
+                  (search-forward mode-name nil t))
             (forward-line 1)
             (let ((inhibit-read-only t))
               (insert "\nEnvironments:\n  ")
@@ -40,9 +41,9 @@
               (insert "\n"))))))
     buffer))
 
-(defun ymacs-editor|after-init (&optional -frame)
+(defun ymacs-editor//after-init (&optional -frame)
   (when (daemonp)
-    (remove-hook 'after-make-frame-functions #'ymacs-editor|after-init))
+    (remove-hook 'after-make-frame-functions #'ymacs-editor//after-init))
 
   (require 'lv)
 
@@ -74,14 +75,14 @@
 (add-hook (if (daemonp)
               'after-make-frame-functions
             'after-init-hook)
-          #'ymacs-editor|after-init)
+          #'ymacs-editor//after-init)
 
 (after! semantic
   (advice-add #'semantic-analyze-completion-at-point-function :override #'ignore)
   (advice-add #'semantic-analyze-notc-completion-at-point-function :override #'ignore)
   (advice-add #'semantic-analyze-nolongprefix-completion-at-point-function :override #'ignore)
 
-  (define-hook! ymacs-semantic|inhibit-function (semantic-inhibit-functions)
+  (define-hook! ymacs-semantic//inhibit-function (semantic-inhibit-functions)
     (or (and default-directory (file-remote-p default-directory))
         (not (derived-mode-p 'prog-mode))))
 
@@ -89,12 +90,12 @@
     (with-local-quit (apply -fn -args))))
 
 (after! dired
-  (define-hook! ymacs-editor|dired-setup (dired-mode-hook)
+  (define-hook! ymacs-editor//dired-setup (dired-mode-hook)
     (setq mode-line-buffer-identification '("%b" (dired-omit-mode " (omit)")))
     (dired-hide-details-mode 1)))
 
 (after! ibuffer
-  (define-hook! ymacs-ibuffer|setup (ibuffer-mode-hook)
+  (define-hook! ymacs-ibuffer//setup (ibuffer-mode-hook)
     ;; (ibuffer-auto-mode 1)
     (ibuffer-switch-to-saved-filter-groups "default")
 
@@ -142,8 +143,8 @@
              'none))))))
 
 (after! ivy
-  (add-hook 'ivy-occur-mode-hook #'ymacs-default|truncate-line)
-  (add-hook 'ivy-occur-grep-mode-hook #'ymacs-default|truncate-line)
+  (add-hook 'ivy-occur-mode-hook #'ymacs-default//truncate-line)
+  (add-hook 'ivy-occur-grep-mode-hook #'ymacs-default//truncate-line)
   (advice-add #'ivy--cleanup :before (lambda (&rest _) (lv-delete-window)))
 
   (define-advice ivy-occur-next-error (:around (-fn &rest -args) ensure-visible)
@@ -203,8 +204,7 @@
      :around #'yas-next-field-or-maybe-expand@expand-local)))
 
 (after! graphviz-dot-mode
-  (define-hook! ymacs-editor|dot-setup (graphviz-dot-mode-hook)
-    (hs-minor-mode 1)
+  (define-hook! ymacs-editor//dot-setup (graphviz-dot-mode-hook)
     (ymacs-editor//add-company-backend 'company-graphviz-dot-backend)))
 
 (after! multiple-cursors

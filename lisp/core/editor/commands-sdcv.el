@@ -169,4 +169,4 @@ Word may contain some special characters:
                     (when (re-search-forward regexp nil t)
                       (match-string 1))))
         (sdcv-search-word word)
-      (sdcv-search))))
+      (call-interactively #'sdcv-search-word))))

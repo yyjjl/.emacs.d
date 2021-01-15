@@ -12,6 +12,12 @@
 
 (defvar ymacs-python-lsp-servers '(pyls pyright))
 
+(defvar-local ymacs-python--last-buffer nil
+  "Help keep track of python buffer when changing to pyshell.")
+
+(eval-when-has-feature! debug
+  (add-to-list 'ymacs-debugger-alist '(python-mode pdb :gud t)))
+
 (eval-when-has-feature! lsp
   (require-packages! lsp-pyright)
 
@@ -25,6 +31,3 @@
 
   (ymacs-lsp//register-client 'pyls :package 'lsp-pyls)
   (ymacs-lsp//register-client 'pyright :package 'lsp-pyright))
-
-(defvar-local ymacs-python--last-buffer nil
-  "Help keep track of python buffer when changing to pyshell.")

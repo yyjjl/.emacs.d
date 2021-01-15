@@ -9,10 +9,12 @@
   (let ((file (expand-file-name (car -args)))
         (process-connection-type nil))
     (recentf-push file)
-    (open! file)
     (kill-buffer)
-    (let (debug-on-error)
-      (user-error "Opened %s in external program" (file-name-nondirectory file)))))
+    (if (fboundp #'counsel-find-file-extern)
+        (progn
+          (counsel-find-file-extern file)
+          (message "Opened %s externally" file))
+      (message "Don't know how to open %s" file))))
 
 (defun ymacs-default//buffer-predicate (buffer)
   (or (buffer-file-name buffer)

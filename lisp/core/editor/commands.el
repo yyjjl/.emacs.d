@@ -9,6 +9,19 @@
   (counsel-find-file-as-root -filename))
 
 ;;;###autoload
+(defun ymacs-editor/find-file-externally (-files)
+  "Open the current file or dired marked files in external app.
+The app is chosen from your OS's preference."
+  (interactive (list (if (eq major-mode 'dired-mode)
+                         (dired-get-marked-files)
+                       (list (buffer-file-name)))))
+  (when (or (<= (length -files) 5)
+            (y-or-n-p "Open more than 5 files? "))
+    (dolist (file -files)
+      (counsel-find-file-extern file))))
+
+
+;;;###autoload
 (defun ymacs-editor/edit-dir-locals (&optional -directory)
   "Edit or create a .dir-locals.el file of the project."
   (interactive

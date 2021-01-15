@@ -1,8 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
 (after! cc-mode
-  (define-hook! ymacs-java|setup (java-mode-hook)
-    (when (buffer-enable-rich-feature-p)
+  (define-hook! ymacs-java//setup (java-mode-hook)
+    (when (is-buffer-suitable-for-coding!)
       (require 'lsp-java)
 
       (setq-local c-basic-offset 8)

@@ -3,11 +3,11 @@
 (declare-function winner-ring "winner")
 (declare-function winner-undo "winner")
 
-(define-hook! ymacs-popup|after-init (after-init-hook)
+(define-hook! ymacs-popup//after-init (after-init-hook)
   (setq display-buffer-alist
         '((ymacs-popup//match ymacs-popup//display-buffer-action))))
 
-(define-hook! (ymacs-popup|compilation-finish-hook -buffer _)
+(define-hook! (ymacs-popup//compilation-finish-hook -buffer _)
   (compilation-finish-functions)
   (when (buffer-live-p -buffer)
     (with-current-buffer -buffer
@@ -17,7 +17,7 @@
         (when-let (window (get-buffer-window -buffer))
           (ymacs-popup//push-window window -buffer t))))))
 
-(define-hook! ymacs-popup|autoclose-popup-window (kill-buffer-hook)
+(define-hook! ymacs-popup//autoclose-popup-window (kill-buffer-hook)
   "Auto quit popup window after buffer killed"
   (let ((window (get-buffer-window)))
     (when (and window

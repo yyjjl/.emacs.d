@@ -23,7 +23,7 @@
   ("p" . diff-hl-previous-hunk)
   ("r" . diff-hl-revert-hunk)
   ("j" . ymacs-git/goto-hunk)
-  ("g" . ymacs-git//status)
+  ("g" . ymacs-git/status)
   ("b" . magit-checkout))
 
 (define-key! :prefix "C-x j"

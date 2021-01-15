@@ -42,7 +42,7 @@
         (back-to-indentation)
       (funcall -fn -n)))
 
-  (define-hook! ymacs-org|setup (org-mode-hook)
+  (define-hook! ymacs-org//setup (org-mode-hook)
     (when buffer-file-name
       (setq-local org-preview-latex-image-directory "auto/cache/"))
 
@@ -61,7 +61,7 @@
     (remove-hook 'company-backends 'company-dabbrev t)
     (ymacs-editor//add-company-backend 'ymacs-org/company-symbols :-main-backend-p nil))
 
-  (define-hook! ymacs-org|src-setup (org-src-mode-hook)
+  (define-hook! ymacs-org//src-setup (org-src-mode-hook)
     (flycheck-mode -1))
 
   (add-hook 'org-speed-command-hook #'ymacs-org/block-speed-command-activate))

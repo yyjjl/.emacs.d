@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(defvar ymacs-debugger-alist nil)
+
 (defvar ymacs-debug--help-window nil)
 (defvar ymacs-debug--help-buffer-name " *DEBUG-HELP*")
 
@@ -91,3 +93,6 @@
 (ymacs-debug//define-goto-command gdb-disassembly-buffer "ld")
 (ymacs-debug//define-goto-command gdb-memory-buffer "lm")
 (ymacs-debug//define-goto-command gdb-threads-buffer "lt")
+
+(define-key! :map prog-mode-map
+  ([f5] . ymacs-debug/debug-current-file))

@@ -1,7 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 (after! compile
-  (define-hook! ymacs-term|setup-compilation (compilation-mode-hook)
+  (define-hook! ymacs-term//compilation-setup (compilation-mode-hook)
     (setq mode-line-buffer-identification
           '("%b"
             (:eval
@@ -12,20 +12,20 @@
               'face font-lock-comment-face))))))
 
 (after! term
-  (define-hook! ymacs-term|term-setup (term-mode-hook)
+  (define-hook! ymacs-term//term-setup (term-mode-hook)
     (setq term-goto-process-mark nil)
 
     (setq ymacs-term-extra-name nil)
     (setq mode-line-buffer-identification
           '("%b" (ymacs-term-extra-name (": " ymacs-term-extra-name)))))
 
-  (define-hook! ymacs-term|set-utf8 (term-exec-hook)
+  (define-hook! ymacs-term//set-utf8 (term-exec-hook)
     (when-let (proc (get-buffer-process (current-buffer)))
       (set-process-coding-system proc 'utf-8-unix 'utf-8-unix))))
 
 
 (after! vterm
-  (define-hook! ymacs-term|vterm-setup (vterm-mode-hook)
+  (define-hook! ymacs-term//vterm-setup (vterm-mode-hook)
     (setq ymacs-term-extra-name nil)
     (setq mode-line-buffer-identification
           '("%b"
@@ -57,9 +57,9 @@
           (vterm-send-key key shift meta ctrl))))))
 
 (after! comint
-  (add-hook 'comint-exec-hook #'ymacs-term//setup-sentinel)
+  (add-hook 'comint-exec-hook #'ymacs-term//sentinel-setup)
 
-  (define-hook! ymacs-term|comint-setup (comint-mode-hook)
+  (define-hook! ymacs-term//comint-setup (comint-mode-hook)
     (when (string-match-p "inferior\\|interactive" (symbol-name major-mode))
       (local-set-key (kbd "M-}") #'ymacs-term/next)
       (local-set-key (kbd "M-{") #'ymacs-term/prev)
@@ -81,7 +81,7 @@ If not, delete -ARG characters forward."
 (after! shell
   (bash-completion-setup)
 
-  (define-hook! ymacs-term|shell-setup (shell-mode-hook)
+  (define-hook! ymacs-term//shell-setup (shell-mode-hook)
     (setq ymacs-term-extra-name nil)
     (setq mode-line-buffer-identification
           '("%b" (ymacs-term-extra-name (": " ymacs-term-extra-name))))))

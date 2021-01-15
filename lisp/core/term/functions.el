@@ -11,7 +11,7 @@
       (setq index (1+ index)))
     name))
 
-(defun ymacs-term//setup-keybindings ()
+(defun ymacs-term//keybindings-setup ()
   (let (bind-key bind-command)
     ;; Unbind base key that conflict with user's keys-tokes.
     (dolist (unbind-key ymacs-term-unbind-key-list)
@@ -20,9 +20,7 @@
        ((vectorp unbind-key) nil)
        (t (signal 'wrong-type-argument (list 'array unbind-key))))
       (define-key term-raw-map unbind-key nil))
-    ;; Add some i use keys.
-    ;; If you don't like my keystroke,
-    ;; just modified `ymacs-term-bind-key-alist'
+    ;; @see `ymacs-term-bind-key-alist'
     (dolist (element ymacs-term-bind-key-alist)
       (setq bind-key (car element))
       (setq bind-command (cdr element))
@@ -55,20 +53,20 @@
           (ymacs-popup//set-term-window window)
           window)))))
 
-(defun ymacs-term|shell-exit (-proc _msg)
-  (let ((window (get-buffer-window (current-buffer))))
-    (when (and (window-live-p window)
-               (eq window (ymacs-popup//get-term-window))
-               (eq ymacs-term-exit-action 'shell)
-               ;; try to switch to next shell  buffer
-               (not (ymacs-term//switch-internal 1)))
-      (if (one-window-p)
-          (quit-window window)
-        (delete-window window))))
+(defun ymacs-term//shell-exit ()
+  (let ((buffer (current-buffer)))
+    (let ((window (get-buffer-window)))
+      (when (and (window-live-p window)
+                 (eq window (ymacs-popup//get-term-window))
+                 (eq ymacs-term-exit-action 'shell)
+                 ;; try to switch to next shell  buffer
+                 (not (ymacs-term//switch-internal 1)))
+        (if (one-window-p)
+            (quit-window window)
+          (delete-window window))))
 
-  (let ((buffer (process-buffer -proc)))
-    (when (and (memq (process-status -proc) '(signal exit))
-               (buffer-live-p buffer))
+    (when (buffer-live-p buffer)
+      ;; the buffer maybe killed or buried
       (with-current-buffer buffer
         (if (not (eq ymacs-term-exit-action 'keep))
             (progn
@@ -76,9 +74,10 @@
                 (set-window-dedicated-p (get-buffer-window) nil))
               (kill-buffer))
 
-          (let ((help-str (propertize "[Press `Ctrl-D' or `q' to kill this buffer. ]"
-                                      'font-lock-face
-                                      'font-lock-warning-face)))
+          (let ((help-str (propertize
+                           "[Press `Ctrl-D' or `q' to kill this buffer. ]"
+                           'font-lock-face
+                           'font-lock-warning-face)))
             (if (listp mode-line-buffer-identification)
                 (add-to-list 'mode-line-buffer-identification help-str t)
               (setq mode-line-buffer-identification
@@ -90,24 +89,25 @@
           (local-set-key (kbd "C-d") #'kill-buffer-and-window)
           (local-set-key (kbd "q") #'kill-buffer-and-window))))))
 
-(defsubst ymacs-term//setup-sentinel ()
-  (let* ((proc (get-buffer-process (current-buffer)))
-         (sentinel (and proc (process-sentinel proc))))
-    (when proc
-      (set-process-sentinel
-       proc
-       (lambda (-proc -msg)
-         (when sentinel
-           (funcall sentinel -proc -msg))
+(defsubst ymacs-term//sentinel-setup ()
+  (when-let ((proc (get-buffer-process (current-buffer))))
+    (set-process-sentinel
+     proc
+     (make-process-sentinel!
+      nil nil
+      (lambda ()
+        (run-hook-with-args 'ymacs-term-process-exit-hook))
+      (process-sentinel proc)))))
 
-         (with-demoted-errors "%s"
-           (run-hook-with-args 'ymacs-term-or-comint-process-exit-hook -proc -msg)))))))
+(defsubst ymacs-term//get-shell-name ()
+  (or ymacs-zsh-path
+      ymacs-bash-path))
 
 (defun ymacs-term//create-vterm-buffer (-buffer -shell-name)
   (let ((vterm-shell -shell-name))
     (with-current-buffer -buffer
       (vterm-mode)
-      (ymacs-term//setup-sentinel))))
+      (ymacs-term//sentinel-setup))))
 
 (defun ymacs-term//create-term-buffer (-buffer -shell-name -term-name)
   ;; Make term, details to see function `make-term' in `term.el'.
@@ -119,13 +119,13 @@
   (with-current-buffer -buffer
     (term-mode)
     (term-char-mode)
-    (ymacs-term//setup-keybindings)
-    (ymacs-term//setup-sentinel)
+    (ymacs-term//keybindings-setup)
+    (ymacs-term//sentinel-setup)
     (setq term-scroll-show-maximum-output nil)
     (setq term-scroll-to-bottom-on-output t)))
 
 (defun ymacs-term//create-shell-buffer (-buffer -shell-name -term-name -shell-buffer-p)
-  ;; (ymacs-term//setup-sentinel) is called in comint-exec-hook
+  ;; (ymacs-term//sentinel-setup) is called in comint-exec-hook
   (if -shell-buffer-p
       (let ((shell-file-name -shell-name))
         (with-current-buffer (shell -buffer)
@@ -136,11 +136,6 @@
       (apply #'make-comint-in-buffer -term-name -buffer -shell-name
              nil
              ymacs-term-program-arguments))))
-
-(defun ymacs-term//get-shell-name ()
-  (or (unless (eq ymacs-term-type 'shell)
-        ymacs-zsh-path)
-      ymacs-bash-path))
 
 (defun ymacs-term//create-buffer (&optional -program -shell-buffer-p -full-name)
   "Get term buffer.
@@ -165,8 +160,9 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
         (ymacs-term//create-vterm-buffer buffer shell-name))
        ((eq ymacs-term-type 'term)
         (ymacs-term//create-term-buffer buffer shell-name term-name))
-       (t
-        (ymacs-term//create-shell-buffer buffer shell-name term-name -shell-buffer-p))))
+       ((eq ymacs-term-type 'shell)
+        (ymacs-term//create-shell-buffer buffer shell-name term-name -shell-buffer-p))
+       (t (user-error "Unsupported shell type %s" ymacs-term-type))))
 
     (when (buffer-live-p buffer)
       (with-current-buffer buffer
@@ -187,26 +183,22 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
     (vterm-send-string -string))
    ((derived-mode-p 'comint-mode)
     (comint-send-string (get-buffer-process (current-buffer)) -string))
-   (t (user-error "%s is not supported" major-mode))))
+   (t (user-error "Unsupported shell type %s" major-mode))))
 
 (defun ymacs-term//exec-program (-program -args &optional -name -full-name)
   (let ((ymacs-term-program-arguments -args)
         (ymacs-term-buffer-name -name))
     (ymacs-term//create-buffer -program nil -full-name)))
 
-(cl-defun ymacs-term//exec-program-reuse-buffer
-    (-buffer-name -program -args &key (-before-exec-fn nil) (-callback nil))
+(cl-defun ymacs-term//exec-program-in-buffer
+    (-buffer-name &key -program -program-args (-callback nil))
+  (declare (indent 1))
   (let* ((buffer-name (concat "*" -buffer-name "*"))
          (buffer (get-buffer-create buffer-name))
          (proc (get-buffer-process buffer)))
-    (unless (and proc
-                 (process-live-p proc)
-                 (eq (buffer-local-value 'major-mode buffer)
-                     'term-mode))
+    (unless (and proc (process-live-p proc))
       (kill-buffer buffer)
-      (when -before-exec-fn
-        (funcall -before-exec-fn))
-      (setq buffer (ymacs-term//exec-program -program -args nil buffer-name)))
+      (setq buffer (ymacs-term//exec-program -program -program-args nil buffer-name)))
 
     (when (buffer-live-p buffer)
       (display-buffer buffer)
@@ -215,41 +207,31 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
         (with-current-buffer buffer
           (funcall -callback))))))
 
-(defun ymacs-term//create-shell (-directory &optional -new)
-  "If there is a term buffer whose default-directory is -DIRECTORY,
-return that buffer. Otherwise create a new term buffer.
-
-If -FORCE is non-nil create a new term buffer directly."
-  (or (and (not -new)
-           (car (--filter
-                 (with-current-buffer it
-                   (and (ymacs-term//shell-buffer-p it)
-                        (directory-equal-p -directory default-directory)))
-                 (buffer-list))))
-      (let ((default-directory -directory))
-        (ymacs-term//create-buffer nil t))))
-
 (defsubst ymacs-term//get-directory ()
   (run-hook-with-args-until-success 'ymacs-term-directory-functions))
+
+(defsubst ymacs-term//get-shell-buffer-in-directory (-directory)
+  (cl-loop
+   for buffer in (buffer-list)
+   for directory = (buffer-local-value 'default-directory buffer)
+   when (and (ymacs-term//shell-buffer-p buffer)
+             (equal-directory! directory -directory))
+   return buffer))
 
 (defun ymacs-term//pop-shell-get-buffer (&optional -arg)
   (when (ymacs-term//shell-buffer-p (current-buffer))
     (user-error "Current buffer is already a shell buffer"))
 
-  (let* ((new (or (= -arg 0) (>= -arg 16)))
+  (let* ((force-new-buffer (or (= -arg 0) (>= -arg 16)))
          (directory
           (or (when (= -arg 4)
                 (ymacs-term//get-directory))
-              (when new
+              (when force-new-buffer
                 (read-directory-name "Shell in: " nil nil :mustmatch))
               default-directory)))
 
-    (or (and (not new)
-             (cl-find-if
-              (lambda (buffer)
-                (and (ymacs-term//shell-buffer-p buffer)
-                     (directory-equal-p directory (buffer-local-value 'default-directory buffer))))
-              (buffer-list)))
+    (or (when (not force-new-buffer)
+          (ymacs-term//get-shell-buffer-in-directory directory))
 
         (let ((default-directory directory))
           (ymacs-term//create-buffer nil t)))))

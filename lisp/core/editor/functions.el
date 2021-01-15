@@ -157,20 +157,25 @@ Arguments are same as of `defhydra'."
   (when (and -cmd (not (stringp -cmd)))
     (setq -cmd (string-join -cmd " ")))
 
-  (let* ((env-string (when ymacs-editor-ivy-extra-environment
-                       (string-join ymacs-editor-ivy-extra-environment "\n")))
+  (let* ((extra-string
+          (when ymacs-editor-ivy-extra-help-lines
+            (propertize
+             (string-join ymacs-editor-ivy-extra-help-lines "\n")
+             'face 'font-lock-string-face)))
          (key-string (ymacs-editor//display-help--keys))
-         (cmd-string (when -cmd
-                       (format "(@%s) %s"
-                               (propertize (or -directory default-directory)
-                                           'face font-lock-constant-face)
-                               (propertize -cmd
-                                           'face font-lock-doc-face))))
-         (help-string (concat env-string
-                              (when (and env-string (or key-string cmd-string)) "\n")
-                              key-string
-                              (when (and cmd-string key-string) "\n")
-                              cmd-string)))
+         (cmd-string
+          (when -cmd
+            (format "(@%s) %s"
+                    (propertize (or -directory default-directory)
+                                'face font-lock-constant-face)
+                    (propertize -cmd
+                                'face font-lock-doc-face))))
+         (help-string
+          (concat extra-string
+                  (when (and extra-string (or key-string cmd-string)) "\n")
+                  key-string
+                  (when (and cmd-string key-string) "\n")
+                  cmd-string)))
     (unless (string-empty-p help-string)
       (lv-message "%s" help-string))))
 

@@ -1,10 +1,10 @@
 ;;; -*- lexical-binding: t; -*-
 
 (after! haskell-mode
-  (define-hook! ymacs-haskell|setup (haskell-mode-hook haskell-literate-mode-hook)
+  (define-hook! ymacs-haskell//setup (haskell-mode-hook haskell-literate-mode-hook)
     (haskell-decl-scan-mode 1)
 
-    (when (buffer-enable-rich-feature-p)
+    (when (is-buffer-suitable-for-coding!)
       (try-enable-lsp! haskell
         :-fallback
         (progn

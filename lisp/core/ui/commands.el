@@ -19,9 +19,7 @@
 (defun ymacs-ui/toggle-aw-scope ()
   (interactive)
   (setq aw-scope
-        (completing-read-simple!
-         :-prompt "Scope: "
-         :-collection (delete aw-scope '(visible global frame))))
+        (completing-read! "Scope: " (remove aw-scope '(visible global frame))))
   (aw-update)
   (force-mode-line-update t)
   (message "Current AW scope: %s" (upcase (symbol-name aw-scope))))

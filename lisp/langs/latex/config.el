@@ -21,7 +21,6 @@
    '("d b" TeX-toggle-debug-bad-boxes "Debug Bad Boxes" :toggle TeX-debug-bad-boxes))
 
   (define-key! :map LaTeX-mode-map
-    ([f5] . TeX-interactive-mode)
     ([f10] . ymacs-latex/build)
     ("M-a" . ymacs-latex/backward-sexp)
     ("M-e" . ymacs-latex/forward-sexp)

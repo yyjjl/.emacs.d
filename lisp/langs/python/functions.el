@@ -98,3 +98,7 @@
     (if (ymacs-python//triple-quotes-p (- end 2) (+ end 1))
         (cons (+ start 2) (- end 2))
       start+end)))
+
+(defsubst ymacs-python//line-startswith-p (-string)
+  (back-to-indentation)
+  (string-prefix-p -string (buffer-substring-no-properties (point) (line-end-position))))

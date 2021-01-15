@@ -12,7 +12,4 @@
 
 (after! cargo
   (define-key! :map cargo-mode-map
-    ("C-c C-c" . ymacs-rust/cargo-dispatch)
-    ("C-c C-l" . ymacs-rust/cargo-run))
-
-  (setq cargo-process--command-flags "--color never"))
+    ("C-c C-c" . ymacs-rust/cargo-dispatch)))

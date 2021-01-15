@@ -1,6 +1,6 @@
 ;; -*- lexical-binding:t -*-
 
-(define-hook! ymacs-lisp|minibuffer-setup (minibuffer-setup-hook
+(define-hook! ymacs-lisp//minibuffer-setup (minibuffer-setup-hook
                                            minibuffer-exit-hook)
   (if (and (not (bound-and-true-p lispy-mode))
            (memq this-command
@@ -13,14 +13,14 @@
       (lispy-mode 1)
     (lispy-mode -1)))
 
-(add-hook 'emacs-lisp-mode-hook #'ymacs-lisp|elisp-setup)
-(add-hook 'lisp-interaction-mode-hook #'ymacs-lisp|elisp-setup)
+(add-hook 'emacs-lisp-mode-hook #'ymacs-lisp//elisp-setup)
+(add-hook 'lisp-interaction-mode-hook #'ymacs-lisp//elisp-setup)
 
 (dolist (hook '(lisp-mode-hook scheme-mode-hook))
-  (add-hook hook #'ymacs-lisp|common-setup))
+  (add-hook hook #'ymacs-lisp//common-setup))
 
 (after! macrostep
-  (define-hook! ymacs-lisp|macrostep-setup (macrostep-mode-hook)
+  (define-hook! ymacs-lisp//macrostep-setup (macrostep-mode-hook)
     (add-to-list 'minor-mode-overriding-map-alist (cons 'macrostep-mode macrostep-keymap))))
 
 (after! lispy

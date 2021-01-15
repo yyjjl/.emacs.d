@@ -1,24 +1,6 @@
 ;; -*- lexical-binding:t -*-
 
 ;;;###autoload
-(defun ymacs-web/load-in-repl ()
-  (interactive)
-
-  (when (file-remote-p default-directory)
-    (user-error "Not support in remove sever !"))
-  (unless (executable-find "node")
-    (user-error "Executable `root' not found !"))
-  (unless (buffer-file-name)
-    (user-error "Buffer has no file !"))
-
-  (let ((file (buffer-file-name)))
-    (ymacs-term//exec-program-reuse-buffer
-     (concat "Node:" (buffer-name))
-     "node" (list "-l" (or file ""))
-     :-callback
-     (lambda () (ymacs-term//send-string (format ".load %s\n" file))))))
-
-;;;###autoload
 (defun ymacs-web/smart-kill ()
   "It's a smarter kill function for `web-mode'."
   (interactive)

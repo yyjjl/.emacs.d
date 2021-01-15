@@ -6,6 +6,9 @@
  'ymacs-default-input-method-alist
  '(haskell-mode haskell-unicode-input-method haskll-unicode))
 
+(eval-when-has-feature! debug
+  (add-to-list 'ymacs-debugger-alist '(haskell-mode haskell-debug)))
+
 (eval-when-has-feature! lsp
   (require-packages! lsp-haskell)
 
