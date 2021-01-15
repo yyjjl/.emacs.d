@@ -241,8 +241,8 @@
   ("." . ivy-switch-view))
 
 (define-key! :prefix "C-x"
-  ("C-_" . goto-last-change)
-  ("C-/" . goto-last-change)
+  ("C-_" . ymacs-editor/goto-last-change)
+  ("C-/" . ymacs-editor/goto-last-change)
 
   ("o" . ace-window)
   ("b" . ivy-switch-buffer)
@@ -325,7 +325,7 @@
   ([f6] . ymacs-editor/toggle-company-ispell)
   ([C-f7] . ymacs-editor/rsync-project)
   ([f7] . ymacs-hydra/toggles)
-  ([f10] . counsel-compile))
+  ([f10] . ymacs-editor/compile))
 
 (define-key! :prefix "C-c m"
   ("P" . mc/mark-pop)
@@ -345,9 +345,8 @@
 
 (define-key! :prefix "C-c i"
   ("r" . ivy-resume)
-  ("e" . ymacs-editor/find-file-as-root)
+  ("e" . ymacs-editor/sudo-edit-or-errors)
 
- ([remap compile] . counsel-compile)
   ([remap dired] . counsel-dired)
   ([remap insert-char] . counsel-unicode-char)
   ([remap set-variable] . counsel-set-variable)
@@ -364,15 +363,16 @@
   ("d" . counsel-dired-jump)
   ("x" . counsel-linux-app)
   ("g" . counsel-git)
+  ("G" . counsel-git-log)
   ("s" . counsel-git-grep)
   ("S" . counsel-git-stash)
   ("h" . counsel-minibuffer-history)
   ("m" . counsel-mark-ring)
   ("/" . counsel-grep)
   ("L" . counsel-locate)
-  ("f" . counsel-describe-face)
+  ("f" . counsel-faces)
   ("S" . counsel-find-symbol)
-  ("F" . counsel-faces)
+  ("F" . counsel-fonts)
   ("W" . counsel-colors-web)
   ("E" . counsel-colors-emacs)
   ("O" . counsel-outline)

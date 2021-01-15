@@ -1,13 +1,11 @@
 ;; -*- lexical-binding:t -*-
 
 (define-hook! ymacs-lisp//minibuffer-setup (minibuffer-setup-hook
-                                           minibuffer-exit-hook)
+                                            minibuffer-exit-hook)
   (if (and (not (bound-and-true-p lispy-mode))
            (memq this-command
                  '(eval-expression
                    pp-eval-expression
-                   ymacs-tools/eval-and-replace
-                   eval-expression-with-eldoc
                    ibuffer-do-eval
                    ibuffer-do-view-and-eval)))
       (lispy-mode 1)

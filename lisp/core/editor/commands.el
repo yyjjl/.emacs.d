@@ -1,12 +1,11 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;;;###autoload
-(defun ymacs-editor/find-file-as-root (-filename)
-  (interactive
-   (list (or (and (not current-prefix-arg)
-                  (buffer-file-name))
-             (read-file-name "Find file as root: " nil nil :must-match))))
-  (counsel-find-file-as-root -filename))
+(defun ymacs-editor/goto-last-change (-arg)
+  (interactive "P")
+  (if -arg
+      (goto-last-change-reverse nil)
+    (goto-last-change nil)))
 
 ;;;###autoload
 (defun ymacs-editor/find-file-externally (-files)

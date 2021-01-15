@@ -262,29 +262,22 @@ Argument -BODY will be evaluated once when that hook is first invoked, then it d
                ,@-body))
        (add-hook ',hook --ymacs-transient-hook ,append-p ,local-p))))
 
-(defmacro with-transient-advice! (-symbol &rest -body)
-  "Add transient forms as advice to a -SYMBOL.
-
-Argument -HOOK can be one of these forms:
-1. a symbol
-3. (symbol . plist)
-
-Argument -BODY will be evaluated once when -SYMBOL is first invoked, then it detaches itself."
+(cl-defmacro with-transient-advice!
+    ((-symbol -where -args . -advice-body) &rest -body)
+  "Add transient -ADVICE-BODY as advice to a -SYMBOL, and then run -BODY."
   (declare (indent 1))
-  (let* ((symbol (or (car-safe -symbol) -symbol))
-         (args (cdr-safe -symbol))
-         (where (or (plist-get args :where) :before))
-         (props (plist-get args :props))
-         (args-list (or (plist-get args :arguments) '(&rest _))))
-    `(progn
-       (when (advice-function-member-p 'ymacs-transient-advice (symbol-function ',symbol))
-         (user-error "Nested transient advice is not supported"))
-       (advice-add
-        ',symbol ,where
-        (lambda ,args-list
-          (advice-remove ',symbol 'ymacs-transient-advice)
-          ,@-body)
-        '((name . ymacs-transient-advice) ,@props)))))
+  `(unwind-protect
+       (progn
+         (when (advice-function-member-p 'ymacs-transient-advice (symbol-function ',-symbol))
+           (user-error "Nested transient advice is not supported"))
+         (advice-add
+          ',-symbol ,-where
+          (lambda ,-args
+            (advice-remove ',-symbol 'ymacs-transient-advice)
+            ,@-advice-body)
+          '((name . ymacs-transient-advice)))
+         ,@-body)
+     (advice-remove ',-symbol 'ymacs-transient-advice)))
 
 (defmacro without-user-record! (&rest -body)
   `(let (ymacs--buffer-visible-p)

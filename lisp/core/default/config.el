@@ -54,7 +54,7 @@
 (setq apropos-do-all t)
 
  ;; keep the point out of the minibuffer
-(setq mark-ring-max 128)
+(setq mark-ring-max 16)
 (setq kill-ring-max 200)
 
 ;; Save clipboard contents before replacement

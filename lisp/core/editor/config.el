@@ -285,9 +285,6 @@
   (setq iedit-auto-narrow t))
 
 (after! flycheck
-  (define-key! :map flycheck-command-map
-    ("j" . ymacs-editor/jump-to-error))
-
   ;; Do not check during newline
   (setq-default flycheck-checker-error-threshold 400)
   (setq-default flycheck-check-syntax-automatically '(idle-change save mode-enabled))

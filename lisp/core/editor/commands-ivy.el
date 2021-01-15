@@ -220,11 +220,14 @@
     (transient-setup 'ymacs-editor/fzf)))
 
 ;;;###autoload
-(defun ymacs-editor/counsel-compile ()
-  (interactive)
+(defun ymacs-editor/compile (-interactive)
+  (interactive "P")
   (let* ((root (or (counsel--compile-root) default-directory))
          (ymacs-editor-ivy-extra-help-lines
           (list (format "%s @ %s"
-                        (if current-prefix-arg "Comint" "Compile")
+                        (if -interactive "Comint" "Compilation")
                         root))))
-    (counsel-compile root)))
+    (with-transient-advice!
+        (compile :around (-fn -cmd &optional _)
+                 (funcall -fn -cmd (and -interactive t)))
+      (counsel-compile root))))
