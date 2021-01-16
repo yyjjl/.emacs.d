@@ -16,7 +16,6 @@ Optional argument ARG is used to toggle narrow functions."
                (message "Use command `%s'" cmd-list)
                (funcall cmd-list))))))
 
-;;;###autoload
 (defun ymacs-editor/grab-regexp (-regexp)
   "Grab strings matching REGEXP to list."
   (let ((case-fold-search nil)
@@ -107,57 +106,39 @@ Otherwise call `avy-goto-char-in-line'
   (interactive "^p")
   (forward-thing 'defun (- -n)))
 
-(autoload #'python-nav-forward-statement "python" nil t)
+(autoload #'python-nav-forward-statement "python")
+(autoload #'c-end-of-statement "cc-mode")
 
 ;;;###autoload
 (defun ymacs-editor/forward-sentence-or-sexp (&optional -n)
   (interactive "^p")
-  (cond ((derived-mode-p 'c-mode 'c++-mode 'java-mode)
-         (if (and (not current-prefix-arg)
-                  (or (= (char-after) ?\{)
-                      (and (< -n 0)
-                           (or (= (char-before) ?\})
-                               (when (= (char-after) ?\})
-                                 (forward-char 1)
-                                 t)))))
-             (forward-sexp -n)
-           (c-end-of-statement -n nil t)))
-        ((derived-mode-p 'python-mode)
-         (python-nav-forward-statement -n))
-        ((derived-mode-p 'prog-mode 'latex-mode 'org-mode)
-         (condition-case nil
-             (forward-sexp -n)
-           (scan-error
-            (forward-char -n))))
-        (t (forward-sentence -n))))
+  (cond
+   ((and (= (abs -n) 1)
+         (or (and (> -n 0) (eq (char-syntax (char-after)) ?\())
+             (and (< -n 0)
+                  (or (eq (char-syntax (char-before)) ?\))
+                      (when (eq (char-syntax (char-after)) ?\))
+                        (forward-char 1)
+                        t)))))
+    (forward-sexp -n))
+
+   ((derived-mode-p 'c-mode 'c++-mode 'java-mode)
+    (c-end-of-statement -n nil t))
+
+   ((derived-mode-p 'python-mode)
+    (python-nav-forward-statement -n))
+
+   ((derived-mode-p 'prog-mode 'org-mode 'latex-mode)
+    (condition-case nil
+        (forward-sexp -n)
+      (scan-error
+       (forward-char -n))))
+   (t (forward-sentence -n))))
 
 ;;;###autoload
 (defun ymacs-editor/backward-sentence-or-sexp (&optional -n)
   (interactive "^p")
   (ymacs-editor/forward-sentence-or-sexp (- -n)))
-
-;;;###autoload
-(defun ymacs-editor/forward-defun-or-paragraph (&optional -n)
-  (interactive "^p")
-  (if (or (derived-mode-p 'prog-mode))
-      (ymacs-editor/forward-defun -n)
-    (forward-paragraph -n)))
-
-;;;###autoload
-(defun ymacs-editor/avy-goto-subword-1-in-defun (-char)
-  (interactive (list (read-char "char in defun: " t)))
-  (let (beg end)
-    (save-excursion
-      (end-of-defun)
-      (setq end (min (point) (window-end nil t)))
-      (beginning-of-defun-comments)
-      (setq beg (max (point) (window-start))))
-    (let ((avy-all-windows nil))
-      (avy-with avy-goto-subword-1
-        (avy-goto-subword-0
-         nil
-         (lambda () (and (char-after) (eq (downcase (char-after)) -char)))
-         beg end)))))
 
 ;;;###autoload
 (defun ymacs-editor/smart-move-begining-of-line ()

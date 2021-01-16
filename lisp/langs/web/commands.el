@@ -11,10 +11,6 @@
            (kill-region (point) pos)
            (message "Kill <%% ... %%>")
            t)))
-   ;; Kill string if current pointer in string area.
-   ((paredit-in-string-p)
-    (paredit-kill-line-in-string)
-    (message "Paredit kill"))
    ;; Kill element if no content in tag.
    ((and (looking-at "\\s-*?</")
          (looking-back "<[[:alnum:]]+\\s-*?>\\s-*?" (line-beginning-position)))
@@ -25,8 +21,9 @@
     (delete-horizontal-space)
     (message "Delete whitespace"))
    ;; Kill element if in tag.
-   ((and (looking-at "\\s-*?[[:alnum:]]*>")
-         (looking-back "</?[[:alnum:]]*\\s-*?" (line-beginning-position)))
+   ((or (and (looking-at "\\s-*?[[:alnum:]]*>")
+             (looking-back "</?[[:alnum:]]*\\s-*?" (line-beginning-position)))
+        (eq (point) (web-mode-tag-beginning-position)))
     (web-mode-element-kill 1)
     (message "Kill element"))
    ;; Kill attributes if point in attributes area.
@@ -45,6 +42,6 @@
                t)))))
    ;; Kill if not inside tag
    ((not (web-mode-tag-beginning-position))
-    (paredit-kill)
-    (message "Paredit kill"))
+    (kill-line)
+    (message "Kill line"))
    (t (message "Nothing to do"))))

@@ -2,11 +2,15 @@
 
 (declare-function dap-hydra 'dap-mode)
 
-(setq lsp-keymap-prefix nil)
+(setq lsp-keymap-prefix "C-c l")
 (after! lsp-mode
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.cache\\'")
-  (add-to-list 'lsp-file-watch-ignored (concat "\\`" (expand-file-name "~/\\.local/lib")))
-  (add-to-list 'lsp-file-watch-ignored (concat "\\`" (regexp-quote (file-truename user-emacs-directory))))
+  (add-to-list 'lsp-file-watch-ignored
+               (eval-when-compile
+                 (rx-to-string `(: string-start ,(expand-file-name "~/.local/lib") string-end))))
+  (add-to-list 'lsp-file-watch-ignored
+               (eval-when-compile
+                 (rx-to-string `(: string-start ,(file-truename user-emacs-directory) string-end))))
 
   (ymacs-editor//add-toggles
    "LSP" 'lsp-mode
@@ -26,18 +30,13 @@
    '("l U" ymacs-lsp/check-for-updates "Update All Servers" :exit t)
    '("l I" lsp-install-server "Install Server" :exit t))
 
-  (setq lsp-command-map
-        (define-key! :map (make-sparse-keymap)
-          ("'" . lsp-avy-lens)
-          ("R" . lsp-workspace-folders-remove)
-          ("S" . lsp-describe-session)
-          ("b" . lsp-workspace-blacklist-remove)
-          ("d" . dap-hydra)
-          ("h" . lsp-document-highlight)
-          ("l" . lsp-lens-mode)
-          ("o" . lsp-workspace-folders-open)
-          ("r" . lsp-workspace-restart)
-          ("s" . lsp-workspace-shutdown)))
+  (define-key! :map lsp-command-map
+    ("'" . lsp-avy-lens)
+    ("R" . lsp-workspace-folders-remove)
+    ("b" . lsp-workspace-blacklist-remove)
+    ("o" . lsp-workspace-folders-open)
+    ("h" . lsp-document-highlight)
+    ("l" . lsp-lens-mode))
 
   (defun ymacs-lsp/format-buffer ()
     (interactive "*")
@@ -48,7 +47,6 @@
     (call-interactively ymacs-lsp-organize-import-function))
 
   (define-key! :map lsp-mode-map
-    ;; ("M-s l" . lsp-lens-mode)
     ("M-s h h" . lsp-document-highlight)
     ("C-c R" . lsp-rename)
     ("C-c I" . lsp-ivy-workspace-symbol)
@@ -58,7 +56,6 @@
     (("C-c b" "C-c C-b") . ymacs-lsp/format-buffer)
     ("C-c C-d" . lsp-describe-thing-at-point)
     ("C-c C-SPC" . lsp-execute-code-action)
-    ("C-c l" :map lsp-command-map)
     ("M-o" . lsp-signature-activate))
 
   (define-key! :map lsp-signature-mode-map
@@ -92,3 +89,57 @@
   (setq lsp-modeline-diagnostics-enable nil)
   (setq lsp-headerline-breadcrumb-enable nil)
   (setq lsp-modeline-code-actions-enable t))
+
+(eval-when! ymacs-lsp-use-modern-ui
+  (after! lsp-ui
+    (ymacs-editor//add-toggles
+     "LSP" 'lsp-mode
+     '("l d" ymacs-lsp/toggle-modern-ui "Modern UI" :toggle lsp-ui-mode))
+
+    (setq lsp-ui-sideline-enable nil)
+    (setq lsp-ui-peek-enable nil)
+    (setq lsp-ui-doc-enable t)
+    (setq lsp-ui-doc-include-signature t)
+    (setq lsp-ui-doc-position 'at-point)
+    (setq lsp-ui-doc-alignment 'window)
+    (setq lsp-ui-doc-max-height 20)
+    (setq lsp-ui-doc-delay eldoc-idle-delay)))
+
+(eval-when! ymacs-lsp-use-dap
+  (after! dap-hydra
+    (defhydra++ dap-hydra ()
+      ("q" :delete)
+      ("ed" dap-ui-expressions-remove "Remove expr")
+      ("se" dap-ui-expressions "List expr")
+      ("so" dap-go-to-output-buffer "Output")
+      ("si" ymacs-dap/goto-log-buffer "Input")
+      ("R" dap-debug-restart "Restart")
+      ("M-s q" nil "quit" :exit t))
+
+    (set-keymap-parent ymacs-dap-running-session-mode-map dap-hydra/keymap))
+
+  (after! dap-mode
+    (require 'dap-python)
+    (require 'dap-lldb)
+
+    (define-key! :map lsp-mode-map
+      ("M-s d" . dap-hydra))
+
+    (define-key! :map lsp-command-map
+      ("d" . dap-hydra))
+
+    (setq dap-auto-configure-features
+          '(sessions locals breakpoints expressions tooltip)))
+
+  (after! dap-python
+    (setq dap-python-executable "python3"))
+
+  (after! dap-ui
+    (define-key! :map dap-ui-repl-mode-map
+      ([remap indent-for-tab-command] . company-complete)
+      ("C-c C-z" . quit-window)))
+
+  (after! dap-lldb
+    (setq dap-lldb-debugged-program-function
+          (lambda ()
+            (read-file-name "Directory: " (ymacs-term//get-directory) nil :must-match)))))

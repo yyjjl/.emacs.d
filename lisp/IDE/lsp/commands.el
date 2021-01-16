@@ -106,3 +106,44 @@
     (font-lock-flush))
   (lsp--info "Semantic Tokens %s. "
              (if lsp-semantic-tokens-enable "enabled" "disabled")))
+
+(eval-when! ymacs-lsp-use-modern-ui
+  (defun ymacs-lsp/toggle-modern-ui ()
+    (interactive)
+
+    (if (bound-and-true-p lsp-ui-mode)
+        (progn
+          (unless eldoc-mode
+            (eldoc-mode 1))
+          (lsp-ui-mode -1))
+      (eldoc-mode -1)
+      (lsp-ui-mode 1))))
+
+
+(eval-when! ymacs-lsp-use-dap
+  (define-minor-mode ymacs-dap-running-session-mode
+    "A mode for adding keybindings to running sessions"
+    nil nil
+    ymacs-dap-running-session-mode-map
+    (if ymacs-dap-running-session-mode
+        (ymacs-debug//enable)
+      (ymacs-debug//disable))
+
+    (force-mode-line-update))
+
+  (defun ymacs-dap/goto-log-buffer ()
+    (interactive)
+    (let ((session (dap--cur-session-or-die)))
+      (when-let* ((proc (dap--debug-session-program-proc session))
+                  (buffer (process-buffer proc)))
+        (pop-to-buffer buffer))))
+
+  (defun ymacs-dap/goto-repl-buffer ()
+    (interactive)
+    (dap-hydra/nil)
+    (if-let ((buffer (get-buffer dap-ui--repl-buffer))
+             (window (get-buffer-window buffer)))
+        (if (eq window (selected-window))
+            (quit-window)
+          (select-window window))
+      (dap-ui-repl))))

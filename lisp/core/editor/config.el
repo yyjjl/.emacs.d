@@ -200,7 +200,7 @@
   (setq ivy-initial-inputs-alist nil)
   (setq ivy-dispatching-done-columns 3)
   (setq ivy-fixed-height-minibuffer t)
-  (setq ivy-re-builders-alist '((t . ivy--regex-plus)))
+  (setq ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
   (setq ivy-use-virtual-buffers t)
   (setq ivy-virtual-abbreviate 'full)
   (setq ivy-use-selectable-prompt t)
@@ -210,8 +210,6 @@
   (setq swiper-stay-on-quit t))
 
 (after! counsel
-  (setq-default counsel-compile-env '("TERM=xterm-256color"))
-
   (add-to-list 'counsel-compile-local-builds #'ymacs-editor//default-compile-command t)
 
   (setq counsel-yank-pop-separator "\n------------------------------------------------------------\n")
@@ -244,6 +242,7 @@
                    :separate)
                   (company-gtags company-etags)
                   company-dabbrev))
+
   ;; Company should be case sensitive
   ;; (setq company-dabbrev-downcase nil)
   ;; (setq company-dabbrev-ignore-case t)
@@ -319,3 +318,9 @@
   (remove-hook 'company-backends 'company-graphviz-dot-backend)
 
   (setq graphviz-dot-indent-width 4))
+
+(after! avy
+  (setq avy-background t)
+  (setq avy-all-windows nil)
+  (setq avy-all-windows-alt t)
+  (setq avy-style 'pre))

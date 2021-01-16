@@ -32,17 +32,16 @@
 
     (ymacs-hydra/global-toggles/body)))
 
-(defhydra ymacs-hydra/sort (:color red)
-  "Sort"
-  ("r" sort-regexp-fields "regexp")
-  ("f" sort-fields "fields")
-  ("c" sort-columns "columns")
-  ("l" sort-lines "lines")
-  ("n" sort-numeric-fields "numeric")
-  ("F" flush-lines "flush")
-  ("k" keep-lines "keep")
-  ("RET" nil "quit")
-  ("q" nil "quit"))
+(pretty-hydra-define ymacs-hydra/sort (:color red :quit-key ("q" "RET"))
+  ("Sort"
+   (("r" sort-regexp-fields "regexp")
+    ("f" sort-fields "fields")
+    ("c" sort-columns "columns")
+    ("l" sort-lines "lines")
+    ("n" sort-numeric-fields "numeric"))
+   "Flush/Keep"
+   (("F" flush-lines "flush")
+    ("k" keep-lines "keep"))))
 
 (pretty-hydra-define ymacs-hydra/window
   (:title "Window Management" :foreign-keys warn :quit-key "q")
@@ -66,35 +65,36 @@
    (("F" set-frame-font "font")
     ("T" load-theme "theme"))))
 
-(defhydra ymacs-hydra/rectangle (:body-pre (rectangle-mark-mode 1)
-                                 :color pink
-                                 :post (deactivate-mark))
-  "
-  ^_p_^         [_k_]kill      [_s_]string
-_b_   _f_       [_q_]quit      [_y_]yank
-  ^_n_^         [_m_]mark      [_w_]copy
-^^^^            [_x_]exchange  [_/_]undo     [_i_]iedit
-^^^^            [_a_]line beg  [_e_]line end [_N_]number
-"
-  ("b" backward-char nil)
-  ("f" forward-char nil)
-  ("p" previous-line nil)
-  ("n" next-line nil)
-  ("a" beginning-of-line nil)
-  ("e" end-of-line nil)
-  ("x" rectangle-exchange-point-and-mark nil)
-  ("w" copy-rectangle-as-kill nil)
-  ("m" (if (region-active-p)
-           (deactivate-mark)
-         (rectangle-mark-mode 1))
-       nil)
-  ("i" iedit-rectangle-mode nil)
-  ("y" yank-rectangle nil)
-  ("/" undo nil)
-  ("N" rectangle-number-lines nil :exit t)
-  ("s" string-rectangle nil)
-  ("k" kill-rectangle nil)
-  ("q" nil nil))
+(pretty-hydra-define ymacs-hydra/rectangle
+  (
+   :body-pre (rectangle-mark-mode 1)
+   :color pink
+   :post (deactivate-mark)
+   :quit-key "q")
+  ("Move"
+   (("b" backward-char "←")
+    ("f" forward-char "→")
+    ("p" previous-line "↑")
+    ("n" next-line "↓")
+    ("a" beginning-of-line "Line begin")
+    ("e" end-of-line "Line end"))
+   "Action"
+   (("w" copy-rectangle-as-kill "Copy")
+    ("d" delete-rectangle "Delete")
+    ("y" yank-rectangle "Yank")
+    ("k" kill-rectangle "Kill")
+    ("c" clear-rectangle "Replace with Spaces")
+    ("s" string-rectangle "Replace with String")
+    ("o" open-rectangle "Shift Right"))
+   "Misc"
+   (("m" (if (region-active-p)
+             (deactivate-mark)
+           (rectangle-mark-mode 1))
+     "toggle")
+    ("x" rectangle-exchange-point-and-mark "Exchange")
+    ("i" iedit-rectangle-mode "Iedit")
+    ("N" rectangle-number-lines "Number")
+    ("/" undo "Undo"))))
 
 (pretty-hydra-define ymacs-hydra/outline
   (:title "Outline [`z' to quit]" :color amaranth :quit-key "z")
@@ -137,46 +137,13 @@ _b_   _f_       [_q_]quit      [_y_]yank
    (("l" ediff-regions-linewise)
     ("w" ediff-regions-wordwise))))
 
-(defhydra ymacs-hydra/next-error (:color pink :hint nil)
-  "Error"
-  ("`" next-error "next")
-  ("n" next-error "next")
-  ("p" previous-error "prev")
-  ("<" first-error "first")
-  ("q" nil "quit" :exit t))
-
-(defhydra ymacs-hydra/mc (:color blue :hint nil)
+(defhydra ymacs-hydra/mc (:color pink :hint nil)
   ""
-  ("." mc/mark-next-like-this "next" :exit nil)
-  ("=" mc/mark-next-like-this "next" :exit nil)
-  ("," mc/mark-previous-like-this "prev" :exit nil)
-  ("-" mc/mark-previous-like-this "prev" :exit nil)
-  ("<" mc/skip-to-previous-like-this "skip prev" :exit nil)
-  (">" mc/skip-to-next-like-this "skip next" :exit nil)
+  ("." mc/mark-next-like-this "next")
+  ("=" mc/mark-next-like-this "next")
+  ("," mc/mark-previous-like-this "prev")
+  ("-" mc/mark-previous-like-this "prev")
+  ("<" mc/skip-to-previous-like-this "skip prev")
+  (">" mc/skip-to-next-like-this "skip next")
   ("RET" nil)
   ("q" nil))
-
-(defhydra ymacs-hydra/games (:color blue :hint nil)
-  "
-[_5_] 5x5            [_a_] animate      [_g_] gomoku    [_h_] hanoi   [_l_] life
-[_m_] mpuz           [_p_] pong         [_t_] tetris    [_z_] zone    ^ ^
-[_b 1_] blackbox     [_b 2_] bubbles    ^ ^             ^ ^           ^ ^
-[_s 1_] snake        [_s 2_] solitaire  ^ ^             ^ ^           ^ ^
-[_d 1_] dissociated  [_d 2_] doctor     [_d 3_] dunnet  ^ ^           ^ ^
-"
-  ("5" 5x5)
-  ("a" animate-birthday-present)
-  ("b 1" blackbox)
-  ("b 2" bubbles)
-  ("d 1" dissociated-press)
-  ("d 2" doctor)
-  ("d 3" dunnet)
-  ("g" gomoku)
-  ("h" hanoi)
-  ("l" life)
-  ("m" mpuz)
-  ("p" pong)
-  ("s 1" snake)
-  ("s 2" solitaire)
-  ("t" tetris)
-  ("z" zone))

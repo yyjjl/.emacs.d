@@ -19,7 +19,8 @@
             (not (eq (shell-command
                       (concat ymacs-ripgrep-path " --pcre2-version"))
                      0)))
-   (message "You need install ripgrep with pcre2 support (@see %s)" (expand-etc! "setup/install_rust.sh"))))
+   (message "You need install ripgrep with pcre2 support (@see %s)"
+            (expand-etc! "setup/install_rust.sh"))))
 
 (require-packages!
  (exec-path-from-shell :when sys/macp)
@@ -41,7 +42,6 @@
  dumb-jump
  expand-region
  easy-kill
- paredit
  goto-chg
  ;; Mark tools
  multiple-cursors
@@ -204,7 +204,6 @@
 (autoload 'ymacs-hydra/mc/mc/mark-next-like-this (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/mc/mc/mark-previous-like-this (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/ediff/body (expand! "commands-hydra") nil t)
-(autoload 'ymacs-hydra/next-error/body (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/outline/body (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/rectangle/body (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/window/enlarge-window (expand! "commands-hydra") nil t)
@@ -213,15 +212,6 @@
 (autoload 'ymacs-hydra/window/shrink-window-horizontally (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/sort/body (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/games/body (expand! "commands-hydra") nil t)
-
-(autoload 'paredit-kill "paredit" nil t)
-(autoload 'paredit-backward-delete "paredit" nil t)
-(autoload 'paredit-forward-delete "paredit" nil t)
-(autoload 'paredit-backward-kill-word "paredit" nil t)
-(autoload 'paredit-forward-kill-word "paredit" nil t)
-(autoload 'paredit-close-round "paredit" nil t)
-(autoload 'paredit-close-square "paredit" nil t)
-(autoload 'paredit-close-curly "paredit" nil t)
 
 (put 'projectile-project-run-cmd 'safe-local-variable #'stringp)
 (put 'projectile-project-test-cmd 'safe-local-variable #'stringp)
@@ -257,7 +247,6 @@
   ("^" . ymacs-hydra/window/enlarge-window)
   ("-" . ymacs-hydra/window/shrink-window)
   ("?" . ymacs-hydra/window/body)
-  ("`" . ymacs-hydra/next-error/body)
   ("SPC" . ymacs-hydra/rectangle/body)
 
   (", s" . ymacs-hydra/sort/body)
@@ -304,10 +293,12 @@
   ("C->" . ymacs-hydra/mc/mc/mark-next-like-this)
   ("C-<" . ymacs-hydra/mc/mc/mark-previous-like-this)
 
+  ("C-'" . avy-goto-line)
+
   ("M-0" . ymacs-editor/goto-char-or-minibuffer)
   ("M-7" . ymacs-editor/avy-copy-and-yank)
   ("M-8" . avy-goto-word-or-subword-1)
-  ("M-9" . ymacs-editor/avy-goto-subword-1-in-defun)
+  ("M-9" . avy-goto-char)
   ("M-g w" . ymacs-editor/avy-copy)
   ("M-g y" . ymacs-editor/avy-copy-and-yank)
   ("M-g 1" . avy-goto-char)
@@ -337,7 +328,7 @@
   ("i" . mc/insert-numbers)
   ("L" . mc/insert-letters)
   ("s" . mc/sort-regions)
-  ("v" . mc/vertical-align)
+  ("|" . mc/vertical-align)
   ("r" . mc/reverse-regions)
   ("." . ymacs-hydra/mc/mc/mark-next-like-this)
   ("," . ymacs-hydra/mc/mc/mark-previous-like-this)
@@ -378,17 +369,3 @@
   ("O" . counsel-outline)
   ("o" . counsel-org-goto-all)
   ("t" . counsel-tmm))
-
-(define-key! :map prog-mode-map
-  ([remap kill-line] . paredit-kill)
-  ([remap delete-char] . paredit-forward-delete)
-  ([remap delete-backward-char] . paredit-backward-delete)
-  ([remap kill-word] . paredit-forward-kill-word)
-  ([remap backward-kill-word] . paredit-backward-kill-word)
-
-  ("]" . paredit-close-square)
-  (")" . paredit-close-round)
-  ("}" . paredit-close-curly))
-
-(define-key! :map read-expression-map
-  ("C-r" . counsel-minibuffer-history))

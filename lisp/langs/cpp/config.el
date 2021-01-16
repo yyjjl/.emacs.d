@@ -21,9 +21,6 @@
    '("C" ymacs-cpp-cmake/change-config :exit t)
    '("L" ymacs-cpp/load-in-repl :exit t))
 
-  (setq c-backspace-function #'paredit-backward-delete)
-  (setq c-delete-function #'paredit-forward-delete)
-
   (dolist (map (list c-mode-map c++-mode-map))
     (define-key! :map map
       (("<" ">" "C-c C-d"))   ; unbind

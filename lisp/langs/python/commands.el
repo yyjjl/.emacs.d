@@ -120,66 +120,6 @@ If not try to complete."
       (ymacs-python//send-region-or-buffer (= (prefix-numeric-value current-prefix-arg) 4)))))
 
 ;;;###autoload
-(defun ymacs-python/kill (-arg)
-  (interactive "*P")
-
-  (with-temp-advice!
-      paredit-string-start+end-points
-      :around ymacs-python//around-string-start+end-points
-    (paredit-kill -arg)))
-
-;;;###autoload
-(defun ymacs-python/forward-kill-word ()
-  (interactive "*")
-
-  (with-temp-advice!
-      kill-word
-      :before
-      (lambda (&rest _)
-        (let ((pos (point)))
-          (when (ymacs-python//triple-quotes-p (- pos 1) (+ pos 2))
-            (goto-char (+ pos 2)))))
-    (paredit-forward-kill-word)))
-
-;;;###autoload
-(defun ymacs-python/backward-kill-word ()
-  (interactive "*")
-
-  (with-temp-advice!
-      backward-kill-word
-      :before
-      (lambda (&rest _)
-        (let ((pos (point)))
-          (when (ymacs-python//triple-quotes-p (- pos 2) (+ pos 1))
-            (goto-char (- pos 2)))))
-    (paredit-backward-kill-word)))
-
-;;;###autoload
-(defun ymacs-python/backward-delete (-arg)
-  (interactive "*p")
-  (unless (python-indent-dedent-line)
-    (let ((prefix (ymacs-python//triple-quotes-p (- (point) 3) (point)))
-          (suffix (ymacs-python//triple-quotes-p (point) (+ (point) 3))))
-      (cond (prefix
-             (backward-char 3)
-             (when (equal prefix suffix)
-               (delete-char 6)))
-            (t (paredit-backward-delete -arg))))))
-
-;;;###autoload
-(defun ymacs-python/forward-delete (-arg)
-  (interactive "*p")
-  (let ((prefix (ymacs-python//triple-quotes-p (- (point) 3) (point)))
-        (suffix (ymacs-python//triple-quotes-p (point) (+ (point) 3))))
-    (cond (suffix
-           (forward-char 3)
-           (when (equal prefix suffix)
-             (delete-char -6)))
-          (t (paredit-forward-delete -arg)))))
-
-(put 'ymacs-python/backspace 'delete-selection 'supersede)
-
-;;;###autoload
 (defun ymacs-python/toggle-breakpoint ()
   "Add a break point, highlight it."
   (interactive)

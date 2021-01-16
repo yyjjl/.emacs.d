@@ -19,8 +19,7 @@
 
 (autoload 'LaTeX-math-mode "latex" nil t)
 
-(add-auto-mode! 'latex-mode "\\.tikz\\'")
-(setcdr (assoc-string "\\.[tT]e[xX]\\'" auto-mode-alist) 'latex-mode)
+(add-to-list 'auto-mode-alist '("\\.tikz\\'" . latex-mode))
 
 (put 'TeX-narrow-to-group 'disabled nil)
 (put 'LaTeX-narrow-to-environment 'disabled nil)

@@ -9,9 +9,8 @@
 
 
 (defsubst ymacs-editor//get-environment ()
-  (append (cl-loop for fn in ymacs-editor-environment-functions
-                   nconc (funcall fn))
-          counsel-compile-env))
+  (cl-loop for fn in ymacs-editor-environment-functions
+           nconc (funcall fn)))
 
 (defun ymacs-editor//propertize-compile-command (-cmd -src-dir &optional -build-dir)
   (unless -build-dir

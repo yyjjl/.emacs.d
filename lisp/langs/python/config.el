@@ -32,12 +32,6 @@
     ("C-c C-z" . ymacs-python/pop-to-source-buffer))
 
   (define-key! :map python-mode-map
-    ([remap python-indent-dedent-line-backspace] . ymacs-python/backward-delete)
-    ([remap delete-char] . ymacs-python/forward-delete)
-    ([remap kill-line] . ymacs-python/kill)
-    ([remap kill-word] . ymacs-python/forward-kill-word)
-    ([remap backward-kill-word] . ymacs-python/backward-kill-word)
-
     ("C-c v" . ymacs-python/create-venv)
     ("C-c V" . ymacs-python/create-venv-in-workon-home)
     ("C-c C-z" . ymacs-python/pop-to-shell)

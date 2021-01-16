@@ -293,13 +293,6 @@ Argument -BODY will be evaluated once when that hook is first invoked, then it d
      (insert-file-contents-literally -filename)
      (buffer-string))))
 
-(defun add-auto-mode! (-mode &rest -patterns)
-  "Add entries to `auto-mode-alist' to use -MODE for all given
-file -PATTERNS."
-  (declare (indent 1))
-  (dolist (pattern -patterns)
-    (add-to-list 'auto-mode-alist (cons pattern -mode))))
-
 (defun ignore-errors! (-fn &rest -args)
   "Use for advice."
   (ignore-errors (apply -fn -args)))
@@ -519,6 +512,11 @@ HTML file converted from org file, it returns t."
 (defmacro eval-when-has-feature! (-name &rest -body)
   (declare (indent 1) (debug t))
   (when (has-feature! -name)
+    `(progn ,@-body)))
+
+(defmacro eval-when! (-condition &rest -body)
+  (declare (indent 1) (debug t))
+  (when (eval -condition)
     `(progn ,@-body)))
 
 (defmacro eval-if-has-feature! (-name -if-body &rest -else-body)

@@ -55,6 +55,8 @@
   (global-company-mode 1)
   (yas-global-mode 1)
 
+  (avy-setup-default)
+
   (when sys/macp
     (exec-path-from-shell-initialize))
 
@@ -216,19 +218,3 @@
   (define-advice iedit-mode (:before (&rest _) disable-mc)
     (when (bound-and-true-p multiple-cursors-mode)
       (multiple-cursors-mode -1))))
-
-(after! paredit
-  (define-advice paredit-move-past-close (:override (-close) no-indent)
-    (if (or (paredit-in-string-p)
-            (paredit-in-comment-p))
-        (insert -close)
-      (if (paredit-in-char-p)
-          (forward-char))
-
-      (when-let (open (paredit-missing-close))
-        (if (eq -close (matching-paren open))
-            (save-excursion
-              (message "Missing closing delimiter: %c" -close)
-              (insert -close))
-          (error "Mismatched missing closing delimiter: %c ... %c" open -close)))
-      (up-list))))

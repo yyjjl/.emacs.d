@@ -151,6 +151,7 @@
   (add-to-list 'calc-language-alist '(org-mode . latex)))
 
 (after! compile
+  (setq-default compilation-environment '("TERM=xterm-256color"))
   ;; kill compilation process before starting another
   (setq compilation-always-kill t)
   (setq compilation-scroll-output t))
