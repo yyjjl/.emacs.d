@@ -320,7 +320,13 @@
   (setq graphviz-dot-indent-width 4))
 
 (after! avy
+  (setq avy-keys
+        '(
+          ?a ?s ?d ?f ?g ?h ?j ?k ?l
+          ?q ?w ?e ?r ?t ?y ?u ?i ?o ?p
+          ?z ?x ?c ?v ?b ?n ?m))
+
   (setq avy-background t)
-  (setq avy-all-windows nil)
-  (setq avy-all-windows-alt t)
-  (setq avy-style 'pre))
+  (setq avy-all-windows t)
+  (setq avy-all-windows-alt nil)
+  (setq avy-style 'at-full))

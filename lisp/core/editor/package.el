@@ -49,7 +49,8 @@
  ;; to the file buffer.
  wgrep
  buffer-move
- graphviz-dot-mode)
+ graphviz-dot-mode
+ ace-pinyin)
 
 (defvar ymacs-editor-toggles-alist
   '(("Global"
@@ -293,7 +294,7 @@
   ("C->" . ymacs-hydra/mc/mc/mark-next-like-this)
   ("C-<" . ymacs-hydra/mc/mc/mark-previous-like-this)
 
-  ("C-'" . avy-goto-line)
+  ("C-'" . avy-goto-char-timer)
 
   ("M-0" . ymacs-editor/goto-char-or-minibuffer)
   ("M-7" . ymacs-editor/avy-copy-and-yank)

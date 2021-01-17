@@ -56,6 +56,7 @@
   (yas-global-mode 1)
 
   (avy-setup-default)
+  (ace-pinyin-mode 1)
 
   (when sys/macp
     (exec-path-from-shell-initialize))
