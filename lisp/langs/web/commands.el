@@ -5,6 +5,8 @@
   "It's a smarter kill function for `web-mode'."
   (interactive)
   (cond
+   (current-prefix-arg
+    (kill-line current-prefix-arg))
    ;; Kill all content wrap by <% ... %> when right is <%
    ((and (looking-at "<%")
          (when-let (pos (save-excursion (search-forward "%>" nil t)))

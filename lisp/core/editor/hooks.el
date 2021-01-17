@@ -58,6 +58,8 @@
   (avy-setup-default)
   (ace-pinyin-mode 1)
 
+  (persistent-scratch-autosave-mode 1)
+
   (when sys/macp
     (exec-path-from-shell-initialize))
 
@@ -69,7 +71,6 @@
       (company-posframe-mode 1)))
 
   (find-file-noselect (expand-cache! "org/*note*"))
-  (find-file-noselect (expand-cache! "org/*task*"))
 
   (message "Init Time: %.3f (with %d packages activated)"
            (float-time (time-subtract after-init-time before-init-time))

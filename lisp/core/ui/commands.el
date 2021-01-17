@@ -30,7 +30,6 @@
   :group 'ymacs
   :init-value nil
   (let ((switch (if ymacs-ui/view-code-mode 1 -1)))
-    (highlight-indent-guides-auto-set-faces)
     (cl-loop for (condition . modes) in ymacs-ui-view-code-modes
              when (or (eq condition t)
                       (and (symbolp condition) (symbol-value condition)))

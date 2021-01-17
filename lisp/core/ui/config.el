@@ -16,6 +16,7 @@
 (setq uniquify-buffer-name-style 'forward)
 (setq uniquify-after-kill-buffer-p t)
 (setq uniquify-ignore-buffers-re "^\\*")
+(setq uniquify-min-dir-content 3)
 
 (with-no-warnings
   (when sys/macp
@@ -114,7 +115,3 @@
 (after! whitespace
   (setq whitespace-global-modes '(text-mode))
   (setq whitespace-style '(face tabs tab-mark spaces space-mark empty)))
-
-(after! highlight-indent-guides
-  (setq highlight-indent-guides-method 'character
-        highlight-indent-guides-responsive 'top))

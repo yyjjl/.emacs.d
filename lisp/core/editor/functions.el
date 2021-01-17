@@ -247,11 +247,26 @@ Arguments are same as of `defhydra'."
 
 (defun ymacs-editor//ivy-switch-buffer-transformer (-string)
   "Transform STR to more readable format."
-  (format "%-60s %s"
-          (ivy-switch-buffer-transformer -string)
-          (if-let (buffer (get-buffer -string))
-              (buffer-local-value 'default-directory buffer)
-            "")))
+  (let ((buffer (get-buffer -string)))
+    (if (not buffer)
+        -string
+      (let* ((remote (buffer-local-value 'ymacs-modeline--remote-host buffer))
+             (remote (and (not (eq remote 'unset))
+                          remote))
+             (face (when buffer
+                     (or (when remote 'ivy-remote)
+                         (when (not (verify-visited-file-modtime buffer)) 'ivy-modified-outside-buffer)
+                         (when (buffer-modified-p buffer) 'ivy-modified-buffer)
+                         (cdr (assq (buffer-local-value 'major-mode buffer)
+                                    ivy-switch-buffer-faces-alist))))))
+        (concat
+         (format "%-60s" (ivy-append-face -string face))
+         (if (buffer-file-name buffer)
+             (when remote
+               (propertize (format "(%s) " remote) 'face 'ymacs-modeline-host))
+           (propertize
+            (buffer-local-value 'default-directory buffer) 'face 'ymacs-modeline-buffer-path)))))))
+
 
 (defun ymacs-editor//ivy-bookmark-transformer (-string)
   "Transform STR to more readable format."

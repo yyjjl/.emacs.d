@@ -80,7 +80,6 @@
 (define-hook! ymacs-default//unkillable-buffer (kill-buffer-query-functions)
   (let ((bn (buffer-name)))
     (cond ((equal bn "*note*") nil)
-          ((equal bn "*task*") nil)
           ((equal bn "*scratch*") (delete-region (point-min) (point-max)) nil)
           (t t))))
 

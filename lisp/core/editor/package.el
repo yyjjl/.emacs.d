@@ -50,7 +50,8 @@
  wgrep
  buffer-move
  graphviz-dot-mode
- ace-pinyin)
+ ace-pinyin
+ persistent-scratch)
 
 (defvar ymacs-editor-toggles-alist
   '(("Global"
@@ -309,6 +310,7 @@
   ("M-g L" . avy-copy-line)
 
   ("M-'" . ymacs-editor/change-surround)
+  ;; ("M-[" . god-local-mode)
 
   ([remap move-beginning-of-line] . ymacs-editor/smart-move-begining-of-line)
 

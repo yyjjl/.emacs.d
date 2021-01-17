@@ -37,6 +37,8 @@
  '(font-lock-warning-face ((t (:background "black" :weight bold :underline t))))
  '(hl-line ((t (:background "grey8"))))
  '(ivy-current-match ((t (:background "grey0"))))
+ '(ivy-modified-buffer ((t (:inherit ymacs-modeline-buffer-modified))))
+ '(ivy-modified-outside-buffer ((t (:inherit ymacs-modeline-urgent))))
  '(org-document-info-keyword ((t :inherit font-lock-builtin-face)))
  '(org-latex-and-related ((t (:foreground "orange red" :weight bold))))
  '(org-meta-line ((t :inherit font-lock-doc-face)))

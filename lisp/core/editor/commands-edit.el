@@ -114,6 +114,8 @@ Otherwise call `avy-goto-char-in-line'
   (interactive "^p")
   (cond
    ((and (= (abs -n) 1)
+         (char-before)
+         (char-after)
          (or (and (> -n 0) (eq (char-syntax (char-after)) ?\())
              (and (< -n 0)
                   (or (eq (char-syntax (char-before)) ?\))
