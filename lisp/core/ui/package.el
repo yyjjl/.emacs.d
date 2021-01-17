@@ -6,7 +6,7 @@
  page-break-lines
  doom-themes
  which-key
- highlight-indent-guides)
+ highlight-indentation)
 
 (load-theme 'doom-molokai t)
 (doom-themes-org-config)
@@ -14,10 +14,10 @@
 (defvar ymacs-ui-view-code-modes
   '((t display-line-numbers-mode
        view-mode
-       line-number-mode
+       ;; line-number-mode
        column-number-mode
        size-indication-mode
-       highlight-indent-guides-mode)))
+       highlight-indentation-mode)))
 
 (define-key!
   ("C-x , ," . ymacs-ui/view-code-mode))

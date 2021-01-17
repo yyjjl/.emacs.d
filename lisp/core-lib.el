@@ -177,7 +177,14 @@ Optional argument -BODY is the function body."
                                (plist-get properties :map)
                                definition))
 
-          (dolist (k (if (listp key) key (list key)))
+          (if (and (cdr-safe key)
+                   (not (consp (cdr key))))
+              (setq key (cl-loop for i from (car key) to (cdr key)
+                                 collect (number-to-string i)))
+            (unless (listp key)
+              (setq key (list key))))
+
+          (dolist (k key)
             (push (list 'define-key sym
                         (if (stringp k)
                             (kbd (concat prefix " " k))

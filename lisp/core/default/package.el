@@ -132,6 +132,7 @@
   (setq org-publish-timestamp-directory (expand-cache! "org-timestamps/"))
   (setq org-templates-directory (expand-etc! "org-templates"))
   (setq package-quickstart-file (expand-cache! "quickstart.el"))
+  (setq persistent-scratch-save-file (expand-cache! "scratch"))
   (setq projectile-cache-file (expand-cache! "projectile-cache.el"))
   (setq projectile-known-projects-file (expand-cache! "projectile-bookmarks.el"))
   (setq recentf-save-file (expand-cache! "recentf.el"))

@@ -49,7 +49,8 @@
  ;; to the file buffer.
  wgrep
  buffer-move
- graphviz-dot-mode)
+ graphviz-dot-mode
+ persistent-scratch)
 
 (defvar ymacs-editor-toggles-alist
   '(("Global"
@@ -308,6 +309,7 @@
   ("M-g L" . avy-copy-line)
 
   ("M-'" . ymacs-editor/change-surround)
+  ;; ("M-[" . god-local-mode)
 
   ([remap move-beginning-of-line] . ymacs-editor/smart-move-begining-of-line)
 
