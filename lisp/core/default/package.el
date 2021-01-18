@@ -43,6 +43,7 @@
 (declare-function winner-redo 'winner)
 
 (define-key! :prefix "C-x"
+  ("'")                                 ; unbind
   ("2" . ymacs-window/split-vertically)
   ("3" . ymacs-window/split-horizontally)
   ("|" . ymacs-window/force-split-horizontally)
@@ -57,9 +58,12 @@
   ("c" . ymacs-default/cleanup-buffer-safe)
   (", -" . ymacs-default/copy-file-name)
 
-  ("R" . ymacs-default/rename-this-file-and-buffer)
-  ("W" . ymacs-default/copy-this-file)
-  ("D" . ymacs-default/delete-this-file)
+  (("R" "' r") . ymacs-default/rename-this-file-and-buffer)
+  (("W" "' w") . ymacs-default/copy-this-file)
+  (("D" "' d") . ymacs-default/delete-this-file)
+
+  (("G" "' g") . revert-buffer)
+  (("I" "' i") . clone-indirect-buffer)
 
   ("w [" . winner-undo)
   ("w ]" . winner-redo))
@@ -72,9 +76,6 @@
 
   ("C-<down>" . text-scale-decrease)
   ("C-<up>" . text-scale-increase)
-
-  ("C-x G" . revert-buffer)
-  ("C-x I" . clone-indirect-buffer)
 
   ("RET" . newline-and-indent)
 

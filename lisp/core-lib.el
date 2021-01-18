@@ -28,7 +28,7 @@
 (defmacro expand! (-name)
   "Expand -NAME relative to current file while loading or byte-compiling."
   `(eval-when-compile
-     (if-let ((filename (or byte-compile-current-file
+     (if-let ((filename (or (bound-and-true-p byte-compile-current-file)
                             load-file-name)))
          (expand-file-name ,-name (file-name-directory filename))
        ,-name)))
@@ -194,6 +194,11 @@ Optional argument -BODY is the function body."
     `(let ((,sym ,map))
        ,@(reverse forms)
        ,sym)))
+
+(defun modify-local-minor-mode-map! (-mode &optional -map)
+  (setf (alist-get -mode minor-mode-overriding-map-alist nil
+                   (if (null -map) 'remove))
+        -map))
 
 (defmacro set-local-minor-mode-map! (-mode &rest -body)
   "Overrides a minor mode keybinding for the local buffer by creating or altering keymaps stored in

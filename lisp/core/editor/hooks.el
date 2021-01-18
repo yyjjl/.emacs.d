@@ -60,6 +60,8 @@
 
   (persistent-scratch-autosave-mode 1)
 
+  (ymacs-x//enable)
+
   (when sys/macp
     (exec-path-from-shell-initialize))
 
@@ -79,7 +81,8 @@
 (add-hook (if (daemonp)
               'after-make-frame-functions
             'after-init-hook)
-          #'ymacs-editor//after-init)
+          #'ymacs-editor//after-init
+          100)
 
 (after! semantic
   (advice-add #'semantic-analyze-completion-at-point-function :override #'ignore)

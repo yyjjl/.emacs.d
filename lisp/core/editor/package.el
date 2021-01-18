@@ -213,7 +213,6 @@
 (autoload 'ymacs-hydra/window/shrink-window (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/window/shrink-window-horizontally (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/sort/body (expand! "commands-hydra") nil t)
-(autoload 'ymacs-hydra/games/body (expand! "commands-hydra") nil t)
 
 (put 'projectile-project-run-cmd 'safe-local-variable #'stringp)
 (put 'projectile-project-test-cmd 'safe-local-variable #'stringp)
@@ -241,7 +240,6 @@
   ("k" . ymacs-editor/kill-buffer)
   ("K" . ymacs-editor/kill-regexp)
 
-  ("j b" . counsel-bookmark)
   ("n n" . ymacs-editor/narrow-or-widen-dwim)
 
   ("{" . ymacs-hydra/window/shrink-window-horizontally)
@@ -253,7 +251,6 @@
 
   (", s" . ymacs-hydra/sort/body)
   (", e" . ymacs-hydra/ediff/body)
-  (", z" . ymacs-hydra/games/body)
   ;; Minor mode to make xref use etags again.
   (", E" . xref-etags-mode)
 
@@ -310,7 +307,6 @@
   ("M-g L" . avy-copy-line)
 
   ("M-'" . ymacs-editor/change-surround)
-  ;; ("M-[" . god-local-mode)
 
   ([remap move-beginning-of-line] . ymacs-editor/smart-move-begining-of-line)
 
@@ -353,6 +349,7 @@
   ("l t" . counsel-load-theme)
   ("l p" . counsel-list-processes)
   ("l f" . counsel-find-library)
+  ("b" . counsel-bookmark)
   ("u" . counsel-unicode-char)
   ("d" . counsel-dired-jump)
   ("x" . counsel-linux-app)
@@ -367,7 +364,7 @@
   ("f" . counsel-faces)
   ("S" . counsel-find-symbol)
   ("F" . counsel-fonts)
-  ("W" . counsel-colors-web)
+  ("w" . counsel-colors-web)
   ("E" . counsel-colors-emacs)
   ("O" . counsel-outline)
   ("o" . counsel-org-goto-all)

@@ -74,7 +74,7 @@
 (setq confirm-nonexistent-file-or-buffer t)
 ;; Use the system's trash can
 (setq delete-by-moving-to-trash t)
-(setq enable-recursive-minibuffers t)
+(setq enable-recursive-minibuffers nil)
 
 ;; Vertical motion starting at end of line keeps to ends of lines
 ;; (setq track-eol t)

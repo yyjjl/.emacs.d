@@ -9,14 +9,14 @@
 (after! haskell-mode
   (define-key! :map haskell-mode-map
     ([f9] . haskell-compile)
-    ("C-c V" . haskell-cabal-visit-file)
-    ("C-c D" . haskell-cabal-add-dependency)
+    (("C-c V" "C-c ' v") . haskell-cabal-visit-file)
+    (("C-c D" "C-c ' d") . haskell-cabal-add-dependency)
 
     ("C-c C-b" . haskell-mode-stylish-buffer)
     ("C-c b" . haskell-mode-stylish-buffer)
 
-    ("C-c Q" . haskell-session-kill)
-    ("C-c R" . haskell-mode-generate-tags)
+    (("C-c Q" "C-c ' q") . haskell-session-kill)
+    (("C-c R" "C-c ' r") . haskell-mode-generate-tags)
     ("C-c j" . haskell-navigate-imports)
     ("C-." . haskell-mode-tag-find)
 
@@ -50,10 +50,10 @@
     ("s" . haskell-debug/step)
     ("t" . haskell-debug/trace)
     ("d" . haskell-debug/delete)
-    ("S" . haskell-debug/select)
+    (("S" "' s") . haskell-debug/select)
     ("a" . haskell-debug/abandon)
     ("g" . haskell-debug/refresh)
     ("c" . haskell-debug/continue)
     ("p" . haskell-debug/previous)
     ("r" . haskell-debug/start-step)
-    ("N" . haskell-debug/breakpoint-numbers)))
+    (("N" "' n") . haskell-debug/breakpoint-numbers)))
