@@ -3,6 +3,8 @@
 (defvar ymacs-default-autoloads-file (expand-cache! "autoloads.el")
   "Autoloads file")
 
+(defvar ymacs-default--mark-ring-alist nil)
+
 (defvar ymacs-default-autosave-interval 300)
 (defvar ymacs-default-autosave-hook
   '(recentf-save-list
@@ -16,6 +18,8 @@
     vc-comment-ring
     flyspell-auto-correct-ring
     org-mark-ring
+    mark-ring
+    global-mark-ring
     planner-browser-file-display-rule-ring))
 
 (defvar ymacs-default-next-error-buffer-modes
@@ -49,9 +53,7 @@
   ("|" . ymacs-window/force-split-horizontally)
   ("_" . ymacs-window/force-split-vertically)
 
-  (", o" . recentf-open-files)
-  ("C-b" . ibuffer)
-  ("C-d" . find-name-dired)
+  (("C-b" "B" "' b") . ibuffer)
 
   ("m" . view-echo-area-messages)
 

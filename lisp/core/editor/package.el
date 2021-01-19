@@ -232,8 +232,11 @@
   ("." . ivy-switch-view))
 
 (define-key! :prefix "C-x"
+  ("x" . exchange-point-and-mark)
+
   ("C-_" . ymacs-editor/goto-last-change)
   ("C-/" . ymacs-editor/goto-last-change)
+  ("/" . ymacs-editor/goto-last-change)
 
   ("o" . ace-window)
   ("b" . ivy-switch-buffer)
@@ -252,7 +255,7 @@
   (", s" . ymacs-hydra/sort/body)
   (", e" . ymacs-hydra/ediff/body)
   ;; Minor mode to make xref use etags again.
-  (", E" . xref-etags-mode)
+  ((", E" ", ' e") . xref-etags-mode)
 
   (", SPC" . ymacs-editor/insert-space-around-chinese)
   (", a" . ymacs-editor/add-local-snippet)

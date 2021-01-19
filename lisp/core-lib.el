@@ -195,11 +195,6 @@ Optional argument -BODY is the function body."
        ,@(reverse forms)
        ,sym)))
 
-(defun modify-local-minor-mode-map! (-mode &optional -map)
-  (setf (alist-get -mode minor-mode-overriding-map-alist nil
-                   (if (null -map) 'remove))
-        -map))
-
 (defmacro set-local-minor-mode-map! (-mode &rest -body)
   "Overrides a minor mode keybinding for the local buffer by creating or altering keymaps stored in
 buffer-local `minor-mode-overriding-map-alist'.

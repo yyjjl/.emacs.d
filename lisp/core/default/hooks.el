@@ -1,5 +1,14 @@
 ;;; -*- lexical-binding: t; -*
 
+(define-advice push-mark-command (:after (&rest _) delete-dups)
+  (let (new-ring)
+    (dolist (marker mark-ring)
+      (unless (and (markerp (car new-ring))
+                   (equal (marker-position marker)
+                          (marker-position (car new-ring))))
+        (push marker new-ring)))
+    (setq mark-ring (nreverse new-ring))))
+
 (define-advice package-generate-autoloads (:after (-name -pkg-dir) autoclose)
   "Auto close *-autoloads.el after a package installed."
   (when-let ((name (format "%s-autoloads.el" (if (symbolp -name)
@@ -17,11 +26,12 @@
 (define-advice savehist-save
     (:around (-fn &optional -auto-save) set-additional-variables)
   (let ((variables savehist-additional-variables)
-        (kill-ring (ymacs-default//filter-ring kill-ring))
-        (ivy-history (ignore-errors (ymacs-default//filter-ring ivy-history))))
+        (kill-ring (ymacs-default//filter-ring kill-ring)))
     (dolist (symbol (apropos-internal "-\\(ring\\|history\\)\\'" 'boundp))
-      (unless (or (memq symbol ymacs-default-savehist-exclude-variables)
+      (unless (or (null (symbol-value symbol))
+                  (memq symbol ymacs-default-savehist-exclude-variables)
                   (memq symbol savehist-minibuffer-history-variables)
+                  (ring-p (symbol-value symbol))
                   (keywordp symbol))
         (cl-pushnew symbol variables)))
     (let ((savehist-additional-variables variables))
@@ -35,6 +45,9 @@
     (apply -fn -args)))
 
 (advice-add #'ffap-guesser :around #'ignore-remote!)
+
+(add-hook 'find-file-hook #'ymacs-default//save-mark-ring--restore)
+(add-hook 'kill-buffer-hook #'ymacs-default//save-mark-ring--update)
 
 (add-hook 'ediff-before-setup-hook
           (lambda () (window-configuration-to-register :ediff-windows)))
