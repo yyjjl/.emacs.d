@@ -255,7 +255,7 @@
   (", s" . ymacs-hydra/sort/body)
   (", e" . ymacs-hydra/ediff/body)
   ;; Minor mode to make xref use etags again.
-  ((", E" ", ' e") . xref-etags-mode)
+  (", E" . xref-etags-mode)
 
   (", SPC" . ymacs-editor/insert-space-around-chinese)
   (", a" . ymacs-editor/add-local-snippet)

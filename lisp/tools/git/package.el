@@ -14,7 +14,7 @@
 
 (define-key! ("C-x g"))
 (define-key! :prefix "C-x g"
-  (("G" "' g") . magit-dispatch)
+  ("G" . magit-dispatch)
   ("f" . magit-file-dispatch)
   ("=" . diff-hl-diff-goto-hunk)
   ("SPC" . diff-hl-mark-hunk)

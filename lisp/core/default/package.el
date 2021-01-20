@@ -51,19 +51,19 @@
   ("|" . ymacs-window/force-split-horizontally)
   ("_" . ymacs-window/force-split-vertically)
 
-  (("C-b" "B" "' b") . ibuffer)
+  (("C-b" "B") . ibuffer)
 
   ("m" . view-echo-area-messages)
 
   ("c" . ymacs-default/cleanup-buffer-safe)
   (", -" . ymacs-default/copy-file-name)
 
-  (("R" "' r") . ymacs-default/rename-this-file-and-buffer)
-  (("W" "' w") . ymacs-default/copy-this-file)
-  (("D" "' d") . ymacs-default/delete-this-file)
+  ("R" . ymacs-default/rename-this-file-and-buffer)
+  ("W" . ymacs-default/copy-this-file)
+  ("D" . ymacs-default/delete-this-file)
 
-  (("G" "' g") . revert-buffer)
-  (("I" "' i") . clone-indirect-buffer)
+  ("G" . revert-buffer)
+  ("I" . clone-indirect-buffer)
 
   ("w [" . winner-undo)
   ("w ]" . winner-redo))

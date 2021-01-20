@@ -33,12 +33,12 @@
 
   (define-key! :map python-mode-map
     ("C-c v" . ymacs-python/create-venv)
-    (("C-c V" "C-c ' v") . ymacs-python/create-venv-in-workon-home)
+    ("C-c V" . ymacs-python/create-venv-in-workon-home)
     (("C-c C-z" "C-c z") . ymacs-python/pop-to-shell)
     ("C-c B" . py-isort-buffer)
     (("C-c C-b" "C-c b") . ymacs-python/autopep8)
     (("C-c C-c" "C-c c") . ymacs-python/send-buffer)
-    (("C-c T" "C-c t" "C-c ' t") . ymacs-python/toggle-breakpoint)
+    (("C-c T" "C-c t") . ymacs-python/toggle-breakpoint)
     ("M-p" . previous-error)
     ("M-n" . next-error))
 

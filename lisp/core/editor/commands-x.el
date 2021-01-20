@@ -12,7 +12,7 @@
     ("-" "C--")
     ("." ymacs-editor/goto-last-change)
     ("/" "C-/" :exit no)
-    ("?" which-key-show-top-level)
+    ("?" which-key-show-top-level :exit no)
     (";" ymacs-x/just-x :exit immediate)
     ("=" "C-=")
     ("RET" "RET")
@@ -61,6 +61,7 @@
 
 (defun ymacs-x//set-ivy-minibuffer-map ()
   (define-key! :map ivy-minibuffer-map
+    (";")
     (("; [" "; ]" "; ;") . self-insert-command)
     ("; '" . minibuffer-keyboard-quit)
     ("; o" . ivy-occur)
@@ -69,7 +70,7 @@
     ("]" . ivy-next-line)))
 
 (defun ymacs-x//unset-ivy-minibuffer-map ()
-  (define-key! :map ivy-minibuffer-map
+  (define-key! :map minibuffer-local-map
     (( ";" "[" "]") . self-insert-command)))
 
 (defsubst ymacs-x//lookup-keys (-keys)
@@ -77,6 +78,37 @@
         (ymacs-x--activated)
         (ymacs-x--keymap-alist))
     (key-binding -keys)))
+
+(defsubst ymacs-x//remove-modifier (-key -modifier -modifiers)
+  (when (memq -modifier -modifiers)
+    (event-convert-list
+     (nconc (remove -modifier -modifiers)
+            (list (event-basic-type -key))))))
+
+(defun ymacs-x//translate-keymap (-keymap)
+  (if (or (not (keymapp -keymap))
+          (symbolp -keymap))
+      -keymap
+    (let ((map (copy-keymap -keymap)))
+      (map-keymap
+       (lambda (-key -binding)
+         (setq -binding (ymacs-x//translate-keymap -binding))
+         (when (integerp -key)
+           (let ((modifiers (event-modifiers -key))
+                 translated-key)
+             (cond ((and (setq translated-key
+                               (ymacs-x//remove-modifier -key 'control modifiers))
+                         (setq translated-key (vector translated-key))
+                         (null (lookup-key-ignore-too-long -keymap translated-key)))
+                    (define-key map translated-key -binding))
+
+                   ((and (memq 'shift modifiers)
+                         (null (lookup-key-ignore-too-long -keymap "'"))
+                         (setq translated-key (ymacs-x//remove-modifier -key 'shift modifiers))
+                         (setq translated-key (vector ?' translated-key)))
+                    (define-key map translated-key -binding))))))
+       -keymap)
+      map)))
 
 (defun ymacs-x//create-dynamic-keymap (-dynamic-keys)
   (let (ymacs-x-mode
@@ -104,8 +136,12 @@
                   (put binding 'ymacs-x-exit exit))))
             (when (stringp old-key-or-def)
               (ignore-errors (define-key map old-key-or-def 'undefined)))
-            (define-key map (kbd new-key) binding))))
+            (define-key map (kbd new-key) (ymacs-x//translate-keymap binding)))))
     map))
+
+(defsubst ymacs-x//update-dynamic-keymap ()
+  (setf (cdar ymacs-x--keymap-alist)
+        (ymacs-x//create-dynamic-keymap ymacs-x-dynamic-keys)))
 
 (defun ymacs-x//pre-command-hook ()
   (let ((exit (get this-command 'ymacs-x-exit))
@@ -123,8 +159,7 @@
 
   (unless ymacs-x--activated
     (unless (cdar ymacs-x--keymap-alist)
-      (setf (cdar ymacs-x--keymap-alist)
-            (ymacs-x//create-dynamic-keymap ymacs-x-dynamic-keys)))
+      (ymacs-x//update-dynamic-keymap))
 
     (add-hook 'pre-command-hook #'ymacs-x//pre-command-hook nil t)
 
@@ -186,10 +221,12 @@
   (define-key universal-argument-map "u" #'universal-argument-more)
   (ymacs-x//set-ivy-minibuffer-map)
 
+  (advice-add 'wgrep-change-to-wgrep-mode :after #'ymacs-x//update-dynamic-keymap)
   (ymacs-x-global-mode 1))
 
 (defun ymacs-x//disable ()
   (define-key universal-argument-map "u" nil)
   (ymacs-x//unset-ivy-minibuffer-map)
 
+  (advice-remove 'wgrep-change-to-wgrep-mode #'ymacs-x//update-dynamic-keymap)
   (ymacs-x-global-mode -1))

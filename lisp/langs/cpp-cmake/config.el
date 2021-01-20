@@ -27,10 +27,10 @@
 (after! cc-mode
   (dolist (map (list c-mode-map c++-mode-map))
     (define-key! :map map
-      (("C-c t" "C-c ' t") . ymacs-cpp-cmake/toggle-option)
-      (("C-c C" "C-c ' c") . ymacs-cpp-cmake/change-config)
-      (("C-c d" "C-c ' d") . ymacs-cpp-cmake/config)
-      (("C-c C-c" "C-c c") . ymacs-cpp-cmake/config-project)
+      (("C-c T" "C-c t") . ymacs-cpp-cmake/toggle-option)
+      ("C-c C" . ymacs-cpp-cmake/change-config)
+      (("C-c D" "C-c d") . ymacs-cpp-cmake/config)
+      ("C-c C-c" . ymacs-cpp-cmake/config-project)
       ([f9] . ymacs-cpp-cmake/config-project))))
 
 (eval-when-has-feature! lsp
