@@ -213,23 +213,34 @@ Displays -BUFFER according to -ALIST and -RULE."
            (byte-compile #'ymacs-popup//match)))))
 
 (ymacs-popup//compile-matcher
- (:macth-fn ymacs-popup//help-buffer-p
+ (
+  :macth-fn ymacs-popup//help-buffer-p
   :side below
   :select t
   :autoclose t)
- (:macth-fn ymacs-popup//term-buffer-p
+ (
+  :macth-fn ymacs-popup//term-buffer-p
   :side below
   :select t
   :terminal t)
- (:macth-fn ymacs-popup//occur-buffer-p
+ (
+  :macth-fn ymacs-popup//occur-buffer-p
   :select t
   :side below
   :dedicated t)
- (:name-regexp ymacs-popup-below-dedicated-buffer-regexp
+ (
+  :name-regexp ymacs-popup-below-dedicated-buffer-regexp
   :select t
   :side below
   :dedicated t)
- (:name-regexp ymacs-popup-below-autoclose-buffer-regexp
+ (
+  :name-regexp ymacs-popup-left-dedicated-buffer-regexp
+  :select t
+  :side left
+  :size 0.25
+  :dedicated t)
+ (
+  :name-regexp ymacs-popup-below-autoclose-buffer-regexp
   :size 0.3
   :side below
   :no-modeline t

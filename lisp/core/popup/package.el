@@ -4,48 +4,59 @@
   (require 'dash))
 
 (defvar ymacs-popup-below-dedicated-buffer-regexp
-  (rx string-start "*"
-      (or (and "Org Src" (*? not-newline))
-          "Backtrace")
-      "*" string-end))
+  (eval-when-compile
+    (rx string-start "*"
+        (or (and "Org Src" (*? not-newline))
+            "Backtrace")
+        "*" string-end)))
+
+(defvar ymacs-popup-left-dedicated-buffer-regexp
+  (eval-when-compile
+    (rx string-start "*"
+        (and "reftex" (*? not-newline))
+        "*" string-end)))
 
 (defvar ymacs-popup-below-autoclose-buffer-regexp
-  (rx string-start
-      (or "*Warnings*"
-          "*Message*"
-          " *LanguageTool Errors* ")
-      string-end))
+  (eval-when-compile
+    (rx string-start
+        (or "*Warnings*"
+            "*Message*"
+            " *LanguageTool Errors* ")
+        string-end)))
 
 (defvar ymacs-popup-occur-buffer-regexp
-  (rx string-start
-      "*" (or "xref" "Man" "TeX" "Shell Command Output") (*? not-newline) "*"
-      string-end))
+  (eval-when-compile
+    (rx string-start
+        "*" (or "xref" "Man" "TeX" "Shell Command Output") (*? not-newline) "*"
+        string-end)))
 
 (defvar ymacs-popup-help-buffer-regexp
-  (rx string-start
-      "*"
-      (or "Compile-Log"
-          "trace-output"
-          (and "poporg: " (*? not-newline))
-          "sdcv"
-          "lispy-message"
-          (and (*? not-newline) (in "Hh") "elp" (*? not-newline))
-          (and (*? not-newline) (in "Dd") "escribe" (*? not-newline))
-          (and (*? not-newline) (in "Dd") "ocumentation" (*? not-newline)))
-      "*"
-      string-end))
+  (eval-when-compile
+    (rx string-start
+        "*"
+        (or "Compile-Log"
+            "trace-output"
+            (and "poporg: " (*? not-newline))
+            "sdcv"
+            "lispy-message"
+            (and (*? not-newline) (in "Hh") "elp" (*? not-newline))
+            (and (*? not-newline) (in "Dd") "escribe" (*? not-newline))
+            (and (*? not-newline) (in "Dd") "ocumentation" (*? not-newline)))
+        "*"
+        string-end)))
 
 (defvar ymacs-popup-term-buffer-regexp
-  (rx string-start
-      "*"
-      (or "shell"
-          "prolog"
-          "sage"
-          (and (*? not-newline) (or "repl" "compilation") (*? not-newline)))
-      (?  "<" (+ digit) ">")
-      "*"
-      (?  "<" (+ digit) ">")
-      string-end))
+  (eval-when-compile
+    (rx string-start
+        "*"
+        (or "shell"
+            "prolog"
+            "sage"
+            (and (*? not-newline) (or "repl" "compilation") (*? not-newline)))
+        (?  "<" (+ digit) ">")
+        "*"
+        (?  "<" (+ digit) ">")
+        string-end)))
 
 (defvar ymacs-popup--window-list nil)
 (defvar ymacs-popup--term-buffer-list nil)

@@ -114,7 +114,9 @@
                               (define-key map (vector -key) -binding)
                               translated-key))))
                    (vector -key)))
-         (define-key map -key -binding))
+         ;; parent keymap are traversed after its child
+         (unless (lookup-key-ignore-too-long map -key)
+           (define-key map -key -binding)))
        -keymap)
       map)))
 

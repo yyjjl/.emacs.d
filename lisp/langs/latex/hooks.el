@@ -2,8 +2,18 @@
 
 (defvar tex--prettify-symbols-alist)
 (declare-function tex--prettify-symbols-compose-p "tex")
+(declare-function reftex-toc-rescan "reftex")
+
+(after! reftex
+  (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan))
+
+(after! tex
+  (define-advice TeX-font (:around (-fn -replace -what) no-modifier)
+    ;; auto add control modifier
+    (funcall -fn -replace (event-convert-list (list 'control -what)))))
 
 (after! latex
+
   (define-hook! ymacs-latex//setup (LaTeX-mode-hook)
     (setq-local prettify-symbols-alist tex--prettify-symbols-alist)
 

@@ -1,7 +1,10 @@
 ;;; -*- lexical-binding: t; -*-
 
+(executable! latexmk)
+
 (require-packages!
- (auctex :compile (latex tex preview reftex)))
+ (auctex :compile (latex tex preview reftex))
+ auctex-latexmk)
 
 (executable! texlab :-exe [(expand-cache! "lsp/texlab") "texlab"])
 

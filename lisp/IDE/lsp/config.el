@@ -2,7 +2,7 @@
 
 (declare-function dap-hydra 'dap-mode)
 
-(setq lsp-keymap-prefix "C-c l")
+(setq lsp-keymap-prefix "C-c ;")
 (after! lsp-mode
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.cache\\'")
   (add-to-list 'lsp-file-watch-ignored

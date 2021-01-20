@@ -65,16 +65,11 @@ Else call with `read-file-name'.
 (defun ymacs-latex/build ()
   (interactive)
   (reftex-parse-all)
-  (let ((TeX-save-query nil))
-    (TeX-save-document (TeX-master-file)))
-  (let ((command (if (save-excursion
-                       (goto-char 1)
-                       (search-forward-regexp
-                        "\\\\usepackage\\s-*{\\s-*minted"
-                        nil t))
-                     "XeLaTeX"
-                   TeX-command-default)))
-    (TeX-command command 'TeX-master-file -1)))
+  (TeX-save-document (TeX-master-file))
+  (TeX-command (cond (ymacs-latexmk-path "LatexMk")
+                     ((eq TeX-engine 'xetex) "XeLaTeX")
+                     (t "LaTeX"))
+               'TeX-master-file -1))
 
 ;;;###autoload
 (defun ymacs-latex/force-update-style ()

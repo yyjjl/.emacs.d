@@ -20,8 +20,15 @@
    '("d w" TeX-toggle-debug-warnings "Debug Warning" :toggle TeX-debug-warnings)
    '("d b" TeX-toggle-debug-bad-boxes "Debug Bad Boxes" :toggle TeX-debug-bad-boxes))
 
+  (auctex-latexmk-setup)
+  (setq auctex-latexmk-inherit-TeX-PDF-mode t)
+
+  (define-key! :map TeX-mode-map
+    ("C-c '"))
+
   (define-key! :map LaTeX-mode-map
     ([f10] . ymacs-latex/build)
+    ([f5] . TeX-view)
     ("M-a" . ymacs-latex/backward-sexp)
     ("M-e" . ymacs-latex/forward-sexp)
     ("M-=" . ymacs-latex/count-words)
@@ -37,16 +44,19 @@
 
   (setq TeX-outline-extra nil))
 
+(setq TeX-fold-command-prefix (kbd "C-c o"))
 (after! tex-fold
   (define-key! :map TeX-fold-keymap
-    ("B" . TeX-fold-buffer) ("C-b")
+    ("B" . TeX-fold-clearout-buffer)
+    ("R" . TeX-fold-clearout-region)
+    ("P" . TeX-fold-clearout-paragraph)
+    ("I" . TeX-fold-clearout-item)
+    ("o" . TeX-fold-dwim) ("C-o")
     ("c" . TeX-fold-comment) ("C-c")
     ("e" . TeX-fold-env) ("C-e")
-    ("d" . TeX-fold-dwim) ("C-o")
-    ("P" . TeX-fold-paragraph) ("C-p")
-    ("R" . TeX-fold-region) ("C-r"))
-
-  (setq TeX-fold-command-prefix (kbd "C-c C-o")))
+    ("b" . TeX-fold-buffer) ("C-b")
+    ("p" . TeX-fold-paragraph) ("C-p")
+    ("r" . TeX-fold-region) ("C-r")))
 
 (after! tex
   (define-key! :map TeX-mode-map
@@ -79,7 +89,8 @@
           (delq (assoc key tex--prettify-symbols-alist) tex--prettify-symbols-alist))))
 
 (after! preview
-  (define-key! :map (make-sparse-keymap)
+  (define-key! :map preview-map
+    (("C-r" "C-p" "C-b" "C-d" "C-i" "C-e" "C-f" "C-w" "C-s" "C-c"))
     ("p" . preview-at-point)
     ("r" . preview-region)
     ("b" . preview-buffer)

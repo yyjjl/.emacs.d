@@ -27,6 +27,7 @@
     ("M-n" . ymacs-org/next-item)
     ("M-p" . ymacs-org/previous-item)
     ("C-c l" . org-store-link)
+    ("C-c b" . org-switchnb)
     ("C-M-i" . completion-at-point)
     ("C-c n" . org-next-block)
     ("C-c p" . org-previous-block)
