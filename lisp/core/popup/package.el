@@ -40,10 +40,8 @@
       "*"
       (or "shell"
           "prolog"
-          "Sage"
-          (and (*? not-newline) (in "Rr") "epl" (*? not-newline))
-          ;; (and (*? not-newline) (in "Ee") "rror" (*? not-newline))
-          )
+          "sage"
+          (and (*? not-newline) (or "repl" "compilation") (*? not-newline)))
       (?  "<" (+ digit) ">")
       "*"
       (?  "<" (+ digit) ">")

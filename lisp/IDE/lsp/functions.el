@@ -33,7 +33,7 @@
 
 (cl-defun lsp-download-install@pretty
     (-callback -error-callback &key url store-path &allow-other-keys)
-  (let ((command (format "proxychains curl %s -o %s"
+  (let ((command (format "curl %s -o %s"
                          (lsp-resolve-value url)
                          (lsp-resolve-value store-path))))
     (lsp-async-start-process@pretty -callback -error-callback command)))

@@ -164,14 +164,14 @@
     ("<C-return>" . ymacs-editor/switch-ivy-backend))
 
   (ymacs-editor//define-switch swiper
-                               (swiper "Search" "S")
-                               (swiper-isearch "Isearch" "I")
-                               (counsel-rg "ripgrep" "rg"))
+    (swiper "Search" "S")
+    (swiper-isearch "Isearch" "I")
+    (counsel-rg "ripgrep" "rg"))
 
   (ymacs-editor//define-switch file-jump
-                               (counsel-fzf "fzf" "f")
-                               (counsel-git "git" "g")
-                               (projectile-find-file "projectile" "proj"))
+    (counsel-fzf "fzf" "f")
+    (counsel-git "git" "g")
+    (projectile-find-file "projectile" "proj"))
 
   (dolist (caller '(ivy-switch-buffer
                     internal-complete-buffer
@@ -232,7 +232,9 @@
     ("C-n" . company-select-next)
     ("C-p" . company-select-previous)
     ("M-n" . company-next-page)
-    ("M-p" . company-previous-page))
+    ("M-p" . company-previous-page)
+    ((0 . 9) . ymacs-editor/company-number)
+    ("=" . ymacs-editor/company-number))
 
   (setq-default company-backends
                 `((company-capf
