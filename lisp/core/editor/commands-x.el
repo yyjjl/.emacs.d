@@ -10,41 +10,42 @@
     ("+" "C-+")
     ("," "C-x ,")
     ("-" "C--")
-    ("." "C-c C-d")
+    ("." ymacs-editor/goto-last-change)
     ("/" "C-/" :exit no)
+    ("?" which-key-show-top-level)
     (";" ymacs-x/just-x :exit immediate)
     ("=" "C-=")
-    ("RET" "C-c i a")
+    ("RET" "RET")
     ("SPC" "C-SPC" :exit no)
     ("TAB" "C-x b")
     ("<tab>" "C-x b")
     ("[" "C-x <left>")
     ("\\" "C-c C-b")
     ("]" "C-x <right>")
-    ("`" "C-x C-s")
+    ("`" pop-to-mark-command :exit no)
     ("a" "C-a" :exit no)
     ("b" "C-b" :exit no)
     ("c" "C-c")
-    ("d" "C-d" :exit immediate)
+    ("d" "C-c C-d")
     ("e" "C-e" :exit no)
     ("f" "C-f" :exit no)
     ("g" "M-g")
     ("h" "C-h")
     ("i" "C-c i")
     ("j" "C-c i j")
-    ("k" "C-k" :exit immediate)
+    ("k" "C-x k")
     ("l" "C-l")
     ("m" "C-c C-SPC")
     ("n" "C-n" :exit no)
-    ("o" "C-o")
+    ("o" "C-x C-f")
     ("p" "C-p" :exit no)
     ("q" ymacs-x/deactivate)
-    ("r" "C-c C-z")
+    ("r" "C-c i a")
     ("s" "C-s")
     ("t" "C-c t")
     ("u" "C-u")
     ("v" "C-v" :exit no)
-    ("w" "C-w")
+    ("w" ymacs-x/kill-or-save-buffer)
     ("x" "C-x")
     ("y" "C-y")
     ("z" "C-z")))
@@ -58,17 +59,18 @@
     (define-key map (kbd ";") #'ymacs-x/activate)
     map))
 
-(defvar ymacs-x-minibuffer-keymap
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "; ;") #'self-insert-command)
-    (define-key map (kbd "; '") #'minibuffer-keyboard-quit)
-    (define-key map (kbd "; [") #'self-insert-command)
-    (define-key map (kbd "; ]") #'self-insert-command)
-    (define-key map (kbd "; RET") #'ivy-immediate-done)
-    (define-key map (kbd "; o") #'ivy-occur)
-    (define-key map (kbd "[") #'ivy-previous-line)
-    (define-key map (kbd "]") #'ivy-next-line)
-    map))
+(defun ymacs-x//set-ivy-minibuffer-map ()
+  (define-key! :map ivy-minibuffer-map
+    (("; [" "; ]" "; ;") . self-insert-command)
+    ("; '" . minibuffer-keyboard-quit)
+    ("; o" . ivy-occur)
+    ("; RET" . ivy-immediate-done)
+    ("[" . ivy-previous-line)
+    ("]" . ivy-next-line)))
+
+(defun ymacs-x//unset-ivy-minibuffer-map ()
+  (define-key! :map ivy-minibuffer-map
+    (( ";" "[" "]") . self-insert-command)))
 
 (defsubst ymacs-x//lookup-keys (-keys)
   (let (ymacs-x-mode
@@ -148,16 +150,19 @@
   (if ymacs-x-mode
       (progn
         (setq ymacs-x--keymap-alist
-              (if (minibufferp)
-                  `((ymacs-x-mode . ,ymacs-x-minibuffer-keymap))
-                `((ymacs-x--activated)
-                  (ymacs-x-mode . ,ymacs-x-keymap))))
+              `((ymacs-x--activated)
+                (ymacs-x-mode . ,ymacs-x-keymap)))
         (add-to-list 'emulation-mode-map-alists 'ymacs-x--keymap-alist t))
     (setq ymacs-x--keymap-alist nil)
     (setq emulation-mode-map-alists (delete 'ymacs-x--keymap-alist emulation-mode-map-alists))))
 
+
+(defun ymacs-x//mode-predicate ()
+  (unless (minibufferp)
+    (ymacs-x-mode 1)))
+
 ;;;###autoload
-(define-globalized-minor-mode ymacs-x-global-mode ymacs-x-mode ymacs-x-mode)
+(define-globalized-minor-mode ymacs-x-global-mode ymacs-x-mode ymacs-x//mode-predicate)
 
 (defun ymacs-x/warn ()
   (interactive)
@@ -169,13 +174,21 @@
   (ymacs-x/deactivate)
   (call-interactively ymacs-x--command))
 
+(defun ymacs-x/kill-or-save-buffer ()
+  (interactive)
+  (if (region-active-p)
+      (call-interactively #'kill-region)
+    (call-interactively #'save-buffer)))
+
 ;;;###autoload
 (defun ymacs-x//enable ()
   (define-key universal-argument-map "u" #'universal-argument-more)
+  (ymacs-x//set-ivy-minibuffer-map)
 
   (ymacs-x-global-mode 1))
 
 (defun ymacs-x//disable ()
   (define-key universal-argument-map "u" nil)
+  (ymacs-x//unset-ivy-minibuffer-map)
 
   (ymacs-x-global-mode -1))

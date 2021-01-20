@@ -137,7 +137,7 @@
   (after! dap-ui
     (define-key! :map dap-ui-repl-mode-map
       ([remap indent-for-tab-command] . company-complete)
-      ("C-c C-z" . quit-window)))
+      (("C-c C-z" "C-c z") . quit-window)))
 
   (after! dap-lldb
     (setq dap-lldb-debugged-program-function

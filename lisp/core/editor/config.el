@@ -200,7 +200,7 @@
   (setq ivy-initial-inputs-alist nil)
   (setq ivy-dispatching-done-columns 3)
   (setq ivy-fixed-height-minibuffer t)
-  (setq ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
+  (setq ivy-re-builders-alist '((t . ivy--regex-plus)))
   (setq ivy-use-virtual-buffers t)
   (setq ivy-virtual-abbreviate 'full)
   (setq ivy-use-selectable-prompt t)

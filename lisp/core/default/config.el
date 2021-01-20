@@ -164,8 +164,7 @@
   (setq speedbar-use-images nil))
 
 (after! savehist
-  (setq savehist-autosave-interval 3000)
-  (add-to-list 'savehist-additional-variables 'ymacs-default--mark-ring-alist))
+  (setq savehist-autosave-interval 3000))
 
 (after! recentf
   (setq recentf-max-saved-items 2048)

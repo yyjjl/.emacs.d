@@ -22,7 +22,7 @@
 
     ("C-c C-." . haskell-indent-put-region-in-literate)
     ("C-c C-\\" . haskell-indent-insert-guard)
-    ("C-c C-z" . haskell-interactive-switch)
+    (("C-c C-z" "C-c z") . haskell-interactive-switch)
 
     ("C-c C-l" . haskell-process-load-file)
     ("C-c C-t" . haskell-process-do-type)

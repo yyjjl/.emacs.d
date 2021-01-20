@@ -46,9 +46,6 @@
 
 (advice-add #'ffap-guesser :around #'ignore-remote!)
 
-(add-hook 'find-file-hook #'ymacs-default//save-mark-ring--restore)
-(add-hook 'kill-buffer-hook #'ymacs-default//save-mark-ring--update)
-
 (add-hook 'ediff-before-setup-hook
           (lambda () (window-configuration-to-register :ediff-windows)))
 (add-hook 'ediff-quit-hook

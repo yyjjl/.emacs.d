@@ -251,12 +251,14 @@ Arguments are same as of `defhydra'."
     (if (not buffer)
         -string
       (let* ((remote (buffer-local-value 'ymacs-modeline--remote-host buffer))
-             (remote (and (not (eq remote 'unset))
-                          remote))
+             (remote (and (not (eq remote 'unset)) remote))
              (face (when buffer
                      (or (when remote 'ivy-remote)
-                         (when (not (verify-visited-file-modtime buffer)) 'ivy-modified-outside-buffer)
-                         (when (buffer-modified-p buffer) 'ivy-modified-buffer)
+                         (when (not (verify-visited-file-modtime buffer)) 'ymacs-modeline-urgent)
+                         (when (and (or (buffer-file-name buffer)
+                                        (not (buffer-local-value 'buffer-read-only buffer)))
+                                    (buffer-modified-p buffer))
+                           'ymacs-modeline-buffer-modified)
                          (cdr (assq (buffer-local-value 'major-mode buffer)
                                     ivy-switch-buffer-faces-alist))))))
         (concat

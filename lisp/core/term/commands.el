@@ -83,6 +83,7 @@
     (with-current-buffer buffer
       (local-set-key [f8] #'ymacs-term/switch-back)
       (local-set-key (kbd "C-c C-z") (interactive! (ymacs-term/switch-back t)))
+      (local-set-key (kbd "C-c z") (interactive! (ymacs-term/switch-back t)))
       (setq ymacs-term--parent-buffer parent-buffer))
     (display-buffer buffer)))
 
@@ -100,6 +101,7 @@ else: try to find a old term buffer and pop to it"
       (with-current-buffer buffer
         (local-set-key [f8] #'ymacs-term/switch-back)
         (local-set-key (kbd "C-c C-z") (interactive! (ymacs-term/switch-back t)))
+        (local-set-key (kbd "C-c z") (interactive! (ymacs-term/switch-back t)))
         (setq ymacs-term--parent-buffer parent-buffer)))
     (display-buffer buffer)))
 

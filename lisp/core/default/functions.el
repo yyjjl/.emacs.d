@@ -5,28 +5,6 @@
    (< (length it) 1024)
    -ring))
 
-(defun ymacs-default//save-mark-ring--update ()
-  (when (buffer-file-name)
-    (let ((filename (file-truename (buffer-file-name))))
-      (setf (alist-get filename ymacs-default--mark-ring-alist nil 'remove #'equal) nil)
-      (push (cons filename (mapcar #'marker-position mark-ring))
-            ymacs-default--mark-ring-alist))
-
-    (when (> (length ymacs-default--mark-ring-alist)
-             save-place-limit)
-      (setq ymacs-default--mark-ring-alist
-            (seq-take ymacs-default--mark-ring-alist save-place-limit)))))
-
-(defun ymacs-default//save-mark-ring--restore ()
-  (when (and (buffer-file-name)
-             (not revert-buffer-in-progress-p))
-    (save-excursion
-      (setq mark-ring
-            (cl-loop
-             for pos in (cdr-safe (assoc (buffer-file-name) ymacs-default--mark-ring-alist))
-             collect (when (<= pos (point-max))
-                       (set-marker (copy-marker (mark-marker)) pos (current-buffer))))))))
-
 (defun ymacs-default//external-file-handler (_op &rest -args)
   (let ((file (expand-file-name (car -args)))
         (process-connection-type nil))

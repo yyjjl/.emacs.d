@@ -3,8 +3,6 @@
 (defvar ymacs-default-autoloads-file (expand-cache! "autoloads.el")
   "Autoloads file")
 
-(defvar ymacs-default--mark-ring-alist nil)
-
 (defvar ymacs-default-autosave-interval 300)
 (defvar ymacs-default-autosave-hook
   '(recentf-save-list
