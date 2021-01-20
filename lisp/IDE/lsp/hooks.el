@@ -13,7 +13,8 @@
     :around (_contents _server-id)
     "Cut signature into a single line"
     (let ((content (string-trim-left (or (cl-call-next-method) ""))))
-      (unless (equal (buffer-name) "*lsp-help*")
+      (unless (or (equal (buffer-name) "*lsp-help*")
+                  (string-prefix-p "!" content))
         (let* ((content-length (length content))
                (max-width (frame-width)))
           (when (>= content-length (- max-width 10))
