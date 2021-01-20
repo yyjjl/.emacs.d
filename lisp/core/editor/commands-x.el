@@ -71,8 +71,9 @@
     map))
 
 (defsubst ymacs-x//lookup-keys (-keys)
-  (let (ymacs-x-mode
-        ymacs-x--activated)
+  (let ((ymacs-x-mode)
+        (ymacs-x--activated)
+        (ymacs-x--keymap-alist))
     (key-binding -keys)))
 
 (defun ymacs-x//create-dynamic-keymap (-dynamic-keys)
