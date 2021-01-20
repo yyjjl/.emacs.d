@@ -1,11 +1,12 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;;;###autoload
-(defun ymacs-editor/goto-last-change (-arg)
-  (interactive "P")
-  (if -arg
-      (goto-last-change-reverse nil)
-    (goto-last-change nil)))
+(defun ymacs-editor/goto-last-point ()
+  (interactive)
+  (let ((old-point (point)))
+    (goto-last-point)
+    (when (eq (point) old-point)
+      (pop-to-mark-command))))
 
 ;;;###autoload
 (defun ymacs-editor/find-file-externally (-files)

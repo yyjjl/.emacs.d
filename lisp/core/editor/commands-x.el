@@ -1,8 +1,10 @@
 ;; -*- lexical-binding: t; -*-
 
 (defvar-local ymacs-x--keymap-alist nil)
+(put 'ymacs-x--keymap-alist 'permanent-local t)
 
 (defvar-local ymacs-x--command nil)
+(defvar-local ymacs-x--return nil)
 (defvar-local ymacs-x--activated nil)
 
 (defvar ymacs-x-dynamic-keys
@@ -10,12 +12,12 @@
     ("+" "C-+")
     ("," "C-x ,")
     ("-" "C--")
-    ("." ymacs-editor/goto-last-change)
+    ("." ymacs-editor/goto-last-point :exit no)
     ("/" "C-/" :exit no)
     ("?" which-key-show-top-level :exit no)
     (";" ymacs-x/just-x :exit immediate)
     ("=" "C-=")
-    ("RET" "RET")
+    ("RET" ymacs-x/return :exit t)
     ("SPC" "C-SPC" :exit no)
     ("TAB" "C-x b")
     ("<tab>" "C-x b")
@@ -35,7 +37,7 @@
     ("j" "C-c i j")
     ("k" "C-x k")
     ("l" "C-l")
-    ("m" "C-c C-SPC")
+    ("m" "C-c C-c")
     ("n" "C-n" :exit no)
     ("o" "C-x C-f")
     ("p" "C-p" :exit no)
@@ -89,24 +91,29 @@
   (if (or (not (keymapp -keymap))
           (symbolp -keymap))
       -keymap
-    (let ((map (copy-keymap -keymap)))
+    (let ((map (make-sparse-keymap)))
       (map-keymap
        (lambda (-key -binding)
          (setq -binding (ymacs-x//translate-keymap -binding))
-         (when (integerp -key)
-           (let ((modifiers (event-modifiers -key))
-                 translated-key)
-             (cond ((and (setq translated-key
-                               (ymacs-x//remove-modifier -key 'control modifiers))
-                         (setq translated-key (vector translated-key))
-                         (null (lookup-key-ignore-too-long -keymap translated-key)))
-                    (define-key map translated-key -binding))
+         (setq -key
+               (or (when (integerp -key)
+                     (let ((modifiers (event-modifiers -key))
+                           translated-key)
+                       (cond ((and (setq translated-key
+                                         (ymacs-x//remove-modifier -key 'control modifiers))
+                                   (setq translated-key (vector translated-key))
+                                   (null (lookup-key-ignore-too-long -keymap translated-key)))
+                              translated-key)
 
-                   ((and (memq 'shift modifiers)
-                         (null (lookup-key-ignore-too-long -keymap "'"))
-                         (setq translated-key (ymacs-x//remove-modifier -key 'shift modifiers))
-                         (setq translated-key (vector ?' translated-key)))
-                    (define-key map translated-key -binding))))))
+                             ((and (memq 'shift modifiers)
+                                   (null (lookup-key-ignore-too-long -keymap "'"))
+                                   (setq translated-key (ymacs-x//remove-modifier -key 'shift modifiers))
+                                   (setq translated-key (vector ?' translated-key)))
+                              ;; keep old binding
+                              (define-key map (vector -key) -binding)
+                              translated-key))))
+                   (vector -key)))
+         (define-key map -key -binding))
        -keymap)
       map)))
 
@@ -139,9 +146,10 @@
             (define-key map (kbd new-key) (ymacs-x//translate-keymap binding)))))
     map))
 
-(defsubst ymacs-x//update-dynamic-keymap ()
-  (setf (cdar ymacs-x--keymap-alist)
-        (ymacs-x//create-dynamic-keymap ymacs-x-dynamic-keys)))
+(defun ymacs-x//update-dynamic-keymap ()
+  (setq-local ymacs-x--keymap-alist
+              `((ymacs-x--activated . ,(ymacs-x//create-dynamic-keymap ymacs-x-dynamic-keys))
+                (ymacs-x-mode . ,ymacs-x-keymap))))
 
 (defun ymacs-x//pre-command-hook ()
   (let ((exit (get this-command 'ymacs-x-exit))
@@ -158,13 +166,14 @@
   (interactive)
 
   (unless ymacs-x--activated
-    (unless (cdar ymacs-x--keymap-alist)
+    (unless (assq 'ymacs-x--activated ymacs-x--keymap-alist)
       (ymacs-x//update-dynamic-keymap))
 
     (add-hook 'pre-command-hook #'ymacs-x//pre-command-hook nil t)
 
     (setq cursor-type 'bar)
     (setq ymacs-x--command (ymacs-x//lookup-keys ";"))
+    (setq ymacs-x--return (ymacs-x//lookup-keys (kbd "RET")))
     (setq ymacs-x--activated t)))
 
 (defun ymacs-x/deactivate ()
@@ -182,12 +191,10 @@
   :group 'ymacs
   :init-value nil
   (setq ymacs-x--activated nil)
-
   (if ymacs-x-mode
       (progn
         (setq ymacs-x--keymap-alist
-              `((ymacs-x--activated)
-                (ymacs-x-mode . ,ymacs-x-keymap)))
+              `((ymacs-x-mode . ,ymacs-x-keymap)))
         (add-to-list 'emulation-mode-map-alists 'ymacs-x--keymap-alist t))
     (setq ymacs-x--keymap-alist nil)
     (setq emulation-mode-map-alists (delete 'ymacs-x--keymap-alist emulation-mode-map-alists))))
@@ -209,6 +216,13 @@
   (interactive)
   (ymacs-x/deactivate)
   (call-interactively ymacs-x--command))
+
+(defun ymacs-x/return ()
+  (interactive)
+  (ymacs-x/deactivate)
+  (when (eq real-last-command 'ymacs-x/activate)
+    (self-insert-command 1 ?\;))
+  (call-interactively ymacs-x--return))
 
 (defun ymacs-x/kill-or-save-buffer ()
   (interactive)

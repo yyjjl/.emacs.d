@@ -42,7 +42,7 @@
  dumb-jump
  expand-region
  easy-kill
- goto-chg
+ goto-last-point
  ;; Mark tools
  multiple-cursors
  ;; `wgrep' allows you to edit a grep buffer and apply those changes
@@ -51,6 +51,7 @@
  buffer-move
  graphviz-dot-mode
  ace-pinyin
+ ace-link
  persistent-scratch)
 
 (defvar ymacs-editor-toggles-alist
@@ -234,9 +235,9 @@
 (define-key! :prefix "C-x"
   ("x" . exchange-point-and-mark)
 
-  ("C-_" . ymacs-editor/goto-last-change)
-  ("C-/" . ymacs-editor/goto-last-change)
-  ("/" . ymacs-editor/goto-last-change)
+  ("C-_" . ymacs-editor/goto-last-point)
+  ("C-/" . ymacs-editor/goto-last-point)
+  ("/" . ymacs-editor/goto-last-point)
 
   ("o" . ace-window)
   ("b" . ivy-switch-buffer)
@@ -264,6 +265,7 @@
 (define-key!
   ([remap kill-ring-save] . easy-kill)
 
+  ("C-c o" . ace-link)
   ("C-c O" . ymacs-hydra/outline/body)
 
   ("C-c <tab>" . company-complete)

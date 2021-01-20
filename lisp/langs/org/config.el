@@ -22,7 +22,6 @@
     ("C-c [" . org-reftex-citation)
     ("C-c {" . org-reftex-citation)
     ("C-c C-x [" . org-agenda-file-to-front)
-    ("C-c v" . ymacs-org/open)
     ("M-," . org-mark-ring-goto)
     ("M-." . org-mark-ring-push)
     ("M-n" . ymacs-org/next-item)

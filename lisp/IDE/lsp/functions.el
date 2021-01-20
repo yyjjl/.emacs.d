@@ -1,9 +1,9 @@
 ;; -*- lexical-binding:t -*-
 
 (cl-defun ymacs-lsp//register-client
-    (-client &key ((:manual -manual)) ((:package -package)))
+    (-client &key ((:manual -manual)) ((:package -package)) ((:enable-fn -enable-fn)))
   (setf (alist-get -client ymacs-lsp--enabled-clients)
-        (cons -package -manual)))
+        (list -package -manual -enable-fn)))
 
 (defun lsp-async-start-process@pretty (-callback -error-callback &rest -command)
   "Start async process COMMAND with CALLBACK and ERROR-CALLBACK."

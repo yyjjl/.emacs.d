@@ -86,7 +86,9 @@
 
   (let (clients manual-clients)
     (cl-loop
-     for (client package . manual) in ymacs-lsp--enabled-clients
+     for (client package manual enable-fn) in ymacs-lsp--enabled-clients
+     when (or (null enable-fn)
+              (funcall enable-fn))
      do (if manual
             (push manual manual-clients)
           (progn

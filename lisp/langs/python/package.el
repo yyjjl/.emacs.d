@@ -29,5 +29,11 @@
 
   (autoload #'ymacs-python/change-lsp-server (expand! "commands") nil t)
 
-  (ymacs-lsp//register-client 'pyls :package 'lsp-pyls)
-  (ymacs-lsp//register-client 'pyright :package 'lsp-pyright))
+  (ymacs-lsp//register-client
+   'pyls
+   :package 'lsp-pyls
+   :enable-fn (lambda () (eq ymacs-python-lsp-server 'pyls)))
+  (ymacs-lsp//register-client
+   'pyright
+   :package 'lsp-pyright
+   :enable-fn (lambda () (eq ymacs-python-lsp-server 'pyright))))
