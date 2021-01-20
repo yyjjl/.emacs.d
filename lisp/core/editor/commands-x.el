@@ -1,5 +1,6 @@
 ;; -*- lexical-binding: t; -*-
 
+(defvar ymacs-x-mode)
 (defvar-local ymacs-x--keymap-alist nil)
 (put 'ymacs-x--keymap-alist 'permanent-local t)
 
