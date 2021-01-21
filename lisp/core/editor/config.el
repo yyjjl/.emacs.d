@@ -160,18 +160,20 @@
     ("C-j" . ivy-immediate-done)
     ("C-M-j" . ivy-done)
     ("M-." . ymacs-editor/ivy-meta-dot)
-    ("C-." . ymacs-editor/ivy-meta-dot)
-    ("<C-return>" . ymacs-editor/switch-ivy-backend))
+    ("C-." . ymacs-editor/ivy-meta-dot))
 
-  (ymacs-editor//define-switch swiper
-    (swiper "Search" "S")
-    (swiper-isearch "Isearch" "I")
-    (counsel-rg "ripgrep" "rg"))
+  (ymacs-editor//define-switch
+    (swiper :doc "Swiper" :key "s")
+    (swiper-isearch :doc "SwiperI" :key "x")
+    (swiper-all :doc "SwiperA" :key "a")
+    (ymacs-editor//rg :doc "ripgrep" :key "r" :save-text t :caller counsel-rg)
+    (counsel-git-grep :doc "gitgrep" :key "g"))
 
-  (ymacs-editor//define-switch file-jump
-    (counsel-fzf "fzf" "f")
-    (counsel-git "git" "g")
-    (projectile-find-file "projectile" "proj"))
+  (ymacs-editor//define-switch
+    (ymacs-editor//fzf :doc "fzf" :key "z" :caller counsel-fzf)
+    (counsel-git :doc "git" :key "g")
+    (projectile-find-file :doc "find file (project)" :key "p")
+    (counsel-find-file :doc "find file" :key "f"))
 
   (dolist (caller '(ivy-switch-buffer
                     internal-complete-buffer
@@ -329,6 +331,6 @@
           ?z ?x ?c ?v ?b ?n ?m))
 
   (setq avy-background t)
-  (setq avy-all-windows t)
-  (setq avy-all-windows-alt nil)
+  (setq avy-all-windows nil)
+  (setq avy-all-windows-alt t)
   (setq avy-style 'at-full))

@@ -180,41 +180,33 @@ Arguments are same as of `defhydra'."
 
 
 ;;
-;;* Switch backend
+;;* Switch ivy backend
 ;;
 
-(defmacro ymacs-editor//define-switch (name &rest body)
-  (declare (indent 1))
-  (let ((commands (mapcar #'car body))
-        (toggle-fn (intern (format "ymacs-editor//toggle-ivy-between-%s" name)))
-        (prompt-fn (intern (format "ymacs-editor//toggle-ivy-between-%s-prompt" name))))
+(defmacro ymacs-editor//define-switch (&rest -body)
+  (declare (indent 0))
+  (let* ((commands (mapcar #'car -body))
+         (props-list (mapcar #'cdr -body))
+         (switch-fns (--map (intern (format "ymacs-editor//switch-to-%s" it)) commands)))
     `(progn
-       (add-to-list 'ymacs-editor-ivy-switch-function-list '(,commands . ,toggle-fn))
-       (defun ,toggle-fn ()
-         ,(format "Toggle %s with the current input."
-                  (string-join (--map (format "`%s'" it) commands) ", "))
-         (ivy-quit-and-run
-           (cl-case (ivy-state-caller ivy-last)
-             ,@(--map
-                `(,it
-                  (,(or (cadr (memq it commands)) ; select next command
-                        (car commands))
-                   ivy-text))
-                commands))))
-       (defun ,prompt-fn ()
-         (ivy-add-prompt-count
-          (cl-case (ivy-state-caller ivy-last)
-            ,@(cl-loop
-               for command in commands
-               collect
-               (list
-                command
-                (concat
-                 (string-join (--map (nth (if (eq (nth 0 it) command) 1 2) it) body) "|")
-                 ": "))))))
-
-       (dolist (caller ',commands)
-         (ivy-set-prompt caller #',prompt-fn)))))
+       ,@(cl-loop
+          for (command current-switch-fn props) in (-zip commands switch-fns props-list)
+          collect
+          `(progn
+             (defun ,current-switch-fn (&rest _)
+               (interactive)
+               ,@(when (plist-get props :save-text)
+                   `((setq ymacs-editor-ivy--last-text ivy-text)))
+               (ivy-quit-and-run
+                 ,(if (plist-get props :save-text)
+                      `(,command)
+                    `(,command ivy-text))))
+             (ivy-add-actions
+              ',(or (plist-get props :caller) command)
+              ',(cl-loop
+                 for (switch-fn . props) in (-zip switch-fns props-list)
+                 when (not (eq switch-fn current-switch-fn))
+                 collect (list (plist-get props :key) switch-fn (plist-get props :doc)))))))))
 
 (defun ymacs-editor/switch-ivy-backend ()
   (interactive)

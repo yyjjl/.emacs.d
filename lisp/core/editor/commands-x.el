@@ -63,6 +63,11 @@
     map))
 
 (defun ymacs-x//set-ivy-minibuffer-map ()
+  (define-key! :map swiper-map
+    ("; l" . swiper-recenter-top-bottom)
+    ("; 0" . swiper-avy)
+    (("; -" "; =") . swiper-mc)
+    ("; f" . swiper-toggle-face-matching))
   (define-key! :map ivy-minibuffer-map
     (";")
     (("; [" "; ]" "; ;") . self-insert-command)
@@ -73,6 +78,8 @@
     ("]" . ivy-next-line)))
 
 (defun ymacs-x//unset-ivy-minibuffer-map ()
+  (define-key! :map swiper-map
+    (";"))
   (define-key! :map minibuffer-local-map
     (( ";" "[" "]") . self-insert-command)))
 
@@ -125,10 +132,10 @@
         ymacs-x--activated
         (map (make-sparse-keymap)))
     (suppress-keymap map)
-    (cl-loop
-     for i from 0 to 26
-     when (or (not (= i 7)) (not (= i 8)))
-     do (define-key map (char-to-string i) 'undefined))
+    ;; (cl-loop
+    ;;  for i from 0 to 26
+    ;;  when (or (not (= i 7)) (not (= i 8)))
+    ;;  do (define-key map (char-to-string i) 'undefined))
 
     (cl-loop
      for (new-key old-key-or-def . props) in -dynamic-keys
@@ -144,8 +151,8 @@
               (let ((exit (plist-get props :exit)))
                 (when exit
                   (put binding 'ymacs-x-exit exit))))
-            (when (stringp old-key-or-def)
-              (ignore-errors (define-key map old-key-or-def 'undefined)))
+            ;; (when (stringp old-key-or-def)
+            ;;   (ignore-errors (define-key map old-key-or-def 'undefined)))
             (define-key map (kbd new-key) (ymacs-x//translate-keymap binding)))))
     map))
 
@@ -158,7 +165,8 @@
   (let ((exit (get this-command 'ymacs-x-exit))
         (after-activated (eq real-last-command 'ymacs-x/activate)))
     (if (and (not after-activated)
-             (eq exit 'immediate))
+             (eq exit 'immediate)
+             (not (eq real-last-command this-command)))
         (setq this-command #'ymacs-x/warn)
       (when (or (eq exit t)
                 (and after-activated
@@ -212,7 +220,7 @@
 
 (defun ymacs-x/warn ()
   (interactive)
-  (message "Please press %s immediately after ;"
+  (message "Please press %s again"
            (key-description (this-command-keys))))
 
 (defun ymacs-x/just-x ()

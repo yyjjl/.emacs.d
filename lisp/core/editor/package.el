@@ -89,8 +89,8 @@
 
 (defvar ymacs-editor-ivy-display-help-extra-commands
   '(ivy-restrict-to-matches
-    delete-blank-lines
-    just-one-space
+    ;; delete-blank-lines
+    ;; just-one-space
     (counsel-find-file . ivy-magic-read-file-env)))
 
 (defvar ymacs-editor-ivy-display-help-ignore-commands
@@ -199,7 +199,6 @@
 (put 'ymacs-editor/ivy-meta-dot 'no-counsel-M-x t)
 (put 'ymacs-editor/ivy-meta-dot-for-counsel-fzf 'no-counsel-M-x t)
 (put 'ymacs-editor/ivy-meta-dot-for-counsel-rg 'no-counsel-M-x t)
-(put 'ymacs-editor/switch-ivy-backend 'no-counsel-M-x t)
 
 (autoload 'ymacs-editor/rg (expand! "commands-ivy.el") nil t)
 (autoload 'ymacs-editor/fzf (expand! "commands-ivy.el") nil t)
