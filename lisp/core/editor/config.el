@@ -1,9 +1,5 @@
 ;; -*- lexical-binding: t -*-
 
-(after! dumb-jump
-  (setq dumb-jump-default-project (or user-emacs-directory "~/.emacs.d"))
-  (setq dumb-jump-prefer-searcher 'rg))
-
 (after! fcitx
   ;; Init fcitx prefix keys
   (setq fcitx-use-dbus nil)

@@ -8,12 +8,15 @@
 (defvar-local ymacs-x--return nil)
 (defvar-local ymacs-x--activated nil)
 
+(when (require 'fcitx nil t)
+  (fcitx--defun-maybe "ymacs-x"))
+
 (defvar ymacs-x-dynamic-keys
   '(("'" keyboard-quit)
     ("+" "C-+")
     ("," "C-x ,")
-    ("-" "C--")
     ("." ymacs-editor/goto-last-point :exit no)
+    ("-" "C--")
     ("/" "C-/" :exit no)
     ("?" which-key-show-top-level :exit no)
     (";" ymacs-x/just-x :exit immediate)
@@ -127,33 +130,41 @@
        -keymap)
       map)))
 
+(defun ymacs-x//undefined ()
+  (interactive)
+  (let* ((keys (this-command-keys))
+         (translated-keys (cadr (assoc keys ymacs-x-dynamic-keys))))
+    (message "%s%s is undefined"
+             (key-description keys)
+             (if (stringp translated-keys)
+                 (concat " (simulate: " translated-keys ")")
+               ""))))
+
 (defun ymacs-x//create-dynamic-keymap (-dynamic-keys)
   (let (ymacs-x-mode
         ymacs-x--activated
         (map (make-sparse-keymap)))
     (suppress-keymap map)
-    ;; (cl-loop
-    ;;  for i from 0 to 26
-    ;;  when (or (not (= i 7)) (not (= i 8)))
-    ;;  do (define-key map (char-to-string i) 'undefined))
 
     (cl-loop
      for (new-key old-key-or-def . props) in -dynamic-keys
      for binding = nil
-     do (progn
+     do (let ((exit (plist-get props :exit)))
           (if (stringp old-key-or-def)
               (progn
                 (setq old-key-or-def (kbd old-key-or-def))
                 (setq binding (ymacs-x//lookup-keys old-key-or-def)))
             (setq binding old-key-or-def))
-          (when binding
-            (when (symbolp binding)
-              (let ((exit (plist-get props :exit)))
-                (when exit
-                  (put binding 'ymacs-x-exit exit))))
-            ;; (when (stringp old-key-or-def)
-            ;;   (ignore-errors (define-key map old-key-or-def 'undefined)))
-            (define-key map (kbd new-key) (ymacs-x//translate-keymap binding)))))
+          ;; keep old key-binding if exit is 'no
+          (when (and (stringp old-key-or-def)
+                     (not (eq exit 'no)))
+            (ignore-errors (define-key map old-key-or-def #'ymacs-x//undefined)))
+          (when (and binding exit (symbolp binding))
+            (put binding 'ymacs-x-exit exit))
+
+          (unless binding
+            (setq binding #'ymacs-x//undefined))
+          (define-key map (kbd new-key) (ymacs-x//translate-keymap binding))))
     map))
 
 (defun ymacs-x//update-dynamic-keymap ()
@@ -182,6 +193,8 @@
 
     (add-hook 'pre-command-hook #'ymacs-x//pre-command-hook nil t)
 
+    (with-demoted-errors "%s"
+      (fcitx--ymacs-x-maybe-deactivate))
     (setq cursor-type 'bar)
     (setq ymacs-x--command (ymacs-x//lookup-keys ";"))
     (setq ymacs-x--return (ymacs-x//lookup-keys (kbd "RET")))
@@ -193,6 +206,9 @@
   (when ymacs-x--activated
     (remove-hook 'pre-command-hook #'ymacs-x//pre-command-hook t)
     (setq cursor-type 'box)
+
+    (with-demoted-errors "%s"
+      (fcitx--ymacs-x-maybe-activate))
 
     (setq ymacs-x--activated nil)))
 
@@ -216,7 +232,8 @@
     (ymacs-x-mode 1)))
 
 ;;;###autoload
-(define-globalized-minor-mode ymacs-x-global-mode ymacs-x-mode ymacs-x//mode-predicate)
+(define-globalized-minor-mode ymacs-x-global-mode ymacs-x-mode ymacs-x//mode-predicate
+  :group 'ymacs)
 
 (defun ymacs-x/warn ()
   (interactive)

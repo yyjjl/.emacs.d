@@ -85,10 +85,11 @@
    ymacs-popup--term-buffer-list))
 
 (defsubst ymacs-popup//get-side-window-size (-side -size)
-  (cons (if (memq -side '(below above up down))
-            'window-height
-          'window-width)
-        (or -size ymacs-popup-default-size)))
+  (unless (eq -size 'auto)
+    (list (cons (if (memq -side '(below above up down))
+                    'window-height
+                  'window-width)
+                (or -size ymacs-popup-default-size)))))
 
 (defsubst ymacs-popup//display-buffer (-buffer -alist -rule)
   "Internal function for `ymacs-popup/display-buffer-action'.
@@ -112,7 +113,7 @@ Displays -BUFFER according to -ALIST and -RULE."
        `((window . main)
          (window-parameters . ((ymacs-quit-action . delete)))
          (direction . ,side)
-         ,(ymacs-popup//get-side-window-size side (plist-get -rule :size))
+         ,@(ymacs-popup//get-side-window-size side (plist-get -rule :size))
          ,@-alist)))
      ;; fallback
      ((display-buffer-pop-up-window -buffer -alist))
@@ -133,7 +134,7 @@ Displays -BUFFER according to -ALIST and -RULE."
                -buffer
                `((window . main)
                  (direction . ,side)
-                 ,(ymacs-popup//get-side-window-size side (plist-get -rule :size))
+                 ,@(ymacs-popup//get-side-window-size side (plist-get -rule :size))
                  ,@-alist)))))
     ;; move term buffer to the head of term-buffer-list
     (ymacs-popup//set-term-window window nil t)
@@ -241,7 +242,7 @@ Displays -BUFFER according to -ALIST and -RULE."
   :dedicated t)
  (
   :name-regexp ymacs-popup-below-autoclose-buffer-regexp
-  :size 0.3
+  :size auto
   :side below
   :no-modeline t
   :autoclose t))

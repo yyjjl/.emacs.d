@@ -2,6 +2,7 @@
 
 (require-packages!
  org-download
+ cdlatex
  (auctex :compile (latex tex preview reftex))
  ;; Export colorful src block in `org-mode'
  htmlize
@@ -21,12 +22,12 @@
 
 (defvar ymacs-org-table-extra-map
   (define-key! :map (make-sparse-keymap)
-    ("t" . orgtbl-insert-radio-table)
-    ("c" . org-table-create)
-    ("I" . org-table-import)
+    ("t" . org-todo)
+    ("n" . org-table-create)
+    ("i" . org-table-import)
     ("e" . org-table-export)
     ("d" . org-table-delete-column)
-    ("i" . org-table-insert-column)
+    ("c" . org-table-insert-column)
     ("r" . org-table-show-reference)))
 
 ;; Config for publish site from org files

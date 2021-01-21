@@ -4,7 +4,8 @@
 
 (require-packages!
  (auctex :compile (latex tex preview reftex))
- auctex-latexmk)
+ auctex-latexmk
+ cdlatex)
 
 (executable! texlab :-exe [(expand-cache! "lsp/texlab") "texlab"])
 

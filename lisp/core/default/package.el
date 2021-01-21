@@ -69,8 +69,6 @@
   ("w ]" . winner-redo))
 
 (define-key!
-  ("C-c q" . auto-fill-mode)
-
   ("M-s f" . ymacs-default/font-faces-at-point)
   ("M-s o" . ymacs-default/occur-dwim)
 

@@ -21,20 +21,21 @@
     ("C-c t" :map ymacs-org-table-extra-map)
     ("C-c [" . org-reftex-citation)
     ("C-c {" . org-reftex-citation)
-    ("C-c C-x [" . org-agenda-file-to-front)
     ("M-," . org-mark-ring-goto)
     ("M-." . org-mark-ring-push)
     ("M-n" . ymacs-org/next-item)
     ("M-p" . ymacs-org/previous-item)
     ("C-c l" . org-store-link)
-    ("C-c b" . org-switchnb)
-    ("C-M-i" . completion-at-point)
-    ("C-c n" . org-next-block)
-    ("C-c p" . org-previous-block)
+    ("C-c b" . org-switchb)
+    ("C-c q" . counsel-org-tags)
+    ("C-c p" . org-previous-visible-heading)
+    ("C-c n" . org-next-visible-heading)
     ("C-c DEL" . org-cycle-list-bullet)
-    ("C-c C-t" . org-todo)
+    ("C-x , l" . org-latex-preview)
+    ("C-x , i" . org-toggle-inline-images)
+    ("C-x , n" . org-next-block)
+    ("C-x , p" . org-previous-block)
     ([f5] . ymacs-org/open)
-    ([C-f9] . ymacs-org/delete-latex-fragement-cache)
     ([f9] . ymacs-org/publish-current-file)
     ([f10] . org-publish)
     ([f12] . ymacs-hydra/org-download/body))
@@ -75,23 +76,8 @@
      (haskell . t)))
 
   (setq org-entities-user
-        (eval-when-compile
-          (when (require 'tex-mode nil :noerror)
-            (let ((entities (make-hash-table :test #'equal)))
-              (dolist (e org-entities)
-                (when (consp e)
-                  (puthash (car e) t entities)))
-              (cl-loop
-               for (latex-name . char) in tex--prettify-symbols-alist
-               for name = (substring latex-name 1)
-               unless (or (not (numberp char)) (gethash name entities))
-               collect (list name
-                             (concat "\\" name)
-                             t
-                             (concat "&#" (number-to-string char) ";")
-                             name
-                             name
-                             (char-to-string char)))))))
+        '(("flat" "\\flat" nil "" "" "266D" "♭")
+          ("sharp" "\\sharp" nil "" "" "266F" "♯")))
 
   (setq org-mouse-1-follows-link nil)
 
@@ -125,7 +111,7 @@
   (setq org-hide-block-startup nil)
 
   (setq org-startup-indented nil)
-  (setq org-startup-folded nil)
+  (setq org-startup-folded 'content)
 
   (setq org-fontify-quote-and-verse-blocks t)
   (setq org-fontify-whole-heading-line t)

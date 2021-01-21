@@ -83,11 +83,6 @@
         ;; Don't insert line-break at inline math
         LaTeX-fill-break-at-separators nil))
 
-(after! tex-mode
-  (dolist (key '("--" "---"))
-    (setq tex--prettify-symbols-alist
-          (delq (assoc key tex--prettify-symbols-alist) tex--prettify-symbols-alist))))
-
 (after! preview
   (define-key! :map preview-map
     (("C-r" "C-p" "C-b" "C-d" "C-i" "C-e" "C-f" "C-w" "C-s" "C-c"))

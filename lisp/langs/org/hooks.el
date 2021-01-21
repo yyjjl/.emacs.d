@@ -49,6 +49,8 @@
     (auto-fill-mode -1)
     (eldoc-mode -1)
 
+    (org-cdlatex-mode 1)
+
     (when (fboundp 'org-num-mode)
       (org-num-mode 1))
 

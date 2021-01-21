@@ -56,7 +56,7 @@
   (yas-global-mode 1)
 
   (avy-setup-default)
-  (ace-pinyin-mode 1)
+  (ace-pinyin-global-mode 1)
 
   (persistent-scratch-autosave-mode 1)
 
@@ -66,8 +66,7 @@
     (exec-path-from-shell-initialize))
 
   (when (display-graphic-p -frame)
-    (when ymacs-fcitx-path
-      (fcitx-aggressive-setup))
+    (fcitx-aggressive-setup)
 
     (when ymacs-editor-use-childframe
       (company-posframe-mode 1)))

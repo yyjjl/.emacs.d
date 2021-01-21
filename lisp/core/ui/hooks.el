@@ -1,9 +1,23 @@
 ;;; -*- lexical-binding: t; -*-
 
+(defun ymacs-ui//pulse (&rest _)
+  (xref-pulse-momentarily))
+
+
 ;; Setup `mode-line-format'
-(define-hook! ymacs-ui//modeline-setup (after-init-hook)
+(define-hook! ymacs-ui//ui-setup (after-init-hook)
   (ace-window-display-mode 1)
   (ymacs-modeline-set! default main)
+
+  (require 'xref)
+  (dolist (cmd '(recenter-top-bottom
+                 other-window
+                 next-error
+                 ace-window
+                 pop-to-mark-command
+                 pop-global-mark
+                 ymacs-editor/goto-last-point))
+    (advice-add cmd :after #'ymacs-ui//pulse))
 
   (global-font-lock-mode 1)
   (global-page-break-lines-mode 1)

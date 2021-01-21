@@ -3,7 +3,6 @@
 (executable! gls)
 (executable! ripgrep :-exe "rg")
 (executable! fdfind :-exe ["fdfind" "fd"])
-(executable! fcitx :-exe "fcitx-remote")
 (executable! ctags :-exe "ctags-exuberant")
 
 (defcustom ymacs-editor-use-childframe nil
@@ -24,7 +23,7 @@
 
 (require-packages!
  (exec-path-from-shell :when sys/macp)
- (fcitx :when (and sys/linuxp ymacs-fcitx-path))
+ (fcitx :when sys/linuxp)
  ;; `counsel-M-x' need amx to get history
  amx
  company
@@ -39,7 +38,6 @@
  swiper
  yasnippet
  yasnippet-snippets
- dumb-jump
  expand-region
  easy-kill
  goto-chg
@@ -255,7 +253,7 @@
   (", e" . ymacs-hydra/ediff/body)
   ;; Minor mode to make xref use etags again.
   (", x" . xref-etags-mode)
-
+  (", o" . ace-link)
   (", SPC" . ymacs-editor/insert-space-around-chinese)
   (", a" . ymacs-editor/add-local-snippet)
   (", d" . ymacs-editor/delete-local-snippet))
@@ -263,7 +261,6 @@
 (define-key!
   ([remap kill-ring-save] . easy-kill)
 
-  ("C-c o" . ace-link)
   ("C-c O" . ymacs-hydra/outline/body)
 
   ("C-c <tab>" . company-complete)

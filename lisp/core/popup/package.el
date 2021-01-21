@@ -21,7 +21,8 @@
     (rx string-start
         (or "*Warnings*"
             "*Message*"
-            " *LanguageTool Errors* ")
+            " *LanguageTool Errors* "
+            " *CDLaTeX Help*")
         string-end)))
 
 (defvar ymacs-popup-occur-buffer-regexp

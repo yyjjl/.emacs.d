@@ -103,10 +103,7 @@
 ;; Default prog-mode setup
 (define-hook! ymacs-default//generic-prog-mode-setup (prog-mode-hook)
   (condition-case err
-      (progn
-        (hs-minor-mode 1)
-        (when (fboundp 'dumb-jump-xref-activate)
-          (add-hook 'xref-backend-functions 'dumb-jump-xref-activate nil t)))
+      (hs-minor-mode 1)
     (user-error (message "%s" (error-message-string err))))
 
   (ymacs-default//generic-text-mode-setup))
