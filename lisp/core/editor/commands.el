@@ -4,9 +4,11 @@
 (defun ymacs-editor/goto-last-point ()
   (interactive)
   (let ((old-point (point)))
-    (goto-last-point)
-    (when (eq (point) old-point)
-      (pop-to-mark-command))))
+    (with-demoted-errors "%s"
+      (call-interactively #'goto-last-change))
+    (if (eq (point) old-point)
+        (call-interactively #'pop-to-mark-command)
+      (message "goto last change"))))
 
 ;;;###autoload
 (defun ymacs-editor/find-file-externally (-files)

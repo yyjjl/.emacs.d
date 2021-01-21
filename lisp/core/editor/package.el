@@ -42,7 +42,7 @@
  dumb-jump
  expand-region
  easy-kill
- goto-last-point
+ goto-chg
  ;; Mark tools
  multiple-cursors
  ;; `wgrep' allows you to edit a grep buffer and apply those changes
@@ -236,7 +236,6 @@
 
   ("C-_" . ymacs-editor/goto-last-point)
   ("C-/" . ymacs-editor/goto-last-point)
-  ("/" . ymacs-editor/goto-last-point)
 
   ("o" . ace-window)
   ("b" . ivy-switch-buffer)
@@ -255,7 +254,7 @@
   (", s" . ymacs-hydra/sort/body)
   (", e" . ymacs-hydra/ediff/body)
   ;; Minor mode to make xref use etags again.
-  (", E" . xref-etags-mode)
+  (", x" . xref-etags-mode)
 
   (", SPC" . ymacs-editor/insert-space-around-chinese)
   (", a" . ymacs-editor/add-local-snippet)

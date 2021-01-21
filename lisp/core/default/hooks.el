@@ -161,9 +161,6 @@
   (savehist-mode 1)
   (save-place-mode 1)
 
-  (require 'goto-last-point)
-  (goto-last-point-mode 1)
-
   ;;`eldoc', show API doc in minibuffer echo area enabled by default
   ;; (global-eldoc-mode 1)
   (global-so-long-mode 1)
