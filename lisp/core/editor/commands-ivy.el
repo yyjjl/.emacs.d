@@ -86,7 +86,6 @@
   (call-interactively (if -arg #'ymacs-hydra/swiper/body #'counsel-grep-or-swiper)))
 
 ;;* ripgrep
-(defvar ymacs-editor-ivy--last-text nil)
 
 (defun ymacs-editor//rg-in-directory (&optional -args -directory -extra-args)
   (interactive (list (transient-args 'ymacs-editor/rg) nil nil))
@@ -114,6 +113,7 @@
          (shell-file-name "/bin/sh"))
     (counsel-rg ymacs-editor-ivy--last-text initial-directory -extra-args)))
 
+;;;###autoload
 (defun ymacs-editor//rg (&optional -args)
   (interactive (list (transient-args 'ymacs-editor/rg)))
 
@@ -171,6 +171,7 @@
 
 ;;* fzf
 
+;;;###autoload
 (defun ymacs-editor//fzf (&optional -args)
   (interactive (list (transient-args 'ymacs-editor/fzf)))
 

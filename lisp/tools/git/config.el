@@ -1,5 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
+(setq diff-hl-command-prefix (kbd "C-x \\"))
 (after! diff-hl
   (setq diff-hl-draw-borders nil)
   (setq diff-hl-side 'left)

@@ -274,3 +274,5 @@
   (setq image-animate-loop t))
 
 (setq winner-dont-bind-my-keys t)
+(after! winner
+  (setq winner-boring-buffers-regexp "^ \\*"))

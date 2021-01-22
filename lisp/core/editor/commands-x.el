@@ -8,6 +8,9 @@
 (defvar-local ymacs-x--return nil)
 (defvar-local ymacs-x--activated nil)
 
+(declare-function fcitx--ymacs-x-maybe-deactivate 'fcitx)
+(declare-function fcitx--ymacs-x-maybe-activate 'fcitx)
+
 (when (require 'fcitx nil t)
   (fcitx--defun-maybe "ymacs-x"))
 

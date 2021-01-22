@@ -14,7 +14,8 @@
 
 (define-key! ("C-x g"))
 (define-key! :prefix "C-x g"
-  ("G" . magit-dispatch)
+  ("d" . magit-dispatch)
+  ("b" . magit-blame)
   ("f" . magit-file-dispatch)
   ("=" . diff-hl-diff-goto-hunk)
   ("SPC" . diff-hl-mark-hunk)
@@ -24,4 +25,4 @@
   ("r" . diff-hl-revert-hunk)
   ("j" . ymacs-git/goto-hunk)
   ("g" . ymacs-git/status)
-  ("b" . magit-checkout))
+  ("c" . magit-checkout))
