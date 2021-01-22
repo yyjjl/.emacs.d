@@ -1,5 +1,11 @@
 ;;; -*- lexical-binding: t; -*-
 
+(defcustom ymacs-python-auto-activate-venv nil
+  "."
+  :group 'ymacs
+  :type 'boolean
+  :safe #'booleanp)
+
 (require-packages!
  py-autopep8
  py-isort

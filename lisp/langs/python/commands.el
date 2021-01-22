@@ -69,7 +69,7 @@ If not try to complete."
 (defun ymacs-python/create-venv (-directory -python-exe &optional -args)
   (interactive
    (list
-    (read-directory-name "Create .venv in: "
+    (read-directory-name "Create venv in: "
                          (ignore-errors (projectile-project-root))
                          nil :mustmatch)
     (read-shell-command "Python executable: " "python")
@@ -85,7 +85,7 @@ If not try to complete."
   (let ((default-directory -directory))
     (compile (format "virtualenv --python=%s %s %s\n"
                      -python-exe
-                     (expand-file-name ".venv")
+                     (expand-file-name "venv")
                      (or -args "")))))
 
 ;;;###autoload

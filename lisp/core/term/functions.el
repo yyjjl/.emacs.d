@@ -166,6 +166,10 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
 
     (when (buffer-live-p buffer)
       (with-current-buffer buffer
+        (when -shell-buffer-p
+          (hack-dir-local-variables-non-file-buffer)
+
+          (run-hooks 'ymacs-term-shell-exec-hook))
         (setq ymacs-term-exit-action (if -shell-buffer-p 'shell 'keep)))
       buffer)))
 

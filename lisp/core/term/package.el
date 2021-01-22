@@ -40,6 +40,7 @@ kill     => when process exits, kill buffer")
 (put 'ymacs-term-exit-action 'permanent-local t)
 
 (defvar ymacs-term-process-exit-hook '(ymacs-term//shell-exit))
+(defvar ymacs-term-shell-exec-hook nil)
 
 (defvar-local ymacs-term--ssh-info nil)
 (defvar-local ymacs-term--parent-buffer nil)

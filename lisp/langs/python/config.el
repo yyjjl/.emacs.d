@@ -63,3 +63,6 @@
 
   (when ymacs-pylint-path
     (setq python-check-command ymacs-pylint-path)))
+
+(after! pyvenv
+  (pyvenv-mode 1))

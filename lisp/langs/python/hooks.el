@@ -1,5 +1,15 @@
 ;;; -*- lexical-binding: t; -*-
 
+(after! pyvenv
+  (define-hook! ymacs-python//shell-exec-hook (ymacs-term-shell-exec-hook)
+    (when ymacs-python-auto-activate-venv
+      (let ((venv (getenv "VIRTUAL_ENV")))
+        (when (and (stringp venv)
+                   (file-directory-p venv))
+          (ymacs-term//send-string
+           (format "source %s\n"
+                   (expand-file-name "bin/activate" venv))))))))
+
 (after! cython-mode
   (define-hook! ymacs-cython//setup (cython-mode-hook)
     (setq electric-indent-chars (delq ?: electric-indent-chars))
