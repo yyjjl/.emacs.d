@@ -20,7 +20,6 @@
     ("<" . ymacs-org/hot-expand)
     ("C-c t" :map ymacs-org-table-extra-map)
     ("C-c [" . org-reftex-citation)
-    ("C-c {" . org-reftex-citation)
     ("M-," . org-mark-ring-goto)
     ("M-." . org-mark-ring-push)
     ("M-n" . ymacs-org/next-item)

@@ -14,6 +14,18 @@
 (when (require 'fcitx nil t)
   (fcitx--defun-maybe "ymacs-x"))
 
+(defvar ymacs-x-translation-table
+  '((?! . ?1)
+    (?@ . ?2)
+    (?# . ?3)
+    (?$ . ?4)
+    (?% . ?5)
+    (?^ . ?6)
+    (?& . ?7)
+    (?* . ?8)
+    (?\( . ?9)
+    (?\) . ?0)))
+
 (defvar ymacs-x-dynamic-keys
   '(("'" keyboard-quit)
     ("+" "C-+")
@@ -113,21 +125,25 @@
                (or (when (integerp -key)
                      (let ((modifiers (event-modifiers -key))
                            translated-key)
-                       (cond ((and (setq translated-key
+                       (cond ((and (setq translated-key (alist-get -key ymacs-x-translation-table))
+                                   (setq translated-key (vector translated-key))
+                                   (null (lookup-key-ignore-too-long -keymap translated-key)))
+                              translated-key)
+
+                             ((and (setq translated-key
                                          (ymacs-x//remove-modifier -key 'control modifiers))
                                    (setq translated-key (vector translated-key))
                                    (null (lookup-key-ignore-too-long -keymap translated-key)))
                               translated-key)
 
-                             ((and (memq 'shift modifiers)
-                                   (null (lookup-key-ignore-too-long -keymap "'"))
+                             ((and (null (lookup-key-ignore-too-long -keymap "'"))
                                    (setq translated-key (ymacs-x//remove-modifier -key 'shift modifiers))
                                    (setq translated-key (vector ?' translated-key)))
                               ;; keep old binding
                               (define-key map (vector -key) -binding)
                               translated-key))))
                    (vector -key)))
-         ;; parent keymap are traversed after its child
+         ;; NOTE: parent keymap are traversed after its child
          (unless (lookup-key-ignore-too-long map -key)
            (define-key map -key -binding)))
        -keymap)

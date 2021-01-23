@@ -23,7 +23,9 @@
 (defvar ymacs-org-table-extra-map
   (define-key! :map (make-sparse-keymap)
     ("t" . org-todo)
+    ("a" . orgtbl-ascii-plot)
     ("n" . org-table-create)
+    ("p" . org-plot/gnuplot)
     ("i" . org-table-import)
     ("e" . org-table-export)
     ("d" . org-table-delete-column)
