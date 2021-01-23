@@ -38,7 +38,7 @@
     ("d" "C-c C-d")
     ("e" "C-e" :exit no)
     ("f" "C-f" :exit no)
-    ("g" "M-g")
+    ("g" "C-x g")
     ("h" "C-h")
     ("i" "C-c i")
     ("j" "C-c i j")
@@ -77,7 +77,7 @@
   (define-key! :map ivy-minibuffer-map
     (";")
     (("; [" "; ]" "; ;") . self-insert-command)
-    ("; '" . minibuffer-keyboard-quit)
+    ("; q" . minibuffer-keyboard-quit)
     ("; o" . ivy-occur)
     ("; RET" . ivy-immediate-done)
     ("[" . ivy-previous-line)

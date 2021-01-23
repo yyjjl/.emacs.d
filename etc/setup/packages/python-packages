@@ -24,3 +24,4 @@ scipy
 svgwrite
 typeguard
 urllib3
+pipenv

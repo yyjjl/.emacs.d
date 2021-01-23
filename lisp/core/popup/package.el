@@ -53,7 +53,7 @@
   (eval-when-compile
     (rx string-start
         "*"
-        (or "shell"
+        (or (and (*? not-newline) "shell")
             "prolog"
             "sage"
             (and (*? not-newline) (or "repl" "compilation") (*? not-newline)))

@@ -44,7 +44,7 @@
   :safe #'booleanp)
 
 (define-key!
-  ("C-c p" . poporg-dwim)
+  ("C-x , p" . poporg-dwim)
   ("C-x O" . ymacs-org/project-open)
   ([C-f6] . ymacs-org/display-latex-fragment-at-point))
 

@@ -11,6 +11,7 @@ CORE_APPS=(
     p7zip
     fzf
     fd
+    pipenv
 )
 
 CASK_APPS=(

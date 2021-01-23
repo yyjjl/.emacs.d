@@ -8,7 +8,7 @@
     ("/" . ymacs-org/split-src-block)))
 
 (after! org
-  (require 'company-auctex nil t)
+  (require 'latex nil t)
 
   (ymacs-editor//add-toggles
    "Org"
@@ -33,8 +33,8 @@
     ("C-x , l" . org-latex-preview)
     ("C-x , ." . org-store-link)
     ("C-x , i" . org-toggle-inline-images)
-    ("C-x , n" . org-next-block)
-    ("C-x , p" . org-previous-block)
+    ("C-x , [" . org-next-block)
+    ("C-x , ]" . org-previous-block)
     ([f5] . ymacs-org/open)
     ([f9] . ymacs-org/publish-current-file)
     ([f10] . org-publish)
