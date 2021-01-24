@@ -222,8 +222,12 @@
   (define-key! :map xref--xref-buffer-mode-map
     ("M-n" . next-error)
     ("M-p" . previous-error)
-    ("j" . (interactive! () (xref--search-property 'xref-item)))
-    ("k" . (interactive! () (xref--search-property 'xref-item t))))
+    ("j"  (defun ymacs-default/xref-next ()
+             (interactive)
+             (xref--search-property 'xref-item)))
+    ("k" (defun ymacs-default/xref-prev ()
+           (interactive)
+           (xref--search-property 'xref-item t))))
 
   (add-to-list 'xref-prompt-for-identifier 'xref-find-references :append))
 

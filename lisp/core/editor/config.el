@@ -28,6 +28,7 @@
           ;; global-semantic-mru-bookmark-mode
           ))
   (setq semantic-idle-scheduler-idle-time 1)
+  (setq semanticdb-project-root-functions '(projectile-project-root))
 
   (dolist (mode '(c++-mode c-mode java-mode))
     (semanticdb-enable-gnu-global-databases mode)))
@@ -293,12 +294,24 @@
 
 (after! hideshow
   (define-key! :map hs-minor-mode-map
-    ("C-x t h" (interactive! (save-excursion (call-interactively #'hs-hide-block))))
-    ("C-x t s" (interactive! (save-excursion (call-interactively #'hs-show-block))))
-    ("C-x t H" (interactive! (save-excursion (call-interactively #'hs-hide-all))))
-    ("C-x t S" (interactive! (save-excursion (call-interactively #'hs-show-all))))
-    ("C-x t l" (interactive! (save-excursion (call-interactively #'hs-hide-level))))
-    ("C-x t t" (interactive! (save-excursion (call-interactively #'hs-toggle-hiding)))))
+    ("C-x t h" (defun ymacs-editor/hs-hide-block ()
+                 (interactive)
+                 (save-excursion (call-interactively #'hs-hide-block))))
+    ("C-x t s" (defun ymacs-editor/hs-show-block ()
+                 (interactive)
+                 (save-excursion (call-interactively #'hs-show-block))))
+    ("C-x t H" (defun ymacs-editor/hs-hide-all ()
+                 (interactive)
+                 (save-excursion (call-interactively #'hs-hide-all))))
+    ("C-x t S" (defun ymacs-editor/hs-show-all ()
+                 (interactive)
+                 (save-excursion (call-interactively #'hs-show-all))))
+    ("C-x t l" (defun ymacs-editor/hs-hide-level ()
+                 (interactive)
+                 (save-excursion (call-interactively #'hs-hide-level))))
+    ("C-x t t" (defun ymacs-editor/hs-toggle-hiding ()
+                 (interactive)
+                 (save-excursion (call-interactively #'hs-toggle-hiding)))))
 
   (define-key! :map ymacs-editor-hs-overlay-map
     ("RET" . hs-show-block))

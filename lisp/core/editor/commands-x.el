@@ -68,7 +68,7 @@
     ("v" "C-v" :exit no)
     ("w" ymacs-x/kill-or-save-buffer)
     ("x" "C-x")
-    ("y" "C-y")
+    ("y" "C-x t")
     ("z" "C-z")))
 
 (put 'digit-argument 'ymacs-x-exit 'no)
@@ -192,7 +192,8 @@
                 (ymacs-x-mode . ,ymacs-x-keymap))))
 
 (defun ymacs-x//pre-command-hook ()
-  (let ((exit (get this-command 'ymacs-x-exit))
+  (let ((exit (and (symbolp this-command)
+                   (get this-command 'ymacs-x-exit)))
         (after-activated (eq real-last-command 'ymacs-x/activate)))
     (if (and (not after-activated)
              (eq exit 'immediate)

@@ -6,6 +6,7 @@
  page-break-lines
  doom-themes
  which-key
+ volatile-highlights
  highlight-indentation)
 
 (load-theme 'doom-molokai t)
