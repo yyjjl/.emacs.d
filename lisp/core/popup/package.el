@@ -88,7 +88,7 @@
 (put 'ymacs-popup--matched-rule 'permanent-local t)
 (put 'ymacs-popup--nosplit-window 'permanent-local t)
 
-(defvar ymacs-popup-default-size 0.35)
+(defvar ymacs-popup-default-size 0.4)
 (defvar ymacs-popup-default-side 'below)
 
 (define-key!

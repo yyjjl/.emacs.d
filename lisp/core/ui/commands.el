@@ -13,7 +13,7 @@
              when (and (window-live-p window)
                        (equal path (window-parameter window 'ace-window-path)))
              return (aw-switch-to-window window))
-      (message "No specified window: %d" path))))
+      (message "No specified window: %s" path))))
 
 ;;;###autoload
 (defun ymacs-ui/toggle-aw-scope ()

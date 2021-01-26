@@ -222,3 +222,16 @@
   (define-advice iedit-mode (:before (&rest _) disable-mc)
     (when (bound-and-true-p multiple-cursors-mode)
       (multiple-cursors-mode -1))))
+
+(after! ace-window
+  (define-advice aw-update (:override () ignore-on)
+    (let ((aw-ignore-on t)
+          (aw-ignore-current))
+      (avy-traverse
+       (avy-tree (aw-window-list) aw-keys)
+       (lambda (path leaf)
+         (set-window-parameter
+          leaf 'ace-window-path
+          (propertize
+           (apply #'string (reverse path))
+           'face 'aw-mode-line-face)))))))
