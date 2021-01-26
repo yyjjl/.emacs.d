@@ -8,8 +8,23 @@
 (defvar-local ymacs-x--return nil)
 (defvar-local ymacs-x--activated nil)
 
+(declare-function fcitx--ymacs-x-maybe-deactivate 'fcitx)
+(declare-function fcitx--ymacs-x-maybe-activate 'fcitx)
+
 (when (require 'fcitx nil t)
   (fcitx--defun-maybe "ymacs-x"))
+
+(defvar ymacs-x-translation-table
+  '((?! . ?1)
+    (?@ . ?2)
+    (?# . ?3)
+    (?$ . ?4)
+    (?% . ?5)
+    (?^ . ?6)
+    (?& . ?7)
+    (?* . ?8)
+    (?\( . ?9)
+    (?\) . ?0)))
 
 (defvar ymacs-x-dynamic-keys
   '(("'" keyboard-quit)
@@ -35,7 +50,7 @@
     ("d" "C-c C-d")
     ("e" "C-e" :exit no)
     ("f" "C-f" :exit no)
-    ("g" "M-g")
+    ("g" "C-x g")
     ("h" "C-h")
     ("i" "C-c i")
     ("j" "C-c i j")
@@ -53,7 +68,7 @@
     ("v" "C-v" :exit no)
     ("w" ymacs-x/kill-or-save-buffer)
     ("x" "C-x")
-    ("y" "C-y")
+    ("y" "C-x t")
     ("z" "C-z")))
 
 (put 'digit-argument 'ymacs-x-exit 'no)
@@ -74,7 +89,7 @@
   (define-key! :map ivy-minibuffer-map
     (";")
     (("; [" "; ]" "; ;") . self-insert-command)
-    ("; '" . minibuffer-keyboard-quit)
+    ("; q" . minibuffer-keyboard-quit)
     ("; o" . ivy-occur)
     ("; RET" . ivy-immediate-done)
     ("[" . ivy-previous-line)
@@ -110,21 +125,25 @@
                (or (when (integerp -key)
                      (let ((modifiers (event-modifiers -key))
                            translated-key)
-                       (cond ((and (setq translated-key
+                       (cond ((and (setq translated-key (alist-get -key ymacs-x-translation-table))
+                                   (setq translated-key (vector translated-key))
+                                   (null (lookup-key-ignore-too-long -keymap translated-key)))
+                              translated-key)
+
+                             ((and (setq translated-key
                                          (ymacs-x//remove-modifier -key 'control modifiers))
                                    (setq translated-key (vector translated-key))
                                    (null (lookup-key-ignore-too-long -keymap translated-key)))
                               translated-key)
 
-                             ((and (memq 'shift modifiers)
-                                   (null (lookup-key-ignore-too-long -keymap "'"))
+                             ((and (null (lookup-key-ignore-too-long -keymap "'"))
                                    (setq translated-key (ymacs-x//remove-modifier -key 'shift modifiers))
                                    (setq translated-key (vector ?' translated-key)))
                               ;; keep old binding
                               (define-key map (vector -key) -binding)
                               translated-key))))
                    (vector -key)))
-         ;; parent keymap are traversed after its child
+         ;; NOTE: parent keymap are traversed after its child
          (unless (lookup-key-ignore-too-long map -key)
            (define-key map -key -binding)))
        -keymap)
@@ -173,7 +192,8 @@
                 (ymacs-x-mode . ,ymacs-x-keymap))))
 
 (defun ymacs-x//pre-command-hook ()
-  (let ((exit (get this-command 'ymacs-x-exit))
+  (let ((exit (and (symbolp this-command)
+                   (get this-command 'ymacs-x-exit)))
         (after-activated (eq real-last-command 'ymacs-x/activate)))
     (if (and (not after-activated)
              (eq exit 'immediate)

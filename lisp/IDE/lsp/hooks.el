@@ -26,7 +26,7 @@
               (setq content
                     (--> content
                       (substring it 0 (- max-width 30))
-                      (replace-regexp-in-string "\n+" "｜" it t t)
+                      (replace-regexp-in-string "\n+" "|" it t t)
                       (concat it suffix)))
               (remove-text-properties 0 (length content) '(display) content)))))
       content))

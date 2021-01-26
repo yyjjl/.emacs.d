@@ -21,6 +21,9 @@
     (rx string-start
         (or "*Warnings*"
             "*Message*"
+            "*Org Agenda*"
+            "*Org Dashboard*"
+            "*Org Select*"
             " *LanguageTool Errors* "
             " *CDLaTeX Help*")
         string-end)))
@@ -50,7 +53,7 @@
   (eval-when-compile
     (rx string-start
         "*"
-        (or "shell"
+        (or (and (*? not-newline) "shell")
             "prolog"
             "sage"
             (and (*? not-newline) (or "repl" "compilation") (*? not-newline)))

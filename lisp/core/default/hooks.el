@@ -81,11 +81,6 @@
 (define-hook! ymacs-default//minibuffer-exit (minibuffer-exit-hook)
   (setq gc-cons-threshold ymacs-gc-cons-threshold))
 
-(define-hook! (ymacs-default//default-frame-setup &optional frame)
-  (window-setup-hook ;; when setup
-   after-make-frame-functions)
-  (set-frame-parameter frame 'buffer-predicate #'ymacs-default//buffer-predicate))
-
 ;; Make scratch buffer un-killable
 (define-hook! ymacs-default//unkillable-buffer (kill-buffer-query-functions)
   (let ((bn (buffer-name)))

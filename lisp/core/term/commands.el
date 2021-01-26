@@ -75,6 +75,10 @@
     (unless -no-quit-p
       (delete-window (ymacs-popup//get-term-window)))))
 
+(defun ymacs-term/switch-back-no-quit ()
+  (interactive)
+  (ymacs-term/switch-back t))
+
 ;;;###autoload
 (defun ymacs-term/pop-shell-here ()
   (interactive)
@@ -82,8 +86,8 @@
              (buffer (ymacs-term//create-buffer nil t)))
     (with-current-buffer buffer
       (local-set-key [f8] #'ymacs-term/switch-back)
-      (local-set-key (kbd "C-c C-z") (interactive! (ymacs-term/switch-back t)))
-      (local-set-key (kbd "C-c z") (interactive! (ymacs-term/switch-back t)))
+      (local-set-key (kbd "C-c C-z") #'ymacs-term/switch-back-no-quit)
+      (local-set-key (kbd "C-c z") #'ymacs-term/switch-back-no-quit)
       (setq ymacs-term--parent-buffer parent-buffer))
     (display-buffer buffer)))
 
@@ -100,8 +104,8 @@ else: try to find a old term buffer and pop to it"
         (switch-to-buffer buffer)
       (with-current-buffer buffer
         (local-set-key [f8] #'ymacs-term/switch-back)
-        (local-set-key (kbd "C-c C-z") (interactive! (ymacs-term/switch-back t)))
-        (local-set-key (kbd "C-c z") (interactive! (ymacs-term/switch-back t)))
+        (local-set-key (kbd "C-c C-z") #'ymacs-term/switch-back-no-quit)
+        (local-set-key (kbd "C-c z") #'ymacs-term/switch-back-no-quit)
         (setq ymacs-term--parent-buffer parent-buffer)))
     (display-buffer buffer)))
 

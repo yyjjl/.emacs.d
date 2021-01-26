@@ -22,10 +22,10 @@
   (global-font-lock-mode 1)
   (global-page-break-lines-mode 1)
   (global-hl-todo-mode 1)
-
   (global-whitespace-mode 1)
 
   (which-key-mode 1)
+  (volatile-highlights-mode 1)
 
   (column-number-mode 1)
   (show-paren-mode 1))

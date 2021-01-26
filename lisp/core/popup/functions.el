@@ -172,6 +172,19 @@ Displays -BUFFER according to -ALIST and -RULE."
         (select-window window)))
     window))
 
+(defun ymacs-popup//buffer-predicate (-buffer)
+  (or (buffer-file-name -buffer)
+      (not
+       (or
+        (eq (buffer-local-value 'major-mode -buffer) 'fundamental-mode)
+        (when-let (rule (buffer-local-value 'ymacs-popup--matched-rule -buffer))
+          (or (plist-get rule :dedicated)
+              (plist-get rule :autoclose)
+              (plist-get rule :terminal)))
+        (ymacs-popup//help-buffer-p -buffer)
+        (ymacs-popup//occur-buffer-p -buffer)
+        (ymacs-popup//term-buffer-p -buffer)))))
+
 
 
 (defsubst ymacs-popup//rule-to-form (rule)

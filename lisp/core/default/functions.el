@@ -16,11 +16,6 @@
           (message "Opened %s externally" file))
       (message "Don't know how to open %s" file))))
 
-(defun ymacs-default//buffer-predicate (buffer)
-  (or (buffer-file-name buffer)
-      (not (string-prefix-p "*" (buffer-name buffer)))
-      (equal (buffer-name buffer) "*scratch*")))
-
 (defun ymacs-default//buffer-has-long-lines-p ()
   ;; @see Doom Emacs #2183: `so-long-detected-long-line-p' tries to parse
   ;;      comment syntax, but in some buffers comment state isn't

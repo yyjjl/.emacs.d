@@ -8,7 +8,7 @@
     ("/" . ymacs-org/split-src-block)))
 
 (after! org
-  (require 'company-auctex nil t)
+  (require 'latex nil t)
 
   (ymacs-editor//add-toggles
    "Org"
@@ -20,21 +20,20 @@
     ("<" . ymacs-org/hot-expand)
     ("C-c t" :map ymacs-org-table-extra-map)
     ("C-c [" . org-reftex-citation)
-    ("C-c {" . org-reftex-citation)
     ("M-," . org-mark-ring-goto)
     ("M-." . org-mark-ring-push)
     ("M-n" . ymacs-org/next-item)
     ("M-p" . ymacs-org/previous-item)
-    ("C-c l" . org-store-link)
     ("C-c b" . org-switchb)
-    ("C-c q" . counsel-org-tags)
+    ("C-c q" . counsel-org-tag)
     ("C-c p" . org-previous-visible-heading)
     ("C-c n" . org-next-visible-heading)
     ("C-c DEL" . org-cycle-list-bullet)
     ("C-x , l" . org-latex-preview)
+    ("C-x , ." . org-store-link)
     ("C-x , i" . org-toggle-inline-images)
-    ("C-x , n" . org-next-block)
-    ("C-x , p" . org-previous-block)
+    ("C-x , [" . org-next-block)
+    ("C-x , ]" . org-previous-block)
     ([f5] . ymacs-org/open)
     ([f9] . ymacs-org/publish-current-file)
     ([f10] . org-publish)

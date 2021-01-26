@@ -137,7 +137,7 @@
    (("l" ediff-regions-linewise)
     ("w" ediff-regions-wordwise))))
 
-(defhydra ymacs-hydra/mc (:color pink :hint nil)
+(defhydra ymacs-hydra/mc (:color red :hint nil)
   ""
   ("." mc/mark-next-like-this "next")
   ("=" mc/mark-next-like-this "next")

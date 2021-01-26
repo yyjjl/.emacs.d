@@ -84,6 +84,7 @@
 (defvar ymacs-editor-ivy-switch-function-list nil)
 (defvar ymacs-editor-ivy-extra-help-lines nil)
 (defvar ymacs-editor-ivy-display-help-max-width 160)
+(defvar ymacs-editor-ivy--last-text nil)
 
 (defvar ymacs-editor-ivy-display-help-extra-commands
   '(ivy-restrict-to-matches
@@ -210,6 +211,7 @@
 (autoload 'ymacs-hydra/window/enlarge-window-horizontally (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/window/shrink-window (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/window/shrink-window-horizontally (expand! "commands-hydra") nil t)
+(autoload 'ymacs-hydra/window/body (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/sort/body (expand! "commands-hydra") nil t)
 
 (put 'projectile-project-run-cmd 'safe-local-variable #'stringp)

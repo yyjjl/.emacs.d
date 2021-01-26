@@ -15,6 +15,8 @@
     (setq lsp-pyright-typechecking-mode "off")))
 
 (after! python
+  (pyvenv-mode 1)
+
   (ymacs-editor//add-toggles
    "Python"
    '(derived-mode-p 'python-mode)
@@ -65,4 +67,4 @@
     (setq python-check-command ymacs-pylint-path)))
 
 (after! pyvenv
-  (pyvenv-mode 1))
+)
