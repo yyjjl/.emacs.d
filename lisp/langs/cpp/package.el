@@ -1,6 +1,11 @@
 ;; -*- lexical-binding:t -*-
 
-(executable! clangd :-exe [(expand-cache! "lsp/clangd/bin/clangd") "clangd"])
+(defcustom ymacs-cpp-clangd-version "11.0.0"
+  "clangd version"
+  :group 'ymacs
+  :type 'string)
+
+(executable! clangd :-exe [(expand-cache! (format "lsp/clangd_%s/bin/clangd" ymacs-cpp-clangd-version)) "clangd"])
 
 (require-packages! clang-format google-c-style)
 
@@ -66,7 +71,4 @@
   (add-to-list 'ymacs-debugger-alist '(c++-mode gdb :gud t)))
 
 (eval-when-has-feature! lsp
-  (ymacs-lsp//register-client
-   'clangd
-   :package 'lsp-clangd
-   :manual `(:title "Clangd" :repo "clangd/clangd" :exe ,ymacs-clangd-path)))
+  (ymacs-lsp//register-client 'clangd :package 'lsp-clangd))

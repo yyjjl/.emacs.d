@@ -2,48 +2,7 @@
 
 (declare-function lsp-semantic-tokens--disable 'lsp-mode)
 
-(defun ymacs-lsp//display-info-from-github (-repo)
-  (require 'url-handlers)
-
-  (let* ((url (format "https://api.github.com/repos/%s/releases/latest" -repo))
-         (info (with-temp-buffer
-                 (erase-buffer)
-                 (message "GET %s ..." url)
-                 (url-insert-file-contents url)
-                 (message "GET %s ...done" url)
-                 (goto-char (point-min))
-                 (json-parse-buffer :object-type 'alist))))
-    (insert (format "*url* :: [[%s]]\n" (alist-get 'html_url info)))
-    (insert (format "*name* :: %s\n" (alist-get 'name info)))
-    (insert (format "*tag_name* :: %s\n" (alist-get 'tag_name info)))
-    (insert (format "*published_at* :: %s\n" (alist-get 'published_at info)))
-    (cl-loop
-     for asset across (or (alist-get 'assets info) [])
-     do (insert (format "- [[%s][%s]] %s\n"
-                        (alist-get 'browser_download_url asset)
-                        (alist-get 'name asset)
-                        (if-let (size (alist-get 'size asset))
-                            (file-size-human-readable size)
-                          "??"))))))
-
-(cl-defun ymacs-lsp//check-software-from-github
-    (&key
-       ((:title -title))
-       ((:repo -repo))
-       ((:exe -executable))
-       ((:version -version-flag) "--version"))
-  (insert (format "* %s\n" -title))
-  (insert (format "*Path* :: %s\n" -executable))
-  (if (file-executable-p -executable)
-      (progn
-        (insert (format "*Installed* :: %s\n"
-                        (shell-command-to-string (concat -executable " " -version-flag))))
-        (ymacs-lsp//display-info-from-github -repo))
-    (insert "*Not installed*\n"))
-  (insert "\n\n")
-  (redisplay t))
-
-(defun ymacs-lsp//install-clients--loop (-clients -manual-clients &optional -outputs)
+(defun ymacs-lsp//install-clients--loop (-clients &optional -outputs)
   (if-let (client (car -clients))
       (progn
         (push (format "* Install %s" client) -outputs)
@@ -51,30 +10,26 @@
         (let ((install-fn (lsp--client-download-server-fn (ht-get lsp-clients client)))
               (callback-fn
                (lambda (&rest _)
-                 (ymacs-lsp//install-clients--callback -clients -manual-clients -outputs))))
+                 (ymacs-lsp//install-clients--callback -clients -outputs))))
           (funcall install-fn client callback-fn callback-fn t)))
 
-    (ymacs-lsp//install-clients--finish -manual-clients -outputs)))
+    (ymacs-lsp//install-clients--finish -outputs)))
 
-(defun ymacs-lsp//install-clients--callback (-clients -manual-clients -outputs)
+(defun ymacs-lsp//install-clients--callback (-clients -outputs)
   (ymacs-lsp//install-clients--loop
    (cdr -clients)
-   -manual-clients
    (let ((buffer (get-buffer-create ymacs-lsp-process-buffer-name)))
      (when (buffer-live-p buffer)
        (with-current-buffer buffer
          (push (buffer-substring (point-min) (point-max)) -outputs)))
      -outputs)))
 
-(defun ymacs-lsp//install-clients--finish (-manual-clients -outputs)
+(defun ymacs-lsp//install-clients--finish (-outputs)
   (with-current-buffer (get-buffer-create ymacs-lsp-process-buffer-name)
     (let ((inhibit-read-only t))
       (erase-buffer)
       (insert (string-join (reverse -outputs) "\n\n") "\n\n")
       (goto-char (point-max))
-
-      (dolist (client -manual-clients)
-        (apply #'ymacs-lsp//check-software-from-github client))
 
       (org-mode)
       (pop-to-buffer (current-buffer))
@@ -84,19 +39,15 @@
 (defun ymacs-lsp/check-for-updates ()
   (interactive)
 
-  (let (clients manual-clients)
-    (cl-loop
-     for (client package manual enable-fn) in ymacs-lsp--enabled-clients
-     when (or (null enable-fn)
-              (funcall enable-fn))
-     do (if manual
-            (push manual manual-clients)
-          (progn
-            (when package
-              (require package nil t))
-            (push client clients))))
-
-    (ymacs-lsp//install-clients--loop clients manual-clients)))
+  (ymacs-lsp//install-clients--loop
+   (cl-loop
+    for (client package enable-fn) in ymacs-lsp--enabled-clients
+    when (or (null enable-fn)
+             (funcall enable-fn))
+    collect (progn
+              (when package
+                (require package nil t))
+              client))))
 
 ;;;###autoload
 (defun ymacs-lsp/toggle-semantic-tokens ()

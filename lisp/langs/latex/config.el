@@ -5,7 +5,14 @@
 
   (after! lsp-diagnostics
     (add-to-list 'lsp-diagnostics-disabled-modes 'latex-mode)
-    (add-to-list 'lsp-diagnostics-disabled-modes 'tex-mode)))
+    (add-to-list 'lsp-diagnostics-disabled-modes 'tex-mode))
+
+  (after! lsp-tex
+    (setf (lsp--client-download-server-fn (ht-get lsp-clients 'texlab))
+          (ymacs-lsp//make-download-from-github-fn
+           "latex-lsp/texlab"
+           (lambda (x) (string-match-p (if sys/linuxp "linux" "macos") x))
+           :tgz))))
 
 (after! latex
   (ymacs-editor//add-toggles

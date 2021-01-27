@@ -16,7 +16,8 @@
  '(ymacs-lsp-use-dap nil)
  '(ymacs-editor-use-childframe t)
  '(ymacs-term-type 'vterm)
- '(ymacs-python-lsp-server 'pyright))
+ '(ymacs-python-lsp-server 'pyright)
+ '(ymacs-cpp-clangd-version "11.0.0"))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

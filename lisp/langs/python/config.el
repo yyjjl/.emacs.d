@@ -34,6 +34,7 @@
     (("C-c C-z" "C-c z") . ymacs-python/pop-to-source-buffer))
 
   (define-key! :map python-mode-map
+    ("C-c e" . ymacs-python/extract-expression)
     ("C-c v" . ymacs-python/create-venv)
     ("C-c V" . ymacs-python/create-venv-in-workon-home)
     (("C-c C-z" "C-c z") . ymacs-python/pop-to-shell)

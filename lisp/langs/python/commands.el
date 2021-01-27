@@ -120,16 +120,30 @@ If not try to complete."
       (ymacs-python//send-region-or-buffer (= (prefix-numeric-value current-prefix-arg) 4)))))
 
 ;;;###autoload
+(defun ymacs-python/extract-expression (-beg -end)
+  (interactive "r")
+  (let ((expr (buffer-substring -beg -end))
+        (var (read-string "Variable: ")))
+    (kill-new (format "%s = %s" var expr))
+    (query-replace expr var nil
+                   (save-excursion
+                     (beginning-of-defun)
+                     (point))
+                   (save-excursion
+                     (end-of-defun)
+                     (point)))))
+
+;;;###autoload
 (defun ymacs-python/toggle-breakpoint ()
   "Add a break point, highlight it."
   (interactive)
   (let* ((version
           (--> "python3 --version"
-               (shell-command-to-string it)
-               (split-string it)
-               (nth 1 it)
-               (split-string it "\\.")
-               (mapcar #'string-to-number it)))
+            (shell-command-to-string it)
+            (split-string it)
+            (nth 1 it)
+            (split-string it "\\.")
+            (mapcar #'string-to-number it)))
          (trace (cond ((and version (>= (or (nth 1 version) 0) 7))
                        "breakpoint()")
                       ((executable-find "ipdb")
