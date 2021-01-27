@@ -232,8 +232,7 @@
     ("C-p" . company-select-previous)
     ("M-n" . company-next-page)
     ("M-p" . company-previous-page)
-    ((0 . 9) . ymacs-editor/company-number)
-    ("=" . ymacs-editor/company-number))
+    ((0 . 9) . ymacs-editor/company-number))
 
   (setq-default company-backends
                 `((company-capf
