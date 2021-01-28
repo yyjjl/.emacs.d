@@ -258,4 +258,7 @@ Displays -BUFFER according to -ALIST and -RULE."
   :size auto
   :side below
   :no-modeline t
-  :autoclose t))
+  :autoclose t)
+ (
+  :name-regexp ymacs-popup-other-window-regexp
+  :select t))

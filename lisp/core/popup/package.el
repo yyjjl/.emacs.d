@@ -28,10 +28,16 @@
             " *CDLaTeX Help*")
         string-end)))
 
+(defvar ymacs-popup-other-window-regexp
+  (eval-when-compile
+    (rx string-start
+        "*" (or "Man" "WoMan") (*? not-newline) "*"
+        string-end)))
+
 (defvar ymacs-popup-occur-buffer-regexp
   (eval-when-compile
     (rx string-start
-        "*" (or "xref" "Man" "TeX" "Shell Command Output") (*? not-newline) "*"
+        "*" (or "xref" "TeX" "Shell Command Output") (*? not-newline) "*"
         string-end)))
 
 (defvar ymacs-popup-help-buffer-regexp
