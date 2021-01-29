@@ -113,6 +113,8 @@
 
 
 (setq package-quickstart t)
+(with-no-warnings
+  (setq package-native-compile t))
 
 ;; The index of archive represents its priority
 (setq package-archives
