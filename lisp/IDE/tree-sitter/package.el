@@ -5,6 +5,11 @@
 (after! tree-sitter
   (require 'tree-sitter-langs)
 
+  (add-to-list
+   'mode-line-misc-info
+   '(tree-sitter-hl-mode "TreeH " (tree-sitter-mode "Tree "))
+   :append)
+
   (ymacs-editor//add-toggles
    "Global" t
    '("H" (if tree-sitter-hl-mode

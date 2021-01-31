@@ -4,4 +4,4 @@
   (advice-add 'cperl-indent-command :around #'indent-for-tab-command@smart)
 
   (define-key! :map cperl-mode-map
-    ("C-c b" . ymacs-perl/perltidy-format)))
+    ("C-c C-b" . ymacs-perl/perltidy-format)))

@@ -35,7 +35,10 @@
 
 (after! dired
   (define-key! :map dired-mode-map
-    (")" . dired-omit-mode)
+    ("\\" . dired-compare-directories)
+    ("]" . dired-omit-mode)
+    (")" . dired-collapse-mode)
+    ("[" . dired-hide-details-mode)
     ("E" . ymacs-editor/find-file-externally)
     ("M-p" . dired-prev-subdir)
     ("M-n" . dired-next-subdir)
@@ -199,7 +202,7 @@
   (setq ivy-initial-inputs-alist nil)
   (setq ivy-dispatching-done-columns 3)
   (setq ivy-fixed-height-minibuffer t)
-  (setq ivy-re-builders-alist '((t . ivy--regex-plus)))
+  (setq ivy-re-builders-alist '((t . ymacs-editor//ivy-re-builder)))
   (setq ivy-use-virtual-buffers t)
   (setq ivy-virtual-abbreviate 'full)
   (setq ivy-use-selectable-prompt t)

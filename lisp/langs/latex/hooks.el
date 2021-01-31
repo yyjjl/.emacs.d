@@ -2,9 +2,6 @@
 
 (declare-function reftex-toc-rescan "reftex")
 
-(after! 'cdlatex
-  (define-key cdlatex-mode-map "\t" nil))
-
 (after! reftex
   (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan))
 

@@ -99,7 +99,13 @@
     (("; [" "; ]" "; ;") . self-insert-command)
     ("; q" . minibuffer-keyboard-quit)
     ("; '" . minibuffer-keyboard-quit)
+    ("; ," . ivy-beginning-of-buffer)
+    ("; ." . ivy-end-of-buffer)
+    ("; a" . ivy-toggle-marks)
     ("; o" . ivy-occur)
+    ("; p" . ivy-previous-line-and-call)
+    ("; n" . ivy-next-line-and-call)
+    ("; r" . counsel-minibuffer-history)
     ("; RET" . ivy-immediate-done)
     ("[" . ivy-previous-line)
     ("]" . ivy-next-line)))
@@ -286,6 +292,14 @@
   (if (region-active-p)
       (call-interactively #'kill-region)
     (call-interactively #'save-buffer)))
+
+(after! which-key
+  (put 'which-key-C-h-dispatch 'ymacs-x-exit 'no)
+  (map-keymap
+   (lambda (_key def)
+     (when (and (symbolp def) (commandp def))
+       (put def 'ymacs-x-exit 'no)))
+   which-key-C-h-map))
 
 ;;;###autoload
 (defun ymacs-x//enable ()

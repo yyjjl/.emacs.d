@@ -12,6 +12,11 @@
                (eval-when-compile
                  (rx-to-string `(: string-start ,(file-truename user-emacs-directory) string-end))))
 
+  (add-to-list
+   'mode-line-misc-info
+   '(lsp-signature-mode
+     (:propertize "[Signature]" face ymacs-modeline-lsp-success)))
+
   (ymacs-editor//add-toggles
    "LSP" 'lsp-mode
    '("l i" lsp-toggle-trace-io
@@ -31,7 +36,8 @@
    '("l I" lsp-install-server "Install Server" :exit t))
 
   (define-key! :map lsp-command-map
-    ("'" . lsp-avy-lens)
+    (";" . lsp-avy-lens)
+    ("i" . ymacs-lsp/remove-invalid-folders)
     ("R" . lsp-workspace-folders-remove)
     ("b" . lsp-workspace-blacklist-remove)
     ("o" . lsp-workspace-folders-open)
@@ -52,8 +58,8 @@
     ("C-c I" . lsp-ivy-workspace-symbol)
     ("C-c G" . lsp-ivy-global-workspace-symbol)
     ("C-c S" . lsp-describe-session)
-    ("C-c B" . ymacs-lsp/organize-imports)
-    (("C-c b" "C-c C-b") . ymacs-lsp/format-buffer)
+    ("C-c b" . ymacs-lsp/organize-imports)
+    ("C-c C-b" . ymacs-lsp/format-buffer)
     ("C-c C-d" . lsp-describe-thing-at-point)
     ("C-c C-SPC" . lsp-execute-code-action)
     ("M-o" . lsp-signature-activate))

@@ -423,14 +423,22 @@ like the scratch buffer where knowing the current project directory is important
 ;;* Misc info
 ;;
 
+(defsubst ymacs-modeline//update-lsp-state (&optional -buffer)
+  (let ((buffer (or -buffer (current-buffer))))
+    (when (buffer-live-p buffer)
+      (with-current-buffer buffer
+        (setq ymacs-modeline--lsp-state
+              (format-mode-line (assoc 'lsp-mode minor-mode-alist)))))))
+
 (ymacs-modeline//def-segment misc-info
   "Mode line construct for miscellaneous information.
 By default, this shows the information specified by `global-mode-string'."
   (list
-   " "
+   ""
    mode-line-misc-info
    (propertize (or ymacs-modeline--project-parent-path default-directory)
-               'face 'font-lock-doc-face)))
+               'face 'font-lock-doc-face)
+   ymacs-modeline--lsp-state))
 
 ;;
 ;;* Position
@@ -483,22 +491,15 @@ By default, this shows the information specified by `global-mode-string'."
                 'face 'ymacs-modeline-input-method)))
 
 ;;
-;;* LSP
+;;* Dired
 ;;
 
-(defsubst ymacs-modeline//update-lsp-state (&optional -buffer)
-  (let ((buffer (or -buffer (current-buffer))))
-    (when (buffer-live-p buffer)
-      (with-current-buffer buffer
-        (setq ymacs-modeline--lsp-state
-              (format-mode-line (assoc 'lsp-mode minor-mode-alist)))))))
-
-(ymacs-modeline//def-segment misc-header
-  '(""
-    (tree-sitter-hl-mode " TreeHL" (tree-sitter-mode " Tree"))
-    ymacs-modeline--lsp-state
-    (lsp-signature-mode
-     (:propertize "[Signature]" face ymacs-modeline-lsp-success))))
+(ymacs-modeline//def-segment dired
+  '(:propertize
+    ((dired-hide-details-mode " Hide")
+     (dired-omit-mode " Omit")
+     (dired-collapse-mode " Collapse"))
+    face font-lock-doc-face))
 
 
 
@@ -509,20 +510,11 @@ By default, this shows the information specified by `global-mode-string'."
 (ymacs-modeline//def-modeline shell
   (window-number matches buffer-info remote-host major-mode))
 
-(ymacs-modeline//def-modeline minimal
-  (matches buffer-info-simple media-info major-mode))
-
-(ymacs-modeline//def-modeline special
-  (window-number matches buffer-info buffer-position buffer-encoding major-mode))
-
-(ymacs-modeline//def-modeline project
-  (window-number matches buffer-default-directory major-mode))
+(ymacs-modeline//def-modeline dired
+  (window-number matches buffer-default-directory major-mode dired))
 
 (ymacs-modeline//def-modeline vcs
   (window-number matches buffer-info buffer-position buffer-encoding major-mode))
-
-(ymacs-modeline//def-modeline info
-  (window-number buffer-info buffer-position buffer-encoding major-mode))
 
 (ymacs-modeline//def-modeline media
   (window-number buffer-size buffer-info media-info major-mode vcs))
@@ -537,4 +529,4 @@ By default, this shows the information specified by `global-mode-string'."
   (window-number matches git-timemachine buffer-position buffer-encoding major-mode))
 
 (ymacs-modeline//def-modeline header
-  (debug input-method misc-header misc-info))
+  (debug input-method misc-info))

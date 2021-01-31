@@ -156,19 +156,26 @@ Arguments are same as of `defhydra'."
   (when (and -cmd (not (stringp -cmd)))
     (setq -cmd (string-join -cmd " ")))
 
+  (when -cmd
+    (setq -cmd (propertize -cmd 'face font-lock-doc-face)))
+
+  (let ((max-cmd-length (frame-width)))
+    (when (> (length -cmd) max-cmd-length)
+      (setq -cmd (concat (substring -cmd 0 max-cmd-length)
+                         (propertize "[...]" 'face font-lock-keyword-face)))))
+
+  (setq -directory
+        (propertize (or -directory default-directory)
+                    'face font-lock-constant-face))
+
   (let* ((extra-string
           (when ymacs-editor-ivy-extra-help-lines
-            (propertize
-             (string-join ymacs-editor-ivy-extra-help-lines "\n")
-             'face 'font-lock-string-face)))
+            (propertize (string-join ymacs-editor-ivy-extra-help-lines "\n")
+                        'face 'font-lock-string-face)))
          (key-string (ymacs-editor//display-help--keys))
          (cmd-string
           (when -cmd
-            (format "(@%s) %s"
-                    (propertize (or -directory default-directory)
-                                'face font-lock-constant-face)
-                    (propertize -cmd
-                                'face font-lock-doc-face))))
+            (format "(@%s) %s" -directory -cmd)))
          (help-string
           (concat extra-string
                   (when (and extra-string (or key-string cmd-string)) "\n")
@@ -180,8 +187,15 @@ Arguments are same as of `defhydra'."
 
 
 ;;
-;;* Switch ivy backend
+;;* Ivy
 ;;
+
+(autoload 'pinyinlib-build-regexp-string "pinyinlib")
+
+(defun ymacs-editor//ivy-re-builder (-str)
+  (when (string-prefix-p "=" -str)
+    (setq -str (pinyinlib-build-regexp-string (substring -str 1) t nil t)))
+  (ivy--regex-plus -str))
 
 (defmacro ymacs-editor//define-switch (&rest -body)
   (declare (indent 0))

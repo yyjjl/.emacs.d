@@ -40,7 +40,7 @@
     (define-key! :map map
       (("<" ">" "C-c C-d"))             ; unbind
       ("*" . ymacs-cpp/electric-star)
-      (("C-c C-b" "C-C b") . clang-format-buffer)
+      ("C-c C-b" . clang-format-buffer)
       ("C-c C-l" . ymacs-term/load-file-in-repl)))
 
   (dolist (key '("#" "}" "/" ";" "," ":" "(" ")" "{"))

@@ -13,7 +13,6 @@
     ("C-c D" . haskell-cabal-add-dependency)
 
     ("C-c C-b" . haskell-mode-stylish-buffer)
-    ("C-c b" . haskell-mode-stylish-buffer)
 
     ("C-c Q" . haskell-session-kill)
     ("C-c R" . haskell-mode-generate-tags)

@@ -1,6 +1,7 @@
 aria2
 autoconf
 automake
+bear
 clang
 clang-format
 cmake

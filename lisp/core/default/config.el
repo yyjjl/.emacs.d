@@ -247,6 +247,9 @@
     ("p" . previous-line)
     ("k" . previous-line)))
 
+(after! info
+  (setq info-lookup-other-window-flag nil))
+
 (after! so-long
   ;; reduce false positives w/ larger threshold
   (setq so-long-threshold 1000)

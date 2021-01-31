@@ -41,11 +41,10 @@
  expand-region
  easy-kill
  goto-chg
- ;; Mark tools
  multiple-cursors
- ;; `wgrep' allows you to edit a grep buffer and apply those changes
- ;; to the file buffer.
  wgrep
+ diredfl
+ dired-collapse
  buffer-move
  graphviz-dot-mode
  ace-pinyin
@@ -93,7 +92,10 @@
     (counsel-find-file . ivy-magic-read-file-env)))
 
 (defvar ymacs-editor-ivy-display-help-ignore-commands
-  '(ymacs-editor/ivy-meta-dot))
+  '(ymacs-editor/ivy-meta-dot
+    counsel-up-directory
+    swiper-C-s
+    swiper-recenter-top-bottom))
 
 (defvar ymacs-editor-rg-type-aliases
   (eval-when-compile
@@ -280,7 +282,6 @@
   ("M-k" . kill-sexp)
   ("C-M-k" . kill-sentence)
 
-  ("M-Q" . ymacs-editor/insert-space-around-chinese)
   ("M-;" . ymacs-editor/comment-dwim)
   ("M-}" . ymacs-editor/forward-defun)
   ("M-{" . ymacs-editor/backward-defun)

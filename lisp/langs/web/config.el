@@ -3,7 +3,7 @@
 (after! web-mode
   (define-key! :map web-mode-map
     ([remap kill-line] . ymacs-web/smart-kill)
-    (("C-c C-b" "C-c b") . web-mode-buffer-indent))
+    ("C-c C-b" . web-mode-buffer-indent))
 
   (setq web-mode-enable-auto-closing t) ;; Enable auto close tag in `web-mode'
   (setq web-mode-enable-auto-pairing t)

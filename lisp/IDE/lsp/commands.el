@@ -100,3 +100,12 @@
             (quit-window)
           (select-window window))
       (dap-ui-repl))))
+
+;;;###autoload
+(defun ymacs-lsp/remove-invalid-folders ()
+  (interactive)
+  (seq-do-interactively!
+   #'lsp-workspace-folders-remove
+   (lambda (-folder)
+     (format "Delete: %s" -folder))
+   (cl-remove-if #'file-exists-p (lsp-session-folders (lsp-session)))))

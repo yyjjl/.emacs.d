@@ -72,6 +72,28 @@
           (throw 'done t))))
     (cons value head)))
 
+(defun seq-do-interactively! (-function -prompt-function -sequence)
+  (let ((map (make-sparse-keymap))
+        no-confirm
+        done)
+    (set-keymap-parent map y-or-n-p-map)
+    (define-key map "a" (interactive! (setq no-confirm "y") (y-or-n-p-insert-y)))
+    (define-key map "s" (interactive! (setq done t) (y-or-n-p-insert-n)))
+    (setq map (make-composed-keymap map query-replace-map))
+
+    (catch 'done
+      (seq-doseq (-item -sequence)
+        (let ((anwser (or no-confirm
+                          (read-from-minibuffer
+                           (concat (funcall -prompt-function -item) " (yes/no/all/stop) ")
+                           nil
+                           map))))
+          (when done
+            (message "Stopped")
+            (throw 'done t))
+          (when (equal anwser "y")
+            (funcall -function -item)))))))
+
 (cl-defmacro executable! (-name &key -exe -docstring -full-name)
   "Define a variable which points to a executable named -EXE.
 

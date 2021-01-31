@@ -135,3 +135,6 @@
           (?b . "\\blockcquote[]{%l}{}"))
         reftex-plug-into-AUCTeX '(t t t t t)
         reftex-use-fonts t))
+
+(after! cdlatex
+  (define-key cdlatex-mode-map "\t" nil))

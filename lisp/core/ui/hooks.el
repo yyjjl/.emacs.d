@@ -70,10 +70,9 @@
 (add-hook 'lsp-unconfigure-hook #'ymacs-modeline//update-lsp-state)
 
 (ymacs-modeline-set! (comint term vterm compilation) shell)
-(ymacs-modeline-set! dired project)
+(ymacs-modeline-set! dired dired)
 (ymacs-modeline-set! image media)
-(ymacs-modeline-set! message message)
-(ymacs-modeline-set! git-commit message)
+(ymacs-modeline-set! (message git-commit) message)
 (ymacs-modeline-set! magit vcs)
 (ymacs-modeline-set! org-src org-src)
 (ymacs-modeline-set! git-timemachine timemachine)
