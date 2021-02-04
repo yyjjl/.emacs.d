@@ -25,6 +25,7 @@
     ("M-n" . ymacs-org/next-item)
     ("M-p" . ymacs-org/previous-item)
     ("C-c b" . org-switchb)
+    ("C-c C-b" . org-indent-line)
     ("C-c q" . counsel-org-tag)
     ("C-c p" . org-previous-visible-heading)
     ("C-c n" . org-next-visible-heading)

@@ -33,10 +33,11 @@ In that case, insert the number.
      ((and (eq n 0))
       (company-filter-candidates))
 
-     ((or (cl-find-if (lambda (-str) (string-prefix-p prefix -str))
-                      company-candidates)
-          (> n (length company-candidates))
-          (looking-back "[0-9]+\\.[0-9]*" (line-beginning-position)))
+     ((or (string-empty-p company-prefix)
+          (or (cl-find-if (lambda (-str) (string-prefix-p prefix -str))
+                          company-candidates)
+              (> n (length company-candidates))
+              (looking-back "[0-9]+\\.[0-9]*" (line-beginning-position))))
       (self-insert-command 1))
 
      (t

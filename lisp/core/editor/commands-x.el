@@ -64,7 +64,7 @@
     ("j" "C-c i j")
     ("k" "C-x k")
     ("l" "C-l")
-    ("m" "C-c C-c")
+    ("m" "C-x p")
     ("n" "C-n" :exit no)
     ("o" "C-x C-f")
     ("p" "C-p" :exit no)
