@@ -69,6 +69,7 @@ _h_tml    _'_         ^ ^             _A_SCII:
             (project
              (or (when (not force)
                    (assoc ymacs-org-publish-last-project org-publish-project-alist))
+                 (assoc ymacs-org-publish-default-project org-publish-project-alist)
                  (when current-prefix-arg
                    (completing-read! "Project: " org-publish-project-alist))
                  (car org-publish-project-alist))))

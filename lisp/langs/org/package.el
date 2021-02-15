@@ -45,6 +45,12 @@
   :type 'boolean
   :safe #'booleanp)
 
+(defcustom ymacs-org-publish-default-project nil
+  ""
+  :group 'ymacs
+  :type 'string
+  :safe #'stringp)
+
 (define-key!
   ("C-x , p" . poporg-dwim)
   ("C-x O" . ymacs-org/project-open)
