@@ -12,3 +12,10 @@
   `((t :weight bold :italic t))
   "Face for arguments"
   :group 'lisp)
+
+(autoload #'lispy-forward "lispy" nil t)
+(autoload #'lispy-backward "lispy" nil t)
+
+(define-key! :map prog-mode-map
+  ("M-[" . lispy-backward)
+  ("M-]" . lispy-forward))

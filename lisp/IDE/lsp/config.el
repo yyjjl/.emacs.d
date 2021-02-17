@@ -53,6 +53,11 @@
     (call-interactively ymacs-lsp-organize-import-function))
 
   (define-key! :map lsp-mode-map
+    ("M-\" r" . lsp-find-references)
+    ("M-\" t" . lsp-find-type-definition)
+    ("M-\" i" . lsp-find-implementation)
+    ("M-\" d" . lsp-find-declaration)
+
     ("M-s h h" . lsp-document-highlight)
     ("C-c R" . lsp-rename)
     ("C-c I" . lsp-ivy-workspace-symbol)
