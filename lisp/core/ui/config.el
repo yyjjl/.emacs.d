@@ -116,7 +116,6 @@
   (setq whitespace-global-modes '(text-mode))
   (setq whitespace-style
         '(face
-          tabs
-          space-before-tab newline
-          indentation space-after-tab
-          tab-mark newline-mark)))
+          tabs spaces trailing space-before-tab newline
+          indentation empty space-after-tab
+          space-mark tab-mark newline-mark)))
