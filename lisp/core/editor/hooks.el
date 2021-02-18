@@ -185,16 +185,7 @@
                       flycheck-error-level-severity)
                   min-severity)
                flycheck-current-errors))
-        t)))
-
-  (define-advice flycheck-add-overlay (:around (-fn &rest -args) set-priority)
-    (let ((ov (apply -fn -args)))
-      (when-let ((err (overlay-get ov 'flycheck-error))
-                 (severity (-> err
-                               flycheck-error-level
-                               flycheck-error-level-severity)))
-        (overlay-put ov 'priority (- severity 10)))
-      ov)))
+        t))))
 
 (after! hideshow
   (advice-add #'goto-line :after #'ymacs-editor//hs-auto-expand)

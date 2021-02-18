@@ -6,6 +6,8 @@
   (define-hook! ymacs-lsp|after-open (lsp-after-open-hook)
     (when (bound-and-true-p lsp-ui-mode)
       (eldoc-mode -1))
+
+    (setq-local company-minimum-prefix-length 1)
     ;; default to sort and filter by server
     (setq-local company-transformers nil))
 
