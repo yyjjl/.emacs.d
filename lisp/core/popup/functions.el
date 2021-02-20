@@ -243,11 +243,11 @@ Displays -BUFFER according to -ALIST and -RULE."
   :select t
   :side below
   :dedicated t)
- (:name-regexp ymacs-popup-left-dedicated-buffer-regexp
-  :select t
-  :side left
-  :size 0.25
-  :dedicated t)
+ ;; (:name-regexp ymacs-popup-left-dedicated-buffer-regexp
+ ;;  :select t
+ ;;  :side left
+ ;;  :size 60
+ ;;  :dedicated t)
  (:name-regexp ymacs-popup-below-autoclose-buffer-regexp
   :size auto
   :side below

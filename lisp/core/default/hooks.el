@@ -156,7 +156,7 @@
   ;;`eldoc', show API doc in minibuffer echo area enabled by default
   ;; (global-eldoc-mode 1)
   (global-so-long-mode 1)
-  (which-function-mode 1)
+  ;; (which-function-mode 1)
 
   ;; (file-name-shadow-mode 1)
   ;; Show the recursion depth in the minibuffer prompt

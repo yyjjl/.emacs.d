@@ -4,6 +4,8 @@
 
 (setq lsp-keymap-prefix "C-c ;")
 (after! lsp-mode
+  (lsp-dired-mode 1)
+
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.cache\\'")
   (add-to-list 'lsp-file-watch-ignored
                (eval-when-compile

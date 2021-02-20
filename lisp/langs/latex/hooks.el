@@ -3,7 +3,9 @@
 (declare-function reftex-toc-rescan "reftex")
 
 (after! reftex
-  (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan))
+  (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
+  (define-hook! ymacs-latex//reftex-select-bib-setup (reftex-select-bib-mode-hook)
+    (setq truncate-lines nil)))
 
 (after! tex
   (define-advice TeX-font (:around (-fn -replace -what) no-modifier)
@@ -25,7 +27,7 @@
     ;; (LaTeX-math-mode 1)
     (cdlatex-mode 1)
     (TeX-fold-mode 1)
-    (TeX-interactive-mode 1)
+    ;; (TeX-interactive-mode 1)
     (TeX-source-correlate-mode 1)
     (TeX-PDF-mode 1)
 

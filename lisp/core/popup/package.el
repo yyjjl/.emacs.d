@@ -7,14 +7,15 @@
   (eval-when-compile
     (rx string-start "*"
         (or (and "Org Src" (*? not-newline))
-            "Backtrace")
+            "Backtrace"
+            "RefTeX Select")
         "*" string-end)))
 
-(defvar ymacs-popup-left-dedicated-buffer-regexp
-  (eval-when-compile
-    (rx string-start "*"
-        (and "reftex" (*? not-newline))
-        "*" string-end)))
+;; (defvar ymacs-popup-left-dedicated-buffer-regexp
+;;   (eval-when-compile
+;;     (rx string-start "*"
+;;         (and "reftex" (*? not-newline))
+;;         "*" string-end)))
 
 (defvar ymacs-popup-below-autoclose-buffer-regexp
   (eval-when-compile
