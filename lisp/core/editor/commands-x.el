@@ -43,7 +43,7 @@
     ("[" "C-x <left>")
     ("\\" "C-c C-b")
     ("]" "C-x <right>")
-    ("`" pop-to-mark-command :exit no)
+    ("`" treemacs)
     ("a" "C-a" :exit no)
     ("b" "C-b" :exit no)
     ("c" "C-c")

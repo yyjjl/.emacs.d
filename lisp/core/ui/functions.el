@@ -412,11 +412,12 @@ like the scratch buffer where knowing the current project directory is important
   (concat
    (when (display-graphic-p)
      (propertize "\u200b" 'display '((height 1.3) (raise -0.15))))
-   " "
    (when-let (number (window-parameter (selected-window) 'ace-window-path))
-     (if ace-window-mode
-         (propertize (concat number " " ace-window-mode) 'face 'aw-leading-char-face)
-       number))))
+     (concat
+      " "
+      (if ace-window-mode
+          (propertize (concat number " " ace-window-mode) 'face 'aw-leading-char-face)
+        number)))))
 
 
 ;;

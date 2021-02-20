@@ -109,3 +109,13 @@
    (lambda (-folder)
      (format "Delete: %s" -folder))
    (cl-remove-if #'file-exists-p (lsp-session-folders (lsp-session)))))
+
+
+;;;###autoload
+(defun ymacs-lsp/select-window-1 ()
+  (interactive)
+  (let ((path (window-parameter (selected-window) 'ace-window-path)))
+    (if (and (equal path "1")
+             (eq 'visible (treemacs-current-visibility)))
+        (treemacs-select-window)
+      (ymacs-ui/aw-select-window))))

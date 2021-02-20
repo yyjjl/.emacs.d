@@ -114,4 +114,5 @@
 ;; `whitespace-space' setup
 (after! whitespace
   (setq whitespace-global-modes '(text-mode))
-  (setq whitespace-style '(face tabs tab-mark spaces space-mark empty)))
+  (setq whitespace-style
+        '(face tabs trailing space-before-tab indentation empty space-after-tab tab-mark)))

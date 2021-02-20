@@ -339,10 +339,13 @@ HTML file converted from org file, it returns t."
         (buffer-base-buffer)
         (string-match-p (concat "^" temporary-file-directory) filename))))
 
+(defsubst is-buffer-too-large ()
+  (> buffer-saved-size ymacs-large-buffer-limit))
+
 (defsubst is-buffer-suitable-for-coding! ()
   (not (or (is-buffer-temporary!)
            (file-remote-p default-directory)
-           (> buffer-saved-size ymacs-large-buffer-limit))))
+           (is-buffer-too-large))))
 
 (defun insert-after! (-after-value -new-value -lst)
   "Find -AFTER-VALUE and Add -NEW-VALUE to -LST after it."

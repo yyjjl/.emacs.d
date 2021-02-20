@@ -74,46 +74,36 @@
   (define-key! :map lsp-signature-mode-map
     ("M-o" . lsp-signature-stop))
 
-  (when ymacs-editor-use-childframe
-    (setq lsp-signature-function #'lsp-signature-posframe)
-    (setq lsp-signature-posframe-params
-          (plist-put lsp-signature-posframe-params
-                     :internal-border-width 10)))
+  (if ymacs-editor-use-childframe
+      (progn
+        (setq lsp-signature-function #'lsp-signature-posframe)
+        (setq lsp-signature-posframe-params
+              (plist-put lsp-signature-posframe-params :internal-border-width 10)))
+    (setq lsp-signature-doc-lines 5))
 
-  (setq lsp-auto-configure t)
-  (setq lsp-auto-guess-root t)
-
-  (setq lsp-auto-execute-action nil)
-
-  (setq lsp-eldoc-enable-hover t)
-  (setq lsp-eldoc-render-all nil)
-
-  (setq lsp-diagnostics-provider :auto)
-  (setq lsp-restart 'interactive)
   (setq lsp-keep-workspace-alive nil)
-  (setq lsp-signature-doc-lines 5)
-  (setq lsp-signature-auto-activate '(:on-trigger-char))
-  (setq lsp-idle-delay 0.5)
 
+  ;; manually configured
   (setq lsp-completion-provider :none)
-
+  ;; boost performance
   (setq lsp-enable-file-watchers nil)
+
   (setq lsp-enable-imenu t)
   (setq lsp-enable-links t)
   (setq lsp-enable-xref t)
   (setq lsp-enable-folding t)
   (setq lsp-enable-snippet t)
+  ;; boost performance
   (setq lsp-enable-on-type-formatting nil)
   (setq lsp-enable-text-document-color t)
   (setq lsp-enable-indentation nil)
   (setq lsp-enable-symbol-highlighting t)
   (setq lsp-symbol-highlighting-skip-current t)
-  (setq lsp-semantic-tokens-enable nil)
 
   (setq lsp-before-save-edits t)
 
+  (setq lsp-semantic-tokens-enable nil)
   (setq lsp-lens-enable t)
-
   (setq lsp-headerline-breadcrumb-enable nil)
   (setq lsp-modeline-workspace-status-enable nil)
   (setq lsp-modeline-diagnostics-enable nil)
@@ -172,3 +162,22 @@
     (setq dap-lldb-debugged-program-function
           (lambda ()
             (read-file-name "Directory: " (ymacs-term//get-directory) nil :must-match)))))
+
+(after! treemacs
+  (define-key!
+    ("M-1" . ymacs-lsp/select-window-1))
+
+  (setq treemacs-collapse-dirs (if treemacs-python-executable 3 0)
+        treemacs-missing-project-action 'remove
+        treemacs-follow-after-init t
+        treemacs-no-png-images t)
+
+  (ymacs-modeline//def-modeline treemacs
+    (window-number major-mode))
+
+  (setq treemacs-user-mode-line-format '(:eval (ymacs-modeline//format--treemacs)))
+
+  (treemacs-follow-mode t)
+  (treemacs-tag-follow-mode t)
+  (treemacs-filewatch-mode t))
+
