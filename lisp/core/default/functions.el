@@ -6,9 +6,9 @@
    -ring))
 
 (defun ymacs-default//external-file-handler (_op &rest -args)
-  (let ((file (expand-file-name (car -args)))
+  (let ((file (car -args))
         (process-connection-type nil))
-    (recentf-push file)
+    (recentf-add-file file)
     (kill-buffer)
     (if (fboundp #'counsel-find-file-extern)
         (progn

@@ -6,9 +6,7 @@
 (defvar ymacs-popup-below-dedicated-buffer-regexp
   (eval-when-compile
     (rx string-start "*"
-        (or (and "Org Src" (*? not-newline))
-            "Backtrace"
-            "RefTeX Select")
+        (or "Backtrace" "RefTeX Select")
         "*" string-end)))
 
 ;; (defvar ymacs-popup-left-dedicated-buffer-regexp
