@@ -2,7 +2,6 @@
 
 (require-packages!
  org-download
- cdlatex
  (auctex :compile (latex tex preview reftex))
  ;; Export colorful src block in `org-mode'
  htmlize

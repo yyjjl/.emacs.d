@@ -24,8 +24,8 @@
     ;; conflict with latex-mode
     (electric-pair-local-mode -1)
     (electric-indent-local-mode -1)
-    ;; (LaTeX-math-mode 1)
-    (cdlatex-mode 1)
+    (LaTeX-math-mode 1)
+
     (TeX-fold-mode 1)
     ;; (TeX-interactive-mode 1)
     (TeX-source-correlate-mode 1)
