@@ -21,8 +21,7 @@
     view
     ffap
 
-    doom-molokai-theme
-    doom-themes-ext-org
+    monokai-theme
 
     semantic
     semantic/db-global

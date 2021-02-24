@@ -4,13 +4,18 @@
  ace-window
  hl-todo
  page-break-lines
- doom-themes
+ monokai-theme
  which-key
  volatile-highlights
  highlight-indentation)
 
-(load-theme 'doom-molokai t)
-(doom-themes-org-config)
+(setq monokai-background "#1B1D1E")
+(setq monokai-height-plus-1 1.0)
+(setq monokai-height-plus-2 1.0)
+(setq monokai-height-plus-3 1.0)
+(setq monokai-height-plus-4 1.0)
+
+(load-theme 'monokai t)
 
 (defvar ymacs-ui-view-code-modes
   '((t display-line-numbers-mode

@@ -35,6 +35,7 @@
     ("/" "C-/" :exit no)
     ("?" which-key-show-top-level :exit no)
     (";" ymacs-x/just-x :exit immediate)
+    ("；" ymacs-x/just-x :exit immediate)
     ("=" "C-=")
     ("RET" ymacs-x/return :exit t)
     ("SPC" "C-SPC" :exit no)
@@ -86,6 +87,7 @@
 (defvar ymacs-x-keymap
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd ";") #'ymacs-x/activate)
+    (define-key map (kbd "；") #'ymacs-x/activate)
     map))
 
 (defun ymacs-x//set-ivy-minibuffer-map ()

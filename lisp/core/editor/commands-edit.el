@@ -43,6 +43,42 @@ grab matched string and insert them into `kill-ring'"
     (message "matched %d strings => kill-ring" (length items))
     items))
 
+(defconst ymacs-editor--punctuation-alist
+  '(("." . "。")
+    ("," . "，")
+    (":" . "：")
+    (";" . "；")
+    ("?" . "？")
+    ("(" . "（")
+    (")" . "）")
+    ("!" . "！")))
+
+;;;###autoload
+(defun ymacs-editor/toggle-punctuation-width (-begin -end &optional -target)
+  "Convert punctuation from/to English/Chinese characters."
+  (interactive
+   (list (if (use-region-p)
+             (region-beginning)
+           (point-min))
+         (if (use-region-p)
+             (region-end)
+           (point-max))
+         (completing-read! "Target:" '(half full))))
+  (let ((regex (if (eq -target 'full)
+                   " ?[.,;?()!] ?"
+                 "[。，；？（）！]")))
+    (save-excursion
+      (perform-replace
+       regex
+       (list (lambda (&rest _)
+               (or (cdr (assoc (string-trim (match-string 0)) ymacs-editor--punctuation-alist))
+                   (cdr (rassoc (string-trim (match-string 0)) ymacs-editor--punctuation-alist))
+                   (read-string "Replacement: "))))
+       t t nil nil nil
+       -begin -end
+       nil                              ; backward
+       (and (use-region-p) (region-noncontiguous-p))))))
+
 (defconst ymacs-editor-ascii-before-chinese
   (rx (group-n 1 (any (?A . ?Z) (?a . ?z) (?0 . ?9) "-!@#$%^&+|:;?><.,/\\" ")]}"))
       (group-n 2 (category chinese-two-byte))))

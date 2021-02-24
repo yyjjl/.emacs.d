@@ -10,9 +10,13 @@
 (defun ymacs-latex/next-error ()
   (interactive)
   (call-interactively
-   (let ((buffer (ymacs-default//get-error-buffer)))
-     (if (and (buffer-live-p buffer)
-              (window-live-p (get-buffer-window buffer)))
+   (let ((buffer (ymacs-default//get-error-buffer))
+         (help-buffer (get-buffer "*TeX Help*")))
+     (if (or (not (and (buffer-live-p help-buffer)
+                       (window-live-p (get-buffer-window help-buffer))))
+             (and
+              (buffer-live-p buffer)
+              (window-live-p (get-buffer-window buffer))))
          #'next-error
        #'TeX-next-error))))
 
@@ -20,9 +24,13 @@
 (defun ymacs-latex/previous-error ()
   (interactive)
   (call-interactively
-   (let ((buffer (ymacs-default//get-error-buffer)))
-     (if (and (buffer-live-p buffer)
-              (window-live-p (get-buffer-window buffer)))
+   (let ((buffer (ymacs-default//get-error-buffer))
+         (help-buffer (get-buffer "*TeX Help*")))
+     (if (or (not (and (buffer-live-p help-buffer)
+                       (window-live-p (get-buffer-window help-buffer))))
+             (and
+              (buffer-live-p buffer)
+              (window-live-p (get-buffer-window buffer))))
          #'previous-error
        #'TeX-previous-error))))
 

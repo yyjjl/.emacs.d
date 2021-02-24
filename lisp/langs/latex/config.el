@@ -40,7 +40,7 @@
     ("M-e" . ymacs-latex/forward-sexp)
     ("M-=" . ymacs-latex/count-words)
     ("C-c E" . TeX-error-overview)
-    ("C-c f l" . TeX-error-overview)
+    (("C-c f l" "C-c l") . TeX-error-overview)
     ("C-t" . TeX-fold-dwim)
     ("C-c h" . TeX-doc)
     ("C-c C-u" . ymacs-latex/force-update-style)
@@ -122,9 +122,6 @@
   (set-face-background 'preview-reference-face (face-attribute 'default :background)))
 
 (after! reftex
-  (define-key! :map reftex-mode-map
-    ("C-c i i" . reftex-goto-label))
-
   (setq reftex-cite-format
         '((?t . "\\textcite[]{%l}")
           (?a . "\\autocite[]{%l}")

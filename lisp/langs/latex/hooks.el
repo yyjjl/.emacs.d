@@ -13,7 +13,6 @@
     (funcall -fn -replace (event-convert-list (list 'control -what)))))
 
 (after! latex
-
   (define-hook! ymacs-latex//setup (LaTeX-mode-hook)
     (prettify-symbols-mode 1)
 
@@ -32,6 +31,8 @@
     (TeX-PDF-mode 1)
 
     (outline-minor-mode 1)
+
+    (flycheck-mode 1)
 
     (when (is-buffer-suitable-for-coding!)
       (try-enable-lsp! latex))))

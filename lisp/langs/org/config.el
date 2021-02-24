@@ -121,7 +121,7 @@
   (setq org-pretty-entities-include-sub-superscripts nil)
 
   (setq org-src-fontify-natively t)
-  (setq org-highlight-latex-and-related nil)
+  (setq org-highlight-latex-and-related '(native))
   (setq org-preview-latex-default-process 'imagemagick)
   (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
 
