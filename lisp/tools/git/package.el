@@ -7,9 +7,6 @@
  git-timemachine
  magit)
 
-(defvar ymacs-git--diff-hl-update-timer nil)
-(defvar ymacs-git--diff-hl-update-delay 0.5)
-
 (autoload 'ymacs-hydra/smerge/body (expand! "commands") nil t)
 
 (define-key! ("C-x g"))

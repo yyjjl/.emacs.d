@@ -74,13 +74,7 @@
   (define-key! :map lsp-signature-mode-map
     ("M-o" . lsp-signature-stop))
 
-  (if ymacs-editor-use-childframe
-      (progn
-        (setq lsp-signature-function #'lsp-signature-posframe)
-        (setq lsp-signature-posframe-params
-              (plist-put lsp-signature-posframe-params :internal-border-width 10)))
-    (setq lsp-signature-doc-lines 5))
-
+  (setq lsp-signature-doc-lines 5)
   (setq lsp-keep-workspace-alive nil)
 
   ;; manually configured

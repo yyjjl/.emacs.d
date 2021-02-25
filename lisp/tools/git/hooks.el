@@ -7,19 +7,7 @@
 (after! diff-hl
   (after! magit
     (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
-    (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
-
-  (define-advice diff-hl-update (:around (-fn) async)
-    (unless ymacs-git--diff-hl-update-timer
-      (setq
-       ymacs-git--diff-hl-update-timer
-       (run-with-idle-timer
-        ymacs-git--diff-hl-update-delay
-        nil
-        (lambda ()
-          (with-demoted-errors "diff-hl error: %s"
-            (funcall -fn))
-          (setq ymacs-git--diff-hl-update-timer nil)))))))
+    (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)))
 
 (after! smerge-mode
   (define-hook! ymacs-git//maybe-enable-smerge (magit-diff-visit-file-hook)
