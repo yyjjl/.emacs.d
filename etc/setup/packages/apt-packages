@@ -2,6 +2,7 @@ aria2
 autoconf
 automake
 bear
+chktex
 clang
 clang-format
 cmake

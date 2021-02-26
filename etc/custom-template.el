@@ -27,6 +27,7 @@
  '(font-lock-builtin-face ((t (:foreground "#749E20"))))
  '(font-lock-doc-face ((t (:foreground "#777777" :weight bold))))
  '(hl-line ((t (:background "grey5"))))
+ '(tooltip ((t (:background "#49483E"))))
  '(ivy-modified-buffer ((t (:inherit ymacs-modeline-buffer-modified))))
  '(ivy-modified-outside-buffer ((t (:inherit ymacs-modeline-urgent))))
  '(tab-line ((t (:background "#1B1D1E" :foreground "white"))))

@@ -15,7 +15,3 @@
 
 (autoload #'lispy-forward "lispy" nil t)
 (autoload #'lispy-backward "lispy" nil t)
-
-(define-key! :map prog-mode-map
-  ("M-[" . lispy-backward)
-  ("M-]" . lispy-forward))
