@@ -39,6 +39,7 @@
     ("M-a" . ymacs-latex/backward-sexp)
     ("M-e" . ymacs-latex/forward-sexp)
     ("M-=" . ymacs-latex/count-words)
+    ("M-RET" . latex-insert-item)
     ("C-c E" . TeX-error-overview)
     (("C-c f l" "C-c l") . TeX-error-overview)
     ("C-t" . TeX-fold-dwim)

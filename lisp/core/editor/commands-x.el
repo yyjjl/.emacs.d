@@ -263,6 +263,8 @@
     (setq ymacs-x--keymap-alist nil)
     (setq emulation-mode-map-alists (delete 'ymacs-x--keymap-alist emulation-mode-map-alists))))
 
+(defun ymacs-x//post-command-hook ()
+  (set-cursor-color (if ymacs-x--activated "steelblue" "orangered")))
 
 (defun ymacs-x//mode-predicate ()
   (unless (minibufferp)
@@ -270,7 +272,10 @@
 
 ;;;###autoload
 (define-globalized-minor-mode ymacs-x-global-mode ymacs-x-mode ymacs-x//mode-predicate
-  :group 'ymacs)
+  :group 'ymacs
+  (if ymacs-x-global-mode
+      (add-hook 'post-command-hook #'ymacs-x//post-command-hook)
+    (remove-hook 'post-command-hook #'ymacs-x//post-command-hook)))
 
 (defun ymacs-x/warn ()
   (interactive)

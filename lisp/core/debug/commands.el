@@ -1,6 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 (defvar gud-chdir-before-run)
+(declare-function gud-call 'gud)
 
 ;;;###autoload
 (defun ymacs-debug/quit ()

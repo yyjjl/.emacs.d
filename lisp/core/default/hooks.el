@@ -15,7 +15,8 @@
                                                  (symbol-name -name)
                                                -name)))
              (buffer (find-file-existing (expand-file-name name -pkg-dir))))
-    (kill-buffer buffer)))
+    (when-let (window (get-buffer-window buffer))
+      (quit-window 'kill window))))
 
 (define-advice package--save-selected-packages (:override (-value) dont-save)
   (when -value

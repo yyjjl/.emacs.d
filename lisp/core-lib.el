@@ -112,7 +112,8 @@ Otherwise `(format \"ymacs-%s-path\" -NAME)' will be used."
   `(defvar ,(if -full-name -name (intern (format "ymacs-%s-path" -name)))
      (eval-when-compile
        (let ((value (or ,@(seq-map (lambda (x) `(executable-find ,x)) -exe))))
-         (when (null value)
+         (when (and (null value)
+                    (not (bound-and-true-p comp-native-compiling)))
            (warn "executable %s is missing" ,-exe))
          value))
      ,-docstring))
@@ -541,7 +542,8 @@ HTML file converted from org file, it returns t."
 
 (defmacro eval-when-compile-config! (&rest -body)
   `(eval-when-compile
-     (when (bound-and-true-p ymacs--compile-config-in-progress)
+     (when (and (bound-and-true-p ymacs--compile-config-in-progress)
+                (not (bound-and-true-p comp-native-compiling)))
        ,@-body)))
 
 (defmacro eval-when-has-feature! (-name &rest -body)

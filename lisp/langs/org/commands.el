@@ -12,6 +12,9 @@
 (defvar org-publish-use-timestamps-flag)
 
 (declare-function org-download-rename-last 'org-download)
+(declare-function org-publish-file 'org-publish)
+(declare-function org-publish-get-project-from-filename 'org-publish)
+(declare-function org-publish-property 'org-publish)
 
 (defhydra ymacs-hydra/org-download (:color blue :hint nil)
   ""

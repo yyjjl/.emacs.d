@@ -3,6 +3,8 @@
 (eval-when-compile
   (require 'hydra))
 
+(declare-function bookmark-get-bookmark-record 'bookmark)
+
 ;;
 ;;* Compile
 ;;

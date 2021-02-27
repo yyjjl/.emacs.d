@@ -147,6 +147,7 @@
 (after! ox-html
   (setq org-html-style-default
         (eval-when-compile
+          (require 'ox-html)
           (if (string-match
                (rx ".org-svg" (+ (not "{")) (+ (not digit)) (group (+ digit) "%"))
                org-html-style-default)

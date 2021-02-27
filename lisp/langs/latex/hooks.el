@@ -34,5 +34,6 @@
 
     (flycheck-mode 1)
 
+    (setq-local tab-width 2)
     (when (is-buffer-suitable-for-coding!)
       (try-enable-lsp! latex))))

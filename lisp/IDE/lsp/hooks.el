@@ -4,8 +4,9 @@
 
 (after! lsp-mode
   (define-hook! ymacs-lsp|after-open (lsp-after-open-hook)
-    (when (bound-and-true-p lsp-ui-mode)
-      (eldoc-mode -1))
+    (when (and ymacs-lsp-use-modern-ui
+               (display-graphic-p))
+      (setq-local lsp-eldoc-enable-hover nil))
 
     (setq-local company-minimum-prefix-length 2)
     ;; default to sort and filter by server

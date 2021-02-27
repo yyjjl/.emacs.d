@@ -1,6 +1,11 @@
 ;;; -*- lexical-binding: t; -*-
 
+(eval-when-compile
+  (require 'lsp-mode))
+
 (declare-function lsp-semantic-tokens--disable 'lsp-mode)
+(declare-function treemacs-current-visibility 'treemacs)
+(declare-function treemacs-select-window 'treemacs)
 
 (defun ymacs-lsp//install-clients--loop (-clients &optional -outputs)
   (if-let (client (car -clients))
@@ -64,12 +69,11 @@
   (defun ymacs-lsp/toggle-modern-ui ()
     (interactive)
 
+    (kill-local-variable 'lsp-eldoc-enable-hover)
     (if (bound-and-true-p lsp-ui-mode)
-        (progn
-          (unless eldoc-mode
-            (eldoc-mode 1))
-          (lsp-ui-mode -1))
-      (eldoc-mode -1)
+        (lsp-ui-mode -1)
+      (setq-local lsp-eldoc-enable-hover nil)
+      (lsp--eldoc-message nil)
       (lsp-ui-mode 1))))
 
 
