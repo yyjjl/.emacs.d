@@ -93,12 +93,17 @@
   (cl-pushnew "--no-heading" -args)
   (cl-pushnew "--color=never" -args)
 
-  (when (and (not (or (member "-z" -args)
-                      (member "--search-zip" -args)))
-             (stringp (buffer-file-name))
+  (when (and (not (member "-z" -args))
+             (buffer-file-name)
              (or (string-suffix-p ".gz" (buffer-file-name))
-                 (string-suffix-p ".zip" (buffer-file-name))))
-    (push "--search-zip" -args))
+                 (string-suffix-p ".zip" (buffer-file-name))
+                 (>= (prefix-numeric-value current-prefix-arg) 4)))
+    (cl-pushnew "--search-zip" -args))
+
+  (when (and (= (prefix-numeric-value current-prefix-arg) 0))
+    (cl-pushnew "--search-zip" -args)
+    (cl-pushnew "--hidden" -args)
+    (cl-pushnew "--no-ignore" -args))
 
   (unless (--some (or (string-prefix-p "-M" it)
                       (string-prefix-p "--max-columns" it))

@@ -46,6 +46,10 @@
     ("h" . lsp-document-highlight)
     ("l" . lsp-lens-mode))
 
+  (defun ymacs-lsp/find-other-file ()
+    (interactive)
+    (call-interactively ymacs-lsp-find-other-file-function))
+
   (defun ymacs-lsp/format-buffer ()
     (interactive "*")
     (call-interactively ymacs-lsp-format-buffer-function))
@@ -53,6 +57,10 @@
   (defun ymacs-lsp/organize-imports ()
     (interactive "*")
     (call-interactively ymacs-lsp-organize-import-function))
+
+  (after! projectile
+    (define-key! :map projectile-command-map
+      ("a" . ymacs-lsp/find-other-file)))
 
   (define-key! :map lsp-mode-map
     ("M-\" r" . lsp-find-references)

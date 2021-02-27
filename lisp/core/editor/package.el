@@ -266,6 +266,7 @@
   ([remap kill-ring-save] . easy-kill)
 
   ("C-c O" . ymacs-hydra/outline/body)
+  ("C-c C-b" . ymacs-editor/format-paragraph)
 
   ("C-c <tab>" . company-complete)
   ("C-c TAB" . company-complete)

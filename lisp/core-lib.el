@@ -504,15 +504,18 @@ HTML file converted from org file, it returns t."
 
 (defmacro after! (-files &rest -body)
   (declare (indent 1) (debug t))
-  (let ((file (or (car-safe -files) -files))
-        (rest (cdr-safe -files)))
-    `(progn
-       (eval-when-compile
-         (require ',file nil t))
-       (with-eval-after-load ',file
-         ,@(if rest
-               `((after! ,rest ,@-body))
-             -body)))))
+  (let* ((file (or (car-safe -files) -files))
+         (rest (cdr-safe -files))
+         (form `(with-eval-after-load ',file
+                  ,@(if rest
+                        `((after! ,rest ,@-body))
+                      -body))))
+    (if byte-compile-current-file
+        (if (require file nil t)
+            form
+          `(with-no-warnings
+             ,form))
+      form)))
 
 (defmacro load-feature! (-name)
   (let* ((feature-name (symbol-name -name))

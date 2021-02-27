@@ -288,3 +288,15 @@ Use `scan-lists', otherwise use simple algorithm."
              (bound-and-true-p lsp-mode))
         (lsp-iedit-highlights)
       (call-interactively #'iedit-mode))))
+
+;;;###autoload
+(defun ymacs-editor/format-paragraph (&optional -whole-buffer)
+  (interactive "P")
+
+  (if (use-region-p)
+      (call-interactively #'indent-region)
+    (save-mark-and-excursion
+      (if -whole-buffer
+          (indent-region (point-min) (point-max))
+        (mark-paragraph)
+        (call-interactively #'indent-region)))))
