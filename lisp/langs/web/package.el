@@ -1,7 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
 (require-packages!
- emmet-mode
  typescript-mode
  web-mode)
 

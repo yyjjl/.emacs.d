@@ -498,8 +498,7 @@ By default, this shows the information specified by `global-mode-string'."
 (ymacs-modeline//def-segment dired
   '(:propertize
     ((dired-hide-details-mode " Hide")
-     (dired-omit-mode " Omit")
-     (dired-collapse-mode " Collapse"))
+     (dired-omit-mode " Omit"))
     face font-lock-doc-face))
 
 

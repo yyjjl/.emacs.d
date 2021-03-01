@@ -37,7 +37,6 @@
   (define-key! :map dired-mode-map
     ("\\" . dired-compare-directories)
     ("]" . dired-omit-mode)
-    (")" . dired-collapse-mode)
     ("[" . dired-hide-details-mode)
     ("E" . ymacs-editor/find-file-externally)
     ("M-p" . dired-prev-subdir)

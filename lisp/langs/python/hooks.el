@@ -14,10 +14,7 @@
   (define-hook! ymacs-cython//setup (cython-mode-hook)
     (setq electric-indent-chars (delq ?: electric-indent-chars))
 
-    (local-set-key (kbd "C-c C-b") nil)
-
-    (when (is-buffer-suitable-for-coding!)
-      (flycheck-mode 1))))
+    (local-set-key (kbd "C-c C-b") nil)))
 
 (after! python
   (define-hook! ymacs-python//compilation-setup (comint-exec-hook)

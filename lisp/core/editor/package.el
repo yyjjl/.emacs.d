@@ -43,8 +43,6 @@
  goto-chg
  multiple-cursors
  wgrep
- diredfl
- dired-collapse
  buffer-move
  graphviz-dot-mode
  ace-pinyin

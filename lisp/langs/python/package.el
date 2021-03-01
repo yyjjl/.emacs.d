@@ -10,8 +10,7 @@
  py-autopep8
  py-isort
  pyvenv
- cython-mode
- flycheck-cython)
+ cython-mode)
 
 (executable! ipython3)
 (executable! pylint)
