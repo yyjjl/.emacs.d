@@ -8,14 +8,14 @@
          (setf (alist-get mode font-lock-maximum-decoration) 1))))
 
 (eval-when-has-feature! lsp
-  (after! lsp-mode
-    (setq lsp-clients-clangd-executable ymacs-clangd-path)
-    (setq lsp-clients-clangd-args
-          '("--all-scopes-completion"
-            "--clang-tidy"
-            "--suggest-missing-includes")))
-
   (after! lsp-clangd
+    (setq lsp-clients-clangd-executable ymacs-clangd-path)
+
+    (dolist (arg '("--all-scopes-completion"
+                   "--cross-file-rename"
+                   "--clang-tidy"))
+      (cl-pushnew arg lsp-clients-clangd-args :test #'string=))
+
     (setf (lsp--client-download-server-fn (ht-get lsp-clients 'clangd))
           (ymacs-lsp//make-download-from-github-fn
            "clangd/clangd"
@@ -40,7 +40,6 @@
     (define-key! :map map
       (("<" ">" "C-c C-d"))             ; unbind
       ("*" . ymacs-cpp/electric-star)
-      ("C-c C-b" . clang-format-buffer)
       ("C-c C-l" . ymacs-term/load-file-in-repl)))
 
   (dolist (key '("#" "}" "/" ";" "," ":" "(" ")" "{"))

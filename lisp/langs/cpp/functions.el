@@ -61,7 +61,6 @@
             (throw 'done t))))
       :-init
       (progn
-        (setq ymacs-lsp-format-buffer-function #'clang-format-buffer)
         (when-let (command-fn (ymacs-cpp//get-function command-fn))
           (cl-pushnew command-fn ymacs-editor-compile-command-functions))
         (ymacs-cpp//run-function lsp-enable-handler))

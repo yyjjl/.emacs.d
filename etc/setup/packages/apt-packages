@@ -4,7 +4,6 @@ automake
 bear
 chktex
 clang
-clang-format
 cmake
 curl
 dvipng

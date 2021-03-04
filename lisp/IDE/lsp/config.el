@@ -83,33 +83,33 @@
     ("M-o" . lsp-signature-stop))
 
   (setq lsp-signature-doc-lines 5)
-  (setq lsp-keep-workspace-alive nil)
+  ;; (setq lsp-keep-workspace-alive nil)
 
   ;; manually configured
   (setq lsp-completion-provider :none)
   ;; boost performance
   (setq lsp-enable-file-watchers nil)
 
-  (setq lsp-enable-imenu t)
-  (setq lsp-enable-links t)
-  (setq lsp-enable-xref t)
-  (setq lsp-enable-folding t)
-  (setq lsp-enable-snippet t)
+  ;; (setq lsp-enable-imenu t)
+  ;; (setq lsp-enable-links t)
+  ;; (setq lsp-enable-xref t)
+  ;; (setq lsp-enable-folding t)
+  ;; (setq lsp-enable-snippet t)
   ;; boost performance
   (setq lsp-enable-on-type-formatting nil)
-  (setq lsp-enable-text-document-color t)
+  ;; (setq lsp-enable-text-document-color t)
   (setq lsp-enable-indentation nil)
-  (setq lsp-enable-symbol-highlighting t)
+  ;; (setq lsp-enable-symbol-highlighting t)
   (setq lsp-symbol-highlighting-skip-current t)
 
-  (setq lsp-before-save-edits t)
+  ;; (setq lsp-before-save-edits t)
 
-  (setq lsp-semantic-tokens-enable nil)
+  ;; (setq lsp-semantic-tokens-enable nil)
   (setq lsp-lens-enable t)
   (setq lsp-headerline-breadcrumb-enable nil)
-  (setq lsp-modeline-workspace-status-enable nil)
+  ;; (setq lsp-modeline-code-actions-enable t)
   (setq lsp-modeline-diagnostics-enable nil)
-  (setq lsp-modeline-code-actions-enable t))
+  (setq lsp-modeline-workspace-status-enable nil))
 
 (eval-when! ymacs-lsp-use-modern-ui
   (after! lsp-ui

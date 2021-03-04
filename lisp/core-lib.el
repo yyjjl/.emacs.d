@@ -109,14 +109,16 @@ Otherwise `(format \"ymacs-%s-path\" -NAME)' will be used."
   (unless (vectorp -exe)
     (setq -exe (vector -exe)))
 
-  `(defvar ,(if -full-name -name (intern (format "ymacs-%s-path" -name)))
-     (eval-when-compile
-       (let ((value (or ,@(seq-map (lambda (x) `(executable-find ,x)) -exe))))
-         (when (and (null value)
-                    (not (bound-and-true-p comp-native-compiling)))
-           (warn "executable %s is missing" ,-exe))
-         value))
-     ,-docstring))
+  (let ((sym (if -full-name -name (intern (format "ymacs-%s-path" -name)))))
+    `(defvar ,sym
+       (eval-when-compile
+         (let ((value (or ,@(seq-map (lambda (x) `(executable-find ,x)) -exe))))
+           (when (not (bound-and-true-p comp-native-compiling))
+             (if value
+                 (message "EXE %s = %s" (symbol-name ',sym) value)
+               (warn "executable %s is missing" ,-exe)))
+           value))
+       ,-docstring)))
 
 (defmacro interactive! (&rest -body)
   "A shortcut for inline interactive lambdas.
