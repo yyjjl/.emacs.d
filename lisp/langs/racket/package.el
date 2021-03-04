@@ -14,11 +14,11 @@
            ((symbol-function #'async-shell-command)
             (symbol-function #'shell-command)))
    (let ((code (racket-mode-start-faster)))
-     (message "Exit with code: %s" code)
+     (print! "  > Exit with code: %s\n" code)
      (unless (eq code 0)
        (if-let (buffer (get-buffer "*Shell Command Output*"))
            (with-current-buffer buffer
-             (message "%s" (buffer-string))))))))
+             (print! "  > %s\n" (buffer-string))))))))
 
 (eval-when-has-feature! debug
   (add-to-list 'ymacs-debugger-alist '(racket-mode racket-run-with-debugging)))

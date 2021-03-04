@@ -7,12 +7,14 @@
 (defvar ymacs-setup-directory
   (expand-file-name "emacs" (file-name-directory load-file-name)))
 
-(add-to-list 'load-path ymacs-setup-directory)
-(message "[Info] User emacs directory: %s"
-         (abbreviate-file-name user-emacs-directory))
+(define-advice message (:around (-fn -fmt &rest -args) indent)
+  (unless (string-prefix-p "Checking " -fmt)
+    (apply -fn (concat "= " -fmt) -args)))
 
-(message "[Info] Setup files directory: %s"
-         (abbreviate-file-name ymacs-setup-directory))
+(add-to-list 'load-path ymacs-setup-directory)
+
+(message "User emacs directory: %s" (abbreviate-file-name user-emacs-directory))
+(message "Setup files directory: %s" (abbreviate-file-name ymacs-setup-directory))
 
 (with-demoted-errors "%s"
   (setq load-prefer-newer t)
@@ -47,7 +49,7 @@
 
   (ymacs-default//after-init)
 
-  (setq ymacs--compile-config-in-progress t)
+  (setq ymacs-compile-config-in-progress t)
 
   (ymacs-default/compile-config)
-  (ymacs-default/compile-elpa-packages :no-message))
+  (ymacs-default/compile-elpa-packages))
