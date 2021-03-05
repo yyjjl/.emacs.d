@@ -174,7 +174,7 @@
   (setq gc-cons-percentage 0.1)
 
   ;; Setup autoloads and packages
-  (setq package-selected-packages ymacs--required-packages)
+  (setq package-selected-packages ymacs-required-packages)
 
   (unless (file-exists-p ymacs-default-autoloads-file)
     (ymacs-default/generate-autoloads))

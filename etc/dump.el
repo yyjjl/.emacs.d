@@ -92,7 +92,7 @@
     lsp-diagnostics
     lsp-modeline
 
-    ,@ymacs--required-packages))
+    ,@ymacs-required-packages))
 
 (dolist (package ymacs-preload-packages)
   (when (not (memq package ymacs-ignored-packages))

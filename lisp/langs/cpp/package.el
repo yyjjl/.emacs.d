@@ -7,7 +7,7 @@
 
 (executable! clangd :-exe [(expand-cache! (format "lsp/clangd_%s/bin/clangd" ymacs-cpp-clangd-version)) "clangd"])
 
-(require-packages! clang-format google-c-style)
+(require-packages! google-c-style)
 
 (cl-defstruct ymacs-cpp-build-system
   (system-id nil)

@@ -13,15 +13,15 @@
 (eval-when-compile
   (require 'seq))
 
-(defvar ymacs--compile-config-in-progress nil
+(defvar ymacs-compile-config-in-progress nil
   "When loading ~/.emacs.d/etc/setup.el, it is set to t.")
-(defvar ymacs--loaded-features ()
+(defvar ymacs-loaded-features ()
   "All loaded features.")
-(defvar ymacs--required-packages ()
+(defvar ymacs-required-packages ()
   "All required packages.")
+
 (defvar ymacs--package-content-freshed-p nil
   "A flag to indicate whether the package contents have been freshed.")
-
 (defvar ymacs--buffer-visible-p t
   "A flag to indicate whether the buffer is not a temporary buffer.")
 
@@ -51,6 +51,14 @@
 (defsubst barf-if-not-visiting-file! ()
   (unless (buffer-file-name)
     (user-error "No file is associated with current buffer")))
+
+(defmacro print! (-fmt &rest -args)
+  (let ((stream (last -args 2))
+        (file ''external-debugging-output))
+    (when (eq (car stream) :file)
+      (setq file (cadr stream))
+      (setq -args (butlast -args 2)))
+    `(princ (format ,-fmt ,@-args) ,file)))
 
 (defun plist-pop! (-plist -prop)
   "Delete -PROP from -PLIST."
@@ -109,14 +117,14 @@ Otherwise `(format \"ymacs-%s-path\" -NAME)' will be used."
   (unless (vectorp -exe)
     (setq -exe (vector -exe)))
 
-  `(defvar ,(if -full-name -name (intern (format "ymacs-%s-path" -name)))
-     (eval-when-compile
-       (let ((value (or ,@(seq-map (lambda (x) `(executable-find ,x)) -exe))))
-         (when (and (null value)
-                    (not (bound-and-true-p comp-native-compiling)))
-           (warn "executable %s is missing" ,-exe))
-         value))
-     ,-docstring))
+  (let ((sym (if -full-name -name (intern (format "ymacs-%s-path" -name)))))
+    `(defvar ,sym
+       (eval-when-compile
+         (let ((value (or ,@(seq-map (lambda (x) `(executable-find ,x)) -exe))))
+           (when (not (bound-and-true-p comp-native-compiling))
+             (print! "  > EXE %s = %s\n" (symbol-name ',sym) (or value "???")))
+           value))
+       ,-docstring)))
 
 (defmacro interactive! (&rest -body)
   "A shortcut for inline interactive lambdas.
@@ -467,7 +475,7 @@ HTML file converted from org file, it returns t."
      (t -topmost))))
 
 (defun require! (-pkg-name)
-  (add-to-list 'ymacs--required-packages -pkg-name)
+  (add-to-list 'ymacs-required-packages -pkg-name)
   (unless (package-installed-p -pkg-name)
     (unless ymacs--package-content-freshed-p
       (package-refresh-contents)
@@ -533,16 +541,16 @@ HTML file converted from org file, it returns t."
                      collect `(load ,path nil t))))
         `(unless (has-feature! ',feature-name)
            ,@forms
-           (add-to-list 'ymacs--loaded-features (cons ',feature-name ',-name))
+           (add-to-list 'ymacs-loaded-features (cons ',feature-name ',-name))
            (mapc #'funcall (get ',feature-name 'after-feature-functions)))
       (user-error "empty feature %s" -name))))
 
 (defsubst has-feature! (-name)
-  (assq -name ymacs--loaded-features))
+  (assq -name ymacs-loaded-features))
 
 (defmacro eval-when-compile-config! (&rest -body)
   `(eval-when-compile
-     (when (and (bound-and-true-p ymacs--compile-config-in-progress)
+     (when (and (bound-and-true-p ymacs-compile-config-in-progress)
                 (not (bound-and-true-p comp-native-compiling)))
        ,@-body)))
 

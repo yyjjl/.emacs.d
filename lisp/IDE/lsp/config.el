@@ -83,7 +83,7 @@
     ("M-o" . lsp-signature-stop))
 
   (setq lsp-signature-doc-lines 5)
-  (setq lsp-keep-workspace-alive nil)
+  ;; (setq lsp-keep-workspace-alive nil)
 
   ;; manually configured
   (setq lsp-completion-provider :none)
@@ -105,13 +105,13 @@
 
   ;; (setq lsp-before-save-edits t)
 
-  (setq lsp-semantic-tokens-enable nil)
+  ;; (setq lsp-semantic-tokens-enable nil)
   (setq lsp-lens-enable t)
 
   (setq lsp-headerline-breadcrumb-enable nil)
-  (setq lsp-modeline-workspace-status-enable nil)
+  ;; (setq lsp-modeline-code-actions-enable t)
   (setq lsp-modeline-diagnostics-enable nil)
-  (setq lsp-modeline-code-actions-enable t))
+  (setq lsp-modeline-workspace-status-enable nil))
 
 (eval-when! ymacs-lsp-use-modern-ui
   (after! lsp-ui
