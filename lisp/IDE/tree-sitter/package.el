@@ -21,6 +21,15 @@
   (when (not (is-buffer-too-large))
     (ignore-errors (tree-sitter-hl-mode 1))))
 
+(eval-when-has-feature! lsp
+  (define-hook! ymacs-tree-sitter//setup-lsp (lsp-semantic-tokens-mode-hook)
+    (if lsp-semantic-tokens-mode
+        (when tree-sitter-mode
+          (tree-sitter-mode -1))
+      (unless (or tree-sitter-mode
+                  (is-buffer-too-large))
+        (ignore-errors (tree-sitter-hl-mode 1))))))
+
 (defun ymacs-tree-sitter/toggle ()
   (interactive)
   (if (memq 'ymacs-tree-sitter//setup prog-mode-hook)

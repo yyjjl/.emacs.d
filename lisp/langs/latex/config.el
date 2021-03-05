@@ -8,11 +8,15 @@
     (add-to-list 'lsp-diagnostics-disabled-modes 'tex-mode))
 
   (after! lsp-tex
-    (setf (lsp--client-download-server-fn (ht-get lsp-clients 'texlab))
-          (ymacs-lsp//make-download-from-github-fn
-           "latex-lsp/texlab"
-           (lambda (x) (string-match-p (if sys/linuxp "linux" "macos") x))
-           :tgz))))
+    (let ((client (gethash 'texlab lsp-clients)))
+      (setf (lsp--client-notification-handlers client)
+            (ht ("textDocument/publishDiagnostics" #'ignore)))
+
+      (setf (lsp--client-download-server-fn client)
+            (ymacs-lsp//make-download-from-github-fn
+             "latex-lsp/texlab"
+             (lambda (x) (string-match-p (if sys/linuxp "linux" "macos") x))
+             :tgz)))))
 
 (after! latex
   (ymacs-editor//add-toggles
