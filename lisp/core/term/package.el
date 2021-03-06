@@ -3,14 +3,14 @@
 (eval-when-compile
   (require 'dash))
 
-(defcustom ymacs-term-type
-  (eval-when-compile
-    (if (and (bound-and-true-p module-file-suffix) ; dynamic module
-             (executable-find "cmake")
-             (executable-find "libtool")
-             (executable-find "make"))
-        'vterm
-      'term))
+(option! term-type
+    (eval-when-compile
+      (if (and (bound-and-true-p module-file-suffix) ; dynamic module
+               (executable-find "cmake")
+               (executable-find "libtool")
+               (executable-find "make"))
+          'vterm
+        'term))
   "Terminal type"
   :group 'ymacs
   :type '(choice

@@ -35,7 +35,8 @@
         (format "Remove *.elc in %s ..." (abbreviate-file-name ymacs-config-directory))
       (delete-file elc-file)))
 
-  (load (expand-file-name "init.el" user-emacs-directory))
+  (setq user-init-file (expand-file-name "init.el" user-emacs-directory))
+  (load user-init-file)
 
   ;; Disable some features when load emacs
   (setq-default prog-mode-hook nil)
@@ -49,7 +50,7 @@
 
   (ymacs-default//after-init)
 
-  (setq ymacs-compile-config-in-progress t)
+  (setq ymacss-compile-config-in-progress t)
 
   (ymacs-default/compile-config)
   (ymacs-default/compile-elpa-packages))

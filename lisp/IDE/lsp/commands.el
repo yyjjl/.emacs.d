@@ -65,7 +65,7 @@
   (lsp--info "Semantic Tokens %s. "
              (if lsp-semantic-tokens-enable "enabled" "disabled")))
 
-(eval-when! ymacs-lsp-use-modern-ui
+(eval-when! ymacs-lsp-use-modern-ui-p
   (defun ymacs-lsp/toggle-modern-ui ()
     (interactive)
 
@@ -77,7 +77,7 @@
       (lsp-ui-mode 1))))
 
 
-(eval-when! ymacs-lsp-use-dap
+(eval-when! ymacs-lsp-use-dap-p
   (define-minor-mode ymacs-dap-running-session-mode
     "A mode for adding keybindings to running sessions"
     nil nil

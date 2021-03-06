@@ -66,9 +66,11 @@
     (exec-path-from-shell-initialize))
 
   (when (display-graphic-p -frame)
+    (mouse-avoidance-mode t)
+
     (fcitx-aggressive-setup)
 
-    (when ymacs-editor-use-childframe
+    (when ymacs-editor-use-childframe-p
       (company-posframe-mode 1)))
 
   (find-file-noselect (expand-cache! "org/*note*"))

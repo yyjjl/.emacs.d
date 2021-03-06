@@ -1,5 +1,13 @@
 ;;; -*- lexical-binding: t; -*-
 
+(option! org-latex-ignore-internal-label nil
+  :type 'boolean
+  :safe #'booleanp)
+
+(option! org-publish-default-project nil
+  :type 'string
+  :safe #'stringp)
+
 (require-packages!
  org-download
  (auctex :compile (latex tex preview reftex))
@@ -37,18 +45,6 @@
 (defvar ymacs-org-project-src-dir (expand-file-name "src" ymacs-org-project-base-dir))
 (defvar ymacs-org-project-dst-dir (expand-file-name "dst" ymacs-org-project-base-dir))
 (defvar ymacs-org-publish-last-project nil)
-
-(defcustom ymacs-org-latex-ignore-internal-label nil
-  ""
-  :group 'ymacs
-  :type 'boolean
-  :safe #'booleanp)
-
-(defcustom ymacs-org-publish-default-project nil
-  ""
-  :group 'ymacs
-  :type 'string
-  :safe #'stringp)
 
 (define-key!
   ("C-x , p" . poporg-dwim)

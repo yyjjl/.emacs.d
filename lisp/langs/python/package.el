@@ -1,8 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
-(defcustom ymacs-python-auto-activate-venv nil
-  "."
-  :group 'ymacs
+(option! python-auto-activate-venv nil
   :type 'boolean
   :safe #'booleanp)
 
@@ -26,11 +24,9 @@
 (eval-when-has-feature! lsp
   (require-packages! lsp-pyright)
 
-  (defcustom ymacs-python-lsp-server 'pyls
+  (option! python-lsp-server 'pyright
     "Python LSP server type"
-    :group 'ymacs
-    :type 'symbol
-    :safe #'(lambda (x) (memq x ymacs-python-lsp-servers)))
+    :type 'symbol)
 
   (autoload #'ymacs-python/change-lsp-server (expand! "commands") nil t)
 

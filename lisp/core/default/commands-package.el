@@ -47,11 +47,6 @@
                   (directory-files ymacs-config-directory t "\\.el$")
                   (directory-files user-emacs-directory t "\\.el$")
                   (cl-loop
-                   for file in (directory-files ymacs-config-directory)
-                   when (and (not (file-directory-p file))
-                             (string-suffix-p ".el" file))
-                   collect file)
-                  (cl-loop
                    for (_ . feature) in ymacs-loaded-features
                    for directory = (expand-file-name (symbol-name feature) ymacs-config-directory)
                    nconc (directory-files-recursively directory "\\.el$")))))

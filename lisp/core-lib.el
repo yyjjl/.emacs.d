@@ -54,11 +54,13 @@
 
 (defmacro print! (-fmt &rest -args)
   (let ((stream (last -args 2))
-        (file ''external-debugging-output))
+        file)
     (when (eq (car stream) :file)
       (setq file (cadr stream))
       (setq -args (butlast -args 2)))
-    `(princ (format ,-fmt ,@-args) ,file)))
+    `(princ (format ,-fmt ,@-args)
+            (or ,file
+                (and noninteractive 'external-debugging-output)))))
 
 (defun plist-pop! (-plist -prop)
   "Delete -PROP from -PLIST."
@@ -125,6 +127,25 @@ Otherwise `(format \"ymacs-%s-path\" -NAME)' will be used."
              (print! "  > EXE %s = %s\n" (symbol-name ',sym) (or value "???")))
            value))
        ,-docstring)))
+
+(defmacro option! (-symbol -standard &rest -args)
+  "Similar to `defcustom'"
+  (declare (indent 2) (doc-string 3) (debug (name body)))
+
+  (let ((doc ""))
+    (when (stringp (car -args))
+      (setq doc (pop -args)))
+    (unless (plist-get -args :group)
+      (let ((group (if (plist-get -args :safe)
+                       ''ymacs-local
+                     ''ymacs)))
+        (setq -args (plist-put -args :group group))))
+
+    (let ((boolean (equal ''boolean (plist-get -args :type))))
+      `(defcustom ,(intern (concat "ymacs-" (symbol-name -symbol) (if boolean "-p" "")))
+         ,-standard
+         ,doc
+         ,@-args))))
 
 (defmacro interactive! (&rest -body)
   "A shortcut for inline interactive lambdas.
@@ -348,13 +369,13 @@ HTML file converted from org file, it returns t."
         (buffer-base-buffer)
         (string-match-p (concat "^" temporary-file-directory) filename))))
 
-(defsubst is-buffer-too-large ()
+(defsubst is-buffer-too-large! ()
   (> buffer-saved-size ymacs-large-buffer-limit))
 
 (defsubst is-buffer-suitable-for-coding! ()
   (not (or (is-buffer-temporary!)
            (file-remote-p default-directory)
-           (is-buffer-too-large))))
+           (is-buffer-too-large!))))
 
 (defun insert-after! (-after-value -new-value -lst)
   "Find -AFTER-VALUE and Add -NEW-VALUE to -LST after it."
@@ -619,9 +640,8 @@ HTML file converted from org file, it returns t."
             (car -collection))
         value))))
 
-(defcustom ymacs-lsp-project-state :enabled
+(option! lsp-project-state :enabled
   "Whether to enable lsp in current project"
-  :group 'ymacs
   :type '(choice
           (const :tag "Enable LSP in current file" :enabled)
           (const :tag "Disable LSP in current file" :disabled))

@@ -8,10 +8,9 @@
     (add-to-list 'lsp-diagnostics-disabled-modes 'tex-mode))
 
   (after! lsp-tex
-    (let ((client (gethash 'texlab lsp-clients)))
+    (let ((client (ht-get lsp-clients 'texlab)))
       (setf (lsp--client-notification-handlers client)
             (ht ("textDocument/publishDiagnostics" #'ignore)))
-
       (setf (lsp--client-download-server-fn client)
             (ymacs-lsp//make-download-from-github-fn
              "latex-lsp/texlab"

@@ -5,10 +5,31 @@
 (executable! fdfind :-exe ["fdfind" "fd"])
 (executable! ctags :-exe "ctags-exuberant")
 
-(defcustom ymacs-editor-use-childframe nil
+(defface ymacs-editor-hs-overlay-face
+  '((t (:inherit font-lock-builtin-face :underline t)))
+  "Face used for the dirname part of the buffer path."
+  :group 'hideshow)
+
+(option! editor-use-childframe nil
   "Whether to use childframe"
-  :group 'ymacs
   :type 'boolean)
+
+(option! editor-local-snippets-list nil
+  "local snippets"
+  :type '(alist :key-type string :value-type string)
+  :safe #'listp)
+
+(option! editor-project-rsync-remote-path nil
+  :type 'directory
+  :safe #'stringp)
+
+(option! editor-project-rsync-local-path nil
+  :type '(directory :must-match t)
+  :safe #'file-directory-p)
+
+(option! editor-project-rsync-extra-options nil
+  :type '(repeat string)
+  :safe (lambda (x) (and (listp x) (-all? #'stringp x))))
 
 (eval-when-compile-config!
  (when sys/macp
@@ -27,7 +48,7 @@
  ;; `counsel-M-x' need amx to get history
  amx
  company
- (company-posframe :when ymacs-editor-use-childframe)
+ (company-posframe :when ymacs-editor-use-childframe-p)
  ivy
  ivy-hydra
  hydra
@@ -120,35 +141,6 @@
     ymacs-modeline--vcs-state
     ymacs-modeline--project-detected-p
     ymacs-modeline--project-root))
-
-(defface ymacs-editor-hs-overlay-face
-  '((t (:inherit font-lock-builtin-face :underline t)))
-  "Face used for the dirname part of the buffer path."
-  :group 'hideshow)
-
-(defcustom ymacs-editor-local-snippets-list nil
-  "local snippets"
-  :group 'ymacs
-  :type '(alist :key-type string :value-type string)
-  :safe #'listp)
-
-(defcustom ymacs-editor-project-rsync-remote-path nil
-  "."
-  :group 'ymacs
-  :type 'directory
-  :safe #'stringp)
-
-(defcustom ymacs-editor-project-rsync-local-path nil
-  "."
-  :group 'ymacs
-  :type '(directory :must-match t)
-  :safe #'file-directory-p)
-
-(defcustom ymacs-editor-project-rsync-extra-options nil
-  "."
-  :group 'ymacs
-  :type '(repeat string)
-  :safe (lambda (x) (and (listp x) (-all? #'stringp x))))
 
 (defvar ymacs-editor-project-rsync-command
   "rsync -azh --progress --filter=':- .gitignore' %s %s %s")

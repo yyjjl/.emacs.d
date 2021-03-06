@@ -1,28 +1,21 @@
 ;; -*- lexical-binding: t -*-
 
-(defconst sys/win32p
-  (eq system-type 'windows-nt)
+(defconst sys/win32p (eq system-type 'windows-nt)
   "Are we running on a WinTel system?")
 
-(defconst sys/linuxp
-  (eq system-type 'gnu/linux)
+(defconst sys/linuxp (eq system-type 'gnu/linux)
   "Are we running on a GNU/Linux system?")
 
-(defconst sys/macp
-  (eq system-type 'darwin)
+(defconst sys/macp (eq system-type 'darwin)
   "Are we running on a Mac system?")
 
-(defconst sys/mac-ns-p
-  (eq window-system 'ns)
+(defconst sys/mac-ns-p (eq window-system 'ns)
   "Are we running on a GNUstep or Macintosh Cocoa display?")
 
-(defconst sys/mac-cocoa-p
-  (featurep 'cocoa)
+(defconst sys/mac-cocoa-p (featurep 'cocoa)
   "Are we running with Cocoa on a Mac system?")
 
 (defvar ymacs-dump-load-path nil)
-
-(defvar ymacs-use-gnutls-p (gnutls-available-p))
 
 (defvar ymacs-gc-cons-threshold (* 100 1024 1024))
 
