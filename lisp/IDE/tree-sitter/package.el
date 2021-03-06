@@ -29,7 +29,7 @@
         (when tree-sitter-mode
           (tree-sitter-mode -1))
       (unless (or tree-sitter-mode
-                  (is-buffer-too-large))
+                  (is-buffer-too-large!))
         (ignore-errors (tree-sitter-hl-mode 1))))))
 
 (defun ymacs-tree-sitter/toggle ()
