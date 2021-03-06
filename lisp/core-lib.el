@@ -644,7 +644,3 @@ HTML file converted from org file, it returns t."
                ,-init
              ,-fallback)))
      ,-fallback))
-
-(provide 'core-lib)
-
-;;; core-lib.el ends here

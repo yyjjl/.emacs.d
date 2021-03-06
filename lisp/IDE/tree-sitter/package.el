@@ -2,6 +2,8 @@
 
 (require-packages! tree-sitter-langs)
 
+(defvar lsp-semantic-tokens-mode)
+
 (after! tree-sitter
   (require 'tree-sitter-langs)
 

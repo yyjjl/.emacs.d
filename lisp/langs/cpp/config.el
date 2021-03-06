@@ -8,7 +8,7 @@
          (setf (alist-get mode font-lock-maximum-decoration) 1))))
 
 (eval-when-has-feature! lsp
-  (after! lsp-clangd
+  (after! (lsp-mode lsp-clangd)
     (setq lsp-clients-clangd-executable ymacs-clangd-path)
 
     (dolist (arg '("--all-scopes-completion"
