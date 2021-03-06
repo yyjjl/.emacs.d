@@ -111,7 +111,7 @@
   (setq lsp-modeline-diagnostics-enable nil)
   (setq lsp-modeline-workspace-status-enable nil))
 
-(eval-when! ymacs-lsp-use-modern-ui
+(eval-when! ymacs-lsp-use-modern-ui-p
   (after! lsp-ui
     (ymacs-editor//add-toggles
      "LSP" 'lsp-mode
@@ -126,7 +126,7 @@
     (setq lsp-ui-doc-max-height 20)
     (setq lsp-ui-doc-delay eldoc-idle-delay)))
 
-(eval-when! ymacs-lsp-use-dap
+(eval-when! ymacs-lsp-use-dap-p
   (after! dap-hydra
     (defhydra++ dap-hydra ()
       ("q" :delete)

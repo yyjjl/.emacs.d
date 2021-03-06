@@ -1,8 +1,7 @@
 ;; -*- lexical-binding:t -*-
 
-(defcustom ymacs-cpp-clangd-version "11.0.0"
+(option! cpp-clangd-version "11.0.0"
   "clangd version"
-  :group 'ymacs
   :type 'string)
 
 (executable! clangd :-exe [(expand-cache! (format "lsp/clangd_%s/bin/clangd" ymacs-cpp-clangd-version)) "clangd"])

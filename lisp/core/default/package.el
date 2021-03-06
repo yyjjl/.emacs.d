@@ -1,5 +1,8 @@
 ;; -*- lexical-binding: t; -*-
 
+(option! package-use-gnutls t
+  :type 'boolean)
+
 (defvar ymacs-default-autoloads-file (expand-cache! "autoloads.el")
   "Autoloads file")
 

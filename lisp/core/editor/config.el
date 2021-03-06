@@ -269,7 +269,7 @@
   (setf (alist-get 'company-search-mode mode-line-misc-info)
         '(("" company-search-lighter " "))))
 
-(when ymacs-editor-use-childframe
+(when ymacs-editor-use-childframe-p
   (after! company-posframe
     (setq company-posframe-show-indicator nil)
     (setq company-posframe-show-metadata nil)

@@ -4,7 +4,7 @@
 
 (after! lsp-mode
   (define-hook! ymacs-lsp|after-open (lsp-after-open-hook)
-    (when (and ymacs-lsp-use-modern-ui
+    (when (and ymacs-lsp-use-modern-ui-p
                (display-graphic-p))
       (setq-local lsp-eldoc-enable-hover nil))
 
@@ -14,7 +14,7 @@
 
   (define-hook! ymacs-lsp//set-lsp-signature-frame-params (lsp-signature-mode-hook)
     (setq lsp-signature-function
-          (if (and ymacs-editor-use-childframe
+          (if (and ymacs-editor-use-childframe-p
                    (display-graphic-p))
               #'lsp-signature-posframe
             #'lsp-lv-message))
@@ -33,7 +33,7 @@
 (after! lsp-modeline
   (setq lsp-modeline-code-actions-segments '(count name)))
 
-(eval-when! ymacs-lsp-use-dap
+(eval-when! ymacs-lsp-use-dap-p
   (after! dap-mode
     (define-advice dap-debug (:before (&rest _args) save-window-configuration)
       (ymacs-debug//before-debug))

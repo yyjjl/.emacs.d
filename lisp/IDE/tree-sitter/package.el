@@ -18,7 +18,7 @@
      "Tree Sitter" :toggle tree-sitter-hl-mode)))
 
 (define-hook! ymacs-tree-sitter//setup (prog-mode-hook)
-  (when (not (is-buffer-too-large))
+  (when (not (is-buffer-too-large!))
     (ignore-errors (tree-sitter-hl-mode 1))))
 
 (defun ymacs-tree-sitter/toggle ()

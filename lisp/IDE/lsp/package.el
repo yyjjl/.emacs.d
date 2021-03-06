@@ -1,20 +1,18 @@
 ;; -*- lexical-binding:t -*-
 
-(defcustom ymacs-lsp-use-modern-ui nil
+(option! lsp-use-modern-ui nil
   "Where to use lsp-ui"
-  :group 'ymacs
   :type 'boolean)
 
-(defcustom ymacs-lsp-use-dap nil
+(option! lsp-use-dap nil
   "Where to use dap-mode"
-  :group 'ymacs
   :type 'boolean)
 
 (require-packages!
  lsp-mode
  lsp-ivy
- (lsp-ui :when ymacs-lsp-use-modern-ui)
- (dap-mode :when ymacs-lsp-use-dap))
+ (lsp-ui :when ymacs-lsp-use-modern-ui-p)
+ (dap-mode :when ymacs-lsp-use-dap-p))
 
 (defvar ymacs-lsp--enabled-clients nil)
 
@@ -24,10 +22,10 @@
 
 (defvar ymacs-lsp-process-buffer-name "*LSP process*")
 
-(eval-when! ymacs-lsp-use-modern-ui
+(eval-when! ymacs-lsp-use-modern-ui-p
   (autoload 'ymacs-lsp/toggle-modern-ui (expand! "commands") nil t))
 
-(eval-when! ymacs-lsp-use-dap
+(eval-when! ymacs-lsp-use-dap-p
   (defvar ymacs-dap-running-session-mode-map
     (let ((map (make-sparse-keymap)))
       (suppress-keymap map)

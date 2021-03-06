@@ -2,7 +2,7 @@
 
 (after! pyvenv
   (define-hook! ymacs-python//shell-exec-hook (ymacs-term-shell-exec-hook)
-    (when ymacs-python-auto-activate-venv
+    (when ymacs-python-auto-activate-venv-p
       (let ((venv (getenv "VIRTUAL_ENV")))
         (when (and (stringp venv)
                    (file-directory-p venv))

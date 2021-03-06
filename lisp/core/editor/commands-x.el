@@ -252,7 +252,7 @@
 ;;;###autoload
 (define-minor-mode ymacs-x-mode
   "use X as leader key"
-  :group 'ymacs
+  :group 'ymacs-x
   :init-value nil
   (setq ymacs-x--activated nil)
   (if ymacs-x-mode
@@ -272,7 +272,7 @@
 
 ;;;###autoload
 (define-globalized-minor-mode ymacs-x-global-mode ymacs-x-mode ymacs-x//mode-predicate
-  :group 'ymacs
+  :group 'ymacs-x
   (if ymacs-x-global-mode
       (add-hook 'post-command-hook #'ymacs-x//post-command-hook)
     (remove-hook 'post-command-hook #'ymacs-x//post-command-hook)))

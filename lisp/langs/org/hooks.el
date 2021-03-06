@@ -82,7 +82,7 @@
     (let ((label (funcall -fn -datum -info -force -full)))
       (with-current-buffer (or (find-buffer-visiting (buffer-file-name))
                                (current-buffer))
-        (if (and ymacs-org-latex-ignore-internal-label
+        (if (and ymacs-org-latex-ignore-internal-label-p
                  (stringp label)
                  (string-prefix-p "\\label{sec:org" label))
             ""

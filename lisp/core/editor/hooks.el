@@ -68,7 +68,7 @@
   (when (display-graphic-p -frame)
     (fcitx-aggressive-setup)
 
-    (when ymacs-editor-use-childframe
+    (when ymacs-editor-use-childframe-p
       (company-posframe-mode 1)))
 
   (find-file-noselect (expand-cache! "org/*note*"))
