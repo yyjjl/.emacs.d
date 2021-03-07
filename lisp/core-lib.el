@@ -82,7 +82,7 @@
           (throw 'done t))))
     (cons value head)))
 
-(defun seq-do-interactively! (-function -prompt-function -sequence)
+(defun seq-do-interactively! (-function -prompt-function -sequence &optional -skip-function)
   (let ((map (make-sparse-keymap))
         no-confirm
         done)
@@ -93,11 +93,15 @@
 
     (catch 'done
       (seq-doseq (-item -sequence)
-        (let ((anwser (or no-confirm
-                          (read-from-minibuffer
-                           (concat (funcall -prompt-function -item) " (yes/no/all/stop) ")
-                           nil
-                           map))))
+        (let ((anwser
+               (or (and -skip-function
+                        (funcall -skip-function -item)
+                        "n")
+                   no-confirm
+                   (read-from-minibuffer
+                    (concat (funcall -prompt-function -item) " (yes/no/all/stop) ")
+                    nil
+                    map))))
           (when done
             (message "Stopped")
             (throw 'done t))

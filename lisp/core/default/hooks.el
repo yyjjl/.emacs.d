@@ -28,6 +28,10 @@
     (:around (-fn &optional -auto-save) set-additional-variables)
   (let ((variables savehist-additional-variables)
         (kill-ring (ymacs-default//filter-ring kill-ring)))
+    (unless noninteractive
+      (cl-pushnew 'ymacs-default-visited-files-list variables)
+      (setq ymacs-default-visited-files-list
+            (cl-remove nil (mapcar #'buffer-file-name (buffer-list)))))
     (dolist (symbol (apropos-internal "-\\(ring\\|history\\)\\'" 'boundp))
       (unless (or (null (symbol-value symbol))
                   (memq symbol ymacs-default-savehist-exclude-variables)

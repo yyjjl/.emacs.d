@@ -65,7 +65,6 @@
  multiple-cursors
  wgrep
  buffer-move
- graphviz-dot-mode
  ace-pinyin
  ace-link
  persistent-scratch)

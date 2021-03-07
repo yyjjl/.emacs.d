@@ -3,6 +3,8 @@
 (option! package-use-gnutls t
   :type 'boolean)
 
+(defvar ymacs-default-visited-files-list nil)
+
 (defvar ymacs-default-autoloads-file (expand-cache! "autoloads.el")
   "Autoloads file")
 
@@ -60,6 +62,7 @@
 
   ("c" . ymacs-default/cleanup-buffer-safe)
   (", -" . ymacs-default/copy-file-name)
+  (", r" . ymacs-default/restore-files)
 
   ("R" . ymacs-default/rename-this-file-and-buffer)
   ("W" . ymacs-default/copy-this-file)
