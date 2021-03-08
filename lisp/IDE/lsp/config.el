@@ -99,15 +99,17 @@
   ;; (setq lsp-enable-snippet t)
   ;; boost performance
   (setq lsp-enable-on-type-formatting nil)
-  ;; (setq lsp-enable-text-document-color t)
-  (setq lsp-enable-indentation nil)
+  (setq lsp-enable-text-document-color t)
+  ;; range formating
+  ;; (setq lsp-enable-indentation t)
   ;; (setq lsp-enable-symbol-highlighting t)
-  (setq lsp-symbol-highlighting-skip-current t)
+  ;; (setq lsp-symbol-highlighting-skip-current t)
 
   ;; (setq lsp-before-save-edits t)
 
   ;; (setq lsp-semantic-tokens-enable nil)
   (setq lsp-lens-enable t)
+
   (setq lsp-headerline-breadcrumb-enable nil)
   ;; (setq lsp-modeline-code-actions-enable t)
   (setq lsp-modeline-diagnostics-enable nil)

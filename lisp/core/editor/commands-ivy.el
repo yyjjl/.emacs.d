@@ -141,7 +141,7 @@
   (interactive)
 
   (setq ymacs-editor-ivy--last-text nil)
-  (let ((default-directory (or (ymacs-default//project-root) default-directory)))
+  (let ((default-directory (ymacs-default//project-root-or-default)))
     (ymacs-editor//rg)))
 
 ;;;###autoload

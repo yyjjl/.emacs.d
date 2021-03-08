@@ -8,10 +8,12 @@
 
 
 (defvar sdcv-wait-timeout 2
-  "The max time (in seconds) to wait for the sdcv process to produce some output.")
+  "The max time (in seconds) to wait for the sdcv process to produce
+  some output.")
 
 (defvar sdcv-wait-interval 0.01
-  "The interval (in seconds) to sleep each time to wait for sdcv's output.")
+  "The interval (in seconds) to sleep each time to wait for sdcv's
+  output.")
 
 (defconst sdcv-process-name "SDCV")
 (defconst sdcv-process-buffer-name " *sdcv-mode-process*")
@@ -24,11 +26,14 @@
 (defvar sdcv-choice-prompts '("Your choice[-1 to abort]: "
                               "您的选择为："
                               "您的選擇為：")
-  "A list of prompts that sdcv use to prompt for a choice of multiple candicates.")
+  "A list of prompts that sdcv use to prompt for a choice of multiple
+  candicates.")
 
-(defvar sdcv-result-patterns '("^Found [0-9]+ items, similar to [*?/|]*\\(.+?\\)[*?]*\\."
-                               "^发现 [0-9]+ 条记录和 [*?/|]*\\(.+?\\)[*?]* 相似。")
-  "A list of patterns to extract result word of sdcv. Special characters are stripped.")
+(defvar sdcv-result-patterns
+  '("^Found [0-9]+ items, similar to [*?/|]*\\(.+?\\)[*?]*\\."
+    "^发现 [0-9]+ 条记录和 [*?/|]*\\(.+?\\)[*?]* 相似。")
+  "A list of patterns to extract result word of sdcv. Special
+  characters are stripped.")
 
 (defvar sdcv-buffer-name "*sdcv*"
   "The name of the buffer of sdcv.")

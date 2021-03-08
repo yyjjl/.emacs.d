@@ -89,3 +89,12 @@ Does not indent buffer, because it is used for a
          (faces (-uniq  (-flatten (list (get-char-property pos 'face)
                                         (get-char-property 0 'face text))))))
     (message "%s" faces)))
+
+;;;###autoload
+(defun ymacs-default/restore-files ()
+  (interactive)
+  (seq-do-interactively!
+   #'find-file
+   (lambda (file) (format "Open %s" file))
+   ymacs-default-visited-files-list
+   #'find-buffer-visiting))
