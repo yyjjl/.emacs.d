@@ -28,7 +28,7 @@
 (defvar ymacs-term-repl-alist nil)
 
 ;; kill the buffer when terminal is exited
-(defvar ymacs-term-directory-functions '(projectile-project-root))
+(defvar ymacs-term-directory-functions '(ymacs-default//project-root))
 
 (defvar ymacs-term-program-arguments ())
 

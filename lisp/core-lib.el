@@ -410,15 +410,20 @@ HTML file converted from org file, it returns t."
       (set-buffer-file-coding-system 'utf-8-unix)
       (write-file -file))))
 
+(defsubst hack-dir-local-variables-for-project! ()
+  (let ((project (project-current)))
+    (dolist (buffer (or (when project
+                          (project--buffer-list project))
+                        (buffer-list)))
+      (with-current-buffer buffer
+        (hack-dir-local-variables-non-file-buffer)))))
+
 (defun save-dir-local-variables! (&rest -variables)
   (save-window-excursion
     (dolist (var -variables)
       (add-dir-local-variable nil var (buffer-local-value var (current-buffer))))
     (save-buffer)
-    (dolist (buffer (or (ignore-errors (projectile-project-buffers))
-                        (list (current-buffer))))
-      (with-current-buffer buffer
-        (hack-dir-local-variables-non-file-buffer)))))
+    (hack-dir-local-variables-for-project!)))
 
 (defun make-process-sentinel! (-callback -error-callback -unwind &optional -sentinel)
   (lambda (-proc -msg)

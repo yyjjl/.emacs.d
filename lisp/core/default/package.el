@@ -3,6 +3,17 @@
 (option! package-use-gnutls t
   :type 'boolean)
 
+(option! default-project nil
+  :type 'string
+  :safe 'stringp)
+
+(defvar ymacs-default-project-cache (make-hash-table :test #'equal))
+(defvar ymacs-default-project-invalidate-cache-empty-vars
+  '((ymacs-modeline--buffer-file-name . nil)
+    (ymacs-modeline--vcs-state . nil)
+    (ymacs-modeline--project-detected-p . nil)
+    (ymacs-modeline--project-root . nil)))
+
 (defvar ymacs-default-autoloads-file (expand-cache! "autoloads.el")
   "Autoloads file")
 
@@ -135,8 +146,7 @@
   (setq org-templates-directory (expand-etc! "org-templates"))
   (setq package-quickstart-file (expand-cache! "quickstart.el"))
   (setq persistent-scratch-save-file (expand-cache! "scratch"))
-  (setq projectile-cache-file (expand-cache! "projectile-cache.el"))
-  (setq projectile-known-projects-file (expand-cache! "projectile-bookmarks.el"))
+  (setq project-list-file (expand-cache! "projects"))
   (setq recentf-save-file (expand-cache! "recentf.el"))
   (setq request-storage-directory (expand-cache! "request"))
   (setq save-place-file (expand-cache! "places.el"))

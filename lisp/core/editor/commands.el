@@ -22,34 +22,6 @@ The app is chosen from your OS's preference."
     (dolist (file -files)
       (counsel-find-file-extern file))))
 
-
-;;;###autoload
-(defun ymacs-editor/edit-dir-locals (&optional -directory)
-  "Edit or create a .dir-locals.el file of the project."
-  (interactive
-   (list (let ((root (projectile-project-root)))
-           (or (and current-prefix-arg
-                    (read-directory-name "Select root" root))
-               root))))
-  (let ((default-directory -directory))
-    (condition-case nil
-        (call-interactively #'add-dir-local-variable)
-      (quit
-       (let ((files (dir-locals--all-files -directory)))
-         (cond ((null files)
-                (let ((file (expand-file-name ".dir-locals.el" -directory)))
-                  (when (yes-or-no-p (format "create file %s" file))
-                    (find-file file)
-                    (when (not (file-exists-p file))
-                      (unwind-protect
-                          (projectile-skel-dir-locals)
-                        (save-buffer))))))
-               ((= (length files) 1)
-                (find-file (car files)))
-               (t
-                (find-file (completing-read "Open file: " files nil t)))))))))
-
-
 ;;;###autoload
 (defun ymacs-editor/rsync-project (-local-path -remote-path -sync-to-remote)
   (interactive

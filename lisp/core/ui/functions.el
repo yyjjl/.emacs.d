@@ -98,7 +98,7 @@ Return nil if no project was found."
   (unless (and ymacs-modeline--project-detected-p
                (equal ymacs-modeline--project-detected-p buffer-file-name))
 
-    (setq ymacs-modeline--project-root (ignore-errors (projectile-project-root))
+    (setq ymacs-modeline--project-root (ymacs-default//project-root)
           ymacs-modeline--project-detected-p buffer-file-name)
 
     (when ymacs-modeline--project-root

@@ -111,4 +111,5 @@
 (put 'ymacs-default//external-file-handler 'operations '(insert-file-contents))
 
 (load (expand! "config-package.el"))
+(load (expand! "config-project.el"))
 (load (expand! "config-misc.el"))

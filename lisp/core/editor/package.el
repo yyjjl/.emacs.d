@@ -55,7 +55,6 @@
  pretty-hydra
  counsel
  flycheck
- projectile
  swiper
  yasnippet
  yasnippet-snippets
@@ -136,12 +135,6 @@
 (defvar ymacs-editor-hs-overlay-map (make-sparse-keymap)
   "Keymap for hs minor mode overlay.")
 
-(defvar ymacs-editor-projectile-invalidate-cache-empty-vars
-  '(ymacs-modeline--buffer-file-name
-    ymacs-modeline--vcs-state
-    ymacs-modeline--project-detected-p
-    ymacs-modeline--project-root))
-
 (defvar ymacs-editor-project-rsync-command
   "rsync -azh --progress --filter=':- .gitignore' %s %s %s")
 
@@ -206,12 +199,6 @@
 (autoload 'ymacs-hydra/window/body (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/sort/body (expand! "commands-hydra") nil t)
 
-(put 'projectile-project-run-cmd 'safe-local-variable #'stringp)
-(put 'projectile-project-test-cmd 'safe-local-variable #'stringp)
-(put 'projectile-project-compilation-cmd 'safe-local-variable #'stringp)
-(put 'projectile-project-configure-cmd 'safe-local-variable #'stringp)
-(put 'projectile-project-compilation-dir 'safe-local-variable #'stringp)
-
 (define-key! :prefix "C-x w"
   ;; buffer-mode
   ("k" . buf-move-up)
@@ -231,7 +218,7 @@
 
   ("o" . ace-window)
   ("b" . ivy-switch-buffer)
-  ("k" . ymacs-editor/kill-buffer)
+  ("k" . kill-buffer)
   ("K" . ymacs-editor/kill-regexp)
 
   ("n n" . ymacs-editor/narrow-or-widen-dwim)

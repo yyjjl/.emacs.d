@@ -18,7 +18,7 @@
 
 (defvar-local ymacs-lsp-format-buffer-function #'lsp-format-buffer)
 (defvar-local ymacs-lsp-organize-import-function #'lsp-organize-imports)
-(defvar-local ymacs-lsp-find-other-file-function #'projectile-find-other-file)
+(defvar-local ymacs-lsp-find-other-file-function nil)
 
 (defvar ymacs-lsp-process-buffer-name "*LSP process*")
 

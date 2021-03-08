@@ -29,13 +29,9 @@
     (mapcar
      (lambda (item)
        (apply #'ymacs-editor//propertize-compile-command item))
-     (append
-      (when-let ((root (projectile-project-root))
-                 (cmd projectile-project-compilation-cmd))
-        `((,cmd ,root)))
-      (cl-loop
-       for compile-command-fn in ymacs-editor-compile-command-functions
-       append (funcall compile-command-fn))))))
+     (cl-loop
+      for compile-command-fn in ymacs-editor-compile-command-functions
+      append (funcall compile-command-fn)))))
 
 
 ;;

@@ -120,11 +120,7 @@
                      (eval-and-compile
                        (list dir-locals-file
                              (concat (file-name-base dir-locals-file) "-2.el")))))
-    (dolist (buffer (or (ignore-errors (projectile-project-buffers))
-                        (buffer-list)))
-      (with-current-buffer buffer
-        (when buffer-file-name
-          (hack-dir-local-variables-non-file-buffer))))))
+    (hack-dir-local-variables-for-project!)))
 
 (define-hook! ymacs-default//after-init (after-init-hook)
   ;; global-modes

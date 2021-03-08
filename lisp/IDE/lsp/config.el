@@ -48,6 +48,8 @@
 
   (defun ymacs-lsp/find-other-file ()
     (interactive)
+    (unless ymacs-lsp-find-other-file-function
+      (user-error "ymacs-lsp-find-other-file-function is not set"))
     (call-interactively ymacs-lsp-find-other-file-function))
 
   (defun ymacs-lsp/format-buffer ()
@@ -58,8 +60,8 @@
     (interactive "*")
     (call-interactively ymacs-lsp-organize-import-function))
 
-  (after! projectile
-    (define-key! :map projectile-command-map
+  (after! project
+    (define-key! :map project-prefix-map
       ("a" . ymacs-lsp/find-other-file)))
 
   (define-key! :map lsp-mode-map

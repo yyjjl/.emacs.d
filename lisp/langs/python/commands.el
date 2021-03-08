@@ -11,8 +11,7 @@
 
     (let (buffers)
       (when-let ((workspaces (lsp-workspaces)))
-        (with-lsp-workspace
-            (lsp--completing-read "Select server: " workspaces 'lsp--workspace-print nil t)
+        (with-lsp-workspace (lsp--read-workspace)
           (setq buffers (lsp--workspace-buffers lsp--cur-workspace))
           (lsp--shutdown-workspace)))
 
@@ -70,7 +69,7 @@ If not try to complete."
   (interactive
    (list
     (read-directory-name "Create venv in: "
-                         (ignore-errors (projectile-project-root))
+                         (ymacs-default//project-root)
                          nil :mustmatch)
     (read-shell-command "Python executable: " "python")
     (when current-prefix-arg
@@ -95,7 +94,7 @@ If not try to complete."
      (list
       (cond ((= arg 0) default-directory)
             ((= arg 16) (read-directory-name "Directory: "))
-            (t (or (projectile-project-root) default-directory))))))
+            (t (ymacs-default//project-root-or-default))))))
   (let ((source-buffer (current-buffer))
         (buffer (process-buffer (ymacs-python//get-or-create-process -directory t))))
     (with-current-buffer buffer

@@ -28,7 +28,7 @@
           ;; global-semantic-mru-bookmark-mode
           ))
   (setq semantic-idle-scheduler-idle-time 1)
-  (setq semanticdb-project-root-functions '(projectile-project-root))
+  (setq semanticdb-project-root-functions '(ymacs-default//project-root))
 
   (dolist (mode '(c++-mode c-mode java-mode))
     (semanticdb-enable-gnu-global-databases mode)))
@@ -126,33 +126,6 @@
 
   (setq ibuffer-filter-group-name-face 'font-lock-doc-face))
 
-(after! projectile
-  (define-key! :map projectile-mode-map
-    ("C-x p" :map projectile-command-map))
-
-  (define-key! :map projectile-command-map
-    ("E" . ymacs-editor/edit-dir-locals)
-    ("K" . projectile-kill-buffers)
-    ("w" . projectile-switch-project))
-
-  ;; Use the faster searcher to handle project files
-  (when ymacs-fdfind-path
-    (setq projectile-generic-command
-          (concat ymacs-fdfind-path " . -0 --type f --color=never")))
-
-  (when ymacs-ctags-path
-    (setq projectile-tags-command
-          (eval-when-compile
-            (string-join
-             (cons ymacs-ctags-path (cdr (split-string projectile-tags-command)))
-             " "))))
-
-  (add-to-list 'projectile-globally-ignored-directories "__pycache__")
-
-  (setq projectile-use-git-grep t)
-  (setq projectile-completion-system 'ivy)
-  (setq projectile-ignored-projects '("~/" "/tmp")))
-
 (after! ivy
   (define-key! :map ivy-minibuffer-map
     ("C-r" . ivy-reverse-i-search)
@@ -171,13 +144,12 @@
   (ymacs-editor//define-switch
     (ymacs-editor//fzf :doc "fzf" :key "z" :caller counsel-fzf)
     (counsel-git :doc "git" :key "g")
-    (projectile-find-file :doc "find file (project)" :key "p")
+    (project-find-file :doc "find file (project)" :key "p")
     (counsel-find-file :doc "find file" :key "f"))
 
   (dolist (caller '(ivy-switch-buffer
                     internal-complete-buffer
-                    ivy-switch-buffer-other-window
-                    ymacs-editor/kill-buffer))
+                    ivy-switch-buffer-other-window))
     (ivy-configure caller
       :display-transformer-fn
       #'ymacs-editor//ivy-switch-buffer-transformer))

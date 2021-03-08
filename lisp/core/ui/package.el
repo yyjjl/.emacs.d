@@ -37,7 +37,6 @@
 (defvar ymacs-modeline-remap-face-cookie nil)
 
 ;;* Project caches
-(declare-function projectile-project-root 'projectile)
 (defvar-local ymacs-modeline--project-detected-p nil)
 (defvar-local ymacs-modeline--project-root nil)
 (defvar-local ymacs-modeline--project-parent-path nil)

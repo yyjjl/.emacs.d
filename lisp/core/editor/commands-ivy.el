@@ -42,28 +42,6 @@
     (error
      (ignore-errors (counsel-imenu)))))
 
-;;* kill buffer
-
-;;;###autoload
-(defun ymacs-editor/kill-buffer (-project-p)
-  "Kill buffer with ivy backends."
-  (interactive "P")
-
-  (let ((ivy-use-virtual-buffers nil))
-    (ivy-read (concat (when -project-p
-                        (format "[%s] " (projectile-project-name)))
-                      "Kill buffer: ")
-              (if -project-p
-                  (mapcar #'buffer-name (projectile-project-buffers))
-                'internal-complete-buffer)
-              :preselect (buffer-name (current-buffer))
-              :action (lambda (name)
-                        (when (buffer-live-p (get-buffer name))
-                          (kill-buffer name)))
-              :keymap ivy-switch-buffer-map
-              :caller 'ymacs-editor/kill-buffer
-              :require-match t)))
-
 ;;* swiper
 (defhydra ymacs-hydra/swiper (:color blue :hint nil)
   "
@@ -163,7 +141,7 @@
   (interactive)
 
   (setq ymacs-editor-ivy--last-text nil)
-  (let ((default-directory (or (projectile-project-root) default-directory)))
+  (let ((default-directory (or (ymacs-default//project-root) default-directory)))
     (ymacs-editor//rg)))
 
 ;;;###autoload

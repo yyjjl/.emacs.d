@@ -50,7 +50,6 @@
   (ivy-mode 1)
   (counsel-mode 1)
   (semantic-mode 1)
-  (projectile-mode 1)
 
   (global-company-mode 1)
   (yas-global-mode 1)
@@ -109,46 +108,6 @@
 
     (unless (eq ibuffer-sorting-mode 'filename/process)
       (ibuffer-do-sort-by-filename/process))))
-
-(after! projectile
-  (add-hook 'kill-emacs-hook #'projectile--cleanup-known-projects)
-  (advice-add #'delete-file-projectile-remove-from-cache :around #'ignore-remote!)
-
-  (define-advice projectile-invalidate-cache (:after (_) empty-vars)
-    (dolist (buffer (ignore-errors (projectile-project-buffers)))
-      (when (buffer-live-p buffer)
-        (with-current-buffer buffer
-          (dolist (var ymacs-editor-projectile-invalidate-cache-empty-vars)
-            (set var nil))))))
-
-  (define-advice projectile-maybe-read-command (:around (-fn &rest -args) show-project-root)
-    (lv-message "Current directory: %s" default-directory)
-    (unwind-protect
-        (apply -fn -args)
-      (lv-delete-window)))
-
-  (define-advice projectile-run-compilation (:override (-cmd) use-comint)
-    (if (functionp -cmd)
-        (funcall -cmd)
-      (compile -cmd t)))
-
-  (define-advice projectile-project-root (:override (&optional -dir) fast)
-    (let ((dir (or -dir default-directory)))
-      (if (file-remote-p dir)
-          (projectile-root-local dir)
-        (cl-subst
-         nil 'none
-         (or (cl-some
-              (lambda (func)
-                (let* ((cache-key (format "%s-%s" func dir))
-                       (cache-value (gethash cache-key projectile-project-root-cache)))
-                  (if (and cache-value (file-exists-p cache-value))
-                      cache-value
-                    (let ((value (funcall func (file-truename dir))))
-                      (puthash cache-key value projectile-project-root-cache)
-                      value))))
-              projectile-project-root-functions)
-             'none))))))
 
 (after! ivy
   (add-hook 'ivy-occur-mode-hook #'ymacs-default//truncate-line)
