@@ -14,6 +14,8 @@
                (display-graphic-p))
       (setq-local lsp-eldoc-enable-hover nil))
 
+    (remove-hook 'eldoc-documentation-functions 'flymake-eldoc-function t)
+
     (setq-local company-minimum-prefix-length 2)
     ;; default to sort and filter by server
     (setq-local company-transformers nil))

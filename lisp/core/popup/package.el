@@ -84,7 +84,6 @@
     completion-list-mode
     TeX-output-mode
     TeX-error-overview-mode
-    flycheck-error-list-mode
     flymake-diagnostics-buffer-mode
     profiler-report-mode))
 

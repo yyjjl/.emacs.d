@@ -6,7 +6,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(fill-column 100)
- '(flycheck-keymap-prefix (kbd "C-c f"))
  '(org-download-backend "curl \"%s\" -o \"%s\"")
  '(org-download-screenshot-method "gnome-screenshot -a -f %s")
  '(warning-suppress-log-types '((comp)))

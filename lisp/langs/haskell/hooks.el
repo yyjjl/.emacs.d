@@ -7,8 +7,6 @@
     (when (is-buffer-suitable-for-coding!)
       (try-enable-lsp! haskell
         :-fallback
-        (progn
-          (haskell-doc-mode 1)
-          (flycheck-mode -1))))
+        (haskell-doc-mode 1)))
 
     (haskell-indentation-mode 1)))

@@ -129,8 +129,7 @@
   ;; or wide buffers.
   (setq so-long-target-modes
         (append so-long-target-modes
-                '(flycheck-mode
-                  flyspell-mode
+                '(flyspell-mode
                   eldoc-mode
                   auto-composition-mode)))
   (setq so-long-predicate #'ymacs-default//buffer-has-long-lines-p))

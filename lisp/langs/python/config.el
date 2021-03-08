@@ -55,8 +55,6 @@
 
   (setq python-shell-prompt-detect-failure-warning t)
   (setq python-pdbtrack-activate t)
-  (setq flycheck-python-flake8-executable "python3")
-  (setq flycheck-python-pycompile-executable "python3")
 
   (if ymacs-ipython3-path
       (setq python-shell-interpreter "ipython3"

@@ -136,14 +136,6 @@
 (after! iedit
   (setq iedit-auto-narrow t))
 
-(after! flycheck
-  ;; Do not check during newline
-  (setq-default flycheck-checker-error-threshold 400)
-  (setq-default flycheck-check-syntax-automatically '(idle-change save mode-enabled))
-  (setq flycheck-navigation-minimum-level 'warning)
-  (setq flycheck-mode-line-prefix "")
-  (setq flycheck-idle-change-delay 1))
-
 (after! yasnippet
   (setq yas-prompt-functions '(yas-completing-prompt))
   (setq-default yas-indent-line 'fixed)

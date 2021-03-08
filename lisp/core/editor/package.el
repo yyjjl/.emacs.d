@@ -313,7 +313,7 @@
 
 (define-key! :prefix "C-c i"
   ("r" . ivy-resume)
-  ("e" . ymacs-editor/sudo-edit-or-errors)
+  ("e" . counsel-compilation-errors)
 
   ([remap dired] . counsel-dired)
   ([remap insert-char] . counsel-unicode-char)
