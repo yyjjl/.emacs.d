@@ -111,7 +111,9 @@
     ("n" . next-line)
     ("j" . next-line)
     ("p" . previous-line)
-    ("k" . previous-line)))
+    ("k" . previous-line))
+
+  (setq-default flymake-diagnostic-functions nil))
 
 (after! info
   (setq info-lookup-other-window-flag nil))

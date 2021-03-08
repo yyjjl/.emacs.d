@@ -40,6 +40,8 @@
         :-pre-init (ymacs-python//set-lsp-server)
         :-init
         (progn
+          (when (bound-and-true-p flymake-mode)
+            (remove-hook 'flymake-diagnostic-functions 'python-flymake t))
           (setq ymacs-lsp-format-buffer-function #'ymacs-python/autopep8)
           (setq ymacs-lsp-organize-import-function #'py-isort-buffer)))))
 

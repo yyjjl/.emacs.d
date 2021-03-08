@@ -59,11 +59,7 @@
 (advice-add #'vc-refresh-state :after #'ymacs-modeline//update-vcs)
 
 ;; update checker
-(declare-function flycheck-count-errors 'flycheck)
-(declare-function flycheck-error-level-compilation-level 'flycheck)
-(add-hook 'flycheck-status-changed-functions #'ymacs-modeline//update-checker-state)
-(add-hook 'flycheck-mode-hook #'ymacs-modeline//update-checker-state)
-
+(advice-add #'flymake--handle-report :after #'ymacs-modeline//update-checker-state)
 (add-hook 'lsp-configure-hook
           (lambda ()
             (run-with-idle-timer 0 nil #'ymacs-modeline//update-lsp-state (current-buffer))))

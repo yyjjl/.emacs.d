@@ -287,44 +287,40 @@ like the scratch buffer where knowing the current project directory is important
 ;;* Checker
 ;;
 
-(defvar flycheck-current-errors)
-(declare-function lsp-workspaces 'lsp-mode)
-(declare-function lsp--workspace-status-string 'lsp-mode)
+(defvar flymake-mode-line-format)
 
-(defsubst ymacs-modeline//update-checker-state (&optional status)
-  "Update flycheck state via STATUS."
+(defsubst ymacs-modeline//update-checker-state (&rest _)
   (setq ymacs-modeline--checker-state
-        (pcase status
-
-          ('finished
-           (if flycheck-current-errors
-               (let ((info 0) (warning 0) (err 0))
-                 (dolist (item (flycheck-count-errors flycheck-current-errors))
-                   (let ((count (cdr item)))
-                     (pcase (flycheck-error-level-compilation-level (car item))
-                       (0 (cl-incf info count))
-                       (1 (cl-incf warning count))
-                       (2 (cl-incf err count)))))
-                 (concat
-                  " "
-                  (propertize (number-to-string err) 'face 'ymacs-modeline-urgent)
-                  "/"
-                  (propertize (number-to-string warning) 'face 'ymacs-modeline-warning)
-                  "/"
-                  (propertize (number-to-string info) 'face 'ymacs-modeline-info)))
-             (propertize " --" 'face 'ymacs-modeline-info)))
-
-          ('running (propertize " Running" 'face 'ymacs-modeline-debug))
-
-          ('no-checker (propertize " No-checker" 'face 'ymacs-modeline-debug))
-
-          ('errored (propertize " Error" 'face 'ymacs-modeline-urgent))
-
-          ('interrupted (propertize " Interrupted" 'face 'ymacs-modeline-debug))
-
-          ('suspicious (propertize " Suspicious" 'face 'ymacs-modeline-urgent))
-
-          (_ nil))))
+        (let* ((running (flymake-running-backends))
+               (disabled (flymake-disabled-backends))
+               (reported (flymake-reporting-backends))
+               (some-waiting (cl-set-difference running reported))
+               (warning-level (flymake--severity :warning))
+               (note-level (flymake--severity :note))
+               (error-count 0)
+               (warning-count 0)
+               (note-count 0))
+          (maphash
+           (lambda (_b state)
+             (dolist (diag (flymake--backend-state-diags state))
+               (let ((severity (flymake--severity (flymake--diag-type diag))))
+                 (cond ((> severity warning-level) (cl-incf error-count))
+                       ((> severity note-level) (cl-incf warning-count))
+                       (t (cl-incf note-count))))))
+           flymake--backend-state)
+          (cond
+           (some-waiting ymacs-modeline--checker-state)
+           ((zerop (hash-table-count flymake--backend-state)) "No-checker")
+           ((and disabled (null running)) "All-disabled")
+           ((if (> (+ error-count warning-count note-count) 0)
+                (concat
+                 " "
+                 (propertize (number-to-string error-count) 'face 'ymacs-modeline-urgent)
+                 "/"
+                 (propertize (number-to-string warning-count) 'face 'ymacs-modeline-warning)
+                 "/"
+                 (propertize (number-to-string note-count) 'face 'ymacs-modeline-info))
+              (propertize " --" 'face 'ymacs-modeline-info)))))))
 
 (ymacs-modeline//def-segment checker
   "Displays color-coded error status in the current buffer with pretty icons."

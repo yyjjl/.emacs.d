@@ -23,23 +23,6 @@
 (after! company-capf
   (advice-add 'company-capf :around #'ignore-errors!))
 
-(after! flycheck
-  (define-advice flycheck-error-level-interesting-p (:override (err) smart)
-    (when (flycheck-error-p err)
-      (if-let ((min-severity (flycheck-error-level-severity flycheck-navigation-minimum-level)))
-          (or (<= min-severity
-                  (-> err
-                      flycheck-error-level
-                      flycheck-error-level-severity))
-              ;; all errors have a severity smaller than min-severity
-              (--all?
-               (< (-> it
-                      flycheck-error-level
-                      flycheck-error-level-severity)
-                  min-severity)
-               flycheck-current-errors))
-        t))))
-
 (after! yasnippet
   (define-advice yas-next-field-or-maybe-expand (:around (-fn &rest -args) expand-local)
     (or (ymacs-editor//try-expand-local-snippets)

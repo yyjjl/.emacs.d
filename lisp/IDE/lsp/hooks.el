@@ -3,6 +3,12 @@
 (declare-function lsp--render-element 'lsp-mode)
 
 (after! lsp-mode
+  ;; FIX the bug which causes flymake diagnostics disappeared 
+  (define-advice lsp-eldoc-function (:around (-fn) checker)
+    (or (when-let (diags (flymake-diagnostics (point)))
+          (mapconcat #'flymake-diagnostic-text diags "\n"))
+        (funcall -fn)))
+
   (define-hook! ymacs-lsp|after-open (lsp-after-open-hook)
     (when (and ymacs-lsp-use-modern-ui-p
                (display-graphic-p))

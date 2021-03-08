@@ -32,7 +32,7 @@
 
     (outline-minor-mode 1)
 
-    (flycheck-mode 1)
+    (flymake-mode 1)
 
     (setq-local tab-width 2)
     (when (is-buffer-suitable-for-coding!)

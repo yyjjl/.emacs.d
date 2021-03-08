@@ -71,14 +71,13 @@
 
 (define-hook! ymacs-default//create-missing-directories (find-file-not-found-functions)
   "Automatically create missing directories when creating new files."
-  (when (and (buffer-file-name)
-             (not (file-remote-p (buffer-file-name))))
+  (when (buffer-file-name)
     (let ((parent-directory (file-name-directory (buffer-file-name))))
       (and (not (file-directory-p parent-directory))
            (y-or-n-p (format "Directory `%s' does not exist! Create it?"
                              parent-directory))
-           (progn (make-directory parent-directory 'parents)
-                  t)))))
+           (prog1 t
+             (make-directory parent-directory 'parents))))))
 
 (define-hook! ymacs-default//minibuffer-setup (minibuffer-setup-hook)
   (setq line-spacing nil)

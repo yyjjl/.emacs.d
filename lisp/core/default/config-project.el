@@ -10,15 +10,14 @@
 (defun ymacs-default//project (-directory)
   "Find current project"
   (or ymacs-default-project
-      (unless (file-remote-p -directory)
-        (let* ((key (expand-file-name -directory))
-               (value (gethash key ymacs-default-project-cache)))
-          (unless (and value (file-exists-p (project-root value)))
-            (setq value (or (project-try-vc -directory)
-                            (when-let (root (locate-dominating-file -directory ".project"))
-                              (cons 'local root))))
-            (puthash key value ymacs-default-project-cache))
-          value))))
+      (let* ((key (expand-file-name -directory))
+             (value (gethash key ymacs-default-project-cache)))
+        (unless (and value (file-exists-p (project-root value)))
+          (setq value (or (project-try-vc -directory)
+                          (when-let (root (locate-dominating-file -directory ".project"))
+                            (cons 'local root))))
+          (puthash key value ymacs-default-project-cache))
+        value)))
 
 (defsubst ymacs-default//project-root (&optional -directory)
   (when-let (project (project-current nil -directory))

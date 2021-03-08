@@ -50,7 +50,6 @@
   (ivy-mode 1)
   (counsel-mode 1)
   (semantic-mode 1)
-  (projectile-mode 1)
 
   (global-company-mode 1)
   (yas-global-mode 1)
@@ -113,3 +112,19 @@
 (after! hideshow
   (advice-add #'goto-line :after #'ymacs-editor//hs-auto-expand)
   (advice-add #'xref-find-definitions :after #'ymacs-editor//hs-auto-expand))
+
+(after! flymake
+  (define-hook! ymacs-editor//setup-flymake (flymake-mode-hook)
+    (when flymake-mode
+      (unless next-error-function
+        (setq-local next-error-function #'flymake-goto-next-error))))
+
+  (define-advice flymake-goto-next-error (:around (-fn &optional -n -filter -interactive))
+    (let ((min-severity (flymake--severity :warning)))
+      (when (cl-some
+             (lambda (ov)
+               (when-let (diag (overlay-get ov 'flymake-diagnostic))
+                 (>= (flymake--severity (flymake--diag-type diag)) min-severity)))
+             (flymake--overlays))
+        (setq -filter '(:error :warning)))
+      (funcall -fn -n -filter -interactive))))

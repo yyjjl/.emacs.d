@@ -51,10 +51,8 @@
  (company-posframe :when ymacs-editor-use-childframe-p)
  ivy
  ivy-hydra
- hydra
  pretty-hydra
  counsel
- flycheck
  swiper
  yasnippet
  yasnippet-snippets

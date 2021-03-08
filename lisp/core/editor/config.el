@@ -25,7 +25,6 @@
   (ymacs-editor//define-switch
     (ymacs-editor//fzf :doc "fzf" :key "z" :caller counsel-fzf)
     (counsel-git :doc "git" :key "g")
-    (project-find-file :doc "find file (project)" :key "p")
     (counsel-find-file :doc "find file" :key "f"))
 
   (dolist (caller '(ivy-switch-buffer
