@@ -19,6 +19,7 @@
     (unless TeX-master
       (setq TeX-master 'dwim))
 
+    (hs-minor-mode 1)
     (reftex-mode 1)
     ;; conflict with latex-mode
     (electric-pair-local-mode -1)

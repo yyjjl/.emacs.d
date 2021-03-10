@@ -135,6 +135,8 @@
 (defvar ymacs-editor-project-rsync-command
   "rsync -azh --progress --filter=':- .gitignore' %s %s %s")
 
+(defvar-local ymacs-editor-prefer-imenu-p nil)
+
 (defvar-local ymacs-editor-compile-command-functions nil)
 (defvar ymacs-editor-environment-functions ())
 

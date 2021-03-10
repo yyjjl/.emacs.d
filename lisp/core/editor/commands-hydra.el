@@ -139,9 +139,9 @@
 
 (defhydra ymacs-hydra/mc (:color red :hint nil)
   ""
-  ("." mc/mark-next-like-this "next")
+  ;; ("." mc/mark-next-like-this "next")
   ("=" mc/mark-next-like-this "next")
-  ("," mc/mark-previous-like-this "prev")
+  ;; ("," mc/mark-previous-like-this "prev")
   ("-" mc/mark-previous-like-this "prev")
   ("<" mc/skip-to-previous-like-this "skip prev")
   (">" mc/skip-to-next-like-this "skip next")

@@ -30,6 +30,7 @@
 
 (after! project
   (define-key! :map project-prefix-map
-    ("E" . ymacs-default/edit-dir-locals))
+    ("E" . ymacs-default/edit-dir-locals)
+    ("i" . ymacs-default/invalid-project-cache))
 
   (setq project-find-functions '(ymacs-default//project)))

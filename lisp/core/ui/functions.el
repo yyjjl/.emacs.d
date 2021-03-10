@@ -115,8 +115,7 @@ Return nil if no project was found."
 (defsubst ymacs-modeline//make-buffer-file-name ()
   "Propertized variable `buffer-file-name' given by FILE-PATH."
   (let* ((file-path (file-local-name
-                     (file-truename
-                      (or (buffer-file-name (buffer-base-buffer)) ""))))
+                     (or (buffer-file-name (buffer-base-buffer)) "")))
          (project-root (file-local-name
                         (or (ymacs-modeline//project-root)
                             default-directory)))

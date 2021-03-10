@@ -16,6 +16,7 @@
 
     (remove-hook 'eldoc-documentation-functions 'flymake-eldoc-function t)
 
+    (setq ymacs-editor-prefer-imenu-p t)
     (setq-local company-minimum-prefix-length 2)
     ;; default to sort and filter by server
     (setq-local company-transformers nil))

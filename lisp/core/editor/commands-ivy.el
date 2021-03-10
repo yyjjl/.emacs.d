@@ -34,7 +34,8 @@
   (interactive)
   (require 'semantic/fw)
   (condition-case nil
-      (if (semantic-active-p)
+      (if (and (not ymacs-editor-prefer-imenu-p)
+               (semantic-active-p))
           (progn
             (semantic-force-refresh)
             (counsel-semantic))
@@ -141,8 +142,10 @@
   (interactive)
 
   (setq ymacs-editor-ivy--last-text nil)
-  (let ((default-directory (ymacs-default//project-root-or-default)))
-    (ymacs-editor//rg)))
+  (if current-prefix-arg
+      (transient-setup 'ymacs-editor/rg)
+    (let ((default-directory (ymacs-default//project-root-or-default)))
+      (ymacs-editor//rg))))
 
 ;;;###autoload
 (defun ymacs-editor/ivy-meta-dot-for-counsel-rg ()
