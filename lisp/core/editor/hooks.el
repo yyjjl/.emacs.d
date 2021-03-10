@@ -1,6 +1,6 @@
 ;; -*- lexical-binding: t -*-
 
-(load (expand! "hooks-builtin"))
+(load (expand! "hooks-builtin") nil t)
 
 (after! ivy
   (add-hook 'ivy-occur-mode-hook #'ymacs-default//truncate-line)
@@ -48,7 +48,7 @@
     (let ((aw-ignore-on t)
           (aw-ignore-current))
       (avy-traverse
-       (avy-tree (aw-window-list) aw-keys)
+       (avy-tree (remove (minibuffer-window) (aw-window-list)) aw-keys)
        (lambda (path leaf)
          (set-window-parameter
           leaf 'ace-window-path

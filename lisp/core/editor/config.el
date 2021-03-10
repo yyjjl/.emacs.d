@@ -1,6 +1,6 @@
 ;; -*- lexical-binding: t -*-
 
-(load (expand! "config-builtin"))
+(load (expand! "config-builtin") nil t)
 
 (after! fcitx
   ;; Init fcitx prefix keys

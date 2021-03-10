@@ -2,15 +2,10 @@
 
 (after! lsp-mode
   (when ymacs-editor-use-childframe-p
-    (define-advice lsp--eldoc-message (:override (&optional -msg) use-frame)
-      (setq lsp--eldoc-saved-message -msg)
-      (run-with-idle-timer
-       0 nil
-       (lambda ()
-         (with-no-warnings
-           (eldoc-message nil))
-         (unless lsp-signature-mode
-           (ymacs-lsp//doc-show -msg))))))
+    (define-advice keyboard-quit (:before () hide-lsp-doc)
+      (when (and (bound-and-true-p lsp-mode)
+                 (bound-and-true-p lsp-eldoc-enable-hover))
+        (posframe-hide ymacs-lsp-doc-buffer))))
 
   (define-hook! ymacs-lsp|after-open (lsp-after-open-hook)
     (when ymacs-editor-use-childframe-p

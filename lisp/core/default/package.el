@@ -70,6 +70,7 @@
   (("C-b" "B") . ibuffer)
 
   ("m" . view-echo-area-messages)
+  ("w w" . ymacs-default/move-buffer)
 
   ("c" . ymacs-default/cleanup-buffer-safe)
   (", -" . ymacs-default/copy-file-name)

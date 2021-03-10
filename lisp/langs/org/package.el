@@ -12,8 +12,7 @@
  org-download
  (auctex :compile (latex tex preview reftex))
  ;; Export colorful src block in `org-mode'
- htmlize
- poporg)
+ htmlize)
 
 (add-to-list
  'ymacs-editor-narrow-dwim-alist
@@ -47,7 +46,6 @@
 (defvar ymacs-org-publish-last-project nil)
 
 (define-key!
-  ("C-x , p" . poporg-dwim)
   ("C-x O" . ymacs-org/project-open)
   ([C-f6] . ymacs-org/display-latex-fragment-at-point))
 

@@ -3,7 +3,6 @@
 (require-packages!
  diff-hl
  gitignore-mode
- gitconfig-mode
  git-timemachine
  magit)
 

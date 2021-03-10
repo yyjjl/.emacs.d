@@ -1,6 +1,6 @@
 ;; -*- lexical-binding:t -*-
 
-(load (expand-file-name "lisp/core-lib" user-emacs-directory))
+(load (expand-file-name "lisp/core-lib" user-emacs-directory) nil t)
 
 (if ymacs-dump-load-path
     (setq load-path ymacs-dump-load-path)
@@ -14,7 +14,7 @@
           (user-error "Template %s does't exist" template-file))
         (copy-file template-file custom-file)))
 
-    (load (file-name-sans-extension custom-file))
+    (load (file-name-sans-extension custom-file) nil t)
 
     (unless custom-file-exists
       (dolist (item (get 'ymacs 'custom-group))

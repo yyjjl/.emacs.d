@@ -27,7 +27,7 @@
   (unless (has-feature! 'cpp)
     (user-error "cpp-cmake should be loaded after feature cpp")))
 
-(require-packages! cmake-mode cmake-font-lock)
+(require-packages! cmake-mode)
 
 (executable! cmake)
 

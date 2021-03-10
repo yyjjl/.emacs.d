@@ -57,13 +57,10 @@
  yasnippet
  yasnippet-snippets
  expand-region
- easy-kill
  goto-chg
  multiple-cursors
  wgrep
- buffer-move
  ace-pinyin
- ace-link
  persistent-scratch)
 
 (defvar ymacs-editor-toggles-alist
@@ -199,12 +196,6 @@
 (autoload 'ymacs-hydra/sort/body (expand! "commands-hydra") nil t)
 
 (define-key! :prefix "C-x w"
-  ;; buffer-mode
-  ("k" . buf-move-up)
-  ("j" . buf-move-down)
-  ("h" . buf-move-left)
-  ("l" . buf-move-right)
-
   ("-" . ivy-pop-view)
   ("=" . ivy-push-view)
   ("." . ivy-switch-view))
@@ -233,14 +224,11 @@
   (", e" . ymacs-hydra/ediff/body)
   ;; Minor mode to make xref use etags again.
   (", x" . xref-etags-mode)
-  (", o" . ace-link)
   (", SPC" . ymacs-editor/insert-space-around-chinese)
   (", a" . ymacs-editor/add-local-snippet)
   (", d" . ymacs-editor/delete-local-snippet))
 
 (define-key!
-  ([remap kill-ring-save] . easy-kill)
-
   ("C-c O" . ymacs-hydra/outline/body)
   ("C-c C-b" . ymacs-editor/format-paragraph)
 

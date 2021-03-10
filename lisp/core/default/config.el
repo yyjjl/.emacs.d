@@ -110,6 +110,6 @@
 (put 'ymacs-default//external-file-handler 'safe-magic t)
 (put 'ymacs-default//external-file-handler 'operations '(insert-file-contents))
 
-(load (expand! "config-package.el"))
-(load (expand! "config-project.el"))
-(load (expand! "config-misc.el"))
+(load (expand! "config-package.el") nil t)
+(load (expand! "config-project.el") nil t)
+(load (expand! "config-misc.el") nil t)

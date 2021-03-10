@@ -178,7 +178,7 @@
   (unless (file-exists-p ymacs-default-autoloads-file)
     (ymacs-default/generate-autoloads))
 
-  (load ymacs-default-autoloads-file)
+  (load ymacs-default-autoloads-file nil t)
 
   (run-with-idle-timer
    ymacs-default-autosave-interval t

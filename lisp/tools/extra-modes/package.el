@@ -2,18 +2,11 @@
 
 (require-packages!
  nginx-mode
- bison-mode
- gnuplot-mode
  crontab-mode
  dockerfile-mode
  yaml-mode
  csv-mode
- graphviz-dot-mode
- zeal-at-point)
-
-(define-key! :prefix "C-h"
-  ("z" . zeal-at-point)
-  ("Z" . zeal-at-point-search))
+ graphviz-dot-mode)
 
 (after! csv-mode
   (setq csv-separators '("," ";" "|" " ")))

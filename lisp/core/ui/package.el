@@ -6,7 +6,6 @@
  page-break-lines
  monokai-theme
  which-key
- volatile-highlights
  highlight-indentation)
 
 (setq monokai-background "#1B1D1E")
