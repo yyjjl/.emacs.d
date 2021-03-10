@@ -93,7 +93,7 @@
                    ;; company-files
                    :with company-yasnippet
                    :separate)
-                  (company-gtags company-etags)
+                  ;; (company-gtags company-etags)
                   company-dabbrev))
 
   ;; Company should be case sensitive

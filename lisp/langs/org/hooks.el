@@ -59,7 +59,7 @@
 
     ;; company-dabbrev too slow in org-mode
     (remove-hook 'company-backends 'company-dabbrev t)
-    (ymacs-editor//add-company-backend 'ymacs-org/company-symbols :-main-backend-p nil))
+    (ymacs-editor//add-company-backend 'ymacs-org/company-symbols :main nil))
 
   (add-hook 'org-speed-command-hook #'ymacs-org/block-speed-command-activate))
 

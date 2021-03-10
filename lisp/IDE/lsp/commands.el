@@ -65,18 +65,6 @@
   (lsp--info "Semantic Tokens %s. "
              (if lsp-semantic-tokens-enable "enabled" "disabled")))
 
-(eval-when! ymacs-lsp-use-modern-ui-p
-  (defun ymacs-lsp/toggle-modern-ui ()
-    (interactive)
-
-    (kill-local-variable 'lsp-eldoc-enable-hover)
-    (if (bound-and-true-p lsp-ui-mode)
-        (lsp-ui-mode -1)
-      (setq-local lsp-eldoc-enable-hover nil)
-      (lsp--eldoc-message nil)
-      (lsp-ui-mode 1))))
-
-
 (eval-when! ymacs-lsp-use-dap-p
   (define-minor-mode ymacs-dap-running-session-mode
     "A mode for adding keybindings to running sessions"

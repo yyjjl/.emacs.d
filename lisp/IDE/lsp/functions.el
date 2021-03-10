@@ -1,5 +1,9 @@
 ;; -*- lexical-binding:t -*-
 
+(declare-function flymake-diagnostic-text 'flymake)
+(declare-function flymake-diagnostic-type 'flymake)
+(declare-function flymake--lookup-type-property 'flymake)
+
 (defun ymacs-lsp//get-latest-url-from-github (-repo -matcher)
   (require 'url-handlers)
   (let* ((url (format "https://api.github.com/repos/%s/releases/latest" -repo))
@@ -66,3 +70,44 @@
 
     (lsp--info "Starting to download %s to %s..." url store-path)
     (lsp-async-start-process@pretty -callback -error-callback command)))
+
+(defsubst ymacs-lsp//set-lsp-signature-width ()
+  (setq lsp-signature-posframe-params
+        (plist-put lsp-signature-posframe-params
+                   :width (max 60 (min (/ (frame-width) 2) (window-width))))))
+
+(when ymacs-editor-use-childframe-p
+  (defun ymacs-lsp//doc-hidehandler (-info)
+    (let ((parent-buffer (cdr (plist-get -info :posframe-parent-buffer))))
+      (and (buffer-live-p parent-buffer)
+           (or (not (equal parent-buffer (current-buffer)))
+               (with-current-buffer parent-buffer
+                 (not (and lsp--hover-saved-bounds
+                           (lsp--point-in-bounds-p lsp--hover-saved-bounds))))))))
+
+  (defun ymacs-lsp//doc-show (-msg)
+    (when-let (diags (flymake-diagnostics (point)))
+      (setq -msg (concat
+                  (mapconcat
+                   (lambda (diag)
+                     (propertize (or (flymake-diagnostic-text diag) "")
+                                 'face
+                                 (flymake--lookup-type-property
+                                  (flymake-diagnostic-type diag)
+                                  'face
+                                  'compilation-error)))
+                   diags
+                   "\n")
+                  "\n\n"
+                  -msg)))
+    (if -msg
+        (posframe-show
+         ymacs-lsp-doc-buffer
+         :string -msg
+         :hidehandler #'ymacs-lsp//doc-hidehandler
+         :poshandler #'posframe-poshandler-point-bottom-left-corner-upward
+         :background-color (face-attribute 'tooltip :background)
+         :height 20
+         :width (max 60 (min (/ (frame-width) 2) (window-width)))
+         :border-width 10)
+      (posframe-hide ymacs-lsp-doc-buffer))))

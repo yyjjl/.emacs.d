@@ -39,12 +39,13 @@
 (load-feature! core/term)
 (load-feature! core/debug)
 
-(load-feature! IDE/lsp)
-(load-feature! IDE/tree-sitter)
+;; (load-feature! IDE/lsp)
+;; (load-feature! IDE/tree-sitter)
 
 (load-feature! tools/git)
-(load-feature! tools/spell)
+;; (load-feature! tools/spell)
 (load-feature! tools/extra-modes)
+;; (load-feature! tools/tabnine)
 
 (load-feature! langs/lisp)
 (load-feature! langs/latex)
@@ -57,10 +58,10 @@
 
 ;; Programming modes
 (load-feature! langs/sh)
-(load-feature! langs/haskell)
-(load-feature! langs/rust)
-(load-feature! langs/java)
-(load-feature! langs/web)
-(load-feature! langs/go)
+;; (load-feature! langs/haskell)
+;; (load-feature! langs/rust)
+;; (load-feature! langs/java)
+;; (load-feature! langs/web)
+;; (load-feature! langs/go)
 (load-feature! langs/perl)
-(load-feature! langs/racket)
+;; (load-feature! langs/racket)

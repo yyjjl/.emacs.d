@@ -298,7 +298,7 @@ Arguments are same as of `defhydra'."
     x))
 
 (cl-defun ymacs-editor//add-company-backend
-    (-backend &key (-main-backend-p t) (-after nil))
+    (-backend &key ((:main -main-backend-p) t) ((:after -after) nil))
   ;; deep copy the backends list
   (let ((backends (mapcar (lambda (x) (if (consp x) (copy-sequence x) x))
                           company-backends)))

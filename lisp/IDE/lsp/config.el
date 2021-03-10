@@ -92,6 +92,8 @@
   ;; boost performance
   (setq lsp-enable-file-watchers nil)
 
+  (setq lsp-eldoc-render-all ymacs-editor-use-childframe-p)
+
   ;; (setq lsp-enable-imenu t)
   ;; (setq lsp-enable-links t)
   ;; (setq lsp-enable-xref t)
@@ -102,7 +104,7 @@
   (setq lsp-enable-text-document-color t)
   ;; range formating
   ;; (setq lsp-enable-indentation t)
-  ;; (setq lsp-enable-symbol-highlighting t)
+  (setq lsp-enable-symbol-highlighting nil)
   ;; (setq lsp-symbol-highlighting-skip-current t)
 
   ;; (setq lsp-before-save-edits t)
@@ -114,21 +116,6 @@
   ;; (setq lsp-modeline-code-actions-enable t)
   (setq lsp-modeline-diagnostics-enable nil)
   (setq lsp-modeline-workspace-status-enable nil))
-
-(eval-when! ymacs-lsp-use-modern-ui-p
-  (after! lsp-ui
-    (ymacs-editor//add-toggles
-     "LSP" 'lsp-mode
-     '("l d" ymacs-lsp/toggle-modern-ui "Modern UI" :toggle lsp-ui-mode))
-
-    (setq lsp-ui-sideline-enable nil)
-    (setq lsp-ui-peek-enable nil)
-    (setq lsp-ui-doc-enable t)
-    (setq lsp-ui-doc-include-signature t)
-    (setq lsp-ui-doc-position 'at-point)
-    (setq lsp-ui-doc-alignment 'window)
-    (setq lsp-ui-doc-max-height 20)
-    (setq lsp-ui-doc-delay eldoc-idle-delay)))
 
 (eval-when! ymacs-lsp-use-dap-p
   (after! dap-hydra

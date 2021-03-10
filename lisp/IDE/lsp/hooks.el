@@ -1,25 +1,23 @@
 ;; -*- lexical-binding:t -*-
 
-(declare-function lsp--render-element 'lsp-mode)
-
 (after! lsp-mode
-  ;; FIX the bug which causes flymake diagnostics disappeared 
-  (define-advice lsp-eldoc-function (:around (-fn) checker)
-    (or (when-let (diags (flymake-diagnostics (point)))
-          (mapconcat #'flymake-diagnostic-text diags "\n"))
-        (funcall -fn)))
+  (when ymacs-editor-use-childframe-p
+    (define-advice lsp--eldoc-message (:override (&optional -msg) use-frame)
+      (setq lsp--eldoc-saved-message -msg)
+      (run-with-idle-timer
+       0 nil
+       (lambda ()
+         (with-no-warnings
+           (eldoc-message nil))
+         (unless lsp-signature-mode
+           (ymacs-lsp//doc-show -msg))))))
 
   (define-hook! ymacs-lsp|after-open (lsp-after-open-hook)
-    (when (and ymacs-lsp-use-modern-ui-p
-               (display-graphic-p))
-      (setq-local lsp-eldoc-enable-hover nil))
-
-    (remove-hook 'eldoc-documentation-functions 'flymake-eldoc-function t)
+    (when ymacs-editor-use-childframe-p
+      (remove-hook 'eldoc-documentation-functions 'flymake-eldoc-function t))
 
     (setq ymacs-editor-prefer-imenu-p t)
-    (setq-local company-minimum-prefix-length 2)
-    ;; default to sort and filter by server
-    (setq-local company-transformers nil))
+    (setq-local company-minimum-prefix-length 2))
 
   (define-hook! ymacs-lsp//set-lsp-signature-frame-params (lsp-signature-mode-hook)
     (setq lsp-signature-function
@@ -27,9 +25,7 @@
                    (display-graphic-p))
               #'lsp-signature-posframe
             #'lsp-lv-message))
-    (setq lsp-signature-posframe-params
-          (plist-put lsp-signature-posframe-params
-                     :width (max 60 (min (/ (frame-width) 2) (window-width))))))
+    (ymacs-lsp//set-lsp-signature-width))
 
   (define-advice lsp--calculate-root (:around (-fn -session -file-name) use-truename)
     (funcall -fn -session (file-truename -file-name)))
