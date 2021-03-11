@@ -3,13 +3,15 @@
 (after! lsp-mode
   (when ymacs-editor-use-childframe-p
     (define-advice keyboard-quit (:before () hide-lsp-doc)
-      (when (and (bound-and-true-p lsp-mode)
-                 (bound-and-true-p lsp-eldoc-enable-hover))
+      (when (and lsp-mode
+                 (eq eldoc-message-function #'ymacs-lsp//eldoc-message))
         (posframe-hide ymacs-lsp-doc-buffer))))
 
   (define-hook! ymacs-lsp|after-open (lsp-after-open-hook)
     (when ymacs-editor-use-childframe-p
       (remove-hook 'eldoc-documentation-functions 'flymake-eldoc-function t))
+
+    (setq-local eldoc-message-function #'ymacs-lsp//eldoc-message)
 
     (setq ymacs-editor-prefer-imenu-p t)
     (setq-local company-minimum-prefix-length 2))

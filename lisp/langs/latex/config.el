@@ -8,6 +8,14 @@
     (add-to-list 'lsp-diagnostics-disabled-modes 'tex-mode))
 
   (after! lsp-tex
+    (lsp-register-custom-settings
+     `(("latex.rootDirectory"
+        (lambda ()
+          (or (when (stringp TeX-master)
+                (file-name-directory TeX-master))
+              ".")))
+       ("latex.lint.onSave" nil t)))
+
     (let ((client (ht-get lsp-clients 'texlab)))
       (setf (lsp--client-notification-handlers client)
             (ht ("textDocument/publishDiagnostics" #'ignore)))

@@ -40,5 +40,6 @@
 
 (defun ymacs-org@wrap-publish-fn (-fn -plist -filename -pub-dir)
   (condition-case err
-      (funcall -fn -plist -filename -pub-dir)
+      (let ((org-confirm-babel-evaluate))
+        (funcall -fn -plist -filename -pub-dir))
     (user-error (message "Fail to publish file %s: %s" -filename err))))

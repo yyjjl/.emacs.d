@@ -77,15 +77,15 @@
                    :width (max 60 (min (/ (frame-width) 2) (window-width))))))
 
 (when ymacs-editor-use-childframe-p
-  (defmacro ymacs-lsp//in-bounds (var)
-    `(and ,var (lsp--point-in-bounds-p ,var)))
+  (defsubst ymacs-lsp//in-bounds ()
+    (and lsp--hover-saved-bounds (lsp--point-in-bounds-p lsp--hover-saved-bounds)))
 
   (defun ymacs-lsp//doc-hidehandler (-info)
     (let ((parent-buffer (cdr (plist-get -info :posframe-parent-buffer))))
       (and (buffer-live-p parent-buffer)
            (or (not (equal parent-buffer (current-buffer)))
                (with-current-buffer parent-buffer
-                 (not (ymacs-lsp//in-bounds lsp--hover-saved-bounds)))))))
+                 (not (ymacs-lsp//in-bounds)))))))
 
   (defun ymacs-lsp//flymake-text (-diags)
     (mapconcat
@@ -101,19 +101,20 @@
 
   (defun ymacs-lsp//eldoc-message (-fmt &rest -args)
     (when-let (diags (flymake-diagnostics (point)))
-      (setq -fmt (concat "%s\n%s" -fmt))
-      (push (mapconcat #'ymacs-lsp//flymake-text diags "\n") -args))
+      (setq -fmt (concat "%s\n\n" -fmt))
+      (setq -args (cons (ymacs-lsp//flymake-text diags) -args)))
 
-    (if lsp-signature-mode
-        (apply #'eldoc-minibuffer-message -fmt -args)
-      (if -fmt
-          (posframe-show
-           ymacs-lsp-doc-buffer
-           :string (apply #'format-message -fmt -args)
-           :hidehandler #'ymacs-lsp//doc-hidehandler
-           :poshandler #'posframe-poshandler-point-bottom-left-corner-upward
-           :background-color (face-attribute 'tooltip :background)
-           :height 20
-           :width (max 60 (min (/ (frame-width) 2) (window-width)))
-           :border-width 10)
-        (posframe-hide ymacs-lsp-doc-buffer)))))
+    (when (ymacs-lsp//in-bounds)
+      (if lsp-signature-mode
+          (apply #'eldoc-minibuffer-message -fmt -args)
+        (if -fmt
+            (posframe-show
+             ymacs-lsp-doc-buffer
+             :string (apply #'format-message -fmt -args)
+             :hidehandler #'ymacs-lsp//doc-hidehandler
+             :poshandler #'posframe-poshandler-point-bottom-left-corner-upward
+             :background-color (face-attribute 'tooltip :background)
+             :height 20
+             :width (max 60 (min (/ (frame-width) 2) (window-width)))
+             :border-width 10)
+          (posframe-hide ymacs-lsp-doc-buffer))))))

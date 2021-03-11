@@ -16,7 +16,7 @@
 (defvar-local ymacs-lsp-find-other-file-function nil)
 
 (defvar ymacs-lsp-process-buffer-name "*lsp process*")
-(defvar ymacs-lsp-doc-buffer "*lsp-doc*")
+(defvar ymacs-lsp-doc-buffer "*lsp-signature*")
 
 (eval-when! ymacs-lsp-use-dap-p
   (defvar ymacs-dap-running-session-mode-map
