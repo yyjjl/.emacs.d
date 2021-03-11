@@ -1,5 +1,9 @@
 ;;; -*- lexical-binding: t; -*-
 
+(eval-when-compile
+  (require 'face-remap)
+  (require 'flymake))
+
 (defsubst ymacs-modeline//focus-change (&rest _)
   (if (frame-focus-state)
       (when ymacs-modeline-remap-face-cookie
@@ -286,8 +290,6 @@ like the scratch buffer where knowing the current project directory is important
 ;;* Checker
 ;;
 
-(defvar flymake-mode-line-format)
-
 (defsubst ymacs-modeline//update-checker-state (&rest _)
   (setq ymacs-modeline--checker-state
         (let* ((running (flymake-running-backends))
@@ -404,15 +406,12 @@ like the scratch buffer where knowing the current project directory is important
 (defvar ace-window-mode)
 
 (ymacs-modeline//def-segment window-number
-  (concat
-   (when (display-graphic-p)
-     (propertize "\u200b" 'display '((height 1.3) (raise -0.15))))
-   (when-let (number (window-parameter (selected-window) 'ace-window-path))
-     (concat
-      " "
-      (if ace-window-mode
-          (propertize (concat number " " ace-window-mode) 'face 'aw-leading-char-face)
-        number)))))
+  (when-let (number (window-parameter (selected-window) 'ace-window-path))
+    (concat
+     " "
+     (if ace-window-mode
+         (propertize (concat number " " ace-window-mode) 'face 'aw-leading-char-face)
+       number))))
 
 
 ;;

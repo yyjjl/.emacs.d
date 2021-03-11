@@ -19,12 +19,7 @@
                  ymacs-editor/goto-last-point))
     (advice-add cmd :after #'ymacs-ui//pulse))
 
-  (global-page-break-lines-mode 1)
-  (global-hl-todo-mode 1)
-  (global-whitespace-mode 1)
-
   (which-key-mode 1)
-
   (column-number-mode 1)
   (show-paren-mode 1))
 

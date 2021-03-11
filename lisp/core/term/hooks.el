@@ -60,6 +60,8 @@
   (add-hook 'comint-exec-hook #'ymacs-term//sentinel-setup)
 
   (define-hook! ymacs-term//comint-setup (comint-mode-hook)
+    (company-mode 1)
+
     (when (string-match-p "inferior\\|interactive" (symbol-name major-mode))
       (local-set-key (kbd "M-}") #'ymacs-term/next)
       (local-set-key (kbd "M-{") #'ymacs-term/prev)

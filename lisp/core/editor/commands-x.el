@@ -264,7 +264,7 @@
     (setq emulation-mode-map-alists (delete 'ymacs-x--keymap-alist emulation-mode-map-alists))))
 
 (defun ymacs-x//post-command-hook ()
-  (set-cursor-color (if ymacs-x--activated "steelblue" "orangered")))
+  (set-cursor-color (if ymacs-x--activated "red" "steelblue")))
 
 (defun ymacs-x//mode-predicate ()
   (unless (minibufferp)

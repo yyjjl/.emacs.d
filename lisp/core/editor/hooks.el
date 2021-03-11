@@ -2,6 +2,32 @@
 
 (load (expand! "hooks-builtin") nil t)
 
+(defun ymacs-editor//generic-setup ()
+  (company-mode 1)
+  (yas-minor-mode 1)
+  (hl-line-mode 1)
+  (display-fill-column-indicator-mode 1)
+
+  (page-break-lines-mode 1)
+
+  (when (not (derived-mode-p 'org-mode))
+    (hl-todo-mode 1))
+
+  (setq show-trailing-whitespace t)
+  (setq indicate-empty-lines t))
+
+(define-hook! ymacs-editor//generic-text-mode-setup (text-mode-hook)
+  (whitespace-mode 1)
+
+  (ymacs-editor//generic-setup))
+
+(define-hook! ymacs-editor//generic-prog-mode-setup (prog-mode-hook)
+  (condition-case err
+      (hs-minor-mode 1)
+    (user-error (message "%s" (error-message-string err))))
+
+  (ymacs-editor//generic-setup))
+
 (after! ivy
   (add-hook 'ivy-occur-mode-hook #'ymacs-default//truncate-line)
   (add-hook 'ivy-occur-grep-mode-hook #'ymacs-default//truncate-line)

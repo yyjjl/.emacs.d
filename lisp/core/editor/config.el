@@ -109,14 +109,6 @@
   ;; (setq company-minimum-prefix-length 3)
   (setq company-tooltip-align-annotations t)
   (setq company-auto-commit nil)
-  ;; Not to load company-mode for certain major modes.
-  (setq company-global-modes
-        '(not eshell-mode
-              ;; comint-mode
-              ;; gud-mode
-              erc-mode
-              rcirc-mode shell-mode
-              minibuffer-inactive-mode))
 
   (setf (alist-get 'company-search-mode mode-line-misc-info)
         '(("" company-search-lighter " "))))
