@@ -15,22 +15,15 @@
         (let ((install-fn (lsp--client-download-server-fn (ht-get lsp-clients client)))
               (callback-fn
                (lambda (&rest _)
-                 (ymacs-lsp//install-clients--callback -clients -outputs))))
+                 (let ((output (buffer-substring (point-min) (point-max))))
+                   (kill-buffer)
+                   (ymacs-lsp//install-clients--loop (cdr -clients) (cons output -outputs))))))
           (funcall install-fn client callback-fn callback-fn t)))
 
     (ymacs-lsp//install-clients--finish -outputs)))
 
-(defun ymacs-lsp//install-clients--callback (-clients -outputs)
-  (ymacs-lsp//install-clients--loop
-   (cdr -clients)
-   (let ((buffer (get-buffer-create ymacs-lsp-process-buffer-name)))
-     (when (buffer-live-p buffer)
-       (with-current-buffer buffer
-         (push (buffer-substring (point-min) (point-max)) -outputs)))
-     -outputs)))
-
 (defun ymacs-lsp//install-clients--finish (-outputs)
-  (with-current-buffer (get-buffer-create ymacs-lsp-process-buffer-name)
+  (with-current-buffer (get-buffer-create ymacs-lsp-install-buffer)
     (let ((inhibit-read-only t))
       (erase-buffer)
       (insert (string-join (reverse -outputs) "\n\n") "\n\n")

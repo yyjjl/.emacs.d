@@ -1,0 +1,17 @@
+#!/bin/bash
+
+case "$1" in
+    tgz)
+        wget -O- "$2" | tar zxf - -C "$3"
+        ;;
+    wget)
+        wget "$2" -O "$3"
+        ;;
+    7z)
+        tmp=/tmp/lsp$$
+        trap rm "$tmp" EXIT
+        wget "$2" -O "$tmp" && 7z x -y "$tmp" -o"$3"
+        ;;
+    *)
+        exit 1
+esac

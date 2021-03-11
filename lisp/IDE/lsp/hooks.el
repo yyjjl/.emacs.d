@@ -8,10 +8,13 @@
         (posframe-hide ymacs-lsp-doc-buffer))))
 
   (define-hook! ymacs-lsp|after-open (lsp-after-open-hook)
-    (when ymacs-editor-use-childframe-p
-      (remove-hook 'eldoc-documentation-functions 'flymake-eldoc-function t))
-
+    (setq-local eldoc-documentation-function #'eldoc-documentation-compose-eagerly)
     (setq-local eldoc-message-function #'ymacs-lsp//eldoc-message)
+
+    (remove-hook 'eldoc-documentation-functions #'flymake-eldoc-function t)
+    (add-hook 'eldoc-documentation-functions #'flymake-eldoc-function -20 t)
+    (when (lsp--capability :hoverProvider)
+      (add-hook 'eldoc-documentation-functions #'ymacs-lsp//eldoc-function -10 t))
 
     (setq ymacs-editor-prefer-imenu-p t)
     (setq-local company-minimum-prefix-length 2))
@@ -29,8 +32,7 @@
 
   (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
 
-  (advice-add #'lsp-download-install :override #'lsp-download-install@pretty)
-  (advice-add #'lsp-async-start-process :override #'lsp-async-start-process@pretty))
+  (advice-add #'lsp-download-install :override #'lsp-download-install@pretty))
 
 (after! lsp-modeline
   (setq lsp-modeline-code-actions-segments '(count name)))

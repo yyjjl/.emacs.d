@@ -1,5 +1,9 @@
 ;;; -*- lexical-binding: t; -*-
 
+(option! latex-build-on-save nil
+  :type 'boolean
+  :safe #'booleanp)
+
 (executable! latexmk)
 
 (require-packages!

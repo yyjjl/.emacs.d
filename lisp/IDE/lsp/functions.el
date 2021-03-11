@@ -37,39 +37,34 @@
   (setf (alist-get -client ymacs-lsp--enabled-clients)
         (list -package -enable-fn)))
 
-(defun lsp-async-start-process@pretty (-callback -error-callback &rest -command)
-  "Start async process COMMAND with CALLBACK and ERROR-CALLBACK."
-  (run-compilation!
-   :-buffer-name ymacs-lsp-process-buffer-name
-   :-command (string-join -command " ")
-   :-callback (lambda (&rest _) (funcall -callback))
-   :-error-callback (lambda (_ -msg) (funcall -error-callback -msg))))
-
 (defun ymacs-lsp//set-simple-install-fn (-client -command &optional -update-command)
   (setf
    (lsp--client-download-server-fn (ht-get lsp-clients -client))
    (lambda (_client -callback -error-callback -update?)
-     (lsp-async-start-process@pretty
-      -callback
-      -error-callback
-      (if -update?
-          (or -update-command -command)
-        -command)))))
+     (apply #'lsp-async-start-process
+            -callback
+            -error-callback
+            (if -update?
+                (or -update-command -command)
+              -command)))))
 
 (cl-defun lsp-download-install@pretty
     (-callback -error-callback &key url store-path decompress &allow-other-keys)
   (let* ((url (lsp-resolve-value url))
          (store-path (lsp-resolve-value store-path))
-         (command
-          (pcase decompress
-            (:tgz (format "wget -O- %s | tar zxf - -C %s" url store-path))
-            (`nil (format "wget %s -O %s" url store-path))
-            (_ (let ((tmp-path "/tmp/lsp$$"))
-                 (format "trap \"rm %2$s\" EXIT; wget %1$s -O %2$s && 7z x %2$s -o%3$s"
-                         url tmp-path store-path))))))
+         (type (pcase decompress
+                 (:tgz "tgz")
+                 (`nil "wget")
+                 (_ "7z"))))
 
     (lsp--info "Starting to download %s to %s..." url store-path)
-    (lsp-async-start-process@pretty -callback -error-callback command)))
+    (lsp-async-start-process
+     -callback -error-callback
+     "bash"
+     (expand-etc! "scripts/install_from_url")
+     type
+     url
+     store-path)))
 
 (defsubst ymacs-lsp//set-lsp-signature-width ()
   (setq lsp-signature-posframe-params
@@ -87,34 +82,42 @@
                (with-current-buffer parent-buffer
                  (not (ymacs-lsp//in-bounds)))))))
 
-  (defun ymacs-lsp//flymake-text (-diags)
-    (mapconcat
-     (lambda (diag)
-       (propertize (or (flymake-diagnostic-text diag) "")
-                   'face
-                   (flymake--lookup-type-property
-                    (flymake-diagnostic-type diag)
-                    'face
-                    'compilation-error)))
-     -diags
-     "\n"))
+  (defun ymacs-lsp//eldoc-function (-report-doc &rest _)
+    (if (ymacs-lsp//in-bounds)
+        (funcall -report-doc lsp--eldoc-saved-message)
+      (setq lsp--hover-saved-bounds nil
+            lsp--eldoc-saved-message nil)
+      (when (not (looking-at "[[:space:]\n]"))
+        (lsp-request-async
+         "textDocument/hover"
+         (lsp--text-document-position-params)
+         (-lambda ((hover &as &Hover? :range? :contents))
+           (when hover
+             (when range?
+               (setq lsp--hover-saved-bounds (lsp--range-to-region range?)))
+             (funcall -report-doc
+                      (setq lsp--eldoc-saved-message
+                            (and contents
+                                 (lsp--render-on-hover-content
+                                  contents
+                                  lsp-eldoc-render-all))))))
+         :error-handler #'ignore
+         :mode 'tick
+         :cancel-token :eldoc-hover))))
 
   (defun ymacs-lsp//eldoc-message (-fmt &rest -args)
-    (when-let (diags (flymake-diagnostics (point)))
-      (setq -fmt (concat "%s\n\n" -fmt))
-      (setq -args (cons (ymacs-lsp//flymake-text diags) -args)))
-
-    (when (ymacs-lsp//in-bounds)
-      (if lsp-signature-mode
-          (apply #'eldoc-minibuffer-message -fmt -args)
-        (if -fmt
-            (posframe-show
-             ymacs-lsp-doc-buffer
-             :string (apply #'format-message -fmt -args)
-             :hidehandler #'ymacs-lsp//doc-hidehandler
-             :poshandler #'posframe-poshandler-point-bottom-left-corner-upward
-             :background-color (face-attribute 'tooltip :background)
-             :height 20
-             :width (max 60 (min (/ (frame-width) 2) (window-width)))
-             :border-width 10)
-          (posframe-hide ymacs-lsp-doc-buffer))))))
+    (if (or lsp-signature-mode
+            (not ymacs-editor-use-childframe-p))
+        (apply #'eldoc-minibuffer-message -fmt -args)
+      (if -fmt
+          (posframe-show
+           ymacs-lsp-doc-buffer
+           :string (apply #'format-message -fmt -args)
+           :hidehandler #'ymacs-lsp//doc-hidehandler
+           :poshandler #'posframe-poshandler-point-bottom-left-corner-upward
+           :background-color (face-attribute 'tooltip :background)
+           :height 20
+           :width (max 60 (min (/ (frame-width) 2) (window-width)))
+           :internal-border-color "dim grey"
+           :internal-border-width 1)
+        (posframe-hide ymacs-lsp-doc-buffer)))))

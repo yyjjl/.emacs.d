@@ -28,7 +28,9 @@
  '(tab-line-tab ((t (:inherit warning))))
  '(tab-line-tab-current ((t (:inherit tab-line-tab :inverse-video t))))
  '(tab-line-tab-inactive ((t (:inherit font-lock-comment-face :inverse-video t))))
- '(tooltip ((t (:background "#49483E")))))
+ '(tooltip ((t (:background "#49483E"))))
+ '(whitespace-indentation ((t (:foreground "dim gray" :weight bold))))
+ '(whitespace-space-after-tab ((t (:foreground "dim gray" :inverse-video t :weight bold)))))
 
 
 

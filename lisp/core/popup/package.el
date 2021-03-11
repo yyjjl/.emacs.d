@@ -44,6 +44,7 @@
     (rx string-start
         "*"
         (or "Compile-Log"
+            "eldoc"
             "trace-output"
             (and "poporg: " (*? not-newline))
             "sdcv"

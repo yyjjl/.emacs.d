@@ -2,6 +2,19 @@
 
 (declare-function reftex-toc-rescan "reftex")
 
+(defun ymacs-latex//build-on-save (&optional -do-build)
+  (when (or -do-build
+            ymacs-latex-build-on-save-p)
+    (let* ((buffer (TeX-process-buffer (TeX-master-file)))
+           (proc (when (buffer-live-p buffer)
+                   (get-buffer-process buffer))))
+      (if (process-live-p proc)
+          (message "Compilation process is running ...")
+        (TeX-command (cond (ymacs-latexmk-path "LatexMk")
+                           ((eq TeX-engine 'xetex) "XeLaTeX")
+                           (t "LaTeX"))
+                     'TeX-master-file -1)))))
+
 (after! reftex
   (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
   (define-hook! ymacs-latex//reftex-select-bib-setup (reftex-select-bib-mode-hook)
@@ -34,6 +47,8 @@
     (outline-minor-mode 1)
 
     (flymake-mode 1)
+
+    (add-hook 'after-save-hook #'ymacs-latex//build-on-save nil t)
 
     (setq-local tab-width 2)
     (when (is-buffer-suitable-for-coding!)

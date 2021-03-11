@@ -74,10 +74,7 @@ Else call with `read-file-name'.
   (interactive)
   (reftex-parse-all)
   (TeX-save-document (TeX-master-file))
-  (TeX-command (cond (ymacs-latexmk-path "LatexMk")
-                     ((eq TeX-engine 'xetex) "XeLaTeX")
-                     (t "LaTeX"))
-               'TeX-master-file -1))
+  (ymacs-latex//build-on-save :do-build))
 
 ;;;###autoload
 (defun ymacs-latex/force-update-style ()

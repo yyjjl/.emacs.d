@@ -46,6 +46,7 @@
 
   (define-key! :map LaTeX-mode-map
     ([f10] . ymacs-latex/build)
+    ([f9] . reftex-parse-all)
     ([f5] . TeX-view)
     ("M-a" . ymacs-latex/backward-sexp)
     ("M-e" . ymacs-latex/forward-sexp)

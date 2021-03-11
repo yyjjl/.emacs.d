@@ -4,7 +4,7 @@
   (after! lsp-haskell
     (ymacs-lsp//set-simple-install-fn
      'lsp-haskell
-     "ghcup install hls")))
+     '("ghcup" "install" "hls"))))
 
 (after! haskell-mode
   (define-key! :map haskell-mode-map
@@ -28,19 +28,11 @@
     ("C-c p b" . haskell-process-cabal-build)
     ("C-c p a" . haskell-process-cabal))
 
-  (setq
-   ;; Use notify.el (if you have it installed) at the end of running
-   ;; Cabal commands or generally things worth notifying.
-   haskell-font-lock-symbols t
-   haskell-notify-p t
-   ;; To enable tags generation on save.
-   haskell-tags-on-save nil
-   ;; Remove annoying error popups
-   haskell-interactive-popup-errors nil
-   ;; Better import handling
-   haskell-process-suggest-remove-import-lines t
-   haskell-process-auto-import-loaded-modules t
-   haskell-stylish-on-save nil))
+  (setq haskell-font-lock-symbols t)
+  ;; Remove annoying error popups
+  (setq haskell-interactive-popup-errors nil)
+  (setq haskell-tags-on-save nil)
+  (setq haskell-stylish-on-save nil))
 
 (after! haskell-debug
   (define-key! :map haskell-mode-map :prefix "C-c d"

@@ -4,7 +4,7 @@
   (after! lsp-go
     (ymacs-lsp//set-simple-install-fn
      'gopls
-     "GO111MODULE=on go get golang.org/x/tools/gopls@latest && go get -u github.com/fatih/gomodifytags")))
+     (list "bash" (expand-etc! "scripts/install_gopls")))))
 
 (after! go-mode
   (define-key! :map go-mode-map

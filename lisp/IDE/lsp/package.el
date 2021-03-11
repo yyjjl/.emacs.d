@@ -15,7 +15,7 @@
 (defvar-local ymacs-lsp-organize-import-function #'lsp-organize-imports)
 (defvar-local ymacs-lsp-find-other-file-function nil)
 
-(defvar ymacs-lsp-process-buffer-name "*lsp process*")
+(defvar ymacs-lsp-install-buffer "*lsp-install*")
 (defvar ymacs-lsp-doc-buffer "*lsp-signature*")
 
 (eval-when! ymacs-lsp-use-dap-p
