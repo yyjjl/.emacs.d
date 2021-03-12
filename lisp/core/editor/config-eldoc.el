@@ -19,7 +19,6 @@
 
   (defun ymacs-editor//eldoc-message (-fmt &rest -args)
     (if (or (not ymacs-editor-use-childframe-p)
-            (company--active-p)         ; company-mode is active
             (bound-and-true-p lsp-signature-mode))
         (progn
           (posframe-hide ymacs-editor-doc-buffer)
