@@ -92,7 +92,8 @@
   ;; boost performance
   (setq lsp-enable-file-watchers nil)
 
-  (setq lsp-eldoc-render-all ymacs-editor-use-childframe-p)
+  (setq lsp-eldoc-render-all nil)
+  (setq lsp-display-inline-image nil)
 
   ;; (setq lsp-enable-imenu t)
   ;; (setq lsp-enable-links t)
@@ -101,7 +102,7 @@
   ;; (setq lsp-enable-snippet t)
   ;; boost performance
   (setq lsp-enable-on-type-formatting nil)
-  (setq lsp-enable-text-document-color t)
+  ;; (setq lsp-enable-text-document-color t)
   ;; range formating
   ;; (setq lsp-enable-indentation t)
   (setq lsp-enable-symbol-highlighting nil)

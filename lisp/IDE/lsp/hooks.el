@@ -1,15 +1,8 @@
 ;; -*- lexical-binding:t -*-
 
 (after! lsp-mode
-  (when ymacs-editor-use-childframe-p
-    (define-advice keyboard-quit (:before () hide-lsp-doc)
-      (when (and lsp-mode
-                 (eq eldoc-message-function #'ymacs-lsp//eldoc-message))
-        (posframe-hide ymacs-lsp-doc-buffer))))
-
   (define-hook! ymacs-lsp|after-open (lsp-after-open-hook)
     (setq-local eldoc-documentation-function #'eldoc-documentation-compose-eagerly)
-    (setq-local eldoc-message-function #'ymacs-lsp//eldoc-message)
 
     (remove-hook 'eldoc-documentation-functions #'flymake-eldoc-function t)
     (add-hook 'eldoc-documentation-functions #'flymake-eldoc-function -20 t)
