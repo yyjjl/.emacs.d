@@ -93,7 +93,6 @@
   (setq lsp-enable-file-watchers nil)
 
   (setq lsp-eldoc-render-all nil)
-  (setq lsp-display-inline-image nil)
 
   ;; (setq lsp-enable-imenu t)
   ;; (setq lsp-enable-links t)

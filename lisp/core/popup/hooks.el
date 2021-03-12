@@ -36,6 +36,8 @@
 (defun keyboard-quit@autoclose (&rest _)
   "When `C-g' pressed, close latest opened popup window"
   (ymacs-popup//cleanup)
+  (when ymacs-editor-use-childframe-p
+    (posframe-hide-all))
   (when (and (called-interactively-p 'interactive)
              (not (region-active-p)))
     (let (window)

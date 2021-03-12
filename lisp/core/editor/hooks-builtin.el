@@ -62,7 +62,7 @@
     (exec-path-from-shell-initialize))
 
   (when (display-graphic-p -frame)
-    (mouse-avoidance-mode t)
+    ;; (mouse-avoidance-mode t)
 
     (fcitx-aggressive-setup)
 
