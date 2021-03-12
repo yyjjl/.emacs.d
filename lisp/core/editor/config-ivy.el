@@ -1,98 +1,46 @@
-;; -*- lexical-binding: t -*-
-
-(eval-when-compile
-  (require 'hydra))
+;;; -*- lexical-binding: t; -*-
 
 (declare-function bookmark-get-bookmark-record 'bookmark)
 
-;;
-;;* Compile
-;;
+(defvar-local ymacs-editor-prefer-imenu-p nil)
 
+(defvar ymacs-editor-ivy--last-text nil)
 
-(defsubst ymacs-editor//get-environment ()
-  (cl-loop for fn in ymacs-editor-environment-functions
-           nconc (funcall fn)))
+(defvar ymacs-editor-ivy-switch-function-list nil)
+(defvar ymacs-editor-ivy-extra-help-lines nil)
+(defvar ymacs-editor-ivy-display-help-max-width 160)
 
-(defun ymacs-editor//propertize-compile-command (-cmd -src-dir &optional -build-dir)
-  (unless -build-dir
-    (setq -build-dir -src-dir))
+(defvar ymacs-editor-ivy-display-help-extra-commands
+  '(ivy-restrict-to-matches
+    ;; delete-blank-lines
+    ;; just-one-space
+    (counsel-find-file . ivy-magic-read-file-env)))
 
-  (let ((cmd (concat (propertize -cmd 'cmd t)
-                     (counsel-compile--pretty-propertize "in" -build-dir 'dired-directory)))
-        (props `(srcdir ,-src-dir blddir ,-build-dir)))
-    (add-text-properties 0 (length cmd) props cmd)
-    cmd))
+(defvar ymacs-editor-ivy-display-help-ignore-commands
+  '(ymacs-editor/ivy-meta-dot
+    counsel-up-directory
+    swiper-C-s
+    swiper-recenter-top-bottom))
 
-(defun ymacs-editor//default-compile-command (&optional -dir)
-  (let ((default-directory (or -dir default-directory)))
-    (mapcar
-     (lambda (item)
-       (apply #'ymacs-editor//propertize-compile-command item))
-     (cl-loop
-      for compile-command-fn in ymacs-editor-compile-command-functions
-      append (funcall compile-command-fn)))))
-
-
-;;
-;;* Hydra
-;;
-
-(defmacro defhydra++ (name body &optional docstring &rest heads)
-  "Redefine an existing hydra by adding new heads.
-Arguments are same as of `defhydra'."
-  (declare (indent defun) (doc-string 3))
-  (unless (stringp docstring)
-    (setq heads (cons docstring heads))
-    (setq docstring nil))
-  (let ((ignore-keys (mapcar #'car (--filter (memq :delete it) heads))))
-    `(defhydra ,name ,(or body (hydra--prop name "/params"))
-       ,(or docstring (hydra--prop name "/docstring"))
-       ,@(cl-delete-duplicates
-          (cl-delete-if
-           (lambda (x) (member (car x) ignore-keys))
-           (append (hydra--prop name "/heads") heads))
-          :key #'car
-          :test #'equal))))
-
-(defun ymacs-editor//add-toggles (-column-name -condition &rest -toggles)
-  (let* ((column (assoc-string -column-name ymacs-editor-toggles-alist))
-         (group (assoc -condition column))
-         (toggles (cdr group)))
-    (dolist (toggle (reverse -toggles))
-      (setf (alist-get (car toggle) toggles nil nil #'equal)
-            (cdr toggle)))
-    (if group
-        (setcdr group toggles)
-      (setq group (cons -condition toggles))
-      (if column
-          (setcdr (last column) (list group))
-        (setq column (list -column-name group))
-        (setcdr (last ymacs-editor-toggles-alist) (list column))))))
-
+(defvar ymacs-editor-rg-type-aliases
+  (eval-when-compile
+    (when ymacs-ripgrep-path
+      (condition-case err
+          (append
+           (--map
+            (-let* (((type alias) (split-string it ":" :omit-nulls)))
+              (cons (string-trim type)
+                    (mapcar #'string-trim (split-string alias "," :omit-nulls))))
+            (-> ymacs-ripgrep-path
+              (concat " --type-list")
+              shell-command-to-string
+              (split-string "\n" :omit-nulls)))
+           '(("all" "all defined type aliases") ;; rg --type=all
+             ("everything" "*")))
+        (error (message "%s" err))))))
 
 ;;
-;;* Rg
-;;
-
-(defun ymacs-editor//rg-default-alias ()
-  "Return the default alias by matching alias globs with the buffer file name."
-  (when-let* ((buffer-name
-               (or (buffer-file-name)
-                   (replace-regexp-in-string "<[0-9]+>\\'" "" (buffer-name))))
-              (filename
-               (and buffer-name
-                    (stringp buffer-name)
-                    (file-name-nondirectory buffer-name))))
-    (cl-find-if
-     (lambda (alias)
-       (string-match (mapconcat 'wildcard-to-regexp (cdr alias) "\\|")
-                     filename))
-     ymacs-editor-rg-type-aliases)))
-
-
-;;
-;;* Display Help
+;;* Dispaly Help in LV 
 ;;
 
 (defsubst ymacs-editor//display-keys--collect (-keymap)
@@ -100,7 +48,7 @@ Arguments are same as of `defhydra'."
     (when -keymap
       (cl--map-keymap-recursively
        (lambda (key definition)
-         (unless (or (eq (aref key 0) 'remap)  ; skip remap
+         (unless (or (eq (aref key 0) 'remap) ; skip remap
                      (memq definition ymacs-editor-ivy-display-help-ignore-commands))
            (push (cons (key-description key) definition) keys)))
        -keymap))
@@ -183,17 +131,14 @@ Arguments are same as of `defhydra'."
     (unless (string-empty-p help-string)
       (lv-message "%s" help-string))))
 
-
-;;
-;;* Ivy
-;;
-
-(autoload 'pinyinlib-build-regexp-string "pinyinlib")
-
 (defun ymacs-editor//ivy-re-builder (-str)
   (when (string-prefix-p "=" -str)
     (setq -str (pinyinlib-build-regexp-string (substring -str 1) t nil t)))
   (ivy--regex-plus -str))
+
+;;
+;;* Switch Backend
+;;
 
 (defmacro ymacs-editor//define-switch (&rest -body)
   (declare (indent 0))
@@ -230,7 +175,6 @@ Arguments are same as of `defhydra'."
     (unless toggle-fn
       (user-error "No toggle-function defined"))
     (funcall toggle-fn)))
-
 
 ;;
 ;;* Transformers
@@ -286,65 +230,85 @@ Arguments are same as of `defhydra'."
        (file-name-nondirectory (cdr (assoc 'filename bm)))))))
 
 
-;;
-;;* Company
-;;
+(after! ivy
+  (add-hook 'ivy-occur-mode-hook #'ymacs-editor//truncate-line)
+  (add-hook 'ivy-occur-grep-mode-hook #'ymacs-editor//truncate-line)
 
-(defsubst ymacs-editor//find-main-company-backend (-backends)
-  (let ((x -backends))
-    (while (and (consp x)
-                (not (and (listp (car x)) (memq :with (car x)))))
-      (setq x (cdr x)))
-    x))
+  (define-advice ivy-occur-next-error (:around (-fn &rest -args) ensure-visible)
+    (if-let (window (or (get-buffer-window (current-buffer))
+                        (display-buffer (current-buffer))))
+        (with-selected-window window
+          (apply -fn -args))
+      (apply -fn -args)))
 
-(cl-defun ymacs-editor//add-company-backend
-    (-backend &key ((:main -main-backend-p) t) ((:after -after) nil))
-  ;; deep copy the backends list
-  (let ((backends (mapcar (lambda (x) (if (consp x) (copy-sequence x) x))
-                          company-backends)))
-    (if -main-backend-p
-        (when-let (parent-of-main-backend (ymacs-editor//find-main-company-backend backends))
-          ;; remove -backend first
-          (setq backends (delete -backend backends))
-          ;; remove 'company-capf
-          (setcar parent-of-main-backend
-                  (delete 'company-capf (car parent-of-main-backend)))
-          (if -after
-              (insert-after! -after -backend (car parent-of-main-backend))
-            (cl-pushnew -backend (car parent-of-main-backend))))
-      (if -after
-          (insert-after! -after -backend backends)
-        (cl-pushnew -backend backends)))
-    (setq-local company-backends backends)))
+  (advice-add 'ivy--preselect-index :around #'ignore-errors!)
+  (advice-add #'ivy--cleanup :before (lambda (&rest _) (lv-delete-window)))
 
+  (define-key! :map ivy-minibuffer-map
+    ("C-r" . ivy-reverse-i-search)
+    ("C-j" . ivy-immediate-done)
+    ("C-M-j" . ivy-done)
+    ("M-." . ymacs-editor/ivy-meta-dot)
+    ("C-." . ymacs-editor/ivy-meta-dot))
 
-;;
-;;* Hideshow
-;;
+  (ymacs-editor//define-switch
+    (swiper :doc "Swiper" :key "s")
+    (swiper-isearch :doc "SwiperI" :key "x")
+    (swiper-all :doc "SwiperA" :key "a")
+    (ymacs-editor//rg :doc "ripgrep" :key "r" :save-text t :caller counsel-rg)
+    (counsel-git-grep :doc "gitgrep" :key "g"))
 
-(defun ymacs-editor//hs-setup-overlay (-ov)
-  (let* ((start (overlay-start -ov))
-         (end (overlay-end -ov))
-         (str (format " ...%d... " (count-lines start end))))
-    (overlay-put -ov 'display str)
-    (overlay-put -ov 'face 'ymacs-editor-hs-overlay-face)
-    (overlay-put -ov 'pointer 'hand)
-    (overlay-put -ov 'keymap ymacs-editor-hs-overlay-map)))
+  (ymacs-editor//define-switch
+    (ymacs-editor//fzf :doc "fzf" :key "z" :caller counsel-fzf)
+    (counsel-git :doc "git" :key "g")
+    (counsel-find-file :doc "find file" :key "f"))
 
-(defun ymacs-editor//hs-auto-expand (&rest _)
-  (save-excursion (hs-show-block)))
+  (dolist (caller '(ivy-switch-buffer
+                    internal-complete-buffer
+                    ivy-switch-buffer-other-window))
+    (ivy-configure caller
+      :display-transformer-fn
+      #'ymacs-editor//ivy-switch-buffer-transformer))
 
+  (ivy-configure 'package-install
+    :display-transformer-fn
+    #'ymacs-editor//ivy-package-install-transformer)
+  (ivy-configure 'counsel-bookmark
+    :display-transformer-fn
+    #'ymacs-editor//ivy-bookmark-transformer)
 
-;;
-;;* Snippet
-;;
+  (add-to-list 'ivy-hooks-alist '(t . ymacs-editor//display-help))
 
-(defun ymacs-editor//try-expand-local-snippets ()
-  (-when-let*
-      (((start . end)
-        (when (looking-back "[a-zA-Z0-9]+" (line-beginning-position) :greedy)
-          (cons (match-beginning 0) (match-end 0))))
-       (template (cdr-safe (assoc-string
-                            (buffer-substring-no-properties start end)
-                            ymacs-editor-local-snippets-list))))
-    (yas-expand-snippet template start end)))
+  (setq ivy-read-action-function #'ivy-hydra-read-action)
+  (setf (alist-get 't ivy-format-functions-alist) #'ivy-format-function-arrow)
+  (setq ivy-height 13)
+  (setq ivy-action-wrap t)
+  (setq ivy-count-format "(%d/%d) ")
+  (setq ivy-extra-directories '("./"))
+  (setq ivy-initial-inputs-alist nil)
+  (setq ivy-fixed-height-minibuffer t)
+  (setq ivy-re-builders-alist '((t . ymacs-editor//ivy-re-builder)))
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-virtual-abbreviate 'full)
+  (setq ivy-use-selectable-prompt t)
+  (setq ivy-on-del-error-function #'ignore))
+
+(after! swiper
+  (setq swiper-stay-on-quit t))
+
+(after! counsel
+  (define-advice counsel--async-command (:before (-cmd &rest _) show-help)
+    (ymacs-editor//display-help -cmd))
+
+  (add-to-list 'counsel-compile-local-builds #'ymacs-editor//default-compile-command t)
+
+  (setq counsel-yank-pop-separator "\n------------------------------------------------------------\n")
+  (setq counsel-find-file-at-point t)
+  (setq counsel-find-file-ignore-regexp
+        (concat
+         ;; file names beginning with # or .
+         "\\(?:\\`[#]\\)"
+         ;; file names ending with # or ~
+         "\\|\\(?:[#~]\\'\\)"))
+
+  (setq counsel-compile-make-args "-k -j"))

@@ -33,6 +33,9 @@
          (expand-file-name ,-name (file-name-directory filename))
        ,-name)))
 
+(defmacro load! (-name)
+  `(load (expand! ,-name) nil (null debug-on-error)))
+
 (defsubst expand-cache! (-name &optional -make-p)
   (let ((val (expand-file-name -name ymacs-cache-direcotry)))
     (when (and -make-p (not (file-exists-p val)))
@@ -556,6 +559,18 @@ HTML file converted from org file, it returns t."
              ,form))
       form)))
 
+(defmacro when! (-cond &rest -body)
+  "Similary to `when', but -COND is eval during byte-compiling."
+  (declare (indent 1) (debug t))
+  `(if! ,-cond (progn ,@-body)))
+
+(defmacro if! (-cond -if-statement &rest -else-body)
+  "Similary to `if', but -COND is eval during byte-compiling."
+  (declare (indent 2) (debug t))
+  (if (eval -cond)
+      -if-statement
+    `(progn ,@-else-body)))
+
 (defmacro load-feature! (-name)
   (let* ((feature-name (symbol-name -name))
          (directory (expand-file-name feature-name ymacs-config-directory)))
@@ -563,12 +578,17 @@ HTML file converted from org file, it returns t."
       (user-error "no feature %s" -name))
 
     (if-let ((feature-name (intern (file-name-base feature-name)))
-             (forms (cl-loop
-                     for name in '("package" "functions" "hooks" "config")
-                     for path = (expand-file-name name directory)
-                     for full-path = (concat path ".el")
-                     when (file-exists-p full-path)
-                     collect `(load ,path nil t))))
+             (forms (append
+                     (cl-loop
+                      for name in '("package" "functions" "hooks" "config")
+                      for path = (expand-file-name name directory)
+                      for full-path = (concat path ".el")
+                      when (file-exists-p full-path)
+                      collect `(load ,path nil t))
+                     (cl-loop
+                      for file in (directory-files directory :full "config-.*.el")
+                      for path = (file-name-sans-extension file)
+                      collect `(load ,path nil t)))))
         `(unless (has-feature! ',feature-name)
            ,@forms
            (add-to-list 'ymacs-loaded-features (cons ',feature-name ',-name))

@@ -5,31 +5,13 @@
 (executable! fdfind :-exe ["fdfind" "fd"])
 (executable! ctags :-exe "ctags-exuberant")
 
-(defface ymacs-editor-hs-overlay-face
-  '((t (:inherit font-lock-builtin-face :underline t)))
-  "Face used for the dirname part of the buffer path."
-  :group 'hideshow)
-
 (option! editor-use-childframe nil
   "Whether to use childframe"
   :type 'boolean)
 
-(option! editor-local-snippets-list nil
-  "local snippets"
-  :type '(alist :key-type string :value-type string)
-  :safe #'listp)
-
-(option! editor-project-rsync-remote-path nil
-  :type 'directory
-  :safe #'stringp)
-
-(option! editor-project-rsync-local-path nil
-  :type '(directory :must-match t)
-  :safe #'file-directory-p)
-
-(option! editor-project-rsync-extra-options nil
-  :type '(repeat string)
-  :safe (lambda (x) (and (listp x) (-all? #'stringp x))))
+(option! default-project nil
+  :type 'list
+  :safe 'consp)
 
 (eval-when-compile-config!
  (when sys/macp
@@ -61,116 +43,12 @@
  multiple-cursors
  wgrep
  ace-pinyin
- persistent-scratch)
-
-(defvar ymacs-editor-toggles-alist
-  '(("Global"
-     (t
-      ("V"
-       (ymacs-ui/view-code-mode (if ymacs-ui/view-code-mode -1 1))
-       "View Code"
-       :toggle ymacs-ui/view-code-mode)
-      ("E"
-       toggle-debug-on-error
-       "Debug on Error"
-       :toggle (default-value 'debug-on-error))
-      ("Q"
-       toggle-debug-on-quit
-       "Debug on Quit"
-       :toggle (default-value 'debug-on-quit))
-      ("W"
-       (setq show-trailing-whitespace (not show-trailing-whitespace))
-       "Trailing Whitespace"
-       :toggle show-trailing-whitespace)
-      ("N"
-       (display-line-numbers-mode (if display-line-numbers-mode -1 1))
-       "Line Number"
-       :toggle display-line-numbers-mode)
-      ("B" display-battery-mode "Battery" :toggle t)
-      ("T" display-time-mode "Time" :toggle t)
-      ("P" prettify-symbols-mode "Pretty Symbol" :toggle t)))))
-
-(defvar ymacs-editor-narrow-dwim-alist nil)
-
-(defvar ymacs-editor-ivy-switch-function-list nil)
-(defvar ymacs-editor-ivy-extra-help-lines nil)
-(defvar ymacs-editor-ivy-display-help-max-width 160)
-(defvar ymacs-editor-ivy--last-text nil)
-
-(defvar ymacs-editor-ivy-display-help-extra-commands
-  '(ivy-restrict-to-matches
-    ;; delete-blank-lines
-    ;; just-one-space
-    (counsel-find-file . ivy-magic-read-file-env)))
-
-(defvar ymacs-editor-ivy-display-help-ignore-commands
-  '(ymacs-editor/ivy-meta-dot
-    counsel-up-directory
-    swiper-C-s
-    swiper-recenter-top-bottom))
-
-(defvar ymacs-editor-rg-type-aliases
-  (eval-when-compile
-    (ignore-errors
-      (append
-       (--map
-        (-let* (((type alias) (split-string it ":" :omit-nulls)))
-          (cons (string-trim type)
-                (mapcar #'string-trim (split-string alias "," :omit-nulls))))
-        (-> counsel-rg-base-command
-            split-string
-            car
-            (concat " --type-list")
-            shell-command-to-string
-            (split-string "\n" :omit-nulls)))
-       '(("all" "all defined type aliases") ;; rg --type=all
-         ("everything" "*"))))))
-
-(defvar ymacs-editor-hs-overlay-map (make-sparse-keymap)
-  "Keymap for hs minor mode overlay.")
-
-(defvar ymacs-editor-project-rsync-command
-  "rsync -azh --progress --filter=':- .gitignore' %s %s %s")
-
-(defvar-local ymacs-editor-prefer-imenu-p nil)
-
-(defvar-local ymacs-editor-compile-command-functions nil)
-(defvar ymacs-editor-environment-functions ())
-
-(defvar ymacs-editor-surround-pair-alist
-  '(("()" . ("(" . ")"))
-    ("{}" . ("{" . "}"))
-    ("[]" . ("[" . "]"))
-    ("`" . (lambda (_)
-             (cons "`"
-                   (if (memq major-mode '(emacs-lisp-mode lisp-interaction-mode))
-                       "'"
-                     "`"))))
-    ("<>,." . (lambda (_)
-                (let ((tag (read-string "Tag: ")))
-                  (cons (concat "<" tag ">")
-                        (concat "</" tag ">")))))
-    ("\\" . (lambda (_)
-              (let ((pair (ymacs-editor//surround-get-pair (read-char))))
-                (when pair
-                  (cons (concat "\\" (car pair))
-                        (concat "\\" (cdr pair)))))))
-    ("b" . (lambda (_)
-             (let ((env (read-string "environment: ")))
-               (when env
-                 (cons (concat "\\begin{" env "}")
-                       (concat "\\end{" env "}"))))))))
-
-(defvar ymacs-editor-avy-copy-key-alist
-  '((?s . symbol)
-    (?e . sexp)
-    (?l . line)
-    (?f . filename)
-    (?d . defun)
-    (?W . word)
-    (?u . url)
-    (?U . uuid)
-    (?n . number)))
+ ace-window
+ persistent-scratch
+ hl-todo
+ page-break-lines
+ which-key
+ highlight-indentation)
 
 (put 'ymacs-editor//fzf 'no-counsel-M-x t)
 (put 'ymacs-editor//rg 'no-counsel-M-x t)
@@ -179,6 +57,14 @@
 (put 'ymacs-editor/ivy-meta-dot 'no-counsel-M-x t)
 (put 'ymacs-editor/ivy-meta-dot-for-counsel-fzf 'no-counsel-M-x t)
 (put 'ymacs-editor/ivy-meta-dot-for-counsel-rg 'no-counsel-M-x t)
+
+(put 'scroll-left 'disabled nil)
+(put 'narrow-to-region 'disabled nil)
+(put 'narrow-to-page 'disabled nil)
+(put 'narrow-to-defun 'disabled nil)
+(put 'erase-buffer 'disabled nil)
+(put 'list-timers 'disabled nil)
+(put 'list-threads 'disabled nil)
 
 (autoload 'ymacs-editor/rg (expand! "commands-ivy.el") nil t)
 (autoload 'ymacs-editor/fzf (expand! "commands-ivy.el") nil t)
@@ -195,12 +81,53 @@
 (autoload 'ymacs-hydra/window/body (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/sort/body (expand! "commands-hydra") nil t)
 
-(define-key! :prefix "C-x w"
-  ("-" . ivy-pop-view)
-  ("=" . ivy-push-view)
-  ("." . ivy-switch-view))
+(autoload 'ymacs-editor/generate-autoloads (expand! "commands-package") nil t)
+
+(autoload 'xref-pulse-momentarily "xref")
+(autoload 'project-root "project")
+(autoload 'project-current "project")
+(autoload 'ansi-color-apply-on-region "ansi-color")
+(autoload 'pinyinlib-build-regexp-string "pinyinlib")
+(autoload 'winner-undo "winner" nil t)
+(autoload 'winner-redo "winner" nil t)
+
+(define-key! :map indent-rigidly-map
+  ("[" . indent-rigidly-left)
+  ("]" . indent-rigidly-right)
+  ("{" . indent-rigidly-left-to-tab-stop)
+  ("}" . indent-rigidly-right-to-tab-stop))
+
+(define-key! :map special-mode-map
+  ("u" . scroll-down-command)
+  ("y" . scroll-down-line)
+  ("e" . scroll-up-line))
 
 (define-key! :prefix "C-x"
+  ("'")                                 ; unbind
+
+  ("c" . ymacs-editor/cleanup-buffer-safe)
+  (", -" . ymacs-editor/copy-file-name)
+
+  ("R" . ymacs-editor/rename-this-file-and-buffer)
+  ("W" . ymacs-editor/copy-this-file)
+  ("D" . ymacs-editor/delete-this-file)
+
+  ("G" . revert-buffer)
+  ("I" . clone-indirect-buffer)
+
+  ("w [" . winner-undo)
+  ("w ]" . winner-redo)
+
+  ("2" . ymacs-editor/window-split-vertically)
+  ("3" . ymacs-editor/window-split-horizontally)
+  ("|" . ymacs-editor/window-force-split-horizontally)
+  ("_" . ymacs-editor/window-force-split-vertically)
+
+  ("w w" . ymacs-editor/move-buffer)
+
+  (("C-b" "B") . ibuffer)
+
+  ("m" . view-echo-area-messages)
   ("x" . exchange-point-and-mark)
 
   ("C-_" . ymacs-editor/goto-last-point)
@@ -209,9 +136,9 @@
   ("o" . ace-window)
   ("b" . ivy-switch-buffer)
   ("k" . kill-buffer)
-  ("K" . ymacs-editor/kill-regexp)
 
   ("n n" . ymacs-editor/narrow-or-widen-dwim)
+  (", ," . ymacs-editor-view-code-mode)
 
   ("{" . ymacs-hydra/window/shrink-window-horizontally)
   ("}" . ymacs-hydra/window/enlarge-window-horizontally)
@@ -224,9 +151,7 @@
   (", e" . ymacs-hydra/ediff/body)
   ;; Minor mode to make xref use etags again.
   (", x" . xref-etags-mode)
-  (", SPC" . ymacs-editor/insert-space-around-chinese)
-  (", a" . ymacs-editor/add-local-snippet)
-  (", d" . ymacs-editor/delete-local-snippet))
+  (", SPC" . ymacs-editor/insert-space-around-chinese))
 
 (define-key!
   ("C-c O" . ymacs-hydra/outline/body)
@@ -273,6 +198,20 @@
   ("M-g l" . avy-goto-line)
   ("M-g s" . avy-goto-symbol-1)
   ("M-g L" . avy-copy-line)
+
+  ("M-s f" . ymacs-editor/font-faces-at-point)
+  ("M-s o" . ymacs-editor/occur-dwim)
+
+  ("C-<down>" . text-scale-decrease)
+  ("C-<up>" . text-scale-increase)
+
+  ("RET" . newline-and-indent)
+
+  ("M-/" . hippie-expand)
+
+  ("M-n" . next-error)
+  ("M-p" . previous-error)
+  ("M-N" . ymacs-editor/select-error-buffer)
 
   ("M-'" . ymacs-editor/change-surround)
 

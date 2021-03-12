@@ -1,7 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;;;###autoload
-(defun ymacs-default/copy-file-name ()
+(defun ymacs-editor/copy-file-name ()
   "Copy current file name to king ring."
   (interactive)
   (let ((path (or (buffer-file-name) default-directory)))
@@ -18,7 +18,7 @@
 
 
 ;;;###autoload
-(defun ymacs-default/delete-this-file ()
+(defun ymacs-editor/delete-this-file ()
   "Delete the current file, and kill the buffer."
   (interactive)
   (barf-if-not-visiting-file!)
@@ -31,7 +31,7 @@
       (kill-buffer))))
 
 ;;;###autoload
-(defun ymacs-default/copy-this-file (-visit)
+(defun ymacs-editor/copy-this-file (-visit)
   "Copy current file to a new file without close original file."
   (interactive "P")
   (barf-if-not-visiting-file!)
@@ -56,7 +56,7 @@
         (find-file-other-window new-file)))))
 
 ;;;###autoload
-(defun ymacs-default/rename-this-file-and-buffer ()
+(defun ymacs-editor/rename-this-file-and-buffer ()
   "Renames both current buffer and file it's visiting to NEW-NAME."
   (interactive)
   (let ((old-file (buffer-file-name)))

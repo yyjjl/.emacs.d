@@ -2,9 +2,10 @@
 
 (require-packages! lispy racket-mode)
 
-(add-to-list
- 'ymacs-default-input-method-alist
- '(racket-mode racket-unicode-input-method racket-unicode))
+(ymacs-editor//set-input-method
+ :mode racket-mode
+ :ime racket-unicode-input-method
+ :package racket-unicode)
 
 (eval-when-compile-config!
  (require 'racket-mode)

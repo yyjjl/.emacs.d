@@ -1,136 +1,75 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;;;###autoload
-(defun ymacs-editor/narrow-or-widen-dwim (&optional -backward-p)
+(defun ymacs-editor/cleanup-buffer-safe ()
+  "Perform a bunch of safe operations on the whitespace content of a buffer.
+Does not indent buffer, because it is used for a
+`before-save-hook', and that might be bad."
+  (interactive)
+  (untabify (point-min) (point-max))
+  (delete-trailing-whitespace))
+
+;;;###autoload
+(defun ymacs-editor/occur-dwim ()
+  (interactive)
+  (let* ((candidate
+          (if (region-active-p)
+              (buffer-substring-no-properties (region-beginning) (region-end))
+            (when-let (sym (thing-at-point 'symbol))
+              (concat "\\_<" (regexp-quote sym) "\\_>"))))
+         (regexp-history
+          (if candidate
+              (cons candidate regexp-history)
+            regexp-history)))
+    (call-interactively 'occur)))
+
+;;;###autoload
+(defun ymacs-editor/font-faces-at-point ()
+  "Get the font face under cursor."
+  (interactive)
+  (let* ((pos (point))
+         (text (buffer-substring pos (1+ pos)))
+         (faces (-uniq (-flatten (list (get-char-property pos 'face)
+                                       (get-char-property 0 'face text))))))
+    (message "%s" faces)))
+
+;;;###autoload
+(defun ymacs-editor/goto-last-point ()
+  (interactive)
+  (let ((old-point (point)))
+    (with-demoted-errors "%s"
+      (call-interactively #'goto-last-change))
+    (if (eq (point) old-point)
+        (call-interactively #'pop-to-mark-command)
+      (message "goto last change"))))
+
+;;;###autoload
+(defun ymacs-editor/find-file-externally (-files)
+  "Open the current file or dired marked files in external app.
+The app is chosen from your OS's preference."
+  (interactive (list (if (eq major-mode 'dired-mode)
+                         (dired-get-marked-files)
+                       (list (buffer-file-name)))))
+  (when (or (<= (length -files) 5)
+            (y-or-n-p "Open more than 5 files? "))
+    (dolist (file -files)
+      (counsel-find-file-extern file))))
+
+;;;###autoload
+(defun ymacs-editor/narrow-or-widen-dwim (&optional -arg)
   "If the buffer is narrowed, it widens.
 Otherwise,it narrows to region, or Org subtree.
-Optional argument ARG is used to toggle narrow functions."
+Optional argument -ARG is used to toggle narrow functions."
   (interactive "P")
   (cond ((buffer-narrowed-p) (widen))
         ((region-active-p) (narrow-to-region (region-beginning) (region-end)))
         (t (let ((cmd-list (cdr (assoc major-mode ymacs-editor-narrow-dwim-alist))))
              (if cmd-list
-                 (setq cmd-list (if -backward-p (cadr cmd-list) (car cmd-list)))
-               (setq cmd-list (if -backward-p #'narrow-to-page #'narrow-to-defun)))
+                 (setq cmd-list (if -arg (cadr cmd-list) (car cmd-list)))
+               (setq cmd-list (if -arg #'narrow-to-page #'narrow-to-defun)))
              (when cmd-list
                (message "Use command `%s'" cmd-list)
                (funcall cmd-list))))))
-
-(defun ymacs-editor/grab-regexp (-regexp)
-  "Grab strings matching REGEXP to list."
-  (let ((case-fold-search nil)
-        (s (buffer-string))
-        (pos 0)
-        item
-        items)
-    (while (setq pos (string-match -regexp s pos))
-      (setq item (match-string-no-properties 0 s))
-      (setq pos (+ pos (length item)))
-      (push item items))
-    items))
-
-;;;###autoload
-(defun ymacs-editor/kill-regexp (-regexp)
-  "Find all strings matching REGEXP in current buffer.
-grab matched string and insert them into `kill-ring'"
-  (interactive
-   (let ((regexp (read-regexp (format "grep regex (default: %s): "
-                                      (car regexp-history))
-                              (car regexp-history))))
-     (list regexp)))
-  (let ((items (ymacs-editor/grab-regexp -regexp)))
-    (kill-new (string-join items "\n"))
-    (message "matched %d strings => kill-ring" (length items))
-    items))
-
-(defconst ymacs-editor--punctuation-alist
-  '(("." . "。")
-    ("," . "，")
-    (":" . "：")
-    (";" . "；")
-    ("?" . "？")
-    ("(" . "（")
-    (")" . "）")
-    ("!" . "！")))
-
-;;;###autoload
-(defun ymacs-editor/toggle-punctuation-width (-begin -end &optional -target)
-  "Convert punctuation from/to English/Chinese characters."
-  (interactive
-   (list (if (use-region-p)
-             (region-beginning)
-           (point-min))
-         (if (use-region-p)
-             (region-end)
-           (point-max))
-         (completing-read! "Target:" '(half full))))
-  (let ((regex (if (eq -target 'full)
-                   " ?[.,;?()!] ?"
-                 "[。，；？（）！]")))
-    (save-excursion
-      (perform-replace
-       regex
-       (list (lambda (&rest _)
-               (or (cdr (assoc (string-trim (match-string 0)) ymacs-editor--punctuation-alist))
-                   (cdr (rassoc (string-trim (match-string 0)) ymacs-editor--punctuation-alist))
-                   (read-string "Replacement: "))))
-       t t nil nil nil
-       -begin -end
-       nil                              ; backward
-       (and (use-region-p) (region-noncontiguous-p))))))
-
-(defconst ymacs-editor-ascii-before-chinese
-  (rx (group-n 1 (any (?A . ?Z) (?a . ?z) (?0 . ?9) "-!@#$%^&+|:;?><.,/\\" ")]}"))
-      (group-n 2 (category chinese-two-byte))))
-(defconst ymacs-editor-non-space-after-punc
-  (rx (group-n 1 (in ","))
-      (group-n 2 (not blank))))
-(defconst ymacs-editor-ascii-after-chinese
-  (rx (group-n 1 (category chinese-two-byte))
-      (group-n 2 (in (?A . ?Z) (?a . ?z) (?0 . ?9) "-!@#$%^&+|></\\" "([{"))))
-
-;;;###autoload
-(defun ymacs-editor/insert-space-around-chinese (&optional -start -end)
-  (interactive (cond (current-prefix-arg
-                      (list (point-min) (point-max)))
-                     ((region-active-p)
-                      (list (region-beginning) (region-end)))
-                     (t
-                      (save-mark-and-excursion
-                        (mark-paragraph)
-                        (list (region-beginning) (region-end))))))
-  (save-excursion
-    (goto-char -start)
-    (while (re-search-forward ymacs-editor-ascii-before-chinese -end t)
-      (replace-match "\\1 \\2" nil nil))
-    (goto-char -start)
-    (while (re-search-forward ymacs-editor-ascii-after-chinese -end t)
-      (replace-match "\\1 \\2" nil nil))
-    (goto-char -start)
-    (while (re-search-forward ymacs-editor-non-space-after-punc -end t)
-      (replace-match "\\1 \\2" nil nil))))
-
-;;;###autoload
-(defun ymacs-editor/goto-char-or-minibuffer ()
-  "If minibuffer-window is active and not selected, select it.
-If current-prefix-arg == (16), jump to first char before (point) in current line.
-If current-prefix-arg is non-nol, jump to first char after (point) in current line.
-Otherwise call `avy-goto-char-in-line'
-"
-  (interactive)
-  (let ((window (active-minibuffer-window)))
-    (cond
-     ((and window (not (eq window (selected-window))))
-      (select-window window))
-     (current-prefix-arg
-      (if (equal current-prefix-arg '(16))
-          (search-backward (char-to-string (read-char "backward to char:"))
-                           (line-beginning-position))
-        (search-forward (char-to-string (read-char "forward to char:"))
-                        (line-end-position))))
-     ((let ((avy-single-candidate-jump t)
-            (avy-all-windows nil))
-        (call-interactively #'avy-goto-char-in-line))))))
 
 ;;;###autoload
 (defun ymacs-editor/forward-defun (&optional -n)
@@ -195,89 +134,6 @@ Otherwise call `avy-goto-char-in-line'
           (looking-at "\\s-*$"))
         (call-interactively 'comment-dwim)
       (comment-or-uncomment-region (line-beginning-position) (line-end-position)))))
-
-(defvar ymacs-editor--suround-origin-pos nil)
-
-(defun ymacs-editor//surround-get-pair (-char)
-  "Get pair from -CHAR"
-  (let ((pair (cl-loop for (keys . pair) in ymacs-editor-surround-pair-alist
-                       when (member -char (string-to-list keys))
-                       return pair)))
-    (cond ((functionp pair) (funcall pair -char)) ; function
-          (pair pair)                             ; normal
-          ((eq -char 13) nil)
-          (t (cons (char-to-string -char)
-                   (char-to-string -char))))))
-
-(defun ymacs-editor//surround-get-bounds (-left -right)
-  "Get bounds of pair. If -LEFT and -RIGHT is a open/close delimeter.
-Use `scan-lists', otherwise use simple algorithm."
-  (if (and (string-match-p "^\\s($" -left)
-           (string-match-p "^\\s)$" -right))
-      (ignore-errors
-        (cons
-         (scan-lists (point) -1 1)
-         (scan-lists (point) 1 1)))
-    (cons (save-excursion
-            (while (and (search-backward -left)
-                        (eq ?\\ (char-before (point)))))
-            (point))
-          (save-excursion
-            (while (and (search-forward -right)
-                        (eq ?\\ (char-before (- (point) (length -right))))))
-            (point)))))
-
-(defun ymacs-editor//surround-mark ()
-  (setq ymacs-editor--suround-origin-pos nil)
-  (let* ((char1 (read-char))
-         (from-pair (and (not (region-active-p))
-                         (ymacs-editor//surround-get-pair char1))))
-    (when-let ((pos (and (not (region-active-p))
-                         (ymacs-editor//surround-get-bounds (car from-pair) (cdr from-pair)))))
-      (setq ymacs-editor--suround-origin-pos (point))
-      (set-mark (car pos))
-      (goto-char (cdr pos))
-      (activate-mark))
-    (list (region-beginning)
-          (region-end)
-          from-pair
-          (ymacs-editor//surround-get-pair (read-char)))))
-
-;;;###autoload
-(defun ymacs-editor/change-surround (-beg -end -from-pair -to-pair)
-  (interactive (ymacs-editor//surround-mark))
-  (unless (equal -from-pair -to-pair)
-    (if (equal -beg -end)
-        (message "Empty region")
-      (let ((from-left (car -from-pair))
-            (from-right (cdr -from-pair))
-            (to-left (car -to-pair))
-            (to-right (cdr -to-pair)))
-        (save-excursion
-          (goto-char -end)
-          (let ((rl (length from-right)))
-            (when (equal (buffer-substring-no-properties
-                          (max (point-min) (- (point) rl)) (point))
-                         from-right)
-              (delete-char (- rl))))
-          ;; Insert right
-          (when to-right (insert to-right))
-          (goto-char -beg)
-          (let ((ll (length from-left)))
-            (when (equal (buffer-substring-no-properties
-                          (point) (min (point-max) (+ (point) ll)))
-                         from-left)
-              (when ymacs-editor--suround-origin-pos
-                (cl-decf ymacs-editor--suround-origin-pos ll))
-              (delete-char ll)))
-          ;; Insert left
-          (when to-left
-            (when ymacs-editor--suround-origin-pos
-              (cl-incf ymacs-editor--suround-origin-pos (length to-left)))
-            (insert to-left))))
-      ;; Restore original point
-      (when ymacs-editor--suround-origin-pos
-        (goto-char ymacs-editor--suround-origin-pos)))))
 
 ;;;###autoload
 (defun ymacs-editor/iedit-mode (-arg)

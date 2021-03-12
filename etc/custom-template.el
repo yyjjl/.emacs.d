@@ -35,7 +35,6 @@
 
 
 (load-feature! core/default)
-(load-feature! core/ui)
 (load-feature! core/popup)
 (load-feature! core/editor)
 (load-feature! core/term)

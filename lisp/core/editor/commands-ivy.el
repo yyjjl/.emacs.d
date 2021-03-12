@@ -66,6 +66,21 @@
 
 ;;* ripgrep
 
+(defun ymacs-editor//rg-default-alias ()
+  "Return the default alias by matching alias globs with the buffer file name."
+  (when-let* ((buffer-name
+               (or (buffer-file-name)
+                   (replace-regexp-in-string "<[0-9]+>\\'" "" (buffer-name))))
+              (filename
+               (and buffer-name
+                    (stringp buffer-name)
+                    (file-name-nondirectory buffer-name))))
+    (cl-find-if
+     (lambda (alias)
+       (string-match (mapconcat 'wildcard-to-regexp (cdr alias) "\\|")
+                     filename))
+     ymacs-editor-rg-type-aliases)))
+
 (defun ymacs-editor//rg-in-directory (&optional -args -directory -extra-args)
   (interactive (list (transient-args 'ymacs-editor/rg) nil nil))
 
@@ -144,7 +159,7 @@
   (setq ymacs-editor-ivy--last-text nil)
   (if current-prefix-arg
       (transient-setup 'ymacs-editor/rg)
-    (let ((default-directory (ymacs-default//project-root-or-default)))
+    (let ((default-directory (ymacs-editor//project-root-or-default)))
       (ymacs-editor//rg))))
 
 ;;;###autoload

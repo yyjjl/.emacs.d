@@ -2,9 +2,10 @@
 
 (require-packages! haskell-mode)
 
-(add-to-list
- 'ymacs-default-input-method-alist
- '(haskell-mode haskell-unicode-input-method haskll-unicode))
+(ymacs-editor//set-input-method
+ :mode haskell-mode
+ :ime haskell-unicode-input-method
+ :package haskell-unicode)
 
 (eval-when-has-feature! debug
   (add-to-list 'ymacs-debugger-alist '(haskell-mode haskell-debug)))

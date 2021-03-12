@@ -1,17 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
 
-(defmacro when! (-cond &rest -body)
-  "Similary to `when', but -COND is eval during byte-compiling."
-  (declare (indent 1) (debug t))
-  `(if! ,-cond (progn ,@-body)))
-
-(defmacro if! (-cond -if-statement &rest -else-body)
-  "Similary to `if', but -COND is eval during byte-compiling."
-  (declare (indent 2) (debug t))
-  (if (eval -cond)
-      -if-statement
-    `(progn ,@-else-body)))
-
 (when! ymacs-editor-use-childframe-p
   (defvar ymacs-editor-doc-buffer "*lsp-signature*")
 
@@ -46,9 +34,15 @@
            :height 6
            :width (min 150 (max 80 (/ (* (frame-width) 3) 4)))
            :border-width 10)
-        (posframe-hide ymacs-editor-doc-buffer)))))
+
+        (eval-if-has-feature! lsp
+            (unless (and (bound-and-true-p lsp-mode)
+                         (and lsp--hover-saved-bounds (lsp--point-in-bounds-p lsp--hover-saved-bounds)))
+              (posframe-hide ymacs-editor-doc-buffer))
+          (posframe-hide ymacs-editor-doc-buffer))))))
 
 (after! eldoc
+  (setq-default eldoc-documentation-function #'eldoc-documentation-compose-eagerly)
+
   (when! ymacs-editor-use-childframe-p
-    (setq-default eldoc-message-function #'ymacs-editor//eldoc-message))
-  (setq-default eldoc-documentation-function #'eldoc-documentation-compose-eagerly))
+    (setq-default eldoc-message-function #'ymacs-editor//eldoc-message)))

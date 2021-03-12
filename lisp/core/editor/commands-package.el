@@ -6,14 +6,14 @@
 (declare-function native-comp-available-p "comp")
 
 ;;;###autoload
-(defun ymacs-default/generate-autoloads ()
+(defun ymacs-editor/generate-autoloads ()
   (interactive)
   (require 'autoload)
 
   (let ((pattern "\\`commands\\(-[^\\.]*\\)?\\.el\\'")
         (success-count 0)
         (failed-count 0))
-    (with-current-buffer (find-file-noselect ymacs-default-autoloads-file)
+    (with-current-buffer (find-file-noselect ymacs-autoloads-file)
       (erase-buffer)
       (cl-loop
        for (_ . feature) in ymacs-loaded-features
@@ -30,16 +30,16 @@
     (print! "> Autoload for %d files generated, %d files failed\n" success-count failed-count)
 
     (when (called-interactively-p 'interactive)
-      (load ymacs-default-autoloads-file))))
+      (load ymacs-autoloads-file))))
 
 ;;;###autoload
-(defun ymacs-default/compile-elpa-packages (&optional -no-message)
+(defun ymacs-editor/compile-elpa-packages (&optional -no-message)
   (interactive)
   (let ((inhibit-message -no-message))
     (byte-recompile-directory package-user-dir 0)))
 
 ;;;###autoload
-(defun ymacs-default/compile-config ()
+(defun ymacs-editor/compile-config ()
   (interactive)
   (dolist (file (cl-remove-duplicates
                  (append

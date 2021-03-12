@@ -69,7 +69,7 @@ If not try to complete."
   (interactive
    (list
     (read-directory-name "Create venv in: "
-                         (ymacs-default//project-root)
+                         (ymacs-editor//project-root)
                          nil :mustmatch)
     (read-shell-command "Python executable: " "python")
     (when current-prefix-arg
@@ -94,7 +94,7 @@ If not try to complete."
      (list
       (cond ((= arg 0) default-directory)
             ((= arg 16) (read-directory-name "Directory: "))
-            (t (ymacs-default//project-root-or-default))))))
+            (t (ymacs-editor//project-root-or-default))))))
   (let ((source-buffer (current-buffer))
         (buffer (process-buffer (ymacs-python//get-or-create-process -directory t))))
     (with-current-buffer buffer

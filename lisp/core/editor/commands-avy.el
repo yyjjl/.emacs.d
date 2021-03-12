@@ -1,5 +1,27 @@
 ;;; -*- lexical-binding: t; -*-
 
+;;;###autoload
+(defun ymacs-editor/goto-char-or-minibuffer ()
+  "If minibuffer-window is active and not selected, select it.
+If current-prefix-arg == (16), jump to first char before (point) in current line.
+If current-prefix-arg is non-nol, jump to first char after (point) in current line.
+Otherwise call `avy-goto-char-in-line'
+"
+  (interactive)
+  (let ((window (active-minibuffer-window)))
+    (cond
+     ((and window (not (eq window (selected-window))))
+      (select-window window))
+     (current-prefix-arg
+      (if (equal current-prefix-arg '(16))
+          (search-backward (char-to-string (read-char "backward to char:"))
+                           (line-beginning-position))
+        (search-forward (char-to-string (read-char "forward to char:"))
+                        (line-end-position))))
+     ((let ((avy-single-candidate-jump t)
+            (avy-all-windows nil))
+        (call-interactively #'avy-goto-char-in-line))))))
+
 (defun ymacs-editor//avy-action-copy--prompt ()
   (format
    "%s to kill, %s/%s/%s to copy, %s/%s to expand/reset: %s"

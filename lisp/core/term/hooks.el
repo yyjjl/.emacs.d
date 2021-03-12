@@ -62,6 +62,12 @@
   (define-hook! ymacs-term//comint-setup (comint-mode-hook)
     (company-mode 1)
 
+    ;; But don't show trailing whitespace in SQLi, inf-ruby etc.
+    (setq show-trailing-whitespace nil)
+    (setq-local company-idle-delay nil)
+
+    (local-set-key [remap completion-at-point] #'company-complete)
+
     (when (string-match-p "inferior\\|interactive" (symbol-name major-mode))
       (local-set-key (kbd "M-}") #'ymacs-term/next)
       (local-set-key (kbd "M-{") #'ymacs-term/prev)

@@ -1,4 +1,4 @@
-;; -*- lexical-binding: t; -*-
+;;; -*- lexical-binding: t; -*-
 
 (defvar ymacs-x-mode)
 (defvar-local ymacs-x--keymap-alist nil)
@@ -249,7 +249,6 @@
 
     (setq ymacs-x--activated nil)))
 
-;;;###autoload
 (define-minor-mode ymacs-x-mode
   "use X as leader key"
   :group 'ymacs-x
@@ -270,7 +269,6 @@
   (unless (minibufferp)
     (ymacs-x-mode 1)))
 
-;;;###autoload
 (define-globalized-minor-mode ymacs-x-global-mode ymacs-x-mode ymacs-x//mode-predicate
   :group 'ymacs-x
   (if ymacs-x-global-mode
@@ -279,8 +277,7 @@
 
 (defun ymacs-x/warn ()
   (interactive)
-  (message "Please press %s again"
-           (key-description (this-command-keys))))
+  (message "Please press %s again" (key-description (this-command-keys))))
 
 (defun ymacs-x/just-x ()
   (interactive)
@@ -308,7 +305,6 @@
        (put def 'ymacs-x-exit 'no)))
    which-key-C-h-map))
 
-;;;###autoload
 (defun ymacs-x//enable ()
   (define-key universal-argument-map "u" #'universal-argument-more)
   (ymacs-x//set-ivy-minibuffer-map)
@@ -322,3 +318,4 @@
 
   (advice-remove 'wgrep-change-to-wgrep-mode #'ymacs-x//update-dynamic-keymap)
   (ymacs-x-global-mode -1))
+

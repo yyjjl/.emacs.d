@@ -52,10 +52,10 @@
     ("v" shrink-window "shrink")
     ("n" balance-windows "balance"))
    "Split"
-   (("H" ymacs-window/split-horizontally "horizontally")
-    ("V" ymacs-window/split-vertically "vertically")
-    ("|" ymacs-window/force-split-horizontally "force horizontally ")
-    ("_" ymacs-window/force-split-vertically "force vertically "))
+   (("H" ymacs-editor/window-split-horizontally "horizontally")
+    ("V" ymacs-editor/window-split-vertically "vertically")
+    ("|" ymacs-editor/window-force-split-horizontally "force horizontally ")
+    ("_" ymacs-editor/window-force-split-vertically "force vertically "))
    "Zoom"
    (("+" text-scale-increase "in")
     ("=" text-scale-increase "in")

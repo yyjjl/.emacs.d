@@ -48,6 +48,9 @@ hasn't to runs those regexps against the filename.")
   (expand-file-name "bin" user-emacs-directory)
   "Some scripts are in this directory")
 
+(defconst ymacs-autoloads-file (expand-file-name "autoloads.el" ymacs-cache-direcotry)
+  "Autoloads file")
+
 ;; Add `ymacs-config-directory' to `load-path'
 (add-to-list 'load-path ymacs-config-directory)
 

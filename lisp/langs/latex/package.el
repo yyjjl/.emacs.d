@@ -15,9 +15,10 @@
 (eval-when-has-feature! lsp
   (ymacs-lsp//register-client 'texlab :package 'lsp-tex))
 
-(add-to-list
- 'ymacs-editor-narrow-dwim-alist
- '(latex-mode LaTeX-narrow-to-environment ymacs-latex/narrow-to-section))
+(ymacs-editor//set-narrow-handler
+ :mode latex-mode
+ :fn1 LaTeX-narrow-to-environment
+ :fn2 ymacs-latex/narrow-to-section)
 
 (autoload 'LaTeX-math-mode "latex" nil t)
 

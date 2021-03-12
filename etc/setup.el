@@ -45,12 +45,13 @@
   (setq after-init-hook nil)
   (setq enable-local-variables :all)
 
-  (when (file-exists-p ymacs-default-autoloads-file)
-    (delete-file ymacs-default-autoloads-file))
+  (when (file-exists-p ymacs-autoloads-file)
+    (delete-file ymacs-autoloads-file))
 
-  (ymacs-default//after-init)
+  (ymacs-editor//after-init-1)
+  (ymacs-editor//after-init-2)
 
   (setq ymacss-compile-config-in-progress t)
 
-  (ymacs-default/compile-config)
-  (ymacs-default/compile-elpa-packages))
+  (ymacs-editor/compile-config)
+  (ymacs-editor/compile-elpa-packages))

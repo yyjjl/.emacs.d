@@ -1,6 +1,39 @@
 ;;; -*- lexical-binding: t; -*-
 
-(defalias 'top 'proced)
+(defvar ymacs-editor-external-file-regexp
+  (eval-when-compile
+    (let ((extentions '("pdf" "djvu" "dvi"
+                        "odf" "odg" "odp" "ods" "odt"
+                        "docx?" "xlsx?" "pptx?"
+                        "mkv" "avi" "mp4" "rmvb")))
+      (rx-to-string
+       `(and "."
+             (or ,@extentions ,@(mapcar #'upcase extentions))
+             string-end)))))
+
+(defun ymacs-editor//external-file-handler (_op &rest -args)
+  (let ((file (car -args))
+        (process-connection-type nil))
+    (recentf-add-file file)
+    (kill-buffer)
+    (if (fboundp #'counsel-find-file-extern)
+        (progn
+          (counsel-find-file-extern file)
+          (message "Opened %s externally" file))
+      (message "Don't know how to open %s" file))))
+
+(defun ymacs-editor//bookmark-setup ()
+  (unless (file-remote-p default-directory)
+    ;; Setup default bookmark
+    (setq bookmark-current-bookmark
+          (ignore-errors
+            (cl-loop for (name . record) in bookmark-alist
+                     when (equal (file-truename (buffer-file-name))
+                                 (file-truename (bookmark-get-filename name)))
+                     return name)))))
+
+(put 'ymacs-editor//external-file-handler 'safe-magic t)
+(put 'ymacs-editor//external-file-handler 'operations '(insert-file-contents))
 
 (setq he-dabbrev-chars "0-9a-zA-Z\\?!_")
 (setq-default hippie-expand-try-functions-list
@@ -18,12 +51,6 @@
 (after! calc
   (add-to-list 'calc-language-alist '(org-mode . latex)))
 
-(after! compile
-  (setq-default compilation-environment '("TERM=xterm-256color"))
-  ;; kill compilation process before starting another
-  (setq compilation-always-kill t)
-  (setq compilation-scroll-output t))
-
 (after! isearch
   (define-key! :map isearch-mode-map
     ("C-o" . isearch-occur)))
@@ -31,20 +58,12 @@
 (after! speedbar
   (setq speedbar-use-images nil))
 
-(after! savehist
-  (setq savehist-autosave-interval 3000))
-
-(after! recentf
-  (setq recentf-max-saved-items 2048)
-  (setq recentf-exclude
-        '("\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
-          "\\.\\(?:gz\\|gif\\|svg\\|png\\|jpe?g\\|bmp\\|xpm\\)$"
-          "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
-          "^/tmp/" "^/var/folders/.+$"
-          (lambda (file)
-            (file-in-directory-p file package-user-dir)))))
-
 (after! ediff
+  (add-hook 'ediff-before-setup-hook
+            (lambda () (window-configuration-to-register :ediff-windows)))
+  (add-hook 'ediff-quit-hook
+            (lambda () (jump-to-register :ediff-windows)))
+
   (setq ediff-split-window-function 'split-window-horizontally)
   (setq ediff-window-setup-function 'ediff-setup-windows-plain))
 
@@ -54,9 +73,11 @@
   ;; Setup for existing buffers
   (dolist (buffer (buffer-list))
     (with-current-buffer buffer
-      (ymacs-default//bookmark-setup))))
+      (ymacs-editor//bookmark-setup))))
 
 (after! ffap
+  (advice-add #'ffap-guesser :around #'ignore-remote!)
+
   ;; do not use ping, it's very slow
   (setq ffap-machine-p-known 'reject))
 
@@ -90,10 +111,10 @@
   (define-key! :map xref--xref-buffer-mode-map
     ("M-n" . next-error)
     ("M-p" . previous-error)
-    ("j"  (defun ymacs-default/xref-next ()
-             (interactive)
-             (xref--search-property 'xref-item)))
-    ("k" (defun ymacs-default/xref-prev ()
+    ("j" (defun ymacs-editor/xref-next ()
+           (interactive)
+           (xref--search-property 'xref-item)))
+    ("k" (defun ymacs-editor/xref-prev ()
            (interactive)
            (xref--search-property 'xref-item t))))
 
@@ -102,18 +123,6 @@
 (after! grep
   (setq grep-highlight-matches t)
   (setq grep-scroll-output t))
-
-(after! flymake
-  (define-key! :map flymake-mode-map
-    ("C-c f l" . flymake-show-diagnostics-buffer))
-
-  (define-key! :map flymake-diagnostics-buffer-mode-map
-    ("n" . next-line)
-    ("j" . next-line)
-    ("p" . previous-line)
-    ("k" . previous-line))
-
-  (setq-default flymake-diagnostic-functions nil))
 
 (after! info
   (setq info-lookup-other-window-flag nil))
@@ -131,8 +140,7 @@
         (append so-long-target-modes
                 '(flyspell-mode
                   eldoc-mode
-                  auto-composition-mode)))
-  (setq so-long-predicate #'ymacs-default//buffer-has-long-lines-p))
+                  auto-composition-mode))))
 
 (after! prolog
   (setq prolog-system 'swi))
@@ -153,3 +161,25 @@
 (after! winner
   (setq winner-boring-buffers-regexp "^ \\*"))
 
+
+(after! fcitx
+  ;; Init fcitx prefix keys
+  (setq fcitx-use-dbus nil)
+  (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c" "C-z"))
+
+(after! iedit
+  (define-advice iedit-mode (:before (&rest _) disable-mc)
+    (when (bound-and-true-p multiple-cursors-mode)
+      (multiple-cursors-mode -1)))
+
+  (setq iedit-auto-narrow t))
+
+(after! multiple-cursors
+  (define-advice multiple-cursors-mode (:before (&rest _) disable-iedit)
+    (when (bound-and-true-p iedit-mode)
+      (iedit-mode -1))))
+
+(after! yasnippet
+  (setq yas-prompt-functions '(yas-completing-prompt))
+  (setq-default yas-indent-line 'fixed)
+  (setq yas-triggers-in-field nil))

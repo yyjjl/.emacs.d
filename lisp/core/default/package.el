@@ -3,122 +3,132 @@
 (option! package-use-gnutls t
   :type 'boolean)
 
-(option! default-project nil
-  :type 'string
-  :safe 'stringp)
+(defvar ymacs-modeline-segment-alist ())
+(defvar ymacs-modeline-vcs-max-length 12
+  "The maximum displayed length of the branch name of version control.")
 
-(defvar ymacs-default-project-cache (make-hash-table :test #'equal))
-(defvar ymacs-default-project-invalidate-cache-empty-vars
-  '((ymacs-modeline--buffer-file-name . nil)
-    (ymacs-modeline--vcs-state . nil)
-    (ymacs-modeline--project-detected-p . nil)
-    (ymacs-modeline--project-root . nil)))
+;;* Ensure modeline is inactive when Emacs is unfocused (and active otherwise)
+(declare-function face-remap-remove-relative 'face-remap)
+(defvar ymacs-modeline-remap-face-cookie nil)
 
-(defvar ymacs-default-visited-files-list nil)
+;;* Project caches
+(defvar-local ymacs-modeline--project-detected-p nil)
+(defvar-local ymacs-modeline--project-root nil)
+(defvar-local ymacs-modeline--project-parent-path nil)
 
-(defvar ymacs-default-autoloads-file (expand-cache! "autoloads.el")
-  "Autoloads file")
+;;* Buffer information
+(defvar-local ymacs-modeline--remote-host 'unset)
+(defvar-local ymacs-modeline--buffer-file-name nil)
 
-(defvar ymacs-default-autosave-interval 300)
-(defvar ymacs-default-autosave-hook
-  '(recentf-save-list
-    save-place-kill-emacs-hook))
+;;* Buffer encoding
+(defvar-local ymacs-modeline--buffer-encoding nil)
 
-(defvar ymacs-default-input-method-alist ())
+;;* VCS
+(defvar-local ymacs-modeline--vcs-state nil)
 
-(defvar ymacs-default-savehist-exclude-variables
-  '(load-history
-    register-alist
-    vc-comment-ring
-    flyspell-auto-correct-ring
-    org-mark-ring
-    mark-ring
-    global-mark-ring
-    planner-browser-file-display-rule-ring))
+;;* Checker
+(defvar-local ymacs-modeline--checker-state nil)
 
-(defvar ymacs-default-next-error-buffer-modes
-  '(occur-mode
-    grep-mode
-    ivy-occur-mode
-    xref--xref-buffer-mode
-    compilation-mode))
+;;* LSP
+(defvar-local ymacs-modeline--lsp-state nil)
 
-(defvar ymacs-default-external-file-regexp
-  (eval-when-compile
-    (let ((extentions '("pdf" "djvu" "dvi"
-                        "odf" "odg" "odp" "ods" "odt"
-                        "docx?" "xlsx?" "pptx?"
-                        "mkv" "avi" "mp4" "rmvb")))
-      (rx-to-string
-       `(and "."
-             (or ,@extentions ,@(mapcar #'upcase extentions))
-             string-end)))))
+(defface ymacs-modeline-buffer-path
+  '((t (:inherit (mode-line-emphasis bold))))
+  "Face used for the dirname part of the buffer path."
+  :group 'mode-line-faces)
 
-(autoload 'ansi-color-apply-on-region "ansi-color")
-(autoload 'ymacs-default/generate-autoloads (expand! "commands-package") nil t)
+(defface ymacs-modeline-buffer-file
+  '((t (:inherit mode-line-buffer-id)))
+  "Face used for the filename part of the mode-line buffer path."
+  :group 'mode-line-faces)
 
-(declare-function winner-undo 'winner)
-(declare-function winner-redo 'winner)
+(defface ymacs-modeline-buffer-modified
+  '((t (:inherit (error bold) :background nil)))
+  "Face used for the 'unsaved' symbol in the mode-line."
+  :group 'mode-line-faces)
 
-(define-key! :prefix "C-x"
-  ("'")                                 ; unbind
-  ("2" . ymacs-window/split-vertically)
-  ("3" . ymacs-window/split-horizontally)
-  ("|" . ymacs-window/force-split-horizontally)
-  ("_" . ymacs-window/force-split-vertically)
+(defface ymacs-modeline-buffer-major-mode
+  '((t (:inherit (mode-line-emphasis bold))))
+  "Face used for the major-mode segment in the mode-line."
+  :group 'mode-line-faces)
 
-  (("C-b" "B") . ibuffer)
+(defface ymacs-modeline-project-dir
+  '((t (:inherit (font-lock-string-face bold))))
+  "Face used for the project directory of the mode-line buffer path."
+  :group 'mode-line-faces)
 
-  ("m" . view-echo-area-messages)
-  ("w w" . ymacs-default/move-buffer)
+(defface ymacs-modeline-panel
+  '((t (:inherit mode-line-highlight)))
+  "Face for 'X out of Y' segments, such as `iedit', etc."
+  :group 'mode-line-faces)
 
-  ("c" . ymacs-default/cleanup-buffer-safe)
-  (", -" . ymacs-default/copy-file-name)
-  (", r" . ymacs-default/restore-files)
+(defface ymacs-modeline-host
+  '((t (:inherit italic)))
+  "Face for remote hosts in the mode-line."
+  :group 'mode-line-faces)
 
-  ("R" . ymacs-default/rename-this-file-and-buffer)
-  ("W" . ymacs-default/copy-this-file)
-  ("D" . ymacs-default/delete-this-file)
+(defface ymacs-modeline-input-method
+  '((t (:inherit (mode-line-emphasis bold))))
+  "Face for input method in the mode-line."
+  :group 'mode-line-faces)
 
-  ("G" . revert-buffer)
-  ("I" . clone-indirect-buffer)
+(defface ymacs-modeline-debug
+  '((t (:inherit (font-lock-doc-face bold) :slant normal)))
+  "Face for debug-level messages in the mode-line. Used by vcs, checker, etc."
+  :group 'mode-line-faces)
 
-  ("w [" . winner-undo)
-  ("w ]" . winner-redo))
+(defface ymacs-modeline-info
+  '((t (:inherit (success bold))))
+  "Face for info-level messages in the mode-line. Used by vcs, checker, etc."
+  :group 'mode-line-faces)
 
-(define-key!
-  ("M-s f" . ymacs-default/font-faces-at-point)
-  ("M-s o" . ymacs-default/occur-dwim)
+(defface ymacs-modeline-warning
+  '((t (:inherit (warning bold))))
+  "Face for warnings in the mode-line. Used by vcs, checker, etc."
+  :group 'mode-line-faces)
 
-  ("C-<down>" . text-scale-decrease)
-  ("C-<up>" . text-scale-increase)
+(defface ymacs-modeline-urgent
+  '((t (:inherit (error bold))))
+  "Face for errors in the mode-line. Used by vcs, checker, etc."
+  :group 'mode-line-faces)
 
-  ("RET" . newline-and-indent)
+(defface ymacs-modeline-bar
+  '((t (:inherit highlight)))
+  "The face used for the left-most bar in the mode-line of an active window."
+  :group 'mode-line-faces)
 
-  ("M-/" . hippie-expand)
+(defface ymacs-modeline-bar-inactive
+  `((t (:background ,(face-foreground 'mode-line-inactive))))
+  "The face used for the left-most bar in the mode-line of an inactive window."
+  :group 'mode-line-faces)
 
-  ("M-n" . next-error)
-  ("M-p" . previous-error)
-  ("M-N" . ymacs-default/select-error-buffer))
+(defface ymacs-modeline-debug-visual
+  '((((class color) (background light))
+     (:background "#D4843E"))
+    (((class color) (background dark))
+     (:background "#915B2D")))
+  "Face to use for the mode-line while debugging."
+  :group 'ymacs-modeline)
 
-(define-key! :map indent-rigidly-map
-  ("[" . indent-rigidly-left)
-  ("]" . indent-rigidly-right)
-  ("{" . indent-rigidly-left-to-tab-stop)
-  ("}" . indent-rigidly-right-to-tab-stop))
+(defface ymacs-modeline-lsp-success
+  '((t (:inherit success :weight normal)))
+  "Face for LSP success state."
+  :group 'mode-line-faces)
 
-(define-key! :map special-mode-map
-  ("u" . scroll-down-command)
-  ("y" . scroll-down-line)
-  ("e" . scroll-up-line))
+(defface ymacs-modeline-lsp-warning
+  '((t (:inherit warning :weight normal)))
+  "Face for LSP warning state."
+  :group 'mode-line-faces)
 
-(put 'scroll-left 'disabled nil)
-(put 'narrow-to-region 'disabled nil)
-(put 'narrow-to-page 'disabled nil)
-(put 'narrow-to-defun 'disabled nil)
-(put 'erase-buffer 'disabled nil)
-(put 'list-timers 'disabled nil)
-(put 'list-threads 'disabled nil)
+(defface ymacs-modeline-lsp-error
+  '((t (:inherit error :weight normal)))
+  "Face for LSP error state."
+  :group 'mode-line-faces)
+
+(defface ymacs-modeline-buffer-timemachine
+  '((t (:inherit (ymacs-modeline-buffer-file italic underline))))
+  "Face for timemachine status."
+  :group 'mode-line-faces)
 
 (with-no-warnings
   (setq TeX-auto-global (expand-cache! "auctex/"))

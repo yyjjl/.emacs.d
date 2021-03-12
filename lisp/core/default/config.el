@@ -96,8 +96,6 @@
 (setq read-process-output-max (* 2 1024 1024))
 (setq large-file-warning-threshold (* 512 1024 1024))
 
-(setq next-error-find-buffer-function #'ymacs-default//next-error-find-buffer)
-
 ;; be quiet at startup; don't load or display anything unnecessary
 (setq inhibit-startup-screen t)
 (setq inhibit-startup-echo-area-message t)
@@ -107,9 +105,120 @@
               emacs-version
               (or user-login-name "anonymous")))
 
-(put 'ymacs-default//external-file-handler 'safe-magic t)
-(put 'ymacs-default//external-file-handler 'operations '(insert-file-contents))
+
 
-(load (expand! "config-package.el") nil t)
-(load (expand! "config-project.el") nil t)
-(load (expand! "config-misc.el") nil t)
+(setq-default mode-line-buffer-identification '("%b"))
+
+(blink-cursor-mode -1)
+(tooltip-mode -1)
+(window-divider-mode -1)
+
+(setq echo-keystrokes 1)
+
+;; paren
+(setq blink-matching-paren nil)
+(setq show-paren-when-point-inside-paren t)
+(setq show-paren-when-point-in-periphery t)
+
+(setq uniquify-buffer-name-style 'forward)
+(setq uniquify-after-kill-buffer-p t)
+(setq uniquify-ignore-buffers-re "^\\*")
+(setq uniquify-min-dir-content 3)
+
+(with-no-warnings
+  (when sys/macp
+    ;; Render thinner fonts
+    (setq ns-use-thin-smoothing t)
+    ;; Don't open a file in a new frame
+    (setq ns-pop-up-frames nil)))
+
+(ignore-errors
+  (set-fringe-bitmap-face 'right-curly-arrow 'warning)
+  (set-fringe-bitmap-face 'left-curly-arrow 'warning)
+  (set-fringe-bitmap-face 'right-triangle 'error)
+  (dolist (bitmap '(right-arrow left-arrow up-arrow down-arrow))
+    (set-fringe-bitmap-face bitmap 'compilation-info)))
+
+(setq widget-image-enable nil)
+
+;; Don't display line number in mode line when buffer is too large
+(setq line-number-display-limit ymacs-large-buffer-limit)
+
+;; Update ui less often
+(setq idle-update-delay 2)
+;; Suppress GUI features
+(setq use-file-dialog nil)
+(setq use-dialog-box nil)
+;; Disable bidirectional text for tiny performance boost
+(setq-default bidi-display-reordering nil)
+(setq bidi-inhibit-bpa t)
+(setq frame-resize-pixelwise t)
+
+(setq cursor-in-non-selected-windows t)
+(setq highlight-nonselected-windows t)
+
+(setq-default indicate-buffer-boundaries nil)
+(setq-default indicate-empty-lines nil)
+
+;; Minibuffer resizing
+(setq-default max-mini-window-height 0.25)
+(setq-default resize-mini-windows 'grow-only)
+
+(setq split-width-threshold 120)
+(setq-default line-spacing 0.25)
+
+;; Defer jit font locking slightly to [try to] improve Emacs performance
+;; (setq-default jit-lock-defer-time 0.3)
+(setq jit-lock-defer-time nil)
+(setq jit-lock-stealth-nice 0.5)
+(setq jit-lock-stealth-time 5)
+(setq jit-lock-stealth-verbose nil)
+
+;; flash the frame to represent a bell.
+(setq ring-bell-function #'ignore)
+(setq visible-bell t)
+
+
+
+(define-advice package-generate-autoloads (:after (-name -pkg-dir) autoclose)
+  "Auto close *-autoloads.el after a package installed."
+  (when-let ((name (format "%s-autoloads.el" (if (symbolp -name)
+                                                 (symbol-name -name)
+                                               -name)))
+             (buffer (find-file-existing (expand-file-name name -pkg-dir))))
+    (when-let (window (get-buffer-window buffer))
+      (quit-window 'kill window))))
+
+(define-advice package--save-selected-packages (:override (-value) dont-save)
+  (when -value
+    (setq package-selected-packages -value))
+  (unless after-init-time
+    (add-hook 'after-init-hook #'package--save-selected-packages)))
+
+(setq package-quickstart t)
+(with-no-warnings
+  (setq package-native-compile t))
+
+(setq package-archives
+      '(("gnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+        ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
+
+(package-initialize)
+
+(unless ymacs-package-use-gnutls-p
+  (dolist (item package-archives)
+    (setcdr item (replace-regexp-in-string "https:" "http:" (cdr item)))))
+
+(require-packages!
+ dash
+ monokai-theme)
+
+(require 'dash)
+
+(setq monokai-background "#1B1D1E")
+(setq monokai-height-plus-1 1.0)
+(setq monokai-height-plus-2 1.0)
+(setq monokai-height-plus-3 1.0)
+(setq monokai-height-plus-4 1.0)
+
+(load-theme 'monokai t)

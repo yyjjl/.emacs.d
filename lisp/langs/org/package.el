@@ -14,9 +14,10 @@
  ;; Export colorful src block in `org-mode'
  htmlize)
 
-(add-to-list
- 'ymacs-editor-narrow-dwim-alist
- '(org-mode org-narrow-to-subtree org-narrow-to-element))
+(ymacs-editor//set-narrow-handler
+ :mode org-mode
+ :fn1 org-narrow-to-subtree
+ :fn2 org-narrow-to-element)
 
 (defvar ymacs-org-remove-texfile t)
 

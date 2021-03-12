@@ -1,17 +1,17 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;;;###autoload
-(defun ymacs-default/invalid-project-cache ()
+(defun ymacs-editor/invalid-project-cache ()
   (interactive)
   (let ((project (project-current)))
     (unless project
       (user-error "No project is found"))
-    (setq ymacs-default-project-cache (clrhash ymacs-default-project-cache))
+    (setq ymacs-editor-project-cache (clrhash ymacs-editor-project-cache))
 
     (dolist (buffer (project--buffer-list project))
       (with-current-buffer buffer
         (cl-loop
-         for (var . val) in ymacs-default-project-invalidate-cache-empty-vars
+         for (var . val) in ymacs-editor-project-invalidate-cache-empty-vars
          when (local-variable-if-set-p var)
          do (set var val))))
 
@@ -20,10 +20,10 @@
   (recentf-cleanup))
 
 ;;;###autoload
-(defun ymacs-default/edit-dir-locals (&optional -directory)
+(defun ymacs-editor/edit-dir-locals (&optional -directory)
   "Edit or create a .dir-locals.el file of the project."
   (interactive
-   (list (let ((root (ymacs-default//project-root)))
+   (list (let ((root (ymacs-editor//project-root)))
            (or (and current-prefix-arg
                     (read-directory-name "Select root" root))
                root))))
