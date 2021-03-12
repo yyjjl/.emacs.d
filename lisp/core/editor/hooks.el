@@ -4,7 +4,6 @@
 
 (defun ymacs-editor//generic-setup ()
   (company-mode 1)
-  (yas-minor-mode 1)
   (hl-line-mode 1)
   (display-fill-column-indicator-mode 1)
 
