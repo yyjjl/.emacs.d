@@ -92,7 +92,7 @@
   ;; boost performance
   (setq lsp-enable-file-watchers nil)
 
-  (setq lsp-eldoc-render-all nil)
+  (setq lsp-eldoc-render-all ymacs-editor-use-childframe-p)
 
   ;; (setq lsp-enable-imenu t)
   ;; (setq lsp-enable-links t)
