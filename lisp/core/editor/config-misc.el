@@ -1,5 +1,9 @@
 ;;; -*- lexical-binding: t; -*-
 
+(defvar bookmark-alist)
+(defvar bookmark-current-bookmark)
+(declare-function bookmark-get-filename 'bookmark)
+
 (defvar ymacs-editor-external-file-regexp
   (eval-when-compile
     (let ((extentions '("pdf" "djvu" "dvi"

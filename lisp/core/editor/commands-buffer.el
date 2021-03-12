@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(declare-function windmove-find-other-window 'windmove)
+
 ;;;###autoload
 (defun ymacs-editor/create-scratch-buffer (&optional -major-mode)
   "Create a new scratch buffer to work in. (could be *scratch* - *scratchX*)."

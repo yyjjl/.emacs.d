@@ -7,9 +7,9 @@
   '(("Global"
      (t
       ("V"
-       (ymacs-ui/view-code-mode (if ymacs-ui/view-code-mode -1 1))
+       (ymacs-editor-view-code-mode (if ymacs-editor-view-code-mode -1 1))
        "View Code"
-       :toggle ymacs-ui/view-code-mode)
+       :toggle ymacs-editor-view-code-mode)
       ("E"
        toggle-debug-on-error
        "Debug on Error"

@@ -103,4 +103,4 @@
     (if (and (equal path "1")
              (eq 'visible (treemacs-current-visibility)))
         (treemacs-select-window)
-      (ymacs-ui/aw-select-window))))
+      (ymacs-editor/aw-select-window))))
