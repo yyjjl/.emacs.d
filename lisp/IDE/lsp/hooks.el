@@ -2,7 +2,7 @@
 
 (after! lsp-mode
   (define-hook! ymacs-lsp|after-open (lsp-after-open-hook)
-    (setq-local eldoc-documentation-function #'eldoc-documentation-compose-eagerly)
+    (remove-function (local 'eldoc-documentation-function) #'lsp-eldoc-function)
 
     (remove-hook 'eldoc-documentation-functions #'flymake-eldoc-function t)
     (add-hook 'eldoc-documentation-functions #'flymake-eldoc-function -20 t)
