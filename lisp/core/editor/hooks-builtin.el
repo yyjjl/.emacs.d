@@ -51,6 +51,7 @@
   (counsel-mode 1)
   (semantic-mode 1)
 
+  (yas-global-mode 1)
   (avy-setup-default)
   (ace-pinyin-global-mode 1)
 
