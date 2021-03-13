@@ -499,7 +499,7 @@ By default, this shows the information specified by `global-mode-string'."
 
 
 (ymacs-modeline//def-modeline main
-  (window-number matches buffer-info remote-host checker buffer-position major-mode vcs buffer-encoding))
+  (window-number matches buffer-position buffer-info remote-host checker major-mode vcs buffer-encoding))
 
 (ymacs-modeline//def-modeline shell
   (window-number matches buffer-info remote-host major-mode))
@@ -508,19 +508,19 @@ By default, this shows the information specified by `global-mode-string'."
   (window-number matches buffer-default-directory major-mode dired))
 
 (ymacs-modeline//def-modeline vcs
-  (window-number matches buffer-info buffer-position major-mode buffer-encoding))
+  (window-number matches buffer-position buffer-info major-mode buffer-encoding))
 
 (ymacs-modeline//def-modeline media
   (window-number buffer-size buffer-info media-info major-mode vcs))
 
 (ymacs-modeline//def-modeline message
-  (window-number matches buffer-info-simple buffer-position major-mode buffer-encoding))
+  (window-number matches buffer-position buffer-info-simple major-mode buffer-encoding))
 
 (ymacs-modeline//def-modeline org-src
-  (window-number matches buffer-info-simple buffer-position major-mode buffer-encoding))
+  (window-number matches buffer-position buffer-info-simple major-mode buffer-encoding))
 
 (ymacs-modeline//def-modeline timemachine
-  (window-number matches git-timemachine buffer-position major-mode buffer-encoding))
+  (window-number matches buffer-position git-timemachine major-mode buffer-encoding))
 
 (ymacs-modeline//def-modeline header
   (debug input-method misc-info))
