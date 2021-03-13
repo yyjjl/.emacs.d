@@ -84,11 +84,6 @@
      url
      store-path)))
 
-(defsubst ymacs-lsp//set-lsp-signature-width ()
-  (setq lsp-signature-posframe-params
-        (plist-put lsp-signature-posframe-params
-                   :width (max 60 (min (/ (frame-width) 2) (window-width))))))
-
 (defun ymacs-lsp//eldoc-function (-report-doc &rest _)
   (if (and lsp--hover-saved-bounds (lsp--point-in-bounds-p lsp--hover-saved-bounds))
       (funcall -report-doc lsp--eldoc-saved-message)
