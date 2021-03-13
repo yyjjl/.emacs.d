@@ -74,7 +74,34 @@
                              (concat (file-name-base dir-locals-file) "-2.el")))))
     (hack-dir-local-variables-for-project!)))
 
-(defun ymacs-editor//after-init-1 ()
+(defun ymacs-editor//generic-setup ()
+  (company-mode 1)
+  (hl-line-mode 1)
+  (display-fill-column-indicator-mode 1)
+
+  (page-break-lines-mode 1)
+
+  (when (not (derived-mode-p 'org-mode))
+    (hl-todo-mode 1))
+
+  (setq show-trailing-whitespace t)
+  (setq indicate-empty-lines t))
+
+(define-hook! ymacs-editor//generic-text-mode-setup (text-mode-hook)
+  (whitespace-mode 1)
+
+  (ymacs-editor//generic-setup))
+
+(define-hook! ymacs-editor//generic-prog-mode-setup (prog-mode-hook)
+  (condition-case err
+      (hs-minor-mode 1)
+    (user-error (message "%s" (error-message-string err))))
+
+  (ymacs-editor//generic-setup))
+
+(run-after-init! 0
+  (require 'lv)
+
   ;; Purges buffers which haven't been displayed in 3 days
   (midnight-mode 1)
   ;; (display-time-mode 1)
@@ -109,10 +136,7 @@
   (global-auto-revert-mode 1)
   ;;`eldoc', show API doc in minibuffer echo area enabled by default
   ;; (global-eldoc-mode 1)
-  (global-so-long-mode 1))
-
-(defun ymacs-editor//after-init-2 (&optional -frame)
-  (require 'lv)
+  (global-so-long-mode 1)
 
   (avy-setup-default)
   (ace-pinyin-global-mode 1)
@@ -126,88 +150,13 @@
   (ymacs-x//enable)
   (yas-global-mode 1)
 
-  ;; Setup autoloads and packages
-  (setq package-selected-packages ymacs-required-packages)
-
-  (unless (file-exists-p ymacs-autoloads-file)
-    (ymacs-editor/generate-autoloads))
-  (load ymacs-autoloads-file nil t)
-
-  (when! sys/macp
+  (eval-when! sys/macp
     (exec-path-from-shell-initialize))
 
   (when (display-graphic-p -frame)
     ;; Keep mouse at upper-right corner when typing
     ;; (mouse-avoidance-mode t)
 
-    (fcitx-aggressive-setup)
+    (fcitx-aggressive-setup))
 
-    (when! ymacs-editor-use-childframe-p
-      (company-posframe-mode 1))))
-
-(defun ymacs-editor//after-init-3 ()
-  ;; Restore `file-name-handler-alist' and `gc-cons-threshold'
-  (setq file-name-handler-alist
-        `((,ymacs-editor-external-file-regexp . ymacs-editor//external-file-handler) . ,ymacs-file-name-handler-alist))
-  (setq gc-cons-threshold ymacs-gc-cons-threshold)
-  (setq gc-cons-percentage 0.3)
-
-  ;; start server
-  (unless (or noninteractive (daemonp))
-    (require 'server)
-    (unless (server-running-p)
-      (server-start)))
-
-  ;; collect garbage after focus changes
-  (add-function
-   :after after-focus-change-function
-   (lambda ()
-     (unless (frame-focus-state)
-       (garbage-collect))))
-
-  (find-file-noselect (expand-cache! "org/*note*"))
-
-  (message "Init Time: %.3f (with %d packages activated)"
-           (float-time (time-subtract after-init-time before-init-time))
-           (length package-activated-list)))
-
-(defun ymacs-editor//after-init (&optional -frame)
-  (remove-hook 'after-make-frame-functions #'ymacs-editor//after-init)
-
-  (ymacs-editor//after-init-1)
-  (ymacs-editor//after-init-2 -frame)
-  (ymacs-editor//after-init-3)
-
-  (ymacs-modeline-set! default main))
-
-(add-hook (if (daemonp)
-              'after-make-frame-functions
-            'after-init-hook)
-          #'ymacs-editor//after-init
-          100)
-
-
-(defun ymacs-editor//generic-setup ()
-  (company-mode 1)
-  (hl-line-mode 1)
-  (display-fill-column-indicator-mode 1)
-
-  (page-break-lines-mode 1)
-
-  (when (not (derived-mode-p 'org-mode))
-    (hl-todo-mode 1))
-
-  (setq show-trailing-whitespace t)
-  (setq indicate-empty-lines t))
-
-(define-hook! ymacs-editor//generic-text-mode-setup (text-mode-hook)
-  (whitespace-mode 1)
-
-  (ymacs-editor//generic-setup))
-
-(define-hook! ymacs-editor//generic-prog-mode-setup (prog-mode-hook)
-  (condition-case err
-      (hs-minor-mode 1)
-    (user-error (message "%s" (error-message-string err))))
-
-  (ymacs-editor//generic-setup))
+  (find-file-noselect (expand-cache! "org/*note*")))

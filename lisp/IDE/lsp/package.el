@@ -1,5 +1,12 @@
 ;; -*- lexical-binding:t -*-
 
+(option! lsp-project-state :enabled
+  "Whether to enable lsp in current project"
+  :type '(choice
+          (const :tag "Enable LSP in current file" :enabled)
+          (const :tag "Disable LSP in current file" :disabled))
+  :safe #'(lambda (x) (memq x '(:enabled :disabled))))
+
 (option! lsp-use-dap nil
   "Where to use dap-mode"
   :type 'boolean)

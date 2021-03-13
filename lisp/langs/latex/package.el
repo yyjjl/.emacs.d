@@ -10,7 +10,7 @@
  (auctex :compile (latex tex preview reftex))
  auctex-latexmk)
 
-(executable! texlab :-exe [(expand-cache! "lsp/texlab") "texlab"])
+(executable! texlab :exe [(expand-cache! "lsp/texlab") "texlab"])
 
 (eval-when-has-feature! lsp
   (ymacs-lsp//register-client 'texlab :package 'lsp-tex))

@@ -39,3 +39,40 @@
 (ymacs-modeline-set! org-src org-src)
 (ymacs-modeline-set! git-timemachine timemachine)
 (ymacs-modeline-set! (prog text conf) header :header)
+
+(run-after-init! 100
+  ;; Start server
+  (unless (or noninteractive (daemonp))
+    (require 'server)
+    (unless (server-running-p)
+      (server-start)))
+
+  ;; Collect garbage after focus changes
+  (add-function
+   :after after-focus-change-function
+   (lambda ()
+     (unless (frame-focus-state)
+       (garbage-collect))))
+
+  ;; Autoloads
+  (unless (file-exists-p ymacs-autoloads-file)
+    (autoload 'ymacs-default/generate-autoloads (expand! "commands-package") nil t)
+    (ymacs-default/generate-autoloads))
+  (load ymacs-autoloads-file nil t)
+
+  ;; Restore `file-name-handler-alist' and `gc-cons-threshold'
+  (setq file-name-handler-alist
+        `((,ymacs-editor-external-file-regexp . ymacs-editor//external-file-handler)
+          ,@ymacs-file-name-handler-alist))
+  (setq gc-cons-threshold ymacs-gc-cons-threshold)
+  (setq gc-cons-percentage 0.3)
+
+  ;; Set default modeline
+  (ymacs-modeline-set! default main)
+
+  ;; Setup autoloads and packages
+  (setq package-selected-packages ymacs-required-packages)
+
+  (message "Init Time: %.3f (with %d packages activated)"
+           (float-time (time-subtract after-init-time before-init-time))
+           (length package-activated-list)))

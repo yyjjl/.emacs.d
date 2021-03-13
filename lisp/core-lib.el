@@ -2,7 +2,7 @@
 ;;
 ;; Copyright (C) 2015-2017 Free Software Foundation, Inc.
 ;;
-;; Author: yyj <yeyajie1229@gmail.com>
+;; Author: Zet <yeyajie1229@gmail.com>
 ;;; Commentary:
 ;;
 ;;; Code:
@@ -111,7 +111,7 @@
           (when (equal anwser "y")
             (funcall -function -item)))))))
 
-(cl-defmacro executable! (-name &key -exe -docstring -full-name)
+(cl-defmacro executable! (-name &key ((:exe -exe)) ((:doc -docstring)) ((:full-name -full-name)))
   "Define a variable which points to a executable named -EXE.
 
 Argument -EXE can also be a vector.
@@ -450,7 +450,13 @@ HTML file converted from org file, it returns t."
               (funcall -unwind))))))))
 
 (cl-defun run-compilation!
-    (&key -name -callback -error-callback -unwind -command -buffer-name (-comint t))
+    (&key ((:name -name))
+          ((:callback -callback))
+          ((:error-callback -error-callback))
+          ((:unwind -unwind))
+          ((:command -command))
+          ((:buffer-name -buffer-name))
+          ((:comint -comint) t))
   (let* ((buffer-name (cond (-buffer-name
                              (lambda (_) -buffer-name))
                             (-name
@@ -467,7 +473,12 @@ HTML file converted from org file, it returns t."
          (make-process-sentinel! -callback -error-callback -unwind sentinel))))))
 
 (cl-defun run-process!
-    (&key -name -program -program-args -callback -error-callback -unwind)
+    (&key ((:name -name))
+          ((:program -program))
+          ((:program-args -program-args))
+          ((:callback -callback))
+          ((:error-callback -error-callback))
+          ((:unwind -unwind)))
   (set-process-sentinel
    (apply #'start-process
           -name                         ; name
@@ -558,18 +569,6 @@ HTML file converted from org file, it returns t."
           `(with-no-warnings
              ,form))
       form)))
-
-(defmacro when! (-cond &rest -body)
-  "Similary to `when', but -COND is eval during byte-compiling."
-  (declare (indent 1) (debug t))
-  `(if! ,-cond (progn ,@-body)))
-
-(defmacro if! (-cond -if-statement &rest -else-body)
-  "Similary to `if', but -COND is eval during byte-compiling."
-  (declare (indent 2) (debug t))
-  (if (eval -cond)
-      -if-statement
-    `(progn ,@-else-body)))
 
 (defmacro load-feature! (-name)
   (let* ((feature-name (symbol-name -name))
@@ -669,27 +668,20 @@ HTML file converted from org file, it returns t."
             (car -collection))
         value))))
 
-(option! lsp-project-state :enabled
-  "Whether to enable lsp in current project"
-  :type '(choice
-          (const :tag "Enable LSP in current file" :enabled)
-          (const :tag "Disable LSP in current file" :disabled))
-  :safe #'(lambda (x) (memq x '(:enabled :disabled))))
+(defun run-after-init!--check-arg (-var -expr)
+  (or (eq -var -expr)
+      (when (consp -expr)
+        (or (run-after-init!--check-arg -var (car -expr))
+            (run-after-init!--check-arg -var (cdr -expr))))))
 
-(cl-defmacro try-enable-lsp!
-    (-name &key (-pre-init nil) (-condition t) (-init nil) (-fallback nil))
-  (declare (indent 1))
-  `(eval-if-has-feature! lsp
-       (progn
-         ,-pre-init
-         (with-transient-hook! (hack-local-variables-hook :local t)
-           (if (and ,-condition
-                    (eq ymacs-lsp-project-state :enabled)
-                    ,(let ((symbol (intern (format "ymacs-%s-lsp" -name))))
-                       `(not (and (boundp ',symbol)
-                                  (eq ,symbol :disabled))))
-                    (ignore-errors (lsp))
-                    (bound-and-true-p lsp-mode))
-               ,-init
-             ,-fallback)))
-     ,-fallback))
+(defmacro run-after-init! (-priority &rest -body)
+  (declare (indent 1) (debug t))
+  `(let ((hook-var (if (daemonp)
+                       'after-make-frame-functions
+                     'after-init-hook)))
+     (cl-labels ((ymacs-after-init (&optional ,(if (run-after-init!--check-arg '-frame -body)
+                                                   '-frame
+                                                 '_))
+                                   (remove-hook hook-var #'ymacs-after-init)
+                                   ,@-body))
+       (add-hook hook-var #'ymacs-after-init ,-priority))))

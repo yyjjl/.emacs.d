@@ -3,14 +3,14 @@
 (declare-function winner-ring "winner")
 (declare-function winner-undo "winner")
 
+(run-after-init! 100
+  (setq display-buffer-alist
+        '((ymacs-popup//match ymacs-popup//display-buffer-action))))
+
 (define-hook! (ymacs-popup//frame-setup &optional -frame)
   (window-setup-hook ;; when setup
    after-make-frame-functions)
   (set-frame-parameter -frame 'buffer-predicate #'ymacs-popup//buffer-predicate))
-
-(define-hook! ymacs-popup//after-init (after-init-hook)
-  (setq display-buffer-alist
-        '((ymacs-popup//match ymacs-popup//display-buffer-action))))
 
 (define-hook! (ymacs-popup//compilation-finish-hook -buffer _)
   (compilation-finish-functions)
@@ -36,8 +36,6 @@
 (defun keyboard-quit@autoclose (&rest _)
   "When `C-g' pressed, close latest opened popup window"
   (ymacs-popup//cleanup)
-  (when ymacs-editor-use-childframe-p
-    (posframe-hide-all))
   (when (and (called-interactively-p 'interactive)
              (not (region-active-p)))
     (let (window)

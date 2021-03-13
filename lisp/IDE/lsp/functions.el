@@ -4,6 +4,24 @@
 (declare-function flymake-diagnostic-type 'flymake)
 (declare-function flymake--lookup-type-property 'flymake)
 
+(defmacro ymacs-lsp//try-enable (-name)
+  `(and (eq ymacs-lsp-project-state :enabled)
+        ,(let ((symbol (intern (format "ymacs-%s-lsp" -name))))
+           `(not (and (boundp ',symbol)
+                      (eq ,symbol :disabled))))
+        (ignore-errors (lsp))
+        (bound-and-true-p lsp-mode)))
+
+(defmacro ymacs-lsp//try-enable-simple (-name &rest -condition)
+  (declare (indent 1))
+  (push '(is-buffer-suitable-for-coding!) -condition)
+  (if (null (cdr -condition))
+      (setq -condition (car -condition))
+    (setq -condition `(and . ,-condition)))
+  `(with-transient-hook! (hack-local-variables-hook :local t)
+     (when ,-condition
+       (ymacs-lsp//try-enable ,-name))))
+
 (defun ymacs-lsp//get-latest-url-from-github (-repo -matcher)
   (require 'url-handlers)
   (let* ((url (format "https://api.github.com/repos/%s/releases/latest" -repo))

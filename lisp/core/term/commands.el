@@ -9,9 +9,9 @@
                                 (plist-get -args :program-args)))
         (cmd (format (plist-get -args :cmd-fmt) (buffer-file-name))))
     (ymacs-term//exec-program-in-buffer (concat "Repl: " (buffer-name))
-      :-program program
-      :-program-args program-args
-      :-callback (lambda () (ymacs-term//send-string cmd)))))
+      :program program
+      :program-args program-args
+      :callback (lambda () (ymacs-term//send-string cmd)))))
 
 ;;;###autoload
 (defun ymacs-term/load-file-in-repl ()

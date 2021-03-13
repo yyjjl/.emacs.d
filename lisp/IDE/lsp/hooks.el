@@ -12,14 +12,6 @@
     (setq ymacs-editor-prefer-imenu-p t)
     (setq-local company-minimum-prefix-length 2))
 
-  (define-hook! ymacs-lsp//set-lsp-signature-frame-params (lsp-signature-mode-hook)
-    (setq lsp-signature-function
-          (if (and ymacs-editor-use-childframe-p
-                   (display-graphic-p))
-              #'lsp-signature-posframe
-            #'lsp-lv-message))
-    (ymacs-lsp//set-lsp-signature-width))
-
   (define-advice lsp--calculate-root (:around (-fn -session -file-name) use-truename)
     (funcall -fn -session (file-truename -file-name)))
 

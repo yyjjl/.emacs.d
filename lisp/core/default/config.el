@@ -165,7 +165,7 @@
 (setq-default resize-mini-windows 'grow-only)
 
 (setq split-width-threshold 120)
-(setq-default line-spacing 0.25)
+(setq-default line-spacing 0.1)
 
 ;; Defer jit font locking slightly to [try to] improve Emacs performance
 ;; (setq-default jit-lock-defer-time 0.3)
@@ -191,9 +191,7 @@
 
 (define-advice package--save-selected-packages (:override (-value) dont-save)
   (when -value
-    (setq package-selected-packages -value))
-  (unless after-init-time
-    (add-hook 'after-init-hook #'package--save-selected-packages)))
+    (setq package-selected-packages -value)))
 
 (setq package-quickstart t)
 (with-no-warnings

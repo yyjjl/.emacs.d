@@ -34,15 +34,15 @@
       (setq-local python-shell-interpreter "python3")
       (setq-local python-shell-interpreter-args "-i"))
 
-    (when (and (is-buffer-suitable-for-coding!)
-               (eq major-mode 'python-mode))
-      (try-enable-lsp! python
-        :-pre-init (ymacs-python//set-lsp-server)
-        :-init
-        (progn
-          (when (bound-and-true-p flymake-mode)
-            (remove-hook 'flymake-diagnostic-functions 'python-flymake t)
-            (remove-hook 'eldoc-documentation-functions 'python-eldoc-function t))
+    (eval-when-has-feature! lsp
+      (with-transient-hook! (hack-local-variables-hook :local t)
+        (ymacs-python//set-lsp-server)
+        (when (and (is-buffer-suitable-for-coding!)
+                   (eq major-mode 'python-mode)
+                   (ymacs-lsp//try-enable python))
+          (remove-hook 'eldoc-documentation-functions 'python-eldoc-function t)
+          (remove-hook 'flymake-diagnostic-functions 'python-flymake t)
+
           (setq ymacs-lsp-format-buffer-function #'ymacs-python/autopep8)
           (setq ymacs-lsp-organize-import-function #'py-isort-buffer)))))
 

@@ -41,6 +41,7 @@
 
 ;; (load-feature! IDE/lsp)
 ;; (load-feature! IDE/tree-sitter)
+;; (load-feature! IDE/childframe)
 
 (load-feature! tools/git)
 ;; (load-feature! tools/spell)

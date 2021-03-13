@@ -51,19 +51,20 @@
     (font-lock-add-keywords nil ymacs-cpp-font-lock-keywords)))
 
 (defun ymacs-cpp//cpp-setup ()
-  (when (is-buffer-suitable-for-coding!)
-    (try-enable-lsp! cpp
-      :-condition
-      (catch 'done
+  (eval-when-has-feature! lsp
+    (with-transient-hook! (hack-local-variables-hook :local t)
+      (if (and (is-buffer-suitable-for-coding!)
+               (catch 'done
+                 (dolist (build-system ymacs-cpp-build-systems)
+                   (when (ymacs-cpp//run-function lsp-enable-fn build-system)
+                     (setq-local ymacs-cpp-current-build-system build-system)
+                     (throw 'done t))))
+               (ymacs-lsp//try-enable cpp))
+          ;; lsp-mode is enabled
+          (progn
+            (when-let (command-fn (ymacs-cpp//get-function command-fn))
+              (cl-pushnew command-fn ymacs-editor-compile-command-functions))
+            (ymacs-cpp//run-function lsp-enable-handler))
+        ;; lsp-mode is disabled
         (dolist (build-system ymacs-cpp-build-systems)
-          (when (ymacs-cpp//run-function lsp-enable-fn build-system)
-            (setq-local ymacs-cpp-current-build-system build-system)
-            (throw 'done t))))
-      :-init
-      (progn
-        (when-let (command-fn (ymacs-cpp//get-function command-fn))
-          (cl-pushnew command-fn ymacs-editor-compile-command-functions))
-        (ymacs-cpp//run-function lsp-enable-handler))
-      :-fallback
-      (dolist (build-system ymacs-cpp-build-systems)
-        (ymacs-cpp//run-function lsp-disable-handler build-system)))))
+          (ymacs-cpp//run-function lsp-disable-handler build-system))))))

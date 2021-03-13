@@ -52,5 +52,6 @@
     (add-hook 'after-save-hook #'ymacs-latex//build-on-save nil t)
 
     (setq-local tab-width 2)
-    (when (is-buffer-suitable-for-coding!)
-      (try-enable-lsp! latex))))
+
+    (eval-when-has-feature! lsp
+      (ymacs-lsp//try-enable-simple latex))))

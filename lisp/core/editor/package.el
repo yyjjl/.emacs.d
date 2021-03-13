@@ -1,13 +1,9 @@
 ;;; -*- lexical-binding: t; -*-
 
 (executable! gls)
-(executable! ripgrep :-exe "rg")
-(executable! fdfind :-exe ["fdfind" "fd"])
-(executable! ctags :-exe "ctags-exuberant")
-
-(option! editor-use-childframe nil
-  "Whether to use childframe"
-  :type 'boolean)
+(executable! ripgrep :exe "rg")
+(executable! fdfind :exe ["fdfind" "fd"])
+(executable! ctags :exe "ctags-exuberant")
 
 (option! default-project nil
   :type 'list
@@ -30,7 +26,6 @@
  ;; `counsel-M-x' need amx to get history
  amx
  company
- (company-posframe :when ymacs-editor-use-childframe-p)
  ivy
  ivy-hydra
  pretty-hydra
@@ -80,8 +75,6 @@
 (autoload 'ymacs-hydra/window/shrink-window-horizontally (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/window/body (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/sort/body (expand! "commands-hydra") nil t)
-
-(autoload 'ymacs-editor/generate-autoloads (expand! "commands-package") nil t)
 
 (autoload 'xref-pulse-momentarily "xref")
 (autoload 'project-root "project")

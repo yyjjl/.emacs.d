@@ -131,6 +131,9 @@
 (after! info
   (setq info-lookup-other-window-flag nil))
 
+(after! eldoc
+  (setq-default eldoc-documentation-function #'eldoc-documentation-compose-eagerly))
+
 (after! so-long
   ;; reduce false positives w/ larger threshold
   (setq so-long-threshold 1000)

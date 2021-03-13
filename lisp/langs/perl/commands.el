@@ -59,5 +59,5 @@ If region is active, operate on it, else operate on line."
               (message "%s exists" link)
             (make-symbolic-link path link)))))
     (run-compilation!
-     :-name "Generate perl tags"
-     :-command "gtags -cv --statistics")))
+     :name "Generate perl tags"
+     :command "gtags -cv --statistics")))

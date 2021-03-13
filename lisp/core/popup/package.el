@@ -103,5 +103,3 @@
      ("d" . sdcv-search-word)
      ("b" . ymacs-popup/display-popup-window)
      ("RET" . ymacs-popup/fix-popup-window))))
-
-

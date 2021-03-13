@@ -36,11 +36,10 @@
          (build-directory (ymacs-cpp-cmake//config-build))
          (default-directory (or build-directory default-directory)))
     (run-process!
-     :-name "cmake"
-     :-program-args (list "-L" build-directory)
-     :-callback
-     (lambda (_)
-       (ymacs-cpp-cmake//set-cmake-options--callback buffer)))))
+     :name "cmake"
+     :program-args (list "-L" build-directory)
+     :callback (lambda (_)
+                 (ymacs-cpp-cmake//set-cmake-options--callback buffer)))))
 
 (defun ymacs-cpp-cmake//run-cmake (&optional -callback)
   (unless ymacs-cpp-cmake-project-root
@@ -61,10 +60,10 @@
         (user-error "Can not cd to build directory")))
 
     (run-compilation!
-     :-buffer-name (format "*CMake Config: %s*" ymacs-cpp-cmake-project-root)
-     :-command command
-     :-callback (when -callback
-                  (lambda (&rest _) (funcall -callback buffer))))))
+     :buffer-name (format "*CMake Config: %s*" ymacs-cpp-cmake-project-root)
+     :command command
+     :callback (when -callback
+                 (lambda (&rest _) (funcall -callback buffer))))))
 
 (defun ymacs-cpp-cmake//config-project--callback (-source-buffer)
   (with-current-buffer -source-buffer

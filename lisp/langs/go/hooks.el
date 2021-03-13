@@ -1,6 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
-(after! go-mode
-  (define-hook! ymacs-go//setup (go-mode-hook)
-    (when (is-buffer-suitable-for-coding!)
-      (try-enable-lsp! go))))
+(eval-when-has-feature! lsp
+  (after! go-mode
+    (define-hook! ymacs-go//setup (go-mode-hook)
+      (ymacs-lsp//try-enable-simple go))))

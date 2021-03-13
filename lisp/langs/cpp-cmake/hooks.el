@@ -2,6 +2,7 @@
 
 (after! cmake-mode
   (define-hook! ymacs-cpp-cmake//setup (cmake-mode-hook)
-    (when (is-buffer-suitable-for-coding!)
-      (try-enable-lsp! cmake
-        :-fallback (ymacs-editor//add-company-backend 'company-cmake)))))
+    (with-transient-hook! (hack-local-variables-hook :local t)
+      (unless (and (is-buffer-suitable-for-coding!)
+                   (ymacs-lsp//try-enable cmake))
+        (ymacs-editor//add-company-backend 'company-cmake)))))

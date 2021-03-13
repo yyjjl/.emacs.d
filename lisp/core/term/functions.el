@@ -195,7 +195,7 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
     (ymacs-term//create-buffer -program nil -full-name)))
 
 (cl-defun ymacs-term//exec-program-in-buffer
-    (-buffer-name &key -program -program-args (-callback nil))
+    (-buffer-name &key ((:program -program)) ((:program-args -program-args)) ((:callback -callback)))
   (declare (indent 1))
   (let* ((buffer-name (concat "*" -buffer-name "*"))
          (buffer (get-buffer-create buffer-name))

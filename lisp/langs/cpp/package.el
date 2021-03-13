@@ -4,7 +4,7 @@
   "clangd version"
   :type 'string)
 
-(executable! clangd :-exe [(expand-cache! (format "lsp/clangd_%s/bin/clangd" ymacs-cpp-clangd-version)) "clangd"])
+(executable! clangd :exe [(expand-cache! (format "lsp/clangd_%s/bin/clangd" ymacs-cpp-clangd-version)) "clangd"])
 
 (require-packages! google-c-style)
 

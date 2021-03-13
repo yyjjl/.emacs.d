@@ -5,7 +5,8 @@
     (haskell-decl-scan-mode 1)
     (haskell-indentation-mode 1)
 
-    (when (is-buffer-suitable-for-coding!)
-      (try-enable-lsp! haskell
-        :-fallback
-        (haskell-doc-mode 1)))))
+    (eval-when-has-feature! lsp
+      (with-transient-hook! (hack-local-variables-hook :local t)
+        (unless (and (is-buffer-suitable-for-coding!)
+                     (ymacs-lsp//try-enable haskell))
+          (haskell-doc-mode 1))))))

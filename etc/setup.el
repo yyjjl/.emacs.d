@@ -41,17 +41,15 @@
   ;; Disable some features when load emacs
   (setq-default prog-mode-hook nil)
   (setq-default auto-mode-alist nil)
-  (setq kill-emacs-hook nil)
-  (setq after-init-hook nil)
   (setq enable-local-variables :all)
 
   (when (file-exists-p ymacs-autoloads-file)
     (delete-file ymacs-autoloads-file))
 
-  (ymacs-editor//after-init-1)
-  (ymacs-editor//after-init-2)
+  (run-hooks 'after-init-hook)
 
+  (setq kill-emacs-hook nil)
   (setq ymacss-compile-config-in-progress t)
 
-  (ymacs-editor/compile-config)
-  (ymacs-editor/compile-elpa-packages))
+  (ymacs-default/compile-config)
+  (ymacs-default/compile-elpa-packages))
