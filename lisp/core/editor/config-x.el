@@ -98,7 +98,7 @@
     ("; f" . swiper-toggle-face-matching))
   (define-key! :map ivy-minibuffer-map
     (";")
-    (("; [" "; ]" "; ;") . self-insert-command)
+    ("; ;" . self-insert-command)
     ("; q" . minibuffer-keyboard-quit)
     ("; '" . minibuffer-keyboard-quit)
     ("; ," . ivy-beginning-of-buffer)
@@ -108,15 +108,13 @@
     ("; p" . ivy-previous-line-and-call)
     ("; n" . ivy-next-line-and-call)
     ("; r" . counsel-minibuffer-history)
-    ("; RET" . ivy-immediate-done)
-    ("[" . ivy-previous-line)
-    ("]" . ivy-next-line)))
+    ("; RET" . ivy-immediate-done)))
 
 (defun ymacs-x//unset-ivy-minibuffer-map ()
   (define-key! :map swiper-map
     (";"))
-  (define-key! :map minibuffer-local-map
-    (( ";" "[" "]") . self-insert-command)))
+  (define-key! :map ivy-minibuffer-map
+    (";" . self-insert-command)))
 
 (defsubst ymacs-x//lookup-keys (-keys)
   (let ((ymacs-x-mode)
