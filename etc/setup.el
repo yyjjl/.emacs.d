@@ -52,4 +52,6 @@
   (setq ymacss-compile-config-in-progress t)
 
   (ymacs-default/compile-config)
-  (ymacs-default/compile-elpa-packages))
+  (ymacs-default/compile-elpa-packages)
+
+  (package-quickstart-refresh))

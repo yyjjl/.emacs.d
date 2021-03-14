@@ -197,9 +197,9 @@
 (with-no-warnings
   (setq package-native-compile t))
 
-(setq package-archives
-      '(("gnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-        ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
+(setq package-archives '(("melpa" . "https://elpa.emacs-china.org/melpa/")
+                         ("org" . "https://elpa.emacs-china.org/org/")
+                         ("gnu" . "https://elpa.emacs-china.org/gnu/")))
 
 (package-initialize)
 
