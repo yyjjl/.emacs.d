@@ -24,6 +24,7 @@
  '(iedit-occurrence ((t (:foreground "#fb2874" :inverse-video t :weight bold))))
  '(ivy-modified-buffer ((t (:inherit ymacs-modeline-buffer-modified))))
  '(ivy-modified-outside-buffer ((t (:inherit ymacs-modeline-urgent))))
+ '(mode-line-highlight ((t (:foreground "#FD971F" :inverse-video t))))
  '(tab-line ((t (:background "#1B1D1E" :foreground "white"))))
  '(tab-line-tab ((t (:inherit warning))))
  '(tab-line-tab-current ((t (:inherit tab-line-tab :inverse-video t))))
