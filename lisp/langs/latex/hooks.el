@@ -48,6 +48,8 @@
     (outline-minor-mode 1)
 
     (flymake-mode 1)
+    ;; only run flymake after saving current buffer
+    (remove-hook ' after-change-functions #'flymake-after-change-function t)
 
     (add-hook 'after-save-hook #'ymacs-latex//build-on-save nil t)
 

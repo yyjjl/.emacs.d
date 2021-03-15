@@ -23,3 +23,7 @@
   (remap! "C-c C-d" "C-c d" web-mode-map)
   (remap! "C-c C-e" "C-c e" web-mode-map)
   (remap! "C-c C-t" "C-c t" web-mode-map))
+
+(after! js
+  (define-key! :map js-mode-map
+    ("M-.")))

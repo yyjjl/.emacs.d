@@ -9,7 +9,11 @@
         ,(let ((symbol (intern (format "ymacs-%s-lsp" -name))))
            `(not (and (boundp ',symbol)
                       (eq ,symbol :disabled))))
-        (ignore-errors (lsp))
+        (ignore-errors
+          (require 'lsp)
+          ;; clear multi-folders
+          (setf (lsp-session-server-id->folders (lsp-session)) (ht))
+          (lsp))
         (bound-and-true-p lsp-mode)))
 
 (defmacro ymacs-lsp//try-enable-simple (-name &rest -condition)
