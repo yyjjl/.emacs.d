@@ -52,6 +52,7 @@
 
 (cl-defun ymacs-lsp//register-client
     (-client &key ((:package -package)) ((:enable-fn -enable-fn)))
+  (add-to-list 'lsp-client-packages -package)
   (setf (alist-get -client ymacs-lsp--enabled-clients)
         (list -package -enable-fn)))
 

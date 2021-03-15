@@ -16,6 +16,8 @@
  lsp-ivy
  (dap-mode :when ymacs-lsp-use-dap-p))
 
+(setq lsp-client-packages nil)
+
 (defvar ymacs-lsp--enabled-clients nil)
 
 (defvar-local ymacs-lsp-format-buffer-function #'lsp-format-buffer)
