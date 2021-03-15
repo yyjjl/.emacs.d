@@ -9,7 +9,7 @@ case "$1" in
         ;;
     7z)
         tmp=/tmp/lsp$$
-        trap rm "$tmp" EXIT
+        trap "rm $tmp" EXIT
         wget "$2" -O "$tmp" && 7z x -y "$tmp" -o"$3"
         ;;
     *)
