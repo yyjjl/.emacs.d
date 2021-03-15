@@ -1,5 +1,8 @@
 ;; -*- lexical-binding:t -*-
 
+(eval-when-compile
+  (require 'lsp-mode))
+
 (declare-function flymake-diagnostic-text 'flymake)
 (declare-function flymake-diagnostic-type 'flymake)
 (declare-function flymake--lookup-type-property 'flymake)
@@ -77,8 +80,9 @@
          (store-path (lsp-resolve-value store-path))
          (type (pcase decompress
                  (:tgz "tgz")
-                 (`nil "wget")
-                 (_ "7z"))))
+                 (:7z "7z")
+                 (:py "py")
+                 (_ "wget"))))
 
     (lsp--info "Starting to download %s to %s..." url store-path)
     (lsp-async-start-process

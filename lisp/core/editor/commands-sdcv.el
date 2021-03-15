@@ -157,7 +157,7 @@ Word may contain some special characters:
    (list
     (let ((word (if (region-active-p)
                     (buffer-substring-no-properties (region-beginning) (region-end))
-                  (current-word))))
+                  (thing-at-point 'word))))
       (read-string (format "Search (default %s): " word) nil nil word))))
   (with-current-buffer (sdcv-get-buffer)
     (let ((inhibit-read-only t))
