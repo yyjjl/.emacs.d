@@ -95,11 +95,14 @@
 
 (defvar ymacs-popup-default-size 0.4)
 (defvar ymacs-popup-default-side 'below)
+(defvar ymacs-popup-max-slots 2)
 
 (define-key!
+  ("C-x 1" . ymacs-popup/delete-other-window)
   ("C-z" :map
    (define-key! :map (make-sparse-keymap)
      ("l" . ymacs-popup/last-popup-window)
      ("d" . sdcv-search-word)
+     ("f" . ymacs-popup/fix-popup-window)
      ("b" . ymacs-popup/display-popup-window)
-     ("RET" . ymacs-popup/fix-popup-window))))
+     ("RET" . window-toggle-side-windows))))

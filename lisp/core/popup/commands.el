@@ -17,6 +17,15 @@
       (display-buffer (completing-read "Popup buffer: " help-buffers nil t)))))
 
 ;;;###autoload
+(defun ymacs-popup/delete-other-window ()
+  (interactive)
+  (let ((window (selected-window)))
+    (when (or (memq window ymacs-popup--window-list)
+              (eq window (ymacs-popup//get-term-window)))
+      (set-window-parameter window 'window-side nil))
+    (call-interactively #'delete-other-windows)))
+
+;;;###autoload
 (defun ymacs-popup/fix-popup-window ()
   "Make a popup window not to close when `C-g' pressed"
   (interactive)

@@ -53,9 +53,7 @@
             (winner-undo))
         (setq window (pop ymacs-popup--window-list))
         (when (window-live-p window)
-          (if (eq (window-parameter window 'ymacs-quit-action) 'delete)
-              (delete-window window)
-            (quit-window nil window)))))))
+          (quit-window nil window))))))
 
 (advice-add 'keyboard-quit :before #'keyboard-quit@autoclose)
 (advice-add 'other-window :before #'keyboard-quit@autoclose)

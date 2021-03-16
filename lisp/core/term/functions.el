@@ -61,9 +61,7 @@
                  (eq ymacs-term-exit-action 'shell)
                  ;; try to switch to next shell  buffer
                  (not (ymacs-term//switch-internal 1)))
-        (if (one-window-p)
-            (quit-window window)
-          (delete-window window))))
+        (quit-window nil window)))
 
     (when (buffer-live-p buffer)
       ;; the buffer maybe killed or buried

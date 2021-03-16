@@ -50,6 +50,8 @@
 
 (setq which-key-dont-use-unicode t)
 (after! which-key
+  (setq which-key-show-prefix 'left)
+  (setq which-key-popup-type 'side-window)
   (setq which-key-allow-imprecise-window-fit nil)
   (setq which-key-show-remaining-keys t))
 

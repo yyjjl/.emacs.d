@@ -21,8 +21,7 @@
     ;; Autoclose window should be dedicated
     (set-window-dedicated-p -window t)
     ;; Add to autoclose list
-    (setq ymacs-popup--window-list
-          (cons -window (cl-remove -window ymacs-popup--window-list))))
+    (setq ymacs-popup--window-list (cons -window ymacs-popup--window-list)))
 
   (set-frame-parameter nil 'ymacs-popup-window -window)
   (set-frame-parameter nil 'ymacs-popup-buffer -buffer))
@@ -86,16 +85,62 @@
 
 (defsubst ymacs-popup//get-side-window-size (-side -size)
   (unless (eq -size 'auto)
-    (list (cons (if (memq -side '(below above up down))
+    (list (cons (if (memq -side '(below above up down top bottom))
                     'window-height
                   'window-width)
                 (or -size ymacs-popup-default-size)))))
+
+(defsubst ymacs-popup//display-buffer-in-side-window (-buffer -alist -side -size &optional -terminal-p)
+  (let ((slots '(1)) windows)
+    (dolist (window (window-list))
+      (when (eq (window-parameter window 'window-side) -side)
+        (push window windows)
+        (push (window-parameter window 'window-slot) slots)))
+
+    (let ((term-window (ymacs-popup//get-term-window))
+          (last-popup-window (car ymacs-popup--window-list))
+          (min-slot (apply #'min slots))
+          window)
+
+      (when (and -terminal-p term-window)
+        ;; Case 1: reuse term-window
+        (setq window term-window)
+        ;; (select-window window)
+        (set-window-dedicated-p window nil)
+        (set-window-buffer window -buffer))
+
+      (or window
+          (let ((slot (or (when -terminal-p
+                            (if (>= (length windows) ymacs-popup-max-slots)
+                                ;; Case 2: the left/up-most slot window
+                                min-slot
+                              ;; Case 3: left/up of all slot windows
+                              (1- min-slot)))
+                          (when (< (length windows) ymacs-popup-max-slots)
+                            ;; Case 3: left/up of all slot windows
+                            (1- min-slot))
+                          ;; Case 4: next slot-window
+                          (progn
+                            (setq windows (remq term-window windows))
+                            (when-let (old-window (or (cadr (memq last-popup-window windows))
+                                                      (car windows)))
+                              (window-parameter old-window 'window-slot)))
+                          0)))
+            (display-buffer-in-side-window
+             -buffer
+             `(;; (window . main)
+               (side . ,-side)
+               (slot . ,slot)
+               ;; (direction . ,side)
+               ,@(ymacs-popup//get-side-window-size -side -size)
+               ,@-alist)))))))
 
 (defsubst ymacs-popup//display-buffer (-buffer -alist -rule)
   "Internal function for `ymacs-popup/display-buffer-action'.
 Displays -BUFFER according to -ALIST and -RULE."
   (let ((display-fn (plist-get -rule :display-fn))
-        (side (plist-get -rule :side)))
+        (side (plist-get -rule :side))
+        (size (plist-get -rule :size)))
     (cond
      ;; custom display-fn
      (display-fn
@@ -108,41 +153,10 @@ Displays -BUFFER according to -ALIST and -RULE."
      ((display-buffer-reuse-window -buffer -alist))
      ;; side window
      (side
-      (display-buffer-in-direction
-       -buffer
-       `((window . main)
-         (window-parameters . ((ymacs-quit-action . delete)))
-         (direction . ,side)
-         ,@(ymacs-popup//get-side-window-size side (plist-get -rule :size))
-         ,@-alist)))
+      (ymacs-popup//display-buffer-in-side-window -buffer -alist side size (plist-get -rule :terminal)))
      ;; fallback
      ((display-buffer-pop-up-window -buffer -alist))
      ((display-buffer-use-some-window -buffer -alist)))))
-
-(defsubst ymacs-popup//display-term-buffer (-buffer -alist -rule)
-  (let ((window (ymacs-popup//get-term-window)))
-    (if window
-        ;; Reuse window
-        (progn
-          ;; (select-window window)
-          (set-window-dedicated-p window nil)
-          (set-window-buffer window -buffer))
-
-      (let ((side (or (plist-get -rule :side) ymacs-popup-default-side)))
-        (setq window
-              (display-buffer-in-direction
-               -buffer
-               `((window . main)
-                 (direction . ,side)
-                 ,@(ymacs-popup//get-side-window-size side (plist-get -rule :size))
-                 ,@-alist)))))
-    ;; move term buffer to the head of term-buffer-list
-    (ymacs-popup//set-term-window window nil t)
-
-    (with-current-buffer -buffer
-      (tab-line-mode 1))
-
-    window))
 
 (defsubst ymacs-popup//display-buffer-action (-buffer -alist)
   "Display -BUFFER-OR-NAME according to the result of `ymacs-popup//match'"
@@ -150,17 +164,20 @@ Displays -BUFFER according to -ALIST and -RULE."
 
   (let* ((ignore-window-parameters t)
          (rule (buffer-local-value 'ymacs-popup--matched-rule -buffer))
-         (window
-          (if (plist-get rule :terminal)
-              (ymacs-popup//display-term-buffer -buffer -alist rule)
-            (ymacs-popup//display-buffer -buffer -alist rule))))
+         (window (ymacs-popup//display-buffer -buffer -alist rule)))
 
     (when (window-live-p window)
-      (when (plist-get rule :dedicated)
+      (cond
+       ((plist-get rule :dedicated)
         (set-window-dedicated-p window t))
 
-      (when (plist-get rule :autoclose)
+       ((plist-get rule :autoclose)
         (ymacs-popup//push-window window -buffer t))
+
+       ((plist-get rule :terminal)
+        (ymacs-popup//set-term-window window nil t)
+        (with-current-buffer -buffer
+          (tab-line-mode 1))))
 
       (with-current-buffer -buffer
         (when (plist-get rule :no-modeline)
@@ -228,20 +245,20 @@ Displays -BUFFER according to -ALIST and -RULE."
 
 (ymacs-popup//compile-matcher
  (:macth-fn ymacs-popup//help-buffer-p
-  :side below
+  :side bottom
   :select t
   :autoclose t)
  (:macth-fn ymacs-popup//term-buffer-p
-  :side below
+  :side bottom
   :select t
   :terminal t)
  (:macth-fn ymacs-popup//occur-buffer-p
   :select t
-  :side below
+  :side bottom
   :dedicated t)
  (:name-regexp ymacs-popup-below-dedicated-buffer-regexp
   :select t
-  :side below
+  :side bottom
   :dedicated t)
  ;; (:name-regexp ymacs-popup-left-dedicated-buffer-regexp
  ;;  :select t
@@ -250,7 +267,7 @@ Displays -BUFFER according to -ALIST and -RULE."
  ;;  :dedicated t)
  (:name-regexp ymacs-popup-below-autoclose-buffer-regexp
   :size auto
-  :side below
+  :side bottom
   :no-modeline t
   :autoclose t)
  (:name-regexp ymacs-popup-other-window-regexp
