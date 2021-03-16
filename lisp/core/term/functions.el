@@ -49,7 +49,7 @@
              (window (selected-window)))
         (unless (= size 1)
           (set-window-dedicated-p window nil)
-          (switch-to-buffer (nth index buffers) 'norecord)
+          (switch-to-buffer (nth index buffers))
           (ymacs-popup//set-term-window window)
           window)))))
 
@@ -61,7 +61,12 @@
                  (eq ymacs-term-exit-action 'shell)
                  ;; try to switch to next shell  buffer
                  (not (ymacs-term//switch-internal 1)))
-        (quit-window nil window)))
+        ;; restore to previous-buffer
+        (let ((force-delete (eq (nth 1 (window-parameter window 'quit-restore)) 'window)))
+          (quit-window nil window)
+          (when (and force-delete
+                     (window-live-p window))
+            (delete-window window)))))
 
     (when (buffer-live-p buffer)
       ;; the buffer maybe killed or buried

@@ -90,7 +90,7 @@
                   'window-width)
                 (or -size ymacs-popup-default-size)))))
 
-(defsubst ymacs-popup//display-buffer-in-side-window (-buffer -alist -side -size &optional -terminal-p)
+(defsubst ymacs-popup//display-buffer-in-side-window (-buffer -alist -side -size -terminal-p -autoclose-p)
   (let ((slots '(1)) windows)
     (dolist (window (window-list))
       (when (eq (window-parameter window 'window-side) -side)
@@ -110,7 +110,7 @@
         (set-window-buffer window -buffer))
 
       (or window
-          (let ((slot (or (when -terminal-p
+          (let ((slot (or (unless -autoclose-p
                             (if (>= (length windows) ymacs-popup-max-slots)
                                 ;; Case 2: the left/up-most slot window
                                 min-slot
@@ -153,7 +153,10 @@ Displays -BUFFER according to -ALIST and -RULE."
      ((display-buffer-reuse-window -buffer -alist))
      ;; side window
      (side
-      (ymacs-popup//display-buffer-in-side-window -buffer -alist side size (plist-get -rule :terminal)))
+      (ymacs-popup//display-buffer-in-side-window
+       -buffer -alist side size
+       (plist-get -rule :terminal)
+       (plist-get -rule :autoclose)))
      ;; fallback
      ((display-buffer-pop-up-window -buffer -alist))
      ((display-buffer-use-some-window -buffer -alist)))))

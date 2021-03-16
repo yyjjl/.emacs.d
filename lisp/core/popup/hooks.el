@@ -51,9 +51,15 @@
                                    1)))
                             1)))
             (winner-undo))
-        (setq window (pop ymacs-popup--window-list))
-        (when (window-live-p window)
-          (quit-window nil window))))))
+        (setq window (car ymacs-popup--window-list))
+        (when (and (window-live-p window)
+                   (with-current-buffer (window-buffer window)
+                     (plist-get ymacs-popup--matched-rule :autoclose)))
+          (if (window-parameter window 'quite-restore)
+              ;; try restore
+              (quit-window nil window)
+            (delete-window window))
+          (pop ymacs-popup--window-list))))))
 
 (advice-add 'keyboard-quit :before #'keyboard-quit@autoclose)
 (advice-add 'other-window :before #'keyboard-quit@autoclose)
