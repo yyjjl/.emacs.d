@@ -140,6 +140,9 @@
   ("?" . ymacs-hydra/window/body)
   ("SPC" . ymacs-hydra/rectangle/body)
 
+  (", c" . ymacs-desktop/change-or-new-desktop)
+  (", d" . ymacs-desktop/delete-desktop)
+
   (", s" . ymacs-hydra/sort/body)
   (", e" . ymacs-hydra/ediff/body)
   ;; Minor mode to make xref use etags again.

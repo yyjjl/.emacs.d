@@ -174,6 +174,15 @@ directory, the file name, and its state (modified, read-only or non-existent)."
 
    '(:propertize mode-line-buffer-identification face ymacs-modeline-buffer-file)))
 
+(ymacs-modeline//def-segment buffer-info-shell
+  "Display buffer information for shell buffer"
+  (list
+   " "
+   (if (and (listp mode-line-buffer-identification)
+            (equal (car mode-line-buffer-identification) "%b"))
+       (cdr mode-line-buffer-identification)
+     mode-line-buffer-identification)))
+
 (ymacs-modeline//def-segment buffer-default-directory
   "Displays `default-directory' . This is for special buffers
 like the scratch buffer where knowing the current project directory is important."
@@ -502,7 +511,7 @@ By default, this shows the information specified by `global-mode-string'."
   (window-number matches buffer-position buffer-info remote-host checker major-mode vcs buffer-encoding))
 
 (ymacs-modeline//def-modeline shell
-  (window-number matches buffer-info remote-host major-mode))
+  (window-number matches buffer-info-shell remote-host major-mode))
 
 (ymacs-modeline//def-modeline dired
   (window-number matches buffer-default-directory major-mode dired))

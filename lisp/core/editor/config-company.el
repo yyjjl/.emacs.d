@@ -42,18 +42,13 @@
 
   (setq-default company-backends
                 `((company-capf
-                   company-dabbrev-code company-keywords
-                   ;; company-files
                    :with company-yasnippet
                    :separate)
-                  ;; (company-gtags company-etags)
+                  company-files
+                  (company-dabbrev-code company-gtags company-etags company-keywords)
                   company-dabbrev))
 
   ;; Company should be case sensitive
-  ;; (setq company-dabbrev-downcase nil)
-  ;; (setq company-dabbrev-ignore-case t)
-  ;; (setq company-dabbrev-code-ignore-case nil)
-  (setq company-dabbrev-char-regexp "[0-9a-zA-Z-_]")
   (setq company-dabbrev-code-other-buffers t)
   (setq company-show-numbers t)
   ;; Don't auto auto complete

@@ -21,6 +21,8 @@
     ;; Autoclose window should be dedicated
     (set-window-dedicated-p -window t)
     ;; Add to autoclose list
+    (setq ymacs-popup--matched-rule
+          (plist-put ymacs-popup--matched-rule :autoclose t))
     (setq ymacs-popup--window-list (cons -window ymacs-popup--window-list)))
 
   (set-frame-parameter nil 'ymacs-popup-window -window)
@@ -183,8 +185,8 @@ Displays -BUFFER according to -ALIST and -RULE."
           (tab-line-mode 1))))
 
       (with-current-buffer -buffer
-        (when (plist-get rule :no-modeline)
-          (setq-local mode-line-format nil))
+        ;; (when (plist-get rule :no-modeline)
+        ;;   (setq-local mode-line-format nil))
         (when (window-dedicated-p window)
           (setq ymacs-popup--nosplit-window window)))
 
@@ -271,7 +273,7 @@ Displays -BUFFER according to -ALIST and -RULE."
  (:name-regexp ymacs-popup-below-autoclose-buffer-regexp
   :size auto
   :side bottom
-  :no-modeline t
+  ;; :no-modeline t
   :autoclose t)
  (:name-regexp ymacs-popup-other-window-regexp
   :select t))

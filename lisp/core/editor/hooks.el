@@ -159,4 +159,6 @@
 
     (fcitx-aggressive-setup))
 
+  (desktop-save-mode 1)
+
   (find-file-noselect (expand-cache! "org/*note*")))
