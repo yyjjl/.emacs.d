@@ -167,13 +167,6 @@
 (setq split-width-threshold 120)
 (setq-default line-spacing 0.1)
 
-;; Defer jit font locking slightly to [try to] improve Emacs performance
-;; (setq-default jit-lock-defer-time 0.3)
-(setq jit-lock-defer-time nil)
-(setq jit-lock-stealth-nice 0.5)
-(setq jit-lock-stealth-time 5)
-(setq jit-lock-stealth-verbose nil)
-
 ;; flash the frame to represent a bell.
 (setq ring-bell-function #'ignore)
 (setq visible-bell t)

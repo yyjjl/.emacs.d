@@ -34,16 +34,6 @@ Does not indent buffer, because it is used for a
     (message "%s" faces)))
 
 ;;;###autoload
-(defun ymacs-editor/goto-last-point ()
-  (interactive)
-  (let ((old-point (point)))
-    (with-demoted-errors "%s"
-      (call-interactively #'goto-last-change))
-    (if (eq (point) old-point)
-        (call-interactively #'pop-to-mark-command)
-      (message "goto last change"))))
-
-;;;###autoload
 (defun ymacs-editor/find-file-externally (-files)
   "Open the current file or dired marked files in external app.
 The app is chosen from your OS's preference."

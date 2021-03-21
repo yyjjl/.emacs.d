@@ -31,14 +31,15 @@
             (run-with-idle-timer 0 nil #'ymacs-modeline//update-lsp-state (current-buffer))))
 (add-hook 'lsp-unconfigure-hook #'ymacs-modeline//update-lsp-state)
 
-(ymacs-modeline-set! (comint term vterm compilation) shell)
+(ymacs-modeline-set! (comint term vterm compilation) shell
+  :body (tab-line-mode 1))
 (ymacs-modeline-set! dired dired)
 (ymacs-modeline-set! image media)
 (ymacs-modeline-set! (message git-commit) message)
 (ymacs-modeline-set! magit vcs)
 (ymacs-modeline-set! org-src org-src)
 (ymacs-modeline-set! git-timemachine timemachine)
-(ymacs-modeline-set! (prog text conf) header :header)
+(ymacs-modeline-set! (prog text conf) header :header-line-p t)
 
 (run-after-init! 100
   ;; Start server

@@ -99,7 +99,10 @@
         TeX-electric-sub-and-superscript nil
         ;; Synctex support
         TeX-source-correlate-start-server nil
+        ;; font-latex-fontify-script 'multi-level
         font-latex-fontify-script nil
+        ;; font-latex-script-display '((raise -0.3) . (raise 0.3))
+        font-latex-quotes nil
         ;; Don't insert line-break at inline math
         LaTeX-fill-break-at-separators nil))
 

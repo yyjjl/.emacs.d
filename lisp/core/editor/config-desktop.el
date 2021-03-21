@@ -1,6 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 (defconst ymacs-desktop-directory (expand-cache! "desktop"))
+(defvar ymacs-desktop-name nil)
 
 (setq desktop-restore-frames nil)
 (setq desktop-globals-to-save

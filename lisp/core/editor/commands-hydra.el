@@ -66,7 +66,7 @@
     ("T" load-theme "theme"))))
 
 (pretty-hydra-define ymacs-hydra/rectangle
-  (
+  (;; indentation
    :body-pre (rectangle-mark-mode 1)
    :color pink
    :post (deactivate-mark)
@@ -138,7 +138,6 @@
     ("w" ediff-regions-wordwise))))
 
 (defhydra ymacs-hydra/mc (:color red :hint nil)
-  ""
   ;; ("." mc/mark-next-like-this "next")
   ("=" mc/mark-next-like-this "next")
   ;; ("," mc/mark-previous-like-this "prev")
@@ -147,3 +146,7 @@
   (">" mc/skip-to-next-like-this "skip next")
   ("RET" nil)
   ("q" nil))
+
+(defhydra ymacs-hydra/last-point (:color red :hint nil)
+  ("/" goto-last-change "change")
+  ("SPC" pop-to-mark-command "mark"))

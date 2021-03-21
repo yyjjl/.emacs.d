@@ -84,6 +84,8 @@
   (when (not (derived-mode-p 'org-mode))
     (hl-todo-mode 1))
 
+  (ymacs-editor//setup-low-level-font-lock)
+
   (setq show-trailing-whitespace t)
   (setq indicate-empty-lines t))
 

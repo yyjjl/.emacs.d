@@ -75,6 +75,7 @@
 (autoload 'ymacs-hydra/window/shrink-window-horizontally (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/window/body (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/sort/body (expand! "commands-hydra") nil t)
+(autoload 'ymacs-hydra/last-point/goto-last-change (expand! "commands-hydra") nil t)
 
 (autoload 'xref-pulse-momentarily "xref")
 (autoload 'project-root "project")
@@ -123,8 +124,8 @@
   ("m" . view-echo-area-messages)
   ("x" . exchange-point-and-mark)
 
-  ("C-_" . ymacs-editor/goto-last-point)
-  ("C-/" . ymacs-editor/goto-last-point)
+  ("C-_" . ymacs-hydra/last-point/goto-last-change)
+  ("C-/" . ymacs-hydra/last-point/goto-last-change)
 
   ("o" . ace-window)
   ("b" . ivy-switch-buffer)

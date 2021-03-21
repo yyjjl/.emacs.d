@@ -44,12 +44,6 @@
   (c-toggle-electric-state 1)
   (c-toggle-auto-newline -1))
 
-(defun ymacs-cpp//font-lock-setup ()
-  (when (or (eq font-lock-maximum-decoration 1)
-            (and (listp font-lock-maximum-decoration)
-                 (eq 1 (alist-get major-mode font-lock-maximum-decoration))))
-    (font-lock-add-keywords nil ymacs-cpp-font-lock-keywords)))
-
 (defun ymacs-cpp//cpp-setup ()
   (eval-when-has-feature! lsp
     (with-transient-hook! (hack-local-variables-hook :local t)
