@@ -56,7 +56,9 @@ LHS and RHS are lists of symbols of modeline -segments defined with
           `(let (byte-compile-warnings)
              (byte-compile #',sym))))))
 
-(defmacro ymacs-modeline-set! (-modes -key &optional -header-line-p)
+(cl-defmacro ymacs-modeline-set!
+    (-modes -key &key ((:header-line-p -header-line-p)) ((:body -body)))
+  (declare (indent 2))
   (let ((fn (intern-soft (format "ymacs-modeline//format--%s" -key)))
         (format-var (if -header-line-p
                         'header-line-format
@@ -73,7 +75,8 @@ LHS and RHS are lists of symbols of modeline -segments defined with
         `(progn
            (defun ,hook-fn ()
              (with-current-buffer (current-buffer)
-               (setq ,format-var '(:eval (,fn)))))
+               (setq ,format-var '(:eval (,fn))))
+             ,@-body)
            ,@(cl-loop
               for mode in -modes
               for name = (symbol-name mode)
@@ -442,7 +445,9 @@ By default, this shows the information specified by `global-mode-string'."
    mode-line-misc-info
    (propertize (or ymacs-modeline--project-parent-path default-directory)
                'face 'font-lock-doc-face)
-   ymacs-modeline--lsp-state))
+   ymacs-modeline--lsp-state
+   (when ymacs-desktop-name
+     (propertize ymacs-desktop-name 'face 'font-lock-constant-face))))
 
 ;;
 ;;* Position

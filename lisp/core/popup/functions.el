@@ -180,9 +180,7 @@ Displays -BUFFER according to -ALIST and -RULE."
         (ymacs-popup//push-window window -buffer t))
 
        ((plist-get rule :terminal)
-        (ymacs-popup//set-term-window window nil t)
-        (with-current-buffer -buffer
-          (tab-line-mode 1))))
+        (ymacs-popup//set-term-window window nil t)))
 
       (with-current-buffer -buffer
         ;; (when (plist-get rule :no-modeline)

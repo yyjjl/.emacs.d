@@ -11,5 +11,4 @@
       ;; (hide-ifdef-mode 1)
       ;; Make a #define be left-aligned
       (setq c-electric-pound-behavior '(alignleft))
-      (ymacs-cpp//font-lock-setup)
       (ymacs-cpp//cpp-setup))))
