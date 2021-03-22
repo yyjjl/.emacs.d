@@ -159,15 +159,15 @@
 
 (after! treemacs
   (define-key!
-    ("M-1" . ymacs-lsp/select-window-1))
+    ("M-1" . ymacs-lsp/select-window-1)
+    ("M-`" . treemacs))
 
   (setq treemacs-collapse-dirs (if treemacs-python-executable 3 0)
         treemacs-missing-project-action 'remove
         treemacs-follow-after-init t
         treemacs-no-png-images t)
 
-  (ymacs-modeline//def-modeline treemacs
-    (window-number major-mode))
+  (ymacs-modeline//def-modeline treemacs (major-mode))
 
   (setq treemacs-user-mode-line-format '(:eval (ymacs-modeline//format--treemacs)))
 

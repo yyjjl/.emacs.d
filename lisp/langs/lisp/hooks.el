@@ -14,7 +14,7 @@
 (add-hook 'emacs-lisp-mode-hook #'ymacs-lisp//elisp-setup)
 (add-hook 'lisp-interaction-mode-hook #'ymacs-lisp//elisp-setup)
 
-(dolist (hook '(lisp-mode-hook scheme-mode-hook))
+(dolist (hook '(lisp-mode-hook scheme-mode-hook lisp-data-mode-hook))
   (add-hook hook #'ymacs-lisp//common-setup))
 
 (after! macrostep

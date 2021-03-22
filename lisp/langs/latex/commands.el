@@ -65,9 +65,7 @@ Else call with `read-file-name'.
                 (read-file-name "TeX file: ")))
            (default-directory (TeX-master-directory))
            (command (format "texcount %s %s" options (shell-quote-argument file))))
-      (run-compilation!
-       :command command
-       :callback (lambda (&rest _) (goto-char (point-min)))))))
+      (run-compilation! :command command))))
 
 ;;;###autoload
 (defun ymacs-latex/build ()

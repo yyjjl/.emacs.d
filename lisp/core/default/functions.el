@@ -76,7 +76,7 @@ LHS and RHS are lists of symbols of modeline -segments defined with
            (defun ,hook-fn ()
              (with-current-buffer (current-buffer)
                (setq ,format-var '(:eval (,fn))))
-             ,@-body)
+             ,-body)
            ,@(cl-loop
               for mode in -modes
               for name = (symbol-name mode)

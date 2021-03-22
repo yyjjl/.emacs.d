@@ -73,7 +73,7 @@
    (format "[%s %s]"
            (mapconcat
             (lambda (item)
-              (propertize (car item) 'face 'font-lock-builtin-face))
+              (propertize (car item) 'face 'help-key-binding))
             items
             "/")
            (cond ((symbolp definition)

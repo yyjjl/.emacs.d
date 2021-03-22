@@ -86,8 +86,7 @@ kill     => when process exits, kill buffer")
 If you do not like default setup, modify it, with (KEY . COMMAND) format.")
 
 (define-key!
-  ([f8] . ymacs-term/pop-shell)
-  ("M-`" . ymacs-term/toggle-window))
+  ([f8] . ymacs-term/pop-shell))
 
 (define-key! :map prog-mode-map
   ("C-c C-l" . ymacs-term/load-file-in-repl))

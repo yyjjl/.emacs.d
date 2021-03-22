@@ -1,5 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
+(eval-when-compile
+  (require 'dash))
+
 (defvar ymacs-editor-window-size-list '(0.25 0.382 0.5 0.618 0.7))
 (defun ymacs-editor//window-split-with-size (-size &optional -vertical)
   "Set new window size to -SIZE"

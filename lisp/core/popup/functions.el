@@ -22,7 +22,7 @@
     (set-window-dedicated-p -window t)
     ;; Add to autoclose list
     (setq ymacs-popup--matched-rule
-          (plist-put ymacs-popup--matched-rule :autoclose t))
+          (plist-put (copy-sequence ymacs-popup--matched-rule) :autoclose t))
     (setq ymacs-popup--window-list (cons -window ymacs-popup--window-list)))
 
   (set-frame-parameter nil 'ymacs-popup-window -window)

@@ -30,6 +30,10 @@
  '(tab-line-tab-current ((t (:inherit tab-line-tab :inverse-video t))))
  '(tab-line-tab-inactive ((t (:inherit font-lock-comment-face :inverse-video t))))
  '(tooltip ((t (:background "#49483E"))))
+ '(wgrep-face ((((type graphic))
+                (:box (:line-width (1 . 1) :color "grey75")))
+               (((type tty))
+                (:underline t))))
  '(whitespace-indentation ((t (:foreground "dim gray" :weight bold)))))
 
 

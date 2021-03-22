@@ -99,9 +99,12 @@
                 (insert "\n"))))))
       buffer))
 
+  (define-key! :map compilation-minor-mode-map
+    ("n" . ymacs-editor/grep-next-error-no-select)
+    ("p" . ymacs-editor/grep-previous-error-no-select)
+    ("C-o" . ymacs-editor/grep-display-error))
+
   (setq-default compilation-environment '("TERM=xterm-256color"))
   ;; kill compilation process before starting another
   (setq compilation-always-kill t)
   (setq compilation-scroll-output t))
-
-
