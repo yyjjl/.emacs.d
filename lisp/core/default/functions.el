@@ -416,11 +416,11 @@ like the scratch buffer where knowing the current project directory is important
 
 (ymacs-modeline//def-segment window-number
   (when-let (number (window-parameter (selected-window) 'ace-window-path))
-    (concat
-     " "
-     (if ace-window-mode
-         (propertize (concat number " " ace-window-mode) 'face 'aw-leading-char-face)
-       number))))
+    (when (bound-and-true-p ymacs-x--activated)
+      (setq number (propertize number 'face 'ymacs-modeline-urgent)))
+    (if ace-window-mode
+        (concat " " number " " (propertize ace-window-mode 'face 'aw-leading-char-face))
+      (concat " " number))))
 
 
 ;;

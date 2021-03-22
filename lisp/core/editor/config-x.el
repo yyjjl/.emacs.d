@@ -233,7 +233,10 @@
     (setq cursor-type 'bar)
     (setq ymacs-x--command (ymacs-x//lookup-keys ";"))
     (setq ymacs-x--return (ymacs-x//lookup-keys (kbd "RET")))
-    (setq ymacs-x--activated t)))
+    (setq ymacs-x--activated t)
+
+    (unless (display-graphic-p)
+      (force-mode-line-update))))
 
 (defun ymacs-x/deactivate ()
   (interactive)
@@ -245,7 +248,10 @@
     (with-demoted-errors "%s"
       (fcitx--ymacs-x-maybe-activate))
 
-    (setq ymacs-x--activated nil)))
+    (setq ymacs-x--activated nil)
+
+    (unless (display-graphic-p)
+      (force-mode-line-update))))
 
 (define-minor-mode ymacs-x-mode
   "use X as leader key"
