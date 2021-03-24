@@ -35,7 +35,6 @@
 
     (hs-minor-mode 1)
     (reftex-mode 1)
-    ;; conflict with latex-mode
     (electric-pair-local-mode -1)
     (electric-indent-local-mode -1)
     (LaTeX-math-mode 1)
@@ -53,6 +52,7 @@
 
     (add-hook 'after-save-hook #'ymacs-latex//build-on-save nil t)
 
+    (setq LaTeX-label-function #'reftex-label)
     (setq-local tab-width 2)
 
     (eval-when-has-feature! lsp

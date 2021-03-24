@@ -1,5 +1,9 @@
 ;;; -*- lexical-binding: t; -*-
 
+(ymacs-editor//set-forward-sexp-handler
+ :modes (latex-mode tex-mode)
+ :forward #'ymacs-latex/forward-sexp)
+
 (eval-when-has-feature! lsp
   (setq lsp-clients-texlab-executable ymacs-texlab-path)
 
@@ -48,8 +52,6 @@
     ([f10] . ymacs-latex/build)
     ([f9] . reftex-parse-all)
     ([f5] . TeX-view)
-    ("M-a" . ymacs-latex/backward-sexp)
-    ("M-e" . ymacs-latex/forward-sexp)
     ("M-=" . ymacs-latex/count-words)
     ("M-RET" . latex-insert-item)
     ("C-c E" . TeX-error-overview)
@@ -92,7 +94,6 @@
         TeX-debug-warnings t
         TeX-auto-save t                 ; parse on save
         TeX-parse-self t                ; parse on load
-        TeX-syntactic-comment t
         TeX-electric-math '("$" . "$")
         TeX-complete-expert-commands t
         LaTeX-electric-left-right-brace t

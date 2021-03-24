@@ -75,7 +75,7 @@ Optional argument -ARG is used to toggle narrow functions."
 (autoload #'c-end-of-statement "cc-mode")
 
 ;;;###autoload
-(defun ymacs-editor/forward-sentence-or-sexp (&optional -n)
+(defun ymacs-editor/forward-sexp (&optional -n)
   (interactive "^p")
   (cond
    ((and (= (abs -n) 1)
@@ -89,13 +89,17 @@ Optional argument -ARG is used to toggle narrow functions."
                         t)))))
     (forward-sexp -n))
 
-   ((derived-mode-p 'c-mode 'c++-mode 'java-mode)
-    (c-end-of-statement -n nil t))
+   ((when-let (handlers (alist-get major-mode ymacs-editor-forward-sexp-handler))
+      (let ((forward-fn (car handlers))
+            (backward-fn (cdr handlers)))
+        (if (>= -n 0)
+            (funcall forward-fn -n)
+          (if backward-fn
+              (funcall backward-fn (- -n))
+            (funcall forward-fn -n)))
+        t)))
 
-   ((derived-mode-p 'python-mode)
-    (python-nav-forward-statement -n))
-
-   ((derived-mode-p 'prog-mode 'org-mode 'latex-mode)
+   ((derived-mode-p 'prog-mode 'org-mode)
     (condition-case nil
         (forward-sexp -n)
       (scan-error
@@ -103,9 +107,9 @@ Optional argument -ARG is used to toggle narrow functions."
    (t (forward-sentence -n))))
 
 ;;;###autoload
-(defun ymacs-editor/backward-sentence-or-sexp (&optional -n)
+(defun ymacs-editor/backward-sexp (&optional -n)
   (interactive "^p")
-  (ymacs-editor/forward-sentence-or-sexp (- -n)))
+  (ymacs-editor/forward-sexp (- -n)))
 
 ;;;###autoload
 (defun ymacs-editor/smart-move-begining-of-line ()

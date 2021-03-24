@@ -1,5 +1,9 @@
 ;; -*- lexical-binding:t -*-
 
+(ymacs-editor//set-forward-sexp-handler
+ :modes (c-mode c++mode java-mode)
+ :forward #'c-end-of-statement)
+
 (ymacs-editor//set-font-lock-level
   :modes (c-mode c++-mode)
   :level 1

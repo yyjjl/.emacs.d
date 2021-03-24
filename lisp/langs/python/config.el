@@ -1,5 +1,9 @@
 ;;; -*- lexical-binding: t; -*-
 
+(ymacs-editor//set-forward-sexp-handler
+ :modes (python-mode)
+ :forward #'python-nav-forward-statement)
+
 (eval-when-has-feature! lsp
   (after! lsp-pyls
     (setq lsp-pyls-configuration-sources ["flake8"])

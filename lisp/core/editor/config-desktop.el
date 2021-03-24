@@ -22,7 +22,12 @@
        (when semantic-enable-p
          (semantic-mode 1))))
 
+  (define-advice desktop-buffer-info (:around (-fn -buffer) no-minor-modes)
+    (let ((info (funcall -fn -buffer)))
+      (setf (nth 4 info) nil)
+      info))
+
   (define-advice desktop-read (:around (-fn &rest -args) disable-semantic)
     "Temporarily disable semantic mode when load desktop"
     (ymacs-desktop//without-semantic-mode
-     (apply -fn -args))))
+      (apply -fn -args))))

@@ -172,8 +172,8 @@
   ("M-;" . ymacs-editor/comment-dwim)
   ("M-}" . ymacs-editor/forward-defun)
   ("M-{" . ymacs-editor/backward-defun)
-  ("M-e" . ymacs-editor/forward-sentence-or-sexp)
-  ("M-a" . ymacs-editor/backward-sentence-or-sexp)
+  ("M-e" . ymacs-editor/forward-sexp)
+  ("M-a" . ymacs-editor/backward-sexp)
   ("C-M-b" . backward-sentence)
   ("C-M-f" . forward-sentence)
 

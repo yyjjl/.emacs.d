@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: attr_html
+# key: ah
+# --
+#+attr_html: :width ${1:100}%
