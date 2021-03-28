@@ -17,11 +17,13 @@
           :require-match))
       major-mode)))
   (let ((buffer (get-buffer-create
-                 (cl-loop
-                  for n from 0
-                  for name = (format "*scratch%s*" (if (= n 0) "" n))
-                  unless (get-buffer name)
-                  return name))))
+                 (if -major-mode
+                     (format "*scratch-%s*" (symbol-name -major-mode))
+                   (cl-loop
+                    for n from 0
+                    for name = (format "*scratch-%s*" (if (= n 0) "" n))
+                    unless (get-buffer name)
+                    return name)))))
     (with-current-buffer buffer
       (funcall -major-mode))
     (pop-to-buffer buffer)))
