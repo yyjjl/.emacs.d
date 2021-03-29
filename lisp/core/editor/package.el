@@ -42,6 +42,7 @@
  persistent-scratch
  hl-todo
  page-break-lines
+ sudo-edit
  which-key
  highlight-indentation)
 
@@ -239,7 +240,7 @@
 
 (define-key! :prefix "C-c i"
   ("r" . ivy-resume)
-  ("e" . counsel-compilation-errors)
+  ("e" . sudo-edit)
 
   ([remap dired] . counsel-dired)
   ([remap insert-char] . counsel-unicode-char)

@@ -86,6 +86,7 @@
 
   (setq lsp-signature-doc-lines 5)
   ;; (setq lsp-keep-workspace-alive nil)
+  (setq lsp-restart 'ignore)
 
   ;; manually configured
   (setq lsp-completion-provider :none)

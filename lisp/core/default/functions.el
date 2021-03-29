@@ -232,8 +232,8 @@ like the scratch buffer where knowing the current project directory is important
            ymacs-modeline--remote-host)
       ;; assume that host will not be changed after file opened
       (setq ymacs-modeline--remote-host
-            (when-let ((host (and default-directory (file-remote-p default-directory 'host))))
-              (propertize (concat "@" host) 'face 'ymacs-modeline-host)))))
+            (when-let ((remote (and default-directory (file-remote-p default-directory))))
+              (propertize (concat "@" remote) 'face 'ymacs-modeline-host)))))
 
 ;;
 ;;* Major mode
@@ -519,7 +519,7 @@ By default, this shows the information specified by `global-mode-string'."
   (window-number matches buffer-info-shell remote-host major-mode))
 
 (ymacs-modeline//def-modeline dired
-  (window-number matches buffer-default-directory major-mode dired))
+  (window-number matches buffer-default-directory remote-host major-mode dired))
 
 (ymacs-modeline//def-modeline vcs
   (window-number matches buffer-position buffer-info major-mode buffer-encoding))
