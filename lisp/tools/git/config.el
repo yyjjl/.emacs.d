@@ -20,6 +20,9 @@
   (define-key! :map magit-mode-map
     ("C-x C-f" . magit-find-file))
 
+  (define-key! :map magit-blob-mode-map
+    ("C-x C-f" . magit-find-file))
+
   (define-key! :map magit-section-mode-map
     (("M-1" "M-2" "M-3" "M-4"))
     ("` 1" . magit-section-show-level-1-all)

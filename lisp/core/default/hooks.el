@@ -31,7 +31,7 @@
             (run-with-idle-timer 0 nil #'ymacs-modeline//update-lsp-state (current-buffer))))
 (add-hook 'lsp-unconfigure-hook #'ymacs-modeline//update-lsp-state)
 
-(ymacs-modeline-set! (comint term vterm compilation) shell
+(ymacs-modeline-set! (comint term vterm) shell
   :body (tab-line-mode 1))
 (ymacs-modeline-set! dired dired)
 (ymacs-modeline-set! image media)
