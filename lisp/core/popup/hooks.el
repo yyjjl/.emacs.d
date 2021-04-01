@@ -3,10 +3,6 @@
 (declare-function winner-ring "winner")
 (declare-function winner-undo "winner")
 
-(run-after-init! 100
-  (setq display-buffer-alist
-        '((ymacs-popup//match ymacs-popup//display-buffer-action))))
-
 (define-hook! (ymacs-popup//frame-setup &optional -frame)
   (window-setup-hook ;; when setup
    after-make-frame-functions)
@@ -70,3 +66,7 @@
                      (when-let (buffer (window-buffer -window))
                        (buffer-local-value 'ymacs-popup--nosplit-window buffer)))))
     (funcall -fn -window -alist)))
+
+(run-after-init! 100
+  (setq display-buffer-alist
+        '((ymacs-popup//match ymacs-popup//display-buffer-action))))

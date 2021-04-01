@@ -26,8 +26,7 @@
        (defsubst ,sym () ,docstring ,@-body)
        (add-to-list 'ymacs-modeline-segment-alist (cons ',-name ',sym))
        ,(unless (bound-and-true-p byte-compile-current-file)
-          `(let (byte-compile-warnings)
-             (byte-compile #',sym))))))
+	  `(byte-compile #',sym)))))
 
 (defun ymacs-modeline//prepare-segments (-segments)
   "Prepare mode-line `SEGMENTS'."
@@ -436,6 +435,8 @@ like the scratch buffer where knowing the current project directory is important
       (with-current-buffer buffer
         (setq ymacs-modeline--lsp-state
               (format-mode-line (assoc 'lsp-mode minor-mode-alist)))))))
+
+(defvar ymacs-desktop-name)
 
 (ymacs-modeline//def-segment misc-info
   "Mode line construct for miscellaneous information.
