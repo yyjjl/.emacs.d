@@ -78,4 +78,4 @@
 (after! whitespace
   (setq whitespace-global-modes '(text-mode))
   (setq whitespace-style
-        '(face tabs trailing space-before-tab indentation empty space-after-tab tab-mark)))
+        '(face tabs space-before-tab indentation empty space-after-tab tab-mark)))
