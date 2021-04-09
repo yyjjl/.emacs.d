@@ -21,6 +21,7 @@
   ("s" org-download-screenshot "Screenshot")
   ("r" org-download-rename-at-point "Rename at point")
   ("l" org-download-rename-last "Rename last")
+  ("D" org-download-delete "delete")
   ("q" nil "quit"))
 
 (defun ymacs-org//hot-expand (-type)

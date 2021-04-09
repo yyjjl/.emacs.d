@@ -8,11 +8,7 @@
       (server-start)))
 
   ;; Collect garbage after focus changes
-  (add-function
-   :after after-focus-change-function
-   (lambda ()
-     (unless (frame-focus-state)
-       (garbage-collect))))
+  (run-with-idle-timer 10 t #'garbage-collect)
 
   ;; Autoloads
   (unless (file-exists-p ymacs-autoloads-file)
