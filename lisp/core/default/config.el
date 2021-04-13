@@ -187,12 +187,9 @@
     (setq package-selected-packages -value)))
 
 (setq package-quickstart t)
-(with-no-warnings
-  (setq package-native-compile t))
-
-(setq package-archives '(("melpa" . "https://elpa.emacs-china.org/melpa/")
-                         ("org" . "https://elpa.emacs-china.org/org/")
-                         ("gnu" . "https://elpa.emacs-china.org/gnu/")))
+(setq package-native-compile t)
+(after! package
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")))
 
 (package-initialize)
 
