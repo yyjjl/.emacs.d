@@ -46,7 +46,8 @@
                    :separate)
                   company-files
                   (company-dabbrev-code company-gtags company-etags company-keywords)
-                  company-dabbrev))
+                  ;; company-dabbrev
+                  ))
 
   ;; Company should be case sensitive
   (setq company-dabbrev-code-other-buffers t)
