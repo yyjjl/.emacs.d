@@ -61,8 +61,9 @@
     (call-interactively ymacs-lsp-organize-import-function))
 
   (after! project
-    (define-key! :map project-prefix-map
-      ("a" . ymacs-lsp/find-other-file)))
+    (when (boundp 'project-prefix-map)
+      (define-key! :map project-prefix-map
+        ("a" . ymacs-lsp/find-other-file))))
 
   (define-key! :map lsp-mode-map
     ("M-\" r" . lsp-find-references)
