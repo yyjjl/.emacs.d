@@ -33,8 +33,9 @@
       default-directory))
 
 (after! project
-  (define-key! :map project-prefix-map
-    ("E" . ymacs-editor/edit-dir-locals)
-    ("i" . ymacs-editor/invalid-project-cache))
+  (when (boundp 'project-prefix-map)
+    (define-key! :map project-prefix-map
+      ("E" . ymacs-editor/edit-dir-locals)
+      ("i" . ymacs-editor/invalid-project-cache)))
 
   (setq project-find-functions '(ymacs-editor//project)))
