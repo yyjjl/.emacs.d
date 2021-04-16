@@ -64,7 +64,8 @@
                      (eval-and-compile
                        (list dir-locals-file
                              (concat (file-name-base dir-locals-file) "-2.el")))))
-    (hack-dir-local-variables-for-project!)))
+    (hack-dir-local-variables-for-project!)
+    (message "dir-local variables for current project are updated")))
 
 (defun ymacs-editor//generic-setup ()
   (company-mode 1)
