@@ -43,7 +43,8 @@
   (interactive)
   (dolist (file (cl-remove-duplicates
                  (append
-                  (directory-files-recursively ymacs-site-lisp-directory "\\.el$")
+                  (when (file-exists-p ymacs-site-lisp-directory)
+                    (directory-files-recursively ymacs-site-lisp-directory "\\.el$"))
                   (directory-files ymacs-config-directory t "\\.el$")
                   (directory-files user-emacs-directory t "\\.el$")
                   (cl-loop
