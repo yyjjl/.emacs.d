@@ -166,6 +166,7 @@
 
 (setq split-width-threshold 120)
 (setq-default line-spacing 0.1)
+(setq-default truncate-lines t)
 
 ;; flash the frame to represent a bell.
 (setq ring-bell-function #'ignore)
@@ -189,13 +190,12 @@
 (setq package-quickstart t)
 (setq package-native-compile t)
 (after! package
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")))
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+  (unless ymacs-package-use-gnutls-p
+    (dolist (item package-archives)
+      (setcdr item (replace-regexp-in-string "https:" "http:" (cdr item))))))
 
 (package-initialize)
-
-(unless ymacs-package-use-gnutls-p
-  (dolist (item package-archives)
-    (setcdr item (replace-regexp-in-string "https:" "http:" (cdr item)))))
 
 (require-packages!
  dash

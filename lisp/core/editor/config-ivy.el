@@ -231,9 +231,6 @@
 
 
 (after! ivy
-  (add-hook 'ivy-occur-mode-hook #'ymacs-editor//truncate-line)
-  (add-hook 'ivy-occur-grep-mode-hook #'ymacs-editor//truncate-line)
-
   (define-advice ivy-occur-next-error (:around (-fn &rest -args) ensure-visible)
     (if-let (window (or (get-buffer-window (current-buffer))
                         (display-buffer (current-buffer))))

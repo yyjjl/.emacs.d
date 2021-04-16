@@ -28,6 +28,10 @@
        :toggle display-line-numbers-mode)
       ("B" display-battery-mode "Battery" :toggle t)
       ("T" display-time-mode "Time" :toggle t)
+      ("L"
+       toggle-truncate-lines
+       "Truncate Line"
+       :toggle truncate-lines)
       ("P" prettify-symbols-mode "Pretty Symbol" :toggle t)))))
 
 (defmacro defhydra++ (name body &optional docstring &rest heads)

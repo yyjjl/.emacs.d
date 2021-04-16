@@ -32,14 +32,6 @@
             (ignore-errors (call-interactively #'company-complete))
             (ignore-errors (call-interactively #'hippie-expand)))))))
 
-;; Display long lines in truncated style (end line with $)
-(define-hook! ymacs-editor//truncate-line
-  (grep-mode-hook
-   compilation-mode-hook
-   xref--xref-buffer-mode-hook)
-  (setq truncate-lines
-        (not (bound-and-true-p compilation-shell-minor-mode))))
-
 (define-hook! ymacs-editor//create-missing-directories (find-file-not-found-functions)
   "Automatically create missing directories when creating new files."
   (when (buffer-file-name)
