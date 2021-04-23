@@ -1,5 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
+(eval-when-compile
+  (require 'gud))
+
 (defun ymacs-debug//gud-source-buffer-p (-buffer _alist)
   (let* ((buffer (get-buffer -buffer))
          (regex (rx string-start "*gud" (*? not-newline) "*" string-end)))
@@ -119,15 +122,17 @@
 
 (define-minor-mode ymacs-debug-command-buffer-mode
   "A mode for adding keybindings to comamnd buffer"
-  nil nil
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "M-o") ymacs-debug-info-mode-map)
-    map))
+  :init-value nil
+  :lighter nil
+  :keymap (let ((map (make-sparse-keymap)))
+            (define-key map (kbd "M-o") ymacs-debug-info-mode-map)
+            map))
 
 (define-minor-mode ymacs-debug-info-buffer-mode
   "A mode for adding keybindings to comamnd buffer"
-  nil nil
-  ymacs-debug-info-mode-map)
+  :init-value nil
+  :lighter nil
+  :keymap ymacs-debug-info-mode-map)
 
 (defun ymacs-debug//enable ()
   (cl-pushnew (current-buffer) ymacs-debug--buffers)
@@ -158,8 +163,9 @@
 
 (define-minor-mode ymacs-debug-running-session-mode
   "A mode for adding keybindings to running sessions"
-  nil nil
-  ymacs-debug-running-session-mode-map
+  :init-value nil
+  :lighter nil
+  :keymap ymacs-debug-running-session-mode-map
 
   (if ymacs-debug-running-session-mode
       (ymacs-debug//enable)
