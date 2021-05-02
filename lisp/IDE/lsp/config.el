@@ -113,7 +113,7 @@
   ;; (setq lsp-before-save-edits t)
 
   ;; (setq lsp-semantic-tokens-enable nil)
-  (setq lsp-lens-enable t)
+  ;; (setq lsp-lens-enable nil)
 
   (setq lsp-headerline-breadcrumb-enable nil)
   ;; (setq lsp-modeline-code-actions-enable t)
