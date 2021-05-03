@@ -88,19 +88,20 @@
 
     ymacs-editor-display-help-window))
 
-(defun ymacs-editor//display-help--show (&optional -message)
-  (if (null -message)
-      (when (window-live-p ymacs-editor-display-help-window)
-        (delete-window ymacs-editor-display-help-window))
-    (with-selected-window (ymacs-editor//display-help--get-window)
-      (unless (string= (buffer-string) -message)
-        (erase-buffer)
-        (insert -message "\n")
+(defun ymacs-editor//display-help--show (-message)
+  (with-selected-window (ymacs-editor//display-help--get-window)
+    (unless (string= (buffer-string) -message)
+      (erase-buffer)
+      (insert -message "\n")
 
-        (let ((window-resize-pixelwise t)
-              (window-size-fixed nil))
-          (fit-window-to-buffer nil nil 1)))
-      (goto-char (point-min)))))
+      (let ((window-resize-pixelwise t)
+            (window-size-fixed nil))
+        (fit-window-to-buffer nil nil 1)))
+    (goto-char (point-min))))
+
+(defun ymacs-editor//display-help--hide (&rest _)
+  (when (window-live-p ymacs-editor-display-help-window)
+    (delete-window ymacs-editor-display-help-window)))
 
 (defun ymacs-editor//display-help (&optional -keys -command -directory)
   (when (and -command (not (stringp -command)))

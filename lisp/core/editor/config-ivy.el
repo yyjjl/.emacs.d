@@ -146,9 +146,7 @@
       (apply -fn -args)))
 
   (advice-add 'ivy--preselect-index :around #'ignore-errors!)
-  (advice-add #'ivy--cleanup
-              :before (lambda (&rest _) (ymacs-editor//display-help--show))
-              '((name . hide-display-help-window)))
+  (advice-add #'ivy--cleanup :before #'ymacs-editor//display-help--hide)
 
   (define-key! :map ivy-minibuffer-map
     ("C-r" . ivy-reverse-i-search)

@@ -77,6 +77,7 @@
 (autoload 'ymacs-hydra/window/body (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/sort/body (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/last-point/goto-last-change (expand! "commands-hydra") nil t)
+(autoload 'ymacs-hydra/query-replace/body (expand! "commands-hydra") nil t)
 
 (autoload 'xref-pulse-momentarily "xref")
 (autoload 'project-root "project")
@@ -204,6 +205,8 @@
   ("C-<up>" . text-scale-increase)
 
   ("RET" . newline-and-indent)
+
+  ("M-%" . ymacs-hydra/query-replace/body)
 
   ("M-/" . hippie-expand)
 

@@ -169,6 +169,20 @@
 (after! winner
   (setq winner-boring-buffers-regexp "^ \\*"))
 
+(after! re-builder
+  (define-key! :map reb-mode-map
+    ("M-q" . reb-quit)
+    ("M-n" . reb-next-match)
+    ("M-p" . reb-prev-match))
+  (define-key! :map reb-lisp-mode-map
+    ("M-q" . reb-quit)
+    ("M-n" . reb-next-match)
+    ("M-p" . reb-prev-match))
+
+  (define-hook! ymacs-editor//setup-reb-mode (reb-mode-hook reb-lisp-mode-hook)
+    (ymacs-editor//display-help (ymacs-editor//display-keys--collect reb-mode-map)))
+
+  (advice-add 'reb-quit :before #'ymacs-editor//display-help--hide))
 
 (after! fcitx
   ;; Init fcitx prefix keys

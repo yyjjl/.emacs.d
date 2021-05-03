@@ -64,7 +64,7 @@
   (save-match-data (read-string "Print: " (thing-at-point 'secp))))
 
 (defun ymacs-debug//before-debug ()
-  (ymacs-editor//display-help--show nil)
+  (ymacs-editor//display-help--hide)
   (lv-delete-window)
   ;; FIXME: In Emacs 28.1, restoring window configuration is a built-in feature
   (window-configuration-to-register :debug-windows)
