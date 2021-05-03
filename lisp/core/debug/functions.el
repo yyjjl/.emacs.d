@@ -63,41 +63,8 @@
 (defun ymacs-debug//find-expr (&rest _args)
   (save-match-data (read-string "Print: " (thing-at-point 'secp))))
 
-(defun ymacs-debug//show-help (-message)
-  (if (null -message)
-      (when (window-live-p ymacs-debug--help-window)
-        (delete-window ymacs-debug--help-window))
-    (let ((buffer (get-buffer-create ymacs-debug--help-buffer-name)))
-      (with-current-buffer buffer
-        (setq window-size-fixed t)
-        (setq mode-line-format nil)
-        (setq header-line-format nil)
-        (setq tab-line-format nil)
-        (setq cursor-type nil)
-        (setq display-line-numbers nil)
-        (setq display-fill-column-indicator nil)
-        (erase-buffer)
-        (insert -message)
-
-        (let ((window
-               (or (when (window-live-p ymacs-debug--help-window)
-                     (if (eq (window-frame ymacs-debug--help-window) (selected-frame))
-                         (set-window-buffer ymacs-debug--help-window buffer)
-                       (delete-window ymacs-debug--help-window))
-                     ymacs-debug--help-window)
-                   (setq ymacs-debug--help-window
-                         (display-buffer-in-side-window buffer '((side . top))))))
-              (window-resize-pixelwise t)
-              (window-size-fixed nil))
-          (set-window-hscroll window 0)
-          (set-window-parameter window 'no-delete-other-windows t)
-          (fit-window-to-buffer window nil 1)
-          (set-window-dedicated-p window t)
-          (set-window-parameter window 'no-other-window t))))))
-
-
 (defun ymacs-debug//before-debug ()
-  (ymacs-debug//show-help nil)
+  (ymacs-editor//display-help--show nil)
   (lv-delete-window)
   ;; FIXME: In Emacs 28.1, restoring window configuration is a built-in feature
   (window-configuration-to-register :debug-windows)

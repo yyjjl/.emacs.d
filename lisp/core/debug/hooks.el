@@ -45,7 +45,7 @@
 
       (setq ymacs-debug--buffer-position -args))
 
-    (ymacs-debug//show-help
+    (ymacs-editor//display-help--show
      (concat ymacs-debug--help-format
              (when (ymacs-debug//gdb-running-p)
                (concat "\n" ymacs-debug--gdb-help-format)))))
