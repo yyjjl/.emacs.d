@@ -179,6 +179,8 @@
     ("M-n" . reb-next-match)
     ("M-p" . reb-prev-match))
 
+  (setq reb-re-syntax 'string)
+
   (define-hook! ymacs-editor//setup-reb-mode (reb-mode-hook reb-lisp-mode-hook)
     (ymacs-editor//display-help (ymacs-editor//display-keys--collect reb-mode-map)))
 

@@ -1,5 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
+(defvar reb-regexp)
+(defvar reb-target-window)
+
 ;;;###autoload
 (defun ymacs-editor/cleanup-buffer-safe ()
   "Perform a bunch of safe operations on the whitespace content of a buffer.

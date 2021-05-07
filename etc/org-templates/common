@@ -1,13 +1,10 @@
-\usepackage{sectsty}
 [DEFAULT-PACKAGES]
 [PACKAGES]
 
 \definecolor{codeblockbg}{rgb}{0.95,0.95,0.95}
 \definecolor{linkcolor}{rgb}{0.1,0.3,0.5}
 
-\hypersetup{colorlinks=true,linkcolor=linkcolor, citecolor=blue}
-
-\geometry{top=2.54cm,bottom=2.54cm,left=2.54cm,right=2.54cm}
+\hypersetup{colorlinks=true, citecolor=blue}
 
 \usepackage{alltt}
 \renewenvironment{verbatim}{\alltt}{\endalltt}
@@ -28,8 +25,11 @@
 \surroundwithmdframed{minted}
 \surroundwithmdframed{quote}
 \mdfsetup{%
-  topline=false,bottomline=false,rightline=false,
-  linewidth=1pt,linecolor=black,
+  topline=false,
+  bottomline=false,
+  rightline=false,
+  linewidth=1pt,
+  linecolor=black,
   backgroundcolor=codeblockbg
 }
 
@@ -47,14 +47,5 @@
   breaksymbolsepright=0pt
 }
 
-% \definecolor{sectioncolor}{rgb}{0.5,0.5,0.25}
-% \definecolor{subsubsectioncolor}{rgb}{0.7,0.3,0.2}
-% \sectionfont{\LARGE\color{sectioncolor}}
-\sectionfont{\LARGE}
-\subsectionfont{\Large}
-\subsubsectionfont{\large}
-\paragraphfont{\large}
-
-\setmonofont{Ubuntu Mono}
 \let\OldTexttt\texttt
 \renewcommand{\texttt}[1]{\colorbox{codeblockbg}{\OldTexttt{{#1}}}}

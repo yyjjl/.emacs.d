@@ -12,5 +12,5 @@ install_from_git(
         'make install',
         'sudo chown root build/bin/light && sudo chmod +s build/bin/light',
     ],
-    output_dir=os.path.expandvars('$HOME/.emacs.d/var')
+    output_dir=os.path.expandvars('$HOME/.emacs.d/.cache')
 )

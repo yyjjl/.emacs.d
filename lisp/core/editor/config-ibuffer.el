@@ -40,7 +40,7 @@
                         (name . "^\\*Completions\\*$")
                         (name . "^\\*Compile-Log\\*$")
                         (name . "^\\*Man .*\\*$")))
-           ("Emacs-Var" (filename . ".emacs.d/var"))
+           ("Emacs-Var" (filename . ".emacs.d/.cache"))
            ("Emacs-Config" (filename . ".emacs.d"))
            ("Code" (predicate . (derived-mode-p 'prog-mode)))
            ("Process" (or (predicate . (get-buffer-process (current-buffer)))
