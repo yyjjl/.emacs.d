@@ -181,9 +181,9 @@
                   -args)
     (push "--type=file" -args))
 
-  (let ((ymacs-editor-ivy-extra-help-lines
+  (let ((ymacs-editor-display-help-extra-lines
          (list (format "FZF_DEFAULT_COMMAND=%s %s" ymacs-fdfind-path (string-join -args " ")))))
-    (with-temp-env! ymacs-editor-ivy-extra-help-lines
+    (with-temp-env! ymacs-editor-display-help-extra-lines
       (counsel-fzf ymacs-editor-ivy--last-text))))
 
 (transient-define-argument ymacs-editor/fzf-file-type ()
@@ -225,7 +225,7 @@
 (defun ymacs-editor/compile (-noninteractive)
   (interactive "P")
   (let* ((root (or (counsel--compile-root) default-directory))
-         (ymacs-editor-ivy-extra-help-lines
+         (ymacs-editor-display-help-extra-lines
           (list (format "%s @ %s"
                         (if -noninteractive "Comint" "Compilation")
                         root))))

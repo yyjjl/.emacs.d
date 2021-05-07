@@ -1,5 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
+(defvar reb-regexp)
+(defvar reb-target-window)
+
 ;;;###autoload
 (defun ymacs-editor/cleanup-buffer-safe ()
   "Perform a bunch of safe operations on the whitespace content of a buffer.
@@ -150,3 +153,52 @@ Optional argument -ARG is used to toggle narrow functions."
           (indent-region (point-min) (point-max))
         (mark-paragraph)
         (call-interactively #'indent-region)))))
+
+;;;###autoload
+(defun ymacs-editor/query-replace-regexp ()
+  (interactive)
+  (let ((saved-point (point))
+        (saved-window-start (window-start))
+        (saved-marker (save-mark-and-excursion--save))
+        (saved-restriction (when (buffer-narrowed-p) (cons (point-min) (point-max))))
+
+        (delimited (and current-prefix-arg (not (eq current-prefix-arg '-))))
+        (start (if (use-region-p) (region-beginning)))
+        (end (if (use-region-p) (region-end)))
+        (backward (and current-prefix-arg (eq current-prefix-arg '-)))
+        (region-noncontiguous-p (if (use-region-p) (region-noncontiguous-p))))
+
+    (when (use-region-p)
+      (deactivate-mark)
+      (narrow-to-region start end))
+
+    (re-builder)
+
+    (advice-add
+     'reb-quit :around
+     (lambda (-fn)
+       (advice-remove 'reb-quit 'query-replace-after-quiting-re-builder)
+
+       (reb-update-regexp)
+       (let ((regexp (reb-target-binding reb-regexp)))
+         (funcall -fn)
+         (with-selected-window reb-target-window
+           (if (null saved-restriction)
+               (widen)
+             (apply #'narrow-to-region saved-restriction))
+
+           ;; restore
+           (goto-char saved-point)
+           (save-mark-and-excursion--restore saved-marker)
+           (set-window-start (selected-window) saved-window-start)
+
+           (query-replace-regexp
+            regexp
+            (query-replace-read-to
+             regexp
+             (format "Query replace%s regexp%s"
+                     (if backward " backward" "")
+                     (if (and start end) " in region" ""))
+             t)
+            delimited start end backward region-noncontiguous-p))))
+     '((name . query-replace-after-quiting-re-builder)))))

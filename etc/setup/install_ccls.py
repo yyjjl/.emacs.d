@@ -13,5 +13,5 @@ install_from_git(
                   -DLLVM_BUILD_INCLUDE_DIR=/usr/include/llvm-10/''',
         'cmake --build build'
     ],
-    output_dir=os.path.expandvars('$HOME/.emacs.d/var')
+    output_dir=os.path.expandvars('$HOME/.emacs.d/.cache')
 )

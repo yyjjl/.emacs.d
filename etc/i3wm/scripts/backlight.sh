@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-LIGHT_EXE=~/.emacs.d/var/light/build/bin/light
+LIGHT_EXE=~/.emacs.d/.cache/light/build/bin/light
 
 if [ "$1" = "up" ];then
     ${LIGHT_EXE} -A 5

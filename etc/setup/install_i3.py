@@ -11,7 +11,7 @@ install_from_git(
         'cat session/i3-gnome',
         'sudo make install',
     ],
-    output_dir=os.path.expandvars('$HOME/.emacs.d/var')
+    output_dir=os.path.expandvars('$HOME/.emacs.d/.cache')
 )
 
 try_link_file(

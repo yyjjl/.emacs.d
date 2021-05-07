@@ -1,30 +1,26 @@
 \documentclass[xcolor=svgnames, presentation]{beamer}
-% default packages
 [DEFAULT-PACKAGES]
-%
-% \usepackage[utf8]{inputenc}
-% \usepackage[T1]{fontenc}
+
 \usepackage{fixltx2e}
-\usepackage{booktabs}
 \usepackage{fancyvrb}
-\tolerance=1000
-%
 [PACKAGES]
-% 
-\setbeamercovered{transparent}
-\setbeamertemplate{caption}[numbered]
-\setbeamertemplate{blocks}[rounded][shadow=true]
-\usepackage{[ORG-TEMPLATE-DIR]/beamer-theme/beamerthememetropolis} %{Darmstadt}
-%
-\usepackage{verbatim}
+
+% \setbeamercovered{transparent}
+% \setbeamertemplate{caption}[numbered]
+% \setbeamertemplate{blocks}[rounded][shadow=true]
+\usepackage{[ORG-TEMPLATE-DIR]/beamer-theme/beamerthememetropolis}
+
 \definecolor{codeblockbg}{rgb}{0.95, 0.95, 0.95}
 \definecolor{linkcolor}{rgb}{0.1, 0.3, 0.5}
+
 \hypersetup{colorlinks=true, linkcolor=linkcolor}
+
 \renewcommand{\theFancyVerbLine}{%
-  \sffamily \textcolor[rgb]{1.0, 0.2, 1.0}{%
-    \scriptsize \oldstylenums{\arabic{FancyVerbLine}}}}
+ \sffamily \textcolor[rgb]{0,0,0}{\scriptsize \oldstylenums{\arabic{FancyVerbLine}}}
+}
 \renewcommand\listoflistingscaption{Program Code List}
 \renewcommand\listingscaption{Program Code}
+
 \surroundwithmdframed{minted}
 \surroundwithmdframed{quote}
 \mdfsetup{%
@@ -32,6 +28,7 @@
   linewidth=1pt, linecolor=black, 
   backgroundcolor=codeblockbg
 }
+
 \setminted{%
   style=colorful, 
   fontsize=\small, 
@@ -46,9 +43,5 @@ breaksymbolindentright=0pt,
 breaksymbolsepright=0pt
 }
 
-\usefonttheme[onlymath]{serif} 
-
-% \setCJKmainfont{Noto San S Chinese}
-% \setmainfont{Ubuntu Mono}
 \let\OldTexttt\texttt
 \renewcommand{\texttt}[1]{\colorbox{codeblockbg}{\OldTexttt{{#1}}}}

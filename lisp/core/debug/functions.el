@@ -1,5 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
+(eval-when-compile
+  (require 'gud))
+
 (defun ymacs-debug//gud-source-buffer-p (-buffer _alist)
   (let* ((buffer (get-buffer -buffer))
          (regex (rx string-start "*gud" (*? not-newline) "*" string-end)))
@@ -60,41 +63,8 @@
 (defun ymacs-debug//find-expr (&rest _args)
   (save-match-data (read-string "Print: " (thing-at-point 'secp))))
 
-(defun ymacs-debug//show-help (-message)
-  (if (null -message)
-      (when (window-live-p ymacs-debug--help-window)
-        (delete-window ymacs-debug--help-window))
-    (let ((buffer (get-buffer-create ymacs-debug--help-buffer-name)))
-      (with-current-buffer buffer
-        (setq window-size-fixed t)
-        (setq mode-line-format nil)
-        (setq header-line-format nil)
-        (setq tab-line-format nil)
-        (setq cursor-type nil)
-        (setq display-line-numbers nil)
-        (setq display-fill-column-indicator nil)
-        (erase-buffer)
-        (insert -message)
-
-        (let ((window
-               (or (when (window-live-p ymacs-debug--help-window)
-                     (if (eq (window-frame ymacs-debug--help-window) (selected-frame))
-                         (set-window-buffer ymacs-debug--help-window buffer)
-                       (delete-window ymacs-debug--help-window))
-                     ymacs-debug--help-window)
-                   (setq ymacs-debug--help-window
-                         (display-buffer-in-side-window buffer '((side . top))))))
-              (window-resize-pixelwise t)
-              (window-size-fixed nil))
-          (set-window-hscroll window 0)
-          (set-window-parameter window 'no-delete-other-windows t)
-          (fit-window-to-buffer window nil 1)
-          (set-window-dedicated-p window t)
-          (set-window-parameter window 'no-other-window t))))))
-
-
 (defun ymacs-debug//before-debug ()
-  (ymacs-debug//show-help nil)
+  (ymacs-editor//display-help--hide)
   (lv-delete-window)
   ;; FIXME: In Emacs 28.1, restoring window configuration is a built-in feature
   (window-configuration-to-register :debug-windows)
@@ -119,15 +89,17 @@
 
 (define-minor-mode ymacs-debug-command-buffer-mode
   "A mode for adding keybindings to comamnd buffer"
-  nil nil
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "M-o") ymacs-debug-info-mode-map)
-    map))
+  :init-value nil
+  :lighter nil
+  :keymap (let ((map (make-sparse-keymap)))
+            (define-key map (kbd "M-o") ymacs-debug-info-mode-map)
+            map))
 
 (define-minor-mode ymacs-debug-info-buffer-mode
   "A mode for adding keybindings to comamnd buffer"
-  nil nil
-  ymacs-debug-info-mode-map)
+  :init-value nil
+  :lighter nil
+  :keymap ymacs-debug-info-mode-map)
 
 (defun ymacs-debug//enable ()
   (cl-pushnew (current-buffer) ymacs-debug--buffers)
@@ -158,8 +130,9 @@
 
 (define-minor-mode ymacs-debug-running-session-mode
   "A mode for adding keybindings to running sessions"
-  nil nil
-  ymacs-debug-running-session-mode-map
+  :init-value nil
+  :lighter nil
+  :keymap ymacs-debug-running-session-mode-map
 
   (if ymacs-debug-running-session-mode
       (ymacs-debug//enable)

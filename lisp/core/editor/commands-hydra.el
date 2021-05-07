@@ -150,3 +150,10 @@
 (defhydra ymacs-hydra/last-point (:color red :hint nil)
   ("/" goto-last-change "change")
   ("SPC" pop-to-mark-command "mark"))
+
+(defhydra ymacs-hydra/query-replace (:color blue :hit nil)
+  ("r" query-replace-regexp "regexp")
+  ("RET" query-replace "text")
+  ("b" ymacs-editor/query-replace-regexp "re-builder")
+  ("SPC" ymacs-editor/query-replace-regexp "re-builder")
+  ("q" nil))

@@ -6,14 +6,8 @@
 
 (defvar ymacs-editor-ivy--last-text nil)
 
-(defvar ymacs-editor-ivy-switch-function-list nil)
-(defvar ymacs-editor-ivy-extra-help-lines nil)
-(defvar ymacs-editor-ivy-display-help-max-width 160)
-
 (defvar ymacs-editor-ivy-display-help-extra-commands
   '(ivy-restrict-to-matches
-    ;; delete-blank-lines
-    ;; just-one-space
     (counsel-find-file . ivy-magic-read-file-env)))
 
 (defvar ymacs-editor-ivy-display-help-ignore-commands
@@ -40,96 +34,20 @@
         (error (message "%s" err))))))
 
 ;;
-;;* Dispaly Help in LV 
+;;* Dispaly Help in LV
 ;;
 
-(defsubst ymacs-editor//display-keys--collect (-keymap)
-  (let (keys)
-    (when -keymap
-      (cl--map-keymap-recursively
-       (lambda (key definition)
-         (unless (or (eq (aref key 0) 'remap) ; skip remap
-                     (memq definition ymacs-editor-ivy-display-help-ignore-commands))
-           (push (cons (key-description key) definition) keys)))
-       -keymap))
-    keys))
-
-(defsubst ymacs-editor//display-keys--collect-extra ()
+(defsubst ymacs-editor//display-keys--collect-ivy-extra ()
   (cl-loop for command in ymacs-editor-ivy-display-help-extra-commands
            for keys = (when (or (not (consp command))
                                 (prog1 (eq (ivy-state-caller ivy-last) (car command))
                                   (setq command (cdr command))))
-                          (where-is-internal command))
+                        (where-is-internal command))
            when keys
            append (cl-loop
                    for key in keys
                    collect
                    (cons (key-description key) command))))
-
-(defsubst ymacs-editor//display-keys--format (keys)
-  (cl-loop
-   for (definition . items) in (-group-by #'cdr keys)
-   collect
-   (format "[%s %s]"
-           (mapconcat
-            (lambda (item)
-              (propertize (car item) 'face 'help-key-binding))
-            items
-            "/")
-           (cond ((symbolp definition)
-                  definition)
-                 ((functionp definition)
-                  "<anonymous>")
-                 (t "<error>")))))
-
-(defsubst ymacs-editor//display-help--keys ()
-  (when-let ((keymap (ivy-state-keymap ivy-last))
-             (keys (ymacs-editor//display-keys--format
-                    (append (ymacs-editor//display-keys--collect keymap)
-                            (ymacs-editor//display-keys--collect-extra)))))
-    (let ((max-width (min (frame-width) ymacs-editor-ivy-display-help-max-width))
-          (width 0)
-          (strings))
-      (dolist (key keys)
-        (when (> (+ (length key) width) max-width)
-          (push "\n" strings)
-          (setq width 0))
-        (cl-incf width (length key))
-        (push key strings))
-      (string-join (nreverse strings)))))
-
-(defun ymacs-editor//display-help (&optional -cmd -directory)
-  (when (and -cmd (not (stringp -cmd)))
-    (setq -cmd (string-join -cmd " ")))
-
-  (when -cmd
-    (setq -cmd (propertize -cmd 'face font-lock-doc-face)))
-
-  (let ((max-cmd-length (frame-width)))
-    (when (> (length -cmd) max-cmd-length)
-      (setq -cmd (concat (substring -cmd 0 max-cmd-length)
-                         (propertize "[...]" 'face font-lock-keyword-face)))))
-
-  (setq -directory
-        (propertize (or -directory default-directory)
-                    'face font-lock-constant-face))
-
-  (let* ((extra-string
-          (when ymacs-editor-ivy-extra-help-lines
-            (propertize (string-join ymacs-editor-ivy-extra-help-lines "\n")
-                        'face 'font-lock-string-face)))
-         (key-string (ymacs-editor//display-help--keys))
-         (cmd-string
-          (when -cmd
-            (format "(@%s) %s" -directory -cmd)))
-         (help-string
-          (concat extra-string
-                  (when (and extra-string (or key-string cmd-string)) "\n")
-                  key-string
-                  (when (and cmd-string key-string) "\n")
-                  cmd-string)))
-    (unless (string-empty-p help-string)
-      (lv-message "%s" help-string))))
 
 (defun ymacs-editor//ivy-re-builder (-str)
   (when (string-prefix-p "=" -str)
@@ -164,17 +82,6 @@
                  for (switch-fn . props) in (-zip switch-fns props-list)
                  when (not (eq switch-fn current-switch-fn))
                  collect (list (plist-get props :key) switch-fn (plist-get props :doc)))))))))
-
-(defun ymacs-editor/switch-ivy-backend ()
-  (interactive)
-  (let* ((caller (ivy-state-caller ivy-last))
-         (toggle-fn (cl-loop
-                     for (callers . toggle-fn) in ymacs-editor-ivy-switch-function-list
-                     when (memq caller callers)
-                     return toggle-fn)))
-    (unless toggle-fn
-      (user-error "No toggle-function defined"))
-    (funcall toggle-fn)))
 
 ;;
 ;;* Transformers
@@ -239,7 +146,7 @@
       (apply -fn -args)))
 
   (advice-add 'ivy--preselect-index :around #'ignore-errors!)
-  (advice-add #'ivy--cleanup :before (lambda (&rest _) (lv-delete-window)))
+  (advice-add #'ivy--cleanup :before #'ymacs-editor//display-help--hide)
 
   (define-key! :map ivy-minibuffer-map
     ("C-r" . ivy-reverse-i-search)
@@ -295,7 +202,11 @@
 
 (after! counsel
   (define-advice counsel--async-command (:before (-cmd &rest _) show-help)
-    (ymacs-editor//display-help -cmd))
+    (ymacs-editor//display-help
+     (when-let (keymap (ivy-state-keymap ivy-last))
+       (append (ymacs-editor//display-keys--collect keymap)
+               (ymacs-editor//display-keys--collect-ivy-extra)))
+     -cmd))
 
   (add-to-list 'counsel-compile-local-builds #'ymacs-editor//default-compile-command t)
 

@@ -49,7 +49,7 @@
           (ymacs-lsp//make-download-from-github-fn
            "clangd/clangd"
            (lambda (x) (string-match-p (if sys/linuxp "linux" "mac") x))
-           :zip))))
+           :7z))))
 
 (after! cc-mode
   (ymacs-editor//add-toggles

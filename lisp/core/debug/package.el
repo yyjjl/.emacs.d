@@ -2,9 +2,6 @@
 
 (defvar ymacs-debugger-alist nil)
 
-(defvar ymacs-debug--help-window nil)
-(defvar ymacs-debug--help-buffer-name " *DEBUG-HELP*")
-
 (defvar-local ymacs-debug--buffer-read-only nil)
 (defvar-local ymacs-debug--cookie nil)
 (defvar ymacs-debug--buffer-position nil)

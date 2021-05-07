@@ -193,7 +193,6 @@
           ("" "booktabs, wasysym, marvosym" nil)
           ("" "subfig" nil)
           ("" "psfrag, epsfig" t)
-          ;; ("OT1" "fontenc" nil)
           ("" "minted" nil)
           ("" "mdframed" t)
           ("" "amsfonts, amsthm, bm, upgreek" t)
@@ -207,8 +206,7 @@
     (add-to-list
      'org-latex-classes
      `("cn-article"
-       ,(concat "\\documentclass[11pt,a4paper]{article}\n"
-                common)
+       ,(concat "\\documentclass[11pt,a4paper]{article}\n" common)
        ("\\section{%s}" . "\\section*{%s}")
        ("\\subsection{%s}" . "\\subsection*{%s}")
        ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
@@ -217,8 +215,7 @@
     (add-to-list
      'org-latex-classes
      `("cn-book"
-       ,(concat "\\documentclass[11pt,openany]{book}\n"
-                common)
+       ,(concat "\\documentclass[11pt,openany]{book}\n" common)
        ("\\chapter{%s}" . "\\chapter*{%s}")
        ("\\section{%s}" . "\\section*{%s}")
        ("\\subsection{%s}" . "\\subsection*{%s}")

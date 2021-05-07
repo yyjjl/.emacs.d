@@ -26,7 +26,7 @@
        (defsubst ,sym () ,docstring ,@-body)
        (add-to-list 'ymacs-modeline-segment-alist (cons ',-name ',sym))
        ,(unless (bound-and-true-p byte-compile-current-file)
-	  `(byte-compile #',sym)))))
+          `(byte-compile #',sym)))))
 
 (defun ymacs-modeline//prepare-segments (-segments)
   "Prepare mode-line `SEGMENTS'."
@@ -146,7 +146,7 @@ Return nil if no project was found."
 (defsubst ymacs-modeline//update-buffer-file-name (&rest _)
   "Update buffer file name in mode-line."
   (setq ymacs-modeline--buffer-file-name
-        (if buffer-file-name
+        (if (buffer-file-name)
             (ymacs-modeline//make-buffer-file-name)
           '(:propertize "%b" face ymacs-modeline-buffer-file))))
 
@@ -154,20 +154,26 @@ Return nil if no project was found."
   "current buffer state."
   (propertize " %1*%n " 'face '(:inherit ymacs-modeline-info :weight bold)))
 
+(defun ymacs-modeline//buffer-identification (-id)
+  (if (and (stringp -id)
+           (= ?% (aref -id 0))
+           (= ?b (aref -id (1- (length -id)))))
+      (or ymacs-modeline--buffer-file-name
+          (ymacs-modeline//update-buffer-file-name))
+    (if (consp -id)
+        (cons (ymacs-modeline//buffer-identification (car -id))
+              (ymacs-modeline//buffer-identification (cdr -id)))
+      -id)))
+
 (ymacs-modeline//def-segment buffer-info
   "Combined information about the current buffer, including the current working
 directory, the file name, and its state (modified, read-only or non-existent)."
-  (cl-list*
+  (list
    (ymacs-modeline//buffer-state)
 
    (when (buffer-base-buffer) "(I)")
 
-   (or ymacs-modeline--buffer-file-name
-       (ymacs-modeline//update-buffer-file-name))
-
-   (when (and (listp mode-line-buffer-identification)
-              (equal (car mode-line-buffer-identification) "%b"))
-     (cdr mode-line-buffer-identification))))
+   (ymacs-modeline//buffer-identification mode-line-buffer-identification)))
 
 (ymacs-modeline//def-segment buffer-info-simple
   "Display only the current buffer's name, but with fontification."
