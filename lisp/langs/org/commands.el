@@ -73,16 +73,22 @@ _h_tml    _'_         ^ ^             _A_SCII:
             (project
              (or (when (not force)
                    (assoc ymacs-org-publish-last-project org-publish-project-alist))
-                 (assoc ymacs-org-publish-default-project org-publish-project-alist)
                  (when current-prefix-arg
                    (completing-read! "Project: " org-publish-project-alist))
-                 (car org-publish-project-alist))))
-       (save-window-excursion
-         (let ((org-publish-use-timestamps-flag
-                (and (not force)
-                     org-publish-use-timestamps-flag)))
-           (org-publish-file (buffer-file-name (buffer-base-buffer)) project)
-           (setq ymacs-org-publish-last-project (car project))))))))
+                 (condition-case nil
+                     (unless (yes-or-no-p
+                              (format "Use org-export-dispatch(y) or %s (n/RET)?"
+                                      (caar org-publish-project-alist)))
+                       (car org-publish-project-alist))
+                   (quit nil)))))
+       (if project
+           (save-window-excursion
+             (let ((org-publish-use-timestamps-flag
+                    (and (not force)
+                         org-publish-use-timestamps-flag)))
+               (setq-local ymacs-org-publish-last-project (car project))
+               (org-publish-file (buffer-file-name (buffer-base-buffer)) project)))
+         (org-export-dispatch '(4)))))))
 
 ;;;###autoload
 (defun ymacs-org/next-item (&optional -n)
