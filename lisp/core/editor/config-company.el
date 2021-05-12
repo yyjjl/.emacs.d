@@ -49,6 +49,7 @@
                   ;; company-dabbrev
                   ))
 
+  (setq company-format-margin-function nil)
   ;; Company should be case sensitive
   (setq company-dabbrev-code-other-buffers t)
   (setq company-show-numbers t)

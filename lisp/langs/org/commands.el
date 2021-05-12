@@ -197,7 +197,7 @@ _h_tml    _'_         ^ ^             _A_SCII:
           (user-error "Process latexmk is still active")))
       (start-process
        "latexmk" (get-buffer-create "LaTeXMK")
-       "latexmk" "-quiet" "-pvc" "-g" "-pdf" "-dvi-" "-ps-"
+       "latexmk" "-pvc" "-g" "-pdf" "-dvi-" "-ps-"
        "-pdflatex=xelatex -shell-escape -interaction=nonstopmode %O %S"
        (concat "-outdir=" out-dir)
        (concat base-name ".tex"))
