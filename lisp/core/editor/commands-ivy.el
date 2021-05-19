@@ -28,21 +28,6 @@
         (funcall fn)
       (message "Not meta-dot function found for %s" caller))))
 
-
-;;;###autoload
-(defun ymacs-editor/semantic-or-imenu ()
-  (interactive)
-  (require 'semantic/fw)
-  (condition-case nil
-      (if (and (not ymacs-editor-prefer-imenu-p)
-               (semantic-active-p))
-          (progn
-            (semantic-force-refresh)
-            (counsel-semantic))
-        (counsel-imenu))
-    (error
-     (ignore-errors (counsel-imenu)))))
-
 ;;* swiper
 (defhydra ymacs-hydra/swiper (:color blue :hint nil)
   "

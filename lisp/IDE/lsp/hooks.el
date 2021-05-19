@@ -9,7 +9,6 @@
     (when (lsp--capability :hoverProvider)
       (add-hook 'eldoc-documentation-functions #'ymacs-lsp//eldoc-function -10 t))
 
-    (setq ymacs-editor-prefer-imenu-p t)
     (setq-local company-minimum-prefix-length 2))
 
   (define-advice lsp--calculate-root (:around (-fn -session -file-name) use-truename)

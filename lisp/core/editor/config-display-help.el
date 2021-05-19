@@ -1,7 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
 (defvar ymacs-editor-display-help-extra-lines nil)
-(defvar ymacs-editor-display-help-max-width 160)
+(defvar ymacs-editor-display-help-max-columns 5)
+(defvar ymacs-editor-display-help-column-sep "  ")
 (defvar ymacs-editor-display-help-ignore-commands nil)
 (defvar ymacs-editor-display-help-window nil)
 (defvar ymacs-editor-display-help-buffer-name " *EDITOR-HELP*")
@@ -24,30 +25,69 @@
   (cl-loop
    for (definition . items) in (-group-by #'cdr keys)
    collect
-   (format "[%s %s]"
+   (format "[%s] %s"
            (mapconcat
-            (lambda (item)
-              (propertize (car item) 'face 'help-key-binding))
+            (lambda (item) (propertize (car item) 'face 'help-key-binding))
             items
             "/")
-           (cond ((symbolp definition)
-                  definition)
-                 ((functionp definition)
-                  "<anonymous>")
+           (cond ((symbolp definition) definition)
+                 ((functionp definition) "<anonymous>")
                  (t "<error>")))))
+
+
+(defsubst ymacs-editor//display-keys--try-columns (-sorted-keys
+                                                   -n-columns -n-long-columns -n-rows
+                                                   -max-width -sep-width)
+  (or (= -n-columns 1)
+      (let ((width (* -sep-width (1- -n-columns)))
+            (keys -sorted-keys))
+        (cl-loop
+         for i from 0 to (1- -n-columns)
+         for n = (+ -n-rows (if (< i -n-long-columns) 1 0))
+         do (progn
+              (setq keys (nthcdr (1- n) keys))
+              ;; the lengths of -sorted-keys is ordered
+              (cl-incf width (length (car keys)))
+              (setq keys (cdr keys))))
+        (< width -max-width))))
+
+(defsubst ymacs-editor//display-keys--format-table (-sorted-keys
+                                                    -n-columns -n-long-columns -n-rows
+                                                    -column-sep)
+  (let ((rows (make-vector (1+ -n-rows) nil))
+        (keys -sorted-keys))
+    (cl-loop
+     for i from 0 to (1- -n-columns)
+     for n = (+ -n-rows (if (< i -n-long-columns) 1 0))
+     for pad-width = (length (car (nthcdr (1- n) keys)))
+     do (progn
+          (dotimes (j n)
+            (aset rows j
+                  (cons (concat (car keys) (make-string (- pad-width (length (car keys))) ?\ ))
+                        (aref rows j)))
+            (setq keys (cdr keys)))))
+    (mapconcat
+     (lambda (row) (string-join (nreverse row) -column-sep))
+     rows
+     "\n")))
 
 (defsubst ymacs-editor//display-help--keys (-keys)
   (when-let (keys (ymacs-editor//display-keys--format -keys))
-    (let ((max-width (min (frame-width) ymacs-editor-display-help-max-width))
-          (width 0)
-          (strings))
-      (dolist (key keys)
-        (when (> (+ (length key) width) max-width)
-          (push "\n" strings)
-          (setq width 0))
-        (cl-incf width (length key))
-        (push key strings))
-      (string-join (nreverse strings)))))
+    ;; sort by length
+    (setq keys (sort keys (lambda (x y) (< (length x) (length y)))))
+
+    (let* ((n-keys (length keys))
+           (max-width (frame-width))
+           (max-columns ymacs-editor-display-help-max-columns)
+           (sep-width (length ymacs-editor-display-help-column-sep)))
+      (cl-loop
+       for n-columns from max-columns downto 1
+       for n-long-columns = (mod n-keys n-columns)
+       for n-rows = (/ n-keys n-columns)
+       when (ymacs-editor//display-keys--try-columns
+             keys n-columns n-long-columns n-rows max-width sep-width)
+       return (ymacs-editor//display-keys--format-table
+               keys n-columns n-long-columns n-rows ymacs-editor-display-help-column-sep)))))
 
 (defun ymacs-editor//display-help--get-window ()
   (if (and (window-live-p ymacs-editor-display-help-window)
@@ -92,7 +132,7 @@
   (with-selected-window (ymacs-editor//display-help--get-window)
     (unless (string= (buffer-string) -message)
       (erase-buffer)
-      (insert -message "\n")
+      (insert -message)
 
       (let ((window-resize-pixelwise t)
             (window-size-fixed nil))
