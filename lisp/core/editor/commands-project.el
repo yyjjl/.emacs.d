@@ -10,6 +10,7 @@
 
     (dolist (buffer (project--buffer-list project))
       (with-current-buffer buffer
+        (vc-refresh-state)
         (cl-loop
          for (var . val) in ymacs-editor-project-invalidate-cache-empty-vars
          when (local-variable-if-set-p var)
