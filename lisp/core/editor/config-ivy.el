@@ -2,8 +2,6 @@
 
 (declare-function bookmark-get-bookmark-record 'bookmark)
 
-(defvar-local ymacs-editor-prefer-imenu-p nil)
-
 (defvar ymacs-editor-ivy--last-text nil)
 
 (defvar ymacs-editor-ivy-display-help-extra-commands
@@ -48,6 +46,12 @@
                    for key in keys
                    collect
                    (cons (key-description key) command))))
+
+(defun ymacs-editor//display-help--ivy ()
+  (ymacs-editor//display-help
+   (when-let (keymap (ivy-state-keymap ivy-last))
+     (append (ymacs-editor//display-keys--collect keymap)
+             (ymacs-editor//display-keys--collect-ivy-extra)))))
 
 (defun ymacs-editor//ivy-re-builder (-str)
   (when (string-prefix-p "=" -str)
@@ -181,7 +185,7 @@
     :display-transformer-fn
     #'ymacs-editor//ivy-bookmark-transformer)
 
-  (add-to-list 'ivy-hooks-alist '(t . ymacs-editor//display-help))
+  (add-to-list 'ivy-hooks-alist '(t . ymacs-editor//display-help--ivy))
 
   (setq ivy-read-action-function #'ivy-hydra-read-action)
   (setf (alist-get 't ivy-format-functions-alist) #'ivy-format-function-arrow)

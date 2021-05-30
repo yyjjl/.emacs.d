@@ -249,7 +249,7 @@
 
   ("j" . ymacs-editor/fzf)
   ("a" . ymacs-editor/rg)
-  ("i" . ymacs-editor/semantic-or-imenu)
+  ("i" . counsel-imenu)
 
   ("l l" . counsel-load-library)
   ("l t" . counsel-load-theme)
