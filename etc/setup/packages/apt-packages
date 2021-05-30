@@ -8,17 +8,16 @@ cmake
 curl
 dvipng
 exuberant-ctags
-fcitx-libpinyin
 fd-find
 ffmpeg
 fzf
 git
 global
+gnome-shell-extension-autohidetopbar
+gnome-shell-extension-pixelsaver
 google-chrome-stable
 gparted
 graphviz
-i3
-i3block
 inkscape
 latexmk
 libboost-dev
@@ -44,5 +43,4 @@ texlive-xetex
 trash-cli
 valgrind
 xsel
-zeal
 zsh
