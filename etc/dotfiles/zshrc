@@ -84,6 +84,10 @@ alias ec='emacsclient -c -a "" -n'
 alias ep='emacs --dump-file=$HOME/.emacs.d/.cache/emacs.pdmp'
 alias gnus='emacs --eval "(gnus)"'
 
+hash -d e=$HOME/.emacs.d
+hash -d d=$HOME/downloads
+hash -d w=$HOME/working
+
 case "$INSIDE_EMACS" in
     vterm)
         alias ff='emacsclient -n'
