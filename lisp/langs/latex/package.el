@@ -24,5 +24,6 @@
 
 (add-to-list 'auto-mode-alist '("\\.tikz\\'" . latex-mode))
 
+(put 'TeX-command-extra-options 'safe-local-variable #'stringp)
 (put 'TeX-narrow-to-group 'disabled nil)
 (put 'LaTeX-narrow-to-environment 'disabled nil)

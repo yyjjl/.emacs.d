@@ -3,6 +3,9 @@
 (defvar reb-regexp)
 (defvar reb-target-window)
 
+(eval-when-compile
+  (require 're-builder))
+
 ;;;###autoload
 (defun ymacs-editor/cleanup-buffer-safe ()
   "Perform a bunch of safe operations on the whitespace content of a buffer.

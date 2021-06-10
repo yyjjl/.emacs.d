@@ -11,11 +11,6 @@
 (after! csv-mode
   (setq csv-separators '("," ";" "|" " ")))
 
-(after! zeal-at-point
-  (setf (cdr (assoc 'c++-mode zeal-at-point-mode-alist)) "cpp"
-        (cdr (assoc 'python-mode zeal-at-point-mode-alist)) "python")
-  (add-to-list 'zeal-at-point-mode-alist '(cmake-mode . "cmake")))
-
 (after! graphviz-dot-mode
   (require 'company-graphviz-dot)
 
