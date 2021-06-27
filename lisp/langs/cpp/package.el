@@ -63,7 +63,7 @@
   ;; set term default directory
   (add-to-list 'ymacs-term-directory-functions #'ymacs-cpp//build-dir)
   (add-to-list 'ymacs-term-repl-alist
-               '(c++-mode :program "root" :program-args ("-l" the-file) :cmd-fmt ".X %s\n")))
+               '(c++-mode :program "root" :program-args ("-l" the-file))))
 
 (eval-when-has-feature! debug
   (add-to-list 'ymacs-debugger-alist '(c-mode gdb :gud t))

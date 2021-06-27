@@ -3,15 +3,20 @@
 (defun ymacs-term//load-file-in-repl--default (-args)
   (barf-if-not-visiting-file!)
 
-  (let ((program (plist-get -args :program))
-        (program-args (cl-subst (buffer-file-name)
-                                'the-file
-                                (plist-get -args :program-args)))
-        (cmd (format (plist-get -args :cmd-fmt) (buffer-file-name))))
+  (let* ((program (plist-get -args :program))
+         (program-args (cl-subst (buffer-file-name)
+                                 'the-file
+                                 (plist-get -args :program-args)))
+         (cmd (plist-get -args :cmd-fmt))
+         (callback
+          (when cmd
+            (let ((file (buffer-file-name)))
+              (lambda ()
+                (ymacs-term//send-string (format cmd file)))))))
     (ymacs-term//exec-program-in-buffer (concat "Repl: " (buffer-name))
       :program program
       :program-args program-args
-      :callback (lambda () (ymacs-term//send-string cmd)))))
+      :callback callback)))
 
 ;;;###autoload
 (defun ymacs-term/load-file-in-repl ()

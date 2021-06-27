@@ -107,7 +107,9 @@
       ymacs-bash-path))
 
 (defun ymacs-term//create-vterm-buffer (-buffer -shell-name)
-  (let ((vterm-shell -shell-name))
+  (let ((vterm-shell (format "%s %s"
+                             -shell-name
+                             (mapconcat #'shell-quote-argument ymacs-term-program-arguments " "))))
     (with-current-buffer -buffer
       (vterm-mode)
       (ymacs-term//sentinel-setup))))
