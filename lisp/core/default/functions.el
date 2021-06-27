@@ -362,21 +362,22 @@ like the scratch buffer where knowing the current project directory is important
   "Show the number of iedit regions matches + what match you're on."
   (when (and (bound-and-true-p iedit-mode)
              (bound-and-true-p iedit-occurrences-overlays))
-    (let ((this-oc
-           (or (let ((inhibit-message t))
-                 (iedit-find-current-occurrence-overlay))
-               (save-excursion
-                 (iedit-prev-occurrence)
-                 (iedit-find-current-occurrence-overlay))))
-          (length (length iedit-occurrences-overlays))
-          (sorted-ocs (sort (copy-sequence iedit-occurrences-overlays)
-                            (lambda (a b) (< (overlay-start a) (overlay-start b))))))
-      (format
-       " %s/%d "
-       (if this-oc
-           (- length (1- (length (memq this-oc sorted-ocs))))
-         "-")
-       length))))
+    (ignore-errors
+      (let ((this-oc
+             (or (let ((inhibit-message t))
+                   (iedit-find-current-occurrence-overlay))
+                 (save-excursion
+                   (iedit-prev-occurrence)
+                   (iedit-find-current-occurrence-overlay))))
+            (length (length iedit-occurrences-overlays))
+            (sorted-ocs (sort (copy-sequence iedit-occurrences-overlays)
+                              (lambda (a b) (< (overlay-start a) (overlay-start b))))))
+        (format
+         " %s/%d "
+         (if this-oc
+             (- length (1- (length (memq this-oc sorted-ocs))))
+           "-")
+         length)))))
 
 (defsubst ymacs-modeline//multiple-cursors ()
   "Show the number of multiple cursors."

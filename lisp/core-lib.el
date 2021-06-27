@@ -423,7 +423,9 @@ HTML file converted from org file, it returns t."
                           (project--buffer-list project))
                         (buffer-list)))
       (with-current-buffer buffer
-        (hack-dir-local-variables-non-file-buffer)))))
+        (if (buffer-file-name)
+            (hack-local-variables)
+          (hack-dir-local-variables-non-file-buffer))))))
 
 (defun save-dir-local-variables! (&rest -variables)
   (save-window-excursion
