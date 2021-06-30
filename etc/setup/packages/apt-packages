@@ -7,7 +7,6 @@ clang
 cmake
 curl
 dvipng
-exuberant-ctags
 fd-find
 ffmpeg
 fzf
@@ -42,6 +41,7 @@ texlive-lang-cjk
 texlive-science
 texlive-xetex
 trash-cli
+universal-ctags
 valgrind
 xsel
 zsh

@@ -190,7 +190,6 @@
 (setq package-quickstart t)
 (setq package-native-compile t)
 (after! package
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
   (unless ymacs-package-use-gnutls-p
     (dolist (item package-archives)
       (setcdr item (replace-regexp-in-string "https:" "http:" (cdr item))))))

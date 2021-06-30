@@ -3,7 +3,7 @@
 (executable! gls)
 (executable! ripgrep :exe "rg")
 (executable! fdfind :exe ["fdfind" "fd"])
-(executable! ctags :exe "ctags-exuberant")
+(executable! ctags :exe ["ctags-universal" "ctags"])
 
 (option! default-project nil
   :type 'list
@@ -26,6 +26,7 @@
  ;; `counsel-M-x' need amx to get history
  amx
  company
+ citre
  ivy
  ivy-hydra
  pretty-hydra
@@ -188,6 +189,7 @@
   ("M-7" . ymacs-editor/avy-copy-and-yank)
   ("M-8" . avy-goto-word-or-subword-1)
   ("M-9" . avy-goto-char)
+  ("M-g ." . citre-ace-peek)
   ("M-g w" . ymacs-editor/avy-copy)
   ("M-g y" . ymacs-editor/avy-copy-and-yank)
   ("M-g 1" . avy-goto-char)

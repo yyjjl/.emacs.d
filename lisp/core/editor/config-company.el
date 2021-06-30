@@ -8,7 +8,11 @@
     x))
 
 (cl-defun ymacs-editor//add-company-backend
-    (-backend &key ((:main -main-backend-p) t) ((:after -after) nil))
+    (-backend
+     &key
+     ((:main -main-backend-p) t)
+     ((:after -after) nil)
+     ((:remove-capf -remove-capf-p) t))
   ;; deep copy the backends list
   (let ((backends (mapcar (lambda (x) (if (consp x) (copy-sequence x) x))
                           company-backends)))
@@ -17,8 +21,9 @@
           ;; remove -backend first
           (setq backends (delete -backend backends))
           ;; remove 'company-capf
-          (setcar parent-of-main-backend
-                  (delete 'company-capf (car parent-of-main-backend)))
+          (when -remove-capf-p
+            (setcar parent-of-main-backend
+                    (delete 'company-capf (car parent-of-main-backend))))
           (if -after
               (insert-after! -after -backend (car parent-of-main-backend))
             (cl-pushnew -backend (car parent-of-main-backend))))
@@ -42,7 +47,7 @@
 
   (setq-default company-backends
                 `((company-capf
-                   :with company-yasnippet
+                   :with company-yasnippet ymacs-editor//company-citre
                    :separate)
                   ;; company-files
                   (company-dabbrev-code company-etags company-keywords)

@@ -212,6 +212,11 @@
                (ymacs-editor//display-keys--collect-ivy-extra)))
      -cmd))
 
+  (define-advice counsel-imenu (:before (&rest _) parse-buffer)
+    (when (eq imenu-create-index-function 'semantic-create-imenu-index)
+      (semantic-clear-toplevel-cache)
+      (semantic-fetch-tags)))
+
   (add-to-list 'counsel-compile-local-builds #'ymacs-editor//default-compile-command t)
 
   (setq counsel-yank-pop-separator "\n------------------------------------------------------------\n")

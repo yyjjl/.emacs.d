@@ -92,7 +92,8 @@
       (hs-minor-mode 1)
     (user-error (message "%s" (error-message-string err))))
 
-  (ymacs-editor//generic-setup))
+  (ymacs-editor//generic-setup)
+  (ymacs-editor//try-enable-ctags))
 
 (run-after-init! 0
   (require 'lv)

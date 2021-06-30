@@ -34,30 +34,17 @@ If region is active, operate on it, else operate on line."
       (ymacs-perl//format-region (point-min) (point-max))))))
 
 ;;;###autoload
-(defun ymacs-perl/generate-global-tags ()
-  (interactive)
-  (let ((default-directory (expand-cache! "perl-modules"))
-        (lib-paths
-         (shell-command-to-string "perl -e 'for(@INC){print \"$_\n\";}'")))
-    (dolist (path (--filter
-                   (file-exists-p it)
-                   (split-string lib-paths "\n" :omit-nulls "\n\t ")))
-      (let ((link path))
-        (while (and link
-                    (not (string-match-p
-                          "perl"
-                          (file-name-base (directory-file-name link)))))
-          (setq link (file-name-directory (directory-file-name link))))
+(defun ymacs-perl/generate-global-tags (-perl-executable -output-file)
+  (interactive
+   (let ((perl (read-shell-command "Perl executable: ")))
+     (list perl
+           (read-file-name "Output file: " nil (format "tags.%s-modules" perl)))))
 
-        (unless (string-empty-p link)
-          (setq link (directory-file-name link))
-          (when (and (> (length link) 5)
-                     (member (substring link 0 5) '("/etc/" "/usr/")))
-            (setq link (substring link 5)))
-          (setq link (replace-regexp-in-string "/" "_" link))
-          (if (file-exists-p link)
-              (message "%s exists" link)
-            (make-symbolic-link path link)))))
+  (let ((lib-paths (--> -perl-executable
+                     (format "%s -e 'for(@INC){print \"$_\n\";}'" it)
+                     (shell-command-to-string it)
+                     (split-string it "\n" :omit-nulls "\n\t ")
+                     (cl-remove-if-not #'file-exists-p it))))
     (run-compilation!
      :name "Generate perl tags"
-     :command "gtags -cv --statistics")))
+     :command (ymacs-editor//build-ctags-command lib-paths -output-file))))

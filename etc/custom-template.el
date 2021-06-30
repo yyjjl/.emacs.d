@@ -8,6 +8,9 @@
  '(fill-column 100)
  '(org-download-backend "curl \"%s\" -o \"%s\"")
  '(org-download-screenshot-method "gnome-screenshot -a -f %s")
+ '(package-archives
+   '(("melpa" . "http://elpa.emacs-china.org/melpa/")
+     ("gnu" . "http://elpa.emacs-china.org/gnu/")))
  '(warning-suppress-log-types '((comp)))
  '(which-key-dont-use-unicode t)
  '(user-full-name "Zet"))
