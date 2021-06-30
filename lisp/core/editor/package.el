@@ -190,7 +190,7 @@
   ("M-8" . avy-goto-word-or-subword-1)
   ("M-9" . avy-goto-char)
   ("M-g ." . citre-ace-peek)
-  ("M-g u" . browse-url-at-point)
+  ("M-g o" . browse-url-at-point)
   ("M-g w" . ymacs-editor/avy-copy)
   ("M-g y" . ymacs-editor/avy-copy-and-yank)
   ("M-g 1" . avy-goto-char)
