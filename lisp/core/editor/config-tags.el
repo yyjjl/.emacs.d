@@ -37,7 +37,7 @@
                  (or (citre-get-symbol) 'stop)))
     (meta (citre-get-property 'signature -arg))
     (annotation (concat (citre-capf--get-annotation -arg) ":citre"))
-    (candidates (seq-take (citre-capf--get-collection -arg) 3))
+    (candidates (all-completions -arg (citre-capf--get-collection -arg)))
     (ignore-case (not citre-completion-case-sensitive))))
 
 (after! citre
@@ -55,6 +55,7 @@
               (error
                (user-error "No %s found for `%s' (%s)" -kind -input (error-message-string err))))))))
 
+  (setq citre-enable-capf-integration nil)
   (setq citre-project-root-function #'ymacs-editor//project-root))
 
 (after! citre-peek
