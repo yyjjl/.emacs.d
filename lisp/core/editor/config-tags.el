@@ -38,7 +38,7 @@
     (meta (citre-get-property 'signature -arg))
     (annotation (concat (citre-capf--get-annotation -arg) ":citre"))
     (candidates (seq-take (citre-capf--get-collection -arg) 3))
-    (ignore-case citre-completion-case-sensitive)))
+    (ignore-case (not citre-completion-case-sensitive))))
 
 (after! citre
   ;; default fallback to citre-xref-backend
