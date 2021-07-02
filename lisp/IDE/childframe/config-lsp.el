@@ -14,6 +14,5 @@
               #'lsp-lv-message))
       (ymacs-lsp//set-lsp-signature-width))
 
-    (setq lsp-eldoc-render-all t)
-    ;; (setq lsp-display-inline-image t)
-    ))
+    (setq lsp-eldoc-render-all ymacs-eldoc-use-childfeame-p)
+    (setq lsp-display-inline-image t)))

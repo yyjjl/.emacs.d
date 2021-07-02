@@ -26,6 +26,8 @@
   (when (and ymacs-ctags-path
              (require 'citre nil t)
              (citre-tags-file-path))
+    ;; disable semantic when using citre
+    (setq ymacs-editor--inhibit-semantic t)
     (citre-mode 1)))
 
 (defun ymacs-editor//company-citre (-command &optional -arg &rest _ignored)

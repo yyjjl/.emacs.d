@@ -38,5 +38,6 @@
             (posframe-hide ymacs-editor-doc-buffer))
         (posframe-hide ymacs-editor-doc-buffer)))))
 
-(after! eldoc
-  (setq-default eldoc-message-function #'ymacs-editor//eldoc-message))
+(when ymacs-eldoc-use-childfeame-p
+  (after! eldoc
+    (setq-default eldoc-message-function #'ymacs-editor//eldoc-message)))

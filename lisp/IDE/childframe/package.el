@@ -1,7 +1,10 @@
 ;;; -*- lexical-binding: t; -*-
 
-(require-packages!
- company-posframe)
+(option! eldoc-use-childfeame nil
+  "use childframe to display eldoc"
+  :type 'boolean)
+
+(require-packages! company-posframe)
 
 (after! posframe
   (advice-add #'keyboard-quit :before #'posframe-hide-all))

@@ -17,7 +17,9 @@
           ;; clear multi-folders
           (setf (lsp-session-server-id->folders (lsp-session)) (ht))
           (lsp))
-        (bound-and-true-p lsp-mode)))
+        (bound-and-true-p lsp-mode)
+        ;; disable semantic when using lsp
+        (setq ymacs-editor--inhibit-semantic t)))
 
 (defmacro ymacs-lsp//try-enable-simple (-name &rest -condition)
   (declare (indent 1))

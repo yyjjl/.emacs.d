@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(defvar-local ymacs-editor--inhibit-semantic nil)
+
 (after! semantic
   (advice-add #'semantic-analyze-completion-at-point-function :override #'ignore)
   (advice-add #'semantic-analyze-notc-completion-at-point-function :override #'ignore)
@@ -7,13 +9,11 @@
 
   (define-hook! ymacs-semantic//inhibit-function (semantic-inhibit-functions)
     (or (and default-directory (file-remote-p default-directory))
+        ymacs-editor--inhibit-semantic
         (not (derived-mode-p 'prog-mode))))
 
   (define-advice semantic-idle-scheduler-function (:around (-fn &rest -args) allow-quit)
     (with-local-quit (apply -fn -args)))
-
-  (semantic-add-system-include "/usr/include/" 'c++-mode)
-  (semantic-add-system-include "/usr/include/" 'c-mode)
 
   (define-key! :map semantic-mode-map :prefix "C-c ,"
     ("." . semantic-ia-fast-jump)

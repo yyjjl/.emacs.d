@@ -38,18 +38,10 @@
 
 (eval-when-has-feature! lsp
   (after! (lsp-mode lsp-clangd)
-    (setq lsp-clients-clangd-executable ymacs-clangd-path)
-
     (dolist (arg '("--all-scopes-completion"
                    "--cross-file-rename"
                    "--clang-tidy"))
-      (cl-pushnew arg lsp-clients-clangd-args :test #'string=))
-
-    (setf (lsp--client-download-server-fn (ht-get lsp-clients 'clangd))
-          (ymacs-lsp//make-download-from-github-fn
-           "clangd/clangd"
-           (lambda (x) (string-match-p (if sys/linuxp "linux" "mac") x))
-           :7z))))
+      (cl-pushnew arg lsp-clients-clangd-args :test #'string=))))
 
 (after! cc-mode
   (ymacs-editor//add-toggles

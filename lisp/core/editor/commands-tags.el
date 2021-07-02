@@ -31,6 +31,7 @@
           (message "etags is running ... please retry after a while")
         (ymacs-editor//generate-tags -directory -tag-file)))))
 
+;;;###autoload
 (defun ymacs-editor/generate-ctags-for-project (-tag-file)
   (interactive
    (let ((root (ymacs-editor//project-root)))

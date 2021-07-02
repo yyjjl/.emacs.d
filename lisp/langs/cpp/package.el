@@ -1,11 +1,5 @@
 ;; -*- lexical-binding:t -*-
 
-(option! cpp-clangd-version "11.0.0"
-  "clangd version"
-  :type 'string)
-
-(executable! clangd :exe [(expand-cache! (format "lsp/clangd_%s/bin/clangd" ymacs-cpp-clangd-version)) "clangd"])
-
 (require-packages! google-c-style)
 
 (cl-defstruct ymacs-cpp-build-system
