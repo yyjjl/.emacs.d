@@ -1,12 +1,19 @@
 ;;; -*- lexical-binding: t; -*-
 
-(option! universal-catgs-smart-git-integration t
+(option! universal-ctags-smart-git-integration t
   "whether to filtering file using git when generating ctags for project"
-  :type 'boolean)
+  :type 'boolean
+  :safe #'booleanp)
 
 (option! universal-ctags-command-template '(("kinds-all" . "'*'") ("fields" . "'*'") ("extras" . "'*'"))
   "command template for universal ctags"
-  :type '(alist))
+  :type '(alist)
+  :safe #'(lambda (x)
+            (and (listp x)
+                 (cl-every
+                  (lambda (c)
+                    (and (stringp (car-safe c)) (stringp (cdr-safe c))))
+                  x))))
 
 (defsubst ymacs-editor//build-ctags-command (&optional -files -output-file)
   (format "%s %s %s -R %s"

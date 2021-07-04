@@ -7,7 +7,7 @@
 
 (option! default-project nil
   :type 'list
-  :safe 'consp)
+  :safe #'(lambda (x) (and (symbolp (car-safe x)) (stringp (cdr-safe x)))))
 
 (eval-when-compile-config!
  (when sys/macp

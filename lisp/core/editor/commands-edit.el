@@ -2,6 +2,7 @@
 
 (defvar reb-regexp)
 (defvar reb-target-window)
+(declare-function reb-update-regexp 're-builder)
 
 (eval-when-compile
   (require 're-builder))

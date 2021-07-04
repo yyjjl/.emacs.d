@@ -11,7 +11,12 @@
        (options . (("CMAKE_BUILD_TYPE" . "Debug")))))
   "Project settings"
   :type '(alist)
-  :safe #'listp)
+  :safe #'(lambda (x)
+            (and (listp x)
+                 (cl-every
+                  (lambda (c)
+                    (and (stringp (car-safe c)) (listp (cdr-safe c))))
+                  x))))
 
 (option! cpp-cmake-current-config-name "Release"
   "Project settings"

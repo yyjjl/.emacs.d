@@ -40,7 +40,7 @@
                (read-file-name "tag file: " root nil nil "tags")))))
   (let* ((default-directory (ymacs-editor//project-root))
          (project (project-current))
-         (files (when (and ymacs-universal-catgs-smart-git-integration-p
+         (files (when (and ymacs-universal-ctags-smart-git-integration-p
                            (file-directory-p ".git"))
                   (thread-first "git ls-files  --full-name --"
                     (shell-command-to-string)
