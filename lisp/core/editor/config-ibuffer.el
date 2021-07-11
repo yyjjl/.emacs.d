@@ -23,7 +23,7 @@
         ibuffer-display-summary nil)
 
   (setq ibuffer-saved-filter-groups
-        '(("default"
+        '(("Default"
            ("Dired" (or (mode . dired-mode)
                         (mode . sr-mode)))
            ("Planner" (or (name . "^\\*Calendar\\*$")
@@ -40,7 +40,7 @@
                         (name . "^\\*Completions\\*$")
                         (name . "^\\*Compile-Log\\*$")
                         (name . "^\\*Man .*\\*$")))
-           ("Emacs-Var" (filename . ".emacs.d/.cache"))
+           ("Emacs-Cache" (filename . ".emacs.d/.cache"))
            ("Emacs-Config" (filename . ".emacs.d"))
            ("Code" (predicate . (derived-mode-p 'prog-mode)))
            ("Process" (or (predicate . (get-buffer-process (current-buffer)))
