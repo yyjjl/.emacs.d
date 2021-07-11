@@ -5,13 +5,14 @@ CURRENT_DIR=$(dirname "$0")
 # Cask applications
 CORE_APPS=(
     cmake
-    ctags
     coreutils
-    ripgrep
-    p7zip
-    fzf
     fd
+    fzf
+    libvterm
+    p7zip
     pipenv
+    ripgrep
+    universal-ctags
 )
 
 CASK_APPS=(
@@ -53,11 +54,10 @@ function main {
     check
 
     brew tap d12frosted/emacs-plus
-    brew install emacs-plus@27 \
+    brew install emacs-plus@28 \
          --with-modern-black-variant-icon \
-         --with-ctags \
-         --with-no-frame-refocus \
-         --with-xwidgets
+         --with-xwidgets \
+         --with-native-comp
 
     for app in ${CORE_APPS[@]}; do
         info ">> Installing ${app}..."
