@@ -13,7 +13,7 @@
   ("d" . magit-dispatch)
   ("b" . magit-blame)
   ("f" . magit-file-dispatch)
-  ("l" . magit-log-buffr-file)
+  ("l" . magit-log-buffer-file)
   ("=" . diff-hl-diff-goto-hunk)
   ("SPC" . diff-hl-mark-hunk)
   ("t" . ymacs-git/timemachine)
