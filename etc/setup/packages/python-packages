@@ -1,14 +1,11 @@
 autopep8
 beautifulsoup4
-configparser
 flake8
 graphviz
 html5lib
 importmagic
 ipython
 isort
-jedi
-json-rpc
 lxml
 nltk
 numpy
@@ -16,7 +13,6 @@ overrides
 pandas
 pyflakes
 pylint
-python-language-server[all]
 requests
 scikit-image
 scikit-learn

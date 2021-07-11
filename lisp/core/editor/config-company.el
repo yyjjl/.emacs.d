@@ -46,9 +46,7 @@
     ("M-p" . company-previous-page))
 
   (setq-default company-backends
-                `((company-capf
-                   :with company-yasnippet ymacs-editor//company-citre
-                   :separate)
+                `((company-capf :with company-yasnippet :separate)
                   ;; company-files
                   (company-dabbrev-code company-etags company-keywords)
                   ;; company-dabbrev
@@ -57,7 +55,7 @@
   (setq company-format-margin-function nil)
   ;; Company should be case sensitive
   (setq company-dabbrev-code-other-buffers t)
-  (setq company-show-numbers t)
+  (setq company-show-quick-access t)
   ;; Don't auto auto complete
   (setq company-idle-delay 0.3)
   (setq company-require-match nil)

@@ -37,7 +37,8 @@
     (define-key! :map project-prefix-map
       ("E" . ymacs-editor/edit-dir-locals)
       ("R" . ymacs-editor/generate-tags)
-      ("C" . ymacs-editor/generate-ctags-for-project)
+      ("U" . citre-update-this-tags-file)
+      ("C" . citre-edit-tags-file-recipe)
       ("i" . ymacs-editor/invalid-project-cache)))
 
   (setq project-find-functions '(ymacs-editor//project)))

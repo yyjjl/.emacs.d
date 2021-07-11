@@ -1,34 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
 
-(option! universal-ctags-smart-git-integration t
-  "whether to filtering file using git when generating ctags for project"
-  :type 'boolean
-  :safe #'booleanp)
-
-(option! universal-ctags-command-template '(("kinds-all" . "'*'") ("fields" . "'*'") ("extras" . "'*'"))
-  "command template for universal ctags"
-  :type '(alist)
-  :safe #'(lambda (x)
-            (and (listp x)
-                 (cl-every
-                  (lambda (c)
-                    (and (stringp (car-safe c)) (stringp (cdr-safe c))))
-                  x))))
-
-(defsubst ymacs-editor//build-ctags-command (&optional -files -output-file)
-  (format "%s %s %s -R %s"
-          ymacs-ctags-path
-          (mapconcat (lambda (option)
-                       (format "--%s=%s" (car option) (cdr option)))
-                     ymacs-universal-ctags-command-template
-                     " ")
-          (if -output-file
-              (concat "-f " (shell-quote-argument -output-file))
-            "")
-          (if -files
-              (mapconcat #'shell-quote-argument -files " ")
-            ".")))
-
 (defun ymacs-editor//try-enable-ctags ()
   (when (and ymacs-ctags-path
              (require 'citre nil t)
@@ -37,17 +8,25 @@
     (setq ymacs-editor--inhibit-semantic t)
     (citre-mode 1)))
 
-(defun ymacs-editor//company-citre (-command &optional -arg &rest _ignored)
-  "Completion backend of for citre.  Execute COMMAND with ARG and IGNORED."
-  (interactive (list 'interactive))
-  (cl-case -command
-    (interactive (company-begin-backend 'ymacs-editor//company-citre))
-    (prefix (and (bound-and-true-p citre-mode)
-                 (or (citre-get-symbol) 'stop)))
-    (meta (citre-get-property 'signature -arg))
-    (annotation (concat (citre-capf--get-annotation -arg) ":citre"))
-    (candidates (all-completions -arg (citre-capf--get-collection -arg)))
-    (ignore-case (not citre-completion-case-sensitive))))
+;; (defun ymacs-editor//company-citre (-command &optional -arg &rest _ignored)
+;;   "Completion backend of for citre.  Execute COMMAND with ARG and IGNORED."
+;;   (interactive (list 'interactive))
+;;   (cl-case -command
+;;     (interactive (company-begin-backend 'ymacs-editor//company-citre))
+;;     (prefix (and (bound-and-true-p citre-mode)
+;;                  (or (citre-get-symbol) 'stop)))
+;;     (meta (citre-get-property 'signature -arg))
+;;     (annotation (concat (citre-capf--get-annotation -arg) ":citre"))
+;;     (candidates (all-completions -arg (citre-capf--get-collection -arg)))
+;;     (ignore-case (not citre-completion-case-sensitive))))
+
+(add-hook 'find-file-hook #'ymacs-editor//try-enable-ctags)
+
+(after! dired
+  (require 'citre-lang-fileref))
+
+(after! cc-mode
+  (require 'citre-lang-c))
 
 (after! citre
   ;; default fallback to citre-xref-backend
@@ -64,8 +43,15 @@
               (error
                (user-error "No %s found for `%s' (%s)" -kind -input (error-message-string err))))))))
 
-  (setq citre-enable-capf-integration nil)
-  (setq citre-project-root-function #'ymacs-editor//project-root))
+  ;; (setq citre-enable-capf-integration nil)
+  (setq citre-ctags-program ymacs-ctags-path)
+  (setq citre-default-create-tags-file-location 'global-cache)
+  (setq citre-tags-file-global-cache-dir (expand-cache! "ctags"))
+  (setq citre-use-project-root-when-creating-tags t)
+  (setq citre-project-root-function #'ymacs-editor//project-root)
+
+  (define-key! :map citre-edit-cmd-buf-map
+    ("C-c g" . ymacs-editor//insert-git-files)))
 
 (after! citre-peek
   (define-key! :map citre-peek-keymap
