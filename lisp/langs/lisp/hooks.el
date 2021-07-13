@@ -32,6 +32,6 @@
 (after! auto-compile
   (define-advice auto-compile-byte-compile (:around (-fn &optional -file -start) native)
     (when (and (funcall -fn -file -start)
-               (fboundp 'native-compile))
+               (native-comp-available-p))
       (with-demoted-errors "%s"
         (message "ELN: %s" (native-compile (or -file (buffer-file-name))))))))

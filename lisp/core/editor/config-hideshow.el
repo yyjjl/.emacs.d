@@ -1,7 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 (defface ymacs-editor-hs-overlay-face
-  '((t (:inherit font-lock-builtin-face :underline t)))
+  '((t (:inherit font-lock-builtin-face)))
   "Face used for the dirname part of the buffer path."
   :group 'hideshow)
 
@@ -9,10 +9,23 @@
   "Keymap for hs minor mode overlay.")
 
 (defun ymacs-editor//hs-setup-overlay (-ov)
-  (let* ((start (overlay-start -ov))
-         (end (overlay-end -ov))
-         (str (format " ...%d... " (count-lines start end))))
-    (overlay-put -ov 'display str)
+  (let ((start (overlay-start -ov))
+        (end (overlay-end -ov))
+        (prefix "")
+        (suffix ""))
+    (with-current-buffer (overlay-buffer -ov)
+      (save-excursion
+        (goto-char end)
+        (skip-chars-backward " \t\n")
+        (setq suffix (buffer-substring (point) end))
+        (setq end (point)))
+      (save-excursion
+        (goto-char start)
+        (skip-chars-forward " \t\n")
+        (setq prefix (buffer-substring start (point)))
+        (setq start (min end (point)))))
+    ;; (move-overlay -ov start end)
+    (overlay-put -ov 'display (format "%s...%d...%s" prefix  (count-lines start end) suffix))
     (overlay-put -ov 'face 'ymacs-editor-hs-overlay-face)
     (overlay-put -ov 'pointer 'hand)
     (overlay-put -ov 'keymap ymacs-editor-hs-overlay-map)))
@@ -25,24 +38,12 @@
   (advice-add #'xref-find-definitions :after #'ymacs-editor//hs-auto-expand)
 
   (define-key! :map hs-minor-mode-map
-    ("C-x t h" (defun ymacs-editor/hs-hide-block ()
-                 (interactive)
-                 (save-excursion (call-interactively #'hs-hide-block))))
-    ("C-x t s" (defun ymacs-editor/hs-show-block ()
-                 (interactive)
-                 (save-excursion (call-interactively #'hs-show-block))))
-    ("C-x t H" (defun ymacs-editor/hs-hide-all ()
-                 (interactive)
-                 (save-excursion (call-interactively #'hs-hide-all))))
-    ("C-x t S" (defun ymacs-editor/hs-show-all ()
-                 (interactive)
-                 (save-excursion (call-interactively #'hs-show-all))))
-    ("C-x t l" (defun ymacs-editor/hs-hide-level ()
-                 (interactive)
-                 (save-excursion (call-interactively #'hs-hide-level))))
-    ("C-x t t" (defun ymacs-editor/hs-toggle-hiding ()
-                 (interactive)
-                 (save-excursion (call-interactively #'hs-toggle-hiding)))))
+    ("C-x t h" . hs-hide-block)
+    ("C-x t s" . hs-show-block)
+    ("C-x t H" . hs-hide-all)
+    ("C-x t S" . hs-show-all)
+    ("C-x t l" . hs-hide-level)
+    ("C-x t t" . hs-toggle-hiding))
 
   (define-key! :map ymacs-editor-hs-overlay-map
     ("RET" . hs-show-block))

@@ -11,9 +11,10 @@
  '(package-archives
    '(("melpa" . "http://elpa.emacs-china.org/melpa/")
      ("gnu" . "http://elpa.emacs-china.org/gnu/")))
+ '(user-full-name "Zet")
  '(warning-suppress-log-types '((comp)))
  '(which-key-dont-use-unicode t)
- '(user-full-name "Zet"))
+ '(ymacs-only-in-terminal-p nil))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -62,6 +63,7 @@
 
 (load-feature! langs/cpp)
 (load-feature! langs/cpp-cmake)
+(load-feature! langs/cpp-blade)
 
 (load-feature! langs/python)
 
