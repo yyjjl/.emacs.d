@@ -148,7 +148,7 @@
   (eval-when! sys/macp
     (exec-path-from-shell-initialize))
 
-  (when (display-graphic-p -frame)
+  (when (and sys/linuxp (display-graphic-p -frame))
     ;; Keep mouse at upper-right corner when typing
     ;; (mouse-avoidance-mode t)
 

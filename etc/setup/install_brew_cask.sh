@@ -9,6 +9,7 @@ CORE_APPS=(
     fd
     fzf
     libvterm
+    osxfuse
     p7zip
     pipenv
     ripgrep
@@ -18,16 +19,12 @@ CORE_APPS=(
 CASK_APPS=(
     iterm2
 
-    osxfuse
     google-chrome
 
     v2rayx # shadowsocksx-ng
 
     # fliqlo        # Screen Saver
     keycastr        # Show keys on the screen
-
-    # Utilities
-    adobe-acrobat-reader
 )
 
 . ${CURRENT_DIR}/utils.sh
@@ -66,7 +63,7 @@ function main {
 
     for app in ${CASK_APPS[@]}; do
         info ">> Installing ${app}..."
-        brew cask install ${app}
+        brew install --cask ${app}
     done
 
     brew cleanup

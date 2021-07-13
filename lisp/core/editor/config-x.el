@@ -228,8 +228,7 @@
 
     (add-hook 'pre-command-hook #'ymacs-x//pre-command-hook nil t)
 
-    (with-demoted-errors "%s"
-      (fcitx--ymacs-x-maybe-deactivate))
+    (ignore-errors (fcitx--ymacs-x-maybe-deactivate))
     (setq cursor-type 'bar)
     (setq ymacs-x--command (ymacs-x//lookup-keys ";"))
     (setq ymacs-x--return (ymacs-x//lookup-keys (kbd "RET")))
@@ -245,8 +244,7 @@
     (remove-hook 'pre-command-hook #'ymacs-x//pre-command-hook t)
     (setq cursor-type 'box)
 
-    (with-demoted-errors "%s"
-      (fcitx--ymacs-x-maybe-activate))
+    (ignore-errors (fcitx--ymacs-x-maybe-activate))
 
     (setq ymacs-x--activated nil)
 

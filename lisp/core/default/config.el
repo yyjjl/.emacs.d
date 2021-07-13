@@ -105,6 +105,11 @@
               emacs-version
               (or user-login-name "anonymous")))
 
+(when sys/mac-cocoa-p
+  (setq mac-option-modifier 'meta)
+  (setq mac-command-modifier 'super)
+  (setq mac-function-modifier 'ctrl))
+
 
 
 (setq-default mode-line-buffer-identification '("%b"))
