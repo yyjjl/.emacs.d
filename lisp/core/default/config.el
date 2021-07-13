@@ -105,6 +105,12 @@
               emacs-version
               (or user-login-name "anonymous")))
 
+(with-no-warnings
+  (when sys/mac-cocoa-p
+    (setq mac-option-modifier 'super)
+    (setq mac-command-modifier 'meta)
+    (setq mac-function-modifier 'ctrl)))
+
 
 
 (setq-default mode-line-buffer-identification '("%b"))
@@ -209,3 +215,9 @@
 (setq monokai-height-plus-4 1.0)
 
 (load-theme 'monokai t)
+
+(when ymacs-only-in-terminal-p
+  (require-packages! clipetty)
+
+  (global-clipetty-mode 1)
+  (xterm-mouse-mode 1))

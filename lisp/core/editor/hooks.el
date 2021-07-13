@@ -125,7 +125,7 @@
   (electric-indent-mode 1)
 
   ;; global-modes
-  (semantic-mode 1)
+  ;; (semantic-mode 1)
   ;; (which-function-mode 1)
   (global-subword-mode 1)
   (global-auto-revert-mode 1)
@@ -148,7 +148,7 @@
   (eval-when! sys/macp
     (exec-path-from-shell-initialize))
 
-  (when (display-graphic-p -frame)
+  (when (and sys/linuxp (display-graphic-p -frame))
     ;; Keep mouse at upper-right corner when typing
     ;; (mouse-avoidance-mode t)
 

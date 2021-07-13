@@ -3,6 +3,9 @@
 (option! package-use-gnutls t
   :type 'boolean)
 
+(option! only-in-terminal nil
+  :type 'boolean)
+
 (defvar ymacs-modeline-segment-alist ())
 (defvar ymacs-modeline-vcs-max-length 12
   "The maximum displayed length of the branch name of version control.")
