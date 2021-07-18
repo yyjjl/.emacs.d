@@ -205,6 +205,11 @@
   (setq swiper-stay-on-quit t))
 
 (after! counsel
+  (define-key! :map counsel-git-grep-map
+    ("C-x C-d" . ymacs-editor/smart-counsel-cd))
+  (define-key! :map counsel-ag-map
+    ("C-x C-d" . ymacs-editor/smart-counsel-cd))
+
   (define-advice counsel--async-command (:before (-cmd &rest _) show-help)
     (ymacs-editor//display-help
      (when-let (keymap (ivy-state-keymap ivy-last))
@@ -219,6 +224,7 @@
 
   (add-to-list 'counsel-compile-local-builds #'ymacs-editor//default-compile-command t)
 
+  (setq counsel-fzf-dir-function #'ymacs-editor//project-root)
   (setq counsel-yank-pop-separator "\n------------------------------------------------------------\n")
   (setq counsel-find-file-at-point t)
   (setq counsel-find-file-ignore-regexp

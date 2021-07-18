@@ -218,3 +218,34 @@
         (compile :around (-fn -cmd &optional _)
                  (funcall -fn -cmd (not -noninteractive)))
       (counsel-compile root))))
+
+;;;###autoload
+(defun ymacs-editor/smart-counsel-cd ()
+  (interactive)
+  (counsel-delete-process)
+  (let* ((input ivy-text)
+         (enable-recursive-minibuffers t)
+         (directory (buffer-file-name (ivy-state-buffer ivy-last)))
+         (directory (and directory (file-name-directory directory)))
+         (candidates
+          (when directory
+            (let ((default-directory directory))
+              (cl-remove-duplicates
+               (thread-last counsel-compile-root-functions
+                 (mapcar #'funcall)
+                 (remove nil)
+                 (remove (expand-file-name (ivy-state-directory ivy-last)))
+                 (mapcar #'expand-file-name))
+               :test #'string=))))
+         (new-directory
+          (if candidates
+              (completing-read!
+               "cd: "
+               candidates
+               ;; return
+               (lambda () (counsel-read-directory-name "cd: " directory))
+               ;; return-prompt
+               "read-interactively")
+            (counsel-read-directory-name "cd: " directory))))
+    (ivy-quit-and-run
+      (funcall (ivy-state-caller ivy-last) input new-directory))))
