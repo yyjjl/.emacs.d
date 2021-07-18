@@ -4,9 +4,6 @@
   (define-hook! ymacs-lsp|after-open (lsp-after-open-hook)
     (remove-function (local 'eldoc-documentation-function) #'lsp-eldoc-function)
 
-    (setq header-line-format (remove '(t (:eval lsp-headerline--string)) header-line-format))
-    (setq tab-line-format '(:eval lsp-headerline--string))
-
     (remove-hook 'eldoc-documentation-functions #'flymake-eldoc-function t)
     (add-hook 'eldoc-documentation-functions #'flymake-eldoc-function -20 t)
     (when (lsp--capability :hoverProvider)
@@ -23,6 +20,12 @@
 
 (after! lsp-modeline
   (setq lsp-modeline-code-actions-segments '(count name)))
+
+(after! lsp-headerline
+  (define-hook! ymacs-lsp|set-headerline (lsp-headerline-breadcrumb-mode-hook)
+    (when lsp-headerline-breadcrumb-mode
+      (setq header-line-format (remove '(t (:eval lsp-headerline--string)) header-line-format))
+      (setq tab-line-format '(:eval lsp-headerline--string)))))
 
 (eval-when! ymacs-lsp-use-dap-p
   (after! dap-mode

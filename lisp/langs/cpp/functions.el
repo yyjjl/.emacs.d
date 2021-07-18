@@ -52,6 +52,14 @@
                  (dolist (build-system ymacs-cpp-build-systems)
                    (when (ymacs-cpp//run-function lsp-enable-fn build-system)
                      (setq-local ymacs-cpp-current-build-system build-system)
+                     (setq-local mode-name
+                                 (concat
+                                  "["
+                                  (symbol-name (ymacs-cpp-build-system-system-id build-system))
+                                  "]"
+                                  (if (string-match "^\\[[^]]+\\]\\(.+\\)" mode-name)
+                                      (match-string 1 mode-name)
+                                    mode-name)))
                      (throw 'done t))))
                (ymacs-lsp//try-enable cpp))
           ;; lsp-mode is enabled
