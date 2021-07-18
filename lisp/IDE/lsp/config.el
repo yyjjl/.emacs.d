@@ -115,7 +115,9 @@
   ;; (setq lsp-semantic-tokens-enable nil)
   ;; (setq lsp-lens-enable nil)
 
-  (setq lsp-headerline-breadcrumb-enable nil)
+  (setq lsp-progress-prefix " LSP:")
+
+  (setq lsp-headerline-breadcrumb-enable t)
   ;; (setq lsp-modeline-code-actions-enable t)
   (setq lsp-modeline-diagnostics-enable nil)
   (setq lsp-modeline-workspace-status-enable nil))

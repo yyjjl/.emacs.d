@@ -4,12 +4,10 @@ CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd)"
 
 . "${CURRENT_DIR}/utils.sh"
 
-if [ -z "$1" ]; then
-    emacs_VERSION=27.1
-else
-    emacs_VERSION="$1"
-fi
-
+NETTLE_VERSION=2.7
+GNUTLS_VERSION=3.1.5
+GMP_VERSION=6.2.0
+TEXINFO_VERSION=6.8
 READLINE_VERSION=6.3
 NCURSES_VERSION=6.1
 INSTALL_PREFIX=${HOME}/.local
@@ -20,7 +18,7 @@ mkdir -p "${PROGRAM_DIR}/" && cd "${PROGRAM_DIR}/" || exit 1
 compile_gnu_source() {
     local ext="$3"
     local dir="$1-$2"
-    local url="https://mirrors.ustc.edu.cn/gnu/$1/${dir}.${ext}"
+    local url="https://ftp.gnu.org/gnu/$1/${dir}.${ext}"
     local fmt="-x"
 
     if [ "${ext}" = "tar.gz" ]; then
@@ -63,3 +61,41 @@ compile_gnu_source emacs ${emacs_VERSION} tar.xz \
                    --without-x --with-xpm=no --with-jpeg=no \
                    --with-png=no --with-gif=no --with-tiff=no \
                    --with-gnutls=no
+
+export LDFLAGS="-L${INSTALL_PREFIX}/lib -L${INSTALL_PREFIX}/lib64"
+export CPATH="${INSTALL_PREFIX}/include"
+export LD_LIBRARY_PATH="${INSTALL_PREFIX}/lib"
+export PKG_CONFIG_PATH="${INSTALL_PREFIX}/lib/pkgconfig:$PKG_CONFIG_PATH"
+
+compile_gnu_source ncurses ${NCURSES_VERSION} tar.gz \
+                   --prefix="${INSTALL_PREFIX}"
+compile_gnu_source texinfo ${TEXINFO_VERSION} tar.gz \
+                   --prefix="${INSTALL_PREFIX}"
+compile_gnu_source readline ${READLINE_VERSION} tar.gz \
+                   --prefix="${INSTALL_PREFIX}"
+compile_gnu_source gmp ${GMP_VERSION} tar.xz \
+                   --prefix="${INSTALL_PREFIX}"
+compile_gnu_source nettle ${NETTLE_VERSION} tar.gz \
+                   --prefix="${INSTALL_PREFIX}"
+compile_gnu_source gnutls ${GNUTLS_VERSION} tar.xz \
+                   --prefix="${INSTALL_PREFIX}"
+
+git clone https://github.com/akheron/jansson jansson
+cd jansson
+mkdir -p build && cd build || exit 1
+cmake .. -DJANSSON_BUILD_DOCS=OFF -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}
+make && make install
+
+mkdir -p "${PROGRAM_DIR}/" && cd "${PROGRAM_DIR}/" || exit 1
+git clone https://github.com/universal-ctags/ctags.git universal-ctags
+cd universal-ctags
+./autogen.sh
+./configure --prefix="${INSTALL_PREFIX}"
+make && make install
+
+mkdir -p "${PROGRAM_DIR}/" && cd "${PROGRAM_DIR}/" || exit 1
+git clone --depth=1 https://github.com/emacs-mirror/emacs emacs
+cd emacs
+./autogen.sh
+./configure --prefix="${INSTALL_PREFIX}" --with-json --with-libgmp
+make && make install

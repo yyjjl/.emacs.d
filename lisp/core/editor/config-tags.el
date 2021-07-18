@@ -6,7 +6,9 @@
              (citre-tags-file-path))
     ;; disable semantic when using citre
     (setq ymacs-editor--inhibit-semantic t)
-    (citre-mode 1)))
+    (unless (eval-when-has-feature! lsp
+              (bound-and-true-p lsp-mode))
+      (citre-mode 1))))
 
 ;; (defun ymacs-editor//company-citre (-command &optional -arg &rest _ignored)
 ;;   "Completion backend of for citre.  Execute COMMAND with ARG and IGNORED."
