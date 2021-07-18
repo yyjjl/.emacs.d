@@ -21,3 +21,25 @@
                              "./build_dev.sh")
                            " && "))
                  (format "python3 %s .." (expand-etc! "scripts/clean_cdb.py")))))))
+
+;;;###autoload
+(defun ymacs-cpp-blade/setup-project ()
+  (interactive)
+  (let* ((project-root (let ((dir (read-directory-name "Root: " (ymacs-editor//project-root))))
+                         (unless (file-exists-p (expand-file-name "BLADE_ROOT" dir))
+                           (user-error "BLADE_ROOT is not found"))
+                         dir))
+         (project-name
+          (with-temp-lv-message! ("ROOT: %s" project-root)
+            (read-string "Project name: " ymacs-cpp-blade-project-name)))
+         (clangd-args
+          (cons
+           (format "--compile-commands-dir=%s" project-root)
+           (cl-remove-if
+            (lambda (x) (string-prefix-p "--compile-commands-dir" x))
+            lsp-clients-clangd-args))))
+    (add-dir-local-variable nil 'ymacs-default-project (cons 'local project-root))
+    (add-dir-local-variable nil 'ymacs-cpp-blade-project-name project-name)
+    (add-dir-local-variable nil 'lsp-clients-clangd-args clangd-args)
+    (save-buffer)
+    (hack-dir-local-variables-for-project!)))
