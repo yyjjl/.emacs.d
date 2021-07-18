@@ -1,7 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;; Do not load extra backends
-(setq org-export-backends '(html latex beamer))
+(setq org-export-backends '(html latex beamer md))
 
 (after! ob
   (define-key! :map org-babel-map

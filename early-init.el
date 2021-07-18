@@ -59,14 +59,15 @@ hasn't to runs those regexps against the filename.")
 ;; initialization, so we must prevent Emacs from doing it early!
 (setq package-enable-at-startup nil)
 
-;; Inhibit resizing frame
-(setq frame-inhibit-implied-resize t)
-
 ;; Faster to disable these here (before they've been initialized)
-(push '(menu-bar-lines . 0) default-frame-alist)
-(push '(tool-bar-lines . 0) default-frame-alist)
-(push '(vertical-scroll-bars . nil) default-frame-alist)
-(push '(undecorated . t) default-frame-alist)
+(unless sys/macp
+  ;; Inhibit resizing frame
+  (setq frame-inhibit-implied-resize t)
+
+  (push '(menu-bar-lines . 0) default-frame-alist)
+  (push '(tool-bar-lines . 0) default-frame-alist)
+  (push '(vertical-scroll-bars . nil) default-frame-alist)
+  (push '(undecorated . t) default-frame-alist))
 
 ;; disable native-compile during setup
 ;; (setq comp-deferred-compilation nil)

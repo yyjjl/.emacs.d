@@ -106,9 +106,9 @@
               (or user-login-name "anonymous")))
 
 (with-no-warnings
-  (when sys/mac-cocoa-p
-    (setq mac-option-modifier 'super)
-    (setq mac-command-modifier 'meta)
+  (when sys/macp
+    (setq mac-option-modifier 'meta)
+    (setq mac-command-modifier 'super)
     (setq mac-function-modifier 'ctrl)))
 
 
@@ -216,7 +216,7 @@
 
 (load-theme 'monokai t)
 
-(when ymacs-only-in-terminal-p
+(eval-when! ymacs-only-in-terminal-p
   (require-packages! clipetty)
 
   (global-clipetty-mode 1)
