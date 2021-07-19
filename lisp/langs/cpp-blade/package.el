@@ -23,7 +23,7 @@
     ([f9] . ymacs-cpp-blade/clean-or-build-project)))
 
 (define-minor-mode ymacs-cpp-blade-mode
-  "Use cmake build-system"
+  "Use blade build-system"
   :group 'blade
   :global nil
   :keymap ymacs-cpp-blade-keymap)
