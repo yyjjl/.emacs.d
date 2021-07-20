@@ -68,7 +68,7 @@ elif which fd 2>&1 >/dev/null; then
     export FZF_DEFAULT_COMMAND='fd --type=file'
 fi
 
-for directory in ".local" ".cargo" ".cabal" ".ghcup" "program/root" "program/node";do
+for directory in .local .cargo .cabal .ghcup program program/root program/node program/maven; do
     if [ -d "$HOME/${directory}/bin" ]; then
         path=("$HOME/${directory}/bin" "$path[@]")
     fi
