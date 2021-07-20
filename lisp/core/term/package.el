@@ -18,8 +18,10 @@
           (const :tag "Term" term)
           (const :tag "Shell" shell)))
 
-(executable! zsh)
-(executable! bash)
+(option! term-path-alist nil
+  "Terminal path"
+  :group 'ymacs
+  :type '(alist :key-type string :value-type string))
 
 (require-packages!
  (vterm :when (eq ymacs-term-type 'vterm))

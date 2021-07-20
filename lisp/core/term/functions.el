@@ -3,6 +3,28 @@
 (eval-when-compile
   (require 'term))
 
+(defsubst ymacs-term//get-type ()
+  (or (and default-directory
+           (file-remote-p default-directory)
+           'shell)
+      ymacs-term-type))
+
+(defsubst ymacs-term//get-shell-file-name ()
+  (let (host)
+    (if (and default-directory
+             (setq host (file-remote-p default-directory 'host)))
+        (or (cdr-safe (assoc-string host ymacs-term-path-alist))
+            (let ((path (file-local-name
+                         (expand-file-name
+                          (read-file-name "Remote shell path: " nil
+                                          shell-file-name t
+                                          shell-file-name)))))
+              (custom-set-variables
+               `(ymacs-term-path-alist '((,host . ,path) . ,ymacs-term-path-alist)))
+              (when (yes-or-no-p "Save `ymacs-term-path-alist' to file?")
+                (custom-save-all))))
+      shell-file-name)))
+
 (defsubst ymacs-term//get-buffer-name (-fmt)
   (let* ((index 1)
          (name (format -fmt index)))
@@ -102,10 +124,6 @@
         (run-hook-with-args 'ymacs-term-process-exit-hook))
       (process-sentinel proc)))))
 
-(defsubst ymacs-term//get-shell-name ()
-  (or ymacs-zsh-path
-      ymacs-bash-path))
-
 (defun ymacs-term//create-vterm-buffer (-buffer -shell-name)
   (let ((vterm-shell (format "%s %s"
                              -shell-name
@@ -132,7 +150,7 @@
 (defun ymacs-term//create-shell-buffer (-buffer -shell-name -term-name -shell-buffer-p)
   ;; (ymacs-term//sentinel-setup) is called in comint-exec-hook
   (if -shell-buffer-p
-      (let ((shell-file-name -shell-name))
+      (let ((explicit-shell-file-name -shell-name))
         (with-current-buffer (shell -buffer)
           (unless (eq major-mode 'shell-mode)
             (shell-mode))))
@@ -145,14 +163,9 @@
 (defun ymacs-term//create-buffer (&optional -program -shell-buffer-p -full-name)
   "Get term buffer.
 If option SPECIAL-SHELL is `non-nil', will use shell from user input."
-  (let* ((ymacs-term-type (if (and default-directory (file-remote-p default-directory))
-                              'shell
-                            ymacs-term-type))
+  (let* ((term-type (ymacs-term//get-type))
          (shell-name (or -program
-                         (ymacs-term//get-shell-name)
-                         (getenv "SHELL")
-                         (getenv "ESHELL")
-                         "/bin/sh"))
+                         (ymacs-term//get-shell-file-name)))
          (term-name (or -full-name
                         (ymacs-term//get-buffer-name
                          (concat "*" ymacs-term-buffer-name "<%s>*"))))
@@ -160,14 +173,14 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
 
     (with-temp-env! (ymacs-editor//get-environment)
       (cond
-       ((and (eq ymacs-term-type 'vterm)
+       ((and (eq term-type 'vterm)
              (require 'vterm nil t))
         (ymacs-term//create-vterm-buffer buffer shell-name))
-       ((eq ymacs-term-type 'term)
+       ((eq term-type 'term)
         (ymacs-term//create-term-buffer buffer shell-name term-name))
-       ((eq ymacs-term-type 'shell)
+       ((eq term-type 'shell)
         (ymacs-term//create-shell-buffer buffer shell-name term-name -shell-buffer-p))
-       (t (user-error "Unsupported shell type %s" ymacs-term-type))))
+       (t (user-error "Unsupported shell type %s" term-type))))
 
     (when (buffer-live-p buffer)
       (with-current-buffer buffer
