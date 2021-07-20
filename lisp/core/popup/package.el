@@ -6,7 +6,10 @@
 (defvar ymacs-popup-below-dedicated-buffer-regexp
   (eval-when-compile
     (rx string-start "*"
-        (or "Backtrace" "RefTeX Select")
+        (or "Backtrace"
+            "RefTeX Select"
+            "LSP Lookup"
+            (and "lsp-java-" (* any)))
         "*" string-end)))
 
 ;; (defvar ymacs-popup-left-dedicated-buffer-regexp
