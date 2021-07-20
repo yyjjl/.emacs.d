@@ -2,7 +2,7 @@
 
 (after! cc-mode
   (define-hook! ymacs-java//setup (java-mode-hook)
-    (setq-local c-basic-offset 8)
+    (setq-local c-basic-offset 4)
 
     (eval-when-has-feature! lsp
       (require 'lsp-java)

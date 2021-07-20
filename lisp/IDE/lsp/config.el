@@ -6,6 +6,9 @@
 (after! lsp-mode
   ;; (lsp-dired-mode 1)
 
+  (when (require 'lsp-treemacs nil t)
+    (lsp-treemacs-sync-mode 1))
+
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.cache\\'")
   (add-to-list 'lsp-file-watch-ignored
                (eval-when-compile
@@ -113,7 +116,7 @@
   ;; (setq lsp-before-save-edits t)
 
   ;; (setq lsp-semantic-tokens-enable nil)
-  ;; (setq lsp-lens-enable nil)
+  (setq lsp-lens-enable t)
 
   (setq lsp-progress-prefix " LSP:")
 
@@ -171,10 +174,18 @@
         treemacs-follow-after-init t
         treemacs-no-png-images t)
 
-  (ymacs-modeline//def-modeline treemacs (major-mode))
+  (ymacs-modeline//def-modeline treemacs (window-number major-mode))
 
   (setq treemacs-user-mode-line-format '(:eval (ymacs-modeline//format--treemacs)))
 
   (treemacs-follow-mode t)
   (treemacs-tag-follow-mode t)
   (treemacs-filewatch-mode t))
+
+(after! lsp-treemacs
+  (define-key!
+    ("C-x ' '" . lsp-treemacs-errors-list)
+    ("C-x ' s" . lsp-treemacs-symbols)
+    ("C-x ' r" . lsp-treemacs-references)
+    ("C-x ' i" . lsp-treemacs-implementations)
+    ("C-x ' c" . lsp-treemacs-call-hierarchy)))
