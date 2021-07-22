@@ -105,6 +105,8 @@
               emacs-version
               (or user-login-name "anonymous")))
 
+(setq enable-remote-dir-locals t)
+
 (with-no-warnings
   (when sys/macp
     (setq mac-option-modifier 'meta)

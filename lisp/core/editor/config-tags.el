@@ -3,6 +3,7 @@
 (defun ymacs-editor//try-enable-ctags ()
   (when (and ymacs-ctags-path
              (require 'citre nil t)
+             (not (file-remote-p default-directory))
              (citre-tags-file-path))
     ;; disable semantic when using citre
     (setq ymacs-editor--inhibit-semantic t)
