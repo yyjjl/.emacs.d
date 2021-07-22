@@ -148,7 +148,9 @@
     ("d" . dap-hydra))
 
   (setq dap-auto-configure-features
-        '(sessions locals breakpoints expressions tooltip)))
+        (if (display-graphic-p)
+            '(sessions locals breakpoints expressions tooltip)
+          '(sessions locals breakpoints expressions))))
 
 (after! dap-python
   (setq dap-python-executable "python3"))

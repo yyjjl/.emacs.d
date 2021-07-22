@@ -1,7 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
 (eval-when-compile
-  (require 'lsp-mode))
+  (require 'lsp-mode)
+  (require 'dap-hydra nil t))
 
 (declare-function lsp-semantic-tokens--disable 'lsp-mode)
 (declare-function treemacs-current-visibility 'treemacs)
@@ -60,7 +61,8 @@
 
 (define-minor-mode ymacs-dap-running-session-mode
   "A mode for adding keybindings to running sessions"
-  nil nil
+  :global nil
+  :init-value nil
   ymacs-dap-running-session-mode-map
   (if ymacs-dap-running-session-mode
       (ymacs-debug//enable)
