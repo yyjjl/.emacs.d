@@ -2,6 +2,11 @@
 
 (declare-function bookmark-get-bookmark-record 'bookmark)
 
+(option! editor-search-directory nil
+  "run searcher in this direcotry"
+  :type 'string
+  :safe #'stringp)
+
 (defvar ymacs-editor-ivy--last-text nil)
 
 (defvar ymacs-editor-ivy-display-help-extra-commands

@@ -125,7 +125,7 @@
   (electric-indent-mode 1)
 
   ;; global-modes
-  ;; (semantic-mode 1)
+  (semantic-mode 1)
   ;; (which-function-mode 1)
   (global-subword-mode 1)
   (global-auto-revert-mode 1)

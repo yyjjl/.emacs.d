@@ -12,6 +12,14 @@
         ymacs-editor--inhibit-semantic
         (not (derived-mode-p 'prog-mode))))
 
+  (define-hook! ymacs-semantic//setup-imenu (mode-local-init-hook)
+    (when (derived-mode-p 'c-mode 'c++-mode)
+      (cond
+       ((bound-and-true-p lsp-mode)
+        (setq imenu-create-index-function #'lsp--imenu-create-index))
+       ((bound-and-true-p citre-mode)
+        (setq imenu-create-index-function #'citre-imenu-create-index-function)))))
+
   (define-advice semantic-idle-scheduler-function (:around (-fn &rest -args) allow-quit)
     (with-local-quit (apply -fn -args)))
 

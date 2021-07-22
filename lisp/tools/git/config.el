@@ -1,5 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
+(after! vc-hooks
+  (setq vc-handled-backends '(Git)))
+
 (setq diff-hl-command-prefix (kbd "C-x \\"))
 (after! diff-hl
   (setq diff-hl-draw-borders nil)

@@ -144,7 +144,8 @@
   (setq ymacs-editor-ivy--last-text nil)
   (if current-prefix-arg
       (transient-setup 'ymacs-editor/rg)
-    (let ((default-directory (ymacs-editor//project-root-or-default)))
+    (let ((default-directory (or ymacs-editor-search-directory
+                                 (ymacs-editor//project-root-or-default))))
       (ymacs-editor//rg))))
 
 ;;;###autoload
