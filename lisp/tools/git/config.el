@@ -34,7 +34,21 @@
     ("` 4" . magit-section-show-level-4-all))
 
   (setq magit-completing-read-function 'ivy-completing-read)
+  (setq magit-diff-refine-hunk t)
   (setq magit-auto-revert-mode nil))
+
+(after! magit-blame
+  (add-hook 'magit-blame-mode-hook #'read-only-mode)
+
+  (setq magit-blame-echo-style 'margin)
+
+  (add-to-list
+   'mode-line-misc-info
+   '(magit-blame-mode
+     (""
+      (:propertize "Blame" face font-lock-builtin-face)
+      (magit-blame-read-only-mode "%%")
+      " "))))
 
 (after! transient
   (define-key! :map transient-map

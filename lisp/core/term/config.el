@@ -7,6 +7,11 @@
   (define-key! :map term-mode-map
     ("M-o" . ymacs-term/switch)))
 
+(after! compile
+  (define-key! :map compilation-shell-minor-mode-map
+    ("M-}" . ymacs-term/next)
+    ("M-{" . ymacs-term/prev)))
+
 (after! vterm
   (setq vterm-buffer-name-string nil)
   (setq vterm-kill-buffer-on-exit nil)

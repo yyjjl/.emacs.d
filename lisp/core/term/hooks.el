@@ -69,8 +69,6 @@
     (local-set-key [remap completion-at-point] #'company-complete)
 
     (when (string-match-p "inferior\\|interactive" (symbol-name major-mode))
-      (local-set-key (kbd "M-}") #'ymacs-term/next)
-      (local-set-key (kbd "M-{") #'ymacs-term/prev)
       (setq ymacs-term-exit-action 'shell)))
 
   (define-advice comint-delchar-or-maybe-eof (:override (-arg) maybe-toggle)
