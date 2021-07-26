@@ -24,6 +24,9 @@
 (eval-when-has-feature! lsp
   (require-packages! lsp-pyright)
 
+  (put 'lsp-pyright-extra-paths 'safe-local-variable #'vectorp)
+  (put 'lsp-pyright-python-executable-cmd 'safe-local-variable #'stringp)
+
   (option! python-lsp-server 'pyright
     "Python LSP server type"
     :type 'symbol)
