@@ -381,7 +381,6 @@ HTML file converted from org file, it returns t."
 
 (defsubst is-buffer-suitable-for-coding! ()
   (not (or (is-buffer-temporary!)
-           (file-remote-p default-directory)
            (is-buffer-too-large!))))
 
 (defun insert-after! (-after-value -new-value -lst)

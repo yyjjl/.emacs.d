@@ -51,10 +51,7 @@ function main {
     check
 
     brew tap d12frosted/emacs-plus
-    brew install emacs-plus@28 \
-         --with-modern-black-variant-icon \
-         --with-xwidgets \
-         --with-native-comp
+    brew install emacs-plus@28 --with-modern-black-variant-icon
 
     for app in ${CORE_APPS[@]}; do
         info ">> Installing ${app}..."
