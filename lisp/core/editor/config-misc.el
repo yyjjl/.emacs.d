@@ -27,7 +27,7 @@
       (message "Don't know how to open %s" file))))
 
 (defun ymacs-editor//bookmark-setup ()
-  (unless (file-remote-p default-directory)
+  (unless (ignore-errors (file-remote-p default-directory))
     ;; Setup default bookmark
     (setq bookmark-current-bookmark
           (ignore-errors

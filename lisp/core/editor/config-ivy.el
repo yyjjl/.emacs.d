@@ -130,8 +130,8 @@
          (if (buffer-file-name buffer)
              (when remote
                (propertize (format "(%s) " remote) 'face 'ymacs-modeline-host))
-           (propertize
-            (buffer-local-value 'default-directory buffer) 'face 'ymacs-modeline-buffer-path)))))))
+           (when-let (directory (buffer-local-value 'default-directory buffer))
+             (propertize directory 'face 'ymacs-modeline-buffer-path))))))))
 
 
 (defun ymacs-editor//ivy-bookmark-transformer (-string)

@@ -164,7 +164,7 @@
          (cmd-string
           (when -command
             (format "(@%s) %s"
-                    (propertize (or -directory default-directory) 'face font-lock-constant-face)
+                    (propertize (or -directory default-directory "") 'face font-lock-constant-face)
                     -command)))
          (help-string
           (concat extra-string
