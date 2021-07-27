@@ -1,17 +1,9 @@
 #+title: My emacs configuration files
 
-* About
-  This configuration originally comes from [[https://github.com/redguardtoo/emacs.d/][Chen Bin]]. I remove a lot
-  functions and packages which I don't need. 
-
-  [[file:doc/sample.png]]
-
 * How to use
   #+BEGIN_SRC sh
   # copy this configuration to ~/.emacs.d
   cd ~/.emacs.d/ || exit 1
-  mv init.el.example init.el
-  touch custom.el
   make
   #+END_SRC
   Packages will be download automatically.
