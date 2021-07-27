@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+PROGRESS_FILE=.install-progress
+
 # Setup colors ################################################################
 if tty -s; then
     export RED=${RED:-$(tput setaf 1)}
@@ -31,6 +33,16 @@ warn () {
 }
 critical () {
     log "${RED}CRIT${RESET}: ${1}"
+}
+
+get_progress() {
+    if [ -f $PROGRESS_FILE ]; then
+	cat $PROGRESS_FILE
+    fi
+}
+
+set_progress() {
+    echo $1 > $PROGRESS_FILE
 }
 
 # export -f now

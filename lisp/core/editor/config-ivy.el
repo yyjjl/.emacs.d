@@ -217,9 +217,10 @@
 
   (define-advice counsel--async-command (:before (-cmd &rest _) show-help)
     (ymacs-editor//display-help
-     (when-let (keymap (ivy-state-keymap ivy-last))
-       (append (ymacs-editor//display-keys--collect keymap)
-               (ymacs-editor//display-keys--collect-ivy-extra)))
+     (let ((extra (ymacs-editor//display-keys--collect-ivy-extra)))
+       (if-let (keymap (ivy-state-keymap ivy-last))
+           (append (ymacs-editor//display-keys--collect keymap) extra)
+         extra))
      -cmd))
 
   (define-advice counsel-imenu (:before (&rest _) parse-buffer)
