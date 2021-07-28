@@ -23,11 +23,6 @@
   "When buffer's size bigger than `ymacs-large-buffer-limit', it
 will close some features to speed up emacs performance")
 
-(defvar ymacs-file-name-handler-alist file-name-handler-alist
-  "Save `file-name-handler-alist' temporarily and set it to nil
-which means on every .el and .elc file loaded during start up, it
-hasn't to runs those regexps against the filename.")
-
 (defconst ymacs-config-directory
   (expand-file-name "lisp" user-emacs-directory)
   "All configurations are in this directory")

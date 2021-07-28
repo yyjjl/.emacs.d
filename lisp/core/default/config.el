@@ -7,7 +7,6 @@
       (add-to-list 'load-path (expand-file-name dir ymacs-site-lisp-directory))))
   (add-to-list 'load-path ymacs-site-lisp-directory))
 
-(setq file-name-handler-alist nil)
 ;; Don't GC during startup to save time
 (setq gc-cons-threshold most-positive-fixnum)
 (setq gc-cons-percentage 0.5)
@@ -50,10 +49,7 @@
 (set-selection-coding-system 'utf-8)
 (modify-coding-system-alist 'process "*" 'utf-8)
 
-;; Make `apropos' more useful
-(setq apropos-do-all t)
-
- ;; keep the point out of the minibuffer
+;; keep the point out of the minibuffer
 (setq mark-ring-max 16)
 (setq kill-ring-max 200)
 
