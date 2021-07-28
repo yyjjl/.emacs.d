@@ -16,10 +16,10 @@
     (ymacs-default/generate-autoloads))
   (load ymacs-autoloads-file nil t)
 
-  ;; Restore `file-name-handler-alist' and `gc-cons-threshold'
+  ;; `gc-cons-threshold'
   (setq file-name-handler-alist
         `((,ymacs-editor-external-file-regexp . ymacs-editor//external-file-handler)
-          ,@ymacs-file-name-handler-alist))
+          ,@file-name-handler-alist))
   (setq gc-cons-threshold ymacs-gc-cons-threshold)
   (setq gc-cons-percentage 0.3)
 

@@ -48,6 +48,10 @@
                 try-complete-file-name-partially
                 try-complete-file-name))
 
+;; Make `apropos' more useful
+(after! apropos
+  (setq apropos-do-all t))
+
 (after! autorevert
   (setq auto-revert-verbose nil)
   (setq global-auto-revert-non-file-buffers t))
