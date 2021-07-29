@@ -72,6 +72,8 @@ download_and_compile_gnu_software() {
     local fmt="-x"
     shift; shift; shift
 
+    shift; shift; shift
+
     if [ "${ext}" = "tar.gz" ]; then
         fmt="-zx"
     elif [ "${ext}" = "tar.xz" ]; then
@@ -136,8 +138,9 @@ download_and_compile_from_github() {
 export PATH="${INSTALL_PREFIX}/bin:$PATH"
 export LDFLAGS="-L${INSTALL_PREFIX}/lib -L${INSTALL_PREFIX}/lib64"
 export CPATH="${INSTALL_PREFIX}/include"
-export LD_LIBRARY_PATH="${INSTALL_PREFIX}/lib"
+export LD_LIBRARY_PATH="${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64"
 export PKG_CONFIG_PATH="${INSTALL_PREFIX}/lib/pkgconfig:$PKG_CONFIG_PATH"
+export CFLAGS="-gdwarf-4"
 
 download_and_compile_gnu_software ncurses ${NCURSES_VERSION} tar.gz
 download_and_compile_gnu_software texinfo ${TEXINFO_VERSION} tar.gz

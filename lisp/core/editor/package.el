@@ -210,6 +210,7 @@
   ("M-%" . ymacs-hydra/query-replace/body)
 
   ("M-/" . hippie-expand)
+  ("M-*" . citre-jump)
 
   ("M-n" . next-error)
   ("M-p" . previous-error)
