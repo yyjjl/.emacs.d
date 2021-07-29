@@ -8,7 +8,7 @@ for directory in .local .cargo .cabal .ghcup program program/root program/node p
 done
 
 export PATH="${local_path}:${PATH}"
-export LD_LIBRARY_PATH="${HOME}/.local/lib:${LD_LIBRARY_PATH}"
+export LD_LIBRARY_PATH="${HOME}/.local/lib:${HOME}/.local/lib64:${LD_LIBRARY_PATH}"
 
 alias et='emacsclient -t -a ""'
 alias ec='emacsclient -c -a "" -n'

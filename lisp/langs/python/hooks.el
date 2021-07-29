@@ -34,6 +34,9 @@
       (setq-local python-shell-interpreter "python3")
       (setq-local python-shell-interpreter-args "-i"))
 
+    ;; too slow
+    (remove-hook 'completion-at-point-functions 'python-completion-at-point t)
+
     (eval-when-has-feature! lsp
       (with-transient-hook! (hack-local-variables-hook :local t)
         (ymacs-python//set-lsp-server)
