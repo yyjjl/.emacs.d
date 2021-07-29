@@ -105,3 +105,10 @@
              (eq 'visible (treemacs-current-visibility)))
         (treemacs-select-window)
       (ymacs-editor/aw-select-window))))
+
+;;;###autoload
+(defun ymacs-lsp/select-window-2 ()
+  (interactive)
+  (or (ymacs-editor//aw-switch-window-internal "2")
+      (ymacs-editor//aw-switch-window-internal "1")
+      (message "No specified window: 1 or 2")))

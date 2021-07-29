@@ -56,34 +56,42 @@ LHS and RHS are lists of symbols of modeline -segments defined with
              (byte-compile #',sym))))))
 
 (cl-defmacro ymacs-modeline-set!
-    (-modes -key &key ((:header-line-p -header-line-p)) ((:body -body)))
-  (declare (indent 2))
-  (let ((fn (intern-soft (format "ymacs-modeline//format--%s" -key)))
-        (format-var (if -header-line-p
-                        'header-line-format
-                      'mode-line-format)))
-    (cl-assert (functionp fn) "predefined modeline %s doesn't exist" -key)
+    (-modes &key ((:mode-line -key)) ((:header-line -header-key)) ((:body -body)))
+  (declare (indent 1))
+  (let* ((fn (when -key (intern-soft (format "ymacs-modeline//format--%s" -key))))
+         (header-fn (when -header-key (intern-soft (format "ymacs-modeline//format--%s" -header-key))))
+         (global? (eq -modes 'default))
+         (setter (if global?
+                     'setq-default
+                   'setq)))
 
-    (if (eq -modes 'default)
-        `(setq-default ,format-var '(:eval (,fn)))
+    (cl-assert (or (not fn) (functionp fn)) "predefined modeline %s doesn't exist" -key)
+    (cl-assert (or (not header-fn) (functionp header-fn)) "predefined modeline %s doesn't exist" -header-key)
 
-      (unless (listp -modes)
-        (setq -modes (list -modes)))
-      (let ((hook-fn (intern (format "ymacs-modeline//%s-setup"
-                                     (mapconcat #'symbol-name -modes "/")))))
-        `(progn
-           (defun ,hook-fn ()
-             (with-current-buffer (current-buffer)
-               (setq ,format-var '(:eval (,fn))))
-             ,-body)
-           ,@(cl-loop
-              for mode in -modes
-              for name = (symbol-name mode)
-              for hook = (if (string-suffix-p "mode-hook" name)
-                             mode
-                           (intern (concat name "-mode-hook")))
-              collect
-              `(add-hook ',hook ',hook-fn)))))))
+    (let* ((forms (remove nil (list
+                               (when fn `(,setter mode-line-format '(:eval (,fn))))
+                               (when header-fn `(,setter header-line-format '(:eval (,header-fn))))
+                               -body)))
+           (modes (if (listp -modes)
+                      -modes
+                    (list -modes))))
+      (if global?
+          (cond ((> (length forms) 1)
+                 `(progn ,@forms))
+                ((= (length forms) 1)
+                 (car forms)))
+        (let ((hook-fn (intern (format "ymacs-modeline//%s-setup" (mapconcat #'symbol-name modes "/")))))
+          `(progn
+             (defun ,hook-fn ()
+               ,@forms)
+             ,@(cl-loop
+                for mode in modes
+                for name = (symbol-name mode)
+                for hook = (if (string-suffix-p "mode-hook" name)
+                               mode
+                             (intern (concat name "-mode-hook")))
+                collect
+                `(add-hook ',hook ',hook-fn))))))))
 
 
 
@@ -457,6 +465,15 @@ By default, this shows the information specified by `global-mode-string'."
    (when ymacs-desktop-name
      (propertize ymacs-desktop-name 'face 'font-lock-constant-face))))
 
+(ymacs-modeline//def-segment misc-info-simple
+  "Mode line construct for miscellaneous information.
+By default, this shows the information specified by `global-mode-string'."
+  (list
+   ""
+   mode-line-misc-info
+   (when ymacs-desktop-name
+     (propertize ymacs-desktop-name 'face 'font-lock-constant-face))))
+
 ;;
 ;;* Position
 ;;
@@ -546,3 +563,6 @@ By default, this shows the information specified by `global-mode-string'."
 
 (ymacs-modeline//def-modeline header
   (debug input-method misc-info))
+
+(ymacs-modeline//def-modeline dired-header
+  (debug input-method misc-info-simple))

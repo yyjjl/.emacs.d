@@ -20,6 +20,21 @@
           (revert-buffer))))))
 
 ;;;###autoload
+(defun ymacs-python/setup-project ()
+  (interactive)
+  (let* ((project-root (read-directory-name "Root: " (ymacs-editor//project-root)))
+         (venv-path (read-directory-name "Venv: " pyvenv-activate))
+         (python-path (read-string "Python: " python-shell-interpreter))
+         (default-directory project-root))
+    (add-dir-local-variable nil 'ymacs-default-project (cons 'local project-root))
+    (eval-when-has-feature! lsp
+      (add-dir-local-variable nil 'lsp-pyright-python-executable-cmd python-path))
+    (add-dir-local-variable nil 'python-shell-interpreter python-path)
+    (add-dir-local-variable nil 'pyvenv-activate venv-path)
+    (save-buffer)
+    (hack-dir-local-variables-for-project!)))
+
+;;;###autoload
 (defun ymacs-python/shell-completion-complete-or-indent ()
   "Complete or indent depending on the context.
 If content before pointer is all whitespace, indent.

@@ -53,4 +53,10 @@
       ("C" . citre-edit-tags-file-recipe)
       ("i" . ymacs-editor/invalid-project-cache)))
 
+  (eval-when! (executable-find "fzf")
+    (when (boundp 'project-prefix-map)
+      (define-key! :map project-prefix-map
+        ("f" . ymacs-editor/fzf)))
+    (setcar (assoc 'project-find-file project-switch-commands) #'ymacs-editor/fzf))
+
   (setq project-find-functions '(ymacs-editor//project)))

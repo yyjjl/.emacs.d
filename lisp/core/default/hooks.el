@@ -55,17 +55,20 @@
                 (run-with-idle-timer 0 nil #'ymacs-modeline//update-lsp-state (current-buffer))))
     (add-hook 'lsp-unconfigure-hook #'ymacs-modeline//update-lsp-state))
 
-  (ymacs-modeline-set! (comint term vterm) shell
+  (ymacs-modeline-set! (comint term vterm)
+    :mode-line shell
     :body (tab-line-mode 1))
-  (ymacs-modeline-set! dired dired)
-  (ymacs-modeline-set! image media)
-  (ymacs-modeline-set! (message git-commit) message)
-  (ymacs-modeline-set! magit vcs)
-  (ymacs-modeline-set! org-src org-src)
-  (ymacs-modeline-set! git-timemachine timemachine)
-  (ymacs-modeline-set! (prog text conf) header :header-line-p t)
+  (ymacs-modeline-set! dired
+    :mode-line dired
+    :header-line dired-header)
+  (ymacs-modeline-set! image :mode-line media)
+  (ymacs-modeline-set! (message git-commit) :mode-line message)
+  (ymacs-modeline-set! magit :mode-line vcs)
+  (ymacs-modeline-set! org-src :mode-line org-src)
+  (ymacs-modeline-set! git-timemachine :mode-line timemachine)
+  (ymacs-modeline-set! (prog text conf) :header-line header)
   ;; Set default modeline
-  (ymacs-modeline-set! default main)
+  (ymacs-modeline-set! default :mode-line main)
 
   ;; Setup autoloads and packages
   (setq package-selected-packages ymacs-required-packages)

@@ -21,6 +21,7 @@
   (setq dired-isearch-filenames 'dwim)
   (setq dired-recursive-copies 'always)
   (setq dired-recursive-deletes 'always)
+  (setq dired-switches-in-mode-line 'as-is)
 
   (when sys/macp
     ;; Suppress the warning: `ls does not support --dired'.

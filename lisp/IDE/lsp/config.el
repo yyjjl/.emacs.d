@@ -168,6 +168,7 @@
 (after! treemacs
   (define-key!
     ("M-1" . ymacs-lsp/select-window-1)
+    ("M-2" . ymacs-lsp/select-window-2)
     ("M-`" . treemacs))
 
   (setq treemacs-collapse-dirs (if treemacs-python-executable 3 0)

@@ -58,6 +58,13 @@
     (delete-other-windows)
     (ymacs-editor/window-split-vertically -arg)))
 
+(defun ymacs-editor//aw-switch-window-internal (-path)
+  (cl-loop
+   for window in (aw-window-list)
+   when (and (window-live-p window)
+             (equal -path (window-parameter window 'ace-window-path)))
+   return (aw-switch-to-window window)))
+
 ;;;###autoload
 (defun ymacs-editor/aw-select-window ()
   "Select the specified window."
@@ -66,11 +73,7 @@
                   key-description
                   (split-string "-")
                   (elt 1))))
-    (unless (cl-loop
-             for window in (aw-window-list)
-             when (and (window-live-p window)
-                       (equal path (window-parameter window 'ace-window-path)))
-             return (aw-switch-to-window window))
+    (unless (ymacs-editor//aw-switch-window-internal path)
       (message "No specified window: %s" path))))
 
 ;;;###autoload
