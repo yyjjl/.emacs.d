@@ -3,6 +3,7 @@
 (after! flymake
   (define-hook! ymacs-editor//setup-flymake (flymake-mode-hook)
     (when flymake-mode
+      (remove-hook 'flymake-diagnostic-functions #'flymake-cc t)
       (unless next-error-function
         (setq-local next-error-function #'flymake-goto-next-error))))
 
