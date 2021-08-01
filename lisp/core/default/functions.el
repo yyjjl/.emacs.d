@@ -433,8 +433,6 @@ like the scratch buffer where knowing the current project directory is important
 
 (ymacs-modeline//def-segment window-number
   (when-let (number (window-parameter (selected-window) 'ace-window-path))
-    (when (bound-and-true-p ymacs-x--activated)
-      (setq number (propertize number 'face 'ymacs-modeline-urgent)))
     (if ace-window-mode
         (concat " " number " " (propertize ace-window-mode 'face 'aw-leading-char-face))
       (concat " " number))))
@@ -459,6 +457,7 @@ By default, this shows the information specified by `global-mode-string'."
   (list
    ""
    mode-line-misc-info
+   " "
    (propertize (or ymacs-modeline--project-parent-path default-directory)
                'face 'font-lock-doc-face)
    ymacs-modeline--lsp-state

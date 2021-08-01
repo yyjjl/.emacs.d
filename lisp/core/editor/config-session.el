@@ -34,9 +34,9 @@
 (after! recentf
   (setq recentf-max-saved-items 2048)
   (setq recentf-exclude
-        '("\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
-          "\\.\\(?:gz\\|gif\\|svg\\|png\\|jpe?g\\|bmp\\|xpm\\)$"
-          "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
-          "^/tmp/" "^/var/folders/.+$"
-          (lambda (file)
-            (file-in-directory-p file package-user-dir)))))
+        (list (eval-when-compile
+                (rx (or (and "." (or "gz" "gif" "svg" "png" "jpg" "jpeg" "xpm" "tags") string-end)
+                        (and (or "tags" "TAGS" "GTAGS") string-end)
+                        (and "COMMIT_EDITMSG" string-end)
+                        (and string-start (or "/tmp/" "/var/"))
+                        ".cache/"))))))

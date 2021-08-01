@@ -180,9 +180,9 @@
 
   (setq treemacs-user-mode-line-format '(:eval (ymacs-modeline//format--treemacs)))
 
-  (treemacs-follow-mode t)
-  (treemacs-tag-follow-mode t)
-  (treemacs-filewatch-mode t))
+  ;; (treemacs-follow-mode t)
+  (treemacs-tag-follow-mode 1)
+  (treemacs-filewatch-mode -1))
 
 (after! lsp-treemacs
   (define-key!

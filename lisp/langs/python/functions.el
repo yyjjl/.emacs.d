@@ -102,3 +102,29 @@
 (defsubst ymacs-python//line-startswith-p (-string)
   (back-to-indentation)
   (string-prefix-p -string (buffer-substring-no-properties (point) (line-end-position))))
+
+(defsubst ymacs-python//get-execution-root-from-pyright-config ()
+  (let* ((project-root (ymacs-editor//project-root))
+         (config-file (expand-file-name "pyrightconfig.json" project-root)))
+    (when (file-exists-p config-file)
+      (let ((config (with-temp-buffer
+                      (insert-file-contents config-file)
+                      (goto-char (point-min))
+                      (json-parse-buffer))))
+        (cl-loop
+         for env across (gethash "executionEnvironments" config)
+         for root = (and (hash-table-p env)
+                         (gethash "root" env))
+         for root-dir = (and root
+                             (expand-file-name root project-root))
+         when (and root-dir
+                   (buffer-file-name)
+                   (file-in-directory-p (buffer-file-name) root-dir))
+         return root-dir)))))
+
+(defsubst ymacs-python//get-execution-root ()
+  (if (not (eq ymacs-python-execution-root 'unset))
+      ymacs-python-execution-root
+    (setq ymacs-python-execution-root
+          (or (ymacs-python//get-execution-root-from-pyright-config)
+              (ymacs-editor//project-root-or-default)))))

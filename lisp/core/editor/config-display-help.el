@@ -66,10 +66,11 @@
                   (cons (concat (car keys) (make-string (- pad-width (length (car keys))) ?\ ))
                         (aref rows j)))
             (setq keys (cdr keys)))))
-    (mapconcat
-     (lambda (row) (string-join (nreverse row) -column-sep))
-     rows
-     "\n")))
+    (string-trim-right
+     (mapconcat
+      (lambda (row) (string-join (nreverse row) -column-sep))
+      rows
+      "\n"))))
 
 (defsubst ymacs-editor//display-help--keys (-keys)
   (when-let (keys (ymacs-editor//display-keys--format -keys))

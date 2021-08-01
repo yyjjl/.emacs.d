@@ -9,19 +9,23 @@
     (setq ymacs-editor--inhibit-semantic t)
     (unless (eval-when-has-feature! lsp
               (bound-and-true-p lsp-mode))
-      (citre-mode 1))))
+      (citre-mode 1)
+      (ymacs-editor//add-company-backend
+       'ymacs-editor//company-citre
+       :after 'company-capf
+       :remove-capf nil))))
 
-;; (defun ymacs-editor//company-citre (-command &optional -arg &rest _ignored)
-;;   "Completion backend of for citre.  Execute COMMAND with ARG and IGNORED."
-;;   (interactive (list 'interactive))
-;;   (cl-case -command
-;;     (interactive (company-begin-backend 'ymacs-editor//company-citre))
-;;     (prefix (and (bound-and-true-p citre-mode)
-;;                  (or (citre-get-symbol) 'stop)))
-;;     (meta (citre-get-property 'signature -arg))
-;;     (annotation (concat (citre-capf--get-annotation -arg) ":citre"))
-;;     (candidates (all-completions -arg (citre-capf--get-collection -arg)))
-;;     (ignore-case (not citre-completion-case-sensitive))))
+(defun ymacs-editor//company-citre (-command &optional -arg &rest _ignored)
+  "Completion backend of for citre.  Execute COMMAND with ARG and IGNORED."
+  (interactive (list 'interactive))
+  (cl-case -command
+    (interactive (company-begin-backend 'ymacs-editor//company-citre))
+    (prefix (and (bound-and-true-p citre-mode)
+                 (or (citre-get-symbol) 'stop)))
+    (meta (citre-get-property 'signature -arg))
+    (annotation (concat (citre-capf--get-annotation -arg) ":citre"))
+    (candidates (all-completions -arg (citre-capf--get-collection -arg)))
+    (ignore-case (not citre-completion-case-sensitive))))
 
 (add-hook 'find-file-hook #'ymacs-editor//try-enable-ctags)
 

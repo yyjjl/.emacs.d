@@ -37,7 +37,7 @@
        . font-lock-constant-face))))
 
 (eval-when-has-feature! lsp
-  (after! (lsp-mode lsp-clangd)
+  (after! lsp-clangd
     (put 'lsp-clients-clangd-args 'risky-local-variable-p nil)
     (put 'lsp-clients-clangd-args 'safe-local-variable (lambda (x) (and (listp x) (cl-every #'stringp x))))
 

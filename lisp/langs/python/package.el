@@ -18,6 +18,12 @@
 (defvar-local ymacs-python--last-buffer nil
   "Help keep track of python buffer when changing to pyshell.")
 
+(defvar-local ymacs-python-execution-root 'unset)
+
+(after-feature! editor
+  (add-to-list 'ymacs-editor-project-invalidate-cache-empty-vars
+               '(ymacs-python-execution-root . unset)))
+
 (eval-when-has-feature! debug
   (add-to-list 'ymacs-debugger-alist '(python-mode pdb :gud t)))
 

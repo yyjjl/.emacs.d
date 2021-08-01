@@ -31,6 +31,7 @@
       (add-dir-local-variable nil 'lsp-pyright-python-executable-cmd python-path))
     (add-dir-local-variable nil 'python-shell-interpreter python-path)
     (add-dir-local-variable nil 'pyvenv-activate venv-path)
+
     (save-buffer)
     (hack-dir-local-variables-for-project!)))
 
@@ -109,7 +110,7 @@ If not try to complete."
      (list
       (cond ((= arg 0) default-directory)
             ((= arg 16) (read-directory-name "Directory: "))
-            (t (ymacs-editor//project-root-or-default))))))
+            (t (ymacs-python//get-execution-root))))))
   (let ((source-buffer (current-buffer))
         (buffer (process-buffer (ymacs-python//get-or-create-process -directory t))))
     (with-current-buffer buffer

@@ -19,6 +19,8 @@
                    (concat (if (s-contains-p "release" ymacs-cpp-blade-build-name)
                                "./build.sh"
                              "./build_dev.sh")
+                           (unless (equal -do-build '(16))
+                             " -nu ")
                            " && "))
                  (format "python3 %s .." (expand-etc! "scripts/clean_cdb.py")))))))
 
@@ -32,6 +34,7 @@
          (project-name
           (with-temp-lv-message! ("ROOT: %s" project-root)
             (read-string "Project name: " ymacs-cpp-blade-project-name)))
+         (build-name (read-string "Build: " ymacs-cpp-blade-build-name))
          (clangd-args
           (cons
            (format "--compile-commands-dir=%s" project-root)
@@ -40,6 +43,7 @@
             lsp-clients-clangd-args))))
     (add-dir-local-variable nil 'ymacs-default-project (cons 'local project-root))
     (add-dir-local-variable nil 'ymacs-cpp-blade-project-name project-name)
+    (add-dir-local-variable nil 'ymacs-cpp-blade-build-name build-name)
     (add-dir-local-variable nil 'lsp-clients-clangd-args clangd-args)
     (save-buffer)
     (hack-dir-local-variables-for-project!)))

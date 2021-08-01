@@ -94,6 +94,19 @@
 
   (ymacs-editor//generic-setup))
 
+(after! term/tty-colors
+  ;; cache for performance
+  (define-advice tty-color-desc (:around (-fn -color &optional -frame) cache)
+    (let ((cache-table (or (frame-parameter -frame 'tty-color-cache)
+                           (let ((table (make-hash-table :test #'equal)))
+                             (set-frame-parameter -frame 'tty-color-cache table)
+                             table))))
+      (if-let (cache (gethash (cons -color -frame) cache-table))
+          (and (not (eq cache 'null)) cache)
+        (let ((ret (funcall -fn -color -frame)))
+          (puthash (cons -color -frame) (or ret 'null) cache-table)
+          ret)))))
+
 (run-after-init! 0
   (require 'lv)
 
