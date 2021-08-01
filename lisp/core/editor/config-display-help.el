@@ -140,7 +140,8 @@
     (goto-char (point-min))))
 
 (defun ymacs-editor//display-help--hide (&rest _)
-  (mapc #'delete-window (get-buffer-window-list ymacs-editor-display-help-buffer-name))
+  (when-let (buffer (get-buffer ymacs-editor-display-help-buffer-name))
+    (mapc #'delete-window (get-buffer-window-list buffer)))
   (when (window-live-p ymacs-editor-display-help-window)
     (delete-window ymacs-editor-display-help-window)))
 
