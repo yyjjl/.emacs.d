@@ -215,7 +215,7 @@
 (load-theme 'monokai t)
 
 (eval-when! ymacs-only-in-terminal-p
-  (require-packages! clipetty)
+  (when (require-packages! clipetty nil t)
 
-  (global-clipetty-mode 1)
-  (xterm-mouse-mode 1))
+    (global-clipetty-mode 1)
+    (xterm-mouse-mode 1)))
