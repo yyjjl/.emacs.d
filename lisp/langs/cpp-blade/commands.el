@@ -41,9 +41,9 @@
            (cl-remove-if
             (lambda (x) (string-prefix-p "--compile-commands-dir" x))
             lsp-clients-clangd-args))))
-    (add-dir-local-variable nil 'ymacs-default-project (cons 'local project-root))
-    (add-dir-local-variable nil 'ymacs-cpp-blade-project-name project-name)
-    (add-dir-local-variable nil 'ymacs-cpp-blade-build-name build-name)
-    (add-dir-local-variable nil 'lsp-clients-clangd-args clangd-args)
-    (save-buffer)
-    (hack-dir-local-variables-for-project!)))
+    (ymacs-editor//setup-project-internal
+     project-root
+     (list
+      (cons 'ymacs-cpp-blade-project-name project-name)
+      (cons 'ymacs-cpp-blade-build-name build-name)
+      (cons 'lsp-clients-clangd-args clangd-args)))))

@@ -15,25 +15,16 @@
   "Find current project"
   (let* ((key (expand-file-name -directory))
          (value (gethash key ymacs-editor-project-cache)))
-    (unless (and value
-                 (not (eq value 'none))
-                 (file-exists-p (project-root value)))
-      (setq value (or
-                   (when ymacs-default-project
-                     (if (file-remote-p -directory)
-                         (cons (car ymacs-default-project)
-                               (tramp-make-tramp-file-name
-                                (tramp-dissect-file-name -directory)
-                                (cdr ymacs-default-project)))
-                       ymacs-default-project))
-                   (project-try-vc -directory)
-                   (when-let (root (locate-dominating-file -directory ".project"))
-                     (cons 'local root))
-                   ;; default is 'none
-                   'none))
-      (puthash key value ymacs-editor-project-cache))
-    (and (not (eq value 'none))
-         value)))
+    (when (not (eq value 'none))
+      (when (not (and value (file-exists-p (project-root value))))
+        (setq value (or (when-let (root (locate-dominating-file -directory ".project"))
+                          (cons 'local root))
+                        (project-try-vc -directory)
+                        ;; default is 'none
+                        'none))
+        (puthash key value ymacs-editor-project-cache))
+      (when (not (eq value 'none))
+        value))))
 
 (defsubst ymacs-editor//project-root (&optional -directory)
   (when-let (project (project-current nil -directory))
@@ -43,6 +34,17 @@
   (or (when-let (project (project-current))
         (project-root project))
       default-directory))
+
+(defsubst ymacs-editor//setup-project-internal (-root -bindings)
+  (let ((default-directory -root))
+    (unless (or (file-exists-p ".project")
+                (not (yes-or-no-p (format "create .project file in %s" -root))))
+      (f-touch ".project")))
+  (cl-loop
+   for (var . val) in -bindings
+   do (add-dir-local-variable nil var val))
+  (save-buffer)
+  (hack-dir-local-variables-for-project!))
 
 (after! project
   (when (boundp 'project-prefix-map)

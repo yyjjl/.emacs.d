@@ -230,7 +230,7 @@
 
   (add-to-list 'counsel-compile-local-builds #'ymacs-editor//default-compile-command t)
 
-  (setq counsel-fzf-dir-function #'ymacs-editor//project-root)
+  (setq counsel-fzf-dir-function #'ymacs-editor//project-root-or-default)
   (setq counsel-yank-pop-separator "\n------------------------------------------------------------\n")
   (setq counsel-find-file-at-point t)
   (setq counsel-find-file-ignore-regexp

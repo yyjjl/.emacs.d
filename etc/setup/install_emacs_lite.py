@@ -55,13 +55,13 @@ class Installer(object):
         os.environ['PATH'] = '{}/bin:{}'.format(
             prefix, os.environ.get('PATH', '')
         )
-        # os.environ['LDFLAGS'] = '-L{0}/lib -L{0}/lib64'.format(prefix)
-        # os.environ['CPATH'] = '{}/include'.format(prefix)
-        # os.environ['LD_LIBRARY_PATH'] = '{0}/lib:{0}/lib64'.format(prefix)
-        # os.environ['PKG_CONFIG_PATH'] = '{0}/lib/pkgconfig:{0}/lib64/pkgconfig:{1}'.format(
-        #     prefix,
-        #     os.environ.get('PKG_CONFIG_PATH', '')
-        # )
+        os.environ['LDFLAGS'] = '-L{0}/lib -L{0}/lib64'.format(prefix)
+        os.environ['CPATH'] = '{}/include'.format(prefix)
+        os.environ['LD_LIBRARY_PATH'] = '{0}/lib:{0}/lib64'.format(prefix)
+        os.environ['PKG_CONFIG_PATH'] = '{0}/lib/pkgconfig:{0}/lib64/pkgconfig:{1}'.format(
+            prefix,
+            os.environ.get('PKG_CONFIG_PATH', '')
+        )
         os.environ['CFLAGS'] = '-gdwarf-4'
 
         if os.path.exists(self._progress_path):
@@ -234,35 +234,35 @@ os.makedirs(BIN_DIR, exist_ok=True)
 
 os.chdir(SRC_DIR)
 with Installer(prefix=ROOT_DIR) as installer:
-    # installer.extract_and_link('fd-*', 'fd', BIN_DIR)
-    # installer.extract_and_link('ripgrep-*', 'rg', BIN_DIR)
+    installer.extract_and_link('fd-*', 'fd', BIN_DIR)
+    installer.extract_and_link('ripgrep-*', 'rg', BIN_DIR)
 
-    # run_cmd([
-    #     'tar', 'zxf', glob(os.path.join(installer.cache_path, 'fzf-*'))[0], '-C', BIN_DIR
-    # ])
+    run_cmd([
+        'tar', 'zxf', glob(os.path.join(installer.cache_path, 'fzf-*'))[0], '-C', BIN_DIR
+    ])
 
-    # installer.download_and_install_cmake(CMAKE)
+    installer.download_and_install_cmake(CMAKE)
 
-    # for name, version, ext, *cmd_args in GNU_SOFTWARES:
-    #     installer.run(
-    #         name,
-    #         [installer.download_gnu_software, name, version, ext],
-    #         [os.chdir, '{}-{}'.format(name, version)],
-    #         [installer.configure, *cmd_args],
-    #         [installer.make],
-    #     )
+    for name, version, ext, *cmd_args in GNU_SOFTWARES:
+        installer.run(
+            name,
+            [installer.download_gnu_software, name, version, ext],
+            [os.chdir, '{}-{}'.format(name, version)],
+            [installer.configure, *cmd_args],
+            [installer.make],
+        )
 
-    # installer.run(
-    #     'gnutls',
-    #     [installer.download_gnutls, GNUTLS],
-    #     [os.chdir, 'gnutls-{}.{}'.format(*GNUTLS)],
-    #     [
-    #         installer.configure,
-    #         '--with-included-libtasn1',
-    #         '--without-p11-kit'
-    #     ],
-    #     [installer.make],
-    # )
+    installer.run(
+        'gnutls',
+        [installer.download_gnutls, GNUTLS],
+        [os.chdir, 'gnutls-{}.{}'.format(*GNUTLS)],
+        [
+            installer.configure,
+            '--with-included-libtasn1',
+            '--without-p11-kit'
+        ],
+        [installer.make],
+    )
 
     installer.run(
         'gcc',
@@ -281,41 +281,41 @@ with Installer(prefix=ROOT_DIR) as installer:
         [installer.make],
     )
 
-    # installer.run(
-    #     'libvterm',
-    #     [download_from_github, 'neovim/libvterm', 'libvterm'],
-    #     [os.chdir, 'libvterm'],
-    #     [subprocess.run, ['make']],
-    #     [subprocess.run,
-    #      ['make', 'install', 'PREFIX={}'.format(installer.prefix)]]
-    # )
+    installer.run(
+        'libvterm',
+        [download_from_github, 'neovim/libvterm', 'libvterm'],
+        [os.chdir, 'libvterm'],
+        [subprocess.run, ['make']],
+        [subprocess.run,
+         ['make', 'install', 'PREFIX={}'.format(installer.prefix)]]
+    )
 
-    # installer.run(
-    #     'jansson',
-    #     [download_from_github, 'akheron/jansson', 'jansson'],
-    #     [os.chdir, 'jansson'],
-    #     [installer.cmake, '-DJANSSON_BUILD_DOCS=OFF'],
-    #     [os.chdir, 'build'],
-    #     [installer.make]
-    # )
+    installer.run(
+        'jansson',
+        [download_from_github, 'akheron/jansson', 'jansson'],
+        [os.chdir, 'jansson'],
+        [installer.cmake, '-DJANSSON_BUILD_DOCS=OFF'],
+        [os.chdir, 'build'],
+        [installer.make]
+    )
 
-    # installer.run(
-    #     'emacs',
-    #     [download_from_github, 'emacs-mirror/emacs', 'emacs'],
-    #     [os.chdir, 'emacs'],
-    #     [
-    #         installer.configure,
-    #         '--with-json',
-    #         '--with-libgmp=no',
-    #         '--with-native-compilation'
-    #     ],
-    #     [installer.make]
-    # )
+    installer.run(
+        'emacs',
+        [download_from_github, 'emacs-mirror/emacs', 'emacs'],
+        [os.chdir, 'emacs'],
+        [
+            installer.configure,
+            '--with-json',
+            '--with-libgmp=no',
+            '--with-native-compilation'
+        ],
+        [installer.make]
+    )
 
-    # installer.run(
-    #     'ctags',
-    #     [download_from_github, 'universal-ctags/ctags', 'universal-ctags'],
-    #     [os.chdir, 'universal-ctags'],
-    #     [installer.configure],
-    #     [installer.make]
-    # )
+    installer.run(
+        'ctags',
+        [download_from_github, 'universal-ctags/ctags', 'universal-ctags'],
+        [os.chdir, 'universal-ctags'],
+        [installer.configure],
+        [installer.make]
+    )

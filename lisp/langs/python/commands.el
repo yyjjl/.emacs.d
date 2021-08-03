@@ -24,16 +24,14 @@
   (interactive)
   (let* ((project-root (read-directory-name "Root: " (ymacs-editor//project-root)))
          (venv-path (read-directory-name "Venv: " pyvenv-activate))
-         (python-path (read-string "Python: " python-shell-interpreter))
-         (default-directory project-root))
-    (add-dir-local-variable nil 'ymacs-default-project (cons 'local project-root))
-    (eval-when-has-feature! lsp
-      (add-dir-local-variable nil 'lsp-pyright-python-executable-cmd python-path))
-    (add-dir-local-variable nil 'python-shell-interpreter python-path)
-    (add-dir-local-variable nil 'pyvenv-activate venv-path)
-
-    (save-buffer)
-    (hack-dir-local-variables-for-project!)))
+         (python-path (read-string "Python: " python-shell-interpreter)))
+    (ymacs-editor//setup-project-internal
+     project-root
+     (append
+      (list (cons 'python-shell-interpreter python-path)
+            (cons 'pyvenv-activate venv-path))
+      (eval-when-has-feature! lsp
+        (list (cons 'lsp-pyright-python-executable-cmd python-path)))))))
 
 ;;;###autoload
 (defun ymacs-python/shell-completion-complete-or-indent ()

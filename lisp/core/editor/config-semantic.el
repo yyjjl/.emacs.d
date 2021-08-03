@@ -13,7 +13,7 @@
         (not (derived-mode-p 'prog-mode))))
 
   (define-hook! ymacs-semantic//setup-imenu (mode-local-init-hook)
-    (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+    (when (derived-mode-p 'prog-mode)
       (cond
        ((bound-and-true-p lsp-mode)
         (setq imenu-create-index-function #'lsp--imenu-create-index))
