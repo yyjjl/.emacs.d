@@ -41,7 +41,6 @@
       `((smerge-mode "SMerge ")
         (view-mode "View ")
         (overwrite-mode ("" overwrite-mode " "))
-        (auto-fill-function "Fill ")
         (visual-line-mode "Wrap ")
         (isearch-mode isearch-mode)
         (next-error-follow-minor-mode "Fol ")
@@ -62,8 +61,7 @@
         (lambda (buffer &optional _buffers)
           (format "[%s]" (buffer-name buffer))))
   (setq tab-line-separator nil)
-  (setq tab-line-tabs-function
-        #'ymacs-popup//get-term-buffer-list))
+  (setq tab-line-tabs-function #'ymacs-popup//get-term-buffer-list))
 
 (setq which-key-dont-use-unicode t)
 (after! which-key

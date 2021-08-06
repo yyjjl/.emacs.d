@@ -110,7 +110,9 @@
 (run-after-init! 0
   (require 'lv)
 
-  (tab-bar-mode 1)
+  (if sys/macp
+      (setq-default tab-line-format '(:eval (ymacs-modeline//format--header)))
+    (tab-bar-mode 1))
 
   ;; Purges buffers which haven't been displayed in 3 days
   (midnight-mode 1)
