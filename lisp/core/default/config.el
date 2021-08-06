@@ -127,7 +127,7 @@
 (setq uniquify-buffer-name-style 'forward)
 (setq uniquify-after-kill-buffer-p t)
 (setq uniquify-ignore-buffers-re "^\\*")
-(setq uniquify-min-dir-content 0)
+(setq uniquify-min-dir-content 1)
 
 (with-no-warnings
   (when sys/macp

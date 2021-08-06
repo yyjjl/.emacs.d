@@ -58,15 +58,13 @@
   (ymacs-modeline-set! (comint term vterm)
     :mode-line shell
     :body (tab-line-mode 1))
-  (ymacs-modeline-set! dired
-    :mode-line dired
-    :header-line dired-header)
+  (ymacs-modeline-set! dired :mode-line dired)
   (ymacs-modeline-set! image :mode-line media)
   (ymacs-modeline-set! (message git-commit) :mode-line message)
   (ymacs-modeline-set! magit :mode-line vcs)
   (ymacs-modeline-set! org-src :mode-line org-src)
   (ymacs-modeline-set! git-timemachine :mode-line timemachine)
-  (ymacs-modeline-set! (prog text conf) :header-line header)
+  ;; (ymacs-modeline-set! (prog text conf) :header-line header)
   ;; Set default modeline
   (ymacs-modeline-set! default :mode-line main)
 

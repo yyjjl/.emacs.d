@@ -110,6 +110,8 @@
 (run-after-init! 0
   (require 'lv)
 
+  (tab-bar-mode 1)
+
   ;; Purges buffers which haven't been displayed in 3 days
   (midnight-mode 1)
   ;; (display-time-mode 1)

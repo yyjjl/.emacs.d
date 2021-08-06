@@ -464,15 +464,6 @@ By default, this shows the information specified by `global-mode-string'."
    (when ymacs-desktop-name
      (propertize ymacs-desktop-name 'face 'font-lock-constant-face))))
 
-(ymacs-modeline//def-segment misc-info-simple
-  "Mode line construct for miscellaneous information.
-By default, this shows the information specified by `global-mode-string'."
-  (list
-   ""
-   mode-line-misc-info
-   (when ymacs-desktop-name
-     (propertize ymacs-desktop-name 'face 'font-lock-constant-face))))
-
 ;;
 ;;* Position
 ;;
@@ -562,6 +553,3 @@ By default, this shows the information specified by `global-mode-string'."
 
 (ymacs-modeline//def-modeline header
   (debug input-method misc-info))
-
-(ymacs-modeline//def-modeline dired-header
-  (debug input-method misc-info-simple))

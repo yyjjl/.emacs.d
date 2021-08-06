@@ -1,5 +1,7 @@
 ;; -*- lexical-binding:t -*-
 
+(declare-function dap-hydra/nil "ext:dap-mode")
+
 (after! lsp-mode
   (define-hook! ymacs-lsp|after-open (lsp-after-open-hook)
     (remove-function (local 'eldoc-documentation-function) #'lsp-eldoc-function)
@@ -20,12 +22,6 @@
 
 (after! lsp-modeline
   (setq lsp-modeline-code-actions-segments '(count name)))
-
-(after! lsp-headerline
-  (define-hook! ymacs-lsp|set-headerline (lsp-headerline-breadcrumb-mode-hook)
-    (when lsp-headerline-breadcrumb-mode
-      (setq header-line-format (remove '(t (:eval lsp-headerline--string)) header-line-format))
-      (setq tab-line-format '(:eval lsp-headerline--string)))))
 
 (after! dap-mode
   (define-advice dap-debug (:before (&rest _args) save-window-configuration)
