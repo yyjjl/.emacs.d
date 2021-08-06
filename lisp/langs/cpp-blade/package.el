@@ -12,10 +12,8 @@
   :type 'string
   :safe #'stringp)
 
-(option! cpp-blade-root-directory nil
-  "Project root for blade"
-  :type 'string
-  :safe #'stringp)
+(defvar-local ymacs-cpp-blade-root-directory nil
+  "Project root for blade")
 
 (defvar ymacs-cpp-blade-keymap
   (define-key! :map (make-sparse-keymap)
