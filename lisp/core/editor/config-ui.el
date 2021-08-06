@@ -61,8 +61,7 @@
         (lambda (buffer &optional _buffers)
           (format "[%s]" (buffer-name buffer))))
   (setq tab-line-separator nil)
-  (setq tab-line-tabs-function
-        #'ymacs-popup//get-term-buffer-list))
+  (setq tab-line-tabs-function #'ymacs-popup//get-term-buffer-list))
 
 (setq which-key-dont-use-unicode t)
 (after! which-key

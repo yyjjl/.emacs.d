@@ -55,7 +55,7 @@
         (progn
           (print! "> Compiling %s\n" file)
           (byte-compile-file file)
-          (when (fboundp 'native-compile)
+          (when (native-comp-available-p)
             (native-compile file)))
       (error
        (print! "  > Failed %s\n" err)))))
