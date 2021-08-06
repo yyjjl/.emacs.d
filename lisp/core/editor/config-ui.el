@@ -37,15 +37,14 @@
 
 
 
-(setq mode-line-misc-info
-      `((smerge-mode "SMerge ")
-        (view-mode "View ")
-        (overwrite-mode ("" overwrite-mode " "))
-        (auto-fill-function "Fill ")
-        (visual-line-mode "Wrap ")
-        (isearch-mode isearch-mode)
-        (next-error-follow-minor-mode "Fol ")
-        ,@mode-line-misc-info))
+(dolist (item '((smerge-mode "SMerge ")
+                (view-mode "View ")
+                (overwrite-mode ("" overwrite-mode " "))
+                (auto-fill-function "Fill ")
+                (visual-line-mode "Wrap ")
+                (isearch-mode isearch-mode)
+                (next-error-follow-minor-mode "Fol ")))
+  (add-to-list 'mode-line-misc-info item))
 
 (defun ymacs-default//tab-bar ()
   `((global menu-item ,(format-mode-line (ymacs-modeline//format--header)) ignore)))

@@ -6,6 +6,7 @@
 (declare-function flymake-diagnostic-text 'flymake)
 (declare-function flymake-diagnostic-type 'flymake)
 (declare-function flymake--lookup-type-property 'flymake)
+(declare-function lsp--progress-status 'lsp)
 
 (defmacro ymacs-lsp//try-enable (-name)
   `(and (eq ymacs-lsp-project-state :enabled)
@@ -117,3 +118,13 @@
        :error-handler #'ignore
        :mode 'tick
        :cancel-token :eldoc-hover))))
+
+(lsp-defun ymacs-lsp//on-progress
+  (workspace (&ProgressParams :token :value (value &as &WorkDoneProgress :kind)))
+  "PARAMS contains the progress data.
+WORKSPACE is the workspace that contains the progress token."
+  (pcase kind
+    ("begin" (lsp-workspace-set-work-done-token token value workspace))
+    ("report" (lsp-workspace-set-work-done-token token value workspace))
+    ("end" (lsp-workspace-rem-work-done-token token workspace)))
+  (setq ymacs-lsp-progress-state (lsp--progress-status)))

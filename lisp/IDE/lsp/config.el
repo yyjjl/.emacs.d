@@ -22,6 +22,20 @@
    '(lsp-signature-mode
      (:propertize "[Signature]" face ymacs-modeline-lsp-success)))
 
+  (add-to-list
+   'mode-line-misc-info
+   '(ymacs-lsp-progress-state ymacs-lsp-progress-state))
+
+  (lsp-defun ymacs-lsp//on-progress
+    (workspace (&ProgressParams :token :value (value &as &WorkDoneProgress :kind)))
+    "PARAMS contains the progress data.
+WORKSPACE is the workspace that contains the progress token."
+    (pcase kind
+      ("begin" (lsp-workspace-set-work-done-token token value workspace))
+      ("report" (lsp-workspace-set-work-done-token token value workspace))
+      ("end" (lsp-workspace-rem-work-done-token token workspace)))
+    (setq ymacs-lsp-progress-state (lsp--progress-status)))
+
   (ymacs-editor//add-toggles
    "LSP" 'lsp-mode
    '("l i" lsp-toggle-trace-io
@@ -118,7 +132,8 @@
   ;; (setq lsp-semantic-tokens-enable nil)
   (setq lsp-lens-enable t)
 
-  (setq lsp-progress-prefix " LSP:")
+  (setq lsp-progress-prefix "LSP:")
+  (setq lsp-progress-function #'ymacs-lsp//on-progress)
 
   ;; (setq lsp-headerline-breadcrumb-enable t)
   ;; (setq lsp-modeline-code-actions-enable t)
