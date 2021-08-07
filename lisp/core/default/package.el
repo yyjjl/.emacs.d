@@ -17,7 +17,7 @@
 ;;* Project caches
 (defvar-local ymacs-modeline--project-detected-p nil)
 (defvar-local ymacs-modeline--project-root nil)
-;; (defvar-local ymacs-modeline--project-parent-path nil)
+(defvar-local ymacs-modeline--project-parent-path nil)
 
 ;;* Buffer information
 (defvar-local ymacs-modeline--remote-host 'unset)

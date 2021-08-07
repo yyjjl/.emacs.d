@@ -9,7 +9,7 @@
 
   (add-to-list
    'mode-line-misc-info
-   '(tree-sitter-hl-mode " TreeH " (tree-sitter-mode " Tree "))
+   '(tree-sitter-hl-mode "TreeH " (tree-sitter-mode "Tree "))
    :append)
 
   (ymacs-editor//add-toggles

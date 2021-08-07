@@ -34,7 +34,10 @@ WORKSPACE is the workspace that contains the progress token."
       ("begin" (lsp-workspace-set-work-done-token token value workspace))
       ("report" (lsp-workspace-set-work-done-token token value workspace))
       ("end" (lsp-workspace-rem-work-done-token token workspace)))
-    (setq ymacs-lsp-progress-state (lsp--progress-status)))
+    (let ((status (lsp--progress-status)))
+      (unless (string-suffix-p status " ")
+        (setq status (concat status " ")))
+      (setq ymacs-lsp-progress-state status)))
 
   (ymacs-editor//add-toggles
    "LSP" 'lsp-mode

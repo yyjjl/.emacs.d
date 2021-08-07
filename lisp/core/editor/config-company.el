@@ -63,6 +63,8 @@
   (setq company-tooltip-align-annotations t)
   (setq company-auto-commit nil)
 
-  (setf (alist-get 'company-search-mode mode-line-misc-info)
-        '(("" company-search-lighter " "))))
+  (add-to-list
+   'mode-line-misc-info
+   '(company-search-mode
+     ("" (company-search-filtering "Filter" "Search") ": \"" company-search-string "\" "))))
 

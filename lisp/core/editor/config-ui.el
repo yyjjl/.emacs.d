@@ -72,7 +72,7 @@
 
 (after! which-func
   (setq which-func-format
-        '("[" (:propertize which-func-current face which-func) "]")))
+        '("<" (:propertize which-func-current face which-func) ">")))
 
 (after! display-line-numbers
   (setq display-line-numbers-type t)
