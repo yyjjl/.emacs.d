@@ -69,9 +69,6 @@
 (defun ymacs-editor//rg-in-directory (&optional -args -directory -extra-args)
   (interactive (list (transient-args 'ymacs-editor/rg) nil nil))
 
-  (cl-pushnew "--no-heading" -args)
-  (cl-pushnew "--color=never" -args)
-
   (when (and (not (member "-z" -args))
              (buffer-file-name)
              (or (string-suffix-p ".gz" (buffer-file-name))
@@ -79,29 +76,25 @@
                  (>= (prefix-numeric-value current-prefix-arg) 4)))
     (cl-pushnew "--search-zip" -args))
 
-  (when (and (= (prefix-numeric-value current-prefix-arg) 0))
-    (cl-pushnew "--search-zip" -args)
-    (cl-pushnew "--hidden" -args)
-    (cl-pushnew "--no-ignore" -args))
-
-  (unless (--some (or (string-prefix-p "-M" it)
-                      (string-prefix-p "--max-columns" it))
-                  -args)
-    (push "--max-columns=1000" -args))
-
-  (unless (member "--no-line-number" -args)
-    (cl-pushnew "--line-number" -args))
-
-  (let* ((initial-directory (or -directory (read-directory-name "Direcotry: ")))
-         (counsel-rg-base-command (concat "rg " (string-join -args " ") " %s ."))
+  (let* ((initial-directory
+          (or -directory
+              (let ((default-directory (or ymacs-editor-ivy--last-directory default-directory)))
+                (setq ymacs-editor-ivy--last-directory
+                      (read-directory-name "Direcotry: ")))))
          (shell-file-name "/bin/sh"))
-    (counsel-rg ymacs-editor-ivy--last-text initial-directory -extra-args)))
+    (counsel-rg ymacs-editor-ivy--last-text
+                initial-directory
+                (string-join (append -args -extra-args) " "))))
 
 ;;;###autoload
 (defun ymacs-editor//rg (&optional -args)
   (interactive (list (transient-args 'ymacs-editor/rg)))
 
-  (ymacs-editor//rg-in-directory -args default-directory))
+  (ymacs-editor//rg-in-directory
+   -args
+   (or ymacs-editor-ivy--last-directory
+       ymacs-editor-search-directory
+       (ymacs-editor//project-root-or-default))))
 
 (transient-define-prefix ymacs-editor/rg ()
   "Run ripgrep"
@@ -120,13 +113,11 @@
     (3 "-n" "Override ignore files" "--no-ignore")
     (3 "-l" "Only print the paths with at least one match" "--files-with-matches")
     ;; (3 "-p" "Alias for '--color always --heading --line-number'" "--pretty")
-    (3 "-N" "Suppress line numbers" "--no-line-number")
     (4 "-o" "Print only the matched (non-empty) parts" "--only-matching")]
    ["Options"
     (3 "A" "After context" "--after-context=")
     (3 "B" "Before context" "--before-context=")
     (3 "C" "Show context" "--context=")
-    (3 "M" "Max columns" "--max-columns=")
     (4 "g" "Filter files glob" "--glob=")
     (6 "i" "Filter files glob (no case)" "--iglob=")
     (3 "t" "Include files types" "--type=" :class ymacs-transient-rg-types)
@@ -136,17 +127,17 @@
     (6 "E" "Force encoding" "--encoding=")
     (6 "r" "Replace match" "--replace=")]]
   [:description
-   (lambda () (format "Actions in %s" (abbreviate-file-name default-directory)))
-   [("SPC" "Search in another directory" ymacs-editor//rg-in-directory)]
-   [("RET" "Search" ymacs-editor//rg)]]
+   (lambda ()
+     (format "Actions [%s]" (or ymacs-editor-ivy--last-directory default-directory)))
+   [("SPC" "Choose a direcotry to search" ymacs-editor//rg-in-directory)]
+   [("RET" "Search in project root" ymacs-editor//rg)]]
   (interactive)
 
   (setq ymacs-editor-ivy--last-text nil)
+  (setq ymacs-editor-ivy--last-directory nil)
   (if current-prefix-arg
       (transient-setup 'ymacs-editor/rg)
-    (let ((default-directory (or ymacs-editor-search-directory
-                                 (ymacs-editor//project-root-or-default))))
-      (ymacs-editor//rg))))
+    (ymacs-editor//rg)))
 
 ;;;###autoload
 (defun ymacs-editor/ivy-meta-dot-for-counsel-rg ()

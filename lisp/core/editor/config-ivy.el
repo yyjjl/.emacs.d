@@ -8,6 +8,7 @@
   :safe #'stringp)
 
 (defvar ymacs-editor-ivy--last-text nil)
+(defvar ymacs-editor-ivy--last-directory nil)
 
 (defvar ymacs-editor-ivy-display-help-extra-commands
   '(ivy-restrict-to-matches
@@ -71,22 +72,26 @@
   (declare (indent 0))
   (let* ((commands (mapcar #'car -body))
          (props-list (mapcar #'cdr -body))
-         (switch-fns (--map (intern (format "ymacs-editor//switch-to-%s" it)) commands)))
+         (switch-fns (--map (intern (format "ymacs-editor//switch-to-%s" it)) commands))
+         (switch-keys (remove nil (--map (plist-get it :key) props-list))))
     `(progn
        ,@(cl-loop
           for (command current-switch-fn props) in (-zip commands switch-fns props-list)
+          for save-text = (plist-get props :save-text)
+          for caller = (or (plist-get props :caller) command)
           collect
           `(progn
              (defun ,current-switch-fn (&rest _)
                (interactive)
-               ,@(when (plist-get props :save-text)
+               ,@(when save-text
                    `((setq ymacs-editor-ivy--last-text ivy-text)))
                (ivy-quit-and-run
-                 ,(if (plist-get props :save-text)
-                      `(,command)
-                    `(,command ivy-text))))
+                 ,(cond ((plist-get props :no-input) `(call-interactively ',command))
+                        (save-text `(,command))
+                        (t `(,command ivy-text)))))
+             (put ',caller 'switch ',(remove (plist-get props :key) switch-keys))
              (ivy-add-actions
-              ',(or (plist-get props :caller) command)
+              ',caller
               ',(cl-loop
                  for (switch-fn . props) in (-zip switch-fns props-list)
                  when (not (eq switch-fn current-switch-fn))
@@ -166,7 +171,7 @@
 
   (ymacs-editor//define-switch
     (swiper :doc "Swiper" :key "s")
-    (swiper-isearch :doc "SwiperI" :key "x")
+    (swiper-isearch :doc "SwiperI" :key "I")
     (swiper-all :doc "SwiperA" :key "a")
     (ymacs-editor//rg :doc "ripgrep" :key "r" :save-text t :caller counsel-rg)
     (counsel-git-grep :doc "gitgrep" :key "g"))
@@ -176,8 +181,14 @@
     (counsel-git :doc "git" :key "g")
     (counsel-find-file :doc "find file" :key "f"))
 
+  (ymacs-editor//define-switch
+    (ivy-switch-buffer :doc "all" :key "a" :no-input t)
+    (project-switch-to-buffer :doc "project" :key "p" :no-input t)
+    (counsel-bookmark :doc "bookmark" :key "m" :no-input t))
+
   (dolist (caller '(ivy-switch-buffer
                     internal-complete-buffer
+                    project-switch-to-buffer
                     ivy-switch-buffer-other-window))
     (ivy-configure caller
       :display-transformer-fn
