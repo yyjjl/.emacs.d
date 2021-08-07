@@ -1,5 +1,10 @@
 ;;; -*- lexical-binding: t; -*-
 
+(defface ymacs-x-face
+  '((t :inherit mode-line-highlight :extend t))
+  "color for ymacs-x indicator"
+  :group 'ymacs)
+
 (defvar ymacs-x-mode)
 (defvar-local ymacs-x--keymap-alist nil)
 (put 'ymacs-x--keymap-alist 'permanent-local t)
@@ -229,7 +234,7 @@
     (add-hook 'pre-command-hook #'ymacs-x//pre-command-hook nil t)
 
     (ignore-errors (fcitx--ymacs-x-maybe-deactivate))
-    (setq cursor-type 'bar)
+    ;; (setq cursor-type 'bar)
     (setq ymacs-x--command (ymacs-x//lookup-keys ";"))
     (setq ymacs-x--return (ymacs-x//lookup-keys (kbd "RET")))
     (setq ymacs-x--activated t)
@@ -242,7 +247,7 @@
 
   (when ymacs-x--activated
     (remove-hook 'pre-command-hook #'ymacs-x//pre-command-hook t)
-    (setq cursor-type 'box)
+    ;; (setq cursor-type 'box)
 
     (ignore-errors (fcitx--ymacs-x-maybe-activate))
 
@@ -268,14 +273,14 @@
 
 (defun ymacs-x//post-command-hook ()
   (if ymacs-x--activated
-      (let ((start (max (point-min) (- (point) 5)))
-            (end (min (point-max) (+ (point) 5)))
-            (buffer (current-buffer)))
+      (let ((start (line-beginning-position))
+            (end (min (point-max) (1+ (line-end-position)))))
         (if (overlayp ymacs-x-indicator-overlay)
-            (move-overlay ymacs-x-indicator-overlay start end buffer)
-          (overlay-put
-           (setq ymacs-x-indicator-overlay (make-overlay start end buffer))
-           'face 'tty-menu-selected-face)))
+            (move-overlay ymacs-x-indicator-overlay start end (current-buffer))
+          (let ((ov (make-overlay start end)))
+            (overlay-put ov 'face 'ymacs-x-face)
+            (overlay-put ov 'priority 100)
+            (setq ymacs-x-indicator-overlay ov))))
     (when (overlayp ymacs-x-indicator-overlay)
       (delete-overlay ymacs-x-indicator-overlay)
       (setq ymacs-x-indicator-overlay nil))))

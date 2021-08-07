@@ -115,11 +115,12 @@ Return nil if no project was found."
     (setq ymacs-modeline--project-root (ymacs-editor//project-root)
           ymacs-modeline--project-detected-p buffer-file-name)
 
-    (when ymacs-modeline--project-root
-      (setq ymacs-modeline--project-parent-path
-            (abbreviate-file-name
-             (file-name-directory
-              (directory-file-name ymacs-modeline--project-root))))))
+    ;; (when ymacs-modeline--project-root
+    ;;   (setq ymacs-modeline--project-parent-path
+    ;;         (abbreviate-file-name
+    ;;          (file-name-directory
+    ;;           (directory-file-name ymacs-modeline--project-root)))))
+    )
   ymacs-modeline--project-root)
 
 ;;
@@ -458,8 +459,6 @@ By default, this shows the information specified by `global-mode-string'."
    ""
    mode-line-misc-info
    " "
-   (propertize (or ymacs-modeline--project-parent-path default-directory)
-               'face 'font-lock-doc-face)
    ymacs-modeline--lsp-state
    (when ymacs-desktop-name
      (propertize ymacs-desktop-name 'face 'font-lock-constant-face))))

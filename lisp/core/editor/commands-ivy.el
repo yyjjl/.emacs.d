@@ -168,7 +168,11 @@
     (push "--type=file" -args))
 
   (let ((ymacs-editor-display-help-extra-lines
-         (list (format "FZF_DEFAULT_COMMAND=fd %s" (string-join -args " ")))))
+         (list (format "FZF_DEFAULT_COMMAND=%s %s"
+                       (or (when-let (cmd (getenv "FZF_DEFAULT_COMMAND"))
+                             (car (split-string cmd)))
+                           "fd")
+                       (string-join -args " ")))))
     (with-temp-env! ymacs-editor-display-help-extra-lines
       (counsel-fzf ymacs-editor-ivy--last-text))))
 
