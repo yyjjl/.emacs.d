@@ -163,6 +163,7 @@
   (advice-add #'ivy--cleanup :before #'ymacs-editor//display-help--hide)
 
   (define-key! :map ivy-minibuffer-map
+    ("SPC" . ymacs-editor//ivy-smart-space)
     ("C-r" . ivy-reverse-i-search)
     ("C-j" . ivy-immediate-done)
     ("C-M-j" . ivy-done)

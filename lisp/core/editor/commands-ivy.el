@@ -28,6 +28,21 @@
         (funcall fn)
       (message "Not meta-dot function found for %s" caller))))
 
+;;;###autoload
+(defun ymacs-editor//ivy-smart-space ()
+  (interactive)
+  (or (and (= (minibuffer-prompt-end) (- (point) 1))
+           (when-let ((key (char-to-string (char-before)))
+                      (caller (ivy-state-caller ivy-last))
+                      (switch-keys (get caller 'switch))
+                      (switch-fn (when (member key switch-keys)
+                                   (cadr (assoc key (plist-get ivy--actions-list caller))))))
+             (when (stringp ivy-text)
+               (setq ivy-text (substring ivy-text 1)))
+             (call-interactively switch-fn)
+             t))
+      (call-interactively #'self-insert-command)))
+
 ;;* swiper
 (defhydra ymacs-hydra/swiper (:color blue :hint nil)
   "
