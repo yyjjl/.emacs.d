@@ -44,3 +44,11 @@
                 (find-file (car files)))
                (t
                 (find-file (completing-read "Open file: " files nil t)))))))))
+
+;;;###autoload
+(defun ymacs-editor/compile (-noninteractive)
+  (interactive "P")
+  (let* ((default-directory (ymacs-editor//project-root-or-default))
+         (current-prefix-arg (when (null -noninteractive) '(4))))
+    (with-temp-lv-message! ("%s @ %s" (if -noninteractive "Comint" "Compilation") default-directory)
+      (call-interactively 'compile))))

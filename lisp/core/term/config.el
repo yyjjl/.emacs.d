@@ -37,7 +37,7 @@
 
   (define-key! :map comint-mode-map
     ("M-o" . ymacs-term/switch)
-    ("M-h" . counsel-shell-history)))
+    ("M-h" . consult-history)))
 
 (after! shell
   (define-key! :map shell-mode-map

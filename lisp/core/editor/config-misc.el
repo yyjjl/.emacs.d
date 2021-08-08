@@ -15,16 +15,24 @@
              (or ,@extentions ,@(mapcar #'upcase extentions))
              string-end)))))
 
+(defun ymacs-editor//find-file-extern (x)
+  (interactive "FFile: ")
+  (call-process-shell-command
+   (format "%s %s"
+           (cl-case system-type
+             (darwin "open")
+             (cygwin "cygstart")
+             (t "xdg-open"))
+           (shell-quote-argument x))
+   nil 0))
+
 (defun ymacs-editor//external-file-handler (_op &rest -args)
   (let ((file (car -args))
         (process-connection-type nil))
     (recentf-add-file file)
     (kill-buffer)
-    (if (fboundp #'counsel-find-file-extern)
-        (progn
-          (counsel-find-file-extern file)
-          (message "Opened %s externally" file))
-      (message "Don't know how to open %s" file))))
+    (ymacs-editor//find-file-extern file)
+    (message "Opened %s externally" file)))
 
 (defun ymacs-editor//bookmark-setup ()
   (unless (ignore-errors (file-remote-p default-directory))
@@ -61,7 +69,11 @@
 
 (after! isearch
   (define-key! :map isearch-mode-map
-    ("C-o" . isearch-occur)))
+    ("C-o" . isearch-occur)
+    ("M-e" . consult-isearch) ;; orig. isearch-edit-string
+    ("M-s e" . consult-isearch) ;; orig. isearch-edit-string
+    ("M-s l" . consult-line)    ;; needed by consult-line to detect isearch
+    ("M-s L" . consult-line-multi)))
 
 (after! speedbar
   (setq speedbar-use-images nil))

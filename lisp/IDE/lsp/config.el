@@ -26,19 +26,6 @@
    'mode-line-misc-info
    '(ymacs-lsp-progress-state ymacs-lsp-progress-state))
 
-  (lsp-defun ymacs-lsp//on-progress
-    (workspace (&ProgressParams :token :value (value &as &WorkDoneProgress :kind)))
-    "PARAMS contains the progress data.
-WORKSPACE is the workspace that contains the progress token."
-    (pcase kind
-      ("begin" (lsp-workspace-set-work-done-token token value workspace))
-      ("report" (lsp-workspace-set-work-done-token token value workspace))
-      ("end" (lsp-workspace-rem-work-done-token token workspace)))
-    (let ((status (lsp--progress-status)))
-      (unless (string-suffix-p status " ")
-        (setq status (concat status " ")))
-      (setq ymacs-lsp-progress-state status)))
-
   (ymacs-editor//add-toggles
    "LSP" 'lsp-mode
    '("l i" lsp-toggle-trace-io
@@ -93,8 +80,8 @@ WORKSPACE is the workspace that contains the progress token."
 
     ("M-s h h" . lsp-document-highlight)
     ("C-c R" . lsp-rename)
-    ("C-c I" . lsp-ivy-workspace-symbol)
-    ("C-c G" . lsp-ivy-global-workspace-symbol)
+    ("C-c D" . consult-lsp-diagnostics)
+    ("C-c I" . consult-lsp-symbols)
     ("C-c S" . lsp-describe-session)
     ("C-c b" . ymacs-lsp/organize-imports)
     ("C-c C-b" . ymacs-lsp/format-buffer)
@@ -136,7 +123,6 @@ WORKSPACE is the workspace that contains the progress token."
   (setq lsp-lens-enable t)
 
   (setq lsp-progress-prefix "LSP:")
-  (setq lsp-progress-function #'ymacs-lsp//on-progress)
 
   ;; (setq lsp-headerline-breadcrumb-enable t)
   ;; (setq lsp-modeline-code-actions-enable t)

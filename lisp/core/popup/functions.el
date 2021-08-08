@@ -55,7 +55,7 @@
 (defsubst ymacs-popup//term-buffer-p (-buffer)
   (let ((case-fold-search t))
     (with-current-buffer -buffer
-      (and (not (string-prefix-p "ivy-occur" (symbol-name major-mode)))
+      (and (not (string-prefix-p "*Embark Export" (buffer-name)))
            (not (derived-mode-p 'gud-mode))
            (or
             (apply #'derived-mode-p ymacs-popup-term-modes)
@@ -64,15 +64,15 @@
 (defsubst ymacs-popup//help-buffer-p (-buffer)
   (let ((case-fold-search t))
     (with-current-buffer -buffer
-      (and (not (string-prefix-p "ivy-occur" (symbol-name major-mode)))
+      (and (not (string-prefix-p "*Embark Export" (buffer-name)))
            (or (apply #'derived-mode-p ymacs-popup-help-modes)
                (string-match-p ymacs-popup-help-buffer-regexp (buffer-name)))))))
 
 (defsubst ymacs-popup//occur-buffer-p (-buffer)
   (let ((case-fold-search t))
     (with-current-buffer -buffer
-      (or (string-prefix-p "ivy-occur" (symbol-name major-mode))
-          (derived-mode-p 'occur-mode 'ivy-occur-mode)
+      (or (string-prefix-p "*Embark Export" (buffer-name))
+          (derived-mode-p 'occur-mode)
           (string-match-p ymacs-popup-occur-buffer-regexp (buffer-name))))))
 
 (defsubst ymacs-popup//get-term-buffer-list ()

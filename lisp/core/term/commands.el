@@ -132,7 +132,7 @@ else: try to find a old term buffer and pop to it"
                (if (eq major-mode 'vterm-mode)
                    (lambda (str) (vterm-send-string str t))
                  (lambda (str) (term-send-raw-string str)))))
-      (call-interactively #'counsel-yank-pop))))
+      (call-interactively #'consult-yank-pop))))
 
 ;;;###autoload
 (defun ymacs-term/kill-line ()

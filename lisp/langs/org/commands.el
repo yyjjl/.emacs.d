@@ -183,7 +183,7 @@ _h_tml    _'_         ^ ^             _A_SCII:
         (when (and file (file-exists-p file))
           (ymacs-editor/find-file-externally (list file))
           (throw 'done t)))
-      (counsel-find-file basename))))
+      (find-file (read-file-name "File: " nil default-directory nil basename)))))
 
 ;;;###autoload
 (defun ymacs-org/latexmk-start-watching (-arg)
@@ -306,12 +306,12 @@ With a prefix BELOW move point to lower block."
   (interactive)
   (let* ((src-dir (file-truename ymacs-org-project-src-dir))
          (prefix-length (length (file-name-as-directory src-dir)))
-         (name (ivy-read "Open note: "
-                         (--map
-                          (substring it prefix-length)
-                          (directory-files-recursively src-dir "\\.org\\'"))
-                         :history 'org-project-note-history
-                         :caller 'org/project-open)))
+         (name (completing-read "Open note: "
+                                (--map
+                                 (substring it prefix-length)
+                                 (directory-files-recursively src-dir "\\.org\\'"))
+                                nil nil nil
+                                'org-project-note-history)))
     (setq name (abbreviate-file-name (expand-file-name name ymacs-org-project-src-dir)))
     (cond ((not (string-suffix-p ".org" name))
            (user-error "filename should endswith \".org\""))

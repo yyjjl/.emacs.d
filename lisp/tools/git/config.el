@@ -33,7 +33,6 @@
     ("` 3" . magit-section-show-level-3-all)
     ("` 4" . magit-section-show-level-4-all))
 
-  (setq magit-completing-read-function 'ivy-completing-read)
   (setq magit-diff-refine-hunk t)
   (setq magit-auto-revert-mode nil))
 

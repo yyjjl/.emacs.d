@@ -28,7 +28,7 @@ Does not indent buffer, because it is used for a
           (if candidate
               (cons candidate regexp-history)
             regexp-history)))
-    (call-interactively 'occur)))
+    (call-interactively 'consult-multi-occur)))
 
 ;;;###autoload
 (defun ymacs-editor/font-faces-at-point ()
@@ -50,7 +50,7 @@ The app is chosen from your OS's preference."
   (when (or (<= (length -files) 5)
             (y-or-n-p "Open more than 5 files? "))
     (dolist (file -files)
-      (counsel-find-file-extern file))))
+      (ymacs-editor//find-file-extern file))))
 
 ;;;###autoload
 (defun ymacs-editor/narrow-or-widen-dwim (&optional -arg)

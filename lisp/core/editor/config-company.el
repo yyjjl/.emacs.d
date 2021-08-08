@@ -34,7 +34,9 @@
 
 (make-variable-buffer-local 'company-backends)
 (after! company
-  (advice-add 'company-capf :around #'ignore-errors!)
+  (define-advice company-capf--candidates (:around (-fn &rest -args) set-completion-styles)
+    (let ((completion-styles '(basic partial-completion emacs22)))
+      (ignore-errors (apply -fn -args))))
 
   (define-key! :map company-active-map
     ("C-d")

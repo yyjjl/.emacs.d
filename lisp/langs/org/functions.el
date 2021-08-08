@@ -17,27 +17,6 @@
                  "^[\t ]*#\\+end_?\\([^ \n]+\\)$"))))
     (cdr (assoc keys ymacs-org-block-key-bindings))))
 
-(defun ymacs-org//generate-long-term-task ()
-  (goto-char (point-min))
-  (unless (re-search-forward "^\\* Long-term Task")
-    (user-error "Can not find heading `Long-term Task'"))
-  (unwind-protect
-      (progn
-        (org-narrow-to-subtree)
-        (let* ((headings (cdr (counsel-outline-candidates)))
-               (result (assoc
-                        (completing-read
-                         "Select subsection: "
-                         headings
-                         nil
-                         :require-match
-                         nil
-                         'org-capture-long-term-task-history)
-                        headings)))
-          (goto-char (cdr result))
-          (end-of-line 1)))
-    (widen)))
-
 (defun ymacs-org@wrap-publish-fn (-fn -plist -filename -pub-dir)
   (condition-case err
       (let ((org-confirm-babel-evaluate))
