@@ -28,13 +28,7 @@
                 (format "~/tmp/%s-%s-stderr" name (cl-incf lsp--stderr-index))))))
     (list
      :connect (plist-get ret :connect)
-     :test?
-     (lambda ()
-       (thread-last -local-command
-         lsp-resolve-final-function
-         cl-first
-         (tramp-make-tramp-file-name (tramp-dissect-file-name default-directory))
-         file-executable-p)))))
+     :test? (lambda () t))))
 
 (cl-defun ymacs-lsp//remote-npm-dependency-install (callback error-callback &key package &allow-other-keys)
   (if-let ((npm-binary (executable-find "npm" :remote)))
