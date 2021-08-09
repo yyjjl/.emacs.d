@@ -12,12 +12,14 @@
   "enable remote lsp server"
   :type 'boolean)
 
+(defsubst ymacs-lsp//remote-server-command-path-nonlocal (-relative-path)
+  (f-join (tramp-make-tramp-file-name
+           (tramp-dissect-file-name default-directory)
+           ymacs-lsp-remote-server-install-dir)
+          -relative-path))
+
 (defsubst ymacs-lsp//remote-server-command-path (-relative-path)
-  (file-local-name
-   (f-join (tramp-make-tramp-file-name
-            (tramp-dissect-file-name default-directory)
-            ymacs-lsp-remote-server-install-dir)
-           -relative-path)))
+  (file-local-name (ymacs-lsp//remote-server-command-path-nonlocal -relative-path)))
 
 (defun ymacs-lsp//tramp-connection (-local-command)
   (let ((ret (lsp-tramp-connection
