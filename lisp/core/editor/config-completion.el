@@ -40,12 +40,18 @@
   (setq completion-category-overrides '((file (styles partial-completion orderless))))
 
   (define-key! :map selectrum-minibuffer-map
+    ([remap delete-backward-char] ymacs-editor//minibuffer-delete-char)
+    ([remap backward-kill-word] ymacs-editor//minibuffer-delete-word)
     ("M-n" . ymacs-editor//next-history-element)
     ("M-o" . embark-act)
     ("C-c C-o" . embark-export)))
 
 (after! consult
   (require 'embark-consult)
+
+  (define-advice consult-imenu--items (:before () refresh)
+    (when (eq imenu-create-index-function #'semantic-create-imenu-index)
+      (semantic-fetch-tags)))
 
   (define-advice consult--command-builder (:around (-fn -builder) display-command)
     (let ((cmd-fn (funcall -fn -builder)))

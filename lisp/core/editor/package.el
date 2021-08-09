@@ -170,7 +170,7 @@
   ("M-0" . ymacs-editor/goto-char-or-minibuffer)
   ("M-7" . ymacs-editor/avy-copy-and-yank)
   ("M-8" . embark-act)
-  ("M-9" . avy-goto-word-or-subword-1)
+  ("M-9" . avy-goto-char-timer)
   ("M-;" . ymacs-editor/comment-dwim)
   ("M-I" . iedit-rectangle-mode)
   ("M-N" . ymacs-editor/select-error-buffer)

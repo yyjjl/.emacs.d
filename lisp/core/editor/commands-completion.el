@@ -1,36 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
 
-(require 'transient)
-
-(defclass ymacs-transient-ripgrep-types (transient-option)
-  ())
-
-(defclass ymacs-transient-ripgrep-directory (transient-option)
-  ())
-
-(cl-defmethod transient-infix-read ((obj ymacs-transient-ripgrep-types))
-  (let ((default-value (oref obj value)))
-    (condition-case nil
-        (let ((values (completing-read-multiple
-                       (format "Type (%s): " (or default-value "everything"))
-                       ymacs-editor-rg-type-aliases
-                       nil
-                       :require-match
-                       default-value)))
-          (unless (member "everything" values)
-            (string-join values ",")))
-      (quit default-value))))
-
-(cl-defmethod transient-infix-read ((obj ymacs-transient-ripgrep-directory))
-  (let ((default-value (oref obj value)))
-    (condition-case nil
-        (let ((directory (read-directory-name "Directory: " default-value nil t)))
-          (ymacs-editor//set-ripgrep-directory directory)
-          directory)
-      (quit default-value))))
-
-
-
 (defvar ymacs-editor-ripgrep-current-buffer nil)
 (defvar-local ymacs-editor-ripgrep-input nil)
 
@@ -67,6 +36,41 @@
       ymacs-editor-search-directory
       (ymacs-editor//project-root-or-default)))
 
+
+
+
+(require 'transient)
+
+(defclass ymacs-transient-ripgrep-types (transient-option)
+  ())
+
+(defclass ymacs-transient-ripgrep-directory (transient-option)
+  ())
+
+(cl-defmethod transient-infix-read ((obj ymacs-transient-ripgrep-types))
+  (let ((default-value (oref obj value)))
+    (condition-case nil
+        (let ((values (completing-read-multiple
+                       (format "Type (%s): " (or default-value "everything"))
+                       ymacs-editor-rg-type-aliases
+                       nil
+                       :require-match
+                       default-value)))
+          (unless (member "everything" values)
+            (string-join values ",")))
+      (quit default-value))))
+
+(cl-defmethod transient-infix-read ((obj ymacs-transient-ripgrep-directory))
+  (let ((default-value (oref obj value)))
+    (condition-case nil
+        (let ((directory (read-directory-name "Directory: " default-value nil t)))
+          (ymacs-editor//set-ripgrep-directory directory)
+          directory)
+      (quit default-value))))
+
+
+
+
 (defmacro ymacs-editor//minibuffer-quit-and-run (&rest -body)
   "Quit the minibuffer and run BODY afterwards."
   (declare (indent 0))
@@ -93,7 +97,46 @@
                     "")))
     (next-history-element -arg)))
 
-;;* Ripgrep
+
+(defsubst ymacs-editor//minibuffer-completing-file-p ()
+  "Return non-nil when completing file names."
+  (eq 'file
+      (completion-metadata-get
+       (completion-metadata
+        (buffer-substring (minibuffer-prompt-end) (max (minibuffer-prompt-end) (point)))
+        minibuffer-completion-table
+        minibuffer-completion-predicate)
+       'category)))
+
+(defun ymacs-editor//minibuffer-up-directory ()
+  (when (and (ymacs-editor//minibuffer-completing-file-p)
+             (eolp)
+             (eq (char-before) ?/))
+    (save-excursion
+      (goto-char (1- (point)))
+      (when (search-backward "/" (minibuffer-prompt-end) t)
+        (delete-region (1+ (point)) (point-max))
+        t))
+    t))
+
+;;;###autoload
+(defun ymacs-editor//minibuffer-delete-char ()
+  (interactive)
+  (unless (minibuffer-window-active-p (selected-window))
+    (user-error "No in minibuffer"))
+
+  (unless (ymacs-editor//minibuffer-up-directory)
+    (call-interactively #'delete-backward-char)))
+
+;;;###autoload
+(defun ymacs-editor//minibuffer-delete-word ()
+  (interactive)
+  (unless (minibuffer-window-active-p (selected-window))
+    (user-error "No in minibuffer"))
+
+  (unless (ymacs-editor//minibuffer-up-directory)
+    (call-interactively #'backward-kill-word)))
+
 
 (defun ymacs-editor//ripgrep-default-alias ()
   "Return the default alias by matching alias globs with the buffer file name."
