@@ -155,6 +155,7 @@
   (ace-window-display-mode 1)
 
   (selectrum-mode 1)
+  (marginalia-mode 1)
 
   (which-key-mode 1)
   (persistent-scratch-autosave-mode 1)

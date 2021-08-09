@@ -57,7 +57,9 @@
                        :require-match
                        default-value)))
           (unless (member "everything" values)
-            (string-join values ",")))
+            (let ( (ret (string-join values ",")))
+              (and (not (string-empty-p ret))
+                   ret))))
       (quit default-value))))
 
 (cl-defmethod transient-infix-read ((obj ymacs-transient-ripgrep-directory))
@@ -198,9 +200,9 @@
      (ymacs-editor//ripgrep-working-directory)
      (cond ((and (not (string-empty-p emacs-input))
                  (not (string-empty-p switches)))
-            (format "%s -- %s#%s" (if (string-empty-p rg-input) "_" rg-input) switches emacs-input))
+            (format "%s -- %s#%s" (if (string-empty-p rg-input) "" rg-input) switches emacs-input))
            ((and (not (string-empty-p switches)))
-            (format "%s -- %s" (if (string-empty-p rg-input) "_" rg-input) switches))
+            (format "%s -- %s" (if (string-empty-p rg-input) "" rg-input) switches))
            ((and (not (string-empty-p emacs-input)))
             (format "%s#%s" rg-input emacs-input))
            (t

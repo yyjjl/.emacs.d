@@ -30,8 +30,11 @@
              ("everything" "*")))
         (error (message "%s" err))))))
 
+(after! marginalia
+  (dolist (catogory '(command function variable file buffer))
+    (setf (alist-get catogory marginalia-annotator-registry) '(builtin))))
+
 (after! selectrum
-  (setq selectrum-fix-vertical-window-height t)
   (setq selectrum-max-window-height 13)
   (setq selectrum-show-indices t)
 
@@ -45,8 +48,8 @@
       (format (format "%%%dd/%%%dd " width width) current total)))
 
   (define-key! :map selectrum-minibuffer-map
-    ([remap delete-backward-char] ymacs-editor//minibuffer-delete-char)
-    ([remap backward-kill-word] ymacs-editor//minibuffer-delete-word)
+    ([remap delete-backward-char] . ymacs-editor//minibuffer-delete-char)
+    ([remap backward-kill-word] . ymacs-editor//minibuffer-delete-word)
     ("M-n" . ymacs-editor//next-history-element)
     ("M-o" . embark-act)
     ("C-c C-o" . embark-export)))
@@ -87,8 +90,8 @@
    :keymap ymacs-editor-ripgrep-map)
 
   (setq consult-async-refresh-delay 0.1)
-  (setq consult-async-input-debounce 0.05)
-  (setq consult-async-input-throttle 0.05)
+  (setq consult-async-input-debounce 0.2)
+  (setq consult-async-input-throttle 0.2)
 
   (setq consult-preview-key (kbd "C-l"))
   (setq consult-narrow-key ">")
