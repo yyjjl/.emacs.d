@@ -13,7 +13,7 @@
 
 (require-packages!
  lsp-mode
- lsp-ivy
+ consult-lsp
  dap-mode)
 
 (setq lsp-client-packages nil)

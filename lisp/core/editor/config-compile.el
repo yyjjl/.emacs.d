@@ -6,7 +6,6 @@
 (defvar ymacs-editor-next-error-buffer-modes
   '(occur-mode
     grep-mode
-    ivy-occur-mode
     xref--xref-buffer-mode
     compilation-mode))
 
@@ -14,25 +13,6 @@
 (defsubst ymacs-editor//get-environment ()
   (cl-loop for fn in ymacs-editor-environment-functions
            nconc (funcall fn)))
-
-(defun ymacs-editor//propertize-compile-command (-cmd -src-dir &optional -build-dir)
-  (unless -build-dir
-    (setq -build-dir -src-dir))
-
-  (let ((cmd (concat (propertize -cmd 'cmd t)
-                     (counsel-compile--pretty-propertize "in" -build-dir 'dired-directory)))
-        (props `(srcdir ,-src-dir blddir ,-build-dir)))
-    (add-text-properties 0 (length cmd) props cmd)
-    cmd))
-
-(defun ymacs-editor//default-compile-command (&optional -dir)
-  (let ((default-directory (or -dir default-directory)))
-    (mapcar
-     (lambda (item)
-       (apply #'ymacs-editor//propertize-compile-command item))
-     (cl-loop
-      for compile-command-fn in ymacs-editor-compile-command-functions
-      append (funcall compile-command-fn)))))
 
 (defun ymacs-editor//get-error-buffer ()
   (let ((buffers

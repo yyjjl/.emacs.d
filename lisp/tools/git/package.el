@@ -20,6 +20,5 @@
   ("n" . diff-hl-next-hunk)
   ("p" . diff-hl-previous-hunk)
   ("r" . diff-hl-revert-hunk)
-  ("j" . ymacs-git/goto-hunk)
   ("g" . magit-status)
   ("c" . magit-checkout))

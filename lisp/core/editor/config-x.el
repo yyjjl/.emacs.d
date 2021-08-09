@@ -95,32 +95,6 @@
     (define-key map (kbd "；") #'ymacs-x/activate)
     map))
 
-(defun ymacs-x//set-ivy-minibuffer-map ()
-  (define-key! :map swiper-map
-    ("; l" . swiper-recenter-top-bottom)
-    ("; 0" . swiper-avy)
-    (("; -" "; =") . swiper-mc)
-    ("; f" . swiper-toggle-face-matching))
-  (define-key! :map ivy-minibuffer-map
-    (";")
-    ("; ;" . self-insert-command)
-    ("; q" . minibuffer-keyboard-quit)
-    ("; '" . minibuffer-keyboard-quit)
-    ("; ," . ivy-beginning-of-buffer)
-    ("; ." . ivy-end-of-buffer)
-    ("; a" . ivy-toggle-marks)
-    ("; o" . ivy-occur)
-    ("; p" . ivy-previous-line-and-call)
-    ("; n" . ivy-next-line-and-call)
-    ("; r" . counsel-minibuffer-history)
-    ("; RET" . ivy-immediate-done)))
-
-(defun ymacs-x//unset-ivy-minibuffer-map ()
-  (define-key! :map swiper-map
-    (";"))
-  (define-key! :map ivy-minibuffer-map
-    (";" . self-insert-command)))
-
 (defsubst ymacs-x//lookup-keys (-keys)
   (let ((ymacs-x-mode)
         (ymacs-x--activated)
@@ -327,14 +301,12 @@
 
 (defun ymacs-x//enable ()
   (define-key universal-argument-map "u" #'universal-argument-more)
-  (ymacs-x//set-ivy-minibuffer-map)
 
   (advice-add 'wgrep-change-to-wgrep-mode :after #'ymacs-x//update-dynamic-keymap)
   (ymacs-x-global-mode 1))
 
 (defun ymacs-x//disable ()
   (define-key universal-argument-map "u" nil)
-  (ymacs-x//unset-ivy-minibuffer-map)
 
   (advice-remove 'wgrep-change-to-wgrep-mode #'ymacs-x//update-dynamic-keymap)
   (ymacs-x-global-mode -1))

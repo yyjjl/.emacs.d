@@ -44,7 +44,11 @@
 
 (define-hook! ymacs-editor//minibuffer-setup (minibuffer-setup-hook)
   (setq line-spacing nil)
-  (setq gc-cons-threshold most-positive-fixnum))
+  (setq gc-cons-threshold most-positive-fixnum)
+  ;; setup consult
+  (setq ymacs-editor-minibuffer-saved-point
+        (with-current-buffer (window-buffer (minibuffer-selected-window))
+          (point))))
 
 (define-hook! ymacs-editor//minibuffer-exit (minibuffer-exit-hook)
   (setq gc-cons-threshold ymacs-gc-cons-threshold))
@@ -110,10 +114,6 @@
 (run-after-init! 0
   (require 'lv)
 
-  (if sys/macp
-      (setq-default tab-line-format '(:eval (ymacs-modeline//format--header)))
-    (tab-bar-mode 1))
-
   ;; Purges buffers which haven't been displayed in 3 days
   (midnight-mode 1)
   ;; (display-time-mode 1)
@@ -154,8 +154,8 @@
   (ace-pinyin-global-mode 1)
   (ace-window-display-mode 1)
 
-  (ivy-mode 1)
-  (counsel-mode 1)
+  (selectrum-mode 1)
+
   (which-key-mode 1)
   (persistent-scratch-autosave-mode 1)
 
@@ -172,5 +172,9 @@
     (fcitx-aggressive-setup))
 
   (desktop-save-mode 1)
+
+  (if sys/macp
+      (setq-default tab-line-format '(:eval (ymacs-modeline//format--header)))
+    (tab-bar-mode 1))
 
   (find-file-noselect (expand-cache! "org/*note*")))
