@@ -34,10 +34,15 @@
   (setq selectrum-fix-vertical-window-height t)
   (setq selectrum-max-window-height 13)
   (setq selectrum-show-indices t)
-  (setq selectrum-count-style 'current/matches)
 
   (setq completion-styles '(orderless))
   (setq completion-category-overrides '((file (styles partial-completion orderless))))
+
+  (define-advice selectrum--count-info (:override () fixed-width)
+    (let* ((total (length selectrum--refined-candidates))
+           (current (1+ (or selectrum--current-candidate-index -1)))
+           (width (1+ (floor (log (max 1 total) 10)))))
+      (format (format "%%%dd/%%%dd " width width) current total)))
 
   (define-key! :map selectrum-minibuffer-map
     ([remap delete-backward-char] ymacs-editor//minibuffer-delete-char)
