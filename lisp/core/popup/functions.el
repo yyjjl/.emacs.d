@@ -72,7 +72,7 @@
   (let ((case-fold-search t))
     (with-current-buffer -buffer
       (or (string-prefix-p "*Embark Export" (buffer-name))
-          (derived-mode-p 'occur-mode)
+          (derived-mode-p 'occur-mode 'embark-collect-mode)
           (string-match-p ymacs-popup-occur-buffer-regexp (buffer-name))))))
 
 (defsubst ymacs-popup//get-term-buffer-list ()
@@ -256,10 +256,6 @@ Displays -BUFFER according to -ALIST and -RULE."
   :select t
   :terminal t)
  (:macth-fn ymacs-popup//occur-buffer-p
-  :select t
-  :side bottom
-  :dedicated t)
- (:name-regexp ymacs-popup-below-dedicated-buffer-regexp
   :select t
   :side bottom
   :dedicated t)

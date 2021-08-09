@@ -3,13 +3,13 @@
 (eval-when-compile
   (require 'dash))
 
-(defvar ymacs-popup-below-dedicated-buffer-regexp
+(defvar ymacs-popup-occur-buffer-regexp
   (eval-when-compile
     (rx string-start "*"
         (or "Backtrace"
             "RefTeX Select"
             "LSP Lookup"
-            (and "lsp-java-" (* any)))
+            (and (or "xref" "TeX" "Shell Command Output" "lsp-java-") (* any)))
         "*" string-end)))
 
 ;; (defvar ymacs-popup-left-dedicated-buffer-regexp
@@ -34,12 +34,6 @@
   (eval-when-compile
     (rx string-start
         "*" (or "Man" "WoMan") (*? not-newline) "*"
-        string-end)))
-
-(defvar ymacs-popup-occur-buffer-regexp
-  (eval-when-compile
-    (rx string-start
-        "*" (or "xref" "TeX" "Shell Command Output") (*? not-newline) "*"
         string-end)))
 
 (defvar ymacs-popup-help-buffer-regexp

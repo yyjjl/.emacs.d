@@ -80,8 +80,8 @@
   (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
 
   ;; Use Consult to select xref locations with preview
-  (setq xref-show-xrefs-function #'consult-xref)
-  (setq xref-show-definitions-function #'consult-xref)
+  ;; (setq xref-show-xrefs-function #'consult-xref)
+  ;; (setq xref-show-definitions-function #'consult-xref)
 
   (consult-customize
    consult-line consult-yank-pop
@@ -101,6 +101,14 @@
     ("C-r" . consult-history)))
 
 (after! embark
+  (define-advice embark-collect-snapshot (:override (&optional -initial-view) fix)
+    (when (get-buffer "*Embark Collect*")
+      (kill-buffer "*Embark Collect*"))
+    (when-let ((window (embark--collect "*Embark Collect*" -initial-view :snapshot))
+               (buffer (window-buffer window)))
+      (ymacs-editor//minibuffer-quit-and-run
+        (pop-to-buffer buffer))))
+
   (defun ymacs-editor//embark-which-key-indicator ()
     (lambda (&optional -keymap _targets -prefix)
       (unless (null -keymap)
