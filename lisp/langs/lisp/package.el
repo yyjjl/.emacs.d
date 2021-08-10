@@ -4,6 +4,7 @@
  ;; Auto compile after .el file load or save
  auto-compile
  elisp-def
+ lispy
  macrostep)
 
 (defface lisp-argument-face
@@ -11,6 +12,7 @@
   "Face for arguments"
   :group 'lisp)
 
-(autoload #'lispy-mode "lispy" nil t)
+(setq lispy-compat '(macrostep magit-blame-mode))
+
 (autoload #'lispy-forward "lispy" nil t)
 (autoload #'lispy-backward "lispy" nil t)
