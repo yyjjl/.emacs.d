@@ -25,6 +25,7 @@
  embark-consult
  selectrum
  orderless
+ marginalia
  citre
  pretty-hydra
  yasnippet
@@ -32,6 +33,7 @@
  expand-region
  goto-chg
  multiple-cursors
+ iedit
  wgrep
  ace-pinyin
  ace-window

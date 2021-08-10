@@ -122,7 +122,7 @@
     t))
 
 ;;;###autoload
-(defun ymacs-editor//minibuffer-delete-char ()
+(defun ymacs-editor/minibuffer-delete-char ()
   (interactive)
   (unless (minibuffer-window-active-p (selected-window))
     (user-error "No in minibuffer"))
@@ -131,7 +131,7 @@
     (call-interactively #'delete-backward-char)))
 
 ;;;###autoload
-(defun ymacs-editor//minibuffer-delete-word ()
+(defun ymacs-editor/minibuffer-delete-word ()
   (interactive)
   (unless (minibuffer-window-active-p (selected-window))
     (user-error "No in minibuffer"))

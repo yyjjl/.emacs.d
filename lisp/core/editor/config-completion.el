@@ -48,8 +48,8 @@
       (format (format "%%%dd/%%%dd " width width) current total)))
 
   (define-key! :map selectrum-minibuffer-map
-    ([remap delete-backward-char] . ymacs-editor//minibuffer-delete-char)
-    ([remap backward-kill-word] . ymacs-editor//minibuffer-delete-word)
+    ([remap delete-backward-char] . ymacs-editor/minibuffer-delete-char)
+    ([remap backward-kill-word] . ymacs-editor/minibuffer-delete-word)
     ("M-n" . ymacs-editor//next-history-element)
     ("M-o" . embark-act)
     ("C-c C-o" . embark-export)))
