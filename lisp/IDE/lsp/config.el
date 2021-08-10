@@ -1,5 +1,8 @@
 ;; -*- lexical-binding:t -*-
 
+(eval-when-compile
+  (require 'dap-hydra))
+
 (declare-function dap-hydra 'dap-mode)
 
 (setq lsp-keymap-prefix "C-c ;")
