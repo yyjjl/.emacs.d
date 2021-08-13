@@ -31,7 +31,7 @@
         (error (message "%s" err))))))
 
 (after! marginalia
-  (dolist (catogory '(command function variable file buffer))
+  (dolist (catogory '(command function variable file))
     (setf (alist-get catogory marginalia-annotator-registry) '(builtin))))
 
 (after! selectrum

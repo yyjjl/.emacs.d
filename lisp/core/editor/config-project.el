@@ -58,7 +58,7 @@
   (eval-when! (executable-find "fzf")
     (when (boundp 'project-prefix-map)
       (define-key! :map project-prefix-map
-        ("f" . ymacs-editor/fzf)))
-    (setcar (assoc 'project-find-file project-switch-commands) #'ymacs-editor/fzf))
+        ("f" . consult-find)))
+    (setcar (assoc 'project-find-file project-switch-commands) #'consult-find))
 
   (setq project-find-functions '(ymacs-editor//project)))
