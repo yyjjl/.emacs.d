@@ -123,7 +123,7 @@
 
 (after! view
   (define-key! :map view-mode-map
-    ("s" . ymacs-editor/swiper)
+    ("s" . consult-line)
     ("q" . View-exit)
     ("Q" . View-quit)))
 

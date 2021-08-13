@@ -26,7 +26,7 @@
     ("M-N" . ymacs-term/set-extra-name)
     ("M-y" . ymacs-term/yank-pop)
     ("C-k" . ymacs-term/kill-line)
-    ("C-s" . ymacs-term/swiper)
+    ("C-s" . ymacs-term/line)
     ("C-c C-j" . vterm-copy-mode)
     ("C-c C-l" . vterm-copy-mode)
     ("<C-backspace>" . vterm-send-meta-backspace)
