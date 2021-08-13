@@ -161,7 +161,7 @@ else: try to find a old term buffer and pop to it"
     (call-interactively #'forward-word)))
 
 ;;;###autoload
-(defun ymacs-term/swiper ()
+(defun ymacs-term/line ()
   (interactive)
   (unless (ymacs-term//shell-buffer-p (current-buffer))
     (user-error "Not in `term-mode' buffer"))
@@ -170,7 +170,7 @@ else: try to find a old term buffer and pop to it"
       (term-line-mode)
     (vterm-copy-mode 1))
 
-  (call-interactively 'ymacs-editor/swiper))
+  (call-interactively #'consult-line))
 
 ;;;###autoload
 (defun ymacs-term/toggle-window ()

@@ -454,6 +454,8 @@ like the scratch buffer where knowing the current project directory is important
 By default, this shows the information specified by `global-mode-string'."
   (list
    ""
+   (when ymacs-system-name
+     (propertize (concat ymacs-system-name " ") 'face 'font-lock-constant-face))
    mode-line-misc-info
    (propertize
     (or ymacs-modeline--project-parent-path default-directory)

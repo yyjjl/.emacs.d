@@ -6,6 +6,9 @@
 (option! only-in-terminal nil
   :type 'boolean)
 
+(option! system-name nil
+  :type 'stringp)
+
 (defvar ymacs-modeline-segment-alist ())
 (defvar ymacs-modeline-vcs-max-length 12
   "The maximum displayed length of the branch name of version control.")

@@ -100,5 +100,5 @@
    (define-key! :map (make-sparse-keymap)
      ("l" . ymacs-popup/last-popup-window)
      ("d" . sdcv-search-word)
-     ("b" . ymacs-popup/display-popup-window)
+     ("b" . pop-to-buffer)
      ("RET" . window-toggle-side-windows))))
