@@ -9,8 +9,8 @@
 (after! lsp-mode
   ;; (lsp-dired-mode 1)
 
-  (when (require 'lsp-treemacs nil t)
-    (lsp-treemacs-sync-mode 1))
+  ;; (when (require 'lsp-treemacs nil t)
+  ;;   (lsp-treemacs-sync-mode 1))
 
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.cache\\'")
   (add-to-list 'lsp-file-watch-ignored
@@ -123,7 +123,7 @@
   ;; (setq lsp-before-save-edits t)
 
   ;; (setq lsp-semantic-tokens-enable nil)
-  (setq lsp-lens-enable t)
+  ;; (setq lsp-lens-enable nil)
 
   (setq lsp-progress-prefix "LSP:")
 
@@ -187,7 +187,7 @@
 
   (setq treemacs-user-mode-line-format '(:eval (ymacs-modeline//format--treemacs)))
 
-  ;; (treemacs-follow-mode t)
+  ;; (treemacs-follow-mode 1)
   (treemacs-tag-follow-mode 1)
   (treemacs-filewatch-mode -1))
 

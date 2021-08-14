@@ -148,7 +148,6 @@
   (setq gnus-init-file (expand-etc! "gnus.el"))
   (setq lsp-session-file (expand-cache! "lsp-sessions"))
   (setq mc/list-file (expand-cache! "mc-lists.el"))
-  (setq org-default-notes-file (expand-cache! "org/*note*"))
   (setq org-export-async-init-file (expand-etc! "org-async-init.el"))
   (setq org-id-locations-file (expand-cache! "org-id-locations"))
   (setq org-preview-latex-image-directory (expand-cache! "ltximg/"))

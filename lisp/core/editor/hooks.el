@@ -174,6 +174,4 @@
 
   (if sys/macp
       (setq-default tab-line-format '(:eval (ymacs-modeline//format--header)))
-    (tab-bar-mode 1))
-
-  (find-file-noselect (expand-cache! "org/*note*")))
+    (tab-bar-mode 1)))
