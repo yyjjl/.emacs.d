@@ -36,6 +36,8 @@
 
     ;; too slow
     (remove-hook 'completion-at-point-functions 'python-completion-at-point t)
+    (remove-hook 'eldoc-documentation-functions 'python-eldoc-function t)
+    (remove-hook 'flymake-diagnostic-functions 'python-flymake t)
 
     (eval-when-has-feature! lsp
       (with-transient-hook! (hack-local-variables-hook :local t)
@@ -43,8 +45,6 @@
         (when (and (is-buffer-suitable-for-coding!)
                    (eq major-mode 'python-mode)
                    (ymacs-lsp//try-enable python))
-          (remove-hook 'eldoc-documentation-functions 'python-eldoc-function t)
-          (remove-hook 'flymake-diagnostic-functions 'python-flymake t)
 
           (setq ymacs-lsp-format-buffer-function #'ymacs-python/autopep8)
           (setq ymacs-lsp-organize-import-function #'py-isort-buffer)))))

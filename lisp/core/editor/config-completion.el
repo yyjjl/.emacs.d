@@ -42,6 +42,16 @@
                       ,@-body)))
      (abort-recursive-edit)))
 
+(defun ymacs-editor//vertico-directory-tidy ()
+  "Tidy shadowed file name, see `rfn-eshadow-overlay'."
+  (when (and (eq this-command #'self-insert-command)
+             (bound-and-true-p rfn-eshadow-overlay)
+             (overlay-buffer rfn-eshadow-overlay)
+             (= (point) (point-max))
+             (or (>= (- (point) (overlay-end rfn-eshadow-overlay)) 2)
+                 (eq ?/ (char-before (- (point) 2)))))
+    (delete-region (overlay-start rfn-eshadow-overlay) (overlay-end rfn-eshadow-overlay))))
+
 (after! marginalia
   (dolist (catogory '(command function variable file))
     (setf (alist-get catogory marginalia-annotator-registry) '(builtin))))
@@ -50,17 +60,17 @@
   (setq vertico-count 13)
   (setq vertico-cycle t)
   (setq vertico-resize nil)
+  (setq vertico-count-format '("%10s " . "%s/%s"))
 
   (setq completion-styles '(orderless))
   (setq completion-category-overrides '((file (styles partial-completion orderless))))
 
-  (define-advice vertico--format-count (:override () fixed-width)
-    (let* ((total vertico--total)
-           (current (cond ((>= vertico--index 0) (1+ vertico--index))
-                          ((vertico--allow-prompt-selection-p) "*")
-                          (t "!")))
-           (width (1+ (floor (log (max 1 total) 10)))))
-      (format (format "%%%ds/%%%dd " width width) current total)))
+  (add-hook 'rfn-eshadow-update-overlay-hook #'ymacs-editor//vertico-directory-tidy)
+
+  (define-advice vertico--format-candidate (:around (-fn -cand -prefix -suffix -index -start) indexed)
+    (funcall -fn -cand
+             (concat (if (equal -index vertico--index) ">" " ") -prefix)
+             -suffix -index -start))
 
   (define-key! :map vertico-map
     ([remap delete-backward-char] . ymacs-editor/minibuffer-delete-char)

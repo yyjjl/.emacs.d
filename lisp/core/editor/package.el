@@ -99,8 +99,6 @@
 
   ("2" . ymacs-editor/window-split-vertically)
   ("3" . ymacs-editor/window-split-horizontally)
-  ("4 b" . consult-buffer-other-window)
-  ("5 b" . consult-buffer-other-frame)
 
   ("-" . ymacs-hydra/window/shrink-window)
   ("?" . ymacs-hydra/window/body)
@@ -116,7 +114,6 @@
 
   ("SPC" . ymacs-hydra/rectangle/body)
 
-  ("b" . consult-buffer)
   ("c" . ymacs-editor/cleanup-buffer-safe)
   ("k" . kill-buffer)
   ("m" . view-echo-area-messages)
@@ -138,9 +135,9 @@
   (("C-b" "B") . ibuffer))
 
 (define-key!
-  ("<help> a" . consult-apropos)
-
-  ("C-'" . avy-goto-char-timer)
+  ("C-;" . ymacs-editor/ripgrep)
+  ("C-'" . consult-find)
+  ("C-." . imenu)
 
   ("C--" . ymacs-hydra/mc/mc/mark-previous-like-this)
   ("C-<" . ymacs-hydra/mc/mc/mark-previous-like-this)
@@ -152,7 +149,7 @@
 
   ("C-c C-b" . ymacs-editor/format-paragraph)
   ("C-c F" . company-files)
-  ("C-}" . company-yasnippet)
+  ([f6] . company-yasnippet)
 
   ("C-M-b" . backward-sentence)
   ("C-M-f" . forward-sentence)
@@ -168,8 +165,7 @@
   ("M-/" . hippie-expand)
 
   ("M-0" . ymacs-editor/goto-char-or-minibuffer)
-  ("M-7" . ymacs-editor/avy-copy-and-yank)
-  ("M-8" . embark-act)
+  ("M-8" . ymacs-editor/avy-copy-and-yank)
   ("M-9" . avy-goto-char-timer)
   ("M-;" . ymacs-editor/comment-dwim)
   ("M-I" . iedit-rectangle-mode)
@@ -180,19 +176,13 @@
   ("M-k" . kill-sexp)
   ("M-n" . next-error)
   ("M-p" . previous-error)
-  ("M-y" . consult-yank-pop)
   ("M-{" . ymacs-editor/backward-defun)
   ("M-}" . ymacs-editor/forward-defun)
 
   ("RET" . newline-and-indent)
 
-  ([C-f7] . ymacs-editor/rsync-project)
-  ([M-f11] . scroll-other-window-down)
-  ([M-f12] . scroll-other-window)
   ([f10] . ymacs-editor/compile)
-  ([f7] . ymacs-hydra/toggles)
-
-  ([remap move-beginning-of-line] . ymacs-editor/smart-move-begining-of-line))
+  ([f7] . ymacs-hydra/toggles))
 
 (define-key! :prefix "C-c m"
   ("P" . mc/mark-pop)
@@ -212,14 +202,13 @@
 
 (define-key! :prefix "M-g"
   ("O" . ymacs-hydra/outline/body)
+  ("b" . bookmark-jump)
   ("e" . consult-compile-error)
   ("f" . consult-flymake)
-  ("g" . consult-goto-line)  ;; orig. goto-line
-  ("M-g" . consult-goto-line) ;; orig. goto-line
-  ("o" . consult-outline)     ;; Alternative: consult-org-heading
+  ("o" . consult-outline)
   ("m" . consult-mark)
   ("k" . consult-global-mark)
-  ("i" . consult-imenu)
+  ("i" . imenu)
   ("I" . consult-imenu-multi)
   ("." . citre-ace-peek)
   ("u" . browse-url-at-point)
@@ -229,26 +218,20 @@
   ("2" . avy-goto-char-2)
   ("l" . avy-goto-line)
   ("s" . avy-goto-symbol-1)
-  ("L" . avy-copy-line))
+  ("L" . locate))
 
 (define-key! :prefix "C-c i"
   ("e" . sudo-edit)
 
+  ("l t" . load-theme)
   ("l l" . load-library)
-  ("l t" . consult-theme)
   ("l p" . list-processes)
   ("l f" . find-library)
 
-  ("j" . consult-find)
-  ("a" . ymacs-editor/ripgrep)
-  ("b" . consult-bookmark)
-  ("i" . consult-imenu)
-  ("L" . consult-locate)
-  ("k" . consult-keep-lines)
+  ("m" . man)
   ("g" . consult-git-grep)
   ("/" . consult-grep)
-  ("f" . customize-face)
-  ("o" . consult-outline))
+  ("f" . customize-face))
 
 (define-key! :prefix "M-s"
   ("e" . consult-isearch)
@@ -256,3 +239,18 @@
   ("k" . consult-keep-lines)
   ("o" . ymacs-editor/occur-dwim)
   ("u" . consult-focus-lines))
+
+(define-key!
+  ([remap move-beginning-of-line] . ymacs-editor/smart-move-begining-of-line)
+  ([remap apropos] . consult-apropos)
+  ([remap bookmark-jump] . consult-bookmark)
+  ([remap goto-line] . consult-goto-line)
+  ([remap imenu] . consult-imenu)
+  ([remap locate] . consult-locate)
+  ([remap load-theme] . consult-theme)
+  ([remap man] . consult-man)
+  ([remap recentf-open-files] . consult-recent-file)
+  ([remap switch-to-buffer] . consult-buffer)
+  ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
+  ([remap switch-to-buffer-other-frame] . consult-buffer-other-frame)
+  ([remap yank-pop] . consult-yank-pop))
