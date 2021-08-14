@@ -11,8 +11,6 @@
   "Face for arguments"
   :group 'lisp)
 
-(setq lispy-compat '(macrostep magit-blame-mode))
-
 (autoload #'lispy-mode "lispy" nil t)
 (autoload #'lispy-forward "lispy" nil t)
 (autoload #'lispy-backward "lispy" nil t)

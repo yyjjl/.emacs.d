@@ -1,5 +1,6 @@
 ;; -*- lexical-binding:t -*-
 
+(defvar ymacs-dap-running-session-mode)
 (declare-function dap-hydra/nil "ext:dap-mode")
 
 (after! lsp-mode

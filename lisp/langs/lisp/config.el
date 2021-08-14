@@ -25,13 +25,13 @@
 
 (after! elisp-mode
   (define-key! :map emacs-lisp-mode-map
+    ("M-." . elisp-def)
     ("C-c e" . macrostep-expand)
     ("C-c C-d" . ymacs-lisp/describe-at-point))
   (define-key! :map lisp-interaction-mode-map
+    ("M-." . elisp-def)
     ("C-c e" . macrostep-expand)
-    ("C-c C-d" . ymacs-lisp/describe-at-point))
-
-  (require 'semantic/bovine/el))
+    ("C-c C-d" . ymacs-lisp/describe-at-point)))
 
 (after! lispy
   (define-key! :map lispy-mode-map

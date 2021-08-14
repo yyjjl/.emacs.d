@@ -41,15 +41,24 @@
 (defun ymacs-default/compile-config ()
   (interactive)
   (dolist (file (cl-remove-duplicates
-                 (append
-                  (when (file-exists-p ymacs-site-lisp-directory)
-                    (directory-files-recursively ymacs-site-lisp-directory "\\.el$"))
-                  (directory-files ymacs-config-directory t "\\.el$")
-                  (directory-files user-emacs-directory t "\\.el$")
-                  (cl-loop
-                   for (_ . feature) in ymacs-loaded-features
-                   for directory = (expand-file-name (symbol-name feature) ymacs-config-directory)
-                   nconc (directory-files-recursively directory "\\.el$")))))
+                 (cl-remove-if
+                  (lambda (file-name)
+                    (or (string-suffix-p "-test.el" file-name)
+                        (string-suffix-p "-pkg.el" file-name)
+                        (string-suffix-p "elpa.el" file-name)
+                        (string-suffix-p ".dir-locals.el" file-name)))
+                  (append
+                   (when (file-exists-p ymacs-site-lisp-directory)
+                     (cl-loop
+                      for dir in (directory-files ymacs-site-lisp-directory)
+                      when (not (string-match-p "^\\." dir))
+                      append (directory-files (expand-file-name dir ymacs-site-lisp-directory) t "\\.el$")))
+                   (directory-files ymacs-config-directory t "\\.el$")
+                   (directory-files user-emacs-directory t "\\.el$")
+                   (cl-loop
+                    for (_ . feature) in ymacs-loaded-features
+                    for directory = (expand-file-name (symbol-name feature) ymacs-config-directory)
+                    nconc (directory-files-recursively directory "\\.el$"))))))
     (condition-case err
         (progn
           (print! "> Compiling %s\n" file)

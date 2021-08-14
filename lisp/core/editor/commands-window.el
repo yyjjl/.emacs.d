@@ -58,6 +58,7 @@
     (delete-other-windows)
     (ymacs-editor/window-split-vertically -arg)))
 
+;;;###autoload
 (defun ymacs-editor//aw-switch-window-internal (-path)
   (cl-loop
    for window in (aw-window-list)

@@ -207,6 +207,7 @@
   (setq fcitx-use-dbus nil)
   (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c" "C-z"))
 
+(setq iedit-toggle-key-default nil)
 (after! iedit
   (define-advice iedit-mode (:before (&rest _) disable-mc)
     (when (bound-and-true-p multiple-cursors-mode)

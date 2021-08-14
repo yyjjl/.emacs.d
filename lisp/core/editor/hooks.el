@@ -14,7 +14,7 @@
 (define-advice indent-for-tab-command (:around (-fn &rest -arg) smart)
   (if (save-excursion
         (forward-line 0)
-        (and outline-minor-mode (looking-at-p outline-regexp)))
+        (and (bound-and-true-p outline-minor-mode) (looking-at-p outline-regexp)))
       ;; Toggle outline
       (outline-toggle-children)
     (let ((old-point (point))
