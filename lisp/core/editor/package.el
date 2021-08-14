@@ -93,8 +93,6 @@
   (", ," . ymacs-editor-view-code-mode)
   (", -" . ymacs-editor/copy-file-name)
   (", SPC" . ymacs-editor/insert-space-around-chinese)
-  (", c" . ymacs-desktop/change-or-new-desktop)
-  (", d" . ymacs-desktop/delete-desktop)
   (", e" . ymacs-hydra/ediff/body)
   (", s" . ymacs-hydra/sort/body)
   (", x" . xref-etags-mode) ;; Minor mode to make xref use etags again.
@@ -192,7 +190,6 @@
   ([M-f11] . scroll-other-window-down)
   ([M-f12] . scroll-other-window)
   ([f10] . ymacs-editor/compile)
-  ([f6] . ymacs-editor/toggle-company-ispell)
   ([f7] . ymacs-hydra/toggles)
 
   ([remap move-beginning-of-line] . ymacs-editor/smart-move-begining-of-line))

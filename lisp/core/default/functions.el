@@ -447,8 +447,6 @@ like the scratch buffer where knowing the current project directory is important
         (setq ymacs-modeline--lsp-state
               (format-mode-line (assoc 'lsp-mode minor-mode-alist)))))))
 
-(defvar ymacs-desktop-name)
-
 (ymacs-modeline//def-segment misc-info
   "Mode line construct for miscellaneous information.
 By default, this shows the information specified by `global-mode-string'."
@@ -460,9 +458,7 @@ By default, this shows the information specified by `global-mode-string'."
    (propertize
     (or ymacs-modeline--project-parent-path default-directory)
     'face 'font-lock-doc-face)
-   ymacs-modeline--lsp-state
-   (when ymacs-desktop-name
-     (concat " " (propertize ymacs-desktop-name 'face 'font-lock-constant-face)))))
+   ymacs-modeline--lsp-state))
 
 ;;
 ;;* Position

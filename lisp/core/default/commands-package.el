@@ -1,7 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
 (defvar comp-valid-source-re)
-(declare-function comp-el-to-eln-filename "comp")
 (declare-function native-compile "comp")
 (declare-function native-comp-available-p "comp")
 
