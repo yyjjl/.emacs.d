@@ -72,19 +72,6 @@
 
 
 
-
-(defmacro ymacs-editor//minibuffer-quit-and-run (&rest -body)
-  "Quit the minibuffer and run BODY afterwards."
-  (declare (indent 0))
-  `(progn
-     (put 'quit 'error-message "")
-     (run-at-time nil nil
-                  (lambda ()
-                    (put 'quit 'error-message "Quit")
-                    (with-demoted-errors "Error: %S"
-                      ,@-body)))
-     (abort-recursive-edit)))
-
 ;;;###autoload
 (defun ymacs-editor//next-history-element (-arg)
   (interactive "p")
@@ -208,6 +195,14 @@
            (t
             rg-input)))))
 
+(defun ymacs-editor//ripgrep ()
+  (interactive)
+
+  (let ((enable-recursive-minibuffers t)
+        (shell-file-name "/bin/sh")
+        (this-command #'consult-ripgrep))
+    (consult-ripgrep (ymacs-editor//ripgrep-working-directory))))
+
 (defmacro ymacs-editor//define-ripgrep-infix-1 (-name -doc -shortarg -argument)
   (declare (indent 1))
   `(transient-define-infix ,(intern (format "ymacs-editor-ripgrep-%s" -name)) ()
@@ -278,4 +273,6 @@
 
   (if current-prefix-arg
       (transient-setup 'ymacs-editor/ripgrep)
-    (ymacs-editor//ripgrep-internal)))
+    (let ((shell-file-name "/bin/sh")
+          (this-command #'consult-ripgrep))
+      (consult-ripgrep (ymacs-editor//ripgrep-working-directory)))))

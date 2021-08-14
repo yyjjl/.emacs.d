@@ -23,7 +23,7 @@
  company
  consult
  embark-consult
- selectrum
+ vertico
  orderless
  marginalia
  citre

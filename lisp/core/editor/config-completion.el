@@ -30,26 +30,42 @@
              ("everything" "*")))
         (error (message "%s" err))))))
 
+(defmacro ymacs-editor//minibuffer-quit-and-run (&rest -body)
+  "Quit the minibuffer and run BODY afterwards."
+  (declare (indent 0))
+  `(progn
+     (put 'quit 'error-message "")
+     (run-at-time nil nil
+                  (lambda ()
+                    (put 'quit 'error-message "Quit")
+                    (with-demoted-errors "Error: %S"
+                      ,@-body)))
+     (abort-recursive-edit)))
+
 (after! marginalia
   (dolist (catogory '(command function variable file))
     (setf (alist-get catogory marginalia-annotator-registry) '(builtin))))
 
-(after! selectrum
-  (setq selectrum-max-window-height 13)
-  (setq selectrum-show-indices t)
+(after! vertico
+  (setq vertico-count 13)
+  (setq vertico-cycle t)
+  (setq vertico-resize nil)
 
   (setq completion-styles '(orderless))
   (setq completion-category-overrides '((file (styles partial-completion orderless))))
 
-  (define-advice selectrum--count-info (:override () fixed-width)
-    (let* ((total (length selectrum--refined-candidates))
-           (current (1+ (or selectrum--current-candidate-index -1)))
+  (define-advice vertico--format-count (:override () fixed-width)
+    (let* ((total vertico--total)
+           (current (cond ((>= vertico--index 0) (1+ vertico--index))
+                          ((vertico--allow-prompt-selection-p) "*")
+                          (t "!")))
            (width (1+ (floor (log (max 1 total) 10)))))
-      (format (format "%%%dd/%%%dd " width width) current total)))
+      (format (format "%%%ds/%%%dd " width width) current total)))
 
-  (define-key! :map selectrum-minibuffer-map
+  (define-key! :map vertico-map
     ([remap delete-backward-char] . ymacs-editor/minibuffer-delete-char)
     ([remap backward-kill-word] . ymacs-editor/minibuffer-delete-word)
+    ("M-i" . vertico-insert)
     ("M-n" . ymacs-editor//next-history-element)
     ("M-o" . embark-act)
     ("C-c C-o" . embark-export)))
@@ -101,14 +117,6 @@
     ("C-r" . consult-history)))
 
 (after! embark
-  (define-advice embark-collect-snapshot (:override (&optional -initial-view) fix)
-    (when (get-buffer "*Embark Collect*")
-      (kill-buffer "*Embark Collect*"))
-    (when-let ((window (embark--collect "*Embark Collect*" -initial-view :snapshot))
-               (buffer (window-buffer window)))
-      (ymacs-editor//minibuffer-quit-and-run
-        (pop-to-buffer buffer))))
-
   (defun ymacs-editor//embark-which-key-indicator ()
     (lambda (&optional -keymap _targets -prefix)
       (unless (null -keymap)
@@ -116,10 +124,29 @@
          "Embark" (if -prefix (lookup-key -keymap -prefix) -keymap)
          nil nil t))))
 
+  (define-advice embark-collect-snapshot (:override (&optional -initial-view) fix)
+    (when-let ((window (embark--collect "*Embark Collect*" -initial-view :snapshot))
+               (buffer (window-buffer window)))
+      (ymacs-editor//minibuffer-quit-and-run
+        (pop-to-buffer buffer))))
+
   (define-advice embark-consult-export-occur (:around (-fn -lines) fix)
     (let ((buffer (funcall -fn -lines)))
       (with-current-buffer buffer
-        (setq occur-highlight-regexp ""))
+        (setq occur-highlight-regexp "")
+        (setq revert-buffer-function
+              (lambda (_ignore1 _ignore2)
+                (user-error "buffer can not be reverted"))))
+      buffer))
+
+  (define-advice embark-consult-export-grep (:around (-fn -lines) fix)
+    (let ((buffer (funcall -fn -lines)))
+      (with-current-buffer buffer
+        (let ((map (copy-keymap (current-local-map))))
+          (define-key map "g" (lambda ()
+                                (interactive)
+                                (user-error "buffer can not be reverted")))
+          (use-local-map map)))
       buffer))
 
   (setq embark-indicators
