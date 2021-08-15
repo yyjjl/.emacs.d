@@ -126,6 +126,8 @@
 
   ("x" . exchange-point-and-mark)
 
+  ("j" . consult-find)
+
   ("^" . ymacs-hydra/window/enlarge-window)
   ("_" . ymacs-editor/window-force-split-vertically)
   ("{" . ymacs-hydra/window/shrink-window-horizontally)
@@ -135,10 +137,6 @@
   (("C-b" "B") . ibuffer))
 
 (define-key!
-  ("C-;" . ymacs-editor/ripgrep)
-  ("C-'" . consult-find)
-  ("C-." . imenu)
-
   ("C--" . ymacs-hydra/mc/mc/mark-previous-like-this)
   ("C-<" . ymacs-hydra/mc/mc/mark-previous-like-this)
   ("C-=" . ymacs-hydra/mc/mc/mark-next-like-this)
@@ -222,6 +220,7 @@
 
 (define-key! :prefix "C-c i"
   ("e" . sudo-edit)
+  ("a" . ymacs-editor/ripgrep)
 
   ("l t" . load-theme)
   ("l l" . load-library)

@@ -50,7 +50,7 @@
     ("\\" "C-c C-b")
     ("]" "C-x <right>")
     ("`" treemacs)
-    ("a" "C-;")
+    ("a" "C-c i a")
     ("b" "C-c b")
     ("c" "C-c")
 
@@ -67,7 +67,7 @@
     ("g" "C-x g")
     ("h" "C-h")
     ("i" imenu)
-    ("j" "C-'")
+    ("j" "C-x j")
     ("k" "C-x k")
     ("l" "C-c C-l")
     ("m" "C-x g b")
