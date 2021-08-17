@@ -7,21 +7,95 @@
 (eval-when-compile
   (require 're-builder))
 
+(defsubst ymacs-editor//skip-out-symbol ()
+  (let ((syntax-b (when (> (point) (point-min)) (char-syntax (char-before))))
+        (syntax-a (when (< (point) (point-max)) (char-syntax (char-after)))))
+    (when (and (or (equal syntax-a ?w) (equal syntax-a ?_))
+               (or (equal syntax-b ?w) (equal syntax-b ?_)))
+      (skip-syntax-backward "w_" (line-beginning-position)))))
+
 ;;;###autoload
 (defun ymacs-editor/smart-M-h ()
   (interactive)
-  (call-interactively
-   (cond
-    ((region-active-p)
-     #'vc-region-history)
-    ((bound-and-true-p lispy-mode)
-     #'lispy-mark-symbol)
-    ((eq major-mode 'python-mode)
-     #'er/mark-python-statement)
-    ((memq major-mode '(c-mode c++-mode java-mode))
-     #'er/c-mark-statement)
-    ((get-buffer-process (current-buffer))
-     #'consult-history))))
+  (cond
+   ((region-active-p)
+    (call-interactively #'vc-region-history))
+   ((get-buffer-process (current-buffer))
+    (call-interactively #'consult-history))
+   (t
+    (let ((current-point (point))
+          (map (make-sparse-keymap)))
+      (if (bound-and-true-p lispy-mode)
+          (call-interactively #'lispy-mark-symbol)
+        (ymacs-editor//skip-out-symbol)
+        (call-interactively #'mark-sexp))
+
+      (define-key map "h" #'er/expand-region)
+      (define-key map (kbd "C-g")
+        (interactive!
+          (deactivate-mark)
+          (goto-char current-point)))
+
+      (set-transient-map map)))))
+
+;;;###autoload
+(defun ymacs-editor/smart-kill-line (-arg)
+  (interactive "p")
+  (cond
+   ((region-active-p)
+    (call-interactively #'kill-region))
+   ((equal -arg 0)
+    (kill-sexp 1 'interactive))
+   ((equal -arg 4)
+    (kill-line))
+   ((eolp)
+    (delete-char 1)
+    (delete-horizontal-space))
+   (t
+    (let (beg end)
+      (save-excursion
+        ;; Step 1: skip backward to symbol start
+        (ymacs-editor//skip-out-symbol)
+
+        (let* ((end-of-line-point (line-end-position))
+               (original-point (point))
+               (current-point original-point)
+               (last-point original-point))
+          ;; Step 2: forward sexp repeatedly
+          (while (condition-case nil
+                     (progn
+                       (forward-sexp 1 nil)
+                       (setq current-point (point))
+                       (and (not (equal last-point current-point))
+                            (< current-point end-of-line-point)))
+                   (error nil))
+            (setq last-point current-point))
+
+          (setq beg original-point)
+          (cond
+           ((= original-point current-point))
+           ((or (<= current-point end-of-line-point)
+                (= original-point last-point))
+            ;; (a | b c) => (a|)
+            ;;
+            ;; |(a    =>  | c
+            ;;   b) c
+            (setq end current-point))
+           ((< original-point last-point)
+            ;; | a (b  => | (b
+            ;;      c)       c)
+            (setq end last-point)))
+
+          ;; Step 3: skip punctuations
+          (when (and end (< end end-of-line-point))
+            (save-excursion
+              (goto-char end)
+              (cl-incf end (skip-syntax-forward "." end-of-line-point))))))
+
+      (unless (and beg end)
+        (user-error "Nothing to kill"))
+
+      (kill-region beg end)))))
 
 ;;;###autoload
 (defun ymacs-editor/cleanup-buffer-safe ()

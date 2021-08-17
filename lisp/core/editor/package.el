@@ -148,6 +148,8 @@
   ("C-c F" . company-files)
   ([f6] . company-yasnippet)
 
+  ("C-k" . ymacs-editor/smart-kill-line)
+
   ("C-r" . consult-line-multi)
   ("C-s" . consult-line)
 
