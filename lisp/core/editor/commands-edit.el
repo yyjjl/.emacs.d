@@ -8,6 +8,22 @@
   (require 're-builder))
 
 ;;;###autoload
+(defun ymacs-editor/smart-M-h ()
+  (interactive)
+  (call-interactively
+   (cond
+    ((region-active-p)
+     #'vc-region-history)
+    ((bound-and-true-p lispy-mode)
+     #'lispy-mark-symbol)
+    ((eq major-mode 'python-mode)
+     #'er/mark-python-statement)
+    ((memq major-mode '(c-mode c++-mode java-mode))
+     #'er/c-mark-statement)
+    ((get-buffer-process (current-buffer))
+     #'consult-history))))
+
+;;;###autoload
 (defun ymacs-editor/cleanup-buffer-safe ()
   "Perform a bunch of safe operations on the whitespace content of a buffer.
 Does not indent buffer, because it is used for a

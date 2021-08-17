@@ -32,7 +32,7 @@
 
     (ymacs-hydra/global-toggles/body)))
 
-(pretty-hydra-define ymacs-hydra/sort (:color red :quit-key ("q" "RET"))
+(pretty-hydra-define ymacs-hydra/sort (:color teal :quit-key ("q" "RET"))
   ("Sort"
    (("r" sort-regexp-fields "regexp")
     ("f" sort-fields "fields")
@@ -44,7 +44,7 @@
     ("k" keep-lines "keep"))))
 
 (pretty-hydra-define ymacs-hydra/window
-  (:title "Window Management" :foreign-keys warn :quit-key "q")
+  (:title "Window Management" :color amaranth :quit-key "q")
   ("Resize"
    (("{" shrink-window-horizontally "->| |<-")
     ("}" enlarge-window-horizontally "<-| |->")
@@ -122,7 +122,7 @@
     )))
 
 (pretty-hydra-define ymacs-hydra/ediff
-  (:title "Ediff" :color blue)
+  (:title "Ediff [`q' to quit]" :color teal :quit-key "q")
   ("Buffers"
    (("b" ediff-buffers)
     ("B" ediff-buffers3))
@@ -147,11 +147,7 @@
   ("RET" nil)
   ("q" nil))
 
-(defhydra ymacs-hydra/last-point (:color red :hint nil)
-  ("/" goto-last-change "change")
-  ("SPC" pop-to-mark-command "mark"))
-
-(defhydra ymacs-hydra/query-replace (:color blue :hit nil)
+(defhydra ymacs-hydra/query-replace (:color teal :hit nil)
   ("r" query-replace-regexp "regexp")
   ("RET" query-replace "text")
   ("b" ymacs-editor/query-replace-regexp "re-builder")

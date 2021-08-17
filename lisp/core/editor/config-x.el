@@ -50,7 +50,7 @@
     ("\\" "C-c C-b")
     ("]" "C-x <right>")
     ("`" treemacs)
-    ("a" "C-c i a")
+    ("a" "M-k")
     ("b" "C-c b")
     ("c" "C-c")
 

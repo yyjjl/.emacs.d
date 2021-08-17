@@ -65,7 +65,6 @@
 (autoload 'ymacs-hydra/window/shrink-window-horizontally (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/window/body (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/sort/body (expand! "commands-hydra") nil t)
-(autoload 'ymacs-hydra/last-point/goto-last-change (expand! "commands-hydra") nil t)
 (autoload 'ymacs-hydra/query-replace/body (expand! "commands-hydra") nil t)
 
 (autoload 'xref-pulse-momentarily "xref")
@@ -103,8 +102,8 @@
   ("-" . ymacs-hydra/window/shrink-window)
   ("?" . ymacs-hydra/window/body)
 
-  ("C-/" . ymacs-hydra/last-point/goto-last-change)
-  ("C-_" . ymacs-hydra/last-point/goto-last-change)
+  ("C-/" . goto-last-change)
+  ("C-_" . goto-last-change)
 
   ("D" . ymacs-editor/delete-this-file)
   ("G" . revert-buffer)
@@ -128,7 +127,7 @@
 
   ("j" . consult-find)
 
-  ("^" . ymacs-hydra/window/enlarge-window)
+  ("^" . ymacs-hydra/window/jenlarge-window)
   ("_" . ymacs-editor/window-force-split-vertically)
   ("{" . ymacs-hydra/window/shrink-window-horizontally)
   ("|" . ymacs-editor/window-force-split-horizontally)
@@ -149,10 +148,6 @@
   ("C-c F" . company-files)
   ([f6] . company-yasnippet)
 
-  ("C-M-b" . backward-sentence)
-  ("C-M-f" . forward-sentence)
-  ("C-M-k" . kill-sentence)
-
   ("C-r" . consult-line-multi)
   ("C-s" . consult-line)
 
@@ -170,8 +165,9 @@
   ("M-N" . ymacs-editor/select-error-buffer)
   ("M-a" . ymacs-editor/backward-sexp)
   ("M-e" . ymacs-editor/forward-sexp)
+  ("M-h" . ymacs-editor/smart-M-h)
   ("M-i" . ymacs-editor/iedit-mode)
-  ("M-k" . kill-sexp)
+  ("M-k" . ymacs-editor/ripgrep)
   ("M-n" . next-error)
   ("M-p" . previous-error)
   ("M-{" . ymacs-editor/backward-defun)

@@ -9,9 +9,9 @@
       ([f9] . lsp-java-build-project)))
 
   (after! lsp-java
-    (setq lsp-java-references-code-lens-enabled t)
-    (setq lsp-java-implementations-code-lens-enabled t)
-    (setq lsp-java-autobuild-enabled nil)split-width-threshold
+    (setq lsp-java-references-code-lens-enabled nil)
+    (setq lsp-java-implementations-code-lens-enabled nil)
+    (setq lsp-java-autobuild-enabled nil)
 
     (setq lsp-java-server-install-dir (expand-cache! "lsp/eclipse.jdt.ls/"))
     (setq lsp-java-workspace-dir (expand-cache! "lsp-java"))
