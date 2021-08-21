@@ -18,7 +18,8 @@
 
     (message "Invalidated Projectile cache for %s." project))
 
-  (recentf-cleanup))
+  (recentf-cleanup)
+  (vc-refresh-state))
 
 ;;;###autoload
 (defun ymacs-editor/edit-dir-locals (&optional -directory)

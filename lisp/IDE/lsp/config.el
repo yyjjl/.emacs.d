@@ -96,6 +96,7 @@
     ("M-o" . lsp-signature-stop))
 
   (setq lsp-signature-doc-lines 5)
+  (setq lsp-signature-auto-activate nil)
   ;; (setq lsp-keep-workspace-alive nil)
   (setq lsp-restart 'interactive)
 

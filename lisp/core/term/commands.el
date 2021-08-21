@@ -67,52 +67,41 @@
     (ymacs-term//switch-internal 1)))
 
 ;;;###autoload
-(defun ymacs-term/switch-back (-no-quit-p)
-  (interactive "P")
-
-  (unless (buffer-live-p ymacs-term--parent-buffer)
-    (user-error "No parent buffer or it was killed !!!"))
-
-  (when (eq (selected-window)
-            (ymacs-popup//get-term-window))
-    (pop-to-buffer ymacs-term--parent-buffer)
-
-    (unless -no-quit-p
-      (delete-window (ymacs-popup//get-term-window)))))
-
-(defun ymacs-term/switch-back-no-quit ()
-  (interactive)
-  (ymacs-term/switch-back t))
-
-;;;###autoload
 (defun ymacs-term/pop-shell-here ()
   (interactive)
-  (when-let ((parent-buffer (or ymacs-term--parent-buffer (current-buffer)))
-             (buffer (ymacs-term//create-buffer nil t)))
+  (when-let (buffer (ymacs-term//create-buffer nil t))
+    (display-buffer buffer)
     (with-current-buffer buffer
-      (local-set-key [f8] #'ymacs-term/switch-back)
-      (local-set-key (kbd "C-c C-z") #'ymacs-term/switch-back-no-quit)
-      (local-set-key (kbd "C-c z") #'ymacs-term/switch-back-no-quit)
-      (setq ymacs-term--parent-buffer parent-buffer))
-    (display-buffer buffer)))
+        (local-set-key [f8] #'ymacs-term/pop-shell))))
 
 ;;;###autoload
-(defun ymacs-term/pop-shell (&optional -arg)
-  "Popup to a term buffer.
--ARG = 0: create a term buffer in current window
--ARG >= 16: try to find a old term buffer by given directory
-else: try to find a old term buffer and pop to it"
-  (interactive "p")
-  (when-let* ((buffer (ymacs-term//pop-shell-get-buffer -arg))
-              (parent-buffer (current-buffer)))
-    (if (= -arg 0)
-        (switch-to-buffer buffer)
+(defun ymacs-term/pop-shell (&optional -scope -only-shell-p -new-buffer-p)
+  (interactive
+   (list (cond ((equal current-prefix-arg '(4)) 'project)
+               ((equal current-prefix-arg '(16)) 'select)
+               (t 'local))
+         (equal (prefix-numeric-value current-prefix-arg) 0)
+         (equal (prefix-numeric-value current-prefix-arg) 16)))
+
+  (if (eq (selected-window) (ymacs-popup//get-term-window))
+      (quit-window nil (selected-window))
+    (let* ((directory (or (when (eq -scope 'select)
+                            (read-directory-name "Shell in: " nil nil :mustmatch))
+                          (when (eq -scope 'project)
+                            (ymacs-term//get-directory))
+                          default-directory))
+           (buffer (or (when (and (not -only-shell-p)
+                                  (not -new-buffer-p))
+                         (if (buffer-live-p ymacs-term--last-buffer)
+                             ymacs-term--last-buffer
+                           (setq ymacs-term--last-buffer nil)))
+                       (when (not -new-buffer-p)
+                         (ymacs-term//get-shell-buffer-in-directory directory))
+                       (let ((default-directory directory))
+                         (ymacs-term//create-buffer nil t)))))
+      (display-buffer buffer)
       (with-current-buffer buffer
-        (local-set-key [f8] #'ymacs-term/switch-back)
-        (local-set-key (kbd "C-c C-z") #'ymacs-term/switch-back-no-quit)
-        (local-set-key (kbd "C-c z") #'ymacs-term/switch-back-no-quit)
-        (setq ymacs-term--parent-buffer parent-buffer)))
-    (display-buffer buffer)))
+        (local-set-key [f8] #'ymacs-term/pop-shell)))))
 
 ;;;###autoload
 (defun ymacs-term/conditional-send-raw ()

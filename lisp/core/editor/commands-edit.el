@@ -39,65 +39,6 @@
       (set-transient-map map)))))
 
 ;;;###autoload
-(defun ymacs-editor/smart-kill-line (-arg)
-  (interactive "p")
-  (cond
-   ((region-active-p)
-    (call-interactively #'kill-region))
-   ((equal -arg 0)
-    (kill-sexp 1 'interactive))
-   ((equal -arg 4)
-    (kill-line))
-   ((eolp)
-    (delete-char 1)
-    (delete-horizontal-space))
-   (t
-    (let (beg end)
-      (save-excursion
-        ;; Step 1: skip backward to symbol start
-        (ymacs-editor//skip-out-symbol)
-
-        (let* ((end-of-line-point (line-end-position))
-               (original-point (point))
-               (current-point original-point)
-               (last-point original-point))
-          ;; Step 2: forward sexp repeatedly
-          (while (condition-case nil
-                     (progn
-                       (forward-sexp 1 nil)
-                       (setq current-point (point))
-                       (and (not (equal last-point current-point))
-                            (< current-point end-of-line-point)))
-                   (error nil))
-            (setq last-point current-point))
-
-          (setq beg original-point)
-          (cond
-           ((= original-point current-point))
-           ((or (<= current-point end-of-line-point)
-                (= original-point last-point))
-            ;; (a | b c) => (a|)
-            ;;
-            ;; |(a    =>  | c
-            ;;   b) c
-            (setq end current-point))
-           ((< original-point last-point)
-            ;; | a (b  => | (b
-            ;;      c)       c)
-            (setq end last-point)))
-
-          ;; Step 3: skip punctuations
-          (when (and end (< end end-of-line-point))
-            (save-excursion
-              (goto-char end)
-              (cl-incf end (skip-syntax-forward "." end-of-line-point))))))
-
-      (unless (and beg end)
-        (user-error "Nothing to kill"))
-
-      (kill-region beg end)))))
-
-;;;###autoload
 (defun ymacs-editor/cleanup-buffer-safe ()
   "Perform a bunch of safe operations on the whitespace content of a buffer.
 Does not indent buffer, because it is used for a

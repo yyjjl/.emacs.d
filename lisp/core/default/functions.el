@@ -32,7 +32,7 @@
   "Prepare mode-line `SEGMENTS'."
   (cl-loop
    for segment in -segments
-   if (stringp segment)
+   if (or (stringp segment) (consp segment))
    collect segment
    else if (symbolp segment)
    collect (if-let ((func (cdr (assq segment ymacs-modeline-segment-alist))))
@@ -286,9 +286,9 @@ like the scratch buffer where knowing the current project directory is important
       (cond ((memq state '(edited added))
              (setq state-str "*"))
             ((eq state 'needs-merge)
-             (setq state-str "M"))
+             (setq state-str "M-"))
             ((eq state 'needs-update)
-             (setq state-str "U")
+             (setq state-str "U-")
              (setq face 'ymacs-modeline-warning))
             ((memq state '(removed conflict unregistered))
              (setq state-str "!")
@@ -296,18 +296,14 @@ like the scratch buffer where knowing the current project directory is important
 
       (setq ymacs-modeline--vcs-state
             (propertize
-             (concat " "
-                     state-str
+             (concat state-str
                      (if (> (length str) ymacs-modeline-vcs-max-length)
                          (concat
                           (substring str 0 (- ymacs-modeline-vcs-max-length 3))
                           "...")
-                       str))
+                       str)
+                     " ")
              'face face)))))
-
-(ymacs-modeline//def-segment vcs
-  "Displays the current branch, colored based on its state."
-  ymacs-modeline--vcs-state)
 
 ;;
 ;;* Checker
@@ -452,13 +448,14 @@ like the scratch buffer where knowing the current project directory is important
 By default, this shows the information specified by `global-mode-string'."
   (list
    ""
-   (when ymacs-system-name
-     (propertize (concat ymacs-system-name " ") 'face 'font-lock-constant-face))
    mode-line-misc-info
-   (propertize
-    (or ymacs-modeline--project-parent-path default-directory)
-    'face 'font-lock-doc-face)
-   ymacs-modeline--lsp-state))
+   ymacs-modeline--vcs-state
+   ymacs-modeline--lsp-state
+   (unless (eq (selected-window)
+               (active-minibuffer-window))
+     (propertize
+      (concat " " (or ymacs-modeline--project-parent-path default-directory))
+      'face 'font-lock-doc-face))))
 
 ;;
 ;;* Position
@@ -511,6 +508,14 @@ By default, this shows the information specified by `global-mode-string'."
                 'face 'ymacs-modeline-input-method)))
 
 ;;
+;;* System name
+;;
+
+(ymacs-modeline//def-segment system-name
+  (propertize (concat (or ymacs-system-name (system-name)) " ")
+              'face 'font-lock-constant-face))
+
+;;
 ;;* Dired
 ;;
 
@@ -524,7 +529,7 @@ By default, this shows the information specified by `global-mode-string'."
 
 
 (ymacs-modeline//def-modeline main
-  (window-number matches buffer-position buffer-info remote-host checker major-mode vcs buffer-encoding))
+  (window-number matches buffer-position buffer-info remote-host checker major-mode buffer-encoding))
 
 (ymacs-modeline//def-modeline shell
   (window-number matches buffer-info-shell remote-host major-mode))
@@ -536,7 +541,7 @@ By default, this shows the information specified by `global-mode-string'."
   (window-number matches buffer-position buffer-info major-mode buffer-encoding))
 
 (ymacs-modeline//def-modeline media
-  (window-number buffer-size buffer-info media-info major-mode vcs))
+  (window-number buffer-size buffer-info media-info major-mode))
 
 (ymacs-modeline//def-modeline message
   (window-number matches buffer-position buffer-info-simple major-mode buffer-encoding))
@@ -548,4 +553,4 @@ By default, this shows the information specified by `global-mode-string'."
   (window-number matches buffer-position git-timemachine major-mode buffer-encoding))
 
 (ymacs-modeline//def-modeline header
-  (debug input-method misc-info))
+  (system-name debug input-method misc-info))

@@ -64,6 +64,7 @@
                (ymacs-lsp//try-enable cpp))
           ;; lsp-mode is enabled
           (progn
+            (setq-local ymacs-lsp-format-buffer-function #'ymacs-cpp/format-dwim)
             (setq-local ymacs-lsp-find-other-file-function #'lsp-clangd-find-other-file)
             (when-let (command-fn (ymacs-cpp//get-function command-fn))
               (cl-pushnew command-fn ymacs-editor-compile-command-functions))

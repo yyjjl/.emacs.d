@@ -8,16 +8,6 @@
    after-make-frame-functions)
   (set-frame-parameter -frame 'buffer-predicate #'ymacs-popup//buffer-predicate))
 
-(define-hook! (ymacs-popup//compilation-finish-hook -buffer _)
-  (compilation-finish-functions)
-  (when (buffer-live-p -buffer)
-    (with-current-buffer -buffer
-      (unless (eq major-mode 'compilation-mode)
-        ;; Sometime it will open a comint buffer
-        (compilation-mode)
-        (when-let (window (get-buffer-window -buffer))
-          (ymacs-popup//push-window window -buffer t))))))
-
 (define-hook! ymacs-popup//autoclose-popup-window (kill-buffer-hook)
   "Auto quit popup window after buffer killed"
   (let ((window (get-buffer-window)))

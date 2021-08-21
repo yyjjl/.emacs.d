@@ -117,7 +117,7 @@
 (tooltip-mode -1)
 (window-divider-mode -1)
 
-(setq echo-keystrokes 1)
+(setq echo-keystrokes 0.2)
 
 ;; paren
 (setq blink-matching-paren nil)

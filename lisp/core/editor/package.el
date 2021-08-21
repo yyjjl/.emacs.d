@@ -148,7 +148,7 @@
   ("C-c F" . company-files)
   ([f6] . company-yasnippet)
 
-  ("C-k" . ymacs-editor/smart-kill-line)
+  ("C-k" . kill-line)
 
   ("C-r" . consult-line-multi)
   ("C-s" . consult-line)
@@ -168,8 +168,8 @@
   ("M-a" . ymacs-editor/backward-sexp)
   ("M-e" . ymacs-editor/forward-sexp)
   ("M-h" . ymacs-editor/smart-M-h)
-  ("M-i" . ymacs-editor/iedit-mode)
   ("M-k" . ymacs-editor/ripgrep)
+  ("M-i" . ymacs-editor/iedit-mode)
   ("M-n" . next-error)
   ("M-p" . previous-error)
   ("M-{" . ymacs-editor/backward-defun)

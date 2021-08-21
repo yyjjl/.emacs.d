@@ -1,6 +1,18 @@
 ;;; -*- lexical-binding: t; -*-
 
+(define-advice delete-window (:around (-fn &rest -args) record-term-buffer)
+  (let ((term-buffer (current-buffer))
+        (term-window? (eq (selected-window) (ymacs-popup//get-term-window))))
+    (apply -fn -args)
+    (when term-window?
+      (setq ymacs-term--last-buffer term-buffer))))
+
+
 (after! compile
+  (define-hook! (ymacs-popup//compilation-finish-hook -buffer _) (compilation-finish-functions)
+    (when (buffer-live-p -buffer)
+      (ymacs-term//set-quit-keys)))
+
   (define-hook! ymacs-term//compilation-setup (compilation-mode-hook)
     (setq mode-line-buffer-identification
           '("%b"

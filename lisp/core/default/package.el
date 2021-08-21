@@ -10,7 +10,7 @@
   :type 'stringp)
 
 (defvar ymacs-modeline-segment-alist ())
-(defvar ymacs-modeline-vcs-max-length 12
+(defvar ymacs-modeline-vcs-max-length 20
   "The maximum displayed length of the branch name of version control.")
 
 ;;* Ensure modeline is inactive when Emacs is unfocused (and active otherwise)

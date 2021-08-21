@@ -58,11 +58,7 @@
          (derived-mode-p 'term-mode 'shell-mode 'eshell-mode 'vterm-mode))))
 
 (defun ymacs-term//switch-internal (-n)
-  (let ((buffers (cl-remove-if-not
-                  (lambda (buffer)
-                    (or (eq buffer (current-buffer))
-                        (process-live-p (get-buffer-process buffer))))
-                  (ymacs-popup//get-term-buffer-list))))
+  (let ((buffers (ymacs-popup//get-term-buffer-list)))
     (when buffers
       (let* ((size (length buffers))
              (index (cl-position (current-buffer) buffers))
@@ -75,20 +71,47 @@
           (ymacs-popup//set-term-window window)
           window)))))
 
+(defun ymacs-term//quit-window (-window)
+  (interactive (list (selected-window)))
+  (when (and (window-live-p -window)
+             (eq -window (ymacs-popup//get-term-window))
+             ;; try to switch to next shell  buffer
+             (not (ymacs-term//switch-internal 1)))
+    ;; restore to previous-buffer
+    (let ((force-delete (eq (nth 1 (window-parameter -window 'quit-restore)) 'window)))
+      (quit-window nil -window)
+      (when (and force-delete
+                 (window-live-p -window))
+        (delete-window -window)))))
+
+(defun ymacs-term//kill-buffer-and-quit-window ()
+  (interactive)
+  (let ((buffer (current-buffer)))
+    (ymacs-term//quit-window (selected-window))
+    (kill-buffer buffer)))
+
+(defun ymacs-term//set-quit-keys (&optional -try-next-p)
+  (let ((help-str (propertize
+                   "[Press `Ctrl-D' or `q' to kill this buffer. ]"
+                   'font-lock-face
+                   'font-lock-warning-face)))
+    (if (listp mode-line-buffer-identification)
+        (add-to-list 'mode-line-buffer-identification help-str t)
+      (setq mode-line-buffer-identification
+            (list mode-line-buffer-identification help-str)))
+    (let ((map (copy-keymap (current-local-map))))
+      (if -try-next-p
+          (progn
+            (define-key map (kbd "C-d") #'ymacs-term//kill-buffer-and-quit-window)
+            (define-key map (kbd "q") #'ymacs-term//quit-window))
+        (define-key map (kbd "C-d") #'kill-buffer-and-window)
+        (define-key map (kbd "q") #'quit-window))
+      (use-local-map map))))
+
 (defun ymacs-term//shell-exit ()
   (let ((buffer (current-buffer)))
-    (let ((window (get-buffer-window)))
-      (when (and (window-live-p window)
-                 (eq window (ymacs-popup//get-term-window))
-                 (eq ymacs-term-exit-action 'shell)
-                 ;; try to switch to next shell  buffer
-                 (not (ymacs-term//switch-internal 1)))
-        ;; restore to previous-buffer
-        (let ((force-delete (eq (nth 1 (window-parameter window 'quit-restore)) 'window)))
-          (quit-window nil window)
-          (when (and force-delete
-                     (window-live-p window))
-            (delete-window window)))))
+    (when (eq ymacs-term-exit-action 'shell)
+      (ymacs-term//quit-window (get-buffer-window)))
 
     (when (buffer-live-p buffer)
       ;; the buffer maybe killed or buried
@@ -99,20 +122,7 @@
                 (set-window-dedicated-p (get-buffer-window) nil))
               (kill-buffer))
 
-          (let ((help-str (propertize
-                           "[Press `Ctrl-D' or `q' to kill this buffer. ]"
-                           'font-lock-face
-                           'font-lock-warning-face)))
-            (if (listp mode-line-buffer-identification)
-                (add-to-list 'mode-line-buffer-identification help-str t)
-              (setq mode-line-buffer-identification
-                    (list mode-line-buffer-identification help-str))))
-
-          (when-let (map (current-local-map))
-            (use-local-map (copy-keymap (current-local-map))))
-
-          (local-set-key (kbd "C-d") #'kill-buffer-and-window)
-          (local-set-key (kbd "q") #'kill-buffer-and-window))))))
+          (ymacs-term//set-quit-keys t))))))
 
 (defsubst ymacs-term//sentinel-setup ()
   (when-let ((proc (get-buffer-process (current-buffer))))
@@ -239,21 +249,3 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
    when (and (ymacs-term//shell-buffer-p buffer)
              (equal-directory! directory -directory))
    return buffer))
-
-(defun ymacs-term//pop-shell-get-buffer (&optional -arg)
-  (when (ymacs-term//shell-buffer-p (current-buffer))
-    (user-error "Current buffer is already a shell buffer"))
-
-  (let* ((force-new-buffer (or (= -arg 0) (>= -arg 16)))
-         (directory
-          (or (when (= -arg 4)
-                (ymacs-term//get-directory))
-              (when force-new-buffer
-                (read-directory-name "Shell in: " nil nil :mustmatch))
-              default-directory)))
-
-    (or (when (not force-new-buffer)
-          (ymacs-term//get-shell-buffer-in-directory directory))
-
-        (let ((default-directory directory))
-          (ymacs-term//create-buffer nil t)))))
