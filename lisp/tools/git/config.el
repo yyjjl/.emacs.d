@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(advice-add #'git-timemachine-completing-read-fn :override #'completing-read)
+
 (after! vc-hooks
   (setq vc-handled-backends '(Git)))
 

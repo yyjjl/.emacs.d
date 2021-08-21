@@ -2,10 +2,12 @@
 
 (defvar reb-regexp)
 (defvar reb-target-window)
-(declare-function reb-update-regexp "reb-builder")
 
 (eval-when-compile
   (require 're-builder))
+
+
+(defvar ymacs-editor-sexp-suffix-chars ";,. ")
 
 (defsubst ymacs-editor//skip-out-symbol ()
   (let ((syntax-b (when (> (point) (point-min)) (char-syntax (char-before))))
@@ -14,29 +16,146 @@
                (or (equal syntax-b ?w) (equal syntax-b ?_)))
       (skip-syntax-backward "w_" (line-beginning-position)))))
 
+(defsubst ymacs-editor//try-narrow-to-comment-or-string (&optional -syntax -bound)
+  (when-let ((syntax (or -syntax (syntax-ppss)))
+             (string-comment-start (nth 8 syntax)))
+    (save-excursion
+      (goto-char string-comment-start)
+      (narrow-to-region
+       (point)
+       (progn
+         (if (nth 3 syntax)             ; in string
+             (condition-case nil
+                 (forward-sexp)
+               (scan-error
+                (goto-char (or -bound (point-max)))))
+           (forward-comment 1))
+         (point))))))
+
+(defun ymacs-editor//forward-sexp-repeatly (end-of-line)
+  (let* ((original-point (point))
+         (current-point (point))
+         (last-point (point))
+         (index 0))
+    (while (condition-case nil
+               (progn ;; 首先看到的是 symbol, 先用 forwad symbol
+                 (if (and (= index 0)
+                          (save-excursion
+                            (skip-syntax-forward " " end-of-line)
+                            (when-let ((char (char-after))
+                                       (syn (char-syntax char)))
+                              (or (= syn ?w)
+                                  (= syn ?_)))))
+                     (forward-symbol 1)
+                   ;; 之后都使用 forward sexp
+                   (forward-sexp 1 nil))
+                 (setq current-point (point))
+                 (and (not (equal last-point current-point))
+                      (< current-point end-of-line)))
+             (error nil))
+      (cl-incf index)
+      (setq last-point current-point))
+
+    (list original-point last-point current-point)))
+
+;;;###autoload
+(defun ymacs-editor/smart-kill-line (-arg)
+  (interactive "p")
+  (cond
+   ((region-active-p)
+    (call-interactively #'kill-region))
+   ((or (eolp) (equal -arg 4))
+    (kill-line))
+   (t
+    (save-restriction
+      (save-excursion
+        (let* ((end-of-line (line-end-position))
+               (sp (syntax-ppss))
+               beg
+               end)
+          (when (or (nth 3 sp) (nth 4 sp))
+            (ymacs-editor//try-narrow-to-comment-or-string sp end-of-line))
+          ;; Step 1: skip backward to symbol start
+          (unless (nth 3 sp)            ; not inside string
+            (ymacs-editor//skip-out-symbol))
+
+          ;; Step 2: forward sexp repeatedly
+          (-let (((original-point last-point current-point)
+                  (ymacs-editor//forward-sexp-repeatly end-of-line)))
+            (setq beg original-point)
+            (cond
+             ((= original-point current-point))
+             ((<= current-point end-of-line)
+              ;; (a | b c) => (a|)
+              (setq end current-point))
+             ((= original-point last-point)
+              ;; 先跳过空白字符
+              (goto-char original-point)
+              (skip-syntax-forward " " end-of-line)
+              (when-let ((char (char-after))
+                         (syntax (char-syntax char)))
+                (if (= syntax ?\()
+                    ;; |(a    =>  | c
+                    ;;   b) c
+                    (setq end current-point)
+                  ;; kill line
+                  (setq end end-of-line))))
+             ((< original-point last-point)
+              ;; | a (b  => | (b
+              ;;      c)       c)
+              (setq end last-point)))
+
+            ;; Step 3: skip punctuations and whitespace
+            (when (and end (< end end-of-line))
+              (goto-char end)
+              (cl-incf end (skip-chars-forward ymacs-editor-sexp-suffix-chars end-of-line))))
+
+          (unless (and beg end)
+            (user-error "Nothing to kill"))
+
+          (kill-region beg end)))))))
+
 ;;;###autoload
 (defun ymacs-editor/smart-M-h ()
   (interactive)
-  (cond
-   ((region-active-p)
-    (call-interactively #'vc-region-history))
-   ((get-buffer-process (current-buffer))
-    (call-interactively #'consult-history))
-   (t
-    (let ((current-point (point))
-          (map (make-sparse-keymap)))
-      (if (bound-and-true-p lispy-mode)
-          (call-interactively #'lispy-mark-symbol)
-        (ymacs-editor//skip-out-symbol)
-        (call-interactively #'mark-sexp))
+  (let ((current-point (point))
+        (map (make-sparse-keymap))
+        (use-transient-map))
+    (cond
+     ((eq last-command #'ymacs-editor/smart-M-h)
+      (deactivate-mark)
+      (setq use-transient-map t)
 
-      (define-key map "h" #'er/expand-region)
+      (call-interactively #'mark-defun)
+      (define-key map "h" #'er/expand-region))
+     ((region-active-p)
+      (call-interactively #'vc-region-history))
+     ((get-buffer-process (current-buffer))
+      (call-interactively #'consult-history))
+     (t
+      (setq use-transient-map t)
+
+      (ymacs-editor//skip-out-symbol)
+      (cond
+       ((bound-and-true-p lispy-mode)
+        (call-interactively #'lispy-mark-symbol))
+       ((eq major-mode 'python-mode)
+        (require 'python-el-expansions)
+        (call-interactively #'er/mark-python-statement))
+       ((memq major-mode '(c-mode c++-mode java-mode))
+        (require 'cc-mode-expansions)
+        (call-interactively #'er/c-mark-statement))
+       (t
+        (call-interactively #'mark-sexp)))
+
+      (define-key map "h" #'ymacs-editor/smart-M-h)))
+
+    (when use-transient-map
       (define-key map (kbd "C-g")
         (interactive!
           (deactivate-mark)
           (goto-char current-point)))
-
-      (set-transient-map map)))))
+      (set-transient-map map))))
 
 ;;;###autoload
 (defun ymacs-editor/cleanup-buffer-safe ()

@@ -16,7 +16,7 @@
   ("l" . magit-log-buffer-file)
   ("=" . diff-hl-diff-goto-hunk)
   ("SPC" . diff-hl-mark-hunk)
-  ("t" . ymacs-git/timemachine)
+  ("t" . git-timemachine)
   ("n" . diff-hl-next-hunk)
   ("p" . diff-hl-previous-hunk)
   ("r" . diff-hl-revert-hunk)
