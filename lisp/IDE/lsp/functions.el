@@ -32,6 +32,22 @@
      (when ,-condition
        (ymacs-lsp//try-enable ,-name))))
 
+(defun ymacs-lsp//clear-leak-handlers (-lsp-client)
+  "Clear leaking handlers in LSP-CLIENT."
+  (let* ((response-handlers (lsp--client-response-handlers -lsp-client))
+         (response-ids (cl-loop
+                        for handler being the hash-values of response-handlers using (hash-keys response-id)
+                        when (> (time-convert (time-since (nth 3 handler)) 'integer)
+                                (* 2 lsp-response-timeout))
+                        collect response-id)))
+
+    (when response-ids
+      (message "Deleting %d handlers in %s lsp-client..."
+               (length response-ids)
+               (lsp--client-server-id -lsp-client))
+      (dolist (response-id response-ids)
+        (remhash response-id response-handlers)))))
+
 (defun ymacs-lsp//get-latest-url-from-github (-repo -matcher)
   (require 'url-handlers)
   (let* ((url (format "https://api.github.com/repos/%s/releases/latest" -repo))

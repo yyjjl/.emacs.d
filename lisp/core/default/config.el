@@ -202,6 +202,7 @@
 
 (require-packages!
  dash
+ gcmh
  monokai-theme)
 
 (require 'dash)

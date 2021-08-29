@@ -1,9 +1,17 @@
 ;; -*- lexical-binding:t -*-
 
 (defvar ymacs-dap-running-session-mode)
+(defvar ymacs-lsp-clear-leak-timer nil)
+
 (declare-function dap-hydra/nil "ext:dap-mode")
 
 (after! lsp-mode
+  (setq ymacs-lsp-clear-leak-timer
+        (run-with-timer
+         30 30
+         (lambda ()
+           (mapc #'ymacs-lsp//clear-leak-handlers (hash-table-values lsp-clients)))))
+
   (define-hook! ymacs-lsp|after-open (lsp-after-open-hook)
     (remove-function (local 'eldoc-documentation-function) #'lsp-eldoc-function)
 

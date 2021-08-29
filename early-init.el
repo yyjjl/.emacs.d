@@ -17,8 +17,6 @@
 
 (defvar ymacs-dump-load-path nil)
 
-(defvar ymacs-gc-cons-threshold (* 100 1024 1024))
-
 (defvar ymacs-large-buffer-limit (* 3 1024 1024)
   "When buffer's size bigger than `ymacs-large-buffer-limit', it
 will close some features to speed up emacs performance")
