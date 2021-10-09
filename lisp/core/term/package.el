@@ -46,6 +46,7 @@ kill     => when process exits, kill buffer")
 
 (defvar-local ymacs-term--ssh-info nil)
 (defvar-local ymacs-term--last-buffer nil)
+(defvar-local ymacs-term-keep-buffer-alive nil)
 
 (defvar ymacs-term-buffer-name "shell"
   "The buffer name of term buffer.")

@@ -147,7 +147,8 @@ class Installer(object):
 
     def download_gnu_software(self, name, version, ext):
         directory = '{}-{}'.format(name, version)
-        save_path = os.path.join(self._cache_path, '{}.{}'.format(directory, ext))
+        save_path = os.path.join(
+            self._cache_path, '{}.{}'.format(directory, ext))
 
         url = 'https://ftp.gnu.org/gnu/{}/{}.{}'.format(name, directory, ext)
         if ext == 'tar.gz':
@@ -223,6 +224,8 @@ GNUTLS = ('3.6', '16')
 GCC = '11.1.0'
 CMAKE = '3.21.0'
 
+PYTHON_URL = 'https://www.python.org/ftp/python/3.9.7/Python-3.9.7.tgz'
+
 SRC_DIR = os.path.expanduser('~/program/')
 ROOT_DIR = os.path.expanduser('~/.local/')
 BIN_DIR = os.path.join(ROOT_DIR, 'bin')
@@ -231,15 +234,11 @@ os.makedirs(SRC_DIR, exist_ok=True)
 os.makedirs(ROOT_DIR, exist_ok=True)
 os.makedirs(BIN_DIR, exist_ok=True)
 
-
 os.chdir(SRC_DIR)
 with Installer(prefix=ROOT_DIR) as installer:
-    installer.extract_and_link('fd-*', 'fd', BIN_DIR)
-    installer.extract_and_link('ripgrep-*', 'rg', BIN_DIR)
-
-    run_cmd([
-        'tar', 'zxf', glob(os.path.join(installer.cache_path, 'fzf-*'))[0], '-C', BIN_DIR
-    ])
+    # installer.extract_and_link('fd-*', 'fd', BIN_DIR)
+    # installer.extract_and_link('ripgrep-*', 'rg', BIN_DIR)
+    # run_cmd(['tar', 'zxf', glob(os.path.join(installer.cache_path, 'fzf-*'))[0], '-C', BIN_DIR])
 
     installer.download_and_install_cmake(CMAKE)
 
@@ -266,7 +265,7 @@ with Installer(prefix=ROOT_DIR) as installer:
 
     installer.run(
         'gcc',
-        # [installer.download_gcc, GCC],
+        [installer.download_gcc, GCC],
         [os.chdir, 'gcc-{}'.format(GCC)],
         [
             installer.configure,
@@ -307,7 +306,8 @@ with Installer(prefix=ROOT_DIR) as installer:
             installer.configure,
             '--with-json',
             '--with-libgmp=no',
-            '--with-native-compilation'
+            '--with-native-compilation',
+            '--with-x-toolkit=no'
         ],
         [installer.make]
     )

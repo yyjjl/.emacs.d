@@ -1,6 +1,12 @@
 ;;; -*- lexical-binding: t; -*-
 
 (after! pyvenv
+  (define-advice pyvenv-track-virtualenv (:around (-fn) deactivate)
+    (if (and (stringp pyvenv-activate)
+             (string-empty-p pyvenv-activate))
+        (pyvenv-deactivate)
+      (funcall -fn)))
+
   (define-hook! ymacs-python//shell-exec-hook (ymacs-term-shell-exec-hook)
     (when ymacs-python-auto-activate-venv-p
       (let ((venv (getenv "VIRTUAL_ENV")))

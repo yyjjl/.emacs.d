@@ -110,8 +110,10 @@
   ;; (setq xref-show-definitions-function #'consult-xref)
 
   (consult-customize
-   consult-line consult-yank-pop
+   consult-line
    :preview-key 'any
+   consult-yank-pop
+   :preview-key (kbd "C-y")
    consult-ripgrep
    :keymap ymacs-editor-ripgrep-map)
 

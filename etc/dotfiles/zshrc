@@ -91,11 +91,9 @@ case "$INSIDE_EMACS" in
     vterm)
         export LANG=zh_CN.UTF-8
         alias ff='emacsclient -n'
-        chpwd() { print -Pn '\e]51;A$(pwd)\e\\'; }
-        # cd() {
-        #     builtin cd "$@" || return;
-        #     [ "$OLDPWD" = "$PWD" ] || echo -ne "\e]51;A$(pwd)\e\\";
-        # };
+        chpwd() {
+            printf "\e]51;A$(whoami)@$(hostname):$(pwd)\e\\"
+        }
         ;;
     *term*)
         alias ff='emacsclient -n'

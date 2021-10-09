@@ -17,8 +17,10 @@
 
     (remove-hook 'eldoc-documentation-functions #'flymake-eldoc-function t)
     (add-hook 'eldoc-documentation-functions #'flymake-eldoc-function -20 t)
-    (when (lsp--capability :hoverProvider)
-      (add-hook 'eldoc-documentation-functions #'ymacs-lsp//eldoc-function -10 t))
+
+    ;; Disable lsp eldoc to speed up, use C-c C-d to view doc
+    ;; (when (lsp--capability :hoverProvider)
+    ;;   (add-hook 'eldoc-documentation-functions #'ymacs-lsp//eldoc-function -10 t))
 
     (setq-local company-minimum-prefix-length 2))
 

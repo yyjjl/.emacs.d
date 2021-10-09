@@ -59,7 +59,7 @@
   (setq company-dabbrev-code-other-buffers t)
   (setq company-show-quick-access t)
   ;; Don't auto auto complete
-  (setq company-idle-delay 0.1)
+  (setq company-idle-delay 0.2)
   (setq company-require-match nil)
   ;; (setq company-minimum-prefix-length 3)
   (setq company-tooltip-align-annotations t)

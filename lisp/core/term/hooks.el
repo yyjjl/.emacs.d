@@ -8,6 +8,15 @@
       (setq ymacs-term--last-buffer term-buffer))))
 
 
+(defun ymacs-term//around-Ctrl-c (-fn &rest -args)
+  (when ymacs-term-keep-buffer-alive
+    (user-error "can not send Ctrl-c"))
+  (apply -fn -args))
+
+(advice-add #'vterm-send-C-c :around #'ymacs-term//around-Ctrl-c)
+(advice-add #'term-interrupt-subjob :around #'ymacs-term//around-Ctrl-c)
+(advice-add #'comint-interrupt-subjob :around #'ymacs-term//around-Ctrl-c)
+
 (after! compile
   (define-hook! (ymacs-popup//compilation-finish-hook -buffer _) (compilation-finish-functions)
     (when (buffer-live-p -buffer)

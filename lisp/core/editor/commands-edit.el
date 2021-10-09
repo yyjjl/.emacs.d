@@ -76,8 +76,8 @@
           (when (or (nth 3 sp) (nth 4 sp))
             (ymacs-editor//try-narrow-to-comment-or-string sp end-of-line))
           ;; Step 1: skip backward to symbol start
-          (unless (nth 3 sp)            ; not inside string
-            (ymacs-editor//skip-out-symbol))
+          ;; (unless (nth 3 sp)            ; not inside string
+          ;;   (ymacs-editor//skip-out-symbol))
 
           ;; Step 2: forward sexp repeatedly
           (-let (((original-point last-point current-point)

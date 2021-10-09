@@ -19,6 +19,19 @@
       :callback callback)))
 
 ;;;###autoload
+(defun ymacs-term/toggle-buffer-alive ()
+  (interactive)
+  (unless (ymacs-term//shell-buffer-p (current-buffer))
+    (user-error "not in a shell buffer"))
+
+  (setq mode-line-buffer-identification
+        (if ymacs-term-keep-buffer-alive
+            (cl-remove "[alive]" mode-line-buffer-identification :test #'equal)
+          (append mode-line-buffer-identification '("[alive]"))))
+
+  (setq ymacs-term-keep-buffer-alive (not ymacs-term-keep-buffer-alive)))
+
+;;;###autoload
 (defun ymacs-term/load-file-in-repl ()
   (interactive)
   (let ((repl (or (alist-get major-mode ymacs-term-repl-alist)
@@ -102,6 +115,7 @@
       (display-buffer buffer)
       (with-current-buffer buffer
         (local-set-key [f8] #'ymacs-term/pop-shell)))))
+
 
 ;;;###autoload
 (defun ymacs-term/conditional-send-raw ()

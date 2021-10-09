@@ -151,7 +151,7 @@
   ("C-k" . ymacs-editor/smart-kill-line)
 
   ("C-r" . consult-line-multi)
-  ("C-s" . consult-line)
+  ("C-s" . ymacs-editor/consult-ripgrep-or-line)
 
   ("M-%" . ymacs-hydra/query-replace/body)
   ("M-'" . ymacs-editor/change-surround)

@@ -128,7 +128,7 @@
 
   (setq lsp-progress-prefix "LSP:")
 
-  ;; (setq lsp-headerline-breadcrumb-enable t)
+  (setq lsp-headerline-breadcrumb-enable nil)
   (setq lsp-headerline-breadcrumb-icons-enable nil)
   (setq lsp-headerline-breadcrumb-segments '(symbols))
   (setq lsp-headerline-breadcrumb-enable-diagnostics nil)

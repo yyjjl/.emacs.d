@@ -44,14 +44,10 @@
 
 (define-hook! ymacs-editor//minibuffer-setup (minibuffer-setup-hook)
   (setq line-spacing nil)
-  (setq gc-cons-threshold most-positive-fixnum)
   ;; setup consult
   (setq ymacs-editor-minibuffer-saved-point
         (with-current-buffer (window-buffer (minibuffer-selected-window))
           (point))))
-
-(define-hook! ymacs-editor//minibuffer-exit (minibuffer-exit-hook)
-  (setq gc-cons-threshold ymacs-gc-cons-threshold))
 
 ;; Make scratch buffer un-killable
 (define-hook! ymacs-editor//unkillable-buffer (kill-buffer-query-functions)
@@ -145,7 +141,7 @@
   (semantic-mode 1)
   ;; (which-function-mode 1)
   (global-subword-mode 1)
-  (global-auto-revert-mode 1)
+  ;; (global-auto-revert-mode 1)
   ;;`eldoc', show API doc in minibuffer echo area enabled by default
   ;; (global-eldoc-mode 1)
   (global-so-long-mode 1)

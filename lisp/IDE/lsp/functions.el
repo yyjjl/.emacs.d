@@ -111,26 +111,3 @@
      type
      url
      store-path)))
-
-(defun ymacs-lsp//eldoc-function (-report-doc &rest _)
-  (if (and lsp--hover-saved-bounds (lsp--point-in-bounds-p lsp--hover-saved-bounds))
-      (funcall -report-doc lsp--eldoc-saved-message)
-    (setq lsp--hover-saved-bounds nil
-          lsp--eldoc-saved-message nil)
-    (when (not (looking-at "[[:space:]\n]"))
-      (lsp-request-async
-       "textDocument/hover"
-       (lsp--text-document-position-params)
-       (-lambda ((hover &as &Hover? :range? :contents))
-         (when hover
-           (when range?
-             (setq lsp--hover-saved-bounds (lsp--range-to-region range?)))
-           (funcall -report-doc
-                    (setq lsp--eldoc-saved-message
-                          (and contents
-                               (lsp--render-on-hover-content
-                                contents
-                                lsp-eldoc-render-all))))))
-       :error-handler #'ignore
-       :mode 'tick
-       :cancel-token :eldoc-hover))))
