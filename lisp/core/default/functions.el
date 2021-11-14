@@ -311,36 +311,7 @@ like the scratch buffer where knowing the current project directory is important
 
 (defsubst ymacs-modeline//update-checker-state (&rest _)
   (setq ymacs-modeline--checker-state
-        (let* ((running (flymake-running-backends))
-               (disabled (flymake-disabled-backends))
-               (reported (flymake-reporting-backends))
-               (some-waiting (cl-set-difference running reported))
-               (warning-level (flymake--severity :warning))
-               (note-level (flymake--severity :note))
-               (error-count 0)
-               (warning-count 0)
-               (note-count 0))
-          (maphash
-           (lambda (_b state)
-             (dolist (diag (flymake--backend-state-diags state))
-               (let ((severity (flymake--severity (flymake--diag-type diag))))
-                 (cond ((> severity warning-level) (cl-incf error-count))
-                       ((> severity note-level) (cl-incf warning-count))
-                       (t (cl-incf note-count))))))
-           flymake--backend-state)
-          (cond
-           (some-waiting ymacs-modeline--checker-state)
-           ((zerop (hash-table-count flymake--backend-state)) "No-checker")
-           ((and disabled (null running)) "All-disabled")
-           ((if (> (+ error-count warning-count note-count) 0)
-                (concat
-                 " "
-                 (propertize (number-to-string error-count) 'face 'ymacs-modeline-urgent)
-                 "/"
-                 (propertize (number-to-string warning-count) 'face 'ymacs-modeline-warning)
-                 "/"
-                 (propertize (number-to-string note-count) 'face 'ymacs-modeline-info))
-              (propertize " --" 'face 'ymacs-modeline-info)))))))
+        (format-mode-line '(" " flymake-mode-line-exception flymake-mode-line-counters))))
 
 (ymacs-modeline//def-segment checker
   "Displays color-coded error status in the current buffer with pretty icons."
