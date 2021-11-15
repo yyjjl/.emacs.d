@@ -123,8 +123,6 @@
   ("w ]" . winner-redo)
   ("w w" . ymacs-editor/move-buffer)
 
-  ("x" . exchange-point-and-mark)
-
   ("j" . consult-find)
 
   ("^" . ymacs-hydra/window/jenlarge-window)

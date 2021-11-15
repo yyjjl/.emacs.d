@@ -12,7 +12,7 @@ def run_cmd(cmd, **kwargs):
 
 def download_and_uncompress(url, save_path, opt=None):
     if not os.path.exists(save_path):
-        if not run_cmd(['wget', '-O', save_path, url]):
+        if not run_cmd(['wget', '--no-check-certificate', '-O', save_path, url]):
             try:
                 os.unlink(save_path)
             except Exception:
@@ -150,7 +150,7 @@ class Installer(object):
         save_path = os.path.join(
             self._cache_path, '{}.{}'.format(directory, ext))
 
-        url = 'https://ftp.gnu.org/gnu/{}/{}.{}'.format(name, directory, ext)
+        url = 'http://ftp.gnu.org/gnu/{}/{}.{}'.format(name, directory, ext)
         if ext == 'tar.gz':
             opt = '-zxf'
         elif ext == 'tar.xz':
@@ -164,7 +164,7 @@ class Installer(object):
         save_path = os.path.join(
             self._cache_path, 'gnutls-{}.{}.tar.xz'.format(*version)
         )
-        url = 'https://www.gnupg.org/ftp/gcrypt/gnutls/v{0}/gnutls-{0}.{1}.tar.xz'.format(
+        url = 'http://www.gnupg.org/ftp/gcrypt/gnutls/v{0}/gnutls-{0}.{1}.tar.xz'.format(
             *version
         )
         return download_and_uncompress(url, save_path,  '-Jxf')
@@ -173,7 +173,7 @@ class Installer(object):
         save_path = os.path.join(
             self._cache_path, 'gcc-{}.tar.xz'.format(version)
         )
-        url = 'https://ftp.gnu.org/gnu/gcc/gcc-{0}/gcc-{0}.tar.xz'.format(
+        url = 'http://ftp.gnu.org/gnu/gcc/gcc-{0}/gcc-{0}.tar.xz'.format(
             version
         )
         return download_and_uncompress(url, save_path,  '-Jxf')

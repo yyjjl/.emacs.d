@@ -2,6 +2,7 @@
 
 (require-packages!
  ;; Auto compile after .el file load or save
+ lispy
  auto-compile
  elisp-def
  macrostep)
