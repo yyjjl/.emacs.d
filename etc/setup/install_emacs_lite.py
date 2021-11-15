@@ -307,7 +307,11 @@ with Installer(prefix=ROOT_DIR) as installer:
             '--with-json',
             '--with-libgmp=no',
             '--with-native-compilation',
-            '--with-x-toolkit=no'
+            '--with-x-toolkit=no',
+            '--with-xpm=ifavailable',
+            '--with-jpeg=ifavailable',
+            '--with-gif=ifavailable',
+            '--with-tiff=ifavailable'
         ],
         [installer.make]
     )
