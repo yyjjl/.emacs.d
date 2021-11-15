@@ -1,6 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
 (after! dired
+  (setq dired-kill-when-opening-new-dired-buffer t)
+
   (define-hook! ymacs-editor//dired-setup (dired-mode-hook)
     (setq mode-line-buffer-identification '("%b" (dired-omit-mode " (omit)")))
     (dired-hide-details-mode 1))

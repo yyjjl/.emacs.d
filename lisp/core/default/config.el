@@ -11,7 +11,7 @@
 (setq gc-cons-threshold most-positive-fixnum)
 (setq gc-cons-percentage 0.5)
 
-(fset 'yes-or-no-p 'y-or-n-p)
+(setq use-short-answers t)
 
 ;;* Default Values
 ;; No tool bar or scroll bar
@@ -111,6 +111,7 @@
 
 
 
+(setq mode-line-compact t)
 (setq-default mode-line-buffer-identification '("%b"))
 
 (blink-cursor-mode -1)

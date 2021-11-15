@@ -111,6 +111,7 @@
 
   (consult-customize
    consult-line
+   ymacs-editor/consult-ripgrep-or-line
    :preview-key 'any
    consult-yank-pop
    :preview-key (kbd "C-y")

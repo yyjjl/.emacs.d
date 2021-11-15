@@ -1,3 +1,0 @@
-[submodule "simple-lispy"]
-	path = site-lisp/simple-lispy
-	url = https://github.com/yyjjl/simple-lispy

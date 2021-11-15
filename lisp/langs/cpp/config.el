@@ -43,7 +43,6 @@
 
     (dolist (arg '("--all-scopes-completion"
                    "--background-index"
-                   "--cross-file-rename"
                    "--clang-tidy"))
       (cl-pushnew arg lsp-clients-clangd-args :test #'string=))))
 

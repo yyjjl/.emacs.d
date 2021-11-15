@@ -2,7 +2,7 @@
 
 (require-packages!
  diff-hl
- gitignore-mode
+ git-modes
  git-timemachine
  magit)
 
