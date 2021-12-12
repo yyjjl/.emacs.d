@@ -14,14 +14,14 @@
   (ymacs-lsp//register-client 'ts-ls :package 'lsp-javascript)
   (ymacs-lsp//register-client 'html-ls :package 'lsp-html))
 
-(add-to-list
- 'auto-mode-alist
- (eval-when-compile
-   (cons (rx "." (or "phtml" "html" "htm" "djhtml"
-                     "gsp" "jsp" "ascx" "aspx"
-                     "tmpl" "tml" "ejs" "swig" "vue"
-                     "php" "erb" "mustache")
-             string-end)
-         'web-mode)))
+;; (add-to-list
+;;  'auto-mode-alist
+;;  (eval-when-compile
+;;    (cons (rx "." (or "phtml" "html" "htm" "djhtml"
+;;                      "gsp" "jsp" "ascx" "aspx"
+;;                      "tmpl" "tml" "ejs" "swig" "vue"
+;;                      "php" "erb" "mustache")
+;;              string-end)
+;;          'web-mode)))
 
-(setq auto-mode-alist (cl-subst 'web-mode 'js-jsx-mode auto-mode-alist))
+;; (setq auto-mode-alist (cl-subst 'web-mode 'js-jsx-mode auto-mode-alist))

@@ -45,7 +45,7 @@
             "trace-output"
             (and "poporg: " (*? not-newline))
             "sdcv"
-            "lispy-message"
+            "ymacs-lisp-message"
             (and (*? not-newline) (in "Hh") "elp" (*? not-newline))
             (and (*? not-newline) (in "Dd") "escribe" (*? not-newline))
             (and (*? not-newline) (in "Dd") "ocumentation" (*? not-newline)))

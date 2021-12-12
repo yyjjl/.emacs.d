@@ -4,7 +4,8 @@
 (defvar reb-target-window)
 
 (eval-when-compile
-  (require 're-builder))
+  (require 're-builder)
+  (require 'expand-region))
 
 
 (defvar ymacs-editor-sexp-suffix-chars ";,. ")
@@ -137,8 +138,8 @@
 
       (ymacs-editor//skip-out-symbol)
       (cond
-       ((bound-and-true-p lispy-mode)
-        (call-interactively #'lispy-mark-symbol))
+       ((bound-and-true-p ymacs-lisp-minor-mode)
+        (call-interactively #'ymacs-lisp/mark-symbol))
        ((eq major-mode 'python-mode)
         (require 'python-el-expansions)
         (call-interactively #'er/mark-python-statement))

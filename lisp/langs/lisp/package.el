@@ -2,7 +2,6 @@
 
 (require-packages!
  ;; Auto compile after .el file load or save
- lispy
  auto-compile
  elisp-def
  macrostep)
@@ -11,7 +10,3 @@
   `((t :weight bold :italic t))
   "Face for arguments"
   :group 'lisp)
-
-(autoload #'lispy-mode "lispy" nil t)
-(autoload #'lispy-forward "lispy" nil t)
-(autoload #'lispy-backward "lispy" nil t)

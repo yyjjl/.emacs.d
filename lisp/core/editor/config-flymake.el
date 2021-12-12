@@ -37,7 +37,7 @@
        nil)))
 
   (define-key! :map flymake-mode-map
-    ("C-c f l" . flymake-show-diagnostics-buffer))
+    ("C-c f l" . flymake-show-buffer-diagnostics))
 
   (define-key! :map flymake-diagnostics-buffer-mode-map
     ("n" . next-line)

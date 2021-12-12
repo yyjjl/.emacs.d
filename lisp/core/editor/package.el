@@ -229,7 +229,7 @@
   ("f" . customize-face))
 
 (define-key! :prefix "M-s"
-  ("e" . consult-isearch)
+  ("e" . consult-isearch-history)
   ("f" . ymacs-editor/font-faces-at-point)
   ("k" . consult-keep-lines)
   ("o" . ymacs-editor/occur-dwim)

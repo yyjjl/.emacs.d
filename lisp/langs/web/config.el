@@ -1,8 +1,13 @@
 ;;; -*- lexical-binding: t; -*-
 
+(eval-when-has-feature! lsp
+  (after! lsp-mode
+    (setf (alist-get 'web-mode lsp--formatting-indent-alist)
+          'web-mode-code-indent-offset)))
+
 (after! web-mode
   (define-key! :map web-mode-map
-    ([remap kill-line] . ymacs-web/smart-kill)
+    ("C-k" . ymacs-web/smart-kill)
     ("C-c C-b" . web-mode-buffer-indent))
 
   (setq web-mode-enable-auto-closing t) ;; Enable auto close tag in `web-mode'

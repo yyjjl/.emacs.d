@@ -32,10 +32,3 @@
     ("M-." . elisp-def)
     ("C-c e" . macrostep-expand)
     ("C-c C-d" . ymacs-lisp/describe-at-point)))
-
-(after! lispy
-  (define-key! :map lispy-mode-map
-    ("M-n")
-    ("x" . self-insert-command))
-
-  (setq lispy-x-default-verbosity 1))

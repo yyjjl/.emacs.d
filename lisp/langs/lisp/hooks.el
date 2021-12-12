@@ -2,14 +2,14 @@
 
 (define-hook! ymacs-lisp//minibuffer-setup (minibuffer-setup-hook
                                             minibuffer-exit-hook)
-  (if (and (not (bound-and-true-p lispy-mode))
+  (if (and (not (bound-and-true-p ymacs-lisp-minor-mode))
            (memq this-command
                  '(eval-expression
                    pp-eval-expression
                    ibuffer-do-eval
                    ibuffer-do-view-and-eval)))
-      (lispy-mode 1)
-    (lispy-mode -1)))
+      (ymacs-lisp-minor-mode 1)
+    (ymacs-lisp-minor-mode -1)))
 
 (add-hook 'emacs-lisp-mode-hook #'ymacs-lisp//elisp-setup)
 (add-hook 'lisp-interaction-mode-hook #'ymacs-lisp//elisp-setup)

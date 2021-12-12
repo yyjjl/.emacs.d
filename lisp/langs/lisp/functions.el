@@ -5,7 +5,7 @@
   (setq-local hippie-expand-try-functions-list
               (append hippie-expand-try-functions-list '(try-complete-lisp-symbol)))
 
-  (lispy-mode 1))
+  (ymacs-lisp-minor-mode 1))
 
 (defun ymacs-lisp//elisp-setup ()
   (ymacs-lisp//common-setup)
