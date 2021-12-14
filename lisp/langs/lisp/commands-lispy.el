@@ -310,8 +310,7 @@ Otherwise (`backward-delete-char-untabify' ARG)."
 (defun ymacs-lisp/eval-other-window (-arg)
   (interactive "P")
   (require 'ace-window)
-  (save-window-excursion
-    (ymacs-lisp//run-body-or-self-insert
+  (ymacs-lisp//run-body-or-self-insert
      (let* ((expr (thing-at-point 'sexp))
             (aw-dispatch-always nil)
             (target-window
@@ -324,9 +323,10 @@ Otherwise (`backward-delete-char-untabify' ARG)."
                    (t (setq ymacs-lisp--eval-other--buffer nil)
                       (setq ymacs-lisp--eval-other--cfg nil)
                       (selected-window))))
-            (result (with-selected-window target-window
-                      (ymacs-lisp//prin1-to-string (eval (read expr) t)))))
-       (ymacs-lisp/message result)))))
+            (result (save-window-excursion
+                      (with-selected-window target-window
+                      (ymacs-lisp//prin1-to-string (eval (read expr) t))))))
+       (ymacs-lisp/message result))))
 
 (defun ymacs-lisp/down ()
   (interactive)
@@ -424,7 +424,7 @@ Self-insert otherwise."
      (ymacs-lisp//move-internal region-side current-point sexp1-beg sexp1-end))))
 
 (defun ymacs-lisp/move-up ()
-  (interactive "p")
+  (interactive)
   (ymacs-lisp//run-body-or-self-insert
    (-let* ((current-point (point))
            ((region-side sexp1-beg sexp1-end sexp1) (ymacs-lisp//bound-of-sexp1))

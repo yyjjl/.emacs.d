@@ -26,6 +26,7 @@
             "*Org Agenda*"
             "*Org Dashboard*"
             "*Org Select*"
+            (and "*eldoc" (*? not-newline) "*")
             " *LanguageTool Errors* "
             " *CDLaTeX Help*")
         string-end)))
@@ -41,7 +42,6 @@
     (rx string-start
         "*"
         (or "Compile-Log"
-            "eldoc"
             "trace-output"
             (and "poporg: " (*? not-newline))
             "sdcv"

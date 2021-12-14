@@ -76,10 +76,10 @@
         ("a" . ymacs-lsp/find-other-file))))
 
   (define-key! :map lsp-mode-map
-    ("M-\" r" . lsp-find-references)
-    ("M-\" t" . lsp-find-type-definition)
-    ("M-\" i" . lsp-find-implementation)
-    ("M-\" d" . lsp-find-declaration)
+    ("M-s r" . lsp-find-references)
+    ("M-s t" . lsp-find-type-definition)
+    ("M-s i" . lsp-find-implementation)
+    ("M-s d" . lsp-find-declaration)
 
     ("M-s h h" . lsp-document-highlight)
     ("C-c R" . lsp-rename)
@@ -121,10 +121,10 @@
   (setq lsp-enable-symbol-highlighting nil)
   ;; (setq lsp-symbol-highlighting-skip-current t)
 
-  ;; (setq lsp-before-save-edits t)
+  (setq lsp-before-save-edits nil)
 
   ;; (setq lsp-semantic-tokens-enable nil)
-  ;; (setq lsp-lens-enable nil)
+  (setq lsp-lens-enable nil)
 
   (setq lsp-progress-prefix "LSP:")
 
