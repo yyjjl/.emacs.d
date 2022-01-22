@@ -26,7 +26,6 @@
  vertico
  orderless
  marginalia
- citre
  pretty-hydra
  yasnippet
  yasnippet-snippets
