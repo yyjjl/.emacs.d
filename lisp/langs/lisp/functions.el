@@ -1,5 +1,7 @@
 ;; -*- lexical-binding:t -*-
 
+(autoload 'ymacs-lisp-minor-mode (expand! "commands-lispy") nil t)
+
 (defun ymacs-lisp//common-setup ()
   "Enable features useful in any Lisp mode."
   (setq-local hippie-expand-try-functions-list

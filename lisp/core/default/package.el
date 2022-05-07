@@ -142,7 +142,6 @@
   (setq backup-directory-alist (list (cons "." (expand-cache! "backups/"))))
   (setq bookmark-default-file (expand-cache! "bookmarks.el"))
   (setq calc-settings-file (expand-cache! "calc.el"))
-  (setq dap-breakpoints-file (expand-cache! ".dap-breakpoints"))
   (setq eshell-directory-name (expand-cache! "eshell/"))
   (setq gnus-directory (expand-cache! "gnus"))
   (setq gnus-init-file (expand-etc! "gnus.el"))

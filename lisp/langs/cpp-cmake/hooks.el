@@ -6,4 +6,4 @@
       (unless (and (is-buffer-suitable-for-coding!)
                    (eval-when-has-feature! lsp
                      (ymacs-lsp//try-enable cmake)))
-        (ymacs-editor//add-company-backend 'company-cmake)))))
+        (add-to-list 'company-backends 'company-cmake)))))

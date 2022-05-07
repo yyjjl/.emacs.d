@@ -6,9 +6,7 @@
 
 (executable! latexmk)
 
-(require-packages!
- (auctex :compile (latex tex preview reftex))
- auctex-latexmk)
+(require-packages! (auctex :compile (latex tex preview reftex)) )
 
 (executable! texlab :exe [(expand-cache! "lsp/texlab") "texlab"])
 

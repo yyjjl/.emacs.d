@@ -1,8 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 (eval-when-compile
-  (require 'lsp-mode)
-  (require 'dap-hydra nil t))
+  (require 'lsp-mode))
 
 (declare-function lsp-semantic-tokens--disable 'lsp-mode)
 (declare-function treemacs-current-visibility 'treemacs)
@@ -58,34 +57,6 @@
     (font-lock-flush))
   (lsp--info "Semantic Tokens %s. "
              (if lsp-semantic-tokens-enable "enabled" "disabled")))
-
-(define-minor-mode ymacs-dap-running-session-mode
-  "A mode for adding keybindings to running sessions"
-  :global nil
-  :init-value nil
-  ymacs-dap-running-session-mode-map
-  (if ymacs-dap-running-session-mode
-      (ymacs-debug//enable)
-    (ymacs-debug//disable))
-
-  (force-mode-line-update))
-
-(defun ymacs-dap/goto-log-buffer ()
-  (interactive)
-  (let ((session (dap--cur-session-or-die)))
-    (when-let* ((proc (dap--debug-session-program-proc session))
-                (buffer (process-buffer proc)))
-      (pop-to-buffer buffer))))
-
-(defun ymacs-dap/goto-repl-buffer ()
-  (interactive)
-  (dap-hydra/nil)
-  (if-let ((buffer (get-buffer dap-ui--repl-buffer))
-           (window (get-buffer-window buffer)))
-      (if (eq window (selected-window))
-          (quit-window)
-        (select-window window))
-    (dap-ui-repl)))
 
 ;;;###autoload
 (defun ymacs-lsp/remove-invalid-folders ()

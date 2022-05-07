@@ -30,6 +30,8 @@
              :tgz)))))
 
 (after! latex
+  (ymacs-latex//setup-latexmk)
+
   (ymacs-editor//add-toggles
    "LaTeX"
    '(derived-mode-p 'latex-mode)
@@ -41,9 +43,6 @@
    '("s" TeX-source-correlate-mode "Source Correlate" :toggle t)
    '("d w" TeX-toggle-debug-warnings "Debug Warning" :toggle TeX-debug-warnings)
    '("d b" TeX-toggle-debug-bad-boxes "Debug Bad Boxes" :toggle TeX-debug-bad-boxes))
-
-  (auctex-latexmk-setup)
-  (setq auctex-latexmk-inherit-TeX-PDF-mode t)
 
   (define-key! :map TeX-mode-map
     ("C-c '"))

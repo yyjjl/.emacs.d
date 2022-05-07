@@ -34,7 +34,6 @@
  multiple-cursors
  iedit
  wgrep
- ace-pinyin
  ace-window
  persistent-scratch
  hl-todo
@@ -70,7 +69,6 @@
 (autoload 'project-root "project")
 (autoload 'project-current "project")
 (autoload 'ansi-color-apply-on-region "ansi-color")
-(autoload 'pinyinlib-build-regexp-string "pinyinlib")
 (autoload 'winner-undo "winner" nil t)
 (autoload 'winner-redo "winner" nil t)
 
@@ -152,7 +150,6 @@
 
   ("M-%" . ymacs-hydra/query-replace/body)
   ("M-'" . ymacs-editor/change-surround)
-  ("M-*" . citre-jump)
   ("M--" . er/expand-region)
   ("M-/" . hippie-expand)
 
@@ -203,7 +200,6 @@
   ("k" . consult-global-mark)
   ("i" . imenu)
   ("I" . consult-imenu-multi)
-  ("." . citre-ace-peek)
   ("u" . browse-url-at-point)
   ("w" . ymacs-editor/avy-copy)
   ("y" . ymacs-editor/avy-copy-and-yank)

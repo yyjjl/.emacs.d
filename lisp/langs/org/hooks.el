@@ -52,14 +52,7 @@
     (when (fboundp 'org-num-mode)
       (org-num-mode 1))
 
-    ;; Add context-sensitive completion for meta options
-    (add-hook 'completion-at-point-functions
-              (lambda () (ignore-errors (pcomplete-completions-at-point)))
-              nil t)
-
-    ;; company-dabbrev too slow in org-mode
-    (remove-hook 'company-backends 'company-dabbrev t)
-    (ymacs-editor//add-company-backend 'ymacs-org/company-symbols :main nil))
+    (add-to-list 'company-backends 'ymacs-org/company-symbols))
 
   (add-hook 'org-speed-command-hook #'ymacs-org/block-speed-command-activate))
 

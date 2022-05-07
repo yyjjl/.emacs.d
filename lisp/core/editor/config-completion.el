@@ -81,11 +81,6 @@
 
   (add-hook 'rfn-eshadow-update-overlay-hook #'ymacs-editor//vertico-directory-tidy)
 
-  (define-advice vertico--format-candidate (:around (-fn -cand -prefix -suffix -index -start) indexed)
-    (funcall -fn -cand
-             (concat (if (equal -index vertico--index) ">" " ") -prefix)
-             -suffix -index -start))
-
   (define-key! :map vertico-map
     ([remap delete-backward-char] . ymacs-editor/minibuffer-delete-char)
     ([remap backward-kill-word] . ymacs-editor/minibuffer-delete-word)
@@ -147,33 +142,7 @@
   (defun ymacs-editor//embark-which-key-indicator ()
     (lambda (&optional -keymap _targets -prefix)
       (unless (null -keymap)
-        (which-key--show-keymap
-         "Embark" (if -prefix (lookup-key -keymap -prefix) -keymap)
-         nil nil t))))
-
-  (define-advice embark-collect-snapshot (:override (&optional -initial-view) fix)
-    (when-let ((window (embark--collect "*Embark Collect*" -initial-view :snapshot))
-               (buffer (window-buffer window)))
-      (ymacs-editor//minibuffer-quit-and-run
-        (pop-to-buffer buffer))))
-
-  (define-advice embark-consult-export-occur (:around (-fn -lines) fix)
-    (let ((buffer (funcall -fn -lines)))
-      (with-current-buffer buffer
-        (setq revert-buffer-function
-              (lambda (_ignore1 _ignore2)
-                (user-error "buffer can not be reverted"))))
-      buffer))
-
-  (define-advice embark-consult-export-grep (:around (-fn -lines) fix)
-    (let ((buffer (funcall -fn -lines)))
-      (with-current-buffer buffer
-        (let ((map (copy-keymap (current-local-map))))
-          (define-key map "g" (lambda ()
-                                (interactive)
-                                (user-error "buffer can not be reverted")))
-          (use-local-map map)))
-      buffer))
+        (which-key--show-keymap "Embark" (if -prefix (lookup-key -keymap -prefix) -keymap) nil nil t))))
 
   (setq embark-indicators
         '(ymacs-editor//embark-which-key-indicator

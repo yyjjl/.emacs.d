@@ -192,7 +192,7 @@
   (when -value
     (setq package-selected-packages -value)))
 
-(setq package-quickstart t)
+;; (setq package-quickstart t)
 (setq package-native-compile t)
 (after! package
   (unless ymacs-package-use-gnutls-p

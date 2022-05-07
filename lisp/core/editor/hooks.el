@@ -147,7 +147,6 @@
   (global-so-long-mode 1)
 
   (avy-setup-default)
-  (ace-pinyin-global-mode 1)
   (ace-window-display-mode 1)
 
   (vertico-mode 1)

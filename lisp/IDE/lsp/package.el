@@ -7,14 +7,9 @@
           (const :tag "Disable LSP in current file" :disabled))
   :safe #'(lambda (x) (memq x '(:enabled :disabled))))
 
-(option! lsp-use-dap nil
-  "Where to use dap-mode"
-  :type 'boolean)
-
 (require-packages!
  lsp-mode
- consult-lsp
- dap-mode)
+ consult-lsp)
 
 (setq lsp-client-packages nil)
 
@@ -26,14 +21,3 @@
 (defvar-local ymacs-lsp-find-other-file-function nil)
 
 (defvar ymacs-lsp-install-buffer "*lsp-install*")
-
-(defvar ymacs-dap-running-session-mode-map
-  (let ((map (make-sparse-keymap)))
-    (suppress-keymap map)
-    (define-key map (kbd "C-c C-z") #'ymacs-dap/goto-repl-buffer)
-    (define-key map (kbd "C-c z") #'ymacs-dap/goto-repl-buffer)
-    map))
-
-(autoload 'ymacs-dap-running-session-mode (expand! "commands") nil t)
-(autoload 'ymacs-dap/goto-log-buffer (expand! "commands") nil t)
-(autoload 'ymacs-dap/goto-repl-buffer (expand! "commands") nil t)

@@ -7,31 +7,6 @@
       (setq x (cdr x)))
     x))
 
-(cl-defun ymacs-editor//add-company-backend
-    (-backend
-     &key
-     ((:main -main-backend-p) t)
-     ((:after -after) nil)
-     ((:remove-capf -remove-capf-p) t))
-  ;; deep copy the backends list
-  (let ((backends (mapcar (lambda (x) (if (consp x) (copy-sequence x) x))
-                          company-backends)))
-    (if -main-backend-p
-        (when-let (parent-of-main-backend (ymacs-editor//find-main-company-backend backends))
-          ;; remove -backend first
-          (setq backends (delete -backend backends))
-          ;; remove 'company-capf
-          (when -remove-capf-p
-            (setcar parent-of-main-backend
-                    (delete 'company-capf (car parent-of-main-backend))))
-          (if -after
-              (insert-after! -after -backend (car parent-of-main-backend))
-            (cl-pushnew -backend (car parent-of-main-backend))))
-      (if -after
-          (insert-after! -after -backend backends)
-        (cl-pushnew -backend backends)))
-    (setq-local company-backends backends)))
-
 (make-variable-buffer-local 'company-backends)
 (after! company
   (define-advice company-capf--candidates (:around (-fn &rest -args) set-completion-styles)
@@ -47,12 +22,7 @@
     ("M-n" . company-next-page)
     ("M-p" . company-previous-page))
 
-  (setq-default company-backends
-                `((company-capf :separate)
-                  ;; company-files
-                  ;; (company-dabbrev-code company-etags company-keywords)
-                  ;; company-dabbrev
-                  ))
+  (setq-default company-backends `(company-capf))
 
   (setq company-format-margin-function nil)
   ;; Company should be case sensitive
@@ -63,7 +33,6 @@
   (setq company-require-match nil)
   ;; (setq company-minimum-prefix-length 3)
   (setq company-tooltip-align-annotations t)
-  (setq company-auto-commit nil)
 
   (add-to-list
    'mode-line-misc-info
