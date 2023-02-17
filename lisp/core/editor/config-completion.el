@@ -84,7 +84,13 @@
   (define-key! :map vertico-map
     ([remap delete-backward-char] . ymacs-editor/minibuffer-delete-char)
     ([remap backward-kill-word] . ymacs-editor/minibuffer-delete-word)
+    ("M-9" . vertico-quick-jump)
     ("M-i" . vertico-insert)
+    ("M-n" . ymacs-editor//next-history-element)
+    ("M-o" . embark-act)
+    ("C-c C-o" . embark-export))
+
+  (define-key! :map minibuffer-mode-map
     ("M-n" . ymacs-editor//next-history-element)
     ("M-o" . embark-act)
     ("C-c C-o" . embark-export)))
@@ -114,6 +120,7 @@
   ;; replace `completing-read-multiple' with an enhanced version.
   (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
 
+  (setq completion-in-region-function #'consult-completion-in-region)
   ;; Use Consult to select xref locations with preview
   ;; (setq xref-show-xrefs-function #'consult-xref)
   ;; (setq xref-show-definitions-function #'consult-xref)
@@ -135,14 +142,44 @@
   (setq consult-narrow-key ">")
   (setq consult-project-root-function #'ymacs-editor//project-root-or-default)
 
-  (define-key! :map minibuffer-local-map
+  (define-key! :map minibuffer-mode-map
     ("C-r" . consult-history)))
 
 (after! embark
   (defun ymacs-editor//embark-which-key-indicator ()
-    (lambda (&optional -keymap _targets -prefix)
-      (unless (null -keymap)
-        (which-key--show-keymap "Embark" (if -prefix (lookup-key -keymap -prefix) -keymap) nil nil t))))
+    "An embark indicator that displays keymaps using which-key.
+The which-key help message will show the type and value of the
+current target followed by an ellipsis if there are further
+targets."
+    (lambda (&optional keymap targets prefix)
+      (if (null keymap)
+          (which-key--hide-popup-ignore-command)
+        (which-key--show-keymap
+         (if (eq (plist-get (car targets) :type) 'embark-become)
+             "Become"
+           (format "Act on %s '%s'%s"
+                   (plist-get (car targets) :type)
+                   (embark--truncate-target (plist-get (car targets) :target))
+                   (if (cdr targets) "…" "")))
+         (if prefix
+             (pcase (lookup-key keymap prefix 'accept-default)
+               ((and (pred keymapp) km) km)
+               (_ (key-binding prefix 'accept-default)))
+           keymap)
+         nil
+         nil
+         t
+         (lambda (binding) (not (string-suffix-p "-argument" (cdr binding))))))))
+
+
+  (defun ymacs-editor//embark-hide-which-key-indicator (-fn &rest -args)2
+    "Hide the which-key indicator immediately when using the completing-read prompter."
+    (which-key--hide-popup-ignore-command)
+    (let ((embark-indicators
+           (remq #'ymacs-editor//embark-which-key-indicator embark-indicators)))
+      (apply -fn -args)))
+
+  (advice-add #'embark-completing-read-prompter :around #'ymacs-editor//embark-hide-which-key-indicator)
 
   (setq embark-indicators
         '(ymacs-editor//embark-which-key-indicator

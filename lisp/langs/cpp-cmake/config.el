@@ -8,7 +8,8 @@
     ("C-c C" . ymacs-cpp-cmake/change-config)
     ("C-c D" . ymacs-cpp-cmake/config)
     ("C-c C-c" . ymacs-cpp-cmake/config-project)
-    ([f9] . ymacs-cpp-cmake/config-project)))
+    ([f9] . ymacs-cpp-cmake/config-project)
+    ([f10] . ymacs-cpp-cmake/run-build)))
 
 (define-minor-mode ymacs-cpp-cmake-mode
   "Use cmake build-system"

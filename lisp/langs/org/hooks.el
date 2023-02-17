@@ -1,6 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
-(after! ox
+(after! ox-publish
+  (advice-add #'org-publish-file :around #'without-user-record!!)
   (advice-add #'org-export-dispatch :around #'without-user-record!!))
 
 (after! ob
@@ -44,7 +45,9 @@
 
   (define-hook! ymacs-org//setup (org-mode-hook)
     (when buffer-file-name
-      (setq-local org-preview-latex-image-directory "auto/cache/"))
+      (setq-local org-download-image-dir
+                  (expand-file-name (format "assets/%s" (file-name-base (buffer-file-name)))))
+      (setq-local org-preview-latex-image-directory (expand-file-name "auto/cache/")))
 
     (auto-fill-mode -1)
     (eldoc-mode -1)
@@ -65,7 +68,6 @@
     (funcall -fn -source -attributes -info)))
 
 (after! ox-latex
-  (advice-add #'org-publish-file :around #'without-user-record!!)
   (advice-add #'org-latex-publish-to-pdf :around #'ymacs-org@wrap-publish-fn)
 
   (define-advice org-latex--label (:around (-fn -datum -info &optional -force -full) maybe-ignore-label)

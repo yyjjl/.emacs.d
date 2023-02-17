@@ -83,7 +83,8 @@
   (setq indicate-empty-lines t))
 
 (define-hook! ymacs-editor//generic-text-mode-setup (text-mode-hook)
-  (whitespace-mode 1)
+  (when (not (derived-mode-p 'org-mode))
+    (whitespace-mode 1))
 
   (ymacs-editor//generic-setup))
 

@@ -135,7 +135,7 @@ If STR is too large, pop it to a buffer instead."
                (cl-assert (not ymacs-lisp--in-special-mode) "already in special mode")
                (let ((ymacs-lisp--in-special-mode t))
                  ,@-body))
-           (scan-error
+           (error
             (message "ERROR: %s" err)
             (goto-char current-point))))
      (call-interactively #'self-insert-command)))
@@ -335,8 +335,10 @@ Otherwise (`backward-delete-char-untabify' ARG)."
      (when is-left
        (ymacs-lisp//different))
      (forward-list 1)
-     (when is-left
-       (ymacs-lisp//different)))))
+     (if is-left
+         (ymacs-lisp//different)
+       (unless (ymacs-lisp//right-p)
+         (user-error "no sexp found"))))))
 
 (defun ymacs-lisp/up ()
   (interactive)
@@ -346,8 +348,10 @@ Otherwise (`backward-delete-char-untabify' ARG)."
        (when is-right
          (ymacs-lisp//different))
        (backward-list 1)
-       (when is-right
-         (ymacs-lisp//different))))))
+       (if is-right
+           (ymacs-lisp//different)
+         (unless (ymacs-lisp//left-p)
+           (user-error "no sexp found")))))))
 
 (defun ymacs-lisp/right (-arg)
   "Call `up-list' with ARG unless in string or comment.

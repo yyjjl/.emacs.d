@@ -82,6 +82,7 @@ alias et='emacsclient -t -a ""'
 alias ec='emacsclient -c -a "" -n'
 alias ep='emacs --dump-file=$HOME/.emacs.d/.cache/emacs.pdmp'
 alias gnus='emacs --eval "(gnus)"'
+alias list_by_size='find -type f -printf "%s\t%p\n" | sort -nr'
 
 hash -d e=$HOME/.emacs.d
 hash -d d=$HOME/downloads

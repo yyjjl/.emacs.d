@@ -78,7 +78,7 @@
 
     ("M-s h h" . lsp-document-highlight)
     ("C-c R" . lsp-rename)
-    ("C-c D" . consult-lsp-diagnostics)
+    ("C-c d" . consult-lsp-diagnostics)
     ("C-c I" . consult-lsp-symbols)
     ("C-c S" . lsp-describe-session)
     ("C-c b" . ymacs-lsp/organize-imports)

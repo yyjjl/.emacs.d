@@ -34,6 +34,9 @@
     ("C-x , i" . org-toggle-inline-images)
     ("C-x , [" . org-next-block)
     ("C-x , ]" . org-previous-block)
+    ("C-c d d" . org-download-screenshot)
+    ("C-c d r" . org-download-rename-at-point)
+    ("C-c d l" . org-download-rename-last-file)
     ([f5] . ymacs-org/open)
     ([f9] . ymacs-org/publish-current-file)
     ([f10] . org-publish)
@@ -236,6 +239,9 @@
      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
      ("\\paragraph{%s}" . "\\paragraph*{%s}")
      ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+
+(after! org-download
+  (setq org-download-heading-lvl nil))
 
 (after! ox-publish
   (setq

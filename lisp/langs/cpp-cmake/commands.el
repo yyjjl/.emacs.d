@@ -65,6 +65,22 @@
      :callback (when -callback
                  (lambda (&rest _) (funcall -callback buffer))))))
 
+(defun ymacs-cpp-cmake/run-build ()
+  (interactive)
+  (unless ymacs-cpp-cmake-project-root
+    (user-error "CMakeLists.txt hasn't been found."))
+
+  (let* ((build-directory (ymacs-cpp-cmake//config-build))
+         (command (format "cmake --build %s" build-directory))
+         (default-directory ymacs-cpp-cmake-project-root))
+
+    (when (not (file-exists-p (or build-directory "")))
+      (user-error "Can not cd to build directory"))
+
+    (run-compilation!
+     :buffer-name (format "*CMake Build: %s*" ymacs-cpp-cmake-project-root)
+     :command command)))
+
 (defun ymacs-cpp-cmake//config-project--callback (-source-buffer)
   (with-current-buffer -source-buffer
     (let ((cdb-path (ymacs-cpp-cmake//cdb-path)))
