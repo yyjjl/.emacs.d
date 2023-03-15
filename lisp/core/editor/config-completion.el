@@ -117,8 +117,6 @@
   ;; tweak the register preview window.
   ;; This adds thin lines, sorting and hides the mode line of the window.
   (advice-add #'register-preview :override #'consult-register-window)
-  ;; replace `completing-read-multiple' with an enhanced version.
-  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
 
   (setq completion-in-region-function #'consult-completion-in-region)
   ;; Use Consult to select xref locations with preview
@@ -130,7 +128,7 @@
    ymacs-editor/consult-ripgrep-or-line
    :preview-key 'any
    consult-yank-pop
-   :preview-key (kbd "C-y")
+   :preview-key "C-y"
    consult-ripgrep
    :keymap ymacs-editor-ripgrep-map)
 
@@ -138,7 +136,7 @@
   (setq consult-async-input-debounce 0.2)
   (setq consult-async-input-throttle 0.2)
 
-  (setq consult-preview-key (kbd "C-l"))
+  (setq consult-preview-key "C-l")
   (setq consult-narrow-key ">")
   (setq consult-project-root-function #'ymacs-editor//project-root-or-default)
 

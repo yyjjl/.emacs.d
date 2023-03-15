@@ -50,7 +50,7 @@
 
 (defface ymacs-modeline-buffer-modified
   '((t (:inherit (error bold) :background nil)))
-  "Face used for the 'unsaved' symbol in the mode-line."
+  "Face used for the `'unsaved' symbol in the mode-line."
   :group 'mode-line-faces)
 
 (defface ymacs-modeline-buffer-major-mode
@@ -65,7 +65,7 @@
 
 (defface ymacs-modeline-panel
   '((t (:inherit mode-line-highlight)))
-  "Face for 'X out of Y' segments, such as `iedit', etc."
+  "Face for X out of Y segments, such as `iedit', etc."
   :group 'mode-line-faces)
 
 (defface ymacs-modeline-host

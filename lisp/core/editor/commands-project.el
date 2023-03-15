@@ -8,7 +8,7 @@
       (user-error "No project is found"))
     (setq ymacs-editor-project-cache (clrhash ymacs-editor-project-cache))
 
-    (dolist (buffer (project--buffer-list project))
+    (dolist (buffer (project-buffers project))
       (with-current-buffer buffer
         (vc-refresh-state)
         (cl-loop

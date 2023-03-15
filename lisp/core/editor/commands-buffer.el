@@ -30,7 +30,7 @@
 
 (defun ymacs-editor//move-buffer (-direction)
   "Helper function to move the current buffer to the window in the given
-   -direction (with must be 'up, 'down', 'left or 'right). An error is
+   -direction (with must be up, down, left or right). An error is
    thrown, if no window exists in this direction."
   (interactive)
 
@@ -54,7 +54,7 @@
 ;;;###autoload
 (defun ymacs-editor/move-buffer ()
   "Helper function to move the current buffer to the window in the given
-   -direction (with must be 'up, 'down', 'left or 'right). An error is
+   -direction (with must be up, down, left or right). An error is
    thrown, if no window exists in this direction."
   (interactive)
 

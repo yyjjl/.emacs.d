@@ -133,13 +133,11 @@
           (buffer-narrowed-p)
           (ignore-errors (file-remote-p buffer-file-name))
           (jka-compr-get-compression-info buffer-file-name)
-          (not (is-buffer-too-large!)))
+          (< buffer-saved-size (* 1024 1024)))
       (call-interactively #'consult-line)
-    (let ((consult-ripgrep-args
-           (concat (substring consult-ripgrep-args 0 (1- (length consult-ripgrep-args)))
-                   "--with-filename "
-                   (shell-quote-argument buffer-file-name))))
-      (call-interactively #'consult-ripgrep))))
+    (let* ((file-name (shell-quote-argument buffer-file-name))
+           (cmd-builder (lambda (_) (consult--ripgrep-make-builder (list file-name)))))
+      (consult--grep "Ripgrep" cmd-builder nil nil))))
 
 
 (defun ymacs-editor//ripgrep-default-alias ()

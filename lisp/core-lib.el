@@ -264,7 +264,7 @@ Argument -BODY is a group of sexps for defining -key bindings
 
 Example:
 
-    (with-local-minor-mode-map! 'abc-mode
+    (with-local-minor-mode-map! \\='abc-mode
       (define-key the-map ...)
       ...)"
   (declare (indent 1))
@@ -419,7 +419,7 @@ HTML file converted from org file, it returns t."
 (defsubst hack-dir-local-variables-for-project! ()
   (let ((project (project-current)))
     (dolist (buffer (or (when project
-                          (project--buffer-list project))
+                          (project-buffers project))
                         (buffer-list)))
       (with-current-buffer buffer
         (if (buffer-file-name)

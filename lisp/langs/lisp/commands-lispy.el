@@ -567,7 +567,7 @@ Self-insert otherwise."
              (forward-sexp 1)
              (cl-assert (ymacs-lisp//right-p) "Nothing to do")
              ;; delete )
-             (backward-delete-char 1))
+             (delete-char -1))
            ;; delete (
            (delete-char 1)
            (save-excursion
@@ -583,7 +583,7 @@ Self-insert otherwise."
            ;; delete (
            (delete-char 1))
          ;; delete )
-         (backward-delete-char 1)
+         (delete-char -1)
          (save-excursion
            (goto-char last-point)
            (ymacs-lisp//format-sexp)))))))

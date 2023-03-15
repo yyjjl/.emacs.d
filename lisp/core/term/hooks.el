@@ -13,7 +13,6 @@
     (user-error "can not send Ctrl-c"))
   (apply -fn -args))
 
-(advice-add #'vterm-send-C-c :around #'ymacs-term//around-Ctrl-c)
 (advice-add #'term-interrupt-subjob :around #'ymacs-term//around-Ctrl-c)
 (advice-add #'comint-interrupt-subjob :around #'ymacs-term//around-Ctrl-c)
 

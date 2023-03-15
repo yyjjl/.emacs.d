@@ -7,6 +7,7 @@ from glob import glob
 
 
 def run_cmd(cmd, **kwargs):
+    print('run_cmd', cmd)
     return subprocess.run(cmd, **kwargs).returncode == 0
 
 
@@ -124,9 +125,9 @@ class Installer(object):
         return run_cmd(['make', *args, 'install'])
 
     def configure(self, *args):
-        if os.path.exists('autogen.sh'):
-            if not run_cmd(['./autogen.sh']):
-                return False
+        # if os.path.exists('autogen.sh'):
+        #     if not run_cmd(['./autogen.sh']):
+        #         return False
 
         return run_cmd(['./configure', '--prefix={}'.format(self._prefix), *args])
 
