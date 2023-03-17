@@ -33,7 +33,7 @@
         (setq truncate-lines nil)
         (ymacs-python//enable-pdbtrack))))
 
-  (define-hook! ymacs-python//setup (python-mode-hook)
+  (define-hook! ymacs-python//setup (python-mode-hook python-ts-mode-hook)
     (setq electric-indent-chars (delq ?: electric-indent-chars))
 
     (when (file-remote-p default-directory)
@@ -49,7 +49,8 @@
       (with-transient-hook! (hack-local-variables-hook :local t)
         (ymacs-python//set-lsp-server)
         (when (and (is-buffer-suitable-for-coding!)
-                   (eq major-mode 'python-mode)
+                   (or (eq major-mode 'python-mode)
+                       (eq major-mode 'python-ts-mode))
                    (ymacs-lsp//try-enable python))
 
           (setq ymacs-lsp-format-buffer-function #'ymacs-python/autopep8)

@@ -245,7 +245,7 @@ Optional argument -ARG is used to toggle narrow functions."
                       (when (eq (char-syntax (char-after)) ?\))
                         (forward-char 1)
                         t)))))
-    (forward-sexp -n))
+    (forward-list -n))
 
    ((when-let (handlers (alist-get major-mode ymacs-editor-forward-sexp-handler))
       (let ((forward-fn (car handlers))

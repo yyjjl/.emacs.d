@@ -41,6 +41,10 @@
   (define-key! :map cmake-mode-map
     ([f10] . compile)))
 
+(after! cmake-ts-mode
+  (define-key! :map cmake-ts-mode-map
+    ([f10] . compile)))
+
 (eval-when-has-feature! lsp
   (after! lsp-cmake
     (ymacs-lsp//set-simple-install-fn

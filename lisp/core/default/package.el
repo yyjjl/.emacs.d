@@ -9,6 +9,10 @@
 (option! system-name nil
   :type 'stringp)
 
+(option! use-native-treesit
+    (and (fboundp 'treesit-available-p) (treesit-available-p))
+  :type 'boolean)
+
 (defvar ymacs-modeline-segment-alist ())
 (defvar ymacs-modeline-vcs-max-length 20
   "The maximum displayed length of the branch name of version control.")

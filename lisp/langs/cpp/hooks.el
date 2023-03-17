@@ -1,5 +1,11 @@
 ;; -*- lexical-binding:t -*-
 
+(after! c-ts-mode
+  (define-hook! ymacs-cpp//c-ts-mode-setup (c-ts-mode-hook c++-ts-mode-hook)
+    (when (boundp 'c-ts-mode-indent-offset)
+      (setq c-ts-mode-indent-offset 4))
+    (ymacs-cpp//cpp-setup)))
+
 (after! cc-mode
   (advice-add 'c-indent-line-or-region :around #'indent-for-tab-command@smart)
 

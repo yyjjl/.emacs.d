@@ -125,10 +125,8 @@ class Installer(object):
         return run_cmd(['make', *args, 'install'])
 
     def configure(self, *args):
-        # if os.path.exists('autogen.sh'):
-        #     if not run_cmd(['./autogen.sh']):
-        #         return False
-
+        if not os.path.exists('configure'):
+            assert run_cmd(['./autogen.sh'])
         return run_cmd(['./configure', '--prefix={}'.format(self._prefix), *args])
 
     def cmake(self, *args, build_dir='build'):
@@ -300,6 +298,15 @@ with Installer(prefix=ROOT_DIR) as installer:
     )
 
     installer.run(
+        'tree-sitter',
+        [download_from_github, 'tree-sitter/tree-sitter', 'tree-sitter'],
+        [os.chdir, 'tree-sitter'],
+        [subprocess.run, ['make']],
+        [subprocess.run,
+         ['make', 'install', 'PREFIX={}'.format(installer.prefix)]]
+    )
+
+    installer.run(
         'emacs',
         [download_from_github, 'emacs-mirror/emacs', 'emacs'],
         [os.chdir, 'emacs'],
@@ -307,12 +314,13 @@ with Installer(prefix=ROOT_DIR) as installer:
             installer.configure,
             '--with-json',
             '--with-libgmp=no',
-            '--with-native-compilation',
+            '--with-native-compilation=aot',
             '--with-x-toolkit=no',
             '--with-xpm=ifavailable',
             '--with-jpeg=ifavailable',
             '--with-gif=ifavailable',
-            '--with-tiff=ifavailable'
+            '--with-tiff=ifavailable',
+            '--with-tree-sitter'
         ],
         [installer.make]
     )

@@ -15,6 +15,7 @@
 /.cache
 /TODO
 /auto-save-list
+/tree-sitter
 /bin
 /custom.el
 /data

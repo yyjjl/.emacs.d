@@ -20,14 +20,16 @@
            return (expand-file-name name dir)))
 
 (defun ymacs-cpp//get-compile-command-from-dot-clangd ()
-  (when (memq major-mode '(c-mode c++-mode))
+  (when (memq major-mode '(c-mode c++-mode c-ts-mode c++-ts-mode))
     (when-let ((dot-clangd (ymacs-cpp//get-dot-clangd-path))
                (flags (replace-regexp-in-string "\n" " " (read-file-content! dot-clangd) t t)))
       (list
        (list (format "%s %s %s"
                      (cl-case major-mode
                        (c-mode "cc")
-                       (c++-mode "c++"))
+                       (c-ts-mode "cc")
+                       (c++-mode "c++")
+                       (c++-ts-mode "c++"))
                      flags
                      (buffer-file-name))
              default-directory)))))

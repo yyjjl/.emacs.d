@@ -148,8 +148,38 @@
   (setq info-lookup-other-window-flag nil))
 
 (after! eldoc
-  (when (fboundp 'eldoc-documentation-compose-eagerly)
-    (setq-default eldoc-documentation-function #'eldoc-documentation-compose-eagerly)))
+  (when (boundp 'eldoc-documentation-strategy)
+    (setq-default eldoc-documentation-strategy #'eldoc-documentation-enthusiast)))
+
+(after! treesit
+  (defsubst ymacs-editor//init-treesit-source (langs url-suffix-fmt &optional src)
+    (let ((url-fmt (concat "https://github.com/" url-suffix-fmt)))
+      (dolist (lang langs)
+        (add-to-list 'treesit-language-source-alist
+                     (if src
+                         (list lang (format url-fmt lang)  nil src nil nil)
+                       (list lang (format url-fmt lang)))))))
+
+  (ymacs-editor//init-treesit-source '(bash c cpp css java go html javascript json python rust) "tree-sitter/tree-sitter-%s")
+  (ymacs-editor//init-treesit-source '(typescript) "tree-sitter/tree-sitter-typescript" "typescript/src")
+  (ymacs-editor//init-treesit-source '(tsx) "tree-sitter/tree-sitter-typescript" "tsx/src")
+  (ymacs-editor//init-treesit-source '(cmake) "uyha/tree-sitter-cmake")
+  (ymacs-editor//init-treesit-source '(dockerfile) "camdencheek/tree-sitter-dockerfile")
+
+  (dolist (mode
+           '((c-mode          . c-ts-mode)
+             (c++-mode        . c++-ts-mode)
+             (css-mode        . css-ts-mode)
+             (cmake-mode      . cmake-ts-mode)
+             (dockerfile-mode . dockerfile-ts-mode)
+             (go-mode         . go-ts-mode)
+             (java-mode       . java-ts-mode)
+             (js-mode         . js-ts-mode)
+             (js-json-mode    . json-ts-mode)
+             (python-mode     . python-ts-mode)
+             (sh-mode         . bash-ts-mode)
+             (typescript-mode . typescript-ts-mode)))
+    (add-to-list 'major-mode-remap-alist mode)))
 
 (after! so-long
   ;; reduce false positives w/ larger threshold

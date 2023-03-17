@@ -133,7 +133,7 @@
           (buffer-narrowed-p)
           (ignore-errors (file-remote-p buffer-file-name))
           (jka-compr-get-compression-info buffer-file-name)
-          (< buffer-saved-size (* 1024 1024)))
+          (< buffer-saved-size (* 256 1024)))
       (call-interactively #'consult-line)
     (let* ((file-name (shell-quote-argument buffer-file-name))
            (cmd-builder (lambda (_) (consult--ripgrep-make-builder (list file-name)))))

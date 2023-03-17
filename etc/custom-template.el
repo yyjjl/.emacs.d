@@ -48,7 +48,6 @@
 (load-feature! core/debug)
 
 ;; (load-feature! IDE/lsp)
-;; (load-feature! IDE/tree-sitter)
 ;; (load-feature! IDE/childframe)
 
 (load-feature! tools/git)

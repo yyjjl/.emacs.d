@@ -6,7 +6,7 @@
 ;; store load-path
 (setq ymacs-dump-load-path load-path)
 
-(defvar ymacs-ignored-packages '(vterm auctex tree-sitter tree-sitter-langs tsc))
+(defvar ymacs-ignored-packages '(vterm auctex tsc))
 (defvar ymacs-preload-packages
   `(so-long
     edmacro

@@ -17,6 +17,12 @@
 (dolist (hook '(lisp-mode-hook scheme-mode-hook lisp-data-mode-hook))
   (add-hook hook #'ymacs-lisp//common-setup))
 
+(after! macrostep
+  (define-hook! ymacs-lisp//setup-macrostep (macrostep-mode-hook)
+    (if macrostep-mode
+        (ymacs-lisp-minor-mode -1)
+      (ymacs-lisp-minor-mode 1))))
+
 (after! auto-compile
   (define-advice auto-compile-byte-compile (:around (-fn &optional -file -start) native)
     (when (and (funcall -fn -file -start)

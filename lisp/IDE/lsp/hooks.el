@@ -10,8 +10,6 @@
            (mapc #'ymacs-lsp//clear-leak-handlers (hash-table-values lsp-clients)))))
 
   (define-hook! ymacs-lsp|after-open (lsp-after-open-hook)
-    (remove-function (local 'eldoc-documentation-function) #'lsp-eldoc-function)
-
     (remove-hook 'eldoc-documentation-functions #'flymake-eldoc-function t)
     (add-hook 'eldoc-documentation-functions #'flymake-eldoc-function -20 t)
 
