@@ -1,6 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
-(option! python-auto-activate-venv nil
+(option! python-auto-activate-venv t
   :type 'boolean
   :safe #'booleanp)
 
@@ -13,7 +13,7 @@
 (executable! ipython3)
 (executable! pylint)
 
-(defvar ymacs-python-lsp-servers '(pyls pyright))
+(defvar ymacs-python-lsp-servers '(pyls pyright pylance))
 
 (defvar-local ymacs-python--last-buffer nil
   "Help keep track of python buffer when changing to pyshell.")
@@ -43,7 +43,13 @@
    'pyls
    :package 'lsp-pyls
    :enable-fn (lambda () (eq ymacs-python-lsp-server 'pyls)))
+
   (ymacs-lsp//register-client
    'pyright
    :package 'lsp-pyright
-   :enable-fn (lambda () (eq ymacs-python-lsp-server 'pyright))))
+   :enable-fn (lambda () (eq ymacs-python-lsp-server 'pyright)))
+
+  (ymacs-lsp//register-client
+   'pylance
+   :package 'lsp-pyright
+   :enable-fn (lambda () (eq ymacs-python-lsp-server 'pylance))))

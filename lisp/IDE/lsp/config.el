@@ -80,6 +80,7 @@
     ("C-c R" . lsp-rename)
     ("C-c d" . consult-lsp-diagnostics)
     ("C-c I" . consult-lsp-symbols)
+    ("C-c E" . ymacs-lsp/open-remote-stderr)
     ("C-c S" . lsp-describe-session)
     ("C-c b" . ymacs-lsp/organize-imports)
     ("C-c C-b" . ymacs-lsp/format-buffer)

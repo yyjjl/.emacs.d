@@ -27,6 +27,7 @@
     ("M-5" . ymacs-editor/aw-select-window)
     ("M-6" . ymacs-editor/aw-select-window)
     ("M-}" . ymacs-term/next)
+    ("M-:" . eval-expression)
     ("M-{" . ymacs-term/prev)
     ("M-o" . ymacs-term/switch)
     ("M-N" . ymacs-term/set-extra-name)

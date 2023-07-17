@@ -53,28 +53,7 @@
             (ymacs-term-extra-name (": " ymacs-term-extra-name)))))
 
   (define-advice vterm--set-title (:override (title) set-suffix)
-    (setq ymacs-term-extra-name title))
-
-  (define-advice vterm--self-insert (:override () fix)
-    "Sends invoking key to libvterm. Fix meta key error in terminal"
-    (interactive)
-    (when vterm--term
-      (let* ((modifiers
-              (event-modifiers
-               (or (and (not (display-graphic-p))
-                        (ignore-errors
-                          (->> (seq-subseq (nreverse (recent-keys t)) 1)
-                               (seq-take-while (lambda (x) (not (consp x))))
-                               nreverse
-                               key-description
-                               kbd
-                               listify-key-sequence)))
-                   last-input-event)))
-             (shift (memq 'shift modifiers))
-             (meta (memq 'meta modifiers))
-             (ctrl (memq 'control modifiers)))
-        (when-let ((key (key-description (vector (event-basic-type last-input-event)))))
-          (vterm-send-key key shift meta ctrl))))))
+    (setq ymacs-term-extra-name title)))
 
 (after! comint
   (add-hook 'comint-exec-hook #'ymacs-term//sentinel-setup)

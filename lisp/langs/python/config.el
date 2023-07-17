@@ -28,8 +28,6 @@
     (setq lsp-pyright-typechecking-mode "off")))
 
 (after! python
-  (pyvenv-mode 1)
-
   (define-key! :map comint-mode-map
     ([f5] . ymacs-python/toggle-pdbtrack))
 

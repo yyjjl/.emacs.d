@@ -2,11 +2,17 @@
 
 (eval-when-has-feature! lsp
   (defsubst ymacs-lsp//set-lsp-signature-width ()
-    (setq lsp-signature-posframe-params
-          (plist-put lsp-signature-posframe-params
-                     :width (max 60 (min (/ (frame-width) 2) (window-width))))))
+    (let ((width (min (/ (frame-width) 2) (window-width)))
+          (height (if (numberp lsp-signature-doc-lines)
+                      lsp-signature-doc-lines
+                    nil)))
+      (setq lsp-signature-posframe-params
+            (plist-put (plist-put lsp-signature-posframe-params :width width) :height height))))
 
   (after! lsp-mode
+    (setq lsp-signature-posframe-params
+          (plist-put lsp-signature-posframe-params :height 4))
+
     (define-hook! ymacs-lsp//set-lsp-signature-frame-params (lsp-signature-mode-hook)
       (setq lsp-signature-function
             (if (display-graphic-p)

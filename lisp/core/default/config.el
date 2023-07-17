@@ -95,6 +95,8 @@
 ;; be quiet at startup; don't load or display anything unnecessary
 (setq inhibit-startup-screen t)
 (setq inhibit-startup-echo-area-message t)
+;; make sure lsp work over tramp
+(setq inhibit-eol-conversion t)
 ;; (setq initial-major-mode 'fundamental-mode)
 (setq initial-scratch-message
       (format ";; Welcome to Emacs %s %s !!!"

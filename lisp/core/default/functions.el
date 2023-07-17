@@ -414,6 +414,16 @@ like the scratch buffer where knowing the current project directory is important
         (setq ymacs-modeline--lsp-state
               (format-mode-line (assoc 'lsp-mode minor-mode-alist)))))))
 
+(ymacs-modeline//def-segment buffer-position
+  "The buffer position information."
+  '(line-number-mode
+    ((column-number-mode " %l:%c" " %l") " " mode-line-percent-position)
+    ((column-number-mode (t " %c " mode-line-percent-position)))))
+
+;;
+;;* Position
+;;
+
 (ymacs-modeline//def-segment misc-info
   "Mode line construct for miscellaneous information.
 By default, this shows the information specified by `global-mode-string'."
@@ -422,21 +432,19 @@ By default, this shows the information specified by `global-mode-string'."
    mode-line-misc-info
    ymacs-modeline--vcs-state
    ymacs-modeline--lsp-state
+   (when (and (boundp 'python-shell-virtualenv-root)
+	      (stringp python-shell-virtualenv-root)
+              (not (string-empty-p python-shell-virtualenv-root)))
+     (propertize
+      (concat "["
+              (file-name-base (directory-file-name python-shell-virtualenv-root))
+              "]")
+      'face 'font-lock-string-face))
    (unless (eq (selected-window)
                (active-minibuffer-window))
      (propertize
       (concat " " (or ymacs-modeline--project-parent-path default-directory))
       'face 'font-lock-doc-face))))
-
-;;
-;;* Position
-;;
-
-(ymacs-modeline//def-segment buffer-position
-  "The buffer position information."
-  '(line-number-mode
-    ((column-number-mode " %l:%c" " %l") " " mode-line-percent-position)
-    ((column-number-mode (t " %c " mode-line-percent-position)))))
 
 ;;
 ;;* Debug
@@ -446,7 +454,7 @@ By default, this shows the information specified by `global-mode-string'."
   "The current debug state."
   (let ((edebug (bound-and-true-p edebug-mode)))
     (propertize
-     (concat (when compilation-in-progress "[Compiling] ")
+     (concat (when (bound-and-true-p compilation-in-progress) "[Compiling] ")
              (when edebug "Edebug ")
              (when debug-on-error "On-Error ")
              (when debug-on-quit "On-Quit "))

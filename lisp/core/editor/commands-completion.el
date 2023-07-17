@@ -32,9 +32,15 @@
   (ymacs-editor//set-ripgrep-field 3 -directory))
 
 (defsubst ymacs-editor//ripgrep-working-directory ()
-  (or (ymacs-editor//ripgrep-directory)
-      ymacs-editor-search-directory
-      (ymacs-editor//project-root-or-default)))
+  (let ((remote-host (file-remote-p default-directory))
+        (working-directory (or (ymacs-editor//ripgrep-directory)
+                               ymacs-editor-search-directory
+                               (ymacs-editor//project-root-or-default))))
+    (if (file-remote-p working-directory)
+        working-directory
+      (if remote-host
+          (concat remote-host working-directory)
+        working-directory))))
 
 
 
@@ -127,17 +133,26 @@
     (call-interactively #'backward-kill-word)))
 
 ;;;###autoload
-(defun ymacs-editor/consult-ripgrep-or-line ()
-  (interactive)
-  (if (or (not buffer-file-name)
-          (buffer-narrowed-p)
-          (ignore-errors (file-remote-p buffer-file-name))
-          (jka-compr-get-compression-info buffer-file-name)
-          (< buffer-saved-size (* 256 1024)))
-      (call-interactively #'consult-line)
-    (let* ((file-name (shell-quote-argument buffer-file-name))
+(defun ymacs-editor/consult-ripgrep-or-line (-arg)
+  (interactive "p")
+
+  (cond
+   ((equal -arg 16)
+    (isearch-mode t t))
+   ((equal -arg 0)
+    (isearch-mode nil t))
+   ((or (not buffer-file-name)
+        (buffer-narrowed-p)
+        (let ((sys (coding-system-plist buffer-file-coding-system)))
+          (not (memq (plist-get sys :category)
+                     '(coding-category-undecided coding-category-utf-8))))
+        (jka-compr-get-compression-info buffer-file-name)
+        (< buffer-saved-size (* 256 1024)))
+    (call-interactively #'consult-line))
+   (t
+    (let* ((file-name (or (file-remote-p buffer-file-name 'localname) buffer-file-name))
            (cmd-builder (lambda (_) (consult--ripgrep-make-builder (list file-name)))))
-      (consult--grep "Ripgrep" cmd-builder nil nil))))
+      (consult--grep "Ripgrep" cmd-builder nil nil)))))
 
 
 (defun ymacs-editor//ripgrep-default-alias ()

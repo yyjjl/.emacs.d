@@ -102,12 +102,13 @@
     (when (eq imenu-create-index-function #'semantic-create-imenu-index)
       (semantic-fetch-tags)))
 
-  (define-advice consult--command-builder (:around (-fn -builder) display-command)
-    (let ((cmd-fn (funcall -fn -builder)))
-      (lambda (input)
-        (let ((cmd (funcall cmd-fn input)))
-          (ymacs-editor//display-help nil (string-join cmd " "))
-          cmd))))
+  (define-advice consult--async-process (:around (-fn -async -builder &rest -props) display-command)
+    (let ((new-builder
+           (lambda (action)
+             (let ((cmd (funcall -builder action)))
+               (ymacs-editor//display-help nil (string-join (car cmd) " "))
+               cmd))))
+      (apply -fn -async new-builder -props)))
 
   ;;  configure the register formatting. This improves the register
   ;; preview for `consult-register', `consult-register-load',

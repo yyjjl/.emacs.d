@@ -93,7 +93,7 @@
   (setq org-special-ctrl-k t)
   (setq org-special-ctrl-o t)
 
-  (setq org-catch-invisible-edits 'smart)
+  (setq org-fold-catch-invisible-edits 'smart)
   ;; Number of empty lines needed to keep an empty line between collapsed
   ;; trees.
   (setq org-cycle-separator-lines 2)
@@ -185,7 +185,7 @@
         '("latexmk -g -pdf -dvi- -ps- -pdflatex=\"xelatex -shell-escape -interaction=nonstopmode %%O %%S\" -outdir=%o %f"))
 
   ;; Use minted
-  (setq org-latex-listings 'minted)
+  (setq org-latex-src-block-backend 'minted)
   (setq org-latex-prefer-user-labels t)
   (setq org-latex-default-class "cn-article")
   (setq org-latex-packages-alist
