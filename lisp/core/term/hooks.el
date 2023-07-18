@@ -64,6 +64,7 @@
     ;; But don't show trailing whitespace in SQLi, inf-ruby etc.
     (setq show-trailing-whitespace nil)
     (setq-local company-idle-delay nil)
+    (setq-local yas-buffer-local-condition nil)
 
     (local-set-key [remap completion-at-point] #'company-complete)
 
