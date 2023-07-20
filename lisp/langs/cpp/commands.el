@@ -30,7 +30,7 @@
         (lsp-format-region (car bounds) (cdr bounds))
       (message "No sexp or defun found, please use C-u prefix")))))
 
-
+;;;###autoload
 (defun ymacs-cpp//select-clangd-by-version ()
   (interactive)
   (let (versions)
@@ -46,18 +46,3 @@
     (custom-set-variables
      `(lsp-clangd-version ,(completing-read! "Select clangd version:" (nreverse (sort versions #'string<)))))
     (custom-save-all)))
-
-
-;;;###autoload
-(defun ymacs-cpp/update-clangd ()
-  (interactive)
-  (let ((default-directory (expand-etc! "setup")))
-    (run-compilation!
-     :name "update-clangd"
-     :command "python3 update_clangd.py"
-     :callback
-     (lambda (_)
-       (ymacs-cpp//select-clangd-by-version))
-     :error-callback
-     (lambda (msg)
-       (message "ERROR %s" msg)))))
