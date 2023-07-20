@@ -52,20 +52,6 @@
                  (eq ?/ (char-before (- (point) 2)))))
     (delete-region (overlay-start rfn-eshadow-overlay) (overlay-end rfn-eshadow-overlay))))
 
-(defun ymacs-editor/consult-ripgrep-or-line ()
-  (interactive)
-  (if (or (not buffer-file-name)
-          (buffer-narrowed-p)
-          (ignore-errors (file-remote-p buffer-file-name))
-          (jka-compr-get-compression-info buffer-file-name)
-          (not (is-buffer-too-large!)))
-      (call-interactively #'consult-line)
-    (let ((consult-ripgrep-args
-           (concat (substring consult-ripgrep-args 0 (1- (length consult-ripgrep-args)))
-                   "--with-filename "
-                   (shell-quote-argument buffer-file-name))))
-      (call-interactively #'consult-ripgrep))))
-
 (after! marginalia
   (dolist (catogory '(command function variable file))
     (setf (alist-get catogory marginalia-annotator-registry) '(builtin))))

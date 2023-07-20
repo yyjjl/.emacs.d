@@ -2,11 +2,62 @@
 
 import logging
 import os
+import platform
 import shutil
+
+import requests
 
 logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(os.path.basename(__file__))
+
+def get_system_type():
+    system_type = platform.platform().lower()
+    if system_type.startswith('linux'):
+        return 'linux'
+    if system_type.startswith('macos'):
+        return 'macos'
+    return system_type
+
+def get_github_release_info(owner, repo):
+    url = 'https://api.github.com/repos/{owner}/{repo}/releases/latest'.format(
+        owner=owner,
+        repo=repo
+    )
+    return requests.get(url).json()
+
+def download_github_assets(owner, repo, output_dir, filter_fn):
+    release_info = get_github_release_info(owner, repo)
+
+    output_files = []
+    for asset_info in release_info['assets']:
+        if not filter_fn(asset_info):
+            continue
+
+        name = asset_info['name']
+        url = asset_info['browser_download_url']
+
+        path = os.path.join(output_dir, name)
+        if os.path.exists(path):
+            output_files.append(path)
+            print(f'INFO {path} exists')
+            continue
+
+        try:
+            rsp = requests.get(url, stream=True)
+            with open(path, 'wb') as fp:
+                for data in rsp.iter_content(1024):
+                    fp.write(data)
+
+            output_files.append(path)
+        except:
+            try:
+                os.unlink(path)
+            except:
+                pass
+            raise
+
+    return output_files
 
 
 def run_command(command, strict=True, directory=None):
