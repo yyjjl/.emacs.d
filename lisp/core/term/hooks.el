@@ -19,7 +19,7 @@
 (after! compile
   (define-hook! (ymacs-popup//compilation-finish-hook -buffer _) (compilation-finish-functions)
     (when (buffer-live-p -buffer)
-      (ymacs-term//set-quit-keys)))
+      (ymacs-term//set-quit-keys t)))
 
   (define-hook! ymacs-term//compilation-setup (compilation-mode-hook)
     (setq mode-line-buffer-identification

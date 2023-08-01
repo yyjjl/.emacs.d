@@ -26,7 +26,7 @@
 
 (after! python
   (define-hook! ymacs-python//shell-exec-hook (ymacs-term-shell-exec-hook)
-    (when ymacs-python-auto-activate-venv-p
+    (when (and ymacs-python-auto-activate-venv-p python-shell-virtualenv-root)
       (if (and (stringp python-shell-virtualenv-root)
                (if-let ((remote-host (file-remote-p default-directory)))
                    (file-directory-p (concat remote-host python-shell-virtualenv-root))
@@ -66,12 +66,13 @@
                          (eq major-mode 'python-ts-mode))
                      (ymacs-lsp//try-enable python))
 
+            (when (and remote-host python-shell-virtualenv-root)
+              (let ((exe (expand-file-name python-shell-interpreter
+                                           (concat python-shell-virtualenv-root "/bin"))))
+                (setq-local python-shell-interpreter exe)))
+
             (setq lsp-pyright-python-executable-cmd python-shell-interpreter)
-            (when remote-host
-              (when python-shell-virtualenv-root
-                (let ((exe (expand-file-name python-shell-interpreter
-                                             (concat python-shell-virtualenv-root "/bin"))))
-                  (setq-local python-shell-interpreter exe))))
+            (setq lsp-pyright-venv-path python-shell-virtualenv-root)
 
             (setq ymacs-lsp-format-buffer-function #'ymacs-python/autopep8)
             (setq ymacs-lsp-organize-import-function #'py-isort-buffer))))))

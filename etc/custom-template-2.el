@@ -24,8 +24,7 @@
    '(("byteide" . "/bin/bash")
      ("ts" . "/bin/bash")
      ("m2" . "/usr/bin/zsh")
-     ("m1" . "/bin/bash")))
- '(ymacs-use-native-treesit-p nil))
+     ("m1" . "/bin/bash"))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

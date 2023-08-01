@@ -176,9 +176,13 @@
              (python-mode     . python-ts-mode)
              (sh-mode         . bash-ts-mode)
              (typescript-mode . typescript-ts-mode)))
-    (unless ymacs-use-native-treesit-p
-      (setq mode (cons (cdr mode) (car mode))))
-    (add-to-list 'major-mode-remap-alist mode)))
+    (let ((original-mode (car mode))
+          (ts-mode (cdr mode)))
+      (unless (memq original-mode ymacs-native-treesit-modes)
+        (setq mode (cons ts-mode original-mode)))
+
+      (setq major-mode-remap-alist (assq-delete-all (cdr mode) major-mode-remap-alist))
+      (add-to-list 'major-mode-remap-alist mode))))
 
 (after! so-long
   ;; reduce false positives w/ larger threshold

@@ -121,6 +121,7 @@
   (setq consult-async-refresh-delay 0.1)
   (setq consult-async-input-debounce 0.2)
   (setq consult-async-input-throttle 0.2)
+  (setq consult-fontify-max-size (* 1024 16))
 
   (setq consult-preview-key "C-l")
   (setq consult-narrow-key ">")
