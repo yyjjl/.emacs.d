@@ -103,6 +103,7 @@
   ;; (setq lsp-eldoc-render-all nil)
   (setq lsp-display-inline-image nil)
 
+  (setq lsp-imenu-index-function #'lsp-imenu-create-categorized-index)
   ;; (setq lsp-enable-imenu t)
   ;; (setq lsp-enable-links t)
   ;; (setq lsp-enable-xref t)

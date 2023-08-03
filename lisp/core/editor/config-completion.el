@@ -99,6 +99,7 @@
   (require 'embark-consult)
 
   (define-advice consult-imenu--items (:before () refresh)
+    (setq imenu-max-item-length (max 80 (- (frame-width) 20)))
     (when (eq imenu-create-index-function #'semantic-create-imenu-index)
       (semantic-fetch-tags)))
 
@@ -135,6 +136,7 @@
   (setq consult-async-refresh-delay 0.1)
   (setq consult-async-input-debounce 0.2)
   (setq consult-async-input-throttle 0.2)
+  (setq consult-fontify-max-size (* 1024 16))
 
   (setq consult-preview-key "C-l")
   (setq consult-narrow-key ">")
