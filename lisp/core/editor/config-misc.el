@@ -116,10 +116,7 @@
           (and (normal-backup-enable-predicate name)
                (not (file-remote-p name 'method)))))
   (setq tramp-chunksize 8192)
-  (setq tramp-verbose 1)
-  ;; @see https://github.com/syl20bnr/spacemacs/issues/1921
-  (setq tramp-ssh-controlmaster-options
-        "-o ControlMaster=auto -o ControlPath='tramp.%%C' -o ControlPersist=no"))
+  (setq tramp-verbose 2))
 
 (after! view
   (define-key! :map view-mode-map
@@ -179,7 +176,13 @@
              (python-mode     . python-ts-mode)
              (sh-mode         . bash-ts-mode)
              (typescript-mode . typescript-ts-mode)))
-    (add-to-list 'major-mode-remap-alist mode)))
+    (let ((original-mode (car mode))
+          (ts-mode (cdr mode)))
+      (unless (memq original-mode ymacs-native-treesit-modes)
+        (setq mode (cons ts-mode original-mode)))
+
+      (setq major-mode-remap-alist (assq-delete-all (cdr mode) major-mode-remap-alist))
+      (add-to-list 'major-mode-remap-alist mode))))
 
 (after! so-long
   ;; reduce false positives w/ larger threshold

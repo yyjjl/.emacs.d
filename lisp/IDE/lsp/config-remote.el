@@ -4,7 +4,7 @@
   (require 'tramp)
   (require 'lsp-mode))
 
-(option! lsp-remote-server-install-dir "~/program/lsp"
+(option! lsp-remote-server-install-dir "~/.emacs.d/.cache/lsp"
   "remote lsp server install directory"
   :type 'string)
 
@@ -21,11 +21,13 @@
 (defsubst ymacs-lsp//remote-server-command-path (-relative-path)
   (file-local-name (ymacs-lsp//remote-server-command-path-nonlocal -relative-path)))
 
+(defsubst ymacs-lsp//get-remote-stderr (-name &optional -index)
+  (format "~/tmp/%s-%s-stderr" -name (or -index lsp--stderr-index)))
+
 (defun ymacs-lsp//tramp-connection (-local-command)
   (let ((ret (lsp-tramp-connection
               -local-command
-              (lambda (name)
-                (format "~/tmp/%s-%s-stderr" name (cl-incf lsp--stderr-index))))))
+              (lambda (name) (ymacs-lsp//get-remote-stderr name (cl-incf lsp--stderr-index))))))
     (list
      :connect (plist-get ret :connect)
      :test? (lambda () t))))

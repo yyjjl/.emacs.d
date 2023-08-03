@@ -65,17 +65,6 @@
                (funcall -matcher url))
      return url)))
 
-(defun ymacs-lsp//make-download-from-github-fn (-repo -matcher &optional -decompress)
-  (lambda (_client -callback -error-callback _update?)
-    (if-let (url (ymacs-lsp//get-latest-url-from-github -repo -matcher))
-        (lsp-download-install
-         -callback
-         -error-callback
-         :url url
-         :store-path lsp-server-install-dir
-         :decompress -decompress)
-      (funcall -error-callback (format "Can't not find download url for %s" -repo)))))
-
 (cl-defun ymacs-lsp//register-client
     (-client &key ((:package -package)) ((:enable-fn -enable-fn)))
   (add-to-list 'lsp-client-packages -package)
@@ -101,13 +90,9 @@
                  (:tgz "tgz")
                  (:7z "7z")
                  (:py "py")
+                 (:zip "zip")
                  (_ "wget"))))
-
     (lsp--info "Starting to download %s to %s..." url store-path)
     (lsp-async-start-process
      -callback -error-callback
-     "bash"
-     (expand-etc! "scripts/install_from_url")
-     type
-     url
-     store-path)))
+     "bash" (expand-etc! "scripts/install_from_url") type url store-path)))

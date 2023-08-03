@@ -20,6 +20,7 @@
     ("C-c C-k" . vterm-copy-mode))
 
   (define-key! :map vterm-mode-map
+    ("M-0" . ymacs-editor/goto-char-or-minibuffer)
     ("M-1" . ymacs-editor/aw-select-window)
     ("M-2" . ymacs-editor/aw-select-window)
     ("M-3" . ymacs-editor/aw-select-window)
@@ -27,6 +28,7 @@
     ("M-5" . ymacs-editor/aw-select-window)
     ("M-6" . ymacs-editor/aw-select-window)
     ("M-}" . ymacs-term/next)
+    ("M-:" . eval-expression)
     ("M-{" . ymacs-term/prev)
     ("M-o" . ymacs-term/switch)
     ("M-N" . ymacs-term/set-extra-name)

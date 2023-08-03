@@ -609,18 +609,19 @@ Self-insert otherwise."
 (defun ymacs-lisp/beginning-of-defun ()
   "Forward to `beginning-of-defun' with ARG"
   (interactive)
-  (let ((stored-point (get 'ymacs-lisp/beginning-of-defun 'stored-point)))
-    (if (and stored-point
-             (numberp stored-point)
-             (and
-              (> stored-point (point))
-              (<= stored-point (save-excursion (forward-list) (point)))))
-        (progn
-          (put 'ymacs-lisp/beginning-of-defun 'stored-point nil)
-          (goto-char stored-point))
-      (cl-assert (not (looking-at "^(")) "already at beginning-of-defun")
-      (put 'ymacs-lisp/beginning-of-defun 'stored-point (point))
-      (beginning-of-defun))))
+  (ymacs-lisp//run-body-or-self-insert
+   (let ((stored-point (get 'ymacs-lisp/beginning-of-defun 'stored-point)))
+     (if (and stored-point
+              (numberp stored-point)
+              (and
+               (> stored-point (point))
+               (<= stored-point (save-excursion (forward-list) (point)))))
+         (progn
+           (put 'ymacs-lisp/beginning-of-defun 'stored-point nil)
+           (goto-char stored-point))
+       (cl-assert (not (looking-at "^(")) "already at beginning-of-defun")
+       (put 'ymacs-lisp/beginning-of-defun 'stored-point (point))
+       (beginning-of-defun)))))
 
 (defun ymacs-lisp/space ()
   (interactive)

@@ -144,12 +144,12 @@ class Installer(object):
         finally:
             os.chdir(src_dir)
 
-    def download_gnu_software(self, name, version, ext):
+    def download_software(self, name, version, ext, fmt):
         directory = '{}-{}'.format(name, version)
-        save_path = os.path.join(
-            self._cache_path, '{}.{}'.format(directory, ext))
+        save_path = os.path.join(self._cache_path, '{}.{}'.format(directory, ext))
 
-        url = 'http://ftp.gnu.org/gnu/{}/{}.{}'.format(name, directory, ext)
+        url = fmt.format(name=name, version=version, ext=ext)
+
         if ext == 'tar.gz':
             opt = '-zxf'
         elif ext == 'tar.xz':
@@ -158,6 +158,10 @@ class Installer(object):
             opt = '-xf'
 
         return download_and_uncompress(url, save_path, opt)
+
+    def download_gnu_software(self, name, version, ext):
+        fmt = 'http://ftp.gnu.org/gnu/{name}/{name}-{version}.{ext}'
+        return self.download_software(name, version, ext, fmt)
 
     def download_gnutls(self, version):
         save_path = os.path.join(
@@ -222,6 +226,7 @@ GNU_SOFTWARES = [
 GNUTLS = ('3.6', '16')
 GCC = '11.1.0'
 CMAKE = '3.21.0'
+ZLIB = '1.2.13'
 
 PYTHON_URL = 'https://www.python.org/ftp/python/3.9.7/Python-3.9.7.tgz'
 
@@ -249,6 +254,14 @@ with Installer(prefix=ROOT_DIR) as installer:
             [installer.configure, *cmd_args],
             [installer.make],
         )
+
+    installer.run(
+        'zlib',
+        [installer.download_software, 'zlib', ZLIB, 'tar.gz', 'http://www.zlib.net/{name}-{version}.{ext}'],
+        [os.chdir, 'zlib-{}'.format(ZLIB)],
+        [installer.configure],
+        [installer.make],
+    )
 
     installer.run(
         'gnutls',
@@ -314,7 +327,7 @@ with Installer(prefix=ROOT_DIR) as installer:
             installer.configure,
             '--with-json',
             '--with-libgmp=no',
-            '--with-native-compilation=aot',
+            '--with-native-compilation=yes',
             '--with-x-toolkit=no',
             '--with-xpm=ifavailable',
             '--with-jpeg=ifavailable',

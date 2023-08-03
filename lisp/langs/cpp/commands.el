@@ -29,3 +29,20 @@
                         (bounds-of-thing-at-point 'defun)))
         (lsp-format-region (car bounds) (cdr bounds))
       (message "No sexp or defun found, please use C-u prefix")))))
+
+;;;###autoload
+(defun ymacs-cpp//select-clangd-by-version ()
+  (interactive)
+  (let (versions)
+    (dolist (path (directory-files (expand-cache! "lsp/clangd") :full))
+      (let ((basename (file-name-nondirectory path)))
+        (unless (or (equal basename ".")
+                    (equal basename "..")
+                    (not (file-directory-p path)))
+          (let ((parts (split-string basename "_")))
+            (when (and (equal (length parts) 2)
+                       (equal (nth 0 parts) "clangd"))
+              (push (nth 1 parts) versions))))))
+    (custom-set-variables
+     `(lsp-clangd-version ,(completing-read! "Select clangd version:" (nreverse (sort versions #'string<)))))
+    (custom-save-all)))

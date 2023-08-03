@@ -53,13 +53,14 @@ will close some features to speed up emacs performance")
 (setq package-enable-at-startup nil)
 
 ;; Faster to disable these here (before they've been initialized)
-(unless sys/macp
-  ;; Inhibit resizing frame
-  (setq frame-inhibit-implied-resize t)
+;; Inhibit resizing frame
+(setq frame-inhibit-implied-resize t)
 
-  (push '(menu-bar-lines . 0) default-frame-alist)
-  (push '(tool-bar-lines . 0) default-frame-alist)
-  (push '(vertical-scroll-bars . nil) default-frame-alist)
+(push '(menu-bar-lines . 0) default-frame-alist)
+(push '(tool-bar-lines . 0) default-frame-alist)
+(push '(vertical-scroll-bars . nil) default-frame-alist)
+
+(unless sys/macp
   (push '(undecorated . t) default-frame-alist))
 
 ;; disable native-compile during setup

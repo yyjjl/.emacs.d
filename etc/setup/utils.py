@@ -4,9 +4,53 @@ import logging
 import os
 import shutil
 
+import requests
+
 logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(os.path.basename(__file__))
+
+def download_url(url, output_file):
+    try:
+        rsp = requests.get(url, stream=True)
+        with open(output_file, 'wb') as fp:
+            for data in rsp.iter_content(1024):
+                fp.write(data)
+    except:
+        try:
+            os.unlink(output_file)
+        except:
+            pass
+        raise
+
+def get_github_release_info(owner, repo):
+    url = 'https://api.github.com/repos/{owner}/{repo}/releases/latest'.format(
+        owner=owner,
+        repo=repo
+    )
+    return requests.get(url).json()
+
+def download_github_assets(owner, repo, output_dir, filter_fn):
+    release_info = get_github_release_info(owner, repo)
+
+    output_files = []
+    for asset_info in release_info['assets']:
+        if not filter_fn(asset_info):
+            continue
+
+        name = asset_info['name']
+        url = asset_info['browser_download_url']
+
+        path = os.path.join(output_dir, name)
+        if os.path.exists(path):
+            output_files.append(path)
+            print(f'INFO {path} exists')
+            continue
+
+        download_url(url, path)
+        output_files.append(path)
+
+    return output_files
 
 
 def run_command(command, strict=True, directory=None):

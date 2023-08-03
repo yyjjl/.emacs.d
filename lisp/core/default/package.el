@@ -9,9 +9,11 @@
 (option! system-name nil
   :type 'stringp)
 
-(option! use-native-treesit
-    (and (fboundp 'treesit-available-p) (treesit-available-p))
-  :type 'boolean)
+(option! native-treesit-modes
+    (and (fboundp 'treesit-available-p)
+         (treesit-available-p)
+         '(js-json-mode sh-mode))
+  :type '(repeat symbol))
 
 (defvar ymacs-modeline-segment-alist ())
 (defvar ymacs-modeline-vcs-max-length 20

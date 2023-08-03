@@ -34,6 +34,18 @@
       (set-buffer-modified-p nil))))
 
 ;;;###autoload
+(defun ymacs-lsp/open-remote-stderr ()
+  (interactive)
+  (if-let* ((remote-host (file-remote-p default-directory))
+            (workspace (car lsp--buffer-workspaces))
+            (name (lsp--client-server-id (lsp--workspace-client workspace)))
+            (path (concat remote-host (ymacs-lsp//get-remote-stderr name))))
+      (if (file-exists-p path)
+          (pop-to-buffer (find-file-noselect path))
+        (message "remote-stderr %s not found" path))
+    (message "remote-stderr not found")))
+
+;;;###autoload
 (defun ymacs-lsp/check-for-updates ()
   (interactive)
 

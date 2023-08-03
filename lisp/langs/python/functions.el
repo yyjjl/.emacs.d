@@ -28,17 +28,18 @@
          (name (python-shell-get-process-name -dedicated))
          (buffer (or
                   (get-buffer (format "*%s*" name))
-                  (python-shell-make-comint (python-shell-calculate-command) name t))))
+                  (python-shell-make-comint (python-shell-calculate-command) name t)))
+         (process (get-buffer-process buffer)))
+    (python-shell-send-string "\n" process)
     (with-current-buffer buffer
       (let ((cumtime 0))
-        (while (and (when (boundp 'python-shell--first-prompt-received)
-                      (not python-shell--first-prompt-received))
+        (while (and (not (bound-and-true-p python-shell--first-prompt-received))
                     (< cumtime 3))
           (when (> cumtime 0.5)
-            (message "Wait for python process ...(%s)" cumtime))
+            (message "Wait for first prompt ...(%.1f)" cumtime))
           (sleep-for 0.1)
           (setq cumtime (+ cumtime 0.1)))))
-    (get-buffer-process buffer)))
+    process))
 
 (defun ymacs-python//send-region-or-buffer (&optional -send-main)
   (if (use-region-p)

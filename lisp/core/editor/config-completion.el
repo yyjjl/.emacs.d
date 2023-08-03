@@ -52,20 +52,6 @@
                  (eq ?/ (char-before (- (point) 2)))))
     (delete-region (overlay-start rfn-eshadow-overlay) (overlay-end rfn-eshadow-overlay))))
 
-(defun ymacs-editor/consult-ripgrep-or-line ()
-  (interactive)
-  (if (or (not buffer-file-name)
-          (buffer-narrowed-p)
-          (ignore-errors (file-remote-p buffer-file-name))
-          (jka-compr-get-compression-info buffer-file-name)
-          (not (is-buffer-too-large!)))
-      (call-interactively #'consult-line)
-    (let ((consult-ripgrep-args
-           (concat (substring consult-ripgrep-args 0 (1- (length consult-ripgrep-args)))
-                   "--with-filename "
-                   (shell-quote-argument buffer-file-name))))
-      (call-interactively #'consult-ripgrep))))
-
 (after! marginalia
   (dolist (catogory '(command function variable file))
     (setf (alist-get catogory marginalia-annotator-registry) '(builtin))))
@@ -103,12 +89,13 @@
     (when (eq imenu-create-index-function #'semantic-create-imenu-index)
       (semantic-fetch-tags)))
 
-  (define-advice consult--command-builder (:around (-fn -builder) display-command)
-    (let ((cmd-fn (funcall -fn -builder)))
-      (lambda (input)
-        (let ((cmd (funcall cmd-fn input)))
-          (ymacs-editor//display-help nil (string-join cmd " "))
-          cmd))))
+  (define-advice consult--async-process (:around (-fn -async -builder &rest -props) display-command)
+    (let ((new-builder
+           (lambda (action)
+             (let ((cmd (funcall -builder action)))
+               (ymacs-editor//display-help nil (string-join (car cmd) " "))
+               cmd))))
+      (apply -fn -async new-builder -props)))
 
   ;;  configure the register formatting. This improves the register
   ;; preview for `consult-register', `consult-register-load',
@@ -126,7 +113,6 @@
 
   (consult-customize
    consult-line
-   ymacs-editor/consult-ripgrep-or-line
    :preview-key 'any
    consult-yank-pop
    :preview-key "C-y"

@@ -244,8 +244,3 @@
   ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
   ([remap switch-to-buffer-other-frame] . consult-buffer-other-frame)
   ([remap yank-pop] . consult-yank-pop))
-
-(when ymacs-use-native-treesit-p
-  (define-key!
-    ("C-c ." . treesit-inspect-node-at-point)
-    ("C-c E" . treesit-explore-mode)))

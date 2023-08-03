@@ -56,7 +56,6 @@ export LC_CTYPE=zh_CN.UTF-8
 export XMODIFIERS='@im=fcitx'
 export XIM=fcitx
 export XIM_PROGRAM=fcitx
-export DEFAULT_USER=yyj
 
 export EDITOR='emacsclient'
 

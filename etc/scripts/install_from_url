@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 DIR=$(dirname "$3")
 mkdir -p "$DIR"
 
@@ -11,6 +13,11 @@ case "$1" in
         wget "$2" -O "$3"
         trap "rm -f $3" EXIT
         7z x -y "$3" -o"$DIR"
+        ;;
+    zip)
+        wget "$2" -O "$3"
+        trap "rm -f $3" EXIT
+        unzip -oq "$3" -d"$DIR"
         ;;
     7z)
         tmp=/tmp/lsp$$

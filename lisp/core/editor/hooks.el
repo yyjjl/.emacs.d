@@ -168,6 +168,4 @@
 
     (fcitx-aggressive-setup))
 
-  (if sys/macp
-      (setq-default tab-line-format '(:eval (ymacs-modeline//format--header)))
-    (tab-bar-mode 1)))
+  (tab-bar-mode 1))

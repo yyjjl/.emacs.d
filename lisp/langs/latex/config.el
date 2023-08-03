@@ -9,25 +9,7 @@
 
   (after! lsp-diagnostics
     (add-to-list 'lsp-diagnostics-disabled-modes 'latex-mode)
-    (add-to-list 'lsp-diagnostics-disabled-modes 'tex-mode))
-
-  (after! lsp-tex
-    (lsp-register-custom-settings
-     `(("latex.rootDirectory"
-        (lambda ()
-          (or (when (stringp TeX-master)
-                (file-name-directory TeX-master))
-              ".")))
-       ("latex.lint.onSave" nil t)))
-
-    (let ((client (ht-get lsp-clients 'texlab)))
-      (setf (lsp--client-notification-handlers client)
-            (ht ("textDocument/publishDiagnostics" #'ignore)))
-      (setf (lsp--client-download-server-fn client)
-            (ymacs-lsp//make-download-from-github-fn
-             "latex-lsp/texlab"
-             (lambda (x) (string-match-p (if sys/linuxp "linux" "macos") x))
-             :tgz)))))
+    (add-to-list 'lsp-diagnostics-disabled-modes 'tex-mode)))
 
 (after! latex
   (ymacs-latex//setup-latexmk)
