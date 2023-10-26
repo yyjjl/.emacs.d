@@ -161,6 +161,10 @@
 (setq bidi-inhibit-bpa t)
 (setq frame-resize-pixelwise t)
 
+(setq long-line-threshold 500)
+(setq large-hscroll-threshold 500)
+(setq syntax-wholeline-max 500)
+
 (setq cursor-in-non-selected-windows t)
 (setq highlight-nonselected-windows t)
 
