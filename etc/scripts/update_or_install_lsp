@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+set -xe
+
+CURRENT_DIR=$(dirname "$0")
+
+server="$1"
+shift;
+
+lsp_server_install_dir="$CURRENT_DIR/../../.cache/lsp"
+mkdir -p "$lsp_server_install_dir"
+
+function npm_install {
+    local package="$1"
+    local package_dir="$lsp_server_install_dir/npm/$package"
+    mkdir -p "$package_dir/lib"
+    npm -g --prefix "$package_dir" install "$package"
+
+    local peer_dependencies=$(npm view "$package" peerDependencies)
+    if [ -n "$peer_dependencies" ]; then
+        cd "$package_dir/lib/node_modules/$package"
+        npm_config_yes=true npx npm-install-peers
+    fi
+}
+
+if [ "$server" = pylance ]; then
+    python3 "$CURRENT_DIR/update_pylance.py"
+elif [ "$server" = clangd ]; then
+    assert_key=clangd-linux
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        assert_key=clangd-mac
+    fi
+
+    clangd_file="$lsp_server_install_dir/clangd-latest.zip"
+    clangd_dir="$lsp_server_install_dir/clangd"
+
+    "$CURRENT_DIR/download_from_github" clangd/clangd "$clangd_file" $assert_key
+
+    mkdir -p "$clangd_dir"
+    unzip -o "$clangd_file" -d"$clangd_dir"
+elif [ "$server" = bash-language-server ]; then
+    npm_install bash-language-server
+elif [ "$server" = texlab ]; then
+    assert_key=linux
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        assert_key=macos
+    fi
+
+    texlab_file="$lsp_server_install_dir/texlab-latest.tar.gz"
+    texlab_dir="$lsp_server_install_dir/texlab"
+
+    "$CURRENT_DIR/download_from_github" latex-lsp/texlab "$textlab_file" $assert_key
+
+    mkdir -p "$texlab_dir"
+    unzip -o "$texlab_file" -d"$texlab_dir"
+fi

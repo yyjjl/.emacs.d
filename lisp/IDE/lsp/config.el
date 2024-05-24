@@ -39,7 +39,6 @@
 
    '("l r" lsp-workspace-restart "Restart" :exit t)
    '("l K" lsp-workspace-shutdown "Shutdown" :exit t)
-   '("l U" ymacs-lsp/check-for-updates "Update All Servers" :exit t)
    '("l I" lsp-install-server "Install Server" :exit t))
 
   (define-key! :map lsp-command-map

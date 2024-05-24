@@ -12,6 +12,10 @@ if len(sys.argv) < 3:
 url = "https://api.github.com/repos/{}/releases/latest"
 url = url.format(sys.argv[1])
 output_file = sys.argv[2]
+assert_key = None
+extract_zip_dir = None
+if len(sys.argv) > 3:
+    assert_key = sys.argv[3]
 print('GET', url)
 
 try:
@@ -27,7 +31,10 @@ try:
 
     asset = None
     while not asset:
-        index_or_key = input('Download (index or key): ').lower()
+        if assert_key is not None:
+            index_or_key = assert_key
+        else:
+            index_or_key = input('Download (index or key): ').lower()
         try:
             asset = assets[int(index_or_key)]
         except ValueError:
