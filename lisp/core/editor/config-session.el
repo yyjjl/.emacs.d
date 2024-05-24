@@ -12,6 +12,7 @@
           extended-command-history)))
 
 (after! recentf
+  (setq recentf-filename-handlers nil)
   (setq recentf-max-saved-items 2048)
   (setq recentf-exclude
         (list (eval-when-compile

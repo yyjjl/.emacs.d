@@ -8,6 +8,8 @@
 
 (autoload 'ymacs-hydra/smerge/body (expand! "commands") nil t)
 
+(defalias 'magit-diff-two-branches #'magit-diff-range)
+
 (define-key! ("C-x g"))
 (define-key! :prefix "C-x g"
   ("d" . magit-dispatch)

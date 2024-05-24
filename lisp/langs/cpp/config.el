@@ -42,8 +42,8 @@
     (put 'lsp-clients-clangd-args 'safe-local-variable (lambda (x) (and (listp x) (cl-every #'stringp x))))
 
     (dolist (arg '("--all-scopes-completion"
-                   "--background-index"
-                   "--clang-tidy"))
+                   "-j=4"
+                   "--background-index"))
       (cl-pushnew arg lsp-clients-clangd-args :test #'string=))))
 
 (after! cc-mode
