@@ -275,9 +275,12 @@
   :argument "@directory="
   :init-value
   (lambda (-obj)
-    (oset -obj value (or (ymacs-editor//ripgrep-directory)
-                         ymacs-editor-search-directory
-                         (ymacs-editor//project-root-or-default)))))
+    (oset -obj value
+          (if (equal current-prefix-arg 0)
+              default-directory
+            (or (ymacs-editor//ripgrep-directory)
+                ymacs-editor-search-directory
+                (ymacs-editor//project-root-or-default))))))
 
 (transient-define-prefix ymacs-editor/ripgrep ()
   "Run ripgrep"

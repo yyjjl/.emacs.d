@@ -84,7 +84,21 @@
 (after! consult
   (require 'embark-consult)
 
+  (defvar consult--source-recent-dired
+    (list :name "Dired Buffer"
+          :narrow '(100 . "Dired")
+          :hidden t
+          :category 'buffer
+          :face 'consult-buffer
+          :history 'buffer-name-history
+          :state #'consult--buffer-state
+          :items (lambda ()
+                   (consult--buffer-query :sort 'visibility :mode 'dired-mode :as #'buffer-name))))
+
+  (add-to-list 'consult-buffer-sources 'consult--source-recent-dired 'append)
+
   (define-advice consult-imenu--items (:before () refresh)
+    (setq imenu-max-item-length (max 80 (- (frame-width) 20)))
     (when (eq imenu-create-index-function #'semantic-create-imenu-index)
       (semantic-fetch-tags)))
 
@@ -131,6 +145,11 @@
     ("C-r" . consult-history)))
 
 (after! embark
+  (define-key! :map embark-file-map
+    ("d" (defun ymacs-embark/open-directory (-file)
+           (dired (file-name-directory -file))))
+    ("X" . delete-file))
+
   (defun ymacs-editor//embark-which-key-indicator ()
     "An embark indicator that displays keymaps using which-key.
 The which-key help message will show the type and value of the
@@ -158,11 +177,11 @@ targets."
 
 
   (defun ymacs-editor//embark-hide-which-key-indicator (-fn &rest -args)2
-    "Hide the which-key indicator immediately when using the completing-read prompter."
-    (which-key--hide-popup-ignore-command)
-    (let ((embark-indicators
-           (remq #'ymacs-editor//embark-which-key-indicator embark-indicators)))
-      (apply -fn -args)))
+         "Hide the which-key indicator immediately when using the completing-read prompter."
+         (which-key--hide-popup-ignore-command)
+         (let ((embark-indicators
+                (remq #'ymacs-editor//embark-which-key-indicator embark-indicators)))
+           (apply -fn -args)))
 
   (advice-add #'embark-completing-read-prompter :around #'ymacs-editor//embark-hide-which-key-indicator)
 

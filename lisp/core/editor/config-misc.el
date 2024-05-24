@@ -166,6 +166,7 @@
   (dolist (mode
            '((c-mode          . c-ts-mode)
              (c++-mode        . c++-ts-mode)
+             (c-or-c++-mode . c-or-c++-ts-mode)
              (css-mode        . css-ts-mode)
              (cmake-mode      . cmake-ts-mode)
              (dockerfile-mode . dockerfile-ts-mode)
