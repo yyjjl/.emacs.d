@@ -44,7 +44,7 @@ def main():
             logging.info('version exists .. nothing to do')
         else:
             os.makedirs(output_dir_of_version, exist_ok=True)
-            fp.extra.ctall(output_dir_of_version)
+            fp.extractall(output_dir_of_version)
 
         link_file = os.path.join(OUTPUT_DIR, 'current')
         if os.path.exists(link_file):
@@ -57,7 +57,7 @@ def main():
         os.path.dirname(__file__),
         'hijack_pylance_server_bundle.js'
     )
-    proc = subprocess.run(args=['node', js_script])
+    proc = subprocess.run(args=['node', js_script, version])
     sys.exit(proc.returncode)
 
 

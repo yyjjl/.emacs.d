@@ -44,15 +44,13 @@ function hijack(version) {
     const result = espree.parse(originalCode, { ecmaVersion: 'latest', range: true });
 
     assert(result.type == 'Program');
-    assert(result.body.length == 3, 'Cannot parse code pattern');
 
-    const functionDefs = result.body.filter(x => (x.type == 'FunctionDeclaration'));
-    const mainStatement = result.body.filter(x => (x.type == 'ExpressionStatement'))[0];
+    const functionDefs = result.body.filter(x => (x.type === 'FunctionDeclaration'));
+    const otherStatements = result.body.filter(x => (x.type !== 'FunctionDeclaration'));
+
+    // assert(result.body.length == 3, 'Cannot parse code pattern');
 
     assert(functionDefs.length == 2, 'Cannot find two entry function defs');
-    assert(mainStatement != undefined, 'Cannot find mainStatement');
-    assert(mainStatement.expression.type == 'SequenceExpression', 'Cannot parse mainStatement (1)');
-    assert(mainStatement.expression.expressions.length == 2, 'Cannot parse mainStatement (2)');
 
     const translateFnName = functionDefs[(functionDefs[0].params.length == 2) ? 0 : 1].id.name;
 
@@ -60,7 +58,10 @@ function hijack(version) {
     vm.createContext(context); // Contextify the object.
     vm.runInContext(getCodeSegment(functionDefs[0]), context);
     vm.runInContext(getCodeSegment(functionDefs[1]), context);
-    vm.runInContext('(' + getCodeSegment(mainStatement.expression.expressions[0]) + ')', context);
+
+    for(const x of otherStatements.slice(0, otherStatements.length - 1)) {
+        vm.runInContext(getCodeSegment(x), context);
+    }
 
     const tokenTranslator = context[translateFnName];
 
@@ -82,7 +83,7 @@ function hijack(version) {
             })
             .join('');
 
-        // console.log('>>>', text, '<<<');
+        console.log('>>>', match[1], '<<<');
         if (text.indexOf('licenseErrorText') != -1) {
             console.log(`Hijack!! replace "${match[0]}" => ";"`)
             finalCode = originalCode.slice(0, match.index) + ';' + originalCode.slice(match.index + match[0].length);
@@ -95,8 +96,7 @@ function hijack(version) {
 
 
 function main() {
-    // const version = process.argv[1];
-    const version = '2023.11.13';
+    const version = process.argv[2];
 
     const finalCode = hijack(version);
     if (finalCode === null) {
