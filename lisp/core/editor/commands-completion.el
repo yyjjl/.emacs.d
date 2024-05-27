@@ -53,6 +53,12 @@
 (defclass ymacs-transient-ripgrep-directory (transient-option)
   ())
 
+(defclass ymacs-transient-ripgrep-input (transient-option)
+  ())
+
+(defclass ymacs-transient-ripgrep-filter (transient-option)
+  ())
+
 (cl-defmethod transient-infix-read ((obj ymacs-transient-ripgrep-types))
   (let ((default-value (oref obj value)))
     (condition-case nil
@@ -74,6 +80,22 @@
         (let ((directory (read-directory-name "Directory: " default-value nil t)))
           (ymacs-editor//set-ripgrep-directory directory)
           directory)
+      (quit default-value))))
+
+(cl-defmethod transient-infix-read ((obj ymacs-transient-ripgrep-input))
+  (let ((default-value (oref obj value)))
+    (condition-case nil
+        (let ((value (read-string "Input: " default-value nil t)))
+          (ymacs-editor//set-ripgrep-input-1 value)
+          value)
+      (quit default-value))))
+
+(cl-defmethod transient-infix-read ((obj ymacs-transient-ripgrep-filter))
+  (let ((default-value (oref obj value)))
+    (condition-case nil
+        (let ((value (read-string "Filter: " default-value nil t)))
+          (ymacs-editor//set-ripgrep-input-2 value)
+          value)
       (quit default-value))))
 
 
@@ -178,7 +200,9 @@
 
   (-let* ((input (with-selected-window (active-minibuffer-window)
                    (minibuffer-contents-no-properties)))
-          ((rg-input emacs-input . _) (consult--split-perl input 0))
+          (split-fn (plist-get (consult--async-split-style) :function))
+          ((rg-input emacs-input-start-pos . _) (funcall split-fn input))
+          (emacs-input (substring input emacs-input-start-pos))
           ((rg-real-input . rg-switches) (consult--command-split rg-input)))
     (ymacs-editor//set-ripgrep-input-1 rg-real-input)
     (ymacs-editor//set-ripgrep-input-2 emacs-input)
@@ -265,7 +289,7 @@
 (ymacs-editor//define-ripgrep-infix-1 no-ignore "Override ignore files" "-n" "--no-ignore")
 
 (ymacs-editor//define-ripgrep-infix-2 glob "Filter files glob" "g" "--glob=")
-(ymacs-editor//define-ripgrep-infix-2 iglob "Filter files glob (no case)" "i" "--iglob=")
+(ymacs-editor//define-ripgrep-infix-2 iglob "Filter files glob (no case)" "I" "--iglob=")
 (ymacs-editor//define-ripgrep-infix-2 type "Filter files glob (no case)" "t" "--type=" ymacs-transient-ripgrep-types)
 
 (transient-define-infix ymacs-editor-ripgrep-directory ()
@@ -282,6 +306,20 @@
                 ymacs-editor-search-directory
                 (ymacs-editor//project-root-or-default))))))
 
+(transient-define-infix ymacs-editor-ripgrep-input ()
+  :description "Ripgrep input"
+  :class 'ymacs-transient-ripgrep-input
+  :shortarg "i"
+  :argument "@input="
+  :init-value (lambda (-obj) (oset -obj value (ymacs-editor//ripgrep-input-1))))
+
+(transient-define-infix ymacs-editor-ripgrep-filter ()
+  :description "Emacs filter"
+  :class 'ymacs-transient-ripgrep-filter
+  :shortarg "f"
+  :argument "@filter="
+  :init-value (lambda (-obj) (oset -obj value (ymacs-editor//ripgrep-input-2))))
+
 (transient-define-prefix ymacs-editor/ripgrep ()
   "Run ripgrep"
   [["Switches"
@@ -294,6 +332,9 @@
     (ymacs-editor-ripgrep-iglob)
     (ymacs-editor-ripgrep-type)
     (ymacs-editor-ripgrep-directory)]]
+  ["Input&Filter"
+   (ymacs-editor-ripgrep-input)
+   (ymacs-editor-ripgrep-filter)]
   ["Action"
    [("RET" "Do search" ymacs-editor//ripgrep-internal)]]
   (interactive)

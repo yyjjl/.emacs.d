@@ -46,12 +46,6 @@
                 (next-error-follow-minor-mode "Fol ")))
   (add-to-list 'mode-line-misc-info item))
 
-(defun ymacs-default//tab-bar ()
-  `((global menu-item ,(format-mode-line (ymacs-modeline//format--header)) ignore)))
-
-(after! tab-bar
-  (setq tab-bar-format '(ymacs-default//tab-bar)))
-
 (after! tab-line
   (setq tab-line-left-button "<")
   (setq tab-line-right-button ">")

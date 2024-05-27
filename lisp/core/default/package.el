@@ -7,7 +7,7 @@
   :type 'boolean)
 
 (option! system-name nil
-  :type 'stringp)
+  :type 'string)
 
 (option! native-treesit-modes
     (and (fboundp 'treesit-available-p)
@@ -55,7 +55,7 @@
   :group 'mode-line-faces)
 
 (defface ymacs-modeline-buffer-modified
-  '((t (:inherit (error bold) :background nil)))
+  '((t (:inherit (error bold) :background unspecified)))
   "Face used for the `'unsaved' symbol in the mode-line."
   :group 'mode-line-faces)
 
@@ -110,7 +110,7 @@
   :group 'mode-line-faces)
 
 (defface ymacs-modeline-bar-inactive
-  `((t (:background ,(face-foreground 'mode-line-inactive))))
+  `((t (:background "#8B8878")))
   "The face used for the left-most bar in the mode-line of an inactive window."
   :group 'mode-line-faces)
 

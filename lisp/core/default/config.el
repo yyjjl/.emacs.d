@@ -220,8 +220,6 @@
 (setq monokai-height-plus-3 1.0)
 (setq monokai-height-plus-4 1.0)
 
-(load-theme 'monokai t)
-
 (eval-when! ymacs-only-in-terminal-p
   (require-packages! clipetty)
   (global-clipetty-mode 1)

@@ -95,6 +95,25 @@
 
   (ymacs-editor//generic-setup))
 
+(defvar ymacs-default--tab-bar-line "")
+(defvar ymacs-default--tab-bar-update-timer nil)
+
+(defun ymacs-default//tab-bar ()
+  ymacs-default--tab-bar-line)
+
+(defun ymacs-default//update-tab-bar ()
+  (setq ymacs-default--tab-bar-line (format-mode-line (ymacs-modeline//format--header)))
+  (force-mode-line-update))
+
+(define-hook! ymacs-default//update-tar-bar-timer (tab-bar-mode-hook)
+  (setq tab-bar-format '(ymacs-default//tab-bar))
+
+  (when ymacs-default--tab-bar-update-timer
+    (cancel-timer ymacs-default--tab-bar-update-timer)
+    (setq ymacs-default--tab-bar-update-timer nil))
+  (when tab-bar-mode
+    (setq ymacs-default--tab-bar-update-timer (run-with-idle-timer 0.5 t #'ymacs-default//update-tab-bar))))
+
 (after! term/tty-colors
   ;; cache for performance
   (define-advice tty-color-desc (:around (-fn -color &optional -frame) cache)
@@ -159,6 +178,10 @@
   (ymacs-x//enable)
   (yas-global-mode 1)
 
+  (tab-bar-mode 1)
+
+  (load-theme 'monokai t)
+
   (eval-when! sys/macp
     (exec-path-from-shell-initialize))
 
@@ -166,6 +189,4 @@
     ;; Keep mouse at upper-right corner when typing
     ;; (mouse-avoidance-mode t)
 
-    (fcitx-aggressive-setup))
-
-  (tab-bar-mode 1))
+    (fcitx-aggressive-setup)))
