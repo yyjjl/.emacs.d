@@ -20,10 +20,6 @@
    '(lsp-signature-mode
      (:propertize "[Signature]" face ymacs-modeline-lsp-success)))
 
-  (add-to-list
-   'mode-line-misc-info
-   '(ymacs-lsp-progress-state ymacs-lsp-progress-state))
-
   (ymacs-editor//add-toggles
    "LSP" 'lsp-mode
    '("l i" lsp-toggle-trace-io
@@ -163,21 +159,7 @@
     ("C-x ' c" . lsp-treemacs-call-hierarchy)))
 
 (after! lsp-clangd
-  (let ((client (ht-get lsp-clients 'clangd)))
-    (setf (lsp--client-download-server-fn client)
-          (lambda (_client callback error-callback _update?)
-            (let ((matcher (lambda (x) (string-match-p (if sys/linuxp "clangd-linux" "clangd-macos") x)))
-                  (repo "clangd/clangd"))
-              (if-let (url (ymacs-lsp//get-latest-url-from-github repo matcher))
-                  (lsp-download-install
-                   (lambda (&rest args)
-                     (ymacs-cpp//select-clangd-by-version)
-                     (apply callback args))
-                   error-callback
-                   :url url
-                   :store-path (f-join lsp-server-install-dir repo)
-                   :decompress :zip)
-                (funcall error-callback (format "Can't not find download url for %s" repo))))))))
+  (ymacs-lsp//use-common-download-script (ht-get lsp-clients 'clangd)))
 
 (after! lsp-tex
   (lsp-register-custom-settings
@@ -191,15 +173,5 @@
   (let ((client (ht-get lsp-clients 'texlab)))
     (setf (lsp--client-notification-handlers client)
           (ht ("textDocument/publishDiagnostics" #'ignore)))
-    (setf (lsp--client-download-server-fn client)
-          (lambda (_client callback error-callback _update?)
-            (let ((matcher (lambda (x) (string-match-p (if sys/linuxp "linux" "macos") x)))
-                  (repo "latex-lsp/texlab"))
-              (if-let (url (ymacs-lsp//get-latest-url-from-github repo matcher))
-                  (lsp-download-install
-                   callback
-                   error-callback
-                   :url url
-                   :store-path (f-join lsp-server-install-dir repo)
-                   :decompress :tgz)
-                (funcall error-callback (format "Can't not find download url for %s" repo))))))))
+
+    (ymacs-lsp//use-common-download-script client)))

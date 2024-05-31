@@ -430,6 +430,7 @@ By default, this shows the information specified by `global-mode-string'."
   (list
    ""
    mode-line-misc-info
+   " "
    ymacs-modeline--vcs-state
    ymacs-modeline--lsp-state
    (when (and (boundp 'python-shell-virtualenv-root)
@@ -437,7 +438,7 @@ By default, this shows the information specified by `global-mode-string'."
               (not (string-empty-p python-shell-virtualenv-root)))
      (propertize
       (concat "["
-              (file-name-base (directory-file-name python-shell-virtualenv-root))
+              (file-name-nondirectory (directory-file-name python-shell-virtualenv-root))
               "]")
       'face 'font-lock-string-face))
    (unless (eq (selected-window)

@@ -8,7 +8,7 @@
 
 (require-packages! (auctex :compile (latex tex preview reftex)) )
 
-(executable! texlab :exe [(expand-cache! "lsp/texlab") "texlab"])
+(executable! texlab :exe [(expand-cache! "lsp/texlab/texlab") "texlab"])
 
 (eval-when-has-feature! lsp
   (ymacs-lsp//register-client 'texlab :package 'lsp-tex))

@@ -7,6 +7,30 @@
 (declare-function treemacs-current-visibility 'treemacs)
 (declare-function treemacs-select-window 'treemacs)
 
+(defun ymacs-lsp//update-or-print-configuration (-section -do-update)
+  (dolist (workspace (lsp-workspaces))
+    (with-lsp-workspace workspace
+      (if -do-update
+          (lsp--set-configuration (lsp-configuration-section -section))
+        (let ((configuration nil))
+          (maphash (-lambda (path (variable boolean?))
+                     (when (s-matches? (concat (regexp-quote -section) "\\..*") path)
+                       (let* ((symbol-value (-> variable
+                                                lsp-resolve-value
+                                                lsp-resolve-value))
+                              (value (if (and boolean? (not symbol-value))
+                                         :json-false
+                                       symbol-value)))
+                         (when (or boolean? value)
+                           (cl-pushnew (format "%s=%s" path value) configuration)))))
+                   lsp-client-settings)
+          (ymacs-lisp/message (string-join configuration "\n") t))))))
+
+
+(defun ymacs-python/update-configuration (-do-update)
+  (interactive "P")
+  (ymacs-lsp//update-or-print-configuration "python" -do-update))
+
 ;;;###autoload
 (defun ymacs-lsp/open-remote-stderr ()
   (interactive)

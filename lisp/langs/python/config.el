@@ -29,7 +29,8 @@
 
 (after! python
   (define-key! :map comint-mode-map
-    ([f5] . ymacs-python/toggle-pdbtrack))
+    ([f5] . ymacs-python/toggle-pdbtrack)
+    ([f9] . ymacs-python/run-current-file))
 
   (define-key! :map inferior-python-mode-map
     ([remap python-shell-completion-complete-or-indent] . ymacs-python/shell-completion-complete-or-indent)

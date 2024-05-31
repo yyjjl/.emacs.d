@@ -49,8 +49,8 @@ elif [ "$server" = texlab ]; then
     texlab_file="$lsp_server_install_dir/texlab-latest.tar.gz"
     texlab_dir="$lsp_server_install_dir/texlab"
 
-    "$CURRENT_DIR/download_from_github" latex-lsp/texlab "$textlab_file" $assert_key
+    "$CURRENT_DIR/download_from_github" latex-lsp/texlab "$texlab_file" $assert_key
 
     mkdir -p "$texlab_dir"
-    unzip -o "$texlab_file" -d"$texlab_dir"
+    tar zxf "$texlab_file" -C"$texlab_dir"
 fi

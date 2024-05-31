@@ -14,7 +14,6 @@
 (setq lsp-client-packages nil)
 
 (defvar ymacs-lsp--enabled-clients nil)
-(defvar ymacs-lsp-progress-state nil)
 
 (defvar-local ymacs-lsp-format-buffer-function #'lsp-format-buffer)
 (defvar-local ymacs-lsp-organize-import-function #'lsp-organize-imports)

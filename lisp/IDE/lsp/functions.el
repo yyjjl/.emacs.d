@@ -8,6 +8,15 @@
 (declare-function flymake--lookup-type-property 'flymake)
 (declare-function lsp--progress-status 'lsp)
 
+(defun ymacs-lsp//use-common-download-script (-client)
+  (let ((client-id (lsp--client-server-id -client)))
+    (setf (lsp--client-download-server-fn -client)
+          (lambda (_client callback error-callback _update?)
+            (let ((default-directory (expand-etc! "scripts")))
+              (lsp-async-start-process
+               callback error-callback
+               "bash" "update_or_install_lsp" (symbol-name client-id)))))))
+
 (defmacro ymacs-lsp//try-enable (-name)
   `(and (eq ymacs-lsp-project-state :enabled)
         ,(let ((symbol (intern (format "ymacs-%s-lsp" -name))))
@@ -48,23 +57,6 @@
       (dolist (response-id response-ids)
         (remhash response-id response-handlers)))))
 
-(defun ymacs-lsp//get-latest-url-from-github (-repo -matcher)
-  (require 'url-handlers)
-  (let* ((url (format "https://api.github.com/repos/%s/releases/latest" -repo))
-         (info (with-temp-buffer
-                 (erase-buffer)
-                 (lsp--info "GET %s ..." url)
-                 (url-insert-file-contents url)
-                 (lsp--info "GET %s ...done" url)
-                 (goto-char (point-min))
-                 (json-parse-buffer :object-type 'alist))))
-    (cl-loop
-     for asset across (or (alist-get 'assets info) [])
-     for url = (alist-get 'browser_download_url asset)
-     when (and (stringp url)
-               (funcall -matcher url))
-     return url)))
-
 (cl-defun ymacs-lsp//register-client
     (-client &key ((:package -package)) ((:enable-fn -enable-fn)))
   (add-to-list 'lsp-client-packages -package)
@@ -81,18 +73,3 @@
             (if -update?
                 (or -update-command -command)
               -command)))))
-
-(cl-defun lsp-download-install@pretty
-    (-callback -error-callback &key url store-path decompress &allow-other-keys)
-  (let* ((url (lsp-resolve-value url))
-         (store-path (lsp-resolve-value store-path))
-         (type (pcase decompress
-                 (:tgz "tgz")
-                 (:7z "7z")
-                 (:py "py")
-                 (:zip "zip")
-                 (_ "wget"))))
-    (lsp--info "Starting to download %s to %s..." url store-path)
-    (lsp-async-start-process
-     -callback -error-callback
-     "bash" (expand-etc! "scripts/install_from_url") type url store-path)))

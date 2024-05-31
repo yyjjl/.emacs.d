@@ -7,7 +7,6 @@
 (require-packages!
  py-autopep8
  py-isort
- pyvenv
  cython-mode)
 
 (executable! ipython3)

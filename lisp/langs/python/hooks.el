@@ -1,23 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
 
-(after! pyvenv
-  (defun ymacs-python//venv-track (&rest _)
-    ;; (pyvenv-track-virtualenv)
-    )
-
-  (add-hook 'window-buffer-change-functions #'ymacs-python//venv-track)
-  (add-hook 'window-selection-change-functions #'ymacs-python//venv-track)
-
-  (define-advice pyvenv-track-virtualenv (:around (-fn) deactivate)
-    (condition-case err
-        (if (or (null pyvenv-activate)
-                (and (stringp pyvenv-activate)
-                     (string-empty-p pyvenv-activate)))
-            (pyvenv-deactivate)
-          (funcall -fn))
-      (error
-       (message "%s" err)))))
-
 (after! cython-mode
   (define-hook! ymacs-cython//setup (cython-mode-hook)
     (setq electric-indent-chars (delq ?: electric-indent-chars))
@@ -61,18 +43,19 @@
       (eval-when-has-feature! lsp
         (with-transient-hook! (hack-local-variables-hook :local t)
           (ymacs-python//set-lsp-server)
+
+          (when (and remote-host python-shell-virtualenv-root)
+            (let ((exe (expand-file-name python-shell-interpreter
+                                         (concat python-shell-virtualenv-root "/bin"))))
+              (setq-local python-shell-interpreter exe)))
+
+          (setq-local lsp-pyright-python-executable-cmd python-shell-interpreter)
+          (setq-local lsp-pyright-venv-path python-shell-virtualenv-root)
+
           (when (and (is-buffer-suitable-for-coding!)
                      (or (eq major-mode 'python-mode)
                          (eq major-mode 'python-ts-mode))
                      (ymacs-lsp//try-enable python))
-
-            (when (and remote-host python-shell-virtualenv-root)
-              (let ((exe (expand-file-name python-shell-interpreter
-                                           (concat python-shell-virtualenv-root "/bin"))))
-                (setq-local python-shell-interpreter exe)))
-
-            (setq lsp-pyright-python-executable-cmd python-shell-interpreter)
-            (setq lsp-pyright-venv-path python-shell-virtualenv-root)
 
             (setq ymacs-lsp-format-buffer-function #'ymacs-python/autopep8)
             (setq ymacs-lsp-organize-import-function #'py-isort-buffer))))))

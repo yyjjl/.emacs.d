@@ -22,9 +22,7 @@
   (define-advice lsp--calculate-root (:around (-fn -session -file-name) use-truename)
     (funcall -fn -session (file-truename -file-name)))
 
-  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
-
-  (advice-add #'lsp-download-install :override #'lsp-download-install@pretty))
+  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration))
 
 (after! lsp-modeline
   (setq lsp-modeline-code-actions-segments '(count name)))

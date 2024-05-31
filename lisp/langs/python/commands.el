@@ -1,7 +1,5 @@
 ;;; -*- lexical-binding: t
 
-(declare-function pyvenv-workon-home 'pyvenv)
-
 (eval-when-has-feature! lsp
   (defun ymacs-python/change-lsp-server ()
     (interactive)
@@ -23,13 +21,13 @@
 (defun ymacs-python/setup-project ()
   (interactive)
   (let* ((project-root (read-directory-name "Root: " (ymacs-editor//project-root)))
-         (venv-path (read-directory-name "Venv: " pyvenv-activate))
+         (venv-root (read-directory-name "VenvRoot: " python-shell-virtualenv-root))
          (python-path (read-string "Python: " python-shell-interpreter)))
     (ymacs-editor//setup-project-internal
      project-root
      (append
       (list (cons 'python-shell-interpreter python-path)
-            (cons 'pyvenv-activate venv-path))
+            (cons 'python-shell-virtualenv-root venv-root))
       (eval-when-has-feature! lsp
         (list (cons 'lsp-pyright-python-executable-cmd python-path)))))))
 
@@ -68,38 +66,6 @@ If not try to complete."
     (when (called-interactively-p 'interactive)
       (message "pdbtrack enabled"))))
 
-;;;###autoload
-(defun ymacs-python/create-venv-in-workon-home ()
-  (interactive)
-  (let ((directory (pyvenv-workon-home)))
-    (ymacs-python/create-venv
-     (expand-file-name (read-from-minibuffer (format "Directory: %s/" directory)) directory)
-     (read-shell-command "Python executable: " "python")
-     (when current-prefix-arg
-       (read-from-minibuffer "Arguments: ")))))
-
-;;;###autoload
-(defun ymacs-python/create-venv (-directory -python-exe &optional -args)
-  (interactive
-   (list
-    (read-directory-name "Create venv in: "
-                         (ymacs-editor//project-root)
-                         nil :mustmatch)
-    (read-shell-command "Python executable: " "python")
-    (when current-prefix-arg
-      (read-from-minibuffer "Arguments: "))))
-
-  (unless (require 'pyvenv)
-    (user-error "Can not load pyvenv"))
-
-  (unless (executable-find "virtualenv")
-    (user-error "Can not find virtualenv"))
-
-  (let ((default-directory -directory))
-    (compile (format "virtualenv --python=%s %s %s\n"
-                     -python-exe
-                     (expand-file-name "venv")
-                     (or -args "")))))
 
 ;;;###autoload
 (defun ymacs-python/pop-to-shell (&optional -directory)
@@ -180,3 +146,13 @@ If not try to complete."
           (back-to-indentation)
           (insert trace "\n")
           (python-indent-line)))))
+
+;;;###autoload
+(defun ymacs-python/run-current-file ()
+  (interactive)
+  (let* ((venv-cmd (ymacs-python//get-venv-source-cmd))
+         (cmd (format
+               "%spython %s"
+               (if venv-cmd venv-cmd "")
+               (shell-quote-argument (buffer-file-name)))))
+    (compile (format "bash -c %s" (shell-quote-argument cmd)) t)))

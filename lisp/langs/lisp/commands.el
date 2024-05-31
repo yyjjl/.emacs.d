@@ -28,7 +28,7 @@ definition and running `eval-defun`."
         (describe-variable symbol))
        (t
         (user-error "Not bound: %S" symbol)))
-    (user-error "There is no symbol at point.")))
+    (eldoc-print-current-symbol-info t)))
 
 (defun ymacs-lisp//remove-hook-at-point (-hook)
   (let ((orig-point (point)))

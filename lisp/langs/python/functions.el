@@ -129,3 +129,12 @@
     (setq ymacs-python-execution-root
           (or (ymacs-python//get-execution-root-from-pyright-config)
               (ymacs-editor//project-root-or-default)))))
+
+(defun ymacs-python//get-venv-source-cmd ()
+  (when (and ymacs-python-auto-activate-venv-p python-shell-virtualenv-root)
+    (if (and (stringp python-shell-virtualenv-root)
+             (if-let ((remote-host (file-remote-p default-directory)))
+                 (file-directory-p (concat remote-host python-shell-virtualenv-root))
+               (file-directory-p python-shell-virtualenv-root)))
+        (format "source %s\n" (expand-file-name "bin/activate" python-shell-virtualenv-root))
+      (user-error "virtualenv %s doesn't exists" python-shell-virtualenv-root))))
