@@ -272,9 +272,22 @@ Optional argument -ARG is used to toggle narrow functions."
 ;;;###autoload
 (defun ymacs-editor/smart-move-begining-of-line ()
   (interactive)
-  (if (bolp)
-      (back-to-indentation)
-    (move-beginning-of-line 1)))
+  (if (minibuffer-window-active-p (selected-window))
+      (-let* ((currrent-pos (point))
+              (offset (line-beginning-position))
+              (input (minibuffer-contents-no-properties))
+              (split-fn (plist-get (consult--async-split-style) :function))
+              (puncts-pos (cdddr (funcall split-fn input)))
+              (punct-pos2 (+ offset (or (cdadr puncts-pos) 10000)))
+              (punct-pos1 (+ offset (or (cdar puncts-pos) 10000))))
+        (cond
+         ((> currrent-pos punct-pos2) (goto-char punct-pos2))
+         ((> currrent-pos punct-pos1) (goto-char punct-pos1))
+         ((= currrent-pos punct-pos1) (goto-char punct-pos2))
+         (t (goto-char (line-beginning-position)))))
+    (if (bolp)
+        (back-to-indentation)
+      (move-beginning-of-line 1))))
 
 ;;;###autoload
 (defun ymacs-editor/comment-dwim ()

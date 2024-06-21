@@ -148,45 +148,4 @@
   (define-key! :map embark-file-map
     ("d" (defun ymacs-embark/open-directory (-file)
            (dired (file-name-directory -file))))
-    ("X" . delete-file))
-
-  (defun ymacs-editor//embark-which-key-indicator ()
-    "An embark indicator that displays keymaps using which-key.
-The which-key help message will show the type and value of the
-current target followed by an ellipsis if there are further
-targets."
-    (lambda (&optional keymap targets prefix)
-      (if (null keymap)
-          (which-key--hide-popup-ignore-command)
-        (which-key--show-keymap
-         (if (eq (plist-get (car targets) :type) 'embark-become)
-             "Become"
-           (format "Act on %s '%s'%s"
-                   (plist-get (car targets) :type)
-                   (embark--truncate-target (plist-get (car targets) :target))
-                   (if (cdr targets) "…" "")))
-         (if prefix
-             (pcase (lookup-key keymap prefix 'accept-default)
-               ((and (pred keymapp) km) km)
-               (_ (key-binding prefix 'accept-default)))
-           keymap)
-         nil
-         nil
-         t
-         (lambda (binding) (not (string-suffix-p "-argument" (cdr binding))))))))
-
-
-  (defun ymacs-editor//embark-hide-which-key-indicator (-fn &rest -args)2
-         "Hide the which-key indicator immediately when using the completing-read prompter."
-         (which-key--hide-popup-ignore-command)
-         (let ((embark-indicators
-                (remq #'ymacs-editor//embark-which-key-indicator embark-indicators)))
-           (apply -fn -args)))
-
-  (advice-add #'embark-completing-read-prompter :around #'ymacs-editor//embark-hide-which-key-indicator)
-
-  (setq embark-indicators
-        '(ymacs-editor//embark-which-key-indicator
-          embark-minimal-indicator
-          embark-highlight-indicator
-          embark-isearch-highlight-indicator)))
+    ("X" . delete-file)))

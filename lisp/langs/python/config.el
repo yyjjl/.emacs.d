@@ -5,15 +5,6 @@
  :forward #'python-nav-forward-statement)
 
 (eval-when-has-feature! lsp
-  (ymacs-editor//add-toggles
-   "Python"
-   '(or (derived-mode-p 'python-mode)
-        (derived-mode-p 'python-ts-mode))
-   '("v" ymacs-python/create-venv "Create Venv" :exit t)
-   '("w" ymacs-python/create-venv-in-workon-home "Create Venv $WORKON-HOME" :exit t)
-   '("c" ymacs-python/change-lsp-server "Change LSP Server" :exit t)
-   '("t" ymacs-python/toggle-breakpoint "Toggle Breakpoint" :exit t))
-
   (after! lsp-pyls
     (setq lsp-pyls-configuration-sources ["flake8"])
     (setq lsp-pyls-plugins-rope-completion-enabled nil)
@@ -29,8 +20,7 @@
 
 (after! python
   (define-key! :map comint-mode-map
-    ([f5] . ymacs-python/toggle-pdbtrack)
-    ([f9] . ymacs-python/run-current-file))
+    ([f5] . ymacs-python/toggle-pdbtrack))
 
   (define-key! :map inferior-python-mode-map
     ([remap python-shell-completion-complete-or-indent] . ymacs-python/shell-completion-complete-or-indent)
@@ -47,6 +37,7 @@
       ("C-c C-b" . ymacs-python/autopep8)
       (("C-c C-c" "C-c c") . ymacs-python/send-buffer)
       (("C-c T" "C-c t") . ymacs-python/toggle-breakpoint)
+      ([f9] . ymacs-python/run-current-file)
       ("M-p" . previous-error)
       ("M-n" . next-error)))
 

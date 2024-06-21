@@ -6,7 +6,7 @@
  git-timemachine
  magit)
 
-(autoload 'ymacs-hydra/smerge/body (expand! "commands") nil t)
+(autoload 'ymacs-transient/smerge (expand! "commands") nil t)
 
 (defalias 'magit-diff-two-branches #'magit-diff-range)
 

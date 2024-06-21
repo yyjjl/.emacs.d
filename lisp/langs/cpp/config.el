@@ -49,19 +49,6 @@
 (after! cc-mode
   (require 'c-ts-mode)
 
-  (ymacs-editor//add-toggles
-   "C/C++"
-   '(memq major-mode '(c-mode c++-mode c-ts-mode c++-ts-mode))
-   '("c" c-toggle-comment-style "comment-style")
-   '("e" c-toggle-electric-state "electric" :toggle c-electric-flag)
-   '("a" c-toggle-auto-newline "auto \\n" :toggle c-auto-newline)
-   '("h" c-toggle-hungry-state "hungry delete" :toggle c-hungry-delete-key)
-
-   '("d" ymacs-cpp-cmake/config :exit t)
-   '("t" ymacs-cpp-cmake/toggle-option :exit t)
-   '("C" ymacs-cpp-cmake/change-config :exit t)
-   '("L" ymacs-cpp/load-in-repl :exit t))
-
   (dolist (map (list c-mode-map c++-mode-map c-ts-mode-map c++-ts-mode-map))
     (define-key! :map map
       (("<" ">" "C-c C-d"))             ; unbind

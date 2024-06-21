@@ -15,4 +15,4 @@
       (goto-char (point-min))
       (when (re-search-forward "^<<<<<<< " nil t)
         (smerge-mode 1)
-        (ymacs-hydra/smerge/body)))))
+        (transient-setup 'ymacs-transient/smerge)))))

@@ -1,32 +1,31 @@
 ;;; -*- lexical-binding: t; -*-
 
-(eval-when-compile
-  (require 'smerge-mode))
+(require 'smerge-mode)
+(require 'transient)
 
-(pretty-hydra-define ymacs-hydra/smerge
-  (:title "Smerge" :color pink :quit-key "q")
-  ("Move"
-   (("n" smerge-next "next hunk")
-    ("p" smerge-prev "prev hunk"))
-   "Keep"
-   (("b" smerge-keep-base "keep base")
-    ("u" smerge-keep-upper "keep upper")
-    ("l" smerge-keep-lower "keep lower")
-    ("a" smerge-keep-all "keep all")
-    ("RET" smerge-keep-current "keep current")
-    ("C-m" smerge-keep-current "keep current"))
-   "Diff"
-   (("<" smerge-diff-base-upper "base/upper")
-    ("=" smerge-diff-upper-lower "upper/lower")
-    (">" smerge-diff-base-lower "base/lower")
-    ("R" smerge-refine "refine")
-    ("E" smerge-ediff "ediff"))
-   "Other"
-   (("C" smerge-combine-with-next "combine")
-    ("r" smerge-resolve "resolve")
-    ("k" smerge-kill-current "kill")
-    ("ZZ" (lambda ()
-            (interactive)
-            (save-buffer)
-            (bury-buffer))
-     "Save and bury buffer" :exit t))))
+(transient-define-prefix ymacs-transient/smerge ()
+  [["Move"
+    ("n" "next hunk" smerge-next :transient t)
+    ("p" "prev hunk" smerge-prev :transient t)]
+   ["Keep"
+    ("b" "keep base" smerge-keep-base :transient t)
+    ("u" "keep upper" smerge-keep-upper :transient t)
+    ("l" "keep lower" smerge-keep-lower :transient t)
+    ("a" "keep all" smerge-keep-all :transient t)
+    ("RET" "keep current" smerge-keep-current :transient t)
+    ("C-m" "keep current" smerge-keep-current :transient t)]
+   ["Diff"
+    ("<" "base/upper" smerge-diff-base-upper :transient t)
+    ("=" "upper/lower" smerge-diff-upper-lower :transient t)
+    (">" "base/lower" smerge-diff-base-lower :transient t)
+    ("R" "refine" smerge-refine :transient t)
+    ("E" "ediff" smerge-ediff :transient t)]
+   ["Other"
+    ("C" "combine" smerge-combine-with-next)
+    ("r" "resolve" smerge-resolve)
+    ("k" "kill" smerge-kill-current)
+    ("ZZ" "Save and bury buffer"
+     (lambda ()
+       (interactive)
+       (save-buffer)
+       (bury-buffer)))]])

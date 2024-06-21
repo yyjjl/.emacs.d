@@ -14,18 +14,6 @@
 (after! latex
   (ymacs-latex//setup-latexmk)
 
-  (ymacs-editor//add-toggles
-   "LaTeX"
-   '(derived-mode-p 'latex-mode)
-   '("u" ymacs-latex/force-update-style "Update Style" :exit t)
-   '("=" ymacs-latex/count-words "Count Words" :exit t)
-   '("i" TeX-interactive-mode "Interactive" :toggle t)
-   '("p" TeX-PDF-mode "PDF" :toggle t)
-   '("f" TeX-fold-mode "Fold" :toggle t)
-   '("s" TeX-source-correlate-mode "Source Correlate" :toggle t)
-   '("d w" TeX-toggle-debug-warnings "Debug Warning" :toggle TeX-debug-warnings)
-   '("d b" TeX-toggle-debug-bad-boxes "Debug Bad Boxes" :toggle TeX-debug-bad-boxes))
-
   (define-key! :map TeX-mode-map
     ("C-c '"))
 

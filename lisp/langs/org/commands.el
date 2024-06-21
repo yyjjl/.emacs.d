@@ -1,6 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 (require 'org-download)
+(require 'transient)
 
 (eval-when-compile
   (require 'org)
@@ -16,52 +17,11 @@
 (declare-function org-publish-get-project-from-filename 'org-publish)
 (declare-function org-publish-property 'org-publish)
 
-(defhydra ymacs-hydra/org-download (:color blue :hint nil)
-  ""
-  ("s" org-download-screenshot "Screenshot")
-  ("r" org-download-rename-at-point "Rename at point")
-  ("l" org-download-rename-last "Rename last")
-  ("D" org-download-delete "delete")
-  ("q" nil "quit"))
-
-(defun ymacs-org//hot-expand (-type)
-  "Expand org template."
-  (org-insert-structure-template -type))
-
-(defhydra ymacs-hydra/org-template (:color blue :hint nil)
-  "
-_c_enter  _q_uote     _E_macs-lisp    _L_aTeX:
-_l_atex   _e_xample   _C_pp           _i_ndex:
-_a_scii   _v_erse     _I_NCLUDE:      _j_avascript
-_s_rc     _S_hell     ^ ^             _H_TML:
-_h_tml    _'_         ^ ^             _A_SCII:
-"
-  ("s" (yas-expand-snippet "#+begin_src $1\n$0\n#+end_src"))
-  ("e" (ymacs-org//hot-expand "example"))
-  ("q" (ymacs-org//hot-expand "quote"))
-  ("v" (ymacs-org//hot-expand "verse"))
-  ("c" (ymacs-org//hot-expand "center"))
-  ("l" (ymacs-org//hot-expand "latex"))
-  ("h" (ymacs-org//hot-expand "html"))
-  ("a" (ymacs-org//hot-expand "ascii"))
-  ("i" (ymacs-org//hot-expand "index"))
-  ("E" (ymacs-org//hot-expand "src "))
-  ("C" (yas-expand-snippet "#+begin_src cpp\n$0\n#+end_src"))
-  ("S" (yas-expand-snippet "#+begin_src sh\n$0\n#+end_src"))
-  ("j" (yas-expand-snippet "#+begin_src javascript\n$0\n#+end_src"))
-  ("L" (ymacs-org//hot-expand "export latex"))
-  ("H" (ymacs-org//hot-expand "export html"))
-  ("A" (ymacs-org//hot-expand "export ascii"))
-  ("I" (yas-expand-snippet "#+include: $0"))
-  ("'" (yas-expand-snippet "#+begin_${1:type}\n$0\n#+end_$1"))
-  ("<" self-insert-command "self-insert"))
-
-;;;###autoload
-(defun ymacs-org/hot-expand ()
-  (interactive)
-  (if (looking-back "^\\s-*" (line-beginning-position))
-      (ymacs-hydra/org-template/body)
-    (self-insert-command 1)))
+(transient-define-prefix ymacs-transient/org-download ()
+  [("s" "Screenshot" org-download-screenshot)
+   ("r" "Rename at point" org-download-rename-at-point)
+   ("l" "Rename last" org-download-rename-last)
+   ("D" "delete" org-download-delete)])
 
 ;;;###autoload
 (defun ymacs-org/publish-current-file ()

@@ -10,14 +10,7 @@
 (after! org
   (require 'latex nil t)
 
-  (ymacs-editor//add-toggles
-   "Org"
-   '(eq major-mode 'org-mode)
-   '("w" ymacs-org/latexmk-start-watching "Start LaTeXMK watching" :exit t)
-   '("d" ymacs-org/delete-latex-fragement-cache "Delete LaTeX Preview" :exit t))
-
   (define-key! :map org-mode-map
-    ("<" . ymacs-org/hot-expand)
     ("C-c t" :map ymacs-org-table-extra-map)
     ("C-c [" . org-reftex-citation)
     ("M-," . org-mark-ring-goto)
@@ -40,7 +33,7 @@
     ([f5] . ymacs-org/open)
     ([f9] . ymacs-org/publish-current-file)
     ([f10] . org-publish)
-    ([f12] . ymacs-hydra/org-download/body))
+    ([f12] . ymacs-transient/org-download))
 
   ;; Highlight `{{{color(<color>, <text>}}}' form
   (font-lock-add-keywords

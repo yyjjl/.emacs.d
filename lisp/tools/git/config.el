@@ -60,4 +60,4 @@
 ;; Resolve diff3 conflicts
 (after! smerge-mode
   (define-key! :map smerge-mode-map
-    ("C-c M" . ymacs-hydra/smerge/body)))
+    ("C-c M" . ymacs-transient/smerge)))

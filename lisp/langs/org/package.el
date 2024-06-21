@@ -50,7 +50,7 @@
   ("C-x O" . ymacs-org/project-open)
   ([C-f6] . ymacs-org/display-latex-fragment-at-point))
 
-(autoload #'ymacs-hydra/org-download/body (expand! "commands") nil t)
+(autoload #'ymacs-transient/org-download (expand! "commands") nil t)
 
 (put 'org-preview-latex-image-directory 'safe-local-variable #'stringp)
 (put 'org-download-image-dir 'safe-local-variable #'stringp)

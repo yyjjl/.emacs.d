@@ -236,6 +236,16 @@
 
   (advice-add 'reb-quit :before #'ymacs-editor//display-help--hide))
 
+(after! rect
+  (define-key! :map rectangle-mark-mode-map
+    ("M-i" . iedit-rectangle-mode)
+    ("C-x c" . clear-rectangle))
+
+  (define-hook! ymacs-editor//setup-rectangle-mark-mode (rectangle-mark-mode-hook)
+    (if rectangle-mark-mode
+        (ymacs-editor//display-help (ymacs-editor//display-keys--collect rectangle-mark-mode-map))
+      (ymacs-editor//display-help--hide))))
+
 (after! fcitx
   ;; Init fcitx prefix keys
   (setq fcitx-use-dbus nil)

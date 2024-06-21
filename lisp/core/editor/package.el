@@ -26,7 +26,6 @@
  vertico
  orderless
  marginalia
- pretty-hydra
  yasnippet
  yasnippet-snippets
  expand-region
@@ -50,20 +49,13 @@
 (put 'list-timers 'disabled nil)
 (put 'list-threads 'disabled nil)
 
-(autoload 'ymacs-editor/ripgrep (expand! "commands-completion.el") nil t)
+(autoload 'ymacs-editor/ripgrep (expand! "commands-rg") nil t)
 
-(autoload 'ymacs-hydra/mc/mc/mark-next-like-this (expand! "commands-hydra") nil t)
-(autoload 'ymacs-hydra/mc/mc/mark-previous-like-this (expand! "commands-hydra") nil t)
-(autoload 'ymacs-hydra/ediff/body (expand! "commands-hydra") nil t)
-(autoload 'ymacs-hydra/outline/body (expand! "commands-hydra") nil t)
-(autoload 'ymacs-hydra/rectangle/body (expand! "commands-hydra") nil t)
-(autoload 'ymacs-hydra/window/enlarge-window (expand! "commands-hydra") nil t)
-(autoload 'ymacs-hydra/window/enlarge-window-horizontally (expand! "commands-hydra") nil t)
-(autoload 'ymacs-hydra/window/shrink-window (expand! "commands-hydra") nil t)
-(autoload 'ymacs-hydra/window/shrink-window-horizontally (expand! "commands-hydra") nil t)
-(autoload 'ymacs-hydra/window/body (expand! "commands-hydra") nil t)
-(autoload 'ymacs-hydra/sort/body (expand! "commands-hydra") nil t)
-(autoload 'ymacs-hydra/query-replace/body (expand! "commands-hydra") nil t)
+(autoload 'ymacs-transient/ediff (expand! "commands-transient") nil t)
+(autoload 'ymacs-transient/outline (expand! "commands-transient") nil t)
+(autoload 'ymacs-transient/window (expand! "commands-transient") nil t)
+(autoload 'ymacs-transient/sort (expand! "commands-transient") nil t)
+(autoload 'ymacs-transient/query-replace (expand! "commands-transient") nil t)
 
 (autoload 'xref-pulse-momentarily "xref")
 (autoload 'project-root "project")
@@ -89,15 +81,14 @@
   (", ," . ymacs-editor-view-code-mode)
   (", -" . ymacs-editor/copy-file-name)
   (", SPC" . ymacs-editor/insert-space-around-chinese)
-  (", e" . ymacs-hydra/ediff/body)
-  (", s" . ymacs-hydra/sort/body)
+  (", e" . ymacs-transient/ediff)
+  (", s" . ymacs-transient/sort)
   (", x" . xref-etags-mode) ;; Minor mode to make xref use etags again.
 
   ("2" . ymacs-editor/window-split-vertically)
   ("3" . ymacs-editor/window-split-horizontally)
 
-  ("-" . ymacs-hydra/window/shrink-window)
-  ("?" . ymacs-hydra/window/body)
+  ("?" . ymacs-transient/window)
 
   ("C-/" . goto-last-change)
   ("C-_" . goto-last-change)
@@ -108,7 +99,7 @@
   ("R" . ymacs-editor/rename-this-file-and-buffer)
   ("W" . ymacs-editor/copy-this-file)
 
-  ("SPC" . ymacs-hydra/rectangle/body)
+  ("SPC" . rectangle-mark-mode)
 
   ("c" . ymacs-editor/cleanup-buffer-safe)
   ("k" . kill-buffer)
@@ -122,22 +113,14 @@
 
   ("j" . consult-find)
 
-  ("^" . ymacs-hydra/window/jenlarge-window)
-  ("_" . ymacs-editor/window-force-split-vertically)
-  ("{" . ymacs-hydra/window/shrink-window-horizontally)
-  ("|" . ymacs-editor/window-force-split-horizontally)
-  ("}" . ymacs-hydra/window/enlarge-window-horizontally)
-
   (("C-b" "B") . ibuffer))
 
 (define-key!
-  ("C--" . ymacs-hydra/mc/mc/mark-previous-like-this)
-  ("C-<" . ymacs-hydra/mc/mc/mark-previous-like-this)
-  ("C-=" . ymacs-hydra/mc/mc/mark-next-like-this)
-  ("C->" . ymacs-hydra/mc/mc/mark-next-like-this)
-
   ("C-<down>" . text-scale-decrease)
   ("C-<up>" . text-scale-increase)
+
+  ("C-." . embark-act)
+  ("C-;" . embark-dwan)
 
   ("C-c C-b" . ymacs-editor/format-paragraph)
   ("C-c F" . company-files)
@@ -148,7 +131,7 @@
   ("C-r" . consult-line-multi)
   ("C-s" . ymacs-editor/consult-ripgrep-or-line)
 
-  ("M-%" . ymacs-hydra/query-replace/body)
+  ("M-%" . ymacs-transient/query-replace)
   ("M-'" . ymacs-editor/change-surround)
   ("M--" . er/expand-region)
   ("M-/" . hippie-expand)
@@ -171,8 +154,7 @@
 
   ("RET" . newline-and-indent)
 
-  ([f10] . ymacs-editor/compile)
-  ([f7] . ymacs-hydra/toggles))
+  ([f10] . ymacs-editor/compile))
 
 (define-key! :prefix "C-c m"
   ("P" . mc/mark-pop)
@@ -186,12 +168,10 @@
   ("s" . mc/sort-regions)
   ("|" . mc/vertical-align)
   ("r" . mc/reverse-regions)
-  ("." . ymacs-hydra/mc/mc/mark-next-like-this)
-  ("," . ymacs-hydra/mc/mc/mark-previous-like-this)
   ([C-S-mouse-1] . mc/add-cursor-on-click))
 
 (define-key! :prefix "M-g"
-  ("O" . ymacs-hydra/outline/body)
+  ("O" . ymacs-transient/outline)
   ("b" . bookmark-jump)
   ("e" . consult-compile-error)
   ("f" . consult-flymake)

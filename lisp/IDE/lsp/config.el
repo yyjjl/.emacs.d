@@ -1,5 +1,7 @@
 ;; -*- lexical-binding:t -*-
 
+(setq lsp-pyright-multi-root nil)
+
 (setq lsp-keymap-prefix "C-c ;")
 (after! lsp-mode
   ;; (lsp-dired-mode 1)
@@ -19,23 +21,6 @@
    'mode-line-misc-info
    '(lsp-signature-mode
      (:propertize "[Signature]" face ymacs-modeline-lsp-success)))
-
-  (ymacs-editor//add-toggles
-   "LSP" 'lsp-mode
-   '("l i" lsp-toggle-trace-io
-     "Trace IO" :toggle lsp-print-io)
-   '("l h" lsp-toggle-symbol-highlight
-     "Highlight Symbol" :toggle lsp-enable-symbol-highlighting)
-   '("l t" lsp-toggle-on-type-formatting
-     "On Type Formating" :toggle lsp-enable-on-type-formatting)
-   '("l s" lsp-toggle-signature-auto-activate
-     "Signature" :toggle lsp-signature-auto-activate)
-   '("l S" ymacs-lsp/toggle-semantic-tokens
-     "Semantic" :toggle lsp-semantic-tokens-enable)
-
-   '("l r" lsp-workspace-restart "Restart" :exit t)
-   '("l K" lsp-workspace-shutdown "Shutdown" :exit t)
-   '("l I" lsp-install-server "Install Server" :exit t))
 
   (define-key! :map lsp-command-map
     (";" . lsp-avy-lens)
@@ -88,7 +73,7 @@
 
   (setq lsp-signature-doc-lines 5)
   (setq lsp-signature-auto-activate nil)
-  ;; (setq lsp-keep-workspace-alive nil)
+  (setq lsp-keep-workspace-alive nil)
   (setq lsp-restart 'interactive)
 
   ;; manually configured
