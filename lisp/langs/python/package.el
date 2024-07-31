@@ -12,8 +12,6 @@
 (executable! ipython3)
 (executable! pylint)
 
-(defvar ymacs-python-lsp-servers '(pyls pyright pylance))
-
 (defvar-local ymacs-python--last-buffer nil
   "Help keep track of python buffer when changing to pyshell.")
 
@@ -25,30 +23,3 @@
 
 (eval-when-has-feature! debug
   (add-to-list 'ymacs-debugger-alist '(python-mode pdb :gud t)))
-
-(eval-when-has-feature! lsp
-  (require-packages! lsp-pyright)
-
-  (put 'lsp-pyright-extra-paths 'safe-local-variable #'vectorp)
-  (put 'lsp-pyright-python-executable-cmd 'safe-local-variable #'stringp)
-
-  (option! python-lsp-server 'pyright
-    "Python LSP server type"
-    :type 'symbol)
-
-  (autoload #'ymacs-python/change-lsp-server (expand! "commands") nil t)
-
-  (ymacs-lsp//register-client
-   'pyls
-   :package 'lsp-pyls
-   :enable-fn (lambda () (eq ymacs-python-lsp-server 'pyls)))
-
-  (ymacs-lsp//register-client
-   'pyright
-   :package 'lsp-pyright
-   :enable-fn (lambda () (eq ymacs-python-lsp-server 'pyright)))
-
-  (ymacs-lsp//register-client
-   'pylance
-   :package 'lsp-pyright
-   :enable-fn (lambda () (eq ymacs-python-lsp-server 'pylance))))

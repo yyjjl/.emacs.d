@@ -41,9 +41,6 @@
 ;;* Checker
 (defvar-local ymacs-modeline--checker-state nil)
 
-;;* LSP
-(defvar-local ymacs-modeline--lsp-state nil)
-
 (defface ymacs-modeline-buffer-path
   '((t (:inherit (mode-line-emphasis bold))))
   "Face used for the dirname part of the buffer path."
@@ -121,21 +118,6 @@
      (:background "#915B2D")))
   "Face to use for the mode-line while debugging."
   :group 'ymacs-modeline)
-
-(defface ymacs-modeline-lsp-success
-  '((t (:inherit success :weight normal)))
-  "Face for LSP success state."
-  :group 'mode-line-faces)
-
-(defface ymacs-modeline-lsp-warning
-  '((t (:inherit warning :weight normal)))
-  "Face for LSP warning state."
-  :group 'mode-line-faces)
-
-(defface ymacs-modeline-lsp-error
-  '((t (:inherit error :weight normal)))
-  "Face for LSP error state."
-  :group 'mode-line-faces)
 
 (defface ymacs-modeline-buffer-timemachine
   '((t (:inherit (ymacs-modeline-buffer-file italic underline))))

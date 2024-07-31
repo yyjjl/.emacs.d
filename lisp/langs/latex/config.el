@@ -4,13 +4,6 @@
  :modes (latex-mode tex-mode)
  :forward #'ymacs-latex/forward-sexp)
 
-(eval-when-has-feature! lsp
-  (setq lsp-clients-texlab-executable ymacs-texlab-path)
-
-  (after! lsp-diagnostics
-    (add-to-list 'lsp-diagnostics-disabled-modes 'latex-mode)
-    (add-to-list 'lsp-diagnostics-disabled-modes 'tex-mode)))
-
 (after! latex
   (ymacs-latex//setup-latexmk)
 

@@ -1,11 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
 
-(eval-when-has-feature! lsp
-  (after! lsp-go
-    (ymacs-lsp//set-simple-install-fn
-     'gopls
-     (list "bash" (expand-etc! "scripts/install_gopls")))))
-
 (after! go-mode
   (define-key! :map go-mode-map
     ("C-c t t" . go-tag-add)

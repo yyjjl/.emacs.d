@@ -78,6 +78,22 @@
 (after! speedbar
   (setq speedbar-use-images nil))
 
+(after! diff-mode
+  (define-key! :map diff-mode-map
+    ("ESC")
+    ("a" . diff-apply-hunk)
+    ("n" . diff-hunk-next)
+    ("p" . diff-hunk-prev)
+    ("g" . diff-refresh-hunk)
+    ("o" . diff-goto-source)
+    ("t" . diff-test-hunk)
+    ("/" . diff-split-hunk)
+    ("C-/" . diff-undo)
+    ("C-_" . diff-undo)
+    ("TAB" . diff-hunk-next)
+    ("<tab>" . diff-hunk-next)
+    ("<backtab>" . diff-hunk-prev)))
+
 (after! ediff
   (add-hook 'ediff-before-setup-hook
             (lambda () (window-configuration-to-register :ediff-windows)))
@@ -257,6 +273,7 @@
     (when (bound-and-true-p multiple-cursors-mode)
       (multiple-cursors-mode -1)))
 
+  (setq iedit-auto-buffering nil)
   (setq iedit-auto-narrow t))
 
 (after! multiple-cursors

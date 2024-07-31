@@ -7,19 +7,13 @@
     (ymacs-modeline--project-detected-p . nil)
     (ymacs-modeline--project-root . nil)))
 
-;; Declare directories with ".project" as a project
-(cl-defmethod project-root ((project (head local)))
-  (cdr project))
-
 (defun ymacs-editor//project (-directory)
   "Find current project"
   (let* ((key (expand-file-name -directory))
          (value (gethash key ymacs-editor-project-cache)))
     (when (not (eq value 'none))
       (when (not (and value (file-exists-p (project-root value))))
-        (setq value (or (when-let (root (locate-dominating-file -directory ".project"))
-                          (cons 'local root))
-                        (project-try-vc -directory)
+        (setq value (or (project-try-vc -directory)
                         ;; default is 'none
                         'none))
         (puthash key value ymacs-editor-project-cache))
@@ -53,10 +47,10 @@
       ("R" . ymacs-editor/generate-tags)
       ("i" . ymacs-editor/invalid-project-cache)))
 
-  (eval-when! (executable-find "fzf")
-    (when (boundp 'project-prefix-map)
-      (define-key! :map project-prefix-map
-        ("f" . consult-find)))
-    (setcar (assoc 'project-find-file project-switch-commands) #'consult-find))
+  (when (boundp 'project-prefix-map)
+    (define-key! :map project-prefix-map
+      ("f" . ymacs-editor/find-file)))
+  (setcar (assoc 'project-find-file project-switch-commands) #'ymacs-editor/find-file)
 
+  (setq project-vc-extra-root-markers '(".project"))
   (setq project-find-functions '(ymacs-editor//project)))

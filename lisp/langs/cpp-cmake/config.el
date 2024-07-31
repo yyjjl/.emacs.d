@@ -44,10 +44,3 @@
 (after! cmake-ts-mode
   (define-key! :map cmake-ts-mode-map
     ([f10] . compile)))
-
-(eval-when-has-feature! lsp
-  (after! lsp-cmake
-    (ymacs-lsp//set-simple-install-fn
-     'cmakels
-     '("pip3" "install" "--user" "cmake-language-server")
-     '("pip3" "install" "--user" "-U" "cmake-language-server"))))

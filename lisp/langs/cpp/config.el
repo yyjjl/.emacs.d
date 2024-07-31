@@ -36,16 +36,6 @@
 ;;       (,(rx symbol-start (or "NULL" "nullptr" "false" "true") symbol-end)
 ;;        . font-lock-constant-face))))
 
-(eval-when-has-feature! lsp
-  (after! lsp-clangd
-    (put 'lsp-clients-clangd-args 'risky-local-variable-p nil)
-    (put 'lsp-clients-clangd-args 'safe-local-variable (lambda (x) (and (listp x) (cl-every #'stringp x))))
-
-    (dolist (arg '("--all-scopes-completion"
-                   "-j=4"
-                   "--background-index"))
-      (cl-pushnew arg lsp-clients-clangd-args :test #'string=))))
-
 (after! cc-mode
   (require 'c-ts-mode)
 

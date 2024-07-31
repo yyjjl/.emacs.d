@@ -23,29 +23,11 @@
 
     monokai-theme
 
-    semantic
-    semantic/db-global
-    semantic/db-file
-    semantic/db-mode
-    semantic/bovine/el
-    semantic/bovine/c
-    semantic/wisent/python
-
     recentf
     saveplace
     savehist
 
     winner
-
-    ;; company
-    company-gtags
-    company-etags
-    company-yasnippet
-    company-keywords
-    company-dabbrev-code
-    company-dabbrev
-    company-capf
-    company-files
 
     ;; ui
     tab-line
@@ -89,18 +71,11 @@
     tramp
     term
 
-    lsp-diagnostics
-    lsp-modeline
-
     ,@ymacs-required-packages))
 
 (dolist (package ymacs-preload-packages)
   (when (not (memq package ymacs-ignored-packages))
-    (require package nil t)
-
-    (when (eq package 'lsp-mode)
-      (dolist (package lsp-client-packages)
-        (require package nil t)))))
+    (require package nil t)))
 
 (message "Preload packages:\n")
 (message "  %s"

@@ -1,27 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
-(cl-defun ymacs-python//set-lsp-server (&optional -server)
-  (when (not -server)
-    (if (get 'ymacs-python-lsp-server 'initialized)
-        (cl-return-from ymacs-python//set-lsp-server)
-      ;; first call to this function
-      (setq -server ymacs-python-lsp-server)
-      (setq ymacs-python-lsp-server nil)
-      (put 'ymacs-python-lsp-server 'initialized t)))
-
-  (cl-assert (memq -server ymacs-python-lsp-servers)
-             "Not in %s"
-             ymacs-python-lsp-servers)
-
-  (when (and (not (eq -server ymacs-python-lsp-server))
-             (require 'lsp-mode nil t))
-    (require (intern (format "lsp-%s" -server)) nil t)
-
-    (setq ymacs-python-lsp-server -server)
-    (setq lsp-disabled-clients (cl-delete -server lsp-disabled-clients))
-    (dolist (server ymacs-python-lsp-servers)
-      (unless (eq server -server)
-        (add-to-list 'lsp-disabled-clients server)))))
+(eval-when-compile
+  (require 'python))
 
 (defun ymacs-python//get-or-create-process (-directory -dedicated)
   (let* ((default-directory -directory)

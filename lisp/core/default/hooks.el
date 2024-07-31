@@ -45,11 +45,6 @@
 
   ;; update checker
   (advice-add #'flymake--handle-report :after #'ymacs-modeline//update-checker-state)
-  (eval-when-has-feature! lsp
-    (add-hook 'lsp-configure-hook
-              (lambda ()
-                (run-with-idle-timer 0 nil #'ymacs-modeline//update-lsp-state (current-buffer))))
-    (add-hook 'lsp-unconfigure-hook #'ymacs-modeline//update-lsp-state))
 
   (ymacs-modeline-set! (comint term vterm)
     :mode-line shell

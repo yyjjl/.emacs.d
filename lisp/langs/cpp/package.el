@@ -30,6 +30,3 @@
 (eval-when-has-feature! debug
   (dolist (mode '(c-mode c++-mode c-ts-mode c++-ts-mode))
     (add-to-list 'ymacs-debugger-alist `(,mode gdb :gud t))))
-
-(eval-when-has-feature! lsp
-  (ymacs-lsp//register-client 'clangd :package 'lsp-clangd))

@@ -59,14 +59,13 @@
   (add-hook 'comint-exec-hook #'ymacs-term//sentinel-setup)
 
   (define-hook! ymacs-term//comint-setup (comint-mode-hook)
-    (company-mode 1)
+    (corfu-mode 1)
+    (setq-local corfu-preselect 'prompt)
 
     ;; But don't show trailing whitespace in SQLi, inf-ruby etc.
     (setq show-trailing-whitespace nil)
-    (setq-local company-idle-delay nil)
+    (setq-local corfu-auto nil)
     (setq-local yas-buffer-local-condition nil)
-
-    (local-set-key [remap completion-at-point] #'company-complete)
 
     (when (string-match-p "inferior\\|interactive" (symbol-name major-mode))
       (setq ymacs-term-exit-action 'shell)))

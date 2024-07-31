@@ -10,9 +10,6 @@
 
 (executable! texlab :exe [(expand-cache! "lsp/texlab/texlab") "texlab"])
 
-(eval-when-has-feature! lsp
-  (ymacs-lsp//register-client 'texlab :package 'lsp-tex))
-
 (ymacs-editor//set-narrow-handler
  :mode latex-mode
  :fn1 LaTeX-narrow-to-environment

@@ -20,7 +20,9 @@
 (require-packages!
  (exec-path-from-shell :when sys/macp)
  (fcitx :when sys/linuxp)
- company
+ corfu
+ corfu-terminal
+ cape
  consult
  embark-consult
  vertico
@@ -39,6 +41,7 @@
  page-break-lines
  sudo-edit
  which-key
+ lv
  highlight-indentation)
 
 (put 'scroll-left 'disabled nil)
@@ -111,7 +114,7 @@
   ("w ]" . winner-redo)
   ("w w" . ymacs-editor/move-buffer)
 
-  ("j" . consult-find)
+  ("j" . ymacs-editor/find-file)
 
   (("C-b" "B") . ibuffer))
 
@@ -123,8 +126,7 @@
   ("C-;" . embark-dwan)
 
   ("C-c C-b" . ymacs-editor/format-paragraph)
-  ("C-c F" . company-files)
-  ([f6] . company-yasnippet)
+  ("C-c F" . cape-file)
 
   ("C-k" . ymacs-editor/smart-kill-line)
 
@@ -178,8 +180,7 @@
   ("o" . consult-outline)
   ("m" . consult-mark)
   ("k" . consult-global-mark)
-  ("i" . imenu)
-  ("I" . consult-imenu-multi)
+  ("i" . consult-imenu-multi)
   ("u" . browse-url-at-point)
   ("w" . ymacs-editor/avy-copy)
   ("y" . ymacs-editor/avy-copy-and-yank)
@@ -198,6 +199,7 @@
   ("l p" . list-processes)
   ("l f" . find-library)
 
+  ("i" . consult-imenu-multi)
   ("m" . man)
   ("g" . consult-git-grep)
   ("/" . consult-grep)

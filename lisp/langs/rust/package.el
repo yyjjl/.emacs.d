@@ -2,9 +2,6 @@
 
 (require-packages! cargo rust-mode)
 
-(eval-when-has-feature! lsp
-  (ymacs-lsp//register-client 'rust-analyzer :package 'lsp-rust))
-
 (defvar ymacs-rust-cargo-commands
   (eval-when-compile
     (let (commands)

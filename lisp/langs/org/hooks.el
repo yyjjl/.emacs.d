@@ -55,7 +55,8 @@
     (when (fboundp 'org-num-mode)
       (org-num-mode 1))
 
-    (add-to-list 'company-backends 'ymacs-org/company-symbols))
+    ;; (add-to-list 'company-backends 'ymacs-org/company-symbols)
+    )
 
   (add-hook 'org-speed-command-hook #'ymacs-org/block-speed-command-activate))
 

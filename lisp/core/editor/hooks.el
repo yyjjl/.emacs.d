@@ -17,20 +17,9 @@
         (and (bound-and-true-p outline-minor-mode) (looking-at-p outline-regexp)))
       ;; Toggle outline
       (outline-toggle-children)
-    (let ((old-point (point))
-          (old-tick (buffer-chars-modified-tick))
-          (do-complete (equal current-prefix-arg '(16))))
-      (unless do-complete
-        (apply -fn -arg))
-      (when (or do-complete
-                (and (equal old-point (point))
-                     (equal old-tick (buffer-chars-modified-tick))
-                     (called-interactively-p 'interactive)
-                     (not (eq tab-always-indent 'complete))))
-        ;; Trigger completions
-        (or (ignore-errors (call-interactively #'company-files))
-            (ignore-errors (call-interactively #'company-complete))
-            (ignore-errors (call-interactively #'hippie-expand)))))))
+    (let ((completion-at-point-functions
+           (cl-list* 'cape-file completion-at-point-functions)))
+      (apply -fn -arg))))
 
 (define-hook! ymacs-editor//create-missing-directories (find-file-not-found-functions)
   "Automatically create missing directories when creating new files."
@@ -44,6 +33,10 @@
 
 (define-hook! ymacs-editor//minibuffer-setup (minibuffer-setup-hook)
   (setq line-spacing nil)
+
+  (when (bound-and-true-p corfu-terminal-mode)
+    (setq completion-in-region-function #'consult-completion-in-region))
+
   ;; setup consult
   (setq ymacs-editor-minibuffer-saved-point
         (with-current-buffer (window-buffer (minibuffer-selected-window))
@@ -68,7 +61,7 @@
     (message "dir-local variables for current project are updated")))
 
 (defun ymacs-editor//generic-setup ()
-  (company-mode 1)
+  (corfu-mode 1)
   (hl-line-mode 1)
   (display-fill-column-indicator-mode 1)
 
@@ -158,7 +151,7 @@
   (electric-indent-mode 1)
 
   ;; global-modes
-  (semantic-mode 1)
+  ;; (semantic-mode 1)
   ;; (which-function-mode 1)
   (global-subword-mode 1)
   ;; (global-auto-revert-mode 1)
@@ -178,12 +171,17 @@
   (ymacs-x//enable)
   (yas-global-mode 1)
 
+  ;; (repeat-mode 1)
+
   (tab-bar-mode 1)
 
   (load-theme 'monokai t)
 
   (eval-when! sys/macp
     (exec-path-from-shell-initialize))
+
+  (unless (display-graphic-p)
+    (corfu-terminal-mode 1))
 
   (when (and sys/linuxp (display-graphic-p -frame))
     ;; Keep mouse at upper-right corner when typing

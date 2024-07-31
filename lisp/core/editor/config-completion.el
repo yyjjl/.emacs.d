@@ -13,7 +13,7 @@
   (define-key! :map (make-sparse-keymap)
     ("M-." . ymacs-editor/meta-dot-for-ripgrep)))
 
-(defvar ymacs-editor-rg-type-aliases
+(defconst ymacs-editor-rg-type-aliases
   (eval-when-compile
     (when ymacs-ripgrep-path
       (condition-case err
@@ -62,7 +62,7 @@
   (setq vertico-resize nil)
   (setq vertico-count-format '("%10s " . "%s/%s"))
 
-  (setq completion-styles '(orderless))
+  (setq completion-styles '(orderless basic))
   (setq completion-category-overrides '((file (styles partial-completion orderless))))
 
   (add-hook 'rfn-eshadow-update-overlay-hook #'ymacs-editor//vertico-directory-tidy)
@@ -97,10 +97,10 @@
 
   (add-to-list 'consult-buffer-sources 'consult--source-recent-dired 'append)
 
-  (define-advice consult-imenu--items (:before () refresh)
-    (setq imenu-max-item-length (max 80 (- (frame-width) 20)))
-    (when (eq imenu-create-index-function #'semantic-create-imenu-index)
-      (semantic-fetch-tags)))
+  ;; (define-advice consult-imenu--items (:before () refresh)
+  ;;   (setq imenu-max-item-length (max 80 (- (frame-width) 20)))
+  ;;   (when (eq imenu-create-index-function #'semantic-create-imenu-index)
+  ;;     (semantic-fetch-tags)))
 
   (define-advice consult--async-process (:around (-fn -async -builder &rest -props) display-command)
     (let ((new-builder
@@ -149,3 +149,21 @@
     ("d" (defun ymacs-embark/open-directory (-file)
            (dired (file-name-directory -file))))
     ("X" . delete-file)))
+
+(after! corfu
+  (setq tab-always-indent 'complete)
+
+  (setq corfu-auto-prefix 2)
+  (setq corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  (setq corfu-auto t)                 ;; Enable auto completion
+  (setq corfu-separator ?\s)          ;; Orderless field separator
+  (setq corfu-quit-at-boundary t)   ;; Never quit at completion boundary
+  ;; (setq corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  (setq corfu-preview-current nil)    ;; Disable current candidate preview
+  (setq corfu-preselect 'valid)      ;; Preselect the prompt
+  ;; (setq corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  ;; (setq corfu-scroll-margin 5)        ;; Use scroll margin
+  )
+
+(after! corfu-terminal
+  (setq corfu-terminal-enable-on-minibuffer nil))

@@ -6,7 +6,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(fill-column 100)
- '(lsp-clangd-version "18.1.3")
  '(mouse-wheel-progressive-speed nil)
  '(native-comp-async-jobs-number 2)
  '(org-download-backend "curl \"%s\" -o \"%s\"")
@@ -22,12 +21,9 @@
  '(user-full-name "Zet")
  '(warning-suppress-log-types '((comp)))
  '(which-key-dont-use-unicode t)
+ '(ymacs-clangd-version "18.1.3")
  '(ymacs-lsp-enable-remote-server-p nil)
  '(ymacs-python-lsp-server 'pylance)
- '(ymacs-term-path-alist
-   '(("ts" . "/bin/bash")
-     ("m2" . "/bin/bash")
-     ("m1" . "/bin/bash")))
  '(ymacs-use-native-treesit-p nil))
 
 (custom-set-faces
@@ -35,26 +31,24 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :extend nil :stipple nil :background "#1B1D1E" :foreground "#F8F8F2" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 130 :width normal :foundry "nil" :family "Monaco"))))
+ '(avy-background-face ((t (:foreground "white"))))
+ '(eglot-diagnostic-tag-unnecessary-face ((t (:inherit shadow :underline t))))
  '(eldoc-highlight-function-argument ((t (:foreground "#86DC2F" :weight bold))))
  '(flymake-error ((t (:inherit error :underline t))))
  '(flymake-note ((t (:foreground "green" :underline t))))
  '(flymake-warning ((t (:inherit warning :inverse-video t))))
  '(font-lock-builtin-face ((t (:foreground "#749E20"))))
  '(font-lock-doc-face ((t (:foreground "#777777" :weight bold))))
- '(hl-line ((t (:background "grey5"))))
+ '(hl-line ((t (:extend t :background "color-234"))))
  '(iedit-occurrence ((t (:foreground "#fb2874" :inverse-video t :weight bold))))
- '(ivy-modified-buffer ((t (:inherit ymacs-modeline-buffer-modified))))
- '(ivy-modified-outside-buffer ((t (:inherit ymacs-modeline-urgent))))
+ '(lsp-lens-face ((t (:inherit lsp-details-face :underline t))))
  '(mode-line-highlight ((t (:foreground "#FD971F" :inverse-video t))))
- '(tab-bar ((t (:background "#1B1D1E" :foreground "white"))))
- '(tab-bar-tab ((t (:inherit warning))))
- '(tab-bar-tab-inactive ((t (:inherit font-lock-comment-face :inverse-video t))))
+ '(tab-bar ((t (:inherit variable-pitch :background "#1B1D1E" :foreground "white"))))
  '(tab-line ((t (:background "#1B1D1E" :foreground "white"))))
  '(tab-line-tab ((t (:inherit warning))))
  '(tab-line-tab-current ((t (:inherit tab-line-tab :inverse-video t))))
  '(tab-line-tab-inactive ((t (:inherit font-lock-comment-face :inverse-video t))))
- '(tooltip ((t (:inherit default :background "#49483E" :foreground "gray100"))))
+ '(tooltip ((t (:background "#49483E"))))
  '(wgrep-face ((((type graphic)) (:box (:line-width (1 . 1) :color "grey75"))) (((type tty)) (:underline t))))
  '(whitespace-indentation ((t (:foreground "dim gray" :weight bold)))))
 

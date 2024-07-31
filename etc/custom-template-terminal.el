@@ -6,8 +6,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(fill-column 120)
- '(lsp-clangd-version "18.1.3")
- '(lsp-java-java-path "~/program/jdk-16.0.1/bin/java")
  '(org-download-backend "curl \"%s\" -o \"%s\"")
  '(package-archives
    '(("melpa" . "http://melpa.org/packages/")
@@ -15,7 +13,6 @@
      ("nongnu" . "http://elpa.nongnu.org/nongnu/")))
  '(safe-local-variable-values
    '((python-shell-interpreter . "python3")
-     (lsp-pyright-python-executable-cmd . "python")
      (python-shell-interpreter . "python")))
  '(shell-file-name "/bin/zsh")
  '(split-width-threshold 160)
@@ -23,6 +20,7 @@
  '(user-full-name "Zet")
  '(warning-suppress-log-types '((comp)))
  '(which-key-dont-use-unicode t)
+ '(ymacs-clangd-version "18.1.3")
  '(ymacs-lsp-enable-remote-server-p nil)
  '(ymacs-only-in-terminal-p t)
  '(ymacs-package-use-gnutls-p nil)
@@ -37,16 +35,15 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(avy-background-face ((t (:foreground "white"))))
+ '(eglot-diagnostic-tag-unnecessary-face ((t (:inherit shadow :underline t))))
  '(eldoc-highlight-function-argument ((t (:foreground "#86DC2F" :weight bold))))
  '(flymake-error ((t (:inherit error :underline t))))
  '(flymake-note ((t (:foreground "green" :underline t))))
  '(flymake-warning ((t (:inherit warning :inverse-video t))))
  '(font-lock-builtin-face ((t (:foreground "#749E20"))))
  '(font-lock-doc-face ((t (:foreground "#777777" :weight bold))))
- '(hl-line ((t (:background "black"))))
+ '(hl-line ((t (:extend t :background "color-234"))))
  '(iedit-occurrence ((t (:foreground "#fb2874" :inverse-video t :weight bold))))
- '(ivy-modified-buffer ((t (:inherit ymacs-modeline-buffer-modified))))
- '(ivy-modified-outside-buffer ((t (:inherit ymacs-modeline-urgent))))
  '(lsp-lens-face ((t (:inherit lsp-details-face :underline t))))
  '(mode-line-highlight ((t (:foreground "#FD971F" :inverse-video t))))
  '(tab-bar ((t (:inherit variable-pitch :background "#1B1D1E" :foreground "white"))))

@@ -21,13 +21,13 @@
   (interactive "P")
   (cond
    (-whole-buffer
-    (lsp-format-buffer))
+    (funcall ymacs-lsp-format-buffer-function))
    ((region-active-p)
-    (lsp-format-region (region-beginning) (region-end)))
+    (funcall ymacs-lsp-format-region-function (region-beginning) (region-end)))
    (t
     (if-let (bounds (or (bounds-of-thing-at-point 'sexp)
                         (bounds-of-thing-at-point 'defun)))
-        (lsp-format-region (car bounds) (cdr bounds))
+        (funcall ymacs-lsp-format-region-function (car bounds) (cdr bounds))
       (message "No sexp or defun found, please use C-u prefix")))))
 
 ;;;###autoload
@@ -44,5 +44,5 @@
                        (equal (nth 0 parts) "clangd"))
               (push (nth 1 parts) versions))))))
     (custom-set-variables
-     `(lsp-clangd-version ,(completing-read! "Select clangd version:" (nreverse (sort versions #'string<)))))
+     `(ymacs-clangd-version ,(completing-read! "Select clangd version:" (nreverse (sort versions #'string<)))))
     (custom-save-all)))

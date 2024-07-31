@@ -1,22 +1,5 @@
 ;;; -*- lexical-binding: t
 
-(eval-when-has-feature! lsp
-  (defun ymacs-python/change-lsp-server ()
-    (interactive)
-    (let* ((servers (cl-remove ymacs-python-lsp-server ymacs-python-lsp-servers))
-           (server (intern (completing-read! "Server: " (mapcar #'symbol-name servers)))))
-      (ymacs-python//set-lsp-server server))
-
-    (let (buffers)
-      (when-let ((workspaces (lsp-workspaces)))
-        (with-lsp-workspace (lsp--read-workspace)
-          (setq buffers (lsp--workspace-buffers lsp--cur-workspace))
-          (lsp--shutdown-workspace)))
-
-      (dolist (buffer buffers)
-        (with-current-buffer buffer
-          (revert-buffer))))))
-
 ;;;###autoload
 (defun ymacs-python/setup-project ()
   (interactive)
@@ -27,21 +10,7 @@
      project-root
      (append
       (list (cons 'python-shell-interpreter python-path)
-            (cons 'python-shell-virtualenv-root venv-root))
-      (eval-when-has-feature! lsp
-        (list (cons 'lsp-pyright-python-executable-cmd python-path)))))))
-
-;;;###autoload
-(defun ymacs-python/shell-completion-complete-or-indent ()
-  "Complete or indent depending on the context.
-If content before pointer is all whitespace, indent.
-If not try to complete."
-  (interactive)
-  (if (string-match "^[[:space:]]*$"
-                    (buffer-substring (comint-line-beginning-position)
-                                      (point)))
-      (indent-for-tab-command)
-    (call-interactively #'company-complete)))
+            (cons 'python-shell-virtualenv-root venv-root))))))
 
 ;;;###autoload
 (defun ymacs-python/autopep8 ()

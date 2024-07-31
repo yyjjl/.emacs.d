@@ -38,6 +38,3 @@
 
 (defvar ymacs-cpp-cmake-config-buffer-name "*ymacs-cpp-cmake-config*")
 (defvar-local ymacs-cpp-cmake-project-root nil)
-
-(eval-when-has-feature! lsp
-  (ymacs-lsp//register-client 'cmakels :package 'lsp-cmake))

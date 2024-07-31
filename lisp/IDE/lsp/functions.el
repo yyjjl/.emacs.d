@@ -1,75 +1,83 @@
 ;; -*- lexical-binding:t -*-
 
 (eval-when-compile
-  (require 'lsp-mode))
+  (require 'python))
 
-(declare-function flymake-diagnostic-text 'flymake)
-(declare-function flymake-diagnostic-type 'flymake)
-(declare-function flymake--lookup-type-property 'flymake)
-(declare-function lsp--progress-status 'lsp)
+(defun ymacs-lsp//default-workspace-configuration (-server)
+  (let ((modes (eglot--major-modes -server)))
+    (cond
+     ((memq 'python-mode modes)
+      (let ((exec-path (python-shell-calculate-exec-path)))
+        `(
+          :python  (
+                    :venvPath ,python-shell-virtualenv-root
+                    :pythonPath ,(executable-find python-shell-interpreter)
+                    :analysis (:typeCheckingMode "basic"))
+          :pyls (:configurationSources ["flake8"]))))
+     ((memq 'tex-mode modes)
+      (let ((root (or (when (and (boundp 'TeX-master) (stringp TeX-master))
+                        (file-name-directory TeX-master))
+                      ".")))
+        `(:latex (:rootDirectory ,root :lint (:onSave :json-false))))))))
 
-(defun ymacs-lsp//use-common-download-script (-client)
-  (let ((client-id (lsp--client-server-id -client)))
-    (setf (lsp--client-download-server-fn -client)
-          (lambda (_client callback error-callback _update?)
-            (let ((default-directory (expand-etc! "scripts")))
-              (lsp-async-start-process
-               callback error-callback
-               "bash" "update_or_install_lsp" (symbol-name client-id)))))))
 
-(defmacro ymacs-lsp//try-enable (-name)
-  `(and (eq ymacs-lsp-project-state :enabled)
-        ,(let ((symbol (intern (format "ymacs-%s-lsp" -name))))
-           `(not (and (boundp ',symbol)
-                      (eq ,symbol :disabled))))
-        (ignore-errors
-          (require 'lsp)
-          ;; clear multi-folders
-          (setf (lsp-session-server-id->folders (lsp-session)) (ht))
-          (lsp))
-        (bound-and-true-p lsp-mode)
-        ;; disable semantic when using lsp
-        (setq ymacs-editor--inhibit-semantic t)))
+(cl-defun ymacs-lsp//set-python-lsp-server (&optional -server)
+  (when (not -server)
+    (if (get 'ymacs-python-lsp-server 'initialized)
+        (cl-return-from ymacs-lsp//set-python-lsp-server)
+      ;; first call to this function
+      (setq -server ymacs-python-lsp-server)
+      (setq ymacs-python-lsp-server nil)
+      (put 'ymacs-python-lsp-server 'initialized t)))
 
-(defmacro ymacs-lsp//try-enable-simple (-name &rest -condition)
+  (cl-assert (memq -server ymacs-python-lsp-servers)
+             "Not in %s"
+             ymacs-python-lsp-servers)
+
+  (when (and (not (eq -server ymacs-python-lsp-server)))
+    (require 'eglot)
+    (setq ymacs-python-lsp-server -server)
+    (setf (cdr (ymacs-lsp//eglot-lookup-mode 'python-mode))
+          (pcase -server
+            ('pylance
+             (list "node" (file-local-name (expand-cache! "lsp/pylance/current/extension/dist/server.bundle.hijack.js")) "--stdio"))
+            ('pyright
+             (list "node" (file-local-name (expand-cache! "lsp/npm/pyright/bin/pyright-langserver")) "--stdio"))
+            ('pyls
+             (list "pyls"))))))
+
+(defun ymacs-lsp//eglot-lookup-mode (-mode)
+  (let ((programs eglot-server-programs))
+    (catch 'found
+      (while (and programs)
+        (let* ((item (car programs))
+               (modes (car item)))
+          (when (or (eq -mode modes)
+                    (and (listp modes)
+                         (or (memq -mode modes)
+                             (memq -mode (mapcar #'car-safe modes)))))
+            (throw 'found item)))
+        (setq programs (cdr programs)))
+      nil)))
+
+(defmacro ymacs-lsp//try-enable-eglot (-name &rest -body)
   (declare (indent 1))
-  (push '(is-buffer-suitable-for-coding!) -condition)
-  (if (null (cdr -condition))
-      (setq -condition (car -condition))
-    (setq -condition `(and . ,-condition)))
-  `(with-transient-hook! (hack-local-variables-hook :local t)
-     (when ,-condition
-       (ymacs-lsp//try-enable ,-name))))
+  (let ((hook-name (intern (format "ymacs-lsp//eglot-setup--%s" -name))))
+    `(when (and (eq ymacs-lsp-project-state :enabled)
+                ,(let ((symbol (intern (format "ymacs-%s-lsp" -name))))
+                   `(not (and (boundp ',symbol)
+                              (eq ,symbol :disabled)))))
+       (defun ,hook-name ()
+         (when eglot--managed-mode
+           ,@-body
+           (eglot-inlay-hints-mode -1)))
+       (add-hook 'eglot-managed-mode-hook ',hook-name nil t)
 
-(defun ymacs-lsp//clear-leak-handlers (-lsp-client)
-  "Clear leaking handlers in LSP-CLIENT."
-  (let* ((response-handlers (lsp--client-response-handlers -lsp-client))
-         (response-ids (cl-loop
-                        for handler being the hash-values of response-handlers using (hash-keys response-id)
-                        when (> (time-convert (time-since (nth 3 handler)) 'integer)
-                                (* 2 lsp-response-timeout))
-                        collect response-id)))
+       (when (and ymacs-lsp-booster-path
+                  (not (bound-and-true-p eglot-booster-mode))
+                  (fboundp 'eglot-booster-mode))
+         (setq eglot-booster-no-remote-boost t)
+         (add-to-list 'exec-path (file-name-directory ymacs-lsp-booster-path))
+         (eglot-booster-mode 1))
 
-    (when response-ids
-      (message "Deleting %d handlers in %s lsp-client..."
-               (length response-ids)
-               (lsp--client-server-id -lsp-client))
-      (dolist (response-id response-ids)
-        (remhash response-id response-handlers)))))
-
-(cl-defun ymacs-lsp//register-client
-    (-client &key ((:package -package)) ((:enable-fn -enable-fn)))
-  (add-to-list 'lsp-client-packages -package)
-  (setf (alist-get -client ymacs-lsp--enabled-clients)
-        (list -package -enable-fn)))
-
-(defun ymacs-lsp//set-simple-install-fn (-client -command &optional -update-command)
-  (setf
-   (lsp--client-download-server-fn (ht-get lsp-clients -client))
-   (lambda (_client -callback -error-callback -update?)
-     (apply #'lsp-async-start-process
-            -callback
-            -error-callback
-            (if -update?
-                (or -update-command -command)
-              -command)))))
+       (eglot-ensure))))

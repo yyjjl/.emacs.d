@@ -14,7 +14,7 @@
                    (file-directory-p (concat remote-host python-shell-virtualenv-root))
                  (file-directory-p python-shell-virtualenv-root)))
           (ymacs-term//send-string
-           (format "source %s\n" (expand-file-name "bin/activate" python-shell-virtualenv-root)))
+           (format " source %s\n" (expand-file-name "bin/activate" python-shell-virtualenv-root)))
         (message "virtualenv %s doesn't exists" python-shell-virtualenv-root))))
 
   (define-hook! ymacs-python//compilation-setup (comint-exec-hook)
@@ -42,23 +42,19 @@
 
       (eval-when-has-feature! lsp
         (with-transient-hook! (hack-local-variables-hook :local t)
-          (ymacs-python//set-lsp-server)
+          (ymacs-lsp//set-python-lsp-server)
 
           (when (and remote-host python-shell-virtualenv-root)
             (let ((exe (expand-file-name python-shell-interpreter
                                          (concat python-shell-virtualenv-root "/bin"))))
               (setq-local python-shell-interpreter exe)))
 
-          (setq-local lsp-pyright-python-executable-cmd python-shell-interpreter)
-          (setq-local lsp-pyright-venv-path python-shell-virtualenv-root)
-
           (when (and (is-buffer-suitable-for-coding!)
                      (or (eq major-mode 'python-mode)
-                         (eq major-mode 'python-ts-mode))
-                     (ymacs-lsp//try-enable python))
-
-            (setq ymacs-lsp-format-buffer-function #'ymacs-python/autopep8)
-            (setq ymacs-lsp-organize-import-function #'py-isort-buffer))))))
+                         (eq major-mode 'python-ts-mode)))
+            (ymacs-lsp//try-enable-eglot python
+              (setq ymacs-lsp-format-buffer-function #'ymacs-python/autopep8)
+              (setq ymacs-lsp-organize-import-function #'py-isort-buffer)))))))
 
   (define-hook! ymacs-python//inferior-setup (inferior-python-mode-hook)
     (remove-hook 'comint-output-filter-functions

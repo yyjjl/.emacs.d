@@ -56,4 +56,4 @@
     (setq-local tab-width 2)
 
     (eval-when-has-feature! lsp
-      (ymacs-lsp//try-enable-simple latex))))
+      (ymacs-lsp//try-enable-eglot latex))))

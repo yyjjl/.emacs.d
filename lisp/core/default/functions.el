@@ -407,13 +407,6 @@ like the scratch buffer where knowing the current project directory is important
 ;;* Misc info
 ;;
 
-(defsubst ymacs-modeline//update-lsp-state (&optional -buffer)
-  (let ((buffer (or -buffer (current-buffer))))
-    (when (buffer-live-p buffer)
-      (with-current-buffer buffer
-        (setq ymacs-modeline--lsp-state
-              (format-mode-line (assoc 'lsp-mode minor-mode-alist)))))))
-
 (ymacs-modeline//def-segment buffer-position
   "The buffer position information."
   '(line-number-mode
@@ -430,9 +423,7 @@ By default, this shows the information specified by `global-mode-string'."
   (list
    ""
    mode-line-misc-info
-   " "
    ymacs-modeline--vcs-state
-   ymacs-modeline--lsp-state
    (when (and (boundp 'python-shell-virtualenv-root)
 	      (stringp python-shell-virtualenv-root)
               (not (string-empty-p python-shell-virtualenv-root)))

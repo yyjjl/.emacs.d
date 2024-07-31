@@ -1,6 +1,13 @@
 ;;; -*- lexical-binding: t; -*-
 
 ;;;###autoload
+(defun ymacs-editor/find-file (-use-find)
+  (interactive "P")
+  (if -use-find
+      (call-interactively #'consult-find)
+    (call-interactively #'project-find-file)))
+
+;;;###autoload
 (defun ymacs-editor/invalid-project-cache ()
   (interactive)
   (let ((project (project-current)))

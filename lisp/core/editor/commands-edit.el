@@ -301,14 +301,11 @@ Optional argument -ARG is used to toggle narrow functions."
       (comment-or-uncomment-region (line-beginning-position) (line-end-position)))))
 
 ;;;###autoload
-(defun ymacs-editor/iedit-mode (-arg)
-  (interactive "P")
+(defun ymacs-editor/iedit-mode ()
+  (interactive)
   (if (bound-and-true-p iedit-rectangle-mode)
       (iedit-rectangle-mode -1)
-    (if (and (equal -arg '(4))
-             (bound-and-true-p lsp-mode))
-        (lsp-iedit-highlights)
-      (call-interactively #'iedit-mode))))
+    (call-interactively #'iedit-mode)))
 
 ;;;###autoload
 (defun ymacs-editor/format-paragraph (&optional -whole-buffer)

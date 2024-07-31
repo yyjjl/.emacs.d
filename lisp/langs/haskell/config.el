@@ -1,11 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
 
-(eval-when-has-feature! lsp
-  (after! lsp-haskell
-    (ymacs-lsp//set-simple-install-fn
-     'lsp-haskell
-     '("ghcup" "install" "hls"))))
-
 (after! haskell-mode
   (define-key! :map haskell-mode-map
     ([f9] . haskell-compile)

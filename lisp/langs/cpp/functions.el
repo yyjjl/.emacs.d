@@ -62,12 +62,11 @@
                                   (if (string-match "^\\[[^]]+\\]\\(.+\\)" mode-name)
                                       (match-string 1 mode-name)
                                     mode-name)))
-                     (throw 'done t))))
-               (ymacs-lsp//try-enable cpp))
-          ;; lsp-mode is enabled
-          (progn
-            (setq-local ymacs-lsp-format-buffer-function #'ymacs-cpp/format-dwim)
-            (setq-local ymacs-lsp-find-other-file-function #'lsp-clangd-find-other-file)
+                     (throw 'done t)))))
+          (ymacs-lsp//try-enable-eglot cpp
+            ;; lsp-mode is enabled
+            (setq-local ymacs-lsp-format-buffer-function  #'ymacs-cpp/format-dwim)
+            (setq-local ymacs-lsp-find-other-file-function #'ymacs-lsp//clangd-find-other-file)
             (when-let (command-fn (ymacs-cpp//get-function command-fn))
               (cl-pushnew command-fn ymacs-editor-compile-command-functions))
             (ymacs-cpp//run-function lsp-enable-handler))

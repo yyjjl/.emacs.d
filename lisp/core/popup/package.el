@@ -9,6 +9,7 @@
         (or "Backtrace"
             "RefTeX Select"
             "LSP Lookup"
+            "EGLOT proposed server changes"
             (and (or "xref" "TeX" "Shell Command Output" "lsp-java-") (* any)))
         "*" string-end)))
 
@@ -45,6 +46,7 @@
             "trace-output"
             (and "poporg: " (*? not-newline))
             "sdcv"
+            "eldoc"
             "ymacs-lisp-message"
             (and (*? not-newline) (in "Hh") "elp" (*? not-newline))
             (and (*? not-newline) (in "Dd") "escribe" (*? not-newline))

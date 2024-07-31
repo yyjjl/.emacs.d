@@ -1,68 +1,57 @@
 ;;; -*- lexical-binding: t; -*-
 
-(eval-when-compile
-  (require 'lsp-mode))
-
-(declare-function lsp-semantic-tokens--disable 'lsp-mode)
 (declare-function treemacs-current-visibility 'treemacs)
 (declare-function treemacs-select-window 'treemacs)
 
-(defun ymacs-lsp//update-or-print-configuration (-section -do-update)
-  (dolist (workspace (lsp-workspaces))
-    (with-lsp-workspace workspace
-      (if -do-update
-          (lsp--set-configuration (lsp-configuration-section -section))
-        (let ((configuration nil))
-          (maphash (-lambda (path (variable boolean?))
-                     (when (s-matches? (concat (regexp-quote -section) "\\..*") path)
-                       (let* ((symbol-value (-> variable
-                                                lsp-resolve-value
-                                                lsp-resolve-value))
-                              (value (if (and boolean? (not symbol-value))
-                                         :json-false
-                                       symbol-value)))
-                         (when (or boolean? value)
-                           (cl-pushnew (format "%s=%s" path value) configuration)))))
-                   lsp-client-settings)
-          (ymacs-lisp/message (string-join configuration "\n") t))))))
+;;;###autoload
+(defun ymacs-lsp/change-python-server ()
+  (interactive)
+  (let* ((servers (cl-remove ymacs-python-lsp-server ymacs-python-lsp-servers))
+         (server (intern (completing-read! "Server: " (mapcar #'symbol-name servers)))))
+    (ymacs-lsp//set-python-lsp-server server))
 
+  (let (buffers)
+    (when-let ((server (eglot-current-server)))
+      (setq buffers (eglot--managed-buffers server))
+      (eglot-shutdown server nil))
 
-(defun ymacs-python/update-configuration (-do-update)
+    (dolist (buffer buffers)
+      (with-current-buffer buffer
+        (revert-buffer)))))
+
+;;;###autoload
+(defun ymacs-lsp//clangd-find-other-file (&optional -new-window)
+  "Switch between the corresponding C/C++ source and header file.
+If NEW-WINDOW (interactively the prefix argument) is non-nil,
+open in a new window.
+
+Only works with clangd."
   (interactive "P")
-  (ymacs-lsp//update-or-print-configuration "python" -do-update))
-
-;;;###autoload
-(defun ymacs-lsp/open-remote-stderr ()
-  (interactive)
-  (if-let* ((remote-host (file-remote-p default-directory))
-            (workspace (car lsp--buffer-workspaces))
-            (name (lsp--client-server-id (lsp--workspace-client workspace)))
-            (path (concat remote-host (ymacs-lsp//get-remote-stderr name))))
+  (if-let* ((server (eglot--current-server-or-lose))
+            (other-file (eglot--request server :textDocument/switchSourceHeader (eglot--TextDocumentIdentifier)))
+            (path (eglot-uri-to-path other-file)))
       (if (file-exists-p path)
-          (pop-to-buffer (find-file-noselect path))
-        (message "remote-stderr %s not found" path))
-    (message "remote-stderr not found")))
+          (funcall (if -new-window #'find-file-other-window #'find-file) path)
+        (user-error "Could not find other file (%s)" path))
+    (user-error "Could not find other file (server no result)")))
 
 ;;;###autoload
-(defun ymacs-lsp/toggle-semantic-tokens ()
+(defun ymacs-lsp/install-lsp-server ()
   (interactive)
-  (setq lsp-semantic-tokens-enable (not lsp-semantic-tokens-enable))
-  (if lsp-semantic-tokens-enable
-      (lsp-semantic-tokens--enable)
-    (lsp-semantic-tokens--disable)
-    (font-lock-flush))
-  (lsp--info "Semantic Tokens %s. "
-             (if lsp-semantic-tokens-enable "enabled" "disabled")))
-
-;;;###autoload
-(defun ymacs-lsp/remove-invalid-folders ()
-  (interactive)
-  (seq-do-interactively!
-   #'lsp-workspace-folders-remove
-   (lambda (-folder)
-     (format "Delete: %s" -folder))
-   (cl-remove-if #'file-exists-p (lsp-session-folders (lsp-session)))))
-
+  (let* ((default-directory (expand-etc! "scripts"))
+         (valid-servers
+          '("pylance" "pyright"
+            "lsp-booster"
+            "bash-language-server"
+            "typescript"
+            "typescript-language-server"
+            "pyright-langserver"
+            "cmakels" "pyls" "gopls" "hls" "texlab"))
+         (server (completing-read "server: " valid-servers nil t)))
+    (run-compilation!
+     :buffer-name (format "*lsp install server: %s*" server)
+     :command (format "bash update_or_install_lsp %s" server)
+     :callback (lambda (_msg) (message "Install %s success" server)))))
 
 ;;;###autoload
 (defun ymacs-lsp/select-window-1 ()

@@ -99,21 +99,20 @@
                             (mapcar 'cdr (ymacs-org//auctex-math-all))))))
     (and char (concat " " (char-to-string (decode-char 'ucs char))))))
 
-;;;###autoload
-(defun ymacs-org/company-symbols (-command &optional -arg &rest _)
-  "Complete math symbol in LaTeX fragments, better than `pcomplete'"
-  (interactive (list 'interactive))
-  (cl-case -command
-    (interactive (company-begin-backend 'ymacs-org/company-symbols))
-    (prefix
-     (ignore-errors
-       (let ((word (company-grab-word)))
-         (and (= ?\\
-                 (char-before
-                  (- (point) (length word))))
-              word))))
-    (candidates (ymacs-org//auctex-symbol-candidates -arg))
-    (annotation (ymacs-org//auctex-symbol-annotation -arg))))
+;; (defun ymacs-org/company-symbols (-command &optional -arg &rest _)
+;;   "Complete math symbol in LaTeX fragments, better than `pcomplete'"
+;;   (interactive (list 'interactive))
+;;   (cl-case -command
+;;     (interactive (company-begin-backend 'ymacs-org/company-symbols))
+;;     (prefix
+;;      (ignore-errors
+;;        (let ((word (company-grab-word)))
+;;          (and (= ?\\
+;;                  (char-before
+;;                   (- (point) (length word))))
+;;               word))))
+;;     (candidates (ymacs-org//auctex-symbol-candidates -arg))
+;;     (annotation (ymacs-org//auctex-symbol-annotation -arg))))
 
 (defsubst ymacs-org//fn-to-extension (-fn)
   (when (symbolp -fn)

@@ -23,9 +23,22 @@ function npm_install {
     fi
 }
 
-if [ "$server" = pylance ]; then
+if [ "$server" == lsp-booster ]; then
+    assert_key=linux
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        assert_key=darwin
+    fi
+
+    lsp_booster_file="$lsp_server_install_dir/emacs-lsp-booster-latest.zip"
+    lsp_booster_dir="$lsp_server_install_dir/emacs-lsp-booster"
+
+    "$CURRENT_DIR/download_from_github" blahgeek/emacs-lsp-booster "$lsp_booster_file" $assert_key
+
+    mkdir -p "$lsp_booster_dir"
+    unzip "$lsp_booster_file" -d "$lsp_booster_dir"
+elif [ "$server" == pylance ]; then
     python3 "$CURRENT_DIR/update_pylance.py"
-elif [ "$server" = clangd ]; then
+elif [ "$server" == clangd ]; then
     assert_key=clangd-linux
     if [[ "$OSTYPE" == "darwin"* ]]; then
         assert_key=clangd-mac
@@ -37,9 +50,23 @@ elif [ "$server" = clangd ]; then
     "$CURRENT_DIR/download_from_github" clangd/clangd "$clangd_file" $assert_key
 
     mkdir -p "$clangd_dir"
-    unzip -o "$clangd_file" -d"$clangd_dir"
-elif [ "$server" = bash-language-server ]; then
+    unzip "$clangd_file" -d"$clangd_dir"
+elif [ "$server" == bash-language-server ]; then
     npm_install bash-language-server
+elif [ "$server" == pyright ]; then
+    npm_install pyright-langserver
+elif [ "$server" == typescript-language-server ]; then
+    npm_install typescript-language-server
+elif [ "$server" == typescript ]; then
+    npm_install typescript
+elif [ "$server" == cmakels ]; then
+    pip3 install --user -U cmake-language-server
+elif [ "$server" == gopls ]; then
+    GO111MODULE=on go get golang.org/x/tools/gopls@latest && go get -u github.com/fatih/gomodifytags
+elif [ "$server" == pyls ]; then
+    pip3 install --user -U "python-language-server[all]"
+elif [ "$server" == hls ]; then
+    ghcup install hls
 elif [ "$server" = texlab ]; then
     assert_key=linux
     if [[ "$OSTYPE" == "darwin"* ]]; then

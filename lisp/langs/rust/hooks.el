@@ -5,4 +5,4 @@
     (cargo-minor-mode 1)
 
     (eval-when-has-feature! lsp
-      (ymacs-lsp//try-enable-simple rust))))
+      (ymacs-lsp//try-enable-eglot rust))))

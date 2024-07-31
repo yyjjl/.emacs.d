@@ -4,26 +4,11 @@
  :modes (python-mode)
  :forward #'python-nav-forward-statement)
 
-(eval-when-has-feature! lsp
-  (after! lsp-pyls
-    (setq lsp-pyls-configuration-sources ["flake8"])
-    (setq lsp-pyls-plugins-rope-completion-enabled nil)
-
-    (ymacs-lsp//set-simple-install-fn
-     'pyls
-     '("pip3" "install" "--user" "'python-language-server[all]'")
-     '("pip3" "install" "--user" "-U" "'python-language-server[all]'")))
-
-  (after! lsp-pyright
-    (setq lsp-pyright-python-executable-cmd "python3")
-    (setq lsp-pyright-typechecking-mode "off")))
-
 (after! python
   (define-key! :map comint-mode-map
     ([f5] . ymacs-python/toggle-pdbtrack))
 
   (define-key! :map inferior-python-mode-map
-    ([remap python-shell-completion-complete-or-indent] . ymacs-python/shell-completion-complete-or-indent)
     ("C-c C-t" . ymacs-python/toggle-pdbtrack)
     (("C-c C-z" "C-c z") . ymacs-python/pop-to-source-buffer))
 

@@ -1,120 +1,23 @@
 ;; -*- lexical-binding:t -*-
 
-(setq lsp-pyright-multi-root nil)
+(defun ymacs-lsp/find-other-file ()
+  (interactive)
+  (unless ymacs-lsp-find-other-file-function
+    (user-error "ymacs-lsp-find-other-file-function is not set"))
+  (call-interactively ymacs-lsp-find-other-file-function))
 
-(setq lsp-keymap-prefix "C-c ;")
-(after! lsp-mode
-  ;; (lsp-dired-mode 1)
+(defun ymacs-lsp/format-buffer ()
+  (interactive "*")
+  (call-interactively ymacs-lsp-format-buffer-function))
 
-  ;; (when (require 'lsp-treemacs nil t)
-  ;;   (lsp-treemacs-sync-mode 1))
+(defun ymacs-lsp/organize-imports ()
+  (interactive "*")
+  (call-interactively ymacs-lsp-organize-import-function))
 
-  (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.cache\\'")
-  (add-to-list 'lsp-file-watch-ignored
-               (eval-when-compile
-                 (rx-to-string `(: string-start ,(expand-file-name "~/.local/lib") string-end))))
-  (add-to-list 'lsp-file-watch-ignored
-               (eval-when-compile
-                 (rx-to-string `(: string-start ,(file-truename user-emacs-directory) string-end))))
-
-  (add-to-list
-   'mode-line-misc-info
-   '(lsp-signature-mode
-     (:propertize "[Signature]" face ymacs-modeline-lsp-success)))
-
-  (define-key! :map lsp-command-map
-    (";" . lsp-avy-lens)
-    ("i" . ymacs-lsp/remove-invalid-folders)
-    ("R" . lsp-workspace-folders-remove)
-    ("b" . lsp-workspace-blacklist-remove)
-    ("o" . lsp-workspace-folders-open)
-    ("h" . lsp-document-highlight)
-    ("l" . lsp-lens-mode))
-
-  (defun ymacs-lsp/find-other-file ()
-    (interactive)
-    (unless ymacs-lsp-find-other-file-function
-      (user-error "ymacs-lsp-find-other-file-function is not set"))
-    (call-interactively ymacs-lsp-find-other-file-function))
-
-  (defun ymacs-lsp/format-buffer ()
-    (interactive "*")
-    (call-interactively ymacs-lsp-format-buffer-function))
-
-  (defun ymacs-lsp/organize-imports ()
-    (interactive "*")
-    (call-interactively ymacs-lsp-organize-import-function))
-
-  (after! project
-    (when (boundp 'project-prefix-map)
-      (define-key! :map project-prefix-map
-        ("a" . ymacs-lsp/find-other-file))))
-
-  (define-key! :map lsp-mode-map
-    ("M-s r" . lsp-find-references)
-    ("M-s t" . lsp-find-type-definition)
-    ("M-s i" . lsp-find-implementation)
-    ("M-s d" . lsp-find-declaration)
-
-    ("M-s h h" . lsp-document-highlight)
-    ("C-c R" . lsp-rename)
-    ("C-c d" . consult-lsp-diagnostics)
-    ("C-c I" . consult-lsp-symbols)
-    ("C-c E" . ymacs-lsp/open-remote-stderr)
-    ("C-c S" . lsp-describe-session)
-    ("C-c b" . ymacs-lsp/organize-imports)
-    ("C-c C-b" . ymacs-lsp/format-buffer)
-    ("C-c C-d" . lsp-describe-thing-at-point)
-    ("C-c C-SPC" . lsp-execute-code-action)
-    ("M-o" . lsp-signature-activate))
-
-  (define-key! :map lsp-signature-mode-map
-    ("M-o" . lsp-signature-stop))
-
-  (setq lsp-signature-doc-lines 5)
-  (setq lsp-signature-auto-activate nil)
-  (setq lsp-keep-workspace-alive nil)
-  (setq lsp-restart 'interactive)
-
-  ;; manually configured
-  (setq lsp-completion-provider :none)
-  ;; boost performance
-  (setq lsp-enable-file-watchers nil)
-
-  ;; (setq lsp-eldoc-render-all nil)
-  (setq lsp-display-inline-image nil)
-
-  (setq lsp-imenu-index-function #'lsp-imenu-create-categorized-index)
-  ;; (setq lsp-enable-imenu t)
-  ;; (setq lsp-enable-links t)
-  ;; (setq lsp-enable-xref t)
-  ;; (setq lsp-enable-folding t)
-  ;; (setq lsp-enable-snippet t)
-  ;; boost performance
-  (setq lsp-enable-on-type-formatting nil)
-  ;; (setq lsp-enable-text-document-color t)
-  ;; range formating
-  ;; (setq lsp-enable-indentation t)
-  (setq lsp-enable-symbol-highlighting nil)
-  ;; (setq lsp-symbol-highlighting-skip-current t)
-
-  (setq lsp-before-save-edits nil)
-
-  ;; (setq lsp-semantic-tokens-enable nil)
-  (setq lsp-lens-enable nil)
-
-  (setq lsp-progress-prefix "LSP:")
-
-  (setq lsp-headerline-breadcrumb-enable nil)
-  (setq lsp-headerline-breadcrumb-icons-enable nil)
-  (setq lsp-headerline-breadcrumb-segments '(symbols))
-  (setq lsp-headerline-breadcrumb-enable-diagnostics nil)
-
-  ;; (setq lsp-modeline-code-actions-enable t)
-  (setq lsp-modeline-code-actions-segments '(name count))
-
-  (setq lsp-modeline-diagnostics-enable nil)
-  (setq lsp-modeline-workspace-status-enable nil))
+(after! project
+  (when (boundp 'project-prefix-map)
+    (define-key! :map project-prefix-map
+      ("a" . ymacs-lsp/find-other-file))))
 
 (after! treemacs
   (define-key!
@@ -135,28 +38,74 @@
   (treemacs-tag-follow-mode 1)
   (treemacs-filewatch-mode -1))
 
-(after! lsp-treemacs
-  (define-key!
-    ("C-x ' '" . lsp-treemacs-errors-list)
-    ("C-x ' s" . lsp-treemacs-symbols)
-    ("C-x ' r" . lsp-treemacs-references)
-    ("C-x ' i" . lsp-treemacs-implementations)
-    ("C-x ' c" . lsp-treemacs-call-hierarchy)))
 
-(after! lsp-clangd
-  (ymacs-lsp//use-common-download-script (ht-get lsp-clients 'clangd)))
+(after! eglot
+  (define-key! :map eglot-mode-map
+    ("C-c C-d" . eldoc)
+    ("C-c R" . eglot-rename)
+    ("C-c I" . consult-eglot-symbols)
+    ("C-c b" . ymacs-lsp/organize-imports)
+    ("C-c C-b" . ymacs-lsp/format-buffer)
+    ("C-c C-SPC" . eglot-code-actions)
+    ("C-c f x" . eglot-shutdown)
+    ("C-c f s" . eglot-stderr-buffer)
+    ("C-c f e" . eglot-events-buffer)
+    ("C-c f r" . eglot-reconnect)
+    ("C-c S" . eglot-show-workspace-configuration)
 
-(after! lsp-tex
-  (lsp-register-custom-settings
-   `(("latex.rootDirectory"
-      (lambda ()
-        (or (when (stringp TeX-master)
-              (file-name-directory TeX-master))
-            ".")))
-     ("latex.lint.onSave" nil t)))
+    ("M-o" . ymacs-lsp/signature-start)
+    ("M-s t" . eglot-find-typeDefinition)
+    ("M-s i" . eglot-find-implementation)
+    ("M-s d" . eglot-find-declaration))
 
-  (let ((client (ht-get lsp-clients 'texlab)))
-    (setf (lsp--client-notification-handlers client)
-          (ht ("textDocument/publishDiagnostics" #'ignore)))
+  (add-to-list 'ymacs-editor-view-code-modes '(eglot--managed-mode eglot-inlay-hints-mode))
 
-    (ymacs-lsp//use-common-download-script client)))
+  (setf (alist-get 'eglot-capf completion-category-overrides)
+        '((styles basic orderless)))
+
+  (setq eglot-confirm-server-edits '((t . maybe-summary)))
+  (setq eglot-extend-to-xref t)
+  (setq eglot-autoshutdown nil)
+  (setq eglot-events-buffer-config '(:size 10 :format full))
+
+  (setq eglot-ignored-server-capabilities
+        '(:documentOnTypeFormattingProvider
+          ;; :documentHighlightProvider
+          :documentLinkProvider
+          :semanticTokensProvider))
+
+  (define-advice eglot--confirm-server-edits (:around (fn &rest args))
+    (if current-prefix-arg
+        'diff
+      (apply fn args)))
+
+  (define-advice eglot--sig-info (:around (fn sig &optional sig-active briefp) fix-pyright)
+    (when (derived-mode-p 'python-base-mode)
+      (setq sig-active nil))
+    (funcall fn sig sig-active briefp))
+
+  (setq mode-line-misc-info
+        `(,@mode-line-misc-info
+          (ymacs-lsp-signature-mode
+           (:propertize "[signature]" face success))
+          (eglot-inlay-hints-mode
+           (:propertize "[inlay]" face eglot-inlay-hint-face))))
+
+  (setf (cdr (ymacs-lsp//eglot-lookup-mode 'sh-mode))
+        (list (expand-cache! "lsp/npm/bash-language-server/bin/bash-language-server") "start"))
+
+  (setf (cdr (ymacs-lsp//eglot-lookup-mode 'js-mode))
+        (list (expand-cache! "lsp/npm/typescript-language-server/bin/typescript-language-server") "--stdio"))
+
+  (setf (cdr (ymacs-lsp//eglot-lookup-mode 'c-mode))
+        (lambda (&optional _interactive _project)
+          (let ((clangd-binary (expand-cache! (format "lsp/clangd/clangd_%s/bin/clangd" ymacs-clangd-version))))
+            (when (file-executable-p clangd-binary)
+              (cons clangd-binary ymacs-clangd-args)))))
+
+  (cl-defmethod eglot-register-capability :around
+    (_server (method (eql workspace/didChangeWatchedFiles)) id &key watchers)
+    (message "[eglot] debug: %s %s %s" method id watchers)
+    (message "[eglot] file-watcher: %s" (cl-call-next-method)))
+
+  (setq-default eglot-workspace-configuration #'ymacs-lsp//default-workspace-configuration))
