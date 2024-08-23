@@ -6,8 +6,6 @@
   :safe #'stringp)
 
 (defvar ymacs-editor-minibuffer-saved-point nil)
-(defvar ymacs-editor-minibuffer--last-input nil)
-(defvar ymacs-editor-minibuffer--last-directory nil)
 
 (defvar ymacs-editor-ripgrep-map
   (define-key! :map (make-sparse-keymap)
@@ -42,22 +40,12 @@
                       ,@-body)))
      (abort-recursive-edit)))
 
-(defun ymacs-editor//vertico-directory-tidy ()
-  "Tidy shadowed file name, see `rfn-eshadow-overlay'."
-  (when (and (eq this-command #'self-insert-command)
-             (bound-and-true-p rfn-eshadow-overlay)
-             (overlay-buffer rfn-eshadow-overlay)
-             (= (point) (point-max))
-             (or (>= (- (point) (overlay-end rfn-eshadow-overlay)) 2)
-                 (eq ?/ (char-before (- (point) 2)))))
-    (delete-region (overlay-start rfn-eshadow-overlay) (overlay-end rfn-eshadow-overlay))))
-
 (after! marginalia
   (dolist (catogory '(command function variable file))
     (setf (alist-get catogory marginalia-annotator-registry) '(builtin))))
 
 (after! vertico
-  (setq vertico-count 13)
+  (setq vertico-count 15)
   (setq vertico-cycle t)
   (setq vertico-resize nil)
   (setq vertico-count-format '("%10s " . "%s/%s"))
@@ -65,7 +53,7 @@
   (setq completion-styles '(orderless basic))
   (setq completion-category-overrides '((file (styles partial-completion orderless))))
 
-  (add-hook 'rfn-eshadow-update-overlay-hook #'ymacs-editor//vertico-directory-tidy)
+  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 
   (define-key! :map vertico-map
     ([remap delete-backward-char] . ymacs-editor/minibuffer-delete-char)
@@ -148,7 +136,15 @@
   (define-key! :map embark-file-map
     ("d" (defun ymacs-embark/open-directory (-file)
            (dired (file-name-directory -file))))
-    ("X" . delete-file)))
+    ("X" . delete-file))
+
+  (setq embark-verbose-indicator-display-action '(display-buffer-in-side-window (side . left)))
+  (setq embark-verbose-indicator-excluded-actions
+        '(embark-collect
+          embark-live embark-export
+          embark-cycle embark-act-all embark-keymap-help
+          embark-become embark-isearch-forward
+          embark-isearch-backward)))
 
 (after! corfu
   (setq tab-always-indent 'complete)

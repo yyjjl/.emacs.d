@@ -106,18 +106,25 @@ LHS and RHS are lists of symbols of modeline -segments defined with
 ;;* Project
 ;;
 
+(cl-defgeneric ymacs-modeline//project-identity (project)
+  "A human-readable identify for the project."
+  (format "%s:%s"
+          (car project)
+          (directory-file-name (project-root project))))
+
+
 (defsubst ymacs-modeline//project-root ()
   "Get the path to the root of your project.
 Return nil if no project was found."
   (unless (and ymacs-modeline--project-detected-p
                (equal ymacs-modeline--project-detected-p buffer-file-name))
 
-    (setq ymacs-modeline--project-root (ymacs-editor//project-root)
-          ymacs-modeline--project-detected-p buffer-file-name)
+    (let ((project (project-current)))
+      (setq ymacs-modeline--project-root (when project (project-root project)))
+      (setq ymacs-modeline--project-detected-p buffer-file-name)
 
-    (when ymacs-modeline--project-root
-      (setq ymacs-modeline--project-parent-path
-            (file-name-directory (directory-file-name ymacs-modeline--project-root)))))
+      (when ymacs-modeline--project-root
+        (setq ymacs-modeline--project-string (ymacs-modeline//project-identity project)))))
   ymacs-modeline--project-root)
 
 ;;
@@ -435,7 +442,7 @@ By default, this shows the information specified by `global-mode-string'."
    (unless (eq (selected-window)
                (active-minibuffer-window))
      (propertize
-      (concat " " (or ymacs-modeline--project-parent-path default-directory))
+      (concat " " (or ymacs-modeline--project-string default-directory))
       'face 'font-lock-doc-face))))
 
 ;;

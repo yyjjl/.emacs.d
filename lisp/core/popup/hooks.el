@@ -52,6 +52,7 @@
 (advice-add 'keyboard-quit :before #'keyboard-quit@autoclose)
 (advice-add 'other-window :before #'keyboard-quit@autoclose)
 
+;; 一些 other window 函数不能切割 popup window
 (define-advice window--try-to-split-window (:around (-fn -window &optional -alist) dont-split-popups)
   (when (or (one-window-p)
             (not (eq -window

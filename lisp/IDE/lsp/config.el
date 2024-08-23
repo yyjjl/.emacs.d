@@ -58,7 +58,7 @@
     ("M-s i" . eglot-find-implementation)
     ("M-s d" . eglot-find-declaration))
 
-  (add-to-list 'ymacs-editor-view-code-modes '(eglot--managed-mode eglot-inlay-hints-mode))
+  ;; (add-to-list 'ymacs-editor-view-code-modes '(eglot--managed-mode eglot-inlay-hints-mode))
 
   (setf (alist-get 'eglot-capf completion-category-overrides)
         '((styles basic orderless)))
@@ -84,12 +84,8 @@
       (setq sig-active nil))
     (funcall fn sig sig-active briefp))
 
-  (setq mode-line-misc-info
-        `(,@mode-line-misc-info
-          (ymacs-lsp-signature-mode
-           (:propertize "[signature]" face success))
-          (eglot-inlay-hints-mode
-           (:propertize "[inlay]" face eglot-inlay-hint-face))))
+  (add-to-list 'mode-line-misc-info '(ymacs-lsp-signature-mode (:propertize "[signature]" face success)))
+  (add-to-list 'mode-line-misc-info '(eglot-inlay-hints-mode (:propertize "[inlay]" face eglot-inlay-hint-face)))
 
   (setf (cdr (ymacs-lsp//eglot-lookup-mode 'sh-mode))
         (list (expand-cache! "lsp/npm/bash-language-server/bin/bash-language-server") "start"))
@@ -107,5 +103,20 @@
     (_server (method (eql workspace/didChangeWatchedFiles)) id &key watchers)
     (message "[eglot] debug: %s %s %s" method id watchers)
     (message "[eglot] file-watcher: %s" (cl-call-next-method)))
+
+  ;; 一些 lsp server 会返回 :metadata 字段, 必须要 &allow-other-keys
+  (cl-defmethod eglot-handle-request
+    (_server (_method (eql workspace/applyEdit)) &key _label edit &allow-other-keys)
+    "Handle server request workspace/applyEdit."
+    (eglot--apply-workspace-edit edit last-command)
+    `(:applied t))
+
+  ;; 把错误打印出来方便 debug
+  ;; (cl-defmethod eglot-handle-request :around (_server _method &rest _params)
+  ;;   "Handle server request workspace/applyEdit."
+  ;;   (condition-case err
+  ;;       (cl-call-next-method)
+  ;;     (error
+  ;;      (message "[EGLOT] error %s" err))))
 
   (setq-default eglot-workspace-configuration #'ymacs-lsp//default-workspace-configuration))

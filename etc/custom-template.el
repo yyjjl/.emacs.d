@@ -61,13 +61,9 @@
 (load-feature! core/debug)
 
 (load-feature! IDE/lsp)
-;; (load-feature! IDE/tree-sitter)
-(load-feature! IDE/childframe)
 
 (load-feature! tools/git)
-;; (load-feature! tools/spell)
 (load-feature! tools/extra-modes)
-;; (load-feature! tools/tabnine)
 
 (load-feature! langs/lisp)
 (load-feature! langs/latex)

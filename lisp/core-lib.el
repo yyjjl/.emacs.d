@@ -586,7 +586,7 @@ HTML file converted from org file, it returns t."
                       when (file-exists-p full-path)
                       collect `(load ,path nil t))
                      (cl-loop
-                      for file in (directory-files directory :full "config-.*.el")
+                      for file in (directory-files directory :full "config-.*.el$")
                       for path = (file-name-sans-extension file)
                       collect `(load ,path nil t)))))
         `(unless (has-feature! ',feature-name)

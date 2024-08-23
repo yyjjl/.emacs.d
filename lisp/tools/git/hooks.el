@@ -15,4 +15,6 @@
       (goto-char (point-min))
       (when (re-search-forward "^<<<<<<< " nil t)
         (smerge-mode 1)
-        (transient-setup 'ymacs-transient/smerge)))))
+        (message "Run \\[ymacs-transient/smerge] to invoke smerge command panel")
+        ;; (transient-setup 'ymacs-transient/smerge)
+        ))))

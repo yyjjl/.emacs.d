@@ -28,6 +28,13 @@
  eglot ; 需要新版本 > 1.17
  consult-eglot)
 
+(eval-when-compile
+  (require 'eglot)
+  (let ((version (mapcar #'string-to-number (split-string (or eglot--version "1.0") "\\."))))
+    (message "EGLOT version: %s" version)
+    (when (< (nth 1 version) 17)
+      (eglot-upgrade-eglot))))
+
 (when ymacs-lsp-booster-path
   (when (and (not (package-installed-p 'eglot-booster))
              (fboundp #'package-vc-install))

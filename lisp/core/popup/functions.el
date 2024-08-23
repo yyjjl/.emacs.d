@@ -92,57 +92,41 @@
                   'window-width)
                 (or -size ymacs-popup-default-size)))))
 
-(defsubst ymacs-popup//display-buffer-in-side-window (-buffer -alist -side -size -terminal-p -autoclose-p)
-  (let ((slots '(1)) windows)
-    (dolist (window (window-list))
-      (when (eq (window-parameter window 'window-side) -side)
-        (push window windows)
-        (push (window-parameter window 'window-slot) slots)))
-
-    (let ((term-window (ymacs-popup//get-term-window))
-          (last-popup-window (car ymacs-popup--window-list))
-          (min-slot (apply #'min slots))
-          window)
-
-      (when (and -terminal-p term-window)
-        ;; Case 1: reuse term-window
-        (setq window term-window)
-        ;; (select-window window)
-        (set-window-dedicated-p window nil)
-        (set-window-buffer window -buffer))
-
-      (or window
-          (let ((slot (or (unless -autoclose-p
-                            (if (>= (length windows) ymacs-popup-max-slots)
-                                ;; Case 2: the left/up-most slot window
-                                min-slot
-                              ;; Case 3: left/up of all slot windows
-                              (1- min-slot)))
-                          (when (< (length windows) ymacs-popup-max-slots)
-                            ;; Case 3: left/up of all slot windows
-                            (1- min-slot))
-                          ;; Case 4: next slot-window
-                          (progn
-                            (setq windows (remq term-window windows))
-                            (when-let (old-window (or (cadr (memq last-popup-window windows))
-                                                      (car windows)))
-                              (window-parameter old-window 'window-slot)))
-                          0)))
-            (display-buffer-in-side-window
-             -buffer
-             `(;; (window . main)
-               (side . ,-side)
-               (slot . ,slot)
-               ;; (direction . ,side)
-               ,@(ymacs-popup//get-side-window-size -side -size)
-               ,@-alist)))))))
+(defsubst ymacs-popup//display-buffer-in-side-window (-buffer -alist -side -size -terminal-p)
+  (let* ((windows
+          (cl-loop for w in (window-list)
+                   when (eq (window-parameter w 'window-side) -side)
+                   collect w))
+         (slots (mapcar (lambda (w) (window-parameter w 'window-slot)) windows)))
+    (or (when -terminal-p
+          (when-let (term-window (ymacs-popup//get-term-window))
+            ;; Case 1: reuse term-window
+            (set-window-dedicated-p term-window nil)
+            (set-window-buffer term-window -buffer)
+            term-window))
+        (let* ((min-slot (if slots (apply #'min slots) 1))
+               (slot (cond
+                      (-terminal-p ymacs-popup-max-slots)
+                      ;; Case 2: the left/up-most slot window
+                      ((>= (length windows) ymacs-popup-max-slots) min-slot)
+                      ;; Case 3: left/up of all slot windows
+                      (t (1- min-slot)))))
+          (display-buffer-in-side-window
+           -buffer
+           `(;; (window . main)
+             (side . ,-side)
+             (slot . ,slot)
+             ;; (direction . ,side)
+             ,@(ymacs-popup//get-side-window-size -side -size)
+             ,@-alist))))))
 
 (defsubst ymacs-popup//display-buffer (-buffer -alist -rule)
   "Internal function for `ymacs-popup/display-buffer-action'.
 Displays -BUFFER according to -ALIST and -RULE."
   (let ((display-fn (plist-get -rule :display-fn))
         (side (plist-get -rule :side))
-        (size (plist-get -rule :size)))
+        (size (plist-get -rule :size))
+        (terminal-p (plist-get -rule :terminal)))
     (cond
      ;; custom display-fn
      (display-fn
@@ -154,11 +138,7 @@ Displays -BUFFER according to -ALIST and -RULE."
      ;; reuse window
      ((display-buffer-reuse-window -buffer -alist))
      ;; side window
-     (side
-      (ymacs-popup//display-buffer-in-side-window
-       -buffer -alist side size
-       (plist-get -rule :terminal)
-       (plist-get -rule :autoclose)))
+     (side (ymacs-popup//display-buffer-in-side-window -buffer -alist side size terminal-p))
      ;; fallback
      ((display-buffer-pop-up-window -buffer -alist))
      ((display-buffer-use-some-window -buffer -alist)))))

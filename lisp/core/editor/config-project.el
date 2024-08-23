@@ -7,15 +7,61 @@
     (ymacs-modeline--project-detected-p . nil)
     (ymacs-modeline--project-root . nil)))
 
+(defmacro ymacs-editor//define-project-local (-method &rest -args)
+  (let ((call-args (cl-remove-if (lambda (x) (string-prefix-p "&" (symbol-name x))) -args)))
+    `(cl-defmethod ,-method ((project (head local)) ,@-args)
+       (if-let (vc-project (nth 2 project))
+           (,-method vc-project ,@call-args)
+         (,-method (cons 'transient (nth 1 project)) ,@call-args)))))
+
+;; Declare directories with ".project" as a project
+(cl-defmethod project-root ((project (head local)))
+  (nth 1 project))
+
+(cl-defmethod project-files ((project (head local)) &optional dirs)
+  (if-let ((root (project-root project))
+           (vc-project (nth 2 project)))
+      (project-files vc-project
+                     ;; 当请求 local root 的时候, 切换到 vc-root
+                     (if (and (= (length dirs) 1)
+                              (file-equal-p root (car dirs)))
+                         nil
+                       dirs))
+    (project-files (cons 'transient root) dirs)))
+
+(cl-defmethod ymacs-modeline//project-identity ((project (head local)))
+  (if-let ((vc-project (nth 2 project))
+           (root (project-root project)))
+      (format "local:%s:vc:%s"
+              (project-name (cons 'transient root))
+              (project-root vc-project))
+    (format "local:%s" (project-name project))))
+
+(ymacs-editor//define-project-local project-external-roots)
+(ymacs-editor//define-project-local project-ignores dir)
+(ymacs-editor//define-project-local project-buffers)
+(ymacs-editor//define-project-local project-name)
+
 (defun ymacs-editor//project (-directory)
   "Find current project"
   (let* ((key (expand-file-name -directory))
          (value (gethash key ymacs-editor-project-cache)))
     (when (not (eq value 'none))
       (when (not (and value (file-exists-p (project-root value))))
-        (setq value (or (project-try-vc -directory)
-                        ;; default is 'none
-                        'none))
+        (let ((vc-project (project-try-vc -directory))
+              (local-root (locate-dominating-file -directory ".project")))
+          (setq value
+                (cond
+                 ((and vc-project local-root)
+                  (if (string-prefix-p (file-truename (project-root vc-project))
+                                       (file-truename local-root))
+                      ;; .project 子目录
+                      (list 'local local-root vc-project)
+                    vc-project))
+                 (vc-project vc-project)
+                 (local-root (list 'local local-root nil))
+                 ;; default is 'none
+                 (t 'none))))
         (puthash key value ymacs-editor-project-cache))
       (when (not (eq value 'none))
         value))))
@@ -52,5 +98,5 @@
       ("f" . ymacs-editor/find-file)))
   (setcar (assoc 'project-find-file project-switch-commands) #'ymacs-editor/find-file)
 
-  (setq project-vc-extra-root-markers '(".project"))
+  (setq project-vc-extra-root-markers nil)
   (setq project-find-functions '(ymacs-editor//project)))

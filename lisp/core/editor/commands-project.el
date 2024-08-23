@@ -3,9 +3,13 @@
 ;;;###autoload
 (defun ymacs-editor/find-file (-use-find)
   (interactive "P")
-  (if -use-find
-      (call-interactively #'consult-find)
-    (call-interactively #'project-find-file)))
+  (cond
+   ((equal -use-find '(16))
+    (call-interactively #'consult-find))
+   ((equal -use-find '(4))
+    (consult-find))
+   (t
+    (project-find-file))))
 
 ;;;###autoload
 (defun ymacs-editor/invalid-project-cache ()
