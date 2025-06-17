@@ -6,7 +6,7 @@
     (save-place-kill-emacs-hook))
 
   (setq savehist-additional-variables
-        '(kill-ring
+        '(; kill-ring
           search-ring
           global-mark-ring
           extended-command-history)))

@@ -32,6 +32,7 @@
              (make-directory parent-directory 'parents))))))
 
 (define-hook! ymacs-editor//minibuffer-setup (minibuffer-setup-hook)
+  (setq-local completion-styles '(orderless basic))
   (setq line-spacing nil)
 
   (when (bound-and-true-p corfu-terminal-mode)

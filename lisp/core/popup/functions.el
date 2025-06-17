@@ -37,8 +37,7 @@
     (set-frame-parameter nil 'ymacs-popup-buffer buffer)
     (if -move-to-head
         (setq ymacs-popup--term-buffer-list
-              (cons buffer
-                    (cl-remove buffer ymacs-popup--term-buffer-list)))
+              `(,@(cl-remove buffer ymacs-popup--term-buffer-list) ,buffer))
       (cl-pushnew buffer ymacs-popup--term-buffer-list))))
 
 (defsubst ymacs-popup//cleanup ()

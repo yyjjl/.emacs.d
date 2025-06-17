@@ -59,7 +59,7 @@
 ;; History & backup settings
 (setq auto-save-default t)
 (setq make-backup-files nil)
-(setq history-length 500)
+(setq history-length 100)
 (setq history-delete-duplicates t)
 (setq kill-do-not-save-duplicates t)
 

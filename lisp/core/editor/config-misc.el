@@ -47,14 +47,23 @@
 (put 'ymacs-editor//external-file-handler 'safe-magic t)
 (put 'ymacs-editor//external-file-handler 'operations '(insert-file-contents))
 
-(setq he-dabbrev-chars "0-9a-zA-Z\\?!_")
-(setq-default hippie-expand-try-functions-list
-              '(try-expand-dabbrev
-                try-expand-all-abbrevs
-                try-expand-dabbrev-all-buffers
-                try-expand-dabbrev-from-kill
-                try-complete-file-name-partially
-                try-complete-file-name))
+(after! hippie-exp
+  (setq he-dabbrev-chars "0-9a-zA-Z\\?!_")
+  (add-to-list 'hippie-expand-ignore-buffers 'text-mode)
+  (add-to-list 'hippie-expand-ignore-buffers 'fundamental-mode)
+  (add-to-list 'hippie-expand-ignore-buffers 'magit-process-mode)
+  (add-to-list 'hippie-expand-ignore-buffers 'magit-diff-mode)
+  (add-to-list 'hippie-expand-ignore-buffers 'magit-status-mode)
+  (add-to-list 'hippie-expand-ignore-buffers
+               (eval-when-compile
+                 (rx string-start "*" (* any) "*" string-end)))
+  (setq-default hippie-expand-try-functions-list
+                '(try-expand-dabbrev
+                  try-expand-all-abbrevs
+                  try-expand-dabbrev-all-buffers
+                  try-expand-dabbrev-from-kill
+                  try-complete-file-name-partially
+                  try-complete-file-name)))
 
 ;; Make `apropos' more useful
 (after! apropos
@@ -97,8 +106,10 @@
 (after! ediff
   (add-hook 'ediff-before-setup-hook
             (lambda () (window-configuration-to-register :ediff-windows)))
+  ;; Should be called after ediff-cleanup-mess
   (add-hook 'ediff-quit-hook
-            (lambda () (jump-to-register :ediff-windows)))
+            (lambda () (jump-to-register :ediff-windows))
+            100)
 
   (setq ediff-split-window-function 'split-window-horizontally)
   (setq ediff-window-setup-function 'ediff-setup-windows-plain))

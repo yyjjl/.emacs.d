@@ -29,7 +29,6 @@
  orderless
  marginalia
  yasnippet
- yasnippet-snippets
  expand-region
  goto-chg
  multiple-cursors

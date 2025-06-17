@@ -102,7 +102,9 @@
   (cl-defmethod eglot-register-capability :around
     (_server (method (eql workspace/didChangeWatchedFiles)) id &key watchers)
     (message "[eglot] debug: %s %s %s" method id watchers)
-    (message "[eglot] file-watcher: %s" (cl-call-next-method)))
+    (message "[eglot] debug: skip file-watcher")
+    ;; (message "[eglot] file-watcher: %s" (cl-call-next-method))
+    )
 
   ;; 一些 lsp server 会返回 :metadata 字段, 必须要 &allow-other-keys
   (cl-defmethod eglot-handle-request
@@ -110,6 +112,48 @@
     "Handle server request workspace/applyEdit."
     (eglot--apply-workspace-edit edit last-command)
     `(:applied t))
+
+  (defun ymacs-lsp//parse-diagnostics (-diagnostics)
+    (cl-loop
+     for diag-spec across -diagnostics
+     collect (eglot--dbind ((Diagnostic) range code message severity source tags)
+                 diag-spec
+               (setq message (concat source (and code (format " [%s]" code)) ": " message))
+               (pcase-let
+                   ((`(,beg . ,end) (eglot-range-region range)))
+                 (when (= beg end)
+                   (eglot--widening
+                    (goto-char (point-min))
+                    (setq beg (eglot--bol (1+ (plist-get (plist-get range :start) :line))))
+                    (setq end (line-end-position (1+ (plist-get (plist-get range :end) :line))))))
+                 (eglot--make-diag
+                  (current-buffer) beg end
+                  (cond ((null severity) 'eglot-error)
+                        ((<= severity 1) 'eglot-error)
+                        ((= severity 2)  'eglot-warning)
+                        (t          'eglot-note))
+                  message `((eglot-lsp-diag . ,diag-spec))
+                  (when-let ((faces
+                              (cl-loop for tag across tags
+                                       when (alist-get tag eglot--tag-faces)
+                                       collect it)))
+                    `((face . ,faces))))))))
+
+  (cl-defmethod eglot-handle-notification :around
+    (_server (_method (eql textDocument/publishDiagnostics)) &key uri diagnostics
+             &allow-other-keys)
+    (when-let* ((path (expand-file-name (eglot-uri-to-path uri)))
+                (buffer (find-buffer-visiting path)))
+      (with-current-buffer buffer
+        ;; 这里只记录, 不触发解析, 解析 eglot-range-to-region 太耗时了
+        (setq eglot--diagnostics diagnostics))))
+
+  (define-advice eglot--report-to-flymake (:override (-diags) fast)
+    (save-restriction
+      (widen)
+      (funcall eglot--current-flymake-report-fn
+               (ymacs-lsp//parse-diagnostics -diags)
+               :region (cons (point-min) (point-max)))))
 
   ;; 把错误打印出来方便 debug
   ;; (cl-defmethod eglot-handle-request :around (_server _method &rest _params)

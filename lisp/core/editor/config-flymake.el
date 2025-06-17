@@ -17,24 +17,24 @@
         (setq -filter '(:error :warning)))
       (funcall -fn -n -filter -interactive)))
 
-  (define-advice flymake-diag-region (:override (-buffer -line &optional -col) fast)
-    (condition-case-unless-debug _err
-        (with-current-buffer -buffer
-          (let ((-line (max -line 1)))
-            (save-excursion
-              (save-match-data
-                (goto-char (point-min))
-                (forward-line (1- -line))
-                (when (and -col (cl-plusp -col))
-                  (forward-char (1- -col)))
-                (let ((beg (point)))
-                  (cons beg
-                        (min (point-max)
-                             (max (1+ beg)
-                                  (or (ignore-errors (end-of-thing 'symbol)) beg)))))))))
-      (error
-       (flymake-log :warning "Invalid region line=%s col=%s" -line -col)
-       nil)))
+  ;; (define-advice flymake-diag-region (:override (-buffer -line &optional -col) fast)
+  ;;   (condition-case-unless-debug _err
+  ;;       (with-current-buffer -buffer
+  ;;         (let ((-line (max -line 1)))
+  ;;           (save-excursion
+  ;;             (save-match-data
+  ;;               (goto-char (point-min))
+  ;;               (forward-line (1- -line))
+  ;;               (when (and -col (cl-plusp -col))
+  ;;                 (forward-char (1- -col)))
+  ;;               (let ((beg (point)))
+  ;;                 (cons beg
+  ;;                       (min (point-max)
+  ;;                            (max (1+ beg)
+  ;;                                 (or (ignore-errors (end-of-thing 'symbol)) beg)))))))))
+  ;;     (error
+  ;;      (flymake-log :warning "Invalid region line=%s col=%s" -line -col)
+  ;;      nil)))
 
   (define-key! :map flymake-mode-map
     ("C-c f l" . flymake-show-buffer-diagnostics))

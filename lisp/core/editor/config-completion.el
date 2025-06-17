@@ -50,7 +50,7 @@
   (setq vertico-resize nil)
   (setq vertico-count-format '("%10s " . "%s/%s"))
 
-  (setq completion-styles '(orderless basic))
+  (setq completion-styles '(basic partial-completion emacs22))
   (setq completion-category-overrides '((file (styles partial-completion orderless))))
 
   (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
@@ -72,16 +72,19 @@
 (after! consult
   (require 'embark-consult)
 
-  (defvar consult--source-recent-dired
-    (list :name "Dired Buffer"
-          :narrow '(100 . "Dired")
-          :hidden t
-          :category 'buffer
-          :face 'consult-buffer
-          :history 'buffer-name-history
-          :state #'consult--buffer-state
-          :items (lambda ()
-                   (consult--buffer-query :sort 'visibility :mode 'dired-mode :as #'buffer-name))))
+  (setq consult--source-recent-dired
+        (list :name "Dired Buffer"
+              :narrow '(100 . "Dired")
+              :hidden t
+              :category 'buffer
+              :face 'consult-buffer
+              :history 'buffer-name-history
+              :state #'consult--buffer-state
+              :items (lambda ()
+                       (consult--buffer-query
+                        :sort 'visibility
+                        :mode 'dired-mode
+                        :as (lambda (-buffer) (buffer-local-value 'default-directory -buffer))))))
 
   (add-to-list 'consult-buffer-sources 'consult--source-recent-dired 'append)
 
@@ -151,9 +154,9 @@
 
   (setq corfu-auto-prefix 2)
   (setq corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (setq corfu-auto t)                 ;; Enable auto completion
+  (setq corfu-auto nil)               ;; Enable auto completion
   (setq corfu-separator ?\s)          ;; Orderless field separator
-  (setq corfu-quit-at-boundary t)   ;; Never quit at completion boundary
+  (setq corfu-quit-at-boundary t)     ;; Never quit at completion boundary
   ;; (setq corfu-quit-no-match nil)      ;; Never quit, even if there is no match
   (setq corfu-preview-current nil)    ;; Disable current candidate preview
   (setq corfu-preselect 'valid)      ;; Preselect the prompt

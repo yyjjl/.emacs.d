@@ -19,9 +19,10 @@
           (file-name (buffer-file-name buffer))
           (item (assoc file-name ymacs-editor--ripgrep-settings))
           (new-list (plist-put (cdr item) ,-var ,-value)))
-     (if item
-         (setf (cdr item) new-list)
-       (push (cons file-name new-list) ymacs-editor--ripgrep-settings))))
+     (unless (null file-name)
+       (if item
+           (setf (cdr item) new-list)
+         (push (cons file-name new-list) ymacs-editor--ripgrep-settings)))))
 
 (defsubst ymacs-editor//ripgrep-working-directory ()
   (let ((remote-host (file-remote-p default-directory))

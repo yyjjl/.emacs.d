@@ -93,7 +93,8 @@
    (list (cond ((equal current-prefix-arg '(4)) 'project)
                ((equal current-prefix-arg '(16)) 'select)
                (t 'local))
-         (equal (prefix-numeric-value current-prefix-arg) 0)
+         ;; (equal (prefix-numeric-value current-prefix-arg) 0)
+         (not (equal (prefix-numeric-value current-prefix-arg) 0))
          (equal (prefix-numeric-value current-prefix-arg) 16)))
 
   (if (eq (selected-window) (ymacs-popup//get-term-window))
