@@ -1,6 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
 (after! savehist
+  (setq savehist-autosave-interval (* 30 60))
+
   (define-advice savehist-autosave (:after () save-additional-content)
     (recentf-save-list)
     (save-place-kill-emacs-hook))

@@ -7,34 +7,16 @@
       (unless next-error-function
         (setq-local next-error-function #'flymake-goto-next-error))))
 
+  ;; 有 error/warning 只在 warning/error 之间跳转
   (define-advice flymake-goto-next-error (:around (-fn &optional -n -filter -interactive))
     (let ((min-severity (flymake--severity :warning)))
       (when (cl-some
              (lambda (ov)
                (when-let (diag (overlay-get ov 'flymake-diagnostic))
                  (>= (flymake--severity (flymake--diag-type diag)) min-severity)))
-             (flymake--overlays))
+             (overlays-in (point-min) (point-max)))
         (setq -filter '(:error :warning)))
       (funcall -fn -n -filter -interactive)))
-
-  ;; (define-advice flymake-diag-region (:override (-buffer -line &optional -col) fast)
-  ;;   (condition-case-unless-debug _err
-  ;;       (with-current-buffer -buffer
-  ;;         (let ((-line (max -line 1)))
-  ;;           (save-excursion
-  ;;             (save-match-data
-  ;;               (goto-char (point-min))
-  ;;               (forward-line (1- -line))
-  ;;               (when (and -col (cl-plusp -col))
-  ;;                 (forward-char (1- -col)))
-  ;;               (let ((beg (point)))
-  ;;                 (cons beg
-  ;;                       (min (point-max)
-  ;;                            (max (1+ beg)
-  ;;                                 (or (ignore-errors (end-of-thing 'symbol)) beg)))))))))
-  ;;     (error
-  ;;      (flymake-log :warning "Invalid region line=%s col=%s" -line -col)
-  ;;      nil)))
 
   (define-key! :map flymake-mode-map
     ("C-c f l" . flymake-show-buffer-diagnostics))

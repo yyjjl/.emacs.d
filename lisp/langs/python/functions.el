@@ -10,7 +10,6 @@
                   (get-buffer (format "*%s*" name))
                   (python-shell-make-comint (python-shell-calculate-command) name t)))
          (process (get-buffer-process buffer)))
-    (python-shell-send-string "\n" process)
     (with-current-buffer buffer
       (let ((cumtime 0))
         (while (and (not (bound-and-true-p python-shell--first-prompt-received))

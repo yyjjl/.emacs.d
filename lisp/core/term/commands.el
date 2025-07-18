@@ -31,7 +31,7 @@
 
   (setq ymacs-term-keep-buffer-alive (not ymacs-term-keep-buffer-alive)))
 
-;;;###autoload
+;;;###autoloadn
 (defun ymacs-term/load-file-in-repl ()
   (interactive)
   (let ((repl (or (alist-get major-mode ymacs-term-repl-alist)
@@ -119,50 +119,18 @@
 
 
 ;;;###autoload
-(defun ymacs-term/conditional-send-raw ()
-  (interactive)
-  (let ((command (global-key-binding (this-command-keys))))
-    ;; When `point' is after last output mark, send raw string
-    ;; Otherwise call global binding
-    (call-interactively (if (and command (ymacs-term//after-prompt-p))
-                            #'term-send-raw
-                          command))))
-
-;;;###autoload
 (defun ymacs-term/yank-pop (&optional _)
   (interactive "P")
   (let ((inhibit-read-only t))
     (cl-letf (((symbol-function 'insert-for-yank)
-               (if (eq major-mode 'vterm-mode)
-                   (lambda (str) (vterm-send-string str t))
-                 (lambda (str) (term-send-raw-string str)))))
+               (lambda (str) (vterm-send-string str t))))
       (call-interactively #'consult-yank-pop))))
 
 ;;;###autoload
 (defun ymacs-term/kill-line ()
   (interactive)
-  (if (eq major-mode 'term-mode)
-      (if (ymacs-term//after-prompt-p)
-          (progn
-            (kill-new (buffer-substring (point) (line-end-position)))
-            (term-send-raw-string "\C-k"))
-        (call-interactively #'kill-line))
-    (kill-new (buffer-substring (point) (line-end-position)))
-    (call-interactively #'vterm--self-insert)))
-
-;;;###autoload
-(defun ymacs-term/send-backward-word ()
-  (interactive)
-  (if (ymacs-term//after-prompt-p)
-      (term-send-raw-string "\eb")
-    (call-interactively #'backward-word)))
-
-;;;###autoload
-(defun ymacs-term/send-forward-word ()
-  (interactive)
-  (if (ymacs-term//after-prompt-p)
-      (term-send-raw-string "\ef")
-    (call-interactively #'forward-word)))
+  (kill-new (buffer-substring (point) (line-end-position)))
+  (call-interactively #'vterm--self-insert))
 
 ;;;###autoload
 (defun ymacs-term/line ()
@@ -170,10 +138,7 @@
   (unless (ymacs-term//shell-buffer-p (current-buffer))
     (user-error "Not in `term-mode' buffer"))
 
-  (if (eq major-mode 'term-mode)
-      (term-line-mode)
-    (vterm-copy-mode 1))
-
+  (vterm-copy-mode 1)
   (call-interactively #'consult-line))
 
 ;;;###autoload
@@ -197,24 +162,3 @@
                                     nil nil
                                     'ymacs-term-extra-name-history)))
     (setq ymacs-term-extra-name (if (string= name "") nil name))))
-
-(defmacro ymacs-term//define-send-key (name key doc)
-  (declare (indent 2))
-  `(defun ,(intern (format "ymacs-term/send-%s" name)) ()
-     ,doc
-     (interactive)
-     (term-send-raw-string ,key)))
-
-(ymacs-term//define-send-key esc "\e" "Send ESC in term mode.")
-(ymacs-term//define-send-key return "\C-m" "Send Return in term mode.")
-(ymacs-term//define-send-key backward-kill-word "\C-w" "Backward kill word in term mode.")
-(ymacs-term//define-send-key forward-kill-word "\ed" "Forward kill word in term mode.")
-(ymacs-term//define-send-key reverse-search-history "\C-r" "Search history reverse.")
-(ymacs-term//define-send-key delete-word "\ed" "Delete word in term mode")
-(ymacs-term//define-send-key M-x "\ex" "Type M-x in term-mode.")
-(ymacs-term//define-send-key up "\ep" "Type M-p in term-mode.")
-(ymacs-term//define-send-key down "\en" "Type M-n in term-mode.")
-(ymacs-term//define-send-key M-l "\el" "Type M-l in term-mode.")
-(ymacs-term//define-send-key M-c "\ec" "Type M-c in term-mode.")
-(ymacs-term//define-send-key M-u "\eu" "Type M-u in term-mode.")
-(ymacs-term//define-send-key undo "\C-_" "Type undo in term-mode.")

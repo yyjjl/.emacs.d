@@ -1,8 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
 
-(eval-when-compile
-  (require 'term))
-
 (defsubst ymacs-term//get-type ()
   (or (and default-directory
            (file-remote-p default-directory)
@@ -32,25 +29,6 @@
       (setq name (format -fmt index))
       (setq index (1+ index)))
     name))
-
-(defun ymacs-term//keybindings-setup ()
-  (let (bind-key bind-command)
-    ;; Unbind base key that conflict with user's keys-tokes.
-    (dolist (unbind-key ymacs-term-unbind-key-list)
-      (cond
-       ((stringp unbind-key) (setq unbind-key (read-kbd-macro unbind-key)))
-       ((vectorp unbind-key) nil)
-       (t (signal 'wrong-type-argument (list 'array unbind-key))))
-      (define-key term-raw-map unbind-key nil))
-    ;; @see `ymacs-term-bind-key-alist'
-    (dolist (element ymacs-term-bind-key-alist)
-      (setq bind-key (car element))
-      (setq bind-command (cdr element))
-      (cond
-       ((stringp bind-key) (setq bind-key (read-kbd-macro bind-key)))
-       ((vectorp bind-key) nil)
-       (t (signal 'wrong-type-argument (list 'array bind-key))))
-      (define-key term-raw-map bind-key bind-command))))
 
 (defsubst ymacs-term//shell-buffer-p (-buffer)
   (and (buffer-live-p -buffer)
@@ -142,21 +120,6 @@
       (vterm-mode)
       (ymacs-term//sentinel-setup))))
 
-(defun ymacs-term//create-term-buffer (-buffer -shell-name -term-name)
-  ;; Make term, details to see function `make-term' in `term.el'.
-  (setq -term-name (substring -term-name 1 (1- (length -term-name))))
-  (apply #'make-term -term-name -shell-name
-         nil
-         ymacs-term-program-arguments)
-
-  (with-current-buffer -buffer
-    (term-mode)
-    (term-char-mode)
-    (ymacs-term//keybindings-setup)
-    (ymacs-term//sentinel-setup)
-    (setq term-scroll-show-maximum-output nil)
-    (setq term-scroll-to-bottom-on-output t)))
-
 (defun ymacs-term//create-shell-buffer (-buffer -shell-name -term-name -shell-buffer-p)
   ;; (ymacs-term//sentinel-setup) is called in comint-exec-hook
   (if -shell-buffer-p
@@ -186,8 +149,6 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
        ((and (eq term-type 'vterm)
              (require 'vterm nil t))
         (ymacs-term//create-vterm-buffer buffer shell-name))
-       ((eq term-type 'term)
-        (ymacs-term//create-term-buffer buffer shell-name term-name))
        ((eq term-type 'shell)
         (ymacs-term//create-shell-buffer buffer shell-name term-name -shell-buffer-p))
        (t (user-error "Unsupported shell type %s" term-type))))
@@ -201,16 +162,8 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
         (setq ymacs-term-exit-action (if -shell-buffer-p 'shell 'keep)))
       buffer)))
 
-(defsubst ymacs-term//after-prompt-p ()
-  (let* ((proc (get-buffer-process (current-buffer)))
-         (mark (and proc (process-mark proc)))
-         (pos (point)))
-    (and mark (>= pos mark))))
-
 (defun ymacs-term//send-string (-string)
   (cond
-   ((eq major-mode 'term-mode)
-    (term-send-raw-string -string))
    ((eq major-mode 'vterm-mode)
     (vterm-send-string -string))
    ((derived-mode-p 'comint-mode)

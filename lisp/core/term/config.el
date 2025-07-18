@@ -1,12 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
 
-(after! term
-  (define-key! :map term-raw-map
-    ([remap term-send-raw] . ymacs-term/conditional-send-raw))
-
-  (define-key! :map term-mode-map
-    ("M-o" . ymacs-term/switch)))
-
 (after! compile
   (define-key! :map compilation-shell-minor-mode-map
     ("M-}" . ymacs-term/next)

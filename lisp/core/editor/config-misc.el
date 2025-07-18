@@ -206,8 +206,9 @@
              (typescript-mode . typescript-ts-mode)))
     (let ((original-mode (car mode))
           (ts-mode (cdr mode)))
-      (unless (memq original-mode ymacs-native-treesit-modes)
-        (setq mode (cons ts-mode original-mode)))
+      (if (memq original-mode ymacs-native-treesit-modes)
+          (setq mode (cons original-mode ts-mode))
+        (setq mode (list original-mode)))
 
       (setq major-mode-remap-alist (assq-delete-all (cdr mode) major-mode-remap-alist))
       (add-to-list 'major-mode-remap-alist mode))))
