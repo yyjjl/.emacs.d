@@ -31,7 +31,7 @@
 
   (setq ymacs-term-keep-buffer-alive (not ymacs-term-keep-buffer-alive)))
 
-;;;###autoloadn
+;;;###autoload
 (defun ymacs-term/load-file-in-repl ()
   (interactive)
   (let ((repl (or (alist-get major-mode ymacs-term-repl-alist)
