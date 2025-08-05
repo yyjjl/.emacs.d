@@ -121,12 +121,13 @@
            (shell-file-name "/bin/sh")
            (this-command #'consult-ripgrep)
            (input (cond ((and emacs-filter
+                              switches
                               (not (string-empty-p emacs-filter))
                               (not (string-empty-p switches)))
                          (format "%s -- %s#%s" (if (string-empty-p search-term) "" search-term) switches emacs-filter))
-                        ((and (not (string-empty-p switches)))
+                        ((and switches (not (string-empty-p switches)))
                          (format "%s -- %s" (if (string-empty-p search-term) "" search-term) switches))
-                        ((and (not (string-empty-p emacs-filter)))
+                        ((and emacs-filter (not (string-empty-p emacs-filter)))
                          (format "%s#%s" search-term emacs-filter))
                         (t
                          search-term))))

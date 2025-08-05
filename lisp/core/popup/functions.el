@@ -162,8 +162,10 @@ Displays -BUFFER according to -ALIST and -RULE."
         (ymacs-popup//set-term-window window nil t)))
 
       (with-current-buffer -buffer
-        ;; (when (plist-get rule :no-modeline)
-        ;;   (setq-local mode-line-format nil))
+        (when (plist-get rule :no-mode-line)
+          (setq-local mode-line-format nil))
+        (when (plist-get rule :no-tab-line)
+          (setq-local tab-line-format nil))
         (when (window-dedicated-p window)
           (setq ymacs-popup--nosplit-window window)))
 
@@ -230,6 +232,12 @@ Displays -BUFFER according to -ALIST and -RULE."
   :side bottom
   :select t
   :autoclose t)
+ (:name "*interpretation*"
+  :side right
+  :select t
+  :size 0.3
+  :no-tab-line t
+  :dedicated t)
  (:macth-fn ymacs-popup//term-buffer-p
   :side bottom
   :select t
@@ -246,7 +254,7 @@ Displays -BUFFER according to -ALIST and -RULE."
  (:name-regexp ymacs-popup-below-autoclose-buffer-regexp
   :size auto
   :side bottom
-  ;; :no-modeline t
+  ;; :no-mode-line t
   :autoclose t)
  (:name-regexp ymacs-popup-other-window-regexp
   :select t))
