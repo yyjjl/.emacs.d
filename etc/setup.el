@@ -9,7 +9,7 @@
 
 (define-advice message (:around (-fn -fmt &rest -args) indent)
   (unless (string-prefix-p "Checking " -fmt)
-    (apply -fn (concat "= " -fmt) -args)))
+    (apply -fn (concat "=== " -fmt) -args)))
 
 (add-to-list 'load-path ymacs-setup-directory)
 

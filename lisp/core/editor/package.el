@@ -5,10 +5,6 @@
 (executable! fdfind :exe ["fdfind" "fd"])
 (executable! ctags :exe ["ctags-universal" "ctags"])
 
-(option! default-project nil
-  :type 'list
-  :safe #'(lambda (x) (and (symbolp (car-safe x)) (stringp (cdr-safe x)))))
-
 (eval-when-compile-config!
  (when (and ymacs-ripgrep-path
             (not (eq (shell-command

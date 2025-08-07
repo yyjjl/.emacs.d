@@ -74,7 +74,7 @@
 
   (-let* ((input (with-selected-window (active-minibuffer-window)
                    (minibuffer-contents-no-properties)))
-          (split-fn (plist-get (consult--async-split-style) :function))
+          (split-fn (plist-get (alist-get consult-async-split-style consult-async-split-styles-alist) :function))
           ((search-term emacs-input-start-pos . _) (funcall split-fn input))
           (emacs-filter (substring input emacs-input-start-pos))
           ((search-term . cmdargs) (consult--command-split search-term)))
@@ -109,7 +109,7 @@
                (buffer-file-name)
                (or (string-suffix-p ".gz" (buffer-file-name))
                    (string-suffix-p ".zip" (buffer-file-name))))
-      (cl-pushnew "--search-zip" cmdargs))
+      (cl-pushnew "--search-zip" cmdargs :test #'equal))
 
     (ymacs-editor//ripgrep-set-var :cmdargs cmdargs)
     (ymacs-editor//ripgrep-set-var :search-term search-term)

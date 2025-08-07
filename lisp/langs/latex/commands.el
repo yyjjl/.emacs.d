@@ -54,7 +54,7 @@ Else call with `read-file-name'.
   (if (region-active-p)
       (call-interactively 'tex-count-words)
     (let* ((options
-            (or (and (eq current-prefix-arg '(16))
+            (or (and (equal current-prefix-arg '(16))
                      (read-string "Options: " "-inc -ch -brief"))
                 "-inc -ch -brief"))
            (file

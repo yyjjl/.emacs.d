@@ -6,7 +6,6 @@
 
 (after! diff-hl
   (after! magit
-    (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)))
 
 (after! smerge-mode

@@ -19,7 +19,7 @@
 
 (option! clangd-args '("--background-index" "-j=4" "--all-scopes-completion" "--header-insertion-decorators=0")
   "Clangd command line args"
-  :type 'list
+  :type '(list string)
   :safe (lambda (x) (and (listp x) (cl-every #'stringp x))))
 
 (defvar ymacs-python-lsp-servers '(pyls pyright pylance))

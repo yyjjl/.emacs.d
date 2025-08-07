@@ -42,7 +42,7 @@
 
 (after! marginalia
   (dolist (catogory '(command function variable file))
-    (setf (alist-get catogory marginalia-annotator-registry) '(builtin))))
+    (setf (alist-get catogory marginalia-annotators) '(builtin))))
 
 (after! vertico
   (setq vertico-count 15)

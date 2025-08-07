@@ -139,20 +139,13 @@
     ;; Don't open a file in a new frame
     (setq ns-pop-up-frames nil)))
 
-(ignore-errors
-  (set-fringe-bitmap-face 'right-curly-arrow 'warning)
-  (set-fringe-bitmap-face 'left-curly-arrow 'warning)
-  (set-fringe-bitmap-face 'right-triangle 'error)
-  (dolist (bitmap '(right-arrow left-arrow up-arrow down-arrow))
-    (set-fringe-bitmap-face bitmap 'compilation-info)))
-
 (setq widget-image-enable nil)
 
 ;; Don't display line number in mode line when buffer is too large
 (setq line-number-display-limit ymacs-large-buffer-limit)
 
 ;; Update ui less often
-(setq idle-update-delay 2)
+(setq which-func-update-delay 2)
 ;; Suppress GUI features
 (setq use-file-dialog nil)
 (setq use-dialog-box nil)

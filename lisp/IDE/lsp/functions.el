@@ -73,11 +73,4 @@
            (eglot-inlay-hints-mode -1)))
        (add-hook 'eglot-managed-mode-hook ',hook-name nil t)
 
-       (when (and ymacs-lsp-booster-path
-                  (not (bound-and-true-p eglot-booster-mode))
-                  (fboundp 'eglot-booster-mode))
-         (setq eglot-booster-no-remote-boost t)
-         (add-to-list 'exec-path (file-name-directory ymacs-lsp-booster-path))
-         (eglot-booster-mode 1))
-
        (eglot-ensure))))

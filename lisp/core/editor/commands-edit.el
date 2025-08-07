@@ -2,10 +2,12 @@
 
 (defvar reb-regexp)
 (defvar reb-target-window)
-(declare-function 'reb-update-regexp "re-builder")
 
 (eval-when-compile
-  (require 'expand-region))
+  (require 'expand-region)
+  (require 're-builder))
+
+(declare-function 'reb-update-regexp "re-builder")
 
 
 (defvar ymacs-editor-sexp-suffix-chars ";,. ")
@@ -276,10 +278,10 @@ Optional argument -ARG is used to toggle narrow functions."
       (-let* ((currrent-pos (point))
               (offset (line-beginning-position))
               (input (minibuffer-contents-no-properties))
-              (split-fn (plist-get (consult--async-split-style) :function))
-              (puncts-pos (cdddr (funcall split-fn input)))
-              (punct-pos2 (+ offset (or (cdadr puncts-pos) 10000)))
-              (punct-pos1 (+ offset (or (cdar puncts-pos) 10000))))
+              (split-fn (plist-get (alist-get consult-async-split-style consult-async-split-styles-alist) :function))
+              ((_str _str-len pct1 pct2) (funcall split-fn input))
+              (punct-pos1 (+ offset (or (cdr pct1) 10000)))
+              (punct-pos2 (+ offset (or (cdr pct2) 10000))))
         (cond
          ((> currrent-pos punct-pos2) (goto-char punct-pos2))
          ((> currrent-pos punct-pos1) (goto-char punct-pos1))
@@ -345,25 +347,24 @@ Optional argument -ARG is used to toggle narrow functions."
        (advice-remove 'reb-quit 'query-replace-after-quiting-re-builder)
 
        (reb-update-regexp)
-       (let ((regexp (reb-target-binding reb-regexp)))
-         (funcall -fn)
-         (with-selected-window reb-target-window
-           (if (null saved-restriction)
-               (widen)
-             (apply #'narrow-to-region saved-restriction))
+       (funcall -fn)
+       (with-selected-window reb-target-window
+         (if (null saved-restriction)
+             (widen)
+           (apply #'narrow-to-region saved-restriction))
 
-           ;; restore
-           (goto-char saved-point)
-           (save-mark-and-excursion--restore saved-marker)
-           (set-window-start (selected-window) saved-window-start)
+         ;; restore
+         (goto-char saved-point)
+         (save-mark-and-excursion--restore saved-marker)
+         (set-window-start (selected-window) saved-window-start)
 
-           (query-replace-regexp
-            regexp
-            (query-replace-read-to
-             regexp
-             (format "Query replace%s regexp%s"
-                     (if backward " backward" "")
-                     (if (and start end) " in region" ""))
-             t)
-            delimited start end backward region-noncontiguous-p))))
+         (query-replace-regexp
+          reb-regexp
+          (query-replace-read-to
+           reb-regexp
+           (format "Query replace%s regexp%s"
+                   (if backward " backward" "")
+                   (if (and start end) " in region" ""))
+           t)
+          delimited start end backward region-noncontiguous-p)))
      '((name . query-replace-after-quiting-re-builder)))))
