@@ -233,9 +233,6 @@
      ("\\paragraph{%s}" . "\\paragraph*{%s}")
      ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
 
-(after! org-download
-  (setq org-download-heading-lvl nil))
-
 (after! ox-publish
   (setq
    org-publish-project-alist

@@ -6,10 +6,10 @@ CURRENT_DIR=$(dirname "$0")
 CORE_APPS=(
     cmake
     coreutils
-    fd
-    fzf
+    # fd
+    # fzf
     libvterm
-    osxfuse
+    # osxfuse
     p7zip
     pipenv
     ripgrep
@@ -19,12 +19,12 @@ CORE_APPS=(
 CASK_APPS=(
     iterm2
 
-    google-chrome
+    # google-chrome
 
-    v2rayx # shadowsocksx-ng
+    # v2rayx # shadowsocksx-ng
 
     # fliqlo        # Screen Saver
-    keycastr        # Show keys on the screen
+    # keycastr        # Show keys on the screen
 )
 
 . ${CURRENT_DIR}/utils.sh
@@ -51,7 +51,7 @@ function main {
     check
 
     brew tap d12frosted/emacs-plus
-    brew install emacs-plus@28 --with-modern-black-variant-icon
+    brew install emacs-plus@29 --with-modern-black-variant-icon
 
     for app in ${CORE_APPS[@]}; do
         info ">> Installing ${app}..."

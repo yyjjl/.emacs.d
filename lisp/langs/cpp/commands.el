@@ -25,8 +25,8 @@
    ((region-active-p)
     (funcall ymacs-lsp-format-region-function (region-beginning) (region-end)))
    (t
-    (if-let (bounds (or (bounds-of-thing-at-point 'sexp)
-                        (bounds-of-thing-at-point 'defun)))
+    (if-let* ((bounds (or (bounds-of-thing-at-point 'sexp)
+                          (bounds-of-thing-at-point 'defun))))
         (funcall ymacs-lsp-format-region-function (car bounds) (cdr bounds))
       (message "No sexp or defun found, please use C-u prefix")))))
 

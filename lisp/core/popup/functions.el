@@ -98,7 +98,7 @@
                    collect w))
          (slots (mapcar (lambda (w) (window-parameter w 'window-slot)) windows)))
     (or (when -terminal-p
-          (when-let (term-window (ymacs-popup//get-term-window))
+          (when-let* ((term-window (ymacs-popup//get-term-window)))
             ;; Case 1: reuse term-window
             (set-window-dedicated-p term-window nil)
             (set-window-buffer term-window -buffer)
@@ -178,7 +178,7 @@ Displays -BUFFER according to -ALIST and -RULE."
       (not
        (or
         (eq (buffer-local-value 'major-mode -buffer) 'fundamental-mode)
-        (when-let (rule (buffer-local-value 'ymacs-popup--matched-rule -buffer))
+        (when-let* ((rule (buffer-local-value 'ymacs-popup--matched-rule -buffer)))
           (or (plist-get rule :dedicated)
               (plist-get rule :autoclose)
               (plist-get rule :terminal)))

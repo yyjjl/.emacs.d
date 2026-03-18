@@ -10,7 +10,7 @@
   (define-hook! ymacs-python//shell-exec-hook (ymacs-term-shell-exec-hook)
     (when (and ymacs-python-auto-activate-venv-p python-shell-virtualenv-root)
       (if (and (stringp python-shell-virtualenv-root)
-               (if-let ((remote-host (file-remote-p default-directory)))
+               (if-let* ((remote-host (file-remote-p default-directory)))
                    (file-directory-p (concat remote-host python-shell-virtualenv-root))
                  (file-directory-p python-shell-virtualenv-root)))
           (ymacs-term//send-string

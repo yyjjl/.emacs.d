@@ -28,8 +28,8 @@
 (defmacro expand! (-name)
   "Expand -NAME relative to current file while loading or byte-compiling."
   `(eval-when-compile
-     (if-let ((filename (or (bound-and-true-p byte-compile-current-file)
-                            load-file-name)))
+     (if-let* ((filename (or (bound-and-true-p byte-compile-current-file)
+                             load-file-name)))
          (expand-file-name ,-name (file-name-directory filename))
        ,-name)))
 
@@ -177,7 +177,7 @@ Each hook should either be a hook-symbol or the form of (hook-symbol . plist).
 Optional argument -BODY is the function body."
   (declare (indent defun) (debug t) (doc-string 3))
   (let* ((anonymous-p (eq -name :anonymous))
-         (-symbol (cond (anonymous-p (cl-gensym "g"))
+         (-symbol (cond (anonymous-p (gensym "g"))
                         ((consp -name) `',(car -name))
                         ((symbolp -name) `',-name)
                         (t (user-error "Invalid hook name: %s" -name))))
@@ -200,7 +200,7 @@ Optional argument -BODY is the function body."
 
 -ARGS should be the form of (:map map :prefix prefix-key key-definitions ...)"
   (declare (indent defun))
-  (let ((sym (cl-gensym))
+  (let ((sym (gensym))
         (map 'global-map)
         (prefix "")
         forms)
@@ -577,18 +577,18 @@ HTML file converted from org file, it returns t."
     (unless (file-directory-p directory)
       (user-error "no feature %s" -name))
 
-    (if-let ((feature-name (intern (file-name-base feature-name)))
-             (forms (append
-                     (cl-loop
-                      for name in '("package" "functions" "hooks" "config")
-                      for path = (expand-file-name name directory)
-                      for full-path = (concat path ".el")
-                      when (file-exists-p full-path)
-                      collect `(load ,path nil t))
-                     (cl-loop
-                      for file in (directory-files directory :full "config-.*.el$")
-                      for path = (file-name-sans-extension file)
-                      collect `(load ,path nil t)))))
+    (if-let* ((feature-name (intern (file-name-base feature-name)))
+              (forms (append
+                      (cl-loop
+                       for name in '("package" "functions" "hooks" "config")
+                       for path = (expand-file-name name directory)
+                       for full-path = (concat path ".el")
+                       when (file-exists-p full-path)
+                       collect `(load ,path nil t))
+                      (cl-loop
+                       for file in (directory-files directory :full "config-.*.el$")
+                       for path = (file-name-sans-extension file)
+                       collect `(load ,path nil t)))))
         `(unless (has-feature! ',feature-name)
            ,@forms
            (add-to-list 'ymacs-loaded-features (cons ',feature-name ',-name))

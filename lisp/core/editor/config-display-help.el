@@ -73,7 +73,7 @@
       "\n"))))
 
 (defsubst ymacs-editor//display-help--keys (-keys)
-  (when-let (keys (ymacs-editor//display-keys--format -keys))
+  (when-let* ((keys (ymacs-editor//display-keys--format -keys)))
     ;; sort by length
     (setq keys (sort keys (lambda (x y) (< (length x) (length y)))))
 
@@ -141,7 +141,7 @@
     (goto-char (point-min))))
 
 (defun ymacs-editor//display-help--hide (&rest _)
-  (when-let (buffer (get-buffer ymacs-editor-display-help-buffer-name))
+  (when-let* ((buffer (get-buffer ymacs-editor-display-help-buffer-name)))
     (mapc #'delete-window (get-buffer-window-list buffer)))
   (when (window-live-p ymacs-editor-display-help-window)
     (delete-window ymacs-editor-display-help-window)))
@@ -151,12 +151,12 @@
     (setq -command (string-join -command " ")))
 
   (when -command
-    (setq -command (propertize -command 'face font-lock-doc-face)))
+    (setq -command (propertize -command 'face 'font-lock-doc-face)))
 
   (let ((max-cmd-length (frame-width)))
     (when (> (length -command) max-cmd-length)
       (setq -command (concat (substring -command 0 max-cmd-length)
-                             (propertize "[...]" 'face font-lock-keyword-face)))))
+                             (propertize "[...]" 'face 'font-lock-keyword-face)))))
 
   (let* ((extra-string
           (when ymacs-editor-display-help-extra-lines
@@ -166,7 +166,7 @@
          (cmd-string
           (when -command
             (format "(@%s) %s"
-                    (propertize (or -directory default-directory "") 'face font-lock-constant-face)
+                    (propertize (or -directory default-directory "") 'face 'font-lock-constant-face)
                     -command)))
          (help-string
           (concat extra-string

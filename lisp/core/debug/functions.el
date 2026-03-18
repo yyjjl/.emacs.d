@@ -26,7 +26,7 @@
       (gud-command-window
 
        (setq ymacs-popup--matched-rule '(:side right :size 0.5))
-       (when-let (window (ymacs-popup//display-buffer-action -buffer -alist))
+       (when-let* ((window (ymacs-popup//display-buffer-action -buffer -alist)))
          (set-window-parameter window 'no-delete-other-windows t)
          (set-window-dedicated-p window t)
          window))
@@ -37,8 +37,8 @@
          (setf (alist-get 'side -alist) 'bottom)
          (setf (alist-get 'slot -alist) (if io-window-p 2 1))
          (setf (alist-get 'window-height -alist) 0.35)
-         (when-let (window (or (display-buffer-reuse-window -buffer -alist)
-                               (display-buffer-in-side-window -buffer -alist)))
+         (when-let* ((window (or (display-buffer-reuse-window -buffer -alist)
+                                 (display-buffer-in-side-window -buffer -alist))))
            (set-window-dedicated-p window t)
            (unless io-window-p
              (select-window window))

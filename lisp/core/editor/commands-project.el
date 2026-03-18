@@ -44,7 +44,7 @@
     (condition-case nil
         (with-temp-lv-message!
             ((propertize (substitute-command-keys "\\[keyboard-quit] to open file")
-                         'face font-lock-builtin-face))
+                         'face 'font-lock-builtin-face))
           (call-interactively #'add-dir-local-variable))
       (quit
        (let ((files (dir-locals--all-files -directory)))

@@ -11,7 +11,7 @@
     (ymacs-lsp//set-python-lsp-server server))
 
   (let (buffers)
-    (when-let ((server (eglot-current-server)))
+    (when-let* ((server (eglot-current-server)))
       (setq buffers (eglot--managed-buffers server))
       (eglot-shutdown server nil))
 

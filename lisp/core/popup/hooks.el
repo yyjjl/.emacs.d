@@ -56,7 +56,7 @@
 (define-advice window--try-to-split-window (:around (-fn -window &optional -alist) dont-split-popups)
   (when (or (one-window-p)
             (not (eq -window
-                     (when-let (buffer (window-buffer -window))
+                     (when-let* ((buffer (window-buffer -window)))
                        (buffer-local-value 'ymacs-popup--nosplit-window buffer)))))
     (funcall -fn -window -alist)))
 

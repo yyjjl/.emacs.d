@@ -17,7 +17,7 @@
    (let ((code (racket-mode-start-faster)))
      (print! "  > Exit with code: %s\n" code)
      (unless (eq code 0)
-       (if-let (buffer (get-buffer "*Shell Command Output*"))
+       (if-let* ((buffer (get-buffer "*Shell Command Output*")))
            (with-current-buffer buffer
              (print! "  > %s\n" (buffer-string))))))))
 

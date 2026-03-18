@@ -10,7 +10,7 @@
 (defmacro ymacs-editor//define-project-local (-method &rest -args)
   (let ((call-args (cl-remove-if (lambda (x) (string-prefix-p "&" (symbol-name x))) -args)))
     `(cl-defmethod ,-method ((project (head local)) ,@-args)
-       (if-let (vc-project (nth 2 project))
+       (if-let* ((vc-project (nth 2 project)))
            (,-method vc-project ,@call-args)
          (,-method (cons 'transient (nth 1 project)) ,@call-args)))))
 
@@ -19,8 +19,8 @@
   (nth 1 project))
 
 (cl-defmethod project-files ((project (head local)) &optional dirs)
-  (if-let ((root (project-root project))
-           (vc-project (nth 2 project)))
+  (if-let* ((root (project-root project))
+            (vc-project (nth 2 project)))
       (project-files vc-project
                      ;; 当请求 local root 的时候, 切换到 vc-root
                      (if (and (= (length dirs) 1)
@@ -30,8 +30,8 @@
     (project-files (cons 'transient root) dirs)))
 
 (cl-defmethod ymacs-modeline//project-identity ((project (head local)))
-  (if-let ((vc-project (nth 2 project))
-           (root (project-root project)))
+  (if-let* ((vc-project (nth 2 project))
+            (root (project-root project)))
       (format "local:%s:vc:%s"
               (project-name (cons 'transient root))
               (project-root vc-project))
@@ -67,11 +67,11 @@
         value))))
 
 (defsubst ymacs-editor//project-root (&optional -directory)
-  (when-let (project (project-current nil -directory))
+  (when-let* ((project (project-current nil -directory)))
     (project-root project)))
 
 (defsubst ymacs-editor//project-root-or-default ()
-  (or (when-let (project (project-current))
+  (or (when-let* ((project (project-current)))
         (project-root project))
       default-directory))
 

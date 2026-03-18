@@ -33,7 +33,7 @@
                  font-lock-maximum-decoration)))
     (when (and (integerp level)
                (< level (length ymacs-editor-font-lock-keywords)))
-      (when-let (keywords (alist-get major-mode (aref ymacs-editor-font-lock-keywords level)))
+      (when-let* ((keywords (alist-get major-mode (aref ymacs-editor-font-lock-keywords level))))
         (font-lock-add-keywords nil keywords)))))
 
 ;; Defer jit font locking slightly to [try to] improve Emacs performance

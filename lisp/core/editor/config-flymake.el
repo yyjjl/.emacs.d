@@ -12,7 +12,7 @@
     (let ((min-severity (flymake--severity :warning)))
       (when (cl-some
              (lambda (ov)
-               (when-let (diag (overlay-get ov 'flymake-diagnostic))
+               (when-let* ((diag (overlay-get ov 'flymake-diagnostic)))
                  (>= (flymake--severity (flymake--diag-type diag)) min-severity)))
              (overlays-in (point-min) (point-max)))
         (setq -filter '(:error :warning)))

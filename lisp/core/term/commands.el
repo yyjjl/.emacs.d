@@ -82,7 +82,7 @@
 ;;;###autoload
 (defun ymacs-term/pop-shell-here ()
   (interactive)
-  (when-let (buffer (ymacs-term//create-buffer nil t))
+  (when-let* ((buffer (ymacs-term//create-buffer nil t)))
     (display-buffer buffer)
     (with-current-buffer buffer
         (local-set-key [f8] #'ymacs-term/pop-shell))))
@@ -144,11 +144,11 @@
 ;;;###autoload
 (defun ymacs-term/toggle-window ()
   (interactive)
-  (if-let (window (ymacs-popup//get-term-window))
+  (if-let* ((window (ymacs-popup//get-term-window)))
       (if (eq window (selected-window))
           (delete-window window)
         (select-window window))
-    (if-let (buffer (car (ymacs-popup//get-active-term-buffer-list)))
+    (if-let* ((buffer (car (ymacs-popup//get-active-term-buffer-list))))
         (display-buffer buffer)
       (call-interactively #'ymacs-term/pop-shell))))
 

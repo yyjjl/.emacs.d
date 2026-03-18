@@ -1,8 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
 (defun ymacs-term//toggle-window@hack ()
-  (if-let ((buffer (gdb-get-buffer-create 'gdb-inferior-io))
-           (window (get-buffer-window buffer)))
+  (if-let* ((buffer (gdb-get-buffer-create 'gdb-inferior-io))
+            (window (get-buffer-window buffer)))
       (if (eq window (selected-window))
           (delete-window window)
         (select-window window))
@@ -29,7 +29,7 @@
 
       (ymacs-debug-command-buffer-mode 1)
 
-      (when-let (window (get-buffer-window))
+      (when-let* ((window (get-buffer-window)))
         (select-window window 'norecord)))))
 
 (after! gud

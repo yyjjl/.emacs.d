@@ -119,7 +119,7 @@ If STR is too large, pop it to a buffer instead."
          (user-error "Unexpected"))))
 
 (defsubst ymacs-lisp//format-sexp ()
-  (when-let (bound (bounds-of-thing-at-point 'sexp))
+  (when-let* ((bound (bounds-of-thing-at-point 'sexp)))
     (indent-region (car bound) (cdr bound))
     (delete-trailing-whitespace (car bound) (cdr bound))))
 
@@ -160,8 +160,8 @@ If STR is too large, pop it to a buffer instead."
         (forward-char 1)
         (ymacs-lisp//in-string-or-comment-p))
       ;; |"abcd" => |<empty>
-      (when-let (bound (or (bounds-of-thing-at-point 'string)
-                           (bounds-of-thing-at-point 'comment)))
+      (when-let* ((bound (or (bounds-of-thing-at-point 'string)
+                             (bounds-of-thing-at-point 'comment))))
         (delete-region (car bound) (cdr bound))))
      ((ymacs-lisp//left-p)
       ;; |(abcd efg) => |<empty>
@@ -202,7 +202,7 @@ Otherwise (`backward-delete-char-untabify' ARG)."
       (ymacs-lisp//in-string-p))
     ;; "abcd"|  => <empty>|
     (backward-char 1)
-    (when-let (bound (bounds-of-thing-at-point 'string))
+    (when-let* ((bound (bounds-of-thing-at-point 'string)))
       (delete-region (car bound) (cdr bound))))
    ((ymacs-lisp//right-p)
     ;; (abcd efg)| => <empty>|
@@ -253,14 +253,14 @@ Otherwise (`backward-delete-char-untabify' ARG)."
 (defun ymacs-lisp/copy-sexp ()
   (interactive)
   (ymacs-lisp//run-body-or-self-insert
-   (when-let (bound (bounds-of-thing-at-point 'sexp))
+   (when-let* ((bound (bounds-of-thing-at-point 'sexp)))
      (kill-new (buffer-substring (car bound) (cdr bound)))
      (message "Copied %s" bound))))
 
 (defun ymacs-lisp/clone-sexp (-arg)
   (interactive "p")
   (ymacs-lisp//run-body-or-self-insert
-   (when-let (str (thing-at-point 'sexp))
+   (when-let* ((str (thing-at-point 'sexp)))
      (cl-labels
          ((doit ()
             (let (deactivate-mark)
@@ -286,13 +286,13 @@ Otherwise (`backward-delete-char-untabify' ARG)."
 (defun ymacs-lisp/comment-sexp ()
   (interactive)
   (ymacs-lisp//run-body-or-self-insert
-   (when-let (bound (bounds-of-thing-at-point 'sexp))
+   (when-let* ((bound (bounds-of-thing-at-point 'sexp)))
      (comment-region (car bound) (cdr bound)))))
 
 (defun ymacs-lisp/eval (-display-style)
   (interactive '(message))
   (ymacs-lisp//run-body-or-self-insert
-   (when-let (str (thing-at-point 'sexp))
+   (when-let* ((str (thing-at-point 'sexp)))
      (let ((result (ymacs-lisp//prin1-to-string (eval (read str) t))))
        (if (eq -display-style 'message)
            (ymacs-lisp/message result)
@@ -447,8 +447,8 @@ Self-insert otherwise."
 (defun ymacs-lisp/raise ()
   (interactive)
   (ymacs-lisp//run-body-or-self-insert
-   (when-let ((bound (bounds-of-thing-at-point 'sexp))
-              (str (buffer-substring (car bound) (cdr bound))))
+   (when-let* ((bound (bounds-of-thing-at-point 'sexp))
+               (str (buffer-substring (car bound) (cdr bound))))
      (let ((region-side (when (region-active-p)
                           (if (equal (point) (region-beginning))
                               'left
@@ -636,7 +636,7 @@ Self-insert otherwise."
   (interactive)
 
   (ymacs-lisp//run-body-or-self-insert
-   (when-let (bound (bounds-of-thing-at-point 'sexp))
+   (when-let* ((bound (bounds-of-thing-at-point 'sexp)))
      (avy-with ymacs-lisp/avy-symbol
        (avy-jump
         "\\_<\\(\\sw\\|\\s_\\)"
@@ -648,7 +648,7 @@ Self-insert otherwise."
   (interactive)
 
   (ymacs-lisp//run-body-or-self-insert
-   (when-let (bound (bounds-of-thing-at-point 'sexp))
+   (when-let* ((bound (bounds-of-thing-at-point 'sexp)))
      (avy-with ymacs-lisp/avy-symbol
        (avy-jump
         "[\\[{(]"

@@ -103,7 +103,7 @@
           (ymacs-term//set-quit-keys t))))))
 
 (defsubst ymacs-term//sentinel-setup ()
-  (when-let ((proc (get-buffer-process (current-buffer))))
+  (when-let* ((proc (get-buffer-process (current-buffer))))
     (set-process-sentinel
      proc
      (make-process-sentinel!

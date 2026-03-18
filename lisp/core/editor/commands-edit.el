@@ -20,8 +20,8 @@
       (skip-syntax-backward "w_" (line-beginning-position)))))
 
 (defsubst ymacs-editor//try-narrow-to-comment-or-string (&optional -syntax -bound)
-  (when-let ((syntax (or -syntax (syntax-ppss)))
-             (string-comment-start (nth 8 syntax)))
+  (when-let* ((syntax (or -syntax (syntax-ppss)))
+              (string-comment-start (nth 8 syntax)))
     (save-excursion
       (goto-char string-comment-start)
       (narrow-to-region
@@ -45,8 +45,8 @@
                  (if (and (= index 0)
                           (save-excursion
                             (skip-syntax-forward " " end-of-line)
-                            (when-let ((char (char-after))
-                                       (syn (char-syntax char)))
+                            (when-let* ((char (char-after))
+                                        (syn (char-syntax char)))
                               (or (= syn ?w)
                                   (= syn ?_)))))
                      (forward-symbol 1)
@@ -95,8 +95,8 @@
               ;; 先跳过空白字符
               (goto-char original-point)
               (skip-syntax-forward " " end-of-line)
-              (when-let ((char (char-after))
-                         (syntax (char-syntax char)))
+              (when-let* ((char (char-after))
+                          (syntax (char-syntax char)))
                 (if (= syntax ?\()
                     ;; |(a    =>  | c
                     ;;   b) c
@@ -175,7 +175,7 @@ Does not indent buffer, because it is used for a
   (let* ((candidate
           (if (region-active-p)
               (buffer-substring-no-properties (region-beginning) (region-end))
-            (when-let (sym (thing-at-point 'symbol))
+            (when-let* ((sym (thing-at-point 'symbol)))
               (concat "\\_<" (regexp-quote sym) "\\_>"))))
          (regexp-history
           (if candidate
@@ -249,7 +249,7 @@ Optional argument -ARG is used to toggle narrow functions."
                         t)))))
     (forward-list -n))
 
-   ((when-let (handlers (alist-get major-mode ymacs-editor-forward-sexp-handler))
+   ((when-let* ((handlers (alist-get major-mode ymacs-editor-forward-sexp-handler)))
       (let ((forward-fn (car handlers))
             (backward-fn (cdr handlers)))
         (if (>= -n 0)

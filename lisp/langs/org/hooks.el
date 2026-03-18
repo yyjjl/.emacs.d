@@ -52,8 +52,8 @@
     (auto-fill-mode -1)
     (eldoc-mode -1)
 
-    (when (fboundp 'org-num-mode)
-      (org-num-mode 1))
+    ;; (when (fboundp 'org-num-mode)
+    ;;   (org-num-mode 1))
 
     ;; (add-to-list 'company-backends 'ymacs-org/company-symbols)
     )

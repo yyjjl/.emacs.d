@@ -25,12 +25,12 @@ Otherwise call `avy-goto-char-in-line'
 (defun ymacs-editor//avy-action-copy--prompt ()
   (format
    "%s to kill, %s/%s/%s to copy, %s/%s to expand/reset: %s"
-   (propertize "k" 'face font-lock-keyword-face)
-   (propertize "w" 'face font-lock-keyword-face)
-   (propertize "RET" 'face font-lock-keyword-face)
-   (propertize "SPC" 'face font-lock-keyword-face)
-   (propertize "-" 'face font-lock-keyword-face)
-   (propertize "0" 'face font-lock-keyword-face)
+   (propertize "k" 'face 'font-lock-keyword-face)
+   (propertize "w" 'face 'font-lock-keyword-face)
+   (propertize "RET" 'face 'font-lock-keyword-face)
+   (propertize "SPC" 'face 'font-lock-keyword-face)
+   (propertize "-" 'face 'font-lock-keyword-face)
+   (propertize "0" 'face 'font-lock-keyword-face)
    (mapconcat
     (lambda (item)
       (format "%s=%s"
@@ -63,8 +63,8 @@ Otherwise call `avy-goto-char-in-line'
               t)
              ((or (eq char 13) (eq char 32) (eq char ?w))
               (setq done 'copy))
-             ((when-let (thing (alist-get char ymacs-editor-avy-copy-key-alist))
-                (if-let (bounds (bounds-of-thing-at-point thing))
+             ((when-let* ((thing (alist-get char ymacs-editor-avy-copy-key-alist)))
+                (if-let* ((bounds (bounds-of-thing-at-point thing)))
                     (save-excursion
                       (goto-char (cdr bounds))
                       (set-mark (point))

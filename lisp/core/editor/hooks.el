@@ -115,7 +115,7 @@
                            (let ((table (make-hash-table :test #'equal)))
                              (set-frame-parameter -frame 'tty-color-cache table)
                              table))))
-      (if-let (cache (gethash (cons -color -frame) cache-table))
+      (if-let* ((cache (gethash (cons -color -frame) cache-table)))
           (and (not (eq cache 'null)) cache)
         (let ((ret (funcall -fn -color -frame)))
           (puthash (cons -color -frame) (or ret 'null) cache-table)

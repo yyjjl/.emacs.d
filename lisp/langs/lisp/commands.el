@@ -7,7 +7,7 @@ definition and running `eval-defun`."
   (interactive)
   (mapatoms
    (lambda (symbol)
-     (when-let (pos (car-safe (get symbol 'edebug)))
+     (when-let* ((pos (car-safe (get symbol 'edebug))))
        (with-current-buffer (marker-buffer pos)
          (goto-char (marker-position pos))
          (eval-defun nil))))))

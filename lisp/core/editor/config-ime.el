@@ -3,7 +3,7 @@
 (defvar ymacs-editor-input-method-alist ())
 
 (define-advice toggle-input-method (:around (-fn &rest -args) preload)
-  (if-let (item (alist-get major-mode ymacs-editor-input-method-alist))
+  (if-let* ((item (alist-get major-mode ymacs-editor-input-method-alist)))
       (when (require (car item) nil t)
         (let ((default-input-method (cadr item)))
           (apply -fn -args)))

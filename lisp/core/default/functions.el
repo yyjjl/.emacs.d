@@ -35,7 +35,7 @@
    if (or (stringp segment) (consp segment))
    collect segment
    else if (symbolp segment)
-   collect (if-let ((func (cdr (assq segment ymacs-modeline-segment-alist))))
+   collect (if-let* ((func (cdr (assq segment ymacs-modeline-segment-alist))))
                (list func)
              (error "%s is not a defined segment" segment))
    else do (error "%s is not a valid segment" segment)))
@@ -250,7 +250,7 @@ like the scratch buffer where knowing the current project directory is important
            ymacs-modeline--remote-host)
       ;; assume that host will not be changed after file opened
       (setq ymacs-modeline--remote-host
-            (when-let ((remote (and default-directory (file-remote-p default-directory))))
+            (when-let* ((remote (and default-directory (file-remote-p default-directory))))
               (propertize (concat "@" remote) 'face 'ymacs-modeline-host)))))
 
 ;;
@@ -404,7 +404,7 @@ like the scratch buffer where knowing the current project directory is important
 (defvar ace-window-mode)
 
 (ymacs-modeline//def-segment window-number
-  (when-let (number (window-parameter (selected-window) 'ace-window-path))
+  (when-let* ((number (window-parameter (selected-window) 'ace-window-path)))
     (if ace-window-mode
         (concat " " number " " (propertize ace-window-mode 'face 'aw-leading-char-face))
       (concat " " number))))

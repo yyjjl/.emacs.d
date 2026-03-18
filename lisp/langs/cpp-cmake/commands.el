@@ -24,7 +24,7 @@
             (ymacs-cpp-cmake//parse-available-options command-buffer))
       (save-dir-local-variables! 'ymacs-cpp-cmake-available-options)
 
-      (when-let (config-ui-buffer (get-buffer ymacs-cpp-cmake-config-buffer-name))
+      (when-let* ((config-ui-buffer (get-buffer ymacs-cpp-cmake-config-buffer-name)))
         (with-current-buffer config-ui-buffer
           (ymacs-cpp-cmake//render-config-buffer -source-buffer)))
 
@@ -113,17 +113,17 @@
 ;;;###autoload
 (defun ymacs-cpp-cmake/toggle-option ()
   (interactive)
-  (when-let ((options (cl-loop
-                       for (key . value) in (ymacs-cpp-cmake//config-options)
-                       when (member value '("Release" "Debug" "ON" "OFF"))
-                       collect (ymacs-cpp-cmake//option-to-string (cons key value))))
+  (when-let* ((options (cl-loop
+                        for (key . value) in (ymacs-cpp-cmake//config-options)
+                        when (member value '("Release" "Debug" "ON" "OFF"))
+                        collect (ymacs-cpp-cmake//option-to-string (cons key value))))
 
-             (option (completing-read! "Options: " options))
+              (option (completing-read! "Options: " options))
 
-             (nv (split-string (substring option 2) "="))
-             (option-name (car nv))
-             (option-value (string-join (cdr nv)))
-             (option (assoc option-name (ymacs-cpp-cmake//config-options))))
+              (nv (split-string (substring option 2) "="))
+              (option-name (car nv))
+              (option-value (string-join (cdr nv)))
+              (option (assoc option-name (ymacs-cpp-cmake//config-options))))
     (setcdr option
             (cond ((equal "Release" option-value) "Debug")
                   ((equal "Debug" option-value) "Release")

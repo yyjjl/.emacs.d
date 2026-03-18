@@ -1,14 +1,17 @@
 ;; -*- lexical-binding:t -*-
 
+(eval-when-compile
+  (require 'cc-vars))
+
 (defmacro ymacs-cpp//run-function (-slot &optional -build-system &rest -args)
   (let ((access-fn (intern (format "ymacs-cpp-build-system-%s" -slot))))
-    `(when-let ((build-system (or ,-build-system ymacs-cpp-current-build-system))
-                (fn (,access-fn build-system)))
+    `(when-let* ((build-system (or ,-build-system ymacs-cpp-current-build-system))
+                 (fn (,access-fn build-system)))
        (funcall fn ,@-args))))
 
 (defmacro ymacs-cpp//get-function (-slot &optional -build-system)
   (let ((access-fn (intern (format "ymacs-cpp-build-system-%s" -slot))))
-    `(when-let (build-system (or ,-build-system ymacs-cpp-current-build-system))
+    `(when-let* ((build-system (or ,-build-system ymacs-cpp-current-build-system)))
        (,access-fn build-system))))
 
 (defsubst ymacs-cpp//get-dot-clangd-path (&optional -directory)
@@ -21,8 +24,8 @@
 
 (defun ymacs-cpp//get-compile-command-from-dot-clangd ()
   (when (memq major-mode '(c-mode c++-mode c-ts-mode c++-ts-mode))
-    (when-let ((dot-clangd (ymacs-cpp//get-dot-clangd-path))
-               (flags (replace-regexp-in-string "\n" " " (read-file-content! dot-clangd) t t)))
+    (when-let* ((dot-clangd (ymacs-cpp//get-dot-clangd-path))
+                (flags (replace-regexp-in-string "\n" " " (read-file-content! dot-clangd) t t)))
       (list
        (list (format "%s %s %s"
                      (cl-case major-mode
@@ -67,7 +70,7 @@
             ;; lsp-mode is enabled
             (setq-local ymacs-lsp-format-buffer-function  #'ymacs-cpp/format-dwim)
             (setq-local ymacs-lsp-find-other-file-function #'ymacs-lsp//clangd-find-other-file)
-            (when-let (command-fn (ymacs-cpp//get-function command-fn))
+            (when-let* ((command-fn (ymacs-cpp//get-function command-fn)))
               (cl-pushnew command-fn ymacs-editor-compile-command-functions))
             (ymacs-cpp//run-function lsp-enable-handler))
         ;; lsp-mode is disabled

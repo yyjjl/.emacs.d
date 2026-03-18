@@ -180,12 +180,12 @@
 
 (define-advice package-generate-autoloads (:after (-name -pkg-dir) autoclose)
   "Auto close *-autoloads.el after a package installed."
-  (when-let ((name (format "%s-autoloads.el" (if (symbolp -name)
-                                                 (symbol-name -name)
-                                               -name)))
-             (buffer (find-file-existing (expand-file-name name -pkg-dir))))
-    (when-let (window (get-buffer-window buffer))
-      (quit-window 'kill window))))
+  (when-let* ((name (format "%s-autoloads.el" (if (symbolp -name)
+                                                  (symbol-name -name)
+                                                -name)))
+              (buffer (find-file-existing (expand-file-name name -pkg-dir)))
+              (window (get-buffer-window buffer)))
+    (quit-window 'kill window)))
 
 (define-advice package--save-selected-packages (:override (-value) dont-save)
   (when -value

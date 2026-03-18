@@ -40,7 +40,7 @@
           '("%b" (ymacs-term-extra-name (": " ymacs-term-extra-name)))))
 
   (define-hook! ymacs-term//set-utf8 (term-exec-hook)
-    (when-let (proc (get-buffer-process (current-buffer)))
+    (when-let* ((proc (get-buffer-process (current-buffer))))
       (set-process-coding-system proc 'utf-8-unix 'utf-8-unix))))
 
 
@@ -75,7 +75,7 @@
     "If point is at the end of the buffer and there is no input, send an EOF.
 If not, delete -ARG characters forward."
     (interactive "p")
-    (if-let (proc (get-buffer-process (current-buffer)))
+    (if-let* ((proc (get-buffer-process (current-buffer))))
         (if (and (eobp)
                  (= (point) (marker-position (process-mark proc))))
             (comint-send-eof)

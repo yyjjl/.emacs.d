@@ -12,7 +12,7 @@
 (defvar org-publish-project-alist)
 (defvar org-publish-use-timestamps-flag)
 
-(declare-function org-download-rename-last 'org-download)
+(declare-function org-download-rename-last-file 'org-download)
 (declare-function org-publish-file 'org-publish)
 (declare-function org-publish-get-project-from-filename 'org-publish)
 (declare-function org-publish-property 'org-publish)
@@ -20,7 +20,7 @@
 (transient-define-prefix ymacs-transient/org-download ()
   [("s" "Screenshot" org-download-screenshot)
    ("r" "Rename at point" org-download-rename-at-point)
-   ("l" "Rename last" org-download-rename-last)
+   ("l" "Rename last" org-download-rename-last-file)
    ("D" "delete" org-download-delete)])
 
 ;;;###autoload
@@ -127,8 +127,8 @@
          (basename (file-name-sans-extension filename))
          (files (list
                  (when project
-                   (when-let ((src-dir (org-publish-property :base-directory project))
-                              (dst-dir (org-publish-property :publishing-directory project)))
+                   (when-let* ((src-dir (org-publish-property :base-directory project))
+                               (dst-dir (org-publish-property :publishing-directory project)))
                      (concat (expand-file-name (file-relative-name basename src-dir) dst-dir)
                              (or (ymacs-org//fn-to-extension
                                   (org-publish-property :publishing-function project))
@@ -234,7 +234,7 @@ With a prefix BELOW move point to lower block."
           (or (and (region-active-p)
                    (cons (region-beginning)
                          (region-end)))
-              (when-let ((datum (org-element-context)))
+              (when-let* ((datum (org-element-context)))
                 (and (memq (org-element-type datum) '(latex-environment latex-fragment))
                      (cons (org-element-property :begin datum)
                            (org-element-property :end datum))))
