@@ -106,3 +106,4 @@ case "$INSIDE_EMACS" in
         alias ff='emacsclient -c -a "" -n'
         ;;
 esac
+export PATH=/Users/bytedance/.local/bin:$PATH

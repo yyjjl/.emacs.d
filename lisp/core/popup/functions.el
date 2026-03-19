@@ -238,6 +238,12 @@ Displays -BUFFER according to -ALIST and -RULE."
   :size 0.3
   :no-tab-line t
   :dedicated t)
+ (:mode agent-shell-mode
+  :side right
+  :select t
+  :size 0.3
+  :no-tab-line t
+  :dedicated t)
  (:macth-fn ymacs-popup//term-buffer-p
   :side bottom
   :select t
