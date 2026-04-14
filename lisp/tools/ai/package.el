@@ -8,10 +8,14 @@
 (define-key!
   ([f7] . agent-shell))
 
+(after! shell-maker
+  (setq shell-maker-root-path ymacs-cache-direcotry))
+
 (after! agent-shell
   (advice-add #'agent-shell--setup-modeline :override #'ignore)
 
   (setq agent-shell-show-session-id nil)
+  (setq agent-shell-show-welcome-message nil)
   (setq agent-shell-show-usage-at-turn-end t)
   (setq agent-shell-thought-process-expand-by-default nil)
   (setq agent-shell-tool-use-expand-by-default nil)
