@@ -238,6 +238,12 @@ Displays -BUFFER according to -ALIST and -RULE."
   :size 0.3
   :no-tab-line t
   :dedicated t)
+ (:name-regexp "\\*AI agent.*\\*"
+  :side right
+  :select t
+  :size 0.4
+  :no-tab-line t
+  :dedicated t)
  (:mode agent-shell-mode
   :side right
   :select t
