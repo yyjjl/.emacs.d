@@ -3,6 +3,8 @@
 ;; Do not load extra backends
 (setq org-export-backends '(html latex beamer md))
 
+(setq org-persist-directory (expand-cache! "org-persist" t))
+
 (after! ob
   (define-key! :map org-babel-map
     ("/" . ymacs-org/split-src-block)))

@@ -43,3 +43,9 @@ package.json
 package-lock.json
 .dap-breakpoints
 /.agent-shell/
+/org-persist/
+/.zshrc.local
+/coco-no-append-system-prompt.sh
+/setup_cloudide.sh
+/start_working.sh
+*.save

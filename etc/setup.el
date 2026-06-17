@@ -30,7 +30,7 @@
 
   (let ((elc-files (append (directory-files-recursively ymacs-config-directory "\\.elc$")
                            (directory-files user-emacs-directory t "\\.elc$")
-                           (directory-files ymacs-cache-direcotry t "\\.elc$"))))
+                           (directory-files ymacs-cache-directory t "\\.elc$"))))
     (dolist-with-progress-reporter (elc-file elc-files)
         (format "Remove *.elc in %s ..." (abbreviate-file-name ymacs-config-directory))
       (delete-file elc-file)))

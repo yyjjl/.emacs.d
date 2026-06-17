@@ -37,16 +37,16 @@
   `(load (expand! ,-name) nil (null debug-on-error)))
 
 (defsubst expand-cache! (-name &optional -make-p)
-  (let ((val (expand-file-name -name ymacs-cache-direcotry)))
+  (let ((val (expand-file-name -name ymacs-cache-directory)))
     (when (and -make-p (not (file-exists-p val)))
       (make-directory val))
     val))
 
 (defsubst expand-etc! (-name)
-  (expand-file-name -name ymacs-etc-direcotry))
+  (expand-file-name -name ymacs-etc-directory))
 
 (defsubst expand-bin! (-name)
-  (expand-file-name -name ymacs-etc-direcotry))
+  (expand-file-name -name ymacs-etc-directory))
 
 (defsubst expand-tmp! (-name)
   (expand-file-name -name temporary-file-directory))

@@ -25,23 +25,23 @@ will close some features to speed up emacs performance")
   (expand-file-name "lisp" user-emacs-directory)
   "All configurations are in this directory")
 
-(defvar ymacs-cache-direcotry
+(defvar ymacs-cache-directory
   (expand-file-name ".cache" user-emacs-directory)
-  "All caches are in this direcotry")
+  "All caches are in this directory")
 
 (defconst ymacs-site-lisp-directory
   (expand-file-name "site-lisp" user-emacs-directory)
   "Local packages are in this directory")
 
-(defconst ymacs-etc-direcotry
+(defconst ymacs-etc-directory
   (expand-file-name "etc" user-emacs-directory)
   "Some configuration files are in this directory")
 
-(defconst ymacs-bin-direcotry
+(defconst ymacs-bin-directory
   (expand-file-name "bin" user-emacs-directory)
   "Some scripts are in this directory")
 
-(defconst ymacs-autoloads-file (expand-file-name "autoloads.el" ymacs-cache-direcotry)
+(defconst ymacs-autoloads-file (expand-file-name "autoloads.el" ymacs-cache-directory)
   "Autoloads file")
 
 ;; Add `ymacs-config-directory' to `load-path'
@@ -68,5 +68,5 @@ will close some features to speed up emacs performance")
 
 (setq load-prefer-newer t)
 
-(unless (file-exists-p ymacs-cache-direcotry)
-  (make-directory ymacs-cache-direcotry))
+(unless (file-exists-p ymacs-cache-directory)
+  (make-directory ymacs-cache-directory))

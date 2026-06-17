@@ -1,7 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 (option! editor-search-directory nil
-  "run searcher in this direcotry"
+  "run searcher in this directory"
   :type 'string
   :safe #'stringp)
 

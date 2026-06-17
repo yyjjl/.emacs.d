@@ -15,7 +15,7 @@
   ([f7] . claude-code-ide))
 
 (after! shell-maker
-  (setq shell-maker-root-path ymacs-cache-direcotry))
+  (setq shell-maker-root-path ymacs-cache-directory))
 
 (after! agent-shell
   (advice-add #'agent-shell--setup-modeline :override #'ignore)
