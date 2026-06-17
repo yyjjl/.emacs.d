@@ -33,7 +33,9 @@
 (defsubst ymacs-term//shell-buffer-p (-buffer)
   (and (buffer-live-p -buffer)
        (with-current-buffer -buffer
-         (derived-mode-p 'term-mode 'shell-mode 'eshell-mode 'vterm-mode))))
+         (and
+          (derived-mode-p 'term-mode 'shell-mode 'eshell-mode 'vterm-mode)
+          (not (bound-and-true-p ymacs-term--is-not-a-shell))))))
 
 (defun ymacs-term//switch-internal (-n)
   (let ((buffers (ymacs-popup//get-term-buffer-list)))

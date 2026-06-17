@@ -10,7 +10,8 @@
   (setq vterm-kill-buffer-on-exit nil)
 
   (define-key! :map vterm-copy-mode-map
-    ("C-c C-k" . vterm-copy-mode))
+    ("C-c C-k" . vterm-copy-mode)
+    ("M-w" . ymacs-term/vterm-copy-mode-copy-as-displayed))
 
   (define-key! :map vterm-mode-map
     ("M-0" . ymacs-editor/goto-char-or-minibuffer)

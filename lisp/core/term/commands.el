@@ -133,6 +133,24 @@
   (call-interactively #'vterm--self-insert))
 
 ;;;###autoload
+(defun ymacs-term/vterm-copy-mode-copy-as-displayed (&optional -arg)
+  "Copy the active region or current screen line in `vterm-copy-mode'.
+
+Unlike `vterm-copy-mode-done', this preserves the fake newlines that
+vterm inserts for visible line wrapping, so the copied text matches the
+current on-screen layout.
+
+When no region is active, copy the current displayed line.  Prefix -ARG
+inverts `vterm-copy-exclude-prompt' for prompt exclusion, matching
+`vterm-copy-mode-done'."
+  (interactive "P")
+  (unless (and (derived-mode-p 'vterm-mode) vterm-copy-mode)
+    (user-error "This command is effective only in vterm-copy-mode"))
+
+  (let ((filter-buffer-substring-function #'buffer-substring--filter))
+      (call-interactively #'kill-ring-save)))
+
+;;;###autoload
 (defun ymacs-term/line ()
   (interactive)
   (unless (ymacs-term//shell-buffer-p (current-buffer))
