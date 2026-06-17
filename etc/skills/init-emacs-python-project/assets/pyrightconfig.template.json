@@ -1,0 +1,11 @@
+{
+  "include": [],
+  "exclude": [
+    "**/.venv",
+    "**/node_modules",
+    "**/tmp",
+    "**/__pycache__"
+  ],
+  "pythonPlatform": "Linux",
+  "executionEnvironments": []
+}
