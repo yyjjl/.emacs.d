@@ -42,7 +42,7 @@
                (string-prefix-p "*AI agent" (buffer-name)))
       (local-set-key (kbd "C-'") #'(lambda () (interactive) (vterm-send-C-g)))
       (local-set-key (kbd "C-c '") #'(lambda () (interactive) (vterm-send-C-g)))
-      (setq-local ymacs-term--is-not-a-shell t)))
+      (setq-local ymacs-term--is-not-a-shell t)
       (setq-local mode-line-format '(:eval (ymacs-modeline//format--ai-agent)))))
 
   (advice-add #'claude-code-ide--configure-vterm-buffer :after #'yamcs-ai//setup-vterm-buffer)
