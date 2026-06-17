@@ -133,6 +133,22 @@
   (call-interactively #'vterm--self-insert))
 
 ;;;###autoload
+(defun ymacs-term/vterm-copy-mode-beginning-of-line ()
+  "Move to the first non-whitespace char of the visual line, or its start."
+  (interactive "^")
+  (let ((origin (point)))
+    (back-to-indentation)
+    (when (= origin (point))
+      (beginning-of-visual-line))))
+
+;;;###autoload
+(defun ymacs-term/vterm-copy-mode-end-of-line ()
+  "Move to the end of the visual line, skipping trailing whitespace."
+  (interactive "^")
+  (end-of-visual-line)
+  (skip-chars-backward " \t" (line-beginning-position)))
+
+;;;###autoload
 (defun ymacs-term/vterm-copy-mode-copy-as-displayed (&optional -arg)
   "Copy the active region or current screen line in `vterm-copy-mode'.
 

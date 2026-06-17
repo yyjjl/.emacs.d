@@ -11,6 +11,8 @@
 
   (define-key! :map vterm-copy-mode-map
     ("C-c C-k" . vterm-copy-mode)
+    ("C-a" . ymacs-term/vterm-copy-mode-beginning-of-line)
+    ("C-e" . ymacs-term/vterm-copy-mode-end-of-line)
     ("M-w" . ymacs-term/vterm-copy-mode-copy-as-displayed))
 
   (define-key! :map vterm-mode-map
