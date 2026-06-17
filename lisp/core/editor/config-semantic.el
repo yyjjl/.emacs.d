@@ -3,9 +3,9 @@
 ;; (defvar-local ymacs-editor--inhibit-semantic nil)
 
 (after! semantic
-  (advice-add #'semantic-analyze-completion-at-point-function :override #'ignore)
-  (advice-add #'semantic-analyze-notc-completion-at-point-function :override #'ignore)
-  (advice-add #'semantic-analyze-nolongprefix-completion-at-point-function :override #'ignore)
+  ;; (advice-add #'semantic-analyze-completion-at-point-function :override #'ignore)
+  ;; (advice-add #'semantic-analyze-notc-completion-at-point-function :override #'ignore)
+  ;; (advice-add #'semantic-analyze-nolongprefix-completion-at-point-function :override #'ignore)
 
   ;; (define-hook! ymacs-semantic//inhibit-function (semantic-inhibit-functions)
   ;;   (or (and default-directory (file-remote-p default-directory))
@@ -18,8 +18,8 @@
   ;;              (bound-and-true-p lsp-mode))
   ;;     (setq imenu-create-index-function #'lsp--imenu-create-index)))
 
-  (define-advice semantic-idle-scheduler-function (:around (-fn &rest -args) allow-quit)
-    (with-local-quit (apply -fn -args)))
+  ;; (define-advice semantic-idle-scheduler-function (:around (-fn &rest -args) allow-quit)
+  ;;   (with-local-quit (apply -fn -args)))
 
   (define-key! :map semantic-mode-map :prefix "C-c ,"
     ("." . semantic-ia-fast-jump)

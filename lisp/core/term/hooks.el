@@ -69,17 +69,7 @@
 
     ;; (when (string-match-p "inferior\\|interactive" (symbol-name major-mode))
     ;;   (setq ymacs-term-exit-action 'shell))
-    )
-
-  (define-advice comint-delchar-or-maybe-eof (:override (-arg) maybe-toggle)
-    "If point is at the end of the buffer and there is no input, send an EOF.
-If not, delete -ARG characters forward."
-    (interactive "p")
-    (if-let* ((proc (get-buffer-process (current-buffer))))
-        (if (and (eobp)
-                 (= (point) (marker-position (process-mark proc))))
-            (comint-send-eof)
-          (delete-char -arg)))))
+    ))
 
 (after! shell
   (bash-completion-setup)
