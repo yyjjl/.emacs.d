@@ -2,19 +2,22 @@
 
 ;;;###autoload
 (defun ymacs-editor/copy-file-name ()
-  "Copy current file name to king ring."
+  "Copy current file name to kill ring."
   (interactive)
-  (let ((path (or (buffer-file-name) default-directory)))
-    (kill-new
-     (completing-read!
-      "Copy"
-      (list (buffer-name)
-            path
-            (abbreviate-file-name path)
-            default-directory
-            (file-name-nondirectory path)
-            (file-name-base path))))
-    (message "Copied %s" (current-kill 0))))
+  (let* ((file (buffer-file-name))
+         (path (or file (directory-file-name default-directory)))
+         (candidates
+          (delete-dups
+           (delq nil
+                 (list (buffer-name)
+                       path
+                       (abbreviate-file-name path)
+                       (when file (file-name-nondirectory path))
+                       (when file (file-name-base path)))))))
+    (when-let* ((value (completing-read! "Copy" candidates)))
+      (unless (string-empty-p value)
+        (kill-new value)
+        (message "Copied %s" value)))))
 
 
 ;;;###autoload
