@@ -27,7 +27,7 @@
          when (local-variable-if-set-p var)
          do (set var val))))
 
-    (message "Invalidated Projectile cache for %s." project))
+    (message "Invalidated project cache for %s." project))
 
   (recentf-cleanup)
   (vc-refresh-state))

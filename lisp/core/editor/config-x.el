@@ -60,7 +60,7 @@
     ("d c" "C-d" :exit no)
     ("d w" "M-d" :exit no)
     ("d DEL" "C-DEL" :exit no)
-    ("d <backspace>" "C-<backsapce>" :exit no)
+    ("d <backspace>" "C-<backspace>" :exit no)
 
     ("e" "C-c f l")
     ("f" "C-c C-f")

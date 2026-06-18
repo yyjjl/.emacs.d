@@ -118,7 +118,7 @@
   ("C-<up>" . text-scale-increase)
 
   ("C-." . embark-act)
-  ("C-;" . embark-dwan)
+  ("C-;" . embark-dwim)
 
   ("C-c C-b" . ymacs-editor/format-paragraph)
   ("C-c F" . cape-file)

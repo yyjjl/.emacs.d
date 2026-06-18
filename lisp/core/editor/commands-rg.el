@@ -2,7 +2,7 @@
 
 (require 'transient)
 
-(defvar ymacs-editor--ripgrep-settings-file (expand-cache! "transient/rigrep-settings.el"))
+(defvar ymacs-editor--ripgrep-settings-file (expand-cache! "transient/ripgrep-settings.el"))
 
 (defvar ymacs-editor--ripgrep-current-buffer nil)
 (defvar ymacs-editor--ripgrep-settings (transient--read-file-contents ymacs-editor--ripgrep-settings-file))

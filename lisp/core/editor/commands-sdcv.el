@@ -151,7 +151,7 @@ Word may contain some special characters:
     ?       match zero or one character
     /       used at the beginning, for fuzzy search
     |       used at the beginning, for data search
-    \       escape the character right after"
+    \\       escape the character right after"
   (interactive
    (list
     (let ((word (if (region-active-p)

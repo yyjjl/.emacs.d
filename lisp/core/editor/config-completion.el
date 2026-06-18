@@ -41,8 +41,8 @@
      (abort-recursive-edit)))
 
 (after! marginalia
-  (dolist (catogory '(command function variable file))
-    (setf (alist-get catogory marginalia-annotators) '(builtin))))
+  (dolist (category '(command function variable file))
+    (setf (alist-get category marginalia-annotators) '(builtin))))
 
 (after! vertico
   (setq vertico-count 15)

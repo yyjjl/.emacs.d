@@ -99,7 +99,7 @@
   (setq ymacs-default--tab-bar-line (format-mode-line (ymacs-modeline//format--header)))
   (force-mode-line-update))
 
-(define-hook! ymacs-default//update-tar-bar-timer (tab-bar-mode-hook)
+(define-hook! ymacs-default//update-tab-bar-timer (tab-bar-mode-hook)
   (setq tab-bar-format '(ymacs-default//tab-bar))
 
   (when ymacs-default--tab-bar-update-timer

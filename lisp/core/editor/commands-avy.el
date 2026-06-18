@@ -4,7 +4,7 @@
 (defun ymacs-editor/goto-char-or-minibuffer ()
   "If minibuffer-window is active and not selected, select it.
 If current-prefix-arg == (16), jump to first char before (point) in current line.
-If current-prefix-arg is non-nol, jump to first char after (point) in current line.
+If current-prefix-arg is non-nil, jump to first char after (point) in current line.
 Otherwise call `avy-goto-char-in-line'
 "
   (interactive)

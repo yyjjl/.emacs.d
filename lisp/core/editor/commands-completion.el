@@ -40,7 +40,7 @@
 (defun ymacs-editor/minibuffer-delete-char ()
   (interactive)
   (unless (minibuffer-window-active-p (selected-window))
-    (user-error "No in minibuffer"))
+    (user-error "Not in minibuffer"))
 
   (unless (ymacs-editor//minibuffer-up-directory)
     (call-interactively #'delete-backward-char)))
@@ -49,7 +49,7 @@
 (defun ymacs-editor/minibuffer-delete-word ()
   (interactive)
   (unless (minibuffer-window-active-p (selected-window))
-    (user-error "No in minibuffer"))
+    (user-error "Not in minibuffer"))
 
   (unless (ymacs-editor//minibuffer-up-directory)
     (call-interactively #'backward-kill-word)))
