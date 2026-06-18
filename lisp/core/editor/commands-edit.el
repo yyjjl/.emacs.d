@@ -188,9 +188,11 @@ Does not indent buffer, because it is used for a
   "Get the font face under cursor."
   (interactive)
   (let* ((pos (point))
-         (text (buffer-substring pos (1+ pos)))
+         (text (when (< pos (point-max))
+                 (buffer-substring pos (1+ pos))))
          (faces (-uniq (-flatten (list (get-char-property pos 'face)
-                                       (get-char-property 0 'face text))))))
+                                       (when text
+                                         (get-char-property 0 'face text)))))))
     (message "%s" faces)))
 
 ;;;###autoload
@@ -229,7 +231,7 @@ Optional argument -ARG is used to toggle narrow functions."
 ;;;###autoload
 (defun ymacs-editor/backward-defun (&optional -n)
   (interactive "^p")
-  (forward-thing 'defun (- -n)))
+  (forward-thing 'defun (- (or -n 1))))
 
 (autoload #'python-nav-forward-statement "python")
 (autoload #'c-end-of-statement "cc-mode")
@@ -269,7 +271,7 @@ Optional argument -ARG is used to toggle narrow functions."
 ;;;###autoload
 (defun ymacs-editor/backward-sexp (&optional -n)
   (interactive "^p")
-  (ymacs-editor/forward-sexp (- -n)))
+  (ymacs-editor/forward-sexp (- (or -n 1))))
 
 ;;;###autoload
 (defun ymacs-editor/smart-move-begining-of-line ()
