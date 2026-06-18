@@ -60,6 +60,6 @@
                        (buffer-local-value 'ymacs-popup--nosplit-window buffer)))))
     (funcall -fn -window -alist)))
 
-(run-after-init! 100
+(run-after-init! 100 (&optional _frame)
   (setq display-buffer-alist
         '((ymacs-popup//match ymacs-popup//display-buffer-action))))

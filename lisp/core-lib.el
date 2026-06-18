@@ -669,20 +669,12 @@ HTML file converted from org file, it returns t."
             (car -collection))
         value))))
 
-(defun run-after-init!--check-arg (-var -expr)
-  (or (eq -var -expr)
-      (when (consp -expr)
-        (or (run-after-init!--check-arg -var (car -expr))
-            (run-after-init!--check-arg -var (cdr -expr))))))
-
-(defmacro run-after-init! (-priority &rest -body)
-  (declare (indent 1) (debug t))
+(defmacro run-after-init! (-priority -args &rest -body)
+  (declare (indent 2) (debug t))
   `(let ((hook-var (if (daemonp)
                        'after-make-frame-functions
                      'after-init-hook)))
-     (cl-labels ((ymacs-after-init (&optional ,(if (run-after-init!--check-arg '-frame -body)
-                                                   '-frame
-                                                 '_))
-                                   (remove-hook hook-var #'ymacs-after-init)
-                                   ,@-body))
+     (cl-labels ((ymacs-after-init ,-args
+                   (remove-hook hook-var #'ymacs-after-init)
+                   ,@-body))
        (add-hook hook-var #'ymacs-after-init ,-priority))))

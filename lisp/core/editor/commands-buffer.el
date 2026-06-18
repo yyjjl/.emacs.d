@@ -32,8 +32,6 @@
   "Helper function to move the current buffer to the window in the given
    -direction (with must be up, down, left or right). An error is
    thrown, if no window exists in this direction."
-  (interactive)
-
   (let* ((other-window (windmove-find-other-window -direction))
          (this-buffer (current-buffer)))
     (when (null other-window)

@@ -121,7 +121,7 @@
           (puthash (cons -color -frame) (or ret 'null) cache-table)
           ret)))))
 
-(run-after-init! 0
+(run-after-init! 0 (&optional -frame)
   (require 'lv)
 
   ;; Purges buffers which haven't been displayed in 3 days

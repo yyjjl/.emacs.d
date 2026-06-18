@@ -1,6 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
-(run-after-init! 100
+(run-after-init! 100 (&optional _frame)
   ;; Start server
   (unless (or noninteractive (daemonp))
     (require 'server)
