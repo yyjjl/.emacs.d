@@ -74,11 +74,12 @@ Otherwise call `avy-goto-char-in-line'
              (t
               (lv-message "Invalid key %c" char))))
         (lv-delete-window))
-      (call-interactively
-       (cl-case done
-         (kill #'kill-region)
-         (copy #'kill-ring-save)))
-      (message "%s %s" done (current-kill 0))))
+      (when done
+        (call-interactively
+         (cl-case done
+           (kill #'kill-region)
+           (copy #'kill-ring-save)))
+        (message "%s %s" done (current-kill 0)))))
   (select-window (cdr (ring-ref avy-ring 0)))
   (when -do-yank
     (yank))
