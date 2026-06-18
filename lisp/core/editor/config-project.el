@@ -96,7 +96,8 @@
   (when (boundp 'project-prefix-map)
     (define-key! :map project-prefix-map
       ("f" . ymacs-editor/find-file)))
-  (setcar (assoc 'project-find-file project-switch-commands) #'ymacs-editor/find-file)
+  (when-let* ((entry (assoc 'project-find-file project-switch-commands)))
+    (setcar entry #'ymacs-editor/find-file))
 
   (setq project-vc-extra-root-markers nil)
   (setq project-find-functions '(ymacs-editor//project)))
