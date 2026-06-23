@@ -2,41 +2,15 @@
 
 (executable! claude-code :exe "claude")
 
-(require-packages!
- agent-shell)
-
 (when ymacs-claude-code-path
   (when (and (not (package-installed-p 'claude-code-ide))
              (fboundp #'package-vc-install))
     (package-vc-install "https://github.com/manzaltu/claude-code-ide.el")))
 
 (define-key!
-  ;; ([f7] . agent-shell)
   ([f7] . claude-code-ide))
 
-(after! shell-maker
-  (setq shell-maker-root-path ymacs-cache-directory))
-
-(after! agent-shell
-  (advice-add #'agent-shell--setup-modeline :override #'ignore)
-
-  (setq agent-shell-show-session-id nil)
-  (setq agent-shell-show-welcome-message nil)
-  (setq agent-shell-show-usage-at-turn-end t)
-  (setq agent-shell-thought-process-expand-by-default nil)
-  (setq agent-shell-tool-use-expand-by-default nil)
-  (setq agent-shell-preferred-agent-config 'claude-code)
-  (setq agent-shell-context-sources '(region error))
-  (define-key! :map agent-shell-mode-map
-    ("S-<return>" . shell-maker-submit)
-    ("C-<return>" . shell-maker-submit)
-    ("RET" . newline)))
-
 (after! claude-code-ide
-  ;; (claude-code-ide-emacs-tools-setup)
-  ;; (setq claude-code-ide-enable-mcp-server nil)
-  ;; (setq claude-code-ide-mcp-server-port 8003)
-
   (defun yamcs-ai//setup-vterm-buffer (&rest _)
     (when (and (eq major-mode  'vterm-mode)
                (string-prefix-p "*AI agent" (buffer-name)))
@@ -53,4 +27,40 @@
                     (file-name-nondirectory (directory-file-name -directory)))))
   (setq claude-code-ide-debug nil)
   (setq claude-code-ide-use-side-window nil)
-  (setq claude-code-ide-cli-path ymacs-claude-code-path))
+  (setq claude-code-ide-cli-path ymacs-claude-code-path)
+
+  (defun yamcs-ai//cli-is-traecli-p ()
+    (let ((name (file-name-nondirectory
+                 (or claude-code-ide-cli-path ""))))
+      (string-match-p "\\(traecli\\|traex\\)" name)))
+
+  (when (yamcs-ai//cli-is-traecli-p)
+    (require 'claude-code-ide-emacs-tools nil t)
+    (when (fboundp 'claude-code-ide-emacs-tools-setup)
+      (claude-code-ide-emacs-tools-setup))
+    (setq claude-code-ide-enable-mcp-server t))
+
+  (defun yamcs-ai//build-traecli-command (session-id)
+    "Build the traecli command line, wiring in Emacs MCP server URL.
+Bypasses the Claude-specific flag generation entirely."
+    (let* ((port (and (fboundp 'claude-code-ide-mcp-server-ensure-server)
+                      (claude-code-ide-mcp-server-ensure-server)))
+           (cmd (shell-quote-argument claude-code-ide-cli-path))
+           (extra (and claude-code-ide-cli-extra-flags
+                       (not (string-empty-p claude-code-ide-cli-extra-flags))
+                       claude-code-ide-cli-extra-flags)))
+      (when port
+        (setq cmd
+              (concat cmd " -c "
+                      (shell-quote-argument
+                       (format "mcp_servers.emacs-tools.url=\"http://localhost:%d/mcp/%s\""
+                               port session-id)))))
+      (when extra
+        (setq cmd (concat cmd " " extra)))
+      cmd))
+
+  (define-advice claude-code-ide--build-claude-command
+      (:around (orig &optional continue resume session-id) yamcs-ai//traecli)
+    (if (yamcs-ai//cli-is-traecli-p)
+        (yamcs-ai//build-traecli-command (or session-id "emacs"))
+      (funcall orig continue resume session-id))))
