@@ -17,8 +17,10 @@
 
 (defsubst ymacs-cpp-cmake//config-build (&optional -config)
   (let ((item (assoc 'build (cdr (or -config (ymacs-cpp-cmake//current-config))))))
-    (when item
-      (setcdr item (expand-file-name (cdr item) ymacs-cpp-cmake-project-root)))))
+    (unless item
+      (user-error "No `build' slot in cmake config %s"
+                  (ymacs-cpp-cmake//config-name -config)))
+    (setcdr item (expand-file-name (cdr item) ymacs-cpp-cmake-project-root))))
 
 (defsubst ymacs-cpp-cmake//set-config-slot (slot value &optional -config)
   (setcdr (assoc slot (cdr (or -config (ymacs-cpp-cmake//current-config))))

@@ -4,5 +4,6 @@
   (electric-indent-local-mode -1)
   (electric-layout-local-mode -1)
   (eval-when-has-feature! lsp
-    (when (not (string-suffix-p ".json" (downcase buffer-file-name)))
+    (when (and buffer-file-name
+               (not (string-suffix-p ".json" (downcase buffer-file-name))))
       (ymacs-lsp//try-enable-eglot web))))

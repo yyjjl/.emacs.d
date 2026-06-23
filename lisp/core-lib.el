@@ -46,7 +46,7 @@
   (expand-file-name -name ymacs-etc-directory))
 
 (defsubst expand-bin! (-name)
-  (expand-file-name -name ymacs-etc-directory))
+  (expand-file-name -name ymacs-bin-directory))
 
 (defsubst expand-tmp! (-name)
   (expand-file-name -name temporary-file-directory))
@@ -284,15 +284,16 @@ Example:
 
 (defmacro with-temp-advice! (-symbol -where -function &rest -body)
   (declare (indent 3))
-  `(progn
-     (advice-add ',-symbol ,-where
-                 ,(if (symbolp -function)
-                      `#',-function
-                    -function)
-                 '((name . ymacs-temp-advice)))
-     (unwind-protect
-         (progn ,@-body)
-       (advice-remove ',-symbol 'ymacs-temp-advice))))
+  (let ((advice-name (gensym "ymacs-temp-advice-")))
+    `(progn
+       (advice-add ',-symbol ,-where
+                   ,(if (symbolp -function)
+                        `#',-function
+                      -function)
+                   '((name . ,advice-name)))
+       (unwind-protect
+           (progn ,@-body)
+         (advice-remove ',-symbol ',advice-name)))))
 
 (defmacro with-temp-lv-message! (-fmt &rest -body)
   (declare (indent 1))
