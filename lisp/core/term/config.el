@@ -13,7 +13,8 @@
     ("C-c C-k" . vterm-copy-mode)
     ("C-a" . ymacs-term/vterm-copy-mode-beginning-of-line)
     ("C-e" . ymacs-term/vterm-copy-mode-end-of-line)
-    ("M-w" . ymacs-term/vterm-copy-mode-copy-as-displayed))
+    ("M-w" . ymacs-term/vterm-copy-mode-copy-as-displayed)
+    ("C-c C-o" . ymacs-term/vterm-copy-mode-browse-url-at-point))
 
   (define-key! :map vterm-mode-map
     ("M-0" . ymacs-editor/goto-char-or-minibuffer)

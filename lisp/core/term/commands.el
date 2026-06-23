@@ -167,6 +167,17 @@ inverts `vterm-copy-exclude-prompt' for prompt exclusion, matching
       (call-interactively #'kill-ring-save)))
 
 ;;;###autoload
+(defun ymacs-term/vterm-copy-mode-browse-url-at-point ()
+  "Open the URL at point in the system browser."
+  (interactive)
+  (unless (and (derived-mode-p 'vterm-mode) vterm-copy-mode)
+    (user-error "This command is effective only in vterm-copy-mode"))
+
+  (if-let* ((url (thing-at-point 'url t)))
+      (browse-url url)
+    (user-error "No URL at point")))
+
+;;;###autoload
 (defun ymacs-term/line ()
   (interactive)
   (unless (ymacs-term//shell-buffer-p (current-buffer))
