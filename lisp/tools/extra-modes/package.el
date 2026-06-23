@@ -4,7 +4,7 @@
  nginx-mode
  crontab-mode
  dockerfile-mode
- markdown-mode
+ ;; markdown-mode
  yaml-mode
  csv-mode
  graphviz-dot-mode)
