@@ -207,11 +207,16 @@
     (let ((original-mode (car mode))
           (ts-mode (cdr mode)))
       (if (memq original-mode ymacs-native-treesit-modes)
-          (setq mode (cons original-mode ts-mode))
-        (setq mode (list original-mode)))
-
-      (setq major-mode-remap-alist (assq-delete-all (cdr mode) major-mode-remap-alist))
-      (add-to-list 'major-mode-remap-alist mode))))
+          (progn
+            (setq major-mode-remap-alist
+                  (assq-delete-all ts-mode major-mode-remap-alist))
+            (add-to-list 'major-mode-remap-alist
+                         (cons original-mode ts-mode)))
+        ;; Modes not using native treesit must not get a remap entry at all:
+        ;; a bare `(MODE)' entry makes `set-auto-mode-0' call nil, which
+        ;; breaks finding e.g. Python files with "void-function nil".
+        (setq major-mode-remap-alist
+              (assq-delete-all original-mode major-mode-remap-alist))))))
 
 (after! so-long
   ;; reduce false positives w/ larger threshold
@@ -273,11 +278,6 @@
     (if rectangle-mark-mode
         (ymacs-editor//display-help (ymacs-editor//display-keys--collect rectangle-mark-mode-map))
       (ymacs-editor//display-help--hide))))
-
-(after! fcitx
-  ;; Init fcitx prefix keys
-  (setq fcitx-use-dbus nil)
-  (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c" "C-z"))
 
 (setq iedit-toggle-key-default nil)
 (after! iedit

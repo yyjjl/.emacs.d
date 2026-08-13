@@ -166,3 +166,57 @@
 
 (after! corfu-terminal
   (setq corfu-terminal-enable-on-minibuffer nil))
+
+(defun ymacs-editor//cape-file-dir-exists-p (file)
+  "Return non-nil if the directory part of FILE exists."
+  (and (string-search "/" file)
+       (file-exists-p
+        (file-name-directory (substitute-in-file-name file)))))
+
+(defun ymacs-editor//cape-file-bounds ()
+  "Return (BEG . END) of the file name at point.
+
+Like `bounds-of-thing-at-point' with `filename', but additionally
+treats spaces as part of the file name when the text between the
+space and point does not resolve to an existing directory.  This
+makes `cape-file' complete paths containing spaces, e.g.
+\"/tmp/my dir/fo\"."
+  (let* ((bounds (bounds-of-thing-at-point 'filename))
+         (beg (car bounds))
+         (end (cdr bounds)))
+    (when (and beg end)
+      (catch 'ymacs-editor//cape-file-bounds
+        (let ((pos (1- beg))
+              (limit (line-beginning-position)))
+          (while (>= pos limit)
+            (let ((ch (char-after pos)))
+              (cond
+               ((eq ch ?\s)
+                (if (ymacs-editor//cape-file-dir-exists-p
+                     (buffer-substring (1+ pos) end))
+                    ;; The space is a separator, path starts after it.
+                    (throw 'ymacs-editor//cape-file-bounds (cons (1+ pos) end))
+                  ;; The space is part of the path, keep scanning left.
+                  (cl-decf pos)))
+               ((or (eq (char-syntax ch) ?w)
+                    (string-match-p
+                     (rx (any alnum "~" "-" "." "_" "/" "\\" ":" "#" "%" "@" "$" "," "{" "}"))
+                     (string ch)))
+                (cl-decf pos))
+               (t
+                ;; Hard delimiter, e.g. punctuation or end of line.
+                (throw 'ymacs-editor//cape-file-bounds (cons (1+ pos) end))))))
+          ;; Reached the beginning of the line.
+          (cons limit end))))))
+
+(defun ymacs-editor//cape-file--bounds-advice (orig thing)
+  "Around advice for `cape--bounds'.
+Use space-aware file name bounds for `cape-file', and keep ORIG
+behavior for every other THING."
+  (if (eq thing 'filename)
+      (or (ymacs-editor//cape-file-bounds)
+          (funcall orig thing))
+    (funcall orig thing)))
+
+(after! cape
+  (advice-add 'cape--bounds :around #'ymacs-editor//cape-file--bounds-advice))

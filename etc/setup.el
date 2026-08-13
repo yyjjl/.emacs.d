@@ -49,7 +49,7 @@
   (run-hooks 'after-init-hook)
 
   (setq kill-emacs-hook nil)
-  (setq ymacss-compile-config-in-progress t)
+  (setq ymacs-compile-config-in-progress t)
 
   (ymacs-default/compile-config)
   (ymacs-default/compile-elpa-packages)
