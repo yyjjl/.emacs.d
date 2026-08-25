@@ -27,7 +27,7 @@
 
   (setq claude-code-ide-terminal-backend 'ghostel)
 
-  (setq claude-code-ide-buffer-name-function #'(lambda (-directory) "*AI agent"))
+  (setq claude-code-ide-buffer-name-function #'(lambda (-directory) "*AI agent*"))
   (setq claude-code-ide-debug nil)
   (setq claude-code-ide-use-side-window nil)
   (setq claude-code-ide-cli-path ymacs-claude-code-path)
