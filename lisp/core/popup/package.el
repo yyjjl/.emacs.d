@@ -74,7 +74,7 @@
   '(term-mode
     eshell-mode
     comint-mode
-    vterm-mode
+    ghostel-mode
     haskell-interactive-mode))
 
 (defvar ymacs-popup-help-modes

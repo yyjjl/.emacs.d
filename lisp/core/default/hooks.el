@@ -46,7 +46,7 @@
   ;; update checker
   (advice-add #'flymake--handle-report :after #'ymacs-modeline//update-checker-state)
 
-  (ymacs-modeline-set! (comint term vterm)
+  (ymacs-modeline-set! (comint term ghostel)
     :mode-line shell
     :body (tab-line-mode 1))
   (ymacs-modeline-set! dired :mode-line dired)

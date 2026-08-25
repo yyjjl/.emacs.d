@@ -8,7 +8,6 @@ CORE_APPS=(
     coreutils
     # fd
     # fzf
-    libvterm
     # osxfuse
     p7zip
     pipenv

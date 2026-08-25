@@ -34,7 +34,7 @@
   (and (buffer-live-p -buffer)
        (with-current-buffer -buffer
          (and
-          (derived-mode-p 'term-mode 'shell-mode 'eshell-mode 'vterm-mode)
+          (derived-mode-p 'term-mode 'shell-mode 'eshell-mode 'ghostel-mode)
           (not (bound-and-true-p ymacs-term--is-not-a-shell))))))
 
 (defun ymacs-term//switch-internal (-n)
@@ -114,13 +114,50 @@
         (run-hook-with-args 'ymacs-term-process-exit-hook))
       (process-sentinel proc)))))
 
-(defun ymacs-term//create-vterm-buffer (-buffer -shell-name)
-  (let ((vterm-shell (format "%s %s"
-                             -shell-name
-                             (mapconcat #'shell-quote-argument ymacs-term-program-arguments " "))))
-    (with-current-buffer -buffer
-      (vterm-mode)
-      (ymacs-term//sentinel-setup))))
+(defun ymacs-term//ghostel-exit (-buffer _event)
+  "Run `ymacs-term-process-exit-hook' when a ghostel terminal exits.
+Added to `ghostel-exit-functions'.  `ghostel-kill-buffer-on-exit' is
+kept nil (see config.el) so our hook, not ghostel, decides the buffer's
+fate via `ymacs-term-exit-action'.
+
+`ghostel-exit-functions' runs in the middle of ghostel's own sentinel,
+which keeps operating on -BUFFER afterwards, so defer to a timer to let
+the sentinel finish before we may kill the buffer."
+  (when (buffer-live-p -buffer)
+    (run-at-time
+     0 nil
+     (lambda ()
+       (when (buffer-live-p -buffer)
+         (with-current-buffer -buffer
+           (run-hook-with-args 'ymacs-term-process-exit-hook)))))))
+
+(defun ymacs-term//create-ghostel-buffer (-term-name -shell-name -program)
+  "Create and return a `ghostel-mode' terminal buffer named -TERM-NAME.
+
+With no explicit -PROGRAM this is an interactive shell, so we spawn it
+through `ghostel-create': that goes via `ghostel--start-process', which
+injects ghostel's bundled shell integration.  The integration's OSC 7
+reports are what make `default-directory' track the shell's working
+directory (and enable prompt navigation).  `ghostel-exec' deliberately
+skips integration -- it is for arbitrary programs -- so a shell started
+with it cannot dirtrack.
+
+With an explicit -PROGRAM (a REPL, see `ymacs-term//exec-program') we do
+want `ghostel-exec': it runs the argv directly with no integration and,
+crucially, no macOS `login' wrap, which `ghostel--start-process' would
+otherwise apply to the program.
+
+Exit handling goes through `ghostel-exit-functions' (see config.el), so
+we don't install a process sentinel here."
+  (let ((ghostel-kill-buffer-on-exit nil))
+    (if -program
+        (let ((buffer (get-buffer-create -term-name)))
+          (ghostel-exec buffer -shell-name ymacs-term-program-arguments)
+          buffer)
+      (let ((ghostel-shell (if ymacs-term-program-arguments
+                               (cons -shell-name ymacs-term-program-arguments)
+                             -shell-name)))
+        (ghostel-create -term-name)))))
 
 (defun ymacs-term//create-shell-buffer (-buffer -shell-name -term-name -shell-buffer-p)
   ;; (ymacs-term//sentinel-setup) is called in comint-exec-hook
@@ -144,14 +181,18 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
          (term-name (or -full-name
                         (ymacs-term//get-buffer-name
                          (concat "*" ymacs-term-buffer-name "<%s>*"))))
-         (buffer (get-buffer-create term-name)))
+         buffer)
 
     (with-temp-env! (ymacs-editor//get-environment)
       (cond
-       ((and (eq term-type 'vterm)
-             (require 'vterm nil t))
-        (ymacs-term//create-vterm-buffer buffer shell-name))
+       ((and (eq term-type 'ghostel)
+             (require 'ghostel nil t))
+        ;; `ghostel-create' generates its own buffer (so shell integration /
+        ;; dirtracking is wired up), so let it own creation instead of
+        ;; pre-creating one that would collide by name.
+        (setq buffer (ymacs-term//create-ghostel-buffer term-name shell-name -program)))
        ((eq term-type 'shell)
+        (setq buffer (get-buffer-create term-name))
         (ymacs-term//create-shell-buffer buffer shell-name term-name -shell-buffer-p))
        (t (user-error "Unsupported shell type %s" term-type))))
 
@@ -166,8 +207,8 @@ If option SPECIAL-SHELL is `non-nil', will use shell from user input."
 
 (defun ymacs-term//send-string (-string)
   (cond
-   ((eq major-mode 'vterm-mode)
-    (vterm-send-string -string))
+   ((eq major-mode 'ghostel-mode)
+    (ghostel-send-string -string))
    ((derived-mode-p 'comint-mode)
     (comint-send-string (get-buffer-process (current-buffer)) -string))
    (t (user-error "Unsupported shell type %s" major-mode))))
