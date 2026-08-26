@@ -121,7 +121,7 @@
           (puthash (cons -color -frame) (or ret 'null) cache-table)
           ret)))))
 
-(run-after-init! 0 (&optional -frame)
+(run-after-init! 0 (&optional _frame)
   (require 'lv)
 
   ;; Purges buffers which haven't been displayed in 3 days
@@ -183,4 +183,5 @@
     (exec-path-from-shell-initialize))
 
   (unless (display-graphic-p)
-    (corfu-terminal-mode 1)))
+    (when (fboundp 'corfu-terminal-mode)
+      (corfu-terminal-mode 1))))
