@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(declare-function term-interrupt-subjob "term")
+
 (define-advice delete-window (:around (-fn &rest -args) record-term-buffer)
   (let ((term-buffer (current-buffer))
         (term-window? (eq (selected-window) (ymacs-popup//get-term-window))))

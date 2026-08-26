@@ -7,7 +7,7 @@
   (require 'expand-region)
   (require 're-builder))
 
-(declare-function 'reb-update-regexp "re-builder")
+(declare-function reb-update-regexp "re-builder")
 
 
 (defvar ymacs-editor-sexp-suffix-chars ";,. ")
