@@ -16,7 +16,7 @@
 (require-packages!
  (exec-path-from-shell :when sys/macp)
  corfu
- corfu-terminal
+ (corfu-terminal :when (< emacs-major-version 31))
  cape
  consult
  embark-consult
@@ -34,7 +34,6 @@
  hl-todo
  page-break-lines
  sudo-edit
- which-key
  lv
  highlight-indentation)
 
