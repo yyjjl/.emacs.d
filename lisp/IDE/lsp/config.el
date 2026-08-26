@@ -108,9 +108,9 @@
 
   ;; 一些 lsp server 会返回 :metadata 字段, 必须要 &allow-other-keys
   (cl-defmethod eglot-handle-request
-    (_server (_method (eql workspace/applyEdit)) &key _label edit &allow-other-keys)
+    (server (_method (eql workspace/applyEdit)) &key _label edit &allow-other-keys)
     "Handle server request workspace/applyEdit."
-    (eglot--apply-workspace-edit edit last-command)
+    (eglot--apply-workspace-edit server edit last-command)
     `(:applied t))
 
   ;; 把错误打印出来方便 debug
