@@ -56,7 +56,7 @@
   (add-to-list 'hippie-expand-ignore-buffers 'magit-status-mode)
   (add-to-list 'hippie-expand-ignore-buffers
                (eval-when-compile
-                 (rx string-start "*" (* any) "*" string-end)))
+                 (rx string-start "*" (* nonl) "*" string-end)))
   (setq-default hippie-expand-try-functions-list
                 '(try-expand-dabbrev
                   try-expand-all-abbrevs
@@ -97,8 +97,8 @@
     ("o" . diff-goto-source)
     ("t" . diff-test-hunk)
     ("/" . diff-split-hunk)
-    ("C-/" . diff-undo)
-    ("C-_" . diff-undo)
+    ("C-/" . undo-ignore-read-only)
+    ("C-_" . undo-ignore-read-only)
     ("TAB" . diff-hunk-next)
     ("<tab>" . diff-hunk-next)
     ("<backtab>" . diff-hunk-prev)))

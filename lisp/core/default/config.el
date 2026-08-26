@@ -128,7 +128,7 @@
 (setq show-paren-when-point-in-periphery t)
 
 (setq uniquify-buffer-name-style 'forward)
-(setq uniquify-after-kill-buffer-p t)
+(setq uniquify-after-kill-buffer-flag t)
 (setq uniquify-ignore-buffers-re "^\\*")
 (setq uniquify-min-dir-content 1)
 
