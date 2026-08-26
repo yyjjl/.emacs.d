@@ -62,6 +62,12 @@
   ;; Setup autoloads and packages
   (setq package-selected-packages ymacs-required-packages)
 
+  ;; Warn if any ELPA .elc was compiled by another Emacs (e.g. after an
+  ;; Emacs upgrade).  `make config' auto-purges them; here we only alert.
+  (unless noninteractive
+    (autoload 'ymacs-default/check-stale-elc (expand! "commands-package") nil t)
+    (ymacs-default/check-stale-elc))
+
   (message "Init Time: %.3f (with %d packages activated)"
            (float-time (time-subtract after-init-time before-init-time))
            (length package-activated-list)))
