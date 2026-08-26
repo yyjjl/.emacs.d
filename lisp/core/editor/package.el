@@ -15,7 +15,6 @@
 
 (require-packages!
  (exec-path-from-shell :when sys/macp)
- (fcitx :when sys/linuxp)
  corfu
  corfu-terminal
  cape

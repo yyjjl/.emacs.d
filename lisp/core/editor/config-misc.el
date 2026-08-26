@@ -274,11 +274,6 @@
         (ymacs-editor//display-help (ymacs-editor//display-keys--collect rectangle-mark-mode-map))
       (ymacs-editor//display-help--hide))))
 
-(after! fcitx
-  ;; Init fcitx prefix keys
-  (setq fcitx-use-dbus nil)
-  (fcitx-prefix-keys-add "C-h" "M-g" "M-s" "M-o" "C-x" "C-c" "C-z"))
-
 (setq iedit-toggle-key-default nil)
 (after! iedit
   (define-advice iedit-mode (:before (&rest _) disable-mc)

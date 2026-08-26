@@ -183,10 +183,4 @@
     (exec-path-from-shell-initialize))
 
   (unless (display-graphic-p)
-    (corfu-terminal-mode 1))
-
-  (when (and sys/linuxp (display-graphic-p -frame))
-    ;; Keep mouse at upper-right corner when typing
-    ;; (mouse-avoidance-mode t)
-
-    (fcitx-aggressive-setup)))
+    (corfu-terminal-mode 1)))
