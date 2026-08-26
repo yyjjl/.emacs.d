@@ -1,338 +1,405 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
+"""Build Emacs (and its dependencies) into a private prefix.
 
-import json
+Design goals (fixing the old ``progress.json`` based installer):
+
+1. Never rebuild software that is already installed.  Whether a package is
+   installed is decided by probing the *actual artifact on disk* (e.g. the
+   library or binary it produces) plus a version stamp -- not by a recorded
+   "how far did we get last time" state.
+2. No fragile per-step progress file.  A package is either fully installed
+   (a stamp exists) or it is rebuilt from scratch.  Stamps are written only
+   after a successful ``make install``.
+3. Changing a version is a one-liner.  Bump the constant (or pass
+   ``--emacs-version``); a mismatching stamp automatically triggers a rebuild.
+
+Usage examples::
+
+    ./install_emacs_lite.py                      # install emacs + missing deps
+    ./install_emacs_lite.py --emacs-version 31.1 # pick the emacs version
+    ./install_emacs_lite.py --force emacs        # force rebuild one package
+    ./install_emacs_lite.py --force all          # force rebuild everything
+    ./install_emacs_lite.py --only emacs gnutls  # restrict to some packages
+    ./install_emacs_lite.py --list               # show status and exit
+"""
+
+import argparse
 import os
+import shutil
 import subprocess
-from glob import glob
+import sys
+from dataclasses import dataclass, field
+from typing import Callable, List, Optional
+
+# --------------------------------------------------------------------------- #
+# Version configuration -- edit here to change what gets built.
+# --------------------------------------------------------------------------- #
+
+EMACS_VERSION = '31.1'
+# The gcc/libgccjit toolchain Emacs native-compilation links against.  Keep
+# this in sync with what is actually installed under the prefix -- bumping it
+# triggers a (very long) gcc rebuild on the next run.
+GCC_VERSION = '11.1.0'
+GNUTLS_VERSION = '3.6.16'
+
+# Base URL mirroring https://ftp.gnu.org/gnu.  The official host is often
+# painfully slow from CN; a nearby mirror makes downloads fast.  Override with
+# --gnu-mirror (e.g. https://ftp.gnu.org/gnu to force the canonical host).
+GNU_MIRROR = 'https://mirrors.tuna.tsinghua.edu.cn/gnu'
+
+GNU_SOFTWARES = [
+    # name,          version,    archive ext
+    ('ncurses',      '6.5',      'tar.gz'),
+    ('texinfo',      '6.8',      'tar.gz'),
+    ('readline',     '6.3',      'tar.gz'),
+    ('gmp',          '6.2.0',    'tar.xz'),
+    ('nettle',       '3.4.1',    'tar.gz'),
+    ('libunistring', '0.9.10',   'tar.gz'),
+    ('libtool',      '2.4',      'tar.xz'),
+    ('mpfr',         '4.1.0',    'tar.xz'),
+    ('mpc',          '1.2.1',    'tar.gz'),
+]
+
+EMACS_CONFIGURE_ARGS = [
+    '--with-libgmp=no',
+    '--with-native-compilation=yes',
+    '--with-x-toolkit=no',
+    '--with-xpm=ifavailable',
+    '--with-jpeg=ifavailable',
+    '--with-png=ifavailable',
+    '--with-gif=ifavailable',
+    '--with-tiff=ifavailable',
+    '--with-tree-sitter=ifavailable',
+]
 
 
-def run_cmd(cmd, **kwargs):
-    print('run_cmd', cmd)
-    return subprocess.run(cmd, **kwargs).returncode == 0
+# --------------------------------------------------------------------------- #
+# Package model
+# --------------------------------------------------------------------------- #
 
+@dataclass
+class Package:
+    """A buildable component.
 
-def download_and_uncompress(url, save_path, opt=None):
-    if not os.path.exists(save_path):
-        if not run_cmd(['wget', '--no-check-certificate', '-O', save_path, url]):
-            try:
-                os.unlink(save_path)
-            except Exception:
-                pass
-            return False
+    ``marker`` is a path (relative to the install prefix) of a real artifact
+    the package produces.  It is used both to skip work when the file is
+    already there and to "adopt" pre-existing installs that predate the stamp
+    mechanism.  ``{version}`` in ``marker`` is substituted with ``version``.
+    """
 
-    if opt is None:
-        return True
-
-    return run_cmd(['tar', opt, save_path])
-
-
-class Installer(object):
-    def __init__(self, prefix=None, progress_path='progress.json', cache_path='cache'):
-        if prefix is None:
-            prefix = os.path.expanduser('~/.local')
-
-        self._prefix = os.path.abspath(prefix)
-        self._progress = {}
-        self._progress_path = progress_path
-        self._cache_path = cache_path
-
-        os.makedirs(self._cache_path, exist_ok=True)
+    name: str
+    version: str
+    url: str
+    marker: str
+    configure_args: List[str] = field(default_factory=list)
+    # Custom build hook; when set it fully replaces the default
+    # configure/make/make-install flow.  Receives (installer,).
+    build: Optional[Callable[['Installer'], None]] = None
 
     @property
-    def prefix(self):
-        return self._prefix
+    def archive_ext(self) -> str:
+        for ext in ('tar.gz', 'tar.xz', 'tar.bz2'):
+            if self.url.endswith(ext):
+                return ext
+        return self.url.rsplit('.', 1)[-1]
 
     @property
-    def cache_path(self):
-        return self._cache_path
+    def archive_name(self) -> str:
+        return '{}-{}.{}'.format(self.name, self.version, self.archive_ext)
 
-    def progress(self, tag, value=None):
-        if value is None:
-            return self._progress.get(tag)
-        self._progress[tag] = value
+    @property
+    def src_name(self) -> str:
+        return '{}-{}'.format(self.name, self.version)
 
-    def _load(self):
-        prefix = self._prefix
-        os.environ['PATH'] = '{}/bin:{}'.format(
-            prefix, os.environ.get('PATH', '')
-        )
+    def marker_path(self, prefix: str) -> str:
+        return os.path.join(prefix, self.marker.format(version=self.version))
+
+
+# --------------------------------------------------------------------------- #
+# Installer
+# --------------------------------------------------------------------------- #
+
+class Installer:
+    def __init__(self, prefix, src_dir, cache_dir, jobs, force):
+        self.prefix = os.path.abspath(os.path.expanduser(prefix))
+        self.src_dir = os.path.abspath(os.path.expanduser(src_dir))
+        self.cache_dir = os.path.abspath(os.path.expanduser(cache_dir))
+        self.stamp_dir = os.path.join(self.prefix, '.install-stamps')
+        self.jobs = jobs
+        self.force = set(force or [])
+
+        for path in (self.prefix, self.src_dir, self.cache_dir, self.stamp_dir):
+            os.makedirs(path, exist_ok=True)
+
+        self._setup_environment()
+
+    # -- environment -------------------------------------------------------- #
+
+    def _setup_environment(self):
+        prefix = self.prefix
+
+        def prepend(var, value):
+            old = os.environ.get(var, '')
+            os.environ[var] = value + (os.pathsep + old if old else '')
+
+        prepend('PATH', '{}/bin'.format(prefix))
         os.environ['LDFLAGS'] = '-L{0}/lib -L{0}/lib64'.format(prefix)
         os.environ['CPATH'] = '{}/include'.format(prefix)
         os.environ['LD_LIBRARY_PATH'] = '{0}/lib:{0}/lib64'.format(prefix)
-        os.environ['PKG_CONFIG_PATH'] = '{0}/lib/pkgconfig:{0}/lib64/pkgconfig:{1}'.format(
-            prefix,
-            os.environ.get('PKG_CONFIG_PATH', '')
-        )
+        prepend('PKG_CONFIG_PATH',
+                '{0}/lib/pkgconfig:{0}/lib64/pkgconfig'.format(prefix))
         os.environ['CFLAGS'] = '-gdwarf-4'
 
-        if os.path.exists(self._progress_path):
-            with open(self._progress_path) as fp:
-                self._progress = json.load(fp)
+    # -- stamps / install detection ---------------------------------------- #
 
-    def _save(self):
-        with open(self._progress_path, 'w') as fp:
-            json.dump(self._progress, fp, indent=2)
+    def _stamp_file(self, name):
+        return os.path.join(self.stamp_dir, name)
 
-    def __enter__(self, *args, **kwargs):
-        self._load()
-        return self
-
-    def __exit__(self, *args, **kwargs):
-        self._save()
-
-    def run(self, tag, *processes):
-        last_progress = None
-
-        current_dir = os.path.abspath(os.curdir)
+    def _read_stamp(self, name):
         try:
-            for process in processes:
-                cmd = process[0]
-                args = process[1:]
-                name = cmd.__qualname__
+            with open(self._stamp_file(name)) as fp:
+                return fp.read().strip()
+        except OSError:
+            return None
 
-                print(name, args)
-                if not name.startswith('Installer.'):
-                    cmd(*args)
-                    continue
+    def _write_stamp(self, pkg):
+        with open(self._stamp_file(pkg.name), 'w') as fp:
+            fp.write(str(pkg.version))
 
-                if self.progress(tag) == last_progress:
-                    if not cmd(*args):
-                        raise Exception('{}: {} failed'.format(tag, name))
-                    print('{}: {} succeeded'.format(tag, name))
-                    self.progress(tag, name)
-
-                last_progress = name
-        finally:
-            os.chdir(current_dir)
-
-    def extract_and_link(self, pattern, exe, bin_dir):
-        archive = glob(os.path.join(self._cache_path, pattern))[0]
-        directory = os.path.basename(archive[:-7])
-        exe_path = os.path.join(bin_dir, exe)
-        run_cmd(['tar', 'zxf', archive])
-        if os.path.exists(exe_path):
-            os.unlink(exe_path)
-        os.symlink(os.path.abspath(os.path.join(directory, exe)), exe_path)
-
-    def make(self, target_dir=None):
-        args = []
-        if target_dir is not None:
-            args = ['-C', target_dir]
-
-        if not run_cmd(['make', '-j4', *args]):
+    def is_installed(self, pkg):
+        """Return True when ``pkg`` at its configured version is present."""
+        if pkg.name in self.force or 'all' in self.force:
             return False
 
-        return run_cmd(['make', *args, 'install'])
+        marker_ok = os.path.exists(pkg.marker_path(self.prefix))
+        stamp = self._read_stamp(pkg.name)
 
-    def configure(self, *args):
-        if not os.path.exists('configure'):
-            assert run_cmd(['./autogen.sh'])
-        return run_cmd(['./configure', '--prefix={}'.format(self._prefix), *args])
+        if stamp is not None:
+            # Stamp is authoritative, but only trust it while the artifact it
+            # promised is still on disk.
+            return stamp == str(pkg.version) and marker_ok
 
-    def cmake(self, *args, build_dir='build'):
-        os.makedirs(build_dir, exist_ok=True)
+        # No stamp: this may be a legacy install predating the stamp scheme.
+        # Adopt it when the real artifact is on disk so we don't rebuild.
+        if marker_ok:
+            self._write_stamp(pkg)
+            return True
 
-        src_dir = os.path.abspath(os.curdir)
-        try:
-            os.chdir(build_dir)
+        return False
 
-            return run_cmd([
-                'cmake', src_dir,
-                '-DCMAKE_INSTALL_PREFIX={}'.format(self._prefix),
-                *args
-            ])
-        finally:
-            os.chdir(src_dir)
+    # -- shell helpers ------------------------------------------------------ #
 
-    def download_software(self, name, version, ext, fmt):
-        directory = '{}-{}'.format(name, version)
-        save_path = os.path.join(self._cache_path, '{}.{}'.format(directory, ext))
+    @staticmethod
+    def _run(cmd, **kwargs):
+        printable = cmd if isinstance(cmd, str) else ' '.join(cmd)
+        print('  $ {}'.format(printable), flush=True)
+        subprocess.run(cmd, check=True, **kwargs)
 
-        url = fmt.format(name=name, version=version, ext=ext)
+    def download(self, pkg):
+        archive = os.path.join(self.cache_dir, pkg.archive_name)
+        if not os.path.exists(archive):
+            tmp = archive + '.part'
+            try:
+                self._run(['wget', '--no-check-certificate',
+                           '-c', '-O', tmp, pkg.url])
+            except Exception:
+                if os.path.exists(tmp):
+                    os.unlink(tmp)
+                raise
+            os.replace(tmp, archive)
+        return archive
 
-        if ext == 'tar.gz':
-            opt = '-zxf'
-        elif ext == 'tar.xz':
-            opt = '-Jxf'
-        else:
-            opt = '-xf'
+    def extract(self, pkg, archive):
+        src_path = os.path.join(self.src_dir, pkg.src_name)
+        if os.path.isdir(src_path):
+            return src_path
+        opt = {'tar.gz': '-zxf', 'tar.xz': '-Jxf', 'tar.bz2': '-jxf'}.get(
+            pkg.archive_ext, '-xf')
+        self._run(['tar', opt, archive, '-C', self.src_dir])
+        return src_path
 
-        return download_and_uncompress(url, save_path, opt)
+    def configure(self, extra_args):
+        if not os.path.exists('configure') and os.path.exists('autogen.sh'):
+            self._run(['./autogen.sh'])
+        self._run(['./configure', '--prefix={}'.format(self.prefix), *extra_args])
 
-    def download_gnu_software(self, name, version, ext):
-        fmt = 'http://ftp.gnu.org/gnu/{name}/{name}-{version}.{ext}'
-        return self.download_software(name, version, ext, fmt)
+    def make_install(self):
+        self._run(['make', '-j{}'.format(self.jobs)])
+        self._run(['make', 'install'])
 
-    def download_gnutls(self, version):
-        save_path = os.path.join(
-            self._cache_path, 'gnutls-{}.{}.tar.xz'.format(*version)
-        )
-        url = 'http://www.gnupg.org/ftp/gcrypt/gnutls/v{0}/gnutls-{0}.{1}.tar.xz'.format(
-            *version
-        )
-        return download_and_uncompress(url, save_path,  '-Jxf')
+    # -- top level ---------------------------------------------------------- #
 
-    def download_gcc(self, version):
-        save_path = os.path.join(
-            self._cache_path, 'gcc-{}.tar.xz'.format(version)
-        )
-        url = 'http://ftp.gnu.org/gnu/gcc/gcc-{0}/gcc-{0}.tar.xz'.format(
-            version
-        )
-        return download_and_uncompress(url, save_path,  '-Jxf')
-
-    def download_and_install_cmake(self, version):
-        save_path = os.path.join(
-            self._cache_path, 'cmake-{0}-linux-x86_64.sh'.format(version)
-        )
-        url = 'https://github.com/Kitware/CMake/releases/download/v{0}/cmake-{0}-linux-x86_64.sh'.format(
-            version
-        )
-
-        if not download_and_uncompress(url, save_path):
+    def install(self, pkg):
+        if self.is_installed(pkg):
+            print('[skip] {}-{} already installed'.format(pkg.name, pkg.version))
             return False
 
-        return run_cmd(
-            ['bash', save_path, '--prefix={}'.format(self._prefix)],
-            input=b'y\nn\n'
-        )
+        print('[build] {}-{}'.format(pkg.name, pkg.version))
+        archive = self.download(pkg)
+        src_path = self.extract(pkg, archive)
 
-
-def download_from_github(repo, directory):
-    url = 'https://github.com/' + repo + '.git'
-
-    current_dir = os.path.abspath(os.curdir)
-    if os.path.exists(directory):
+        cwd = os.getcwd()
         try:
-            os.chdir(directory)
-            return run_cmd(['git', 'pull'])
+            os.chdir(src_path)
+            if pkg.build is not None:
+                pkg.build(self)
+            else:
+                self.configure(pkg.configure_args)
+                self.make_install()
         finally:
-            os.chdir(current_dir)
-    else:
-        return 0 == os.system('git clone {} {}'.format(url, directory))
+            os.chdir(cwd)
+
+        if not os.path.exists(pkg.marker_path(self.prefix)):
+            raise RuntimeError(
+                '{}: build finished but marker {!r} is missing'.format(
+                    pkg.name, pkg.marker_path(self.prefix)))
+
+        self._write_stamp(pkg)
+        print('[done] {}-{}'.format(pkg.name, pkg.version))
+        return True
 
 
-GNU_SOFTWARES = [
-    ('ncurses', '6.2', 'tar.gz'),
-    ('texinfo', '6.8', 'tar.gz'),
-    ('readline', '6.3', 'tar.gz'),
-    ('gmp', '6.2.0', 'tar.xz'),
-    ('nettle', '3.4.1', 'tar.gz'),
-    ('libunistring', '0.9.10', 'tar.gz'),
-    ('libtool', '2.4', 'tar.xz'),
-    ('mpfr', '4.1.0', 'tar.xz'),
-    ('mpc', '1.2.1', 'tar.gz')
-]
-GNUTLS = ('3.6', '16')
-GCC = '11.1.0'
-CMAKE = '3.21.0'
-ZLIB = '1.2.13'
+# --------------------------------------------------------------------------- #
+# Package catalogue
+# --------------------------------------------------------------------------- #
 
-PYTHON_URL = 'https://www.python.org/ftp/python/3.9.7/Python-3.9.7.tgz'
+def gnu_url(mirror, name, version, ext):
+    return '{0}/{1}/{1}-{2}.{3}'.format(mirror.rstrip('/'), name, version, ext)
 
-SRC_DIR = os.path.expanduser('~/program/')
-ROOT_DIR = os.path.expanduser('~/.local/')
-BIN_DIR = os.path.join(ROOT_DIR, 'bin')
 
-os.makedirs(SRC_DIR, exist_ok=True)
-os.makedirs(ROOT_DIR, exist_ok=True)
-os.makedirs(BIN_DIR, exist_ok=True)
+def _build_gcc(installer):
+    installer.configure([
+        '--disable-bootstrap',
+        '--enable-host-shared',
+        '--enable-languages=jit,c,c++',
+        '--disable-multilib',
+        '--with-gmp=' + installer.prefix,
+        '--with-mpfr=' + installer.prefix,
+        '--with-mpc=' + installer.prefix,
+    ])
+    installer.make_install()
 
-os.chdir(SRC_DIR)
-with Installer(prefix=ROOT_DIR) as installer:
-    # installer.extract_and_link('fd-*', 'fd', BIN_DIR)
-    # installer.extract_and_link('ripgrep-*', 'rg', BIN_DIR)
-    # run_cmd(['tar', 'zxf', glob(os.path.join(installer.cache_path, 'fzf-*'))[0], '-C', BIN_DIR])
 
-    installer.download_and_install_cmake(CMAKE)
+def build_packages(emacs_version, mirror):
+    packages = []
 
-    for name, version, ext, *cmd_args in GNU_SOFTWARES:
-        installer.run(
-            name,
-            [installer.download_gnu_software, name, version, ext],
-            [os.chdir, '{}-{}'.format(name, version)],
-            [installer.configure, *cmd_args],
-            [installer.make],
-        )
+    # Markers are the real artifacts each dep produces in the prefix.
+    markers = {
+        'ncurses': 'lib/libncurses.a',
+        'texinfo': 'bin/makeinfo',
+        'readline': 'lib/libreadline.so',
+        'gmp': 'lib/libgmp.so',
+        'nettle': 'lib64/libnettle.so',
+        'libunistring': 'lib/libunistring.so',
+        'libtool': 'bin/libtool',
+        'mpfr': 'lib/libmpfr.so',
+        'mpc': 'lib/libmpc.so',
+    }
+    for name, version, ext in GNU_SOFTWARES:
+        packages.append(Package(
+            name=name,
+            version=version,
+            url=gnu_url(mirror, name, version, ext),
+            marker=markers[name],
+        ))
 
-    installer.run(
-        'zlib',
-        [installer.download_software, 'zlib', ZLIB, 'tar.gz', 'http://www.zlib.net/{name}-{version}.{ext}'],
-        [os.chdir, 'zlib-{}'.format(ZLIB)],
-        [installer.configure],
-        [installer.make],
+    # GnuTLS lives on gnupg's mirror, path keyed by the major.minor series.
+    gnutls_series = '.'.join(GNUTLS_VERSION.split('.')[:2])
+    packages.append(Package(
+        name='gnutls',
+        version=GNUTLS_VERSION,
+        url='https://www.gnupg.org/ftp/gcrypt/gnutls/v{0}/gnutls-{1}.tar.xz'.format(
+            gnutls_series, GNUTLS_VERSION),
+        marker='lib/libgnutls.so',
+        configure_args=['--with-included-libtasn1', '--without-p11-kit'],
+    ))
+
+    packages.append(Package(
+        name='gcc',
+        version=GCC_VERSION,
+        url='{0}/gcc/gcc-{1}/gcc-{1}.tar.xz'.format(mirror.rstrip('/'), GCC_VERSION),
+        marker='bin/gcc',
+        build=_build_gcc,
+    ))
+
+    packages.append(Package(
+        name='emacs',
+        version=emacs_version,
+        url=gnu_url(mirror, 'emacs', emacs_version, 'tar.gz'),
+        marker='bin/emacs-{version}',
+        configure_args=EMACS_CONFIGURE_ARGS,
+    ))
+
+    return packages
+
+
+# --------------------------------------------------------------------------- #
+# CLI
+# --------------------------------------------------------------------------- #
+
+def parse_args(argv):
+    parser = argparse.ArgumentParser(
+        description='Build Emacs and its dependencies into a private prefix.')
+    parser.add_argument('--prefix', default='~/.local',
+                        help='install prefix (default: %(default)s)')
+    parser.add_argument('--src-dir', default='~/program',
+                        help='where sources are extracted (default: %(default)s)')
+    parser.add_argument('--cache-dir', default='~/program/cache',
+                        help='where archives are cached (default: %(default)s)')
+    parser.add_argument('--emacs-version', default=EMACS_VERSION,
+                        help='emacs version to build (default: %(default)s)')
+    parser.add_argument('--gnu-mirror', default=GNU_MIRROR,
+                        help='base URL mirroring ftp.gnu.org/gnu (default: %(default)s)')
+    parser.add_argument('--jobs', type=int, default=min((os.cpu_count() or 4), 8),
+                        help='parallel make jobs (default: %(default)s)')
+    parser.add_argument('--only', nargs='+', metavar='PKG',
+                        help='only act on these packages')
+    parser.add_argument('--force', nargs='+', metavar='PKG', default=[],
+                        help="rebuild these packages ('all' for everything)")
+    parser.add_argument('--list', action='store_true',
+                        help='print install status and exit')
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    args = parse_args(argv if argv is not None else sys.argv[1:])
+
+    if not shutil.which('wget'):
+        sys.exit('error: wget is required but was not found on PATH')
+
+    packages = build_packages(args.emacs_version, args.gnu_mirror)
+    if args.only:
+        wanted = set(args.only)
+        packages = [p for p in packages if p.name in wanted]
+        missing = wanted - {p.name for p in packages}
+        if missing:
+            sys.exit('error: unknown package(s): {}'.format(', '.join(sorted(missing))))
+
+    installer = Installer(
+        prefix=args.prefix,
+        src_dir=args.src_dir,
+        cache_dir=args.cache_dir,
+        jobs=args.jobs,
+        force=args.force,
     )
 
-    installer.run(
-        'gnutls',
-        [installer.download_gnutls, GNUTLS],
-        [os.chdir, 'gnutls-{}.{}'.format(*GNUTLS)],
-        [
-            installer.configure,
-            '--with-included-libtasn1',
-            '--without-p11-kit'
-        ],
-        [installer.make],
-    )
+    if args.list:
+        print('prefix: {}'.format(installer.prefix))
+        for pkg in packages:
+            state = 'installed' if installer.is_installed(pkg) else 'missing'
+            print('  {:<14} {:<8} {}'.format(pkg.name, pkg.version, state))
+        return
 
-    installer.run(
-        'gcc',
-        [installer.download_gcc, GCC],
-        [os.chdir, 'gcc-{}'.format(GCC)],
-        [
-            installer.configure,
-            '--disable-bootstrap',
-            '--enable-host-shared',
-            '--enable-languages=jit,c,c++',
-            '--disable-multilib',
-            '--with-gmp=' + installer.prefix,
-            '--with-mpfr=' + installer.prefix,
-            '--with-mpc=' + installer.prefix
-        ],
-        [installer.make],
-    )
+    built = []
+    for pkg in packages:
+        if installer.install(pkg):
+            built.append('{}-{}'.format(pkg.name, pkg.version))
 
-    installer.run(
-        'jansson',
-        [download_from_github, 'akheron/jansson', 'jansson'],
-        [os.chdir, 'jansson'],
-        [installer.cmake, '-DJANSSON_BUILD_DOCS=OFF'],
-        [os.chdir, 'build'],
-        [installer.make]
-    )
+    print('\nSummary: {} built, {} already present.'.format(
+        len(built), len(packages) - len(built)))
+    if built:
+        print('  built: {}'.format(', '.join(built)))
 
-    installer.run(
-        'tree-sitter',
-        [download_from_github, 'tree-sitter/tree-sitter', 'tree-sitter'],
-        [os.chdir, 'tree-sitter'],
-        [subprocess.run, ['make']],
-        [subprocess.run,
-         ['make', 'install', 'PREFIX={}'.format(installer.prefix)]]
-    )
 
-    installer.run(
-        'emacs',
-        [download_from_github, 'emacs-mirror/emacs', 'emacs'],
-        [os.chdir, 'emacs'],
-        [
-            installer.configure,
-            '--with-json',
-            '--with-libgmp=no',
-            '--with-native-compilation=yes',
-            '--with-x-toolkit=no',
-            '--with-xpm=ifavailable',
-            '--with-jpeg=ifavailable',
-            '--with-gif=ifavailable',
-            '--with-tiff=ifavailable',
-            '--with-tree-sitter'
-        ],
-        [installer.make]
-    )
-
-    installer.run(
-        'ctags',
-        [download_from_github, 'universal-ctags/ctags', 'universal-ctags'],
-        [os.chdir, 'universal-ctags'],
-        [installer.configure],
-        [installer.make]
-    )
+if __name__ == '__main__':
+    main()
