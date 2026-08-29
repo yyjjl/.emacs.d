@@ -200,7 +200,7 @@ makes `cape-file' complete paths containing spaces, e.g.
                   (cl-decf pos)))
                ((or (eq (char-syntax ch) ?w)
                     (string-match-p
-                     (rx (any alnum "~" "-" "." "_" "/" "\\" ":" "#" "%" "@" "$" "," "{" "}"))
+                     (rx (any alnum "&" "," "+" "~" "-" "." "_" "/" "\\" ":" "#" "%" "@" "$" "," "{" "}" "(" ")" "》" "《" "）" "（" "：" "[" "]"))
                      (string ch)))
                 (cl-decf pos))
                (t
