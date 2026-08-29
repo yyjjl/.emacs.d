@@ -5,7 +5,7 @@
   (advice-add #'org-export-dispatch :around #'without-user-record!!))
 
 (after! ob
-  (add-hook 'org-babel-after-execute-hook #'org-redisplay-inline-images))
+  (add-hook 'org-babel-after-execute-hook #'org-link-preview-refresh))
 
 (after! org
   (put #'org-archive-subtree 'disabled t)

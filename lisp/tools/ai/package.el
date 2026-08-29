@@ -11,20 +11,23 @@
   ([f7] . claude-code-ide))
 
 (after! claude-code-ide
-  (defun ymacs-ai//setup-vterm-buffer (&rest _)
-    (when (and (eq major-mode  'vterm-mode)
+  (defun ymacs-ai//setup-agent-buffer (&rest _)
+    (when (and (eq major-mode 'ghostel-mode)
                (string-prefix-p "*AI agent" (buffer-name)))
-      (local-set-key (kbd "C-'") #'(lambda () (interactive) (vterm-send-C-g)))
-      (local-set-key (kbd "C-c '") #'(lambda () (interactive) (vterm-send-C-g)))
+      (local-set-key (kbd "C-'") #'(lambda () (interactive) (ghostel-send-C-g)))
+      (local-set-key (kbd "C-c '") #'(lambda () (interactive) (ghostel-send-C-g)))
       (setq-local ymacs-term--is-not-a-shell t)
       (setq-local mode-line-format '(:eval (ymacs-modeline//format--ai-agent)))))
 
-  (advice-add #'claude-code-ide--configure-vterm-buffer :after #'ymacs-ai//setup-vterm-buffer)
+  ;; `claude-code-ide--setup-terminal-keybindings' runs in the freshly created
+  ;; agent buffer for every backend, so it is the reliable hook point now that
+  ;; ghostel (not vterm) has no dedicated `configure' step.
+  (advice-add #'claude-code-ide--setup-terminal-keybindings
+              :after #'ymacs-ai//setup-agent-buffer)
 
-  (setq claude-code-ide-buffer-name-function
-        #'(lambda (-directory)
-            (format "*AI agent[%s]*"
-                    (file-name-nondirectory (directory-file-name -directory)))))
+  (setq claude-code-ide-terminal-backend 'ghostel)
+
+  (setq claude-code-ide-buffer-name-function #'(lambda (-directory) "*AI agent*"))
   (setq claude-code-ide-debug nil)
   (setq claude-code-ide-use-side-window nil)
   (setq claude-code-ide-cli-path ymacs-claude-code-path)

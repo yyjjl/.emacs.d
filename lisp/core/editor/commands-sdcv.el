@@ -168,9 +168,9 @@ Word may contain some special characters:
 (defun sdcv-goto-number (-num-str)
   (interactive (list (this-command-keys)))
   (let ((regexp (concat -num-str sdcv-item-regexp-partial)))
-    (if-let (word (save-excursion
-                    (goto-char (point-min))
-                    (when (re-search-forward regexp nil t)
-                      (match-string 1))))
+    (if-let* ((word (save-excursion
+                      (goto-char (point-min))
+                      (when (re-search-forward regexp nil t)
+                        (match-string 1)))))
         (sdcv-search-word word)
       (call-interactively #'sdcv-search-word))))

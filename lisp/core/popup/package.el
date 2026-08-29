@@ -10,7 +10,7 @@
             "RefTeX Select"
             "LSP Lookup"
             "EGLOT proposed server changes"
-            (and (or "xref" "TeX" "Shell Command Output" "lsp-java-") (* any)))
+            (and (or "xref" "TeX" "Shell Command Output" "lsp-java-") (* nonl)))
         "*" string-end)))
 
 ;; (defvar ymacs-popup-left-dedicated-buffer-regexp
@@ -74,7 +74,7 @@
   '(term-mode
     eshell-mode
     comint-mode
-    vterm-mode
+    ghostel-mode
     haskell-interactive-mode))
 
 (defvar ymacs-popup-help-modes

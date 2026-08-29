@@ -293,15 +293,6 @@ with Installer(prefix=ROOT_DIR) as installer:
     )
 
     installer.run(
-        'libvterm',
-        [download_from_github, 'neovim/libvterm', 'libvterm'],
-        [os.chdir, 'libvterm'],
-        [subprocess.run, ['make']],
-        [subprocess.run,
-         ['make', 'install', 'PREFIX={}'.format(installer.prefix)]]
-    )
-
-    installer.run(
         'jansson',
         [download_from_github, 'akheron/jansson', 'jansson'],
         [os.chdir, 'jansson'],

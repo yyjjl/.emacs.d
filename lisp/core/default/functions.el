@@ -69,7 +69,8 @@ LHS and RHS are lists of symbols of modeline -segments defined with
     (cl-assert (or (not header-fn) (functionp header-fn)) "predefined modeline %s doesn't exist" -header-key)
 
     (let* ((forms (remove nil (list
-                               (when fn `(,setter mode-line-format '(:eval (,fn))))
+                               (when fn
+                                 `(,setter mode-line-format '((eldoc-mode-line-string (" " eldoc-mode-line-string " ")) (:eval (,fn)))))
                                (when header-fn `(,setter header-line-format '(:eval (,header-fn))))
                                -body)))
            (modes (if (listp -modes)
@@ -199,10 +200,7 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   "Display buffer information for shell buffer"
   (list
    " "
-   (if (and (listp mode-line-buffer-identification)
-            (equal (car mode-line-buffer-identification) "%b"))
-       (cdr mode-line-buffer-identification)
-     mode-line-buffer-identification)))
+   mode-line-buffer-identification))
 
 (ymacs-modeline//def-segment buffer-info-ai-agent
   "Display buffer information for shell buffer"
@@ -511,10 +509,10 @@ By default, this shows the information specified by `global-mode-string'."
   (window-number matches buffer-position buffer-info remote-host checker major-mode buffer-encoding))
 
 (ymacs-modeline//def-modeline shell
-  (window-number matches buffer-info-shell remote-host major-mode))
+  (window-number matches buffer-info-shell remote-host buffer-default-directory major-mode))
 
 (ymacs-modeline//def-modeline ai-agent
-  (window-number matches buffer-info-ai-agent buffer-default-directory))
+  (window-number matches major-mode buffer-info-ai-agent))
 
 (ymacs-modeline//def-modeline dired
   (window-number matches buffer-default-directory remote-host major-mode dired))

@@ -88,13 +88,6 @@ hash -d d=$HOME/downloads
 hash -d w=$HOME/working
 
 case "$INSIDE_EMACS" in
-    vterm)
-        export LANG=zh_CN.UTF-8
-        alias ff='emacsclient -n'
-        chpwd() {
-            printf "\e]51;A$(whoami)@$(hostname):$(pwd)\e\\"
-        }
-        ;;
     *term*)
         alias ff='emacsclient -n'
         chpwd() {
@@ -106,4 +99,3 @@ case "$INSIDE_EMACS" in
         alias ff='emacsclient -c -a "" -n'
         ;;
 esac
-export PATH=/Users/bytedance/.local/bin:$PATH

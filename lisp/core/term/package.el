@@ -3,18 +3,11 @@
 (eval-when-compile
   (require 'dash))
 
-(option! term-type
-    (eval-when-compile
-      (if (and (bound-and-true-p module-file-suffix) ; dynamic module
-               (executable-find "cmake")
-               (executable-find "libtool")
-               (executable-find "make"))
-          'vterm
-        'term))
+(option! term-type 'ghostel
   "Terminal type"
   :group 'ymacs
   :type '(choice
-          (const :tag "Vterm" vterm)
+          (const :tag "Ghostel" ghostel)
           (const :tag "Shell" shell)))
 
 (option! term-path-alist nil
@@ -23,7 +16,7 @@
   :type '(alist :key-type string :value-type string))
 
 (require-packages!
- (vterm :when (eq ymacs-term-type 'vterm))
+ (ghostel :when (eq ymacs-term-type 'ghostel))
  bash-completion)
 
 (defvar ymacs-term-repl-alist nil)
@@ -33,7 +26,6 @@
 
 (defvar ymacs-term-program-arguments ())
 
-(defvar-local ymacs-term-extra-name nil)
 (defvar-local ymacs-term-exit-action 'kill
   "shell => when process exits, switch to other shell
 keep   => when process exits, make buffer readonly

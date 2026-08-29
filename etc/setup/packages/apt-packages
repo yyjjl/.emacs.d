@@ -21,7 +21,6 @@ latexmk
 libboost-dev
 libboost-doc
 libclang-dev
-libvterm-dev
 lldb
 llvm-dev
 markdown

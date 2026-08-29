@@ -26,7 +26,7 @@
     ("C-c DEL" . org-cycle-list-bullet)
     ("C-x , l" . org-latex-preview)
     ("C-x , ." . org-store-link)
-    ("C-x , i" . org-toggle-inline-images)
+    ("C-x , i" . org-link-preview)
     ("C-x , [" . org-next-block)
     ("C-x , ]" . org-previous-block)
     ("C-c d d" . org-download-screenshot)
@@ -78,7 +78,7 @@
 
   (setq org-mouse-1-follows-link nil)
 
-  (setq org-edit-src-content-indentation 0)
+  (setq org-src-content-indentation 0)
   (setq org-edit-timestamp-down-means-later t)
 
   (setq org-use-speed-commands t)
@@ -152,15 +152,14 @@
             org-html-style-default)))
 
   (setq org-html-head
-        (eval-when-compile
-          (concat "<style type=\"text/css\">\n/*<![CDATA[*/\n"
-                  (with-demoted-errors "Error %s"
-                    (with-temp-buffer
-                      (erase-buffer)
-                      (url-insert-file-contents "https://gongzhitaao.org/orgcss/org.css")
-                      (buffer-string)))
-                  (read-file-content! (expand-etc! "org-common.css"))
-                  "\n/*]]>*/\n</style>")))
+        (concat "<style type=\"text/css\">\n/*<![CDATA[*/\n"
+                (with-demoted-errors "Error %s"
+                  (with-temp-buffer
+                    (erase-buffer)
+                    (url-insert-file-contents "https://gongzhitaao.org/orgcss/org.css")
+                    (buffer-string)))
+                (read-file-content! (expand-etc! "org-common.css"))
+                "\n/*]]>*/\n</style>"))
   (setq org-html-mathjax-template
         (eval-when-compile
           (read-file-content!

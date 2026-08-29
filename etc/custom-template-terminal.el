@@ -26,7 +26,7 @@
  '(ymacs-package-use-gnutls-p nil)
  '(ymacs-python-lsp-server 'pylance)
  '(ymacs-system-name "M2")
- '(ymacs-term-type 'vterm)
+ '(ymacs-term-type 'ghostel)
  '(ymacs-use-native-treesit-p nil))
 
 (custom-set-faces

@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(declare-function term-interrupt-subjob "term")
+
 (define-advice delete-window (:around (-fn &rest -args) record-term-buffer)
   (let ((term-buffer (current-buffer))
         (term-window? (eq (selected-window) (ymacs-popup//get-term-window))))
@@ -33,27 +35,11 @@
 
 (after! term
   (define-hook! ymacs-term//term-setup (term-mode-hook)
-    (setq term-goto-process-mark nil)
-
-    (setq ymacs-term-extra-name nil)
-    (setq mode-line-buffer-identification
-          '("%b" (ymacs-term-extra-name (": " ymacs-term-extra-name)))))
+    (setq term-goto-process-mark nil))
 
   (define-hook! ymacs-term//set-utf8 (term-exec-hook)
     (when-let* ((proc (get-buffer-process (current-buffer))))
       (set-process-coding-system proc 'utf-8-unix 'utf-8-unix))))
-
-
-(after! vterm
-  (define-hook! ymacs-term//vterm-setup (vterm-mode-hook)
-    (setq ymacs-term-extra-name nil)
-    (setq mode-line-buffer-identification
-          '("%b"
-            (vterm-copy-mode "[copy]")
-            (ymacs-term-extra-name (": " ymacs-term-extra-name)))))
-
-  (define-advice vterm--set-title (:override (title) set-suffix)
-    (setq ymacs-term-extra-name title)))
 
 (after! comint
   (add-hook 'comint-exec-hook #'ymacs-term//sentinel-setup)
@@ -72,9 +58,4 @@
     ))
 
 (after! shell
-  (bash-completion-setup)
-
-  (define-hook! ymacs-term//shell-setup (shell-mode-hook)
-    (setq ymacs-term-extra-name nil)
-    (setq mode-line-buffer-identification
-          '("%b" (ymacs-term-extra-name (": " ymacs-term-extra-name))))))
+  (bash-completion-setup))

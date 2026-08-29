@@ -5,18 +5,17 @@
     ("M-}" . ymacs-term/next)
     ("M-{" . ymacs-term/prev)))
 
-(after! vterm
-  (setq vterm-buffer-name-string nil)
-  (setq vterm-kill-buffer-on-exit nil)
+(after! ghostel
+  ;; Let our exit hook (see functions.el / config below) decide the buffer's
+  ;; fate through `ymacs-term-exit-action', instead of ghostel killing it.
+  (setq ghostel-kill-buffer-on-exit nil)
 
-  (define-key! :map vterm-copy-mode-map
-    ("C-c C-k" . vterm-copy-mode)
-    ("C-a" . ymacs-term/vterm-copy-mode-beginning-of-line)
-    ("C-e" . ymacs-term/vterm-copy-mode-end-of-line)
-    ("M-w" . ymacs-term/vterm-copy-mode-copy-as-displayed)
-    ("C-c C-o" . ymacs-term/vterm-copy-mode-browse-url-at-point))
+  (add-hook 'ghostel-exit-functions #'ymacs-term//ghostel-exit)
 
-  (define-key! :map vterm-mode-map
+  ;; Ghostel's semi-char mode forwards most keys to the terminal, so our
+  ;; window / navigation keys must be bound in `ghostel-semi-char-mode-map'
+  ;; to win over the per-key `ghostel--send-event' bindings.
+  (define-key! :map ghostel-semi-char-mode-map
     ("M-0" . ymacs-editor/goto-char-or-minibuffer)
     ("M-1" . ymacs-editor/aw-select-window)
     ("M-2" . ymacs-editor/aw-select-window)
@@ -25,16 +24,9 @@
     ("M-5" . ymacs-editor/aw-select-window)
     ("M-6" . ymacs-editor/aw-select-window)
     ("M-}" . ymacs-term/next)
-    ("M-:" . eval-expression)
     ("M-{" . ymacs-term/prev)
     ("M-o" . ymacs-term/switch)
-    ("M-N" . ymacs-term/set-extra-name)
-    ("M-y" . ymacs-term/yank-pop)
-    ("C-k" . ymacs-term/kill-line)
     ("C-s" . ymacs-term/line)
-    ("C-c C-j" . vterm-copy-mode)
-    ("C-c C-l" . vterm-copy-mode)
-    ("<C-backspace>" . vterm-send-meta-backspace)
     ("C-S-t" . ymacs-term/pop-shell-here)))
 
 (after! comint
@@ -50,5 +42,4 @@
     ("M-}" . ymacs-term/next)
     ("M-{" . ymacs-term/prev)
     ("M-o" . ymacs-term/switch)
-    ("M-N" . ymacs-term/set-extra-name)
     ("C-S-t" . ymacs-term/pop-shell-here)))
