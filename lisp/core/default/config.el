@@ -187,8 +187,8 @@
               (window (get-buffer-window buffer)))
     (quit-window 'kill window)))
 
-(define-advice package--save-selected-packages (:override (-value) dont-save)
-  (when -value
+(define-advice package--save-selected-packages (:override (&optional -value) dont-save)
+  (when (or -value after-init-time)
     (setq package-selected-packages -value)))
 
 ;; (setq package-quickstart t)

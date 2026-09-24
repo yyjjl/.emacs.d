@@ -238,6 +238,13 @@ like the scratch buffer where knowing the current project directory is important
                   "UTF-8")
                  (t (upcase (symbol-name (plist-get sys :name)))))))))
 
+(defun ymacs-modeline//watch-buffer-encoding (_symbol -value _operation -where)
+  "Update -WHERE's cached mode-line encoding to -VALUE."
+  (when (and (buffer-live-p -where)
+             (coding-system-p -value))
+    (with-current-buffer -where
+      (ymacs-modeline//update-buffer-encoding -value))))
+
 (ymacs-modeline//def-segment buffer-encoding
   "Displays the eol and the encoding style of the buffer the same way Atom does."
   (or ymacs-modeline--buffer-encoding

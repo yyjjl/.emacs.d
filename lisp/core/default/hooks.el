@@ -31,12 +31,8 @@
 
 
   ;; update buffer encoding
-  (add-variable-watcher
-   'buffer-file-coding-system
-   (lambda (-sym _value _op -where)
-     (when -where
-       (with-current-buffer -where
-         (ymacs-modeline//update-buffer-encoding (symbol-value -sym))))))
+  (add-variable-watcher 'buffer-file-coding-system
+                        #'ymacs-modeline//watch-buffer-encoding)
 
   ;; update vcs
   (add-hook 'find-file-hook #'ymacs-modeline//update-vcs)

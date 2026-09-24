@@ -35,7 +35,7 @@
  page-break-lines
  sudo-edit
  lv
- highlight-indentation)
+ indent-bars)
 
 (put 'scroll-left 'disabled nil)
 (put 'narrow-to-region 'disabled nil)

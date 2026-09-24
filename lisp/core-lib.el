@@ -391,15 +391,16 @@ HTML file converted from org file, it returns t."
       (setcdr pair (cons -new-value (cdr pair))))))
 
 (defun insert-before! (-before-value -new-value -lst)
-  "Find -BEFORE-VALUE and Add -NEW-VALUE to -LST after it."
+  "Find -BEFORE-VALUE and add -NEW-VALUE to -LST before it."
   (if (equal -before-value (car -lst))
       (progn
         (setcdr -lst (cons (car -lst) (cdr -lst)))
         (setcar -lst -new-value))
     (let ((x -lst))
-      (while (and (listp x) (not (equal -before-value (cadr x))))
+      (while (and (consp (cdr x)) (not (equal -before-value (cadr x))))
         (setq x (cdr x)))
-      (setcdr x (cons -new-value (cdr x))))))
+      (when (consp (cdr x))
+        (setcdr x (cons -new-value (cdr x)))))))
 
 (defsubst equal-directory! (-d1 -d2)
   (string= (file-name-as-directory -d1)
@@ -414,7 +415,7 @@ HTML file converted from org file, it returns t."
   (unless (file-directory-p -file)
     (with-temp-buffer
       (insert-file-contents -file)
-      (set-buffer-file-coding-system 'utf-8-unix)
+      (set-buffer-file-coding-system -encoding)
       (write-file -file))))
 
 (defsubst hack-dir-local-variables-for-project! ()
@@ -497,8 +498,8 @@ HTML file converted from org file, it returns t."
     (while (and map -key)
       (setq map (assoc (pop -key) map)))
     (when map
-      (define-key -map (kbd -new) (cdr map))
-      (define-key -map (kbd -old) nil))))
+      (define-key (or -map global-map) (kbd -new) (cdr map))
+      (define-key (or -map global-map) (kbd -old) nil))))
 
 (defun replace! (-value -keyword -transformer-fn)
   (if (and (not (null -value)) (listp -value))

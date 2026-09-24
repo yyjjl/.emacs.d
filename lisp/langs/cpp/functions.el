@@ -68,7 +68,7 @@
                      (throw 'done t)))))
           (ymacs-lsp//try-enable-eglot cpp
             ;; lsp-mode is enabled
-            (setq-local ymacs-lsp-format-buffer-function  #'ymacs-cpp/format-dwim)
+            (setq-local ymacs-lsp-format-buffer-function #'ymacs-cpp/format-dwim)
             (setq-local ymacs-lsp-find-other-file-function #'ymacs-lsp//clangd-find-other-file)
             (when-let* ((command-fn (ymacs-cpp//get-function command-fn)))
               (cl-pushnew command-fn ymacs-editor-compile-command-functions))

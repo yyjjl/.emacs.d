@@ -8,7 +8,7 @@
     (package-vc-install "https://github.com/manzaltu/claude-code-ide.el")))
 
 (define-key!
-  ([f7] . claude-code-ide))
+  ([f7] . ymacs-ai/agent-create-or-toggle))
 
 (after! claude-code-ide
   (defun yamcs-ai//setup-agent-buffer (&rest _)
@@ -27,7 +27,9 @@
 
   (setq claude-code-ide-terminal-backend 'ghostel)
 
-  (setq claude-code-ide-buffer-name-function #'(lambda (-directory) "*AI agent*"))
+  (setq claude-code-ide-buffer-name-function
+        #'(lambda (-directory)
+            (format "*AI agent[%s]*" (file-name-nondirectory (directory-file-name -directory)))))
   (setq claude-code-ide-debug nil)
   (setq claude-code-ide-use-side-window nil)
   (setq claude-code-ide-cli-path ymacs-claude-code-path)

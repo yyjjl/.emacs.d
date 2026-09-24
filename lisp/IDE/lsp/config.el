@@ -73,6 +73,11 @@
           ;; :documentHighlightProvider
           :documentLinkProvider
           :semanticTokensProvider))
+  ;; Keep dynamic file watching inside the project and let Eglot enforce a
+  ;; finite watcher budget.  External edits made by LLM tools must still reach
+  ;; the language server.
+  (setq eglot-watch-files-outside-project-root nil)
+  (setq eglot-max-file-watches 10000)
 
   (define-advice eglot--confirm-server-edits (:around (fn &rest args))
     (if current-prefix-arg
@@ -99,19 +104,22 @@
             (when (file-executable-p clangd-binary)
               (cons clangd-binary ymacs-clangd-args)))))
 
+  ;; Replace the old watcher-suppressing method with a transparent method.
+  ;; Keeping the same specialization also fixes already-running sessions when
+  ;; this file is re-evaluated.
   (cl-defmethod eglot-register-capability :around
-    (_server (method (eql workspace/didChangeWatchedFiles)) id &key watchers)
-    (message "[eglot] debug: %s %s %s" method id watchers)
-    (message "[eglot] debug: skip file-watcher")
-    ;; (message "[eglot] file-watcher: %s" (cl-call-next-method))
-    )
+    (server (method (eql workspace/didChangeWatchedFiles)) id
+            &key watchers &allow-other-keys)
+    (cl-call-next-method server method id :watchers watchers))
 
-  ;; 一些 lsp server 会返回 :metadata 字段, 必须要 &allow-other-keys
-  (cl-defmethod eglot-handle-request
-    (server (_method (eql workspace/applyEdit)) &key _label edit &allow-other-keys)
-    "Handle server request workspace/applyEdit."
-    (eglot--apply-workspace-edit server edit last-command)
-    `(:applied t))
+  ;; Some servers add non-standard fields such as :metadata.  Filter those
+  ;; fields in an around method and delegate the actual response, including
+  ;; applied/failureReason, to Eglot's implementation.
+  (cl-defmethod eglot-handle-request :around
+    (server (method (eql workspace/applyEdit)) &rest params)
+    (cl-call-next-method server method
+                         :label (plist-get params :label)
+                         :edit (plist-get params :edit)))
 
   ;; 把错误打印出来方便 debug
   ;; (cl-defmethod eglot-handle-request :around (_server _method &rest _params)

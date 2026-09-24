@@ -15,8 +15,6 @@
   (dolist (keymap (list python-mode-map python-ts-mode-map))
     (define-key! :map keymap
       ("C-c e" . ymacs-python/extract-expression)
-      ("C-c v" . ymacs-python/create-venv)
-      ("C-c V" . ymacs-python/create-venv-in-workon-home)
       (("C-c C-z" "C-c z") . ymacs-python/pop-to-shell)
       ("C-c b" . py-isort-buffer)
       ("C-c C-b" . ymacs-python/autopep8)

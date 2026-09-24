@@ -69,9 +69,7 @@
           (not (memq (plist-get sys :category)
                      '(coding-category-undecided coding-category-utf-8))))
         (jka-compr-get-compression-info buffer-file-name)
-        (< buffer-saved-size (* 256 1024)))
+        (< (buffer-size) (* 256 1024)))
     (call-interactively #'consult-line))
    (t
-    (let* ((file-name (or (file-remote-p buffer-file-name 'localname) buffer-file-name))
-           (cmd-builder (lambda (_) (consult--ripgrep-make-builder (list file-name)))))
-      (consult--grep "Ripgrep" cmd-builder nil nil)))))
+    (call-interactively #'isearch-forward))))

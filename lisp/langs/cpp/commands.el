@@ -17,18 +17,17 @@
   (message "%s" (shell-command-to-string (expand-etc! "scripts/C_include_paths"))))
 
 ;;;###autoload
-(defun ymacs-cpp/format-dwim (-whole-buffer)
+(defun ymacs-cpp/format-dwim (&optional -whole-buffer)
   (interactive "P")
   (cond
    (-whole-buffer
-    (funcall ymacs-lsp-format-buffer-function))
+    (eglot-format-buffer))
    ((region-active-p)
     (funcall ymacs-lsp-format-region-function (region-beginning) (region-end)))
    (t
-    (if-let* ((bounds (or (bounds-of-thing-at-point 'sexp)
-                          (bounds-of-thing-at-point 'defun))))
+    (if-let* ((bounds (bounds-of-thing-at-point 'defun)))
         (funcall ymacs-lsp-format-region-function (car bounds) (cdr bounds))
-      (message "No sexp or defun found, please use C-u prefix")))))
+      (message "No defun found, please use C-u prefix")))))
 
 ;;;###autoload
 (defun ymacs-cpp//select-clangd-by-version ()

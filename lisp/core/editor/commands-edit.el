@@ -181,7 +181,7 @@ Does not indent buffer, because it is used for a
           (if candidate
               (cons candidate regexp-history)
             regexp-history)))
-    (call-interactively 'consult-multi-occur)))
+    (call-interactively #'occur)))
 
 ;;;###autoload
 (defun ymacs-editor/font-faces-at-point ()

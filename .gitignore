@@ -49,3 +49,6 @@ package-lock.json
 /setup_cloudide.sh
 /start_working.sh
 *.save
+/audit/
+/task.md
+/etc/setup/install_mvn.sh

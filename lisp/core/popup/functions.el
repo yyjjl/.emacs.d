@@ -129,9 +129,10 @@ Displays -BUFFER according to -ALIST and -RULE."
     (cond
      ;; custom display-fn
      (display-fn
-      (let ((window (funcall display-fn -buffer -alist -rule)) _)
+      (let ((window (funcall display-fn -buffer -alist -rule)))
         (unless (window-live-p window)
-          (user-error "display-fn didn't return window: %S %S" window display-fn))))
+          (user-error "display-fn didn't return window: %S %S" window display-fn))
+        window))
      ;; ignore buffer
      ((plist-get -rule :ignore) 'fail)
      ;; reuse window

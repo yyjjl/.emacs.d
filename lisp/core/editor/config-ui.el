@@ -3,21 +3,35 @@
 (defvar ymacs-editor-view-code-modes
   '((t display-line-numbers-mode
        read-only-mode
-       line-number-mode
-       column-number-mode
-       size-indication-mode
-       highlight-indentation-mode)))
+       indent-bars-mode)))
+
+(defvar-local ymacs-editor-view-code--saved-mode-states 'unset)
+
+(defsubst ymacs-editor//view-code-mode-enabled-p (-mode)
+  (if (eq -mode 'read-only-mode)
+      buffer-read-only
+    (and (boundp -mode) (symbol-value -mode))))
 
 (define-minor-mode ymacs-editor-view-code-mode
   "View code"
   :group 'ymacs
   :init-value nil
-  (let ((switch (if ymacs-editor-view-code-mode 1 -1)))
-    (cl-loop for (condition . modes) in ymacs-editor-view-code-modes
-             when (or (eq condition t)
-                      (and (symbolp condition) (symbol-value condition)))
-             do (dolist (mode modes)
-                  (funcall mode switch)))))
+  (if ymacs-editor-view-code-mode
+      (when (eq ymacs-editor-view-code--saved-mode-states 'unset)
+        (setq ymacs-editor-view-code--saved-mode-states nil)
+        (cl-loop for (condition . modes) in ymacs-editor-view-code-modes
+                 when (or (eq condition t)
+                          (and (symbolp condition)
+                               (boundp condition)
+                               (symbol-value condition)))
+                 do (dolist (mode modes)
+                      (push (cons mode (ymacs-editor//view-code-mode-enabled-p mode))
+                            ymacs-editor-view-code--saved-mode-states)
+                      (funcall mode 1))))
+    (unless (eq ymacs-editor-view-code--saved-mode-states 'unset)
+      (dolist (state ymacs-editor-view-code--saved-mode-states)
+        (funcall (car state) (if (cdr state) 1 -1)))
+      (setq ymacs-editor-view-code--saved-mode-states 'unset))))
 
 (defun ymacs-editor//pulse (&rest _)
   (xref-pulse-momentarily))
