@@ -1,8 +1,13 @@
+EMACS ?= emacs
+EMACS_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+
+.PHONY: config tarball
+
 config:
-	emacs --batch -l ~/.emacs.d/etc/setup.el
+	$(EMACS) --batch -Q \
+	  --eval '(setq user-emacs-directory "$(EMACS_DIR)/")' \
+	  -l "$(EMACS_DIR)/etc/setup.el"
 
 tarball:
-	cd ~ && tar zcf /tmp/emacs.d.tgz --exclude-vcs-ignores .emacs.d
-
-dump:
-	emacs --batch -l ~/.emacs.d/etc/dump.el
+	tar -C "$(dir $(EMACS_DIR))" -zcf /tmp/emacs.d.tgz \
+	  --exclude-vcs-ignores "$(notdir $(EMACS_DIR))"

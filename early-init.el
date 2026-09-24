@@ -15,8 +15,6 @@
 (defconst sys/mac-cocoa-p (featurep 'cocoa)
   "Are we running with Cocoa on a Mac system?")
 
-(defvar ymacs-dump-load-path nil)
-
 (defvar ymacs-large-buffer-limit (* 3 1024 1024)
   "When buffer's size bigger than `ymacs-large-buffer-limit', it
 will close some features to speed up emacs performance")
@@ -44,6 +42,10 @@ will close some features to speed up emacs performance")
 (defconst ymacs-autoloads-file (expand-file-name "autoloads.el" ymacs-cache-directory)
   "Autoloads file")
 
+(defconst ymacs-autoloads-manifest-file
+  (expand-file-name "autoloads-manifest.el" ymacs-cache-directory)
+  "Manifest used to detect added, removed, or modified autoload sources.")
+
 ;; Add `ymacs-config-directory' to `load-path'
 (add-to-list 'load-path ymacs-config-directory)
 
@@ -69,4 +71,4 @@ will close some features to speed up emacs performance")
 (setq load-prefer-newer t)
 
 (unless (file-exists-p ymacs-cache-directory)
-  (make-directory ymacs-cache-directory))
+  (make-directory ymacs-cache-directory t))

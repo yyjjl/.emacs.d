@@ -40,7 +40,7 @@
         (setq-local python-shell-interpreter "python3")
         (setq-local python-shell-interpreter-args "-i"))
 
-      (eval-when-has-feature! lsp
+      (eval-when-has-feature! IDE/lsp
         (with-transient-hook! (hack-local-variables-hook :local t)
           (ymacs-lsp//set-python-lsp-server)
 

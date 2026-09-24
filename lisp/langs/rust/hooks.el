@@ -4,5 +4,5 @@
   (define-hook! ymacs-rust//setup (rust-mode-hook)
     (cargo-minor-mode 1)
 
-    (eval-when-has-feature! lsp
+    (eval-when-has-feature! IDE/lsp
       (ymacs-lsp//try-enable-eglot rust))))

@@ -3,6 +3,9 @@
 ;; (defvar-local ymacs-editor--inhibit-semantic nil)
 
 (after! semantic
+  (setq semanticdb-default-save-directory (expand-cache! "semanticdb/"))
+  (setq srecode-map-save-file (expand-cache! "srecode-map.el"))
+
   ;; (advice-add #'semantic-analyze-completion-at-point-function :override #'ignore)
   ;; (advice-add #'semantic-analyze-notc-completion-at-point-function :override #'ignore)
   ;; (advice-add #'semantic-analyze-nolongprefix-completion-at-point-function :override #'ignore)

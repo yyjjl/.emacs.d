@@ -20,13 +20,13 @@
     :lsp-enable-fn #'ymacs-cpp//get-dot-clangd-path
     :command-fn #'ymacs-cpp//get-compile-command-from-dot-clangd)))
 
-(eval-when-has-feature! term
+(eval-when-has-feature! core/term
   ;; set term default directory
   (add-to-list 'ymacs-term-directory-functions #'ymacs-cpp//build-dir)
   (dolist (mode '(c-mode c++-mode c-ts-mode c++-ts-mode))
     (add-to-list 'ymacs-term-repl-alist
                  `(,mode :program "root" :program-args ("-l" the-file)))))
 
-(eval-when-has-feature! debug
+(eval-when-has-feature! core/debug
   (dolist (mode '(c-mode c++-mode c-ts-mode c++-ts-mode))
     (add-to-list 'ymacs-debugger-alist `(,mode gdb :gud t))))

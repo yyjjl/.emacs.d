@@ -21,5 +21,5 @@
            (with-current-buffer buffer
              (print! "  > %s\n" (buffer-string))))))))
 
-(eval-when-has-feature! debug
+(eval-when-has-feature! core/debug
   (add-to-list 'ymacs-debugger-alist '(racket-mode racket-run-with-debugging)))

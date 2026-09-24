@@ -17,9 +17,9 @@
 
 (defvar-local ymacs-python-execution-root 'unset)
 
-(after-feature! editor
+(after-feature! core/editor
   (add-to-list 'ymacs-editor-project-invalidate-cache-empty-vars
                '(ymacs-python-execution-root . unset)))
 
-(eval-when-has-feature! debug
+(eval-when-has-feature! core/debug
   (add-to-list 'ymacs-debugger-alist '(python-mode pdb :gud t)))

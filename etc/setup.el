@@ -4,19 +4,13 @@
 
 (setq comp-deferred-compilation nil)
 
-(defvar ymacs-setup-directory
-  (expand-file-name "emacs" (file-name-directory load-file-name)))
-
 (define-advice message (:around (-fn -fmt &rest -args) indent)
   (unless (string-prefix-p "Checking " -fmt)
     (apply -fn (concat "=== " -fmt) -args)))
 
-(add-to-list 'load-path ymacs-setup-directory)
-
 (message "User emacs directory: %s" (abbreviate-file-name user-emacs-directory))
-(message "Setup files directory: %s" (abbreviate-file-name ymacs-setup-directory))
 
-(with-demoted-errors "%s"
+(progn
   (setq load-prefer-newer t)
   (setq ymacs--buffer-visible-p nil)
 
@@ -49,7 +43,7 @@
   (run-hooks 'after-init-hook)
 
   (setq kill-emacs-hook nil)
-  (setq ymacss-compile-config-in-progress t)
+  (setq ymacs-compile-config-in-progress t)
 
   (ymacs-default/compile-config)
   (ymacs-default/compile-elpa-packages)

@@ -1,26 +1,26 @@
 ;;; -*- lexical-binding: t; -*-
 
 (run-after-init! 100 (&optional _frame)
+  ;; Use a bounded runtime threshold without installing per-command GC hooks.
+  (setq gc-cons-threshold (* 64 1024 1024))
+  (setq gc-cons-percentage 0.1)
+
   ;; Start server
   (unless (or noninteractive (daemonp))
     (require 'server)
     (unless (server-running-p)
       (server-start)))
 
-  (gcmh-mode 1)
-
   ;; Autoloads
-  (unless (file-exists-p ymacs-autoloads-file)
-    (autoload 'ymacs-default/generate-autoloads (expand! "commands-package") nil t)
+  (autoload 'ymacs-default/autoloads-stale-p (expand! "commands-package"))
+  (autoload 'ymacs-default/generate-autoloads (expand! "commands-package") nil t)
+  (when (ymacs-default/autoloads-stale-p)
     (ymacs-default/generate-autoloads))
   (load ymacs-autoloads-file nil t)
 
   (setq file-name-handler-alist
         `((,ymacs-editor-external-file-regexp . ymacs-editor//external-file-handler)
           ,@file-name-handler-alist))
-
-  (add-function :after after-focus-change-function #'ymacs-modeline//focus-change)
-  (advice-add #'handle-switch-frame :after #'ymacs-modeline//focus-change)
 
   (add-hook 'find-file-hook #'ymacs-modeline//update-buffer-file-name)
   (add-hook 'after-save-hook #'ymacs-modeline//update-buffer-file-name)

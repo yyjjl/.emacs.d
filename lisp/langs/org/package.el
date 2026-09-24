@@ -8,6 +8,12 @@
   :type 'string
   :safe #'stringp)
 
+(setq org-export-async-init-file (expand-etc! "org-async-init.el"))
+(setq org-id-locations-file (expand-cache! "org-id-locations"))
+(setq org-preview-latex-image-directory (expand-cache! "ltximg/"))
+(setq org-publish-timestamp-directory (expand-cache! "org-timestamps/"))
+(setq org-templates-directory (expand-etc! "org-templates"))
+
 (require-packages!
  org-download
  (auctex :compile (latex tex preview reftex))

@@ -3,13 +3,16 @@
 ;; Add site-package's path to `load-path'
 (when (file-exists-p ymacs-site-lisp-directory)
   (dolist (dir (directory-files ymacs-site-lisp-directory))
-    (unless (string-match "^\\." dir)
-      (add-to-list 'load-path (expand-file-name dir ymacs-site-lisp-directory))))
+    (let ((path (expand-file-name dir ymacs-site-lisp-directory)))
+      (when (and (not (string-prefix-p "." dir))
+                 (file-directory-p path))
+        (add-to-list 'load-path path))))
   (add-to-list 'load-path ymacs-site-lisp-directory))
 
-;; Don't GC during startup to save time
-(setq gc-cons-threshold most-positive-fixnum)
-(setq gc-cons-percentage 0.5)
+;; Keep startup GC infrequent without leaving an unbounded threshold behind if
+;; initialization aborts before `after-init-hook'.
+(setq gc-cons-threshold (* 128 1024 1024))
+(setq gc-cons-percentage 0.2)
 
 (setq use-short-answers t)
 
@@ -183,7 +186,7 @@
   (when-let* ((name (format "%s-autoloads.el" (if (symbolp -name)
                                                   (symbol-name -name)
                                                 -name)))
-              (buffer (find-file-existing (expand-file-name name -pkg-dir)))
+              (buffer (get-file-buffer (expand-file-name name -pkg-dir)))
               (window (get-buffer-window buffer)))
     (quit-window 'kill window)))
 
@@ -202,7 +205,6 @@
 
 (require-packages!
  dash
- gcmh
  monokai-theme)
 
 (require 'dash)

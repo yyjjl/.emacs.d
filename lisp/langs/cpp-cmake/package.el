@@ -29,7 +29,7 @@
   :safe #'listp)
 
 (eval-when-compile
-  (unless (has-feature! 'cpp)
+  (unless (has-feature! 'langs/cpp)
     (user-error "cpp-cmake should be loaded after feature cpp")))
 
 (require-packages! cmake-mode)

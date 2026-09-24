@@ -7,7 +7,7 @@
  :ime haskell-unicode-input-method
  :package haskell-unicode)
 
-(eval-when-has-feature! debug
+(eval-when-has-feature! core/debug
   (add-to-list 'ymacs-debugger-alist '(haskell-mode haskell-debug)))
 
 (autoload 'haskell-debug "haskell-debug" nil t)

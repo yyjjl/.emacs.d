@@ -16,7 +16,7 @@
 (defvar ymacs-compile-config-in-progress nil
   "When loading ~/.emacs.d/etc/setup.el, it is set to t.")
 (defvar ymacs-loaded-features ()
-  "All loaded features.")
+  "Alist of loaded full feature names.")
 (defvar ymacs-required-packages ()
   "All required packages.")
 
@@ -128,11 +128,10 @@ Otherwise `(format \"ymacs-%s-path\" -NAME)' will be used."
 
   (let ((sym (if -full-name -name (intern (format "ymacs-%s-path" -name)))))
     `(defvar ,sym
-       (eval-when-compile
-         (let ((value (or ,@(seq-map (lambda (x) `(executable-find ,x)) -exe))))
-           (when (not (bound-and-true-p comp-native-compiling))
-             (print! "  > EXE %s = %s\n" (symbol-name ',sym) (or value "???")))
-           value))
+       (let ((value (or ,@(seq-map (lambda (x) `(executable-find ,x)) -exe))))
+         (when (not (bound-and-true-p comp-native-compiling))
+           (print! "  > EXE %s = %s\n" (symbol-name ',sym) (or value "???")))
+         value)
        ,-docstring)))
 
 (defmacro option! (-symbol -standard &rest -args)
@@ -153,6 +152,17 @@ Otherwise `(format \"ymacs-%s-path\" -NAME)' will be used."
          ,-standard
          ,doc
          ,@-args))))
+
+(defun ymacs-initialize-custom-saved-values (&optional -group)
+  "Record current values for unsaved Custom variables in -GROUP.
+The `saved-value' property uses the expression-list shape expected by
+Emacs Custom.  -GROUP defaults to `ymacs'."
+  (dolist (item (get (or -group 'ymacs) 'custom-group))
+    (when (memq 'custom-variable item)
+      (let ((symbol (car item)))
+        (unless (get symbol 'saved-value)
+          (put symbol 'saved-value
+               (list (custom-quote (default-value symbol)))))))))
 
 (defmacro interactive! (&rest -body)
   "A shortcut for inline interactive lambdas.
@@ -378,7 +388,7 @@ HTML file converted from org file, it returns t."
         (string-match-p (concat "^" temporary-file-directory) filename))))
 
 (defsubst is-buffer-too-large! ()
-  (> buffer-saved-size ymacs-large-buffer-limit))
+  (> (buffer-size) ymacs-large-buffer-limit))
 
 (defsubst is-buffer-suitable-for-coding! ()
   (not (or (is-buffer-temporary!)
@@ -437,20 +447,25 @@ HTML file converted from org file, it returns t."
 
 (defun make-process-sentinel! (-callback -error-callback -unwind &optional -sentinel)
   (lambda (-proc -msg)
-    (when -sentinel
-      (funcall -sentinel -proc -msg))
+    (let ((buffer (process-buffer -proc)))
+      (when -sentinel
+        (funcall -sentinel -proc -msg))
 
-    (when (memq (process-status -proc) '(exit signal))
-      (let ((exit-status (process-exit-status -proc)))
-        (with-current-buffer (process-buffer -proc)
+      (when (memq (process-status -proc) '(exit signal))
+        (let ((exit-status (process-exit-status -proc)))
           (unwind-protect
-              (if (= exit-status 0)
-                  (when -callback
-                    (funcall -callback -msg))
-                (when -error-callback
-                  (funcall -error-callback exit-status -msg)))
+              (when (buffer-live-p buffer)
+                (with-current-buffer buffer
+                  (if (= exit-status 0)
+                      (when -callback
+                        (funcall -callback -msg))
+                    (when -error-callback
+                      (funcall -error-callback exit-status -msg)))))
             (when -unwind
-              (funcall -unwind))))))))
+              (if (buffer-live-p buffer)
+                  (with-current-buffer buffer
+                    (funcall -unwind))
+                (funcall -unwind)))))))))
 
 (cl-defun run-compilation!
     (&key ((:name -name))
@@ -566,7 +581,7 @@ HTML file converted from org file, it returns t."
                   ,@(if rest
                         `((after! ,rest ,@-body))
                       -body))))
-    (if byte-compile-current-file
+    (if (bound-and-true-p byte-compile-current-file)
         (if (require file nil t)
             form
           `(with-no-warnings
@@ -579,8 +594,7 @@ HTML file converted from org file, it returns t."
     (unless (file-directory-p directory)
       (user-error "no feature %s" -name))
 
-    (if-let* ((feature-name (intern (file-name-base feature-name)))
-              (forms (append
+    (if-let* ((forms (append
                       (cl-loop
                        for name in '("package" "functions" "hooks" "config")
                        for path = (expand-file-name name directory)
@@ -591,10 +605,10 @@ HTML file converted from org file, it returns t."
                        for file in (directory-files directory :full "config-.*.el$")
                        for path = (file-name-sans-extension file)
                        collect `(load ,path nil t)))))
-        `(unless (has-feature! ',feature-name)
+        `(unless (has-feature! ',-name)
            ,@forms
-           (add-to-list 'ymacs-loaded-features (cons ',feature-name ',-name))
-           (mapc #'funcall (get ',feature-name 'after-feature-functions)))
+           (add-to-list 'ymacs-loaded-features (cons ',-name ',-name))
+           (mapc #'funcall (get ',-name 'after-feature-functions)))
       (user-error "empty feature %s" -name))))
 
 (defsubst has-feature! (-name)
@@ -608,19 +622,19 @@ HTML file converted from org file, it returns t."
 
 (defmacro eval-when-has-feature! (-name &rest -body)
   (declare (indent 1) (debug t))
-  (when (has-feature! -name)
-    `(progn ,@-body)))
+  `(when (has-feature! ',-name)
+     ,@-body))
 
 (defmacro eval-when! (-condition &rest -body)
   (declare (indent 1) (debug t))
-  (when (eval -condition)
-    `(progn ,@-body)))
+  `(when ,-condition
+     ,@-body))
 
 (defmacro eval-if-has-feature! (-name -if-body &rest -else-body)
   (declare (indent 2) (debug t))
-  (if (has-feature! -name)
-      -if-body
-    `(progn ,@-else-body)))
+  `(if (has-feature! ',-name)
+       ,-if-body
+     ,@-else-body))
 
 (defmacro after-feature! (-name &rest -body)
   (declare (indent 1) (debug t))
@@ -653,7 +667,10 @@ HTML file converted from org file, it returns t."
       (with-temp-lv-message! ("%s" prompt)
         (let ((key (read-key -prompt)))
           (cond
-           ((and (>= key ?0) (<= key ?9)) (nth (- key ?0) -collection))
+           ((and (characterp key)
+                 (>= key ?0)
+                 (< (- key ?0) (length -collection)))
+            (nth (- key ?0) -collection))
 
            ((equal key 13) 'return)
 
@@ -673,10 +690,7 @@ HTML file converted from org file, it returns t."
 
 (defmacro run-after-init! (-priority -args &rest -body)
   (declare (indent 2) (debug t))
-  `(let ((hook-var (if (daemonp)
-                       'after-make-frame-functions
-                     'after-init-hook)))
-     (cl-labels ((ymacs-after-init ,-args
-                   (remove-hook hook-var #'ymacs-after-init)
-                   ,@-body))
-       (add-hook hook-var #'ymacs-after-init ,-priority))))
+  `(cl-labels ((ymacs-after-init ,-args
+                 (remove-hook 'after-init-hook #'ymacs-after-init)
+                 ,@-body))
+     (add-hook 'after-init-hook #'ymacs-after-init ,-priority)))

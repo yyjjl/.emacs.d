@@ -2,8 +2,8 @@
 
 (ymacs-editor//set-font-lock-level :modes (java-mode) :level 2)
 
-(eval-when-has-feature! debug
+(eval-when-has-feature! core/debug
   (add-to-list 'ymacs-debugger-alist '(java-mode jdb :gud t)))
 
-(eval-when-has-feature! lsp
+(eval-when-has-feature! IDE/lsp
   (require-packages! eglot-java))

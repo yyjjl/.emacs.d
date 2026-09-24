@@ -50,7 +50,7 @@
   (c-toggle-auto-newline -1))
 
 (defun ymacs-cpp//cpp-setup ()
-  (eval-when-has-feature! lsp
+  (eval-when-has-feature! IDE/lsp
     (with-transient-hook! (hack-local-variables-hook :local t)
       (if (and (is-buffer-suitable-for-coding!)
                (catch 'done

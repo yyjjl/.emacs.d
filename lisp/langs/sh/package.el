@@ -1,6 +1,6 @@
 ;; -*- lexical-binding:t -*-
 
-(eval-when-has-feature! lsp
+(eval-when-has-feature! IDE/lsp
   (after! sh-script
     (when (and (memq 'sh-mode ymacs-native-treesit-modes)
                (boundp 'bash-ts-mode-map))

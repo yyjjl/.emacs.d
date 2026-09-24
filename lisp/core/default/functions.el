@@ -1,18 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 (eval-when-compile
-  (require 'face-remap)
   (require 'flymake))
-
-(defsubst ymacs-modeline//focus-change (&rest _)
-  (if (frame-focus-state)
-      (when ymacs-modeline-remap-face-cookie
-        (face-remap-remove-relative ymacs-modeline-remap-face-cookie))
-
-    (setq ymacs-modeline-remap-face-cookie
-          (face-remap-add-relative 'mode-line 'mode-line-inactive)))
-
-  (force-mode-line-update))
 
 (defmacro ymacs-modeline//def-segment (-name &rest -body)
   "Defines a modeline segment NAME with BODY and byte compiles it."
@@ -117,15 +106,13 @@ LHS and RHS are lists of symbols of modeline -segments defined with
 (defsubst ymacs-modeline//project-root ()
   "Get the path to the root of your project.
 Return nil if no project was found."
-  (unless (and ymacs-modeline--project-detected-p
-               (equal ymacs-modeline--project-detected-p buffer-file-name))
-
-    (let ((project (project-current)))
+  (let ((cache-key (list buffer-file-name default-directory)))
+    (unless (equal ymacs-modeline--project-detected-p cache-key)
+      (let ((project (project-current)))
       (setq ymacs-modeline--project-root (when project (project-root project)))
-      (setq ymacs-modeline--project-detected-p buffer-file-name)
-
-      (when ymacs-modeline--project-root
-        (setq ymacs-modeline--project-string (ymacs-modeline//project-identity project)))))
+        (setq ymacs-modeline--project-string
+              (when project (ymacs-modeline//project-identity project)))
+        (setq ymacs-modeline--project-detected-p cache-key))))
   ymacs-modeline--project-root)
 
 ;;
@@ -170,6 +157,7 @@ Return nil if no project was found."
 
 (defun ymacs-modeline//buffer-identification (-id)
   (if (and (stringp -id)
+           (> (length -id) 1)
            (= ?% (aref -id 0))
            (= ?b (aref -id (1- (length -id)))))
       (or ymacs-modeline--buffer-file-name
@@ -292,6 +280,7 @@ like the scratch buffer where knowing the current project directory is important
 
 (defsubst ymacs-modeline//update-vcs (&rest _)
   "Update vcs state in mode-line."
+  (setq ymacs-modeline--vcs-state nil)
   (when (and vc-mode buffer-file-name)
     (let* ((backend (vc-backend buffer-file-name))
            (state (vc-state buffer-file-name backend))

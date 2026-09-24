@@ -4,8 +4,9 @@
 (defvar ymacs-editor-project-invalidate-cache-empty-vars
   '((ymacs-modeline--buffer-file-name . nil)
     (ymacs-modeline--vcs-state . nil)
-    (ymacs-modeline--project-detected-p . nil)
-    (ymacs-modeline--project-root . nil)))
+    (ymacs-modeline--project-detected-p . unset)
+    (ymacs-modeline--project-root . nil)
+    (ymacs-modeline--project-string . nil)))
 
 (defmacro ymacs-editor//define-project-local (-method &rest -args)
   (let ((call-args (cl-remove-if (lambda (x) (string-prefix-p "&" (symbol-name x))) -args)))

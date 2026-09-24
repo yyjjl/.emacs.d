@@ -4,7 +4,7 @@
   (setq-local c-basic-offset 4)
   (setq-local java-ts-mode-indent-offset 4)
 
-  (eval-when-has-feature! lsp
+  (eval-when-has-feature! IDE/lsp
     (with-transient-hook! (hack-local-variables-hook :local t)
       (when (is-buffer-suitable-for-coding!)
         (ymacs-lsp//try-enable-eglot java)))))

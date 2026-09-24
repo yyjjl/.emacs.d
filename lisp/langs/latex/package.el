@@ -4,6 +4,8 @@
   :type 'boolean
   :safe #'booleanp)
 
+(setq TeX-auto-global (expand-cache! "auctex/"))
+
 (executable! latexmk)
 
 (require-packages! (auctex :compile (latex tex preview reftex)) )

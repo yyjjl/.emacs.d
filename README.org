@@ -1,9 +1,35 @@
-#+title: My emacs configuration files
+#+title: My Emacs configuration
 
 * How to use
   #+BEGIN_SRC sh
-  # copy this configuration to ~/.emacs.d
-  cd ~/.emacs.d/ || exit 1
-  make
+  git clone <repository> ~/.emacs.d
+  make -C ~/.emacs.d config
   #+END_SRC
-  Packages will be download automatically.
+
+  =make config= starts Emacs with =-Q=, installs missing packages, regenerates
+  command autoloads, and compiles the configuration.  Normal Emacs startup
+  loads =early-init.el= and =init.el=.  Run =make config= after package or
+  configuration changes; a normal startup can still install a missing package.
+
+* Review workflow
+
+  - =C-x g g=: open Magit status.
+  - =C-x g n= / =C-x g p=: move between Diff-hl hunks.
+  - =C-x g ==: inspect the current hunk.
+  - =C-x , e=: open the Ediff menu.
+  - =C-x , ,=: toggle read-only review mode with line numbers and indent bars.
+  - =C-s=: search the current buffer; large buffers use built-in isearch.
+
+* Editing and Eglot
+
+  Completion is manual: Corfu automatic completion is disabled.  Use =M-TAB=
+  (or =C-M-i=) for =complete-symbol=, and =M-/= for =hippie-expand=.
+
+  In an Eglot-managed buffer:
+
+  - =C-c C-SPC=: code actions.
+  - =C-c R=: rename symbol.
+  - =C-c C-b=: format using the language-specific formatter.  In C/C++, it
+    formats the active region or current defun; use =C-u C-c C-b= for the
+    entire buffer.
+  - =C-c f r=: reconnect the language server.

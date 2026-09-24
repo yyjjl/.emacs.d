@@ -1,5 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
 
-(eval-when-has-feature! lsp
+(eval-when-has-feature! IDE/lsp
   (define-hook! ymacs-go//setup (go-mode-hook go-ts-mode-hook)
     (ymacs-lsp//try-enable-eglot go)))
