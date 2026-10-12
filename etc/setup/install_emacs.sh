@@ -18,6 +18,6 @@ cd emacs
 ./configure \
    --prefix="${INSTALL_PREFIX}" \
    --with-json \
-   --with-all --with-x --with-modules --with-gconf
+   --with-all --with-x --with-modules --with-gconf \
    --with-native-compilation
 make -j && make install

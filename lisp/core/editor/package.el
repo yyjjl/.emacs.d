@@ -16,19 +16,16 @@
 (require-packages!
  (exec-path-from-shell :when sys/macp)
  corfu
- (corfu-terminal :when (< emacs-major-version 31))
  cape
  consult
  embark-consult
  vertico
  orderless
- marginalia
  yasnippet
  expand-region
  goto-chg
  multiple-cursors
  iedit
- wgrep
  ace-window
  persistent-scratch
  hl-todo

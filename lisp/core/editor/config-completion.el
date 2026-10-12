@@ -40,10 +40,6 @@
                       ,@-body)))
      (abort-recursive-edit)))
 
-(after! marginalia
-  (dolist (category '(command function variable file))
-    (setf (alist-get category marginalia-annotators) '(builtin))))
-
 (after! vertico
   (setq vertico-count 15)
   (setq vertico-cycle t)
@@ -56,8 +52,8 @@
   (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 
   (define-key! :map vertico-map
-    ([remap delete-backward-char] . ymacs-editor/minibuffer-delete-char)
-    ([remap backward-kill-word] . ymacs-editor/minibuffer-delete-word)
+    ([remap delete-backward-char] . vertico-directory-delete-char)
+    ([remap backward-kill-word] . vertico-directory-delete-word)
     ("M-9" . vertico-quick-jump)
     ("M-i" . vertico-insert)
     ("M-n" . ymacs-editor//next-history-element)
@@ -93,13 +89,15 @@
   ;;   (when (eq imenu-create-index-function #'semantic-create-imenu-index)
   ;;     (semantic-fetch-tags)))
 
-  (define-advice consult--async-process (:around (-fn -async -builder &rest -props) display-command)
+  (define-advice consult--async-process (:around (-fn -builder &rest -props) display-command)
     (let ((new-builder
            (lambda (action)
-             (let ((cmd (funcall -builder action)))
-               (ymacs-editor//display-help nil (string-join (car cmd) " "))
-               cmd))))
-      (apply -fn -async new-builder -props)))
+             (let* ((result (funcall -builder action))
+                    (command (if (stringp (car result)) result (car result))))
+               (when command
+                 (ymacs-editor//display-help nil command))
+               result))))
+      (apply -fn new-builder -props)))
 
   ;;  configure the register formatting. This improves the register
   ;; preview for `consult-register', `consult-register-load',
@@ -163,6 +161,3 @@
   ;; (setq corfu-on-exact-match nil)     ;; Configure handling of exact matches
   ;; (setq corfu-scroll-margin 5)        ;; Use scroll margin
   )
-
-(after! corfu-terminal
-  (setq corfu-terminal-enable-on-minibuffer nil))

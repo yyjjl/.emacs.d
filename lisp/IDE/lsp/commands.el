@@ -1,8 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
 
-(declare-function treemacs-current-visibility 'treemacs)
-(declare-function treemacs-select-window 'treemacs)
-
 ;;;###autoload
 (defun ymacs-lsp/change-python-server ()
   (interactive)
@@ -41,7 +38,6 @@ Only works with clangd."
   (let* ((default-directory (expand-etc! "scripts"))
          (valid-servers
           '("pylance" "pyright"
-            "lsp-booster"
             "bash-language-server"
             "typescript"
             "typescript-language-server"
@@ -52,19 +48,3 @@ Only works with clangd."
      :buffer-name (format "*lsp install server: %s*" server)
      :command (format "bash update_or_install_lsp %s" server)
      :callback (lambda (_msg) (message "Install %s success" server)))))
-
-;;;###autoload
-(defun ymacs-lsp/select-window-1 ()
-  (interactive)
-  (let ((path (window-parameter (selected-window) 'ace-window-path)))
-    (if (and (equal path "1")
-             (eq 'visible (treemacs-current-visibility)))
-        (treemacs-select-window)
-      (ymacs-editor/aw-select-window))))
-
-;;;###autoload
-(defun ymacs-lsp/select-window-2 ()
-  (interactive)
-  (or (ymacs-editor//aw-switch-window-internal "2")
-      (ymacs-editor//aw-switch-window-internal "1")
-      (message "No specified window: 1 or 2")))

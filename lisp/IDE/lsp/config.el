@@ -19,25 +19,6 @@
     (define-key! :map project-prefix-map
       ("a" . ymacs-lsp/find-other-file))))
 
-(after! treemacs
-  (define-key!
-    ("M-1" . ymacs-lsp/select-window-1)
-    ("M-2" . ymacs-lsp/select-window-2)
-    ("M-`" . treemacs))
-
-  (setq treemacs-collapse-dirs (if treemacs-python-executable 3 0)
-        treemacs-missing-project-action 'remove
-        treemacs-follow-after-init t
-        treemacs-no-png-images t)
-
-  (ymacs-modeline//def-modeline treemacs (window-number major-mode))
-
-  (setq treemacs-user-mode-line-format '(:eval (ymacs-modeline//format--treemacs)))
-
-  ;; (treemacs-follow-mode 1)
-  (treemacs-tag-follow-mode 1)
-  (treemacs-filewatch-mode -1))
-
 
 (after! eglot
   (define-key! :map eglot-mode-map

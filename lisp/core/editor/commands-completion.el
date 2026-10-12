@@ -15,45 +15,6 @@
     (next-history-element -arg)))
 
 
-(defsubst ymacs-editor//minibuffer-completing-file-p ()
-  "Return non-nil when completing file names."
-  (eq 'file
-      (completion-metadata-get
-       (completion-metadata
-        (buffer-substring (minibuffer-prompt-end) (max (minibuffer-prompt-end) (point)))
-        minibuffer-completion-table
-        minibuffer-completion-predicate)
-       'category)))
-
-(defun ymacs-editor//minibuffer-up-directory ()
-  (when (and (ymacs-editor//minibuffer-completing-file-p)
-             (eolp)
-             (eq (char-before) ?/))
-    (save-excursion
-      (goto-char (1- (point)))
-      (when (search-backward "/" (minibuffer-prompt-end) t)
-        (delete-region (1+ (point)) (point-max))
-        t))
-    t))
-
-;;;###autoload
-(defun ymacs-editor/minibuffer-delete-char ()
-  (interactive)
-  (unless (minibuffer-window-active-p (selected-window))
-    (user-error "Not in minibuffer"))
-
-  (unless (ymacs-editor//minibuffer-up-directory)
-    (call-interactively #'delete-backward-char)))
-
-;;;###autoload
-(defun ymacs-editor/minibuffer-delete-word ()
-  (interactive)
-  (unless (minibuffer-window-active-p (selected-window))
-    (user-error "Not in minibuffer"))
-
-  (unless (ymacs-editor//minibuffer-up-directory)
-    (call-interactively #'backward-kill-word)))
-
 ;;;###autoload
 (defun ymacs-editor/consult-ripgrep-or-line (-arg)
   (interactive "p")

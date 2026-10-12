@@ -292,13 +292,9 @@
 
 (defun ymacs-x//enable ()
   (define-key universal-argument-map "u" #'universal-argument-more)
-
-  (advice-add 'wgrep-change-to-wgrep-mode :after #'ymacs-x//update-dynamic-keymap)
   (ymacs-x-global-mode 1))
 
 (defun ymacs-x//disable ()
   (define-key universal-argument-map "u" nil)
-
-  (advice-remove 'wgrep-change-to-wgrep-mode #'ymacs-x//update-dynamic-keymap)
   (ymacs-x-global-mode -1))
 

@@ -7,8 +7,6 @@
           (const :tag "Disable LSP in current file" :disabled))
   :safe #'(lambda (x) (memq x '(:enabled :disabled))))
 
-(executable! lsp-booster :exe (expand-cache! "lsp/emacs-lsp-booster/emacs-lsp-booster"))
-
 (option! python-lsp-server 'pyright
   "Python LSP server type"
   :type 'symbol)
@@ -23,15 +21,6 @@
   :safe (lambda (x) (and (listp x) (cl-every #'stringp x))))
 
 (defvar ymacs-python-lsp-servers '(pyls pyright pylance))
-
-(require-packages!
- eglot ; 需要新版本 > 1.17
- consult-eglot)
-
-(when ymacs-lsp-booster-path
-  (when (and (not (package-installed-p 'eglot-booster))
-             (fboundp #'package-vc-install))
-    (package-vc-install "https://github.com/jdtsmith/eglot-booster")))
 
 (defvar-local ymacs-lsp-format-buffer-function #'eglot-format-buffer)
 (defvar-local ymacs-lsp-format-region-function #'eglot-format)
