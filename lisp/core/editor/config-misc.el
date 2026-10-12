@@ -218,15 +218,21 @@
   (setq so-long-threshold 1000)
   ;; make sure that save-place not operate in large/long files
   (add-to-list 'so-long-variable-overrides '(save-place-alist . nil))
+  (add-to-list 'so-long-variable-overrides '(show-trailing-whitespace . nil))
+  (add-to-list 'so-long-variable-overrides '(indicate-empty-lines . nil))
   ;; Text files could possibly be too long too
   (add-to-list 'so-long-target-modes 'text-mode)
-  ;; But disable everything else that may be unnecessary/expensive for large
-  ;; or wide buffers.
-  (setq so-long-target-modes
-        (append so-long-target-modes
-                '(flyspell-mode
+  ;; Disable buffer-local modes that are unnecessary or expensive for large
+  ;; or wide buffers.  `so-long-target-modes' only accepts major modes.
+  (dolist (mode '(auto-composition-mode
+                  corfu-mode
+                  display-fill-column-indicator-mode
                   eldoc-mode
-                  auto-composition-mode))))
+                  hl-todo-mode
+                  hs-minor-mode
+                  page-break-lines-mode
+                  yas-minor-mode))
+    (add-to-list 'so-long-minor-modes mode)))
 
 (after! prolog
   (setq prolog-system 'swi))

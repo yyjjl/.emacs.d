@@ -108,24 +108,12 @@
   (when tab-bar-mode
     (setq ymacs-default--tab-bar-update-timer (run-with-idle-timer 0.5 t #'ymacs-default//update-tab-bar))))
 
-(after! term/tty-colors
-  ;; cache for performance
-  (define-advice tty-color-desc (:around (-fn -color &optional -frame) cache)
-    (let ((cache-table (or (frame-parameter -frame 'tty-color-cache)
-                           (let ((table (make-hash-table :test #'equal)))
-                             (set-frame-parameter -frame 'tty-color-cache table)
-                             table))))
-      (if-let* ((cache (gethash (cons -color -frame) cache-table)))
-          (and (not (eq cache 'null)) cache)
-        (let ((ret (funcall -fn -color -frame)))
-          (puthash (cons -color -frame) (or ret 'null) cache-table)
-          ret)))))
 
 (run-after-init! 0 (&optional _frame)
   (require 'lv)
 
   ;; Purges buffers which haven't been displayed in 3 days
-  (midnight-mode 1)
+  ;; (midnight-mode 1)
   ;; (display-time-mode 1)
   (transient-mark-mode 1)
   (delete-selection-mode 1)
