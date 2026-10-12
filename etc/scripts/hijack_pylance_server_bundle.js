@@ -41,6 +41,24 @@ function hijack(version) {
 
     const workingDir = path.join(outputDir, version, 'extension/dist');
     const originalCode = fs.readFileSync(path.join(workingDir, 'server.bundle.js'), { encoding: 'utf-8' });
+
+    // ---- Newer pylance bundles are a single webpack expression ----
+    // The license check is `throw Error(`<license-var>\n\n`)`; neutralize it
+    // instead of relying on the espree-based translation below (which expects
+    // two top-level FunctionDeclarations from older bundles).
+    const licenseDecl = originalCode.match(/(?:let|const|var)\s+(n\d+)="(You may install[^"]*)"/);
+    if (licenseDecl) {
+        const licenseVar = licenseDecl[1];
+        const backtick = '`';
+        const licenseThrow = new RegExp(
+            'throw\\s+Error\\(' + backtick + '\\$\\{' + licenseVar + '\\}\\s*' + backtick + '\\)', 'g');
+        const matches = originalCode.match(licenseThrow);
+        if (matches && matches.length > 0) {
+            console.log(`Hijack!! replace ${matches.length} license throw(s) with ";"`);
+            return originalCode.replace(licenseThrow, ';');
+        }
+    }
+
     const result = espree.parse(originalCode, { ecmaVersion: 'latest', range: true });
 
     assert(result.type == 'Program');

@@ -11,7 +11,7 @@
   ([f7] . ymacs-ai/agent-create-or-toggle))
 
 (after! claude-code-ide
-  (defun yamcs-ai//setup-agent-buffer (&rest _)
+  (defun ymacs-ai//setup-agent-buffer (&rest _)
     (when (and (eq major-mode 'ghostel-mode)
                (string-prefix-p "*AI agent" (buffer-name)))
       (local-set-key (kbd "C-'") #'(lambda () (interactive) (ghostel-send-C-g)))
@@ -23,7 +23,7 @@
   ;; agent buffer for every backend, so it is the reliable hook point now that
   ;; ghostel (not vterm) has no dedicated `configure' step.
   (advice-add #'claude-code-ide--setup-terminal-keybindings
-              :after #'yamcs-ai//setup-agent-buffer)
+              :after #'ymacs-ai//setup-agent-buffer)
 
   (setq claude-code-ide-terminal-backend 'ghostel)
 
@@ -34,20 +34,27 @@
   (setq claude-code-ide-use-side-window nil)
   (setq claude-code-ide-cli-path ymacs-claude-code-path)
 
-  (defun yamcs-ai//cli-is-traecli-p ()
+  (defun ymacs-ai//cli-is-traecli-p ()
     (let ((name (file-name-nondirectory
                  (or claude-code-ide-cli-path ""))))
       (string-match-p "\\(traecli\\|traex\\)" name)))
 
-  (when (yamcs-ai//cli-is-traecli-p)
+  (defun ymacs-ai//cli-is-codex-p ()
+    (let ((name (file-name-nondirectory
+                 (or claude-code-ide-cli-path ""))))
+      (string-match-p "\\(codex\\)" name)))
+
+  (when (ymacs-ai//cli-is-traecli-p)
     (require 'claude-code-ide-emacs-tools nil t)
     (when (fboundp 'claude-code-ide-emacs-tools-setup)
       (claude-code-ide-emacs-tools-setup))
     (setq claude-code-ide-enable-mcp-server t))
 
-  (defun yamcs-ai//build-traecli-command (session-id)
-    "Build the traecli command line, wiring in Emacs MCP server URL.
-Bypasses the Claude-specific flag generation entirely."
+  (defun ymacs-ai//build-mcp-command (session-id)
+    "Build the traecli/codex command line, wiring in Emacs MCP server URL.
+Both CLIs take `-c key=value' configuration overrides instead of the
+Claude-specific flags that `claude-code-ide--build-claude-command'
+would emit (e.g. `--append-system-prompt')."
     (let* ((port (and (fboundp 'claude-code-ide-mcp-server-ensure-server)
                       (claude-code-ide-mcp-server-ensure-server)))
            (cmd (shell-quote-argument claude-code-ide-cli-path))
@@ -65,7 +72,11 @@ Bypasses the Claude-specific flag generation entirely."
       cmd))
 
   (define-advice claude-code-ide--build-claude-command
-      (:around (orig &optional continue resume session-id) yamcs-ai//traecli)
-    (if (yamcs-ai//cli-is-traecli-p)
-        (yamcs-ai//build-traecli-command (or session-id "emacs"))
-      (funcall orig continue resume session-id))))
+      (:around (orig &optional continue resume session-id) ymacs-ai//codex)
+    (cond
+     ((ymacs-ai//cli-is-codex-p)
+      (ymacs-ai//build-mcp-command (or session-id "emacs")))
+     ((ymacs-ai//cli-is-traecli-p)
+      (ymacs-ai//build-mcp-command (or session-id "emacs")))
+     (t
+      (funcall orig continue resume session-id)))))

@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: psc
+# key: psc
+# --
+- title: $1
+  - amount: $2
+  - unit: ${3:$$(yas-choose-value '("CNY" "JPY" "USD"))}
+  - date: $4
